@@ -1,1 +1,1 @@
-# stacked-core
+# stacked

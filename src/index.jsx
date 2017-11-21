@@ -7,11 +7,17 @@ class App extends React.Component {
 	}
 
 	render() {
+		const Layout = require('../../stacked-example/lib/patterns/atoms/layout/index.js').default;
 		const Button = require('../../stacked-example/lib/patterns/atoms/button/index.js').default;
 		return (
 			<div>
 				hello world
-				{Button({disabled: true, children: 'asdf'})}
+				{Layout({
+					children: [
+						Button({disabled: true, children: 'asdf'}),
+						'Hello World!'
+					]
+				})}
 			</div>
 		);
 	}

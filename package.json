@@ -21,9 +21,9 @@
 	},
 	"dependencies": {
 		"cli": "^1.0.1",
-		"dts-parser": "^0.1.0",
 		"optimist": "^0.6.1",
 		"react": "^15.6.1",
+		"readts": "^0.1.0",
 		"ts-node": "^3.3.0"
 	},
 	"homepage": "https://github.com/stackedapp/stacked-core#readme"

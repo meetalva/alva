@@ -19,6 +19,7 @@
 		"typescript": "^2.6.1"
 	},
 	"dependencies": {
+		"cli": "^1.0.1",
 		"react": "^15.6.1",
 		"ts-node": "^3.3.0"
 	},

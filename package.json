@@ -5,8 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "webpack",
-		"start": "ts-node ./index.ts",
-		"start-server": "node ./index.js"
+		"start-server": "node ./index.js",
+		"type-test": "ts-node ./pattern-type.ts"
 	},
 	"repository": {
 		"type": "git",

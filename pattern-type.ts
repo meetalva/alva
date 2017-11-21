@@ -5,34 +5,46 @@ import { readFileSync } from "fs";
 
 export class PatternType {
 	public property: Property[];
+	public name: string;
 
 	public static parse(path: string): PatternType {
 		let type: PatternType = new PatternType();
 
-		let declaraction = ts.createSourceFile(path,
-			readFileSync(path).toString(), ts.ScriptTarget.ES2016);
+		let sourceFile: ts.SourceFile = ts.createSourceFile(path,
+			readFileSync(path).toString(), ts.ScriptTarget.ES2016, true);
 
-		declaraction.getChildren().forEach((node) => {
-			this.output(node, ' ');
+		sourceFile.forEachChild((node) => {
+			if (ts.isExportAssignment(node)) {
+				let assignment: ts.ExportAssignment = node;
+				type.name = assignment.expression.getText();
+			}
+		});
+
+		let declaration: ts.InterfaceDeclaration;
+		sourceFile.forEachChild((node) => {
+			if (ts.isInterfaceDeclaration(node)) {
+				let candidate: ts.InterfaceDeclaration = node;
+				if (candidate.name.escapedText === type.name + 'Props') {
+					declaration = candidate;
+				}
+			}
+		});
+
+		declaration.forEachChild((node) => {
+			console.log(kinds[node.kind]);
+			if (ts.isPropertySignature(node)) {
+				let signature: ts.PropertySignature = node;
+				let property: Property = new Property();
+				property.name = signature.name.getText();
+				property.required = signature.questionToken === undefined;
+				console.log("Name: " + property.name);
+				console.log("Required: " + property.required);
+				console.log("Type: " + signature.type.getFullText());
+			}
+			console.log('');
 		});
 
 		return type;
-	}
-
-	public static output(node: ts.Node, indentation: string) {
-		let anonNode: any = node;
-		if (anonNode.name && anonNode.name.escapedText) {
-			console.log(indentation + '[' + kinds[anonNode.kind] + '] ' + anonNode.name.escapedText);
-		} else {
-			console.log(indentation + '[' + kinds[anonNode.kind] + ']');
-		}
-		let childCount = node.getChildCount();
-		for (let childNo = 0; childNo < childCount; childNo++) {
-			try {
-				this.output(node.getChildAt(childNo), indentation + '  ');
-			} catch (error) {
-			}
-		}
 	}
 }
 
@@ -52,12 +64,11 @@ export class Option {
 	public displayName: string;
 }
 
-let kinds: {[kind: number]: string} = {};
+let kinds: { [kind: number]: string } = {};
 Object.keys(ts.SyntaxKind).map((value: string, index: number, array: string[]) => {
 	kinds[ts.SyntaxKind[value]] = value;
 });
 
 let [styleGuidePath, projectName, pageName] = optimist.argv._;
 let declarationPath = path.join(styleGuidePath, 'lib', 'patterns', 'atoms', 'button', 'index.d.ts');
-console.log(declarationPath);
-PatternType.parse(declarationPath);
+let patternType: PatternType = PatternType.parse(declarationPath);

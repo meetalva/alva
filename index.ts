@@ -2,13 +2,16 @@ import * as path from 'path';
 import * as optimist from 'optimist';
 import * as readts from 'readts';
 import * as ts from 'typescript';
+import {readFileSync} from "fs";
 
-let [npmCommand, styleGuidePath, projectName, pageName] = optimist.argv._;
+let [styleGuidePath, projectName, pageName] = optimist.argv._;
 let pagePath = path.join(styleGuidePath, 'stacked', projectName, pageName + '.json');
 
 let declarationPath = path.join(styleGuidePath, 'lib', 'patterns', 'atoms', 'button', 'index.d.ts');
 
 console.log("Path: " + declarationPath);
+
+console.log(JSON.stringify(ts.createSourceFile(declarationPath, readFileSync(declarationPath).toString(), ts.ScriptTarget.ES2016)));
 
 console.log("Pattern: ");
 let tsConfig: ts.ParsedCommandLine = {options:{}, fileNames: [declarationPath], errors: []};

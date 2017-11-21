@@ -16,10 +16,13 @@
 		"url": "https://github.com/stackedapp/stacked-core/issues"
 	},
 	"devDependencies": {
+		"@types/node": "^8.0.53",
 		"typescript": "^2.6.1"
 	},
 	"dependencies": {
 		"cli": "^1.0.1",
+		"dts-parser": "^0.1.0",
+		"optimist": "^0.6.1",
 		"react": "^15.6.1",
 		"ts-node": "^3.3.0"
 	},

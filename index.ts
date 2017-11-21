@@ -11,7 +11,13 @@ let declarationPath = path.join(styleGuidePath, 'lib', 'patterns', 'atoms', 'but
 
 console.log("Path: " + declarationPath);
 
-console.log(JSON.stringify(ts.createSourceFile(declarationPath, readFileSync(declarationPath).toString(), ts.ScriptTarget.ES2016)));
+console.log(
+	ts.createSourceFile(
+		declarationPath, readFileSync(declarationPath).toString(), ts.ScriptTarget.ES2016
+	).forEachChild((child) => {
+		console.log('child', child);
+	})
+);
 
 console.log("Pattern: ");
 let tsConfig: ts.ParsedCommandLine = {options:{}, fileNames: [declarationPath], errors: []};

@@ -11,7 +11,7 @@ class App extends React.Component {
 		return (
 			<div>
 				hello world
-				{Button({disabled: true})}
+				{Button({disabled: true, children: 'asdf'})}
 			</div>
 		);
 	}

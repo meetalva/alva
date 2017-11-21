@@ -1,19 +1,26 @@
 {
-  "name": "stacked-core",
-  "version": "0.1.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/stackedapp/stacked-core.git"
-  },
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/stackedapp/stacked-core/issues"
-  },
-  "homepage": "https://github.com/stackedapp/stacked-core#readme"
+	"name": "stacked-core",
+	"version": "0.1.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"start": "ts-node ./index.ts"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/stackedapp/stacked-core.git"
+	},
+	"author": "",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/stackedapp/stacked-core/issues"
+	},
+	"devDependencies": {
+		"typescript": "^2.6.1"
+	},
+	"dependencies": {
+		"react": "^15.6.1",
+		"ts-node": "^3.3.0"
+	},
+	"homepage": "https://github.com/stackedapp/stacked-core#readme"
 }

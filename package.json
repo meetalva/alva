@@ -4,7 +4,9 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"start": "ts-node ./index.ts"
+		"build": "webpack",
+		"start": "ts-node ./index.ts",
+		"start-server": "node ./index.js"
 	},
 	"repository": {
 		"type": "git",
@@ -17,13 +19,22 @@
 	},
 	"devDependencies": {
 		"@types/node": "^8.0.53",
-		"typescript": "^2.6.1"
+		"babel-core": "^6.26.0",
+		"babel-loader": "^7.1.2",
+		"babel-preset-es2015": "^6.24.1",
+		"babel-preset-react": "^6.24.1",
+		"typescript": "^2.6.1",
+		"webpack": "^3.8.1"
 	},
 	"dependencies": {
 		"cli": "^1.0.1",
+		"express": "^4.14.0",
 		"optimist": "^0.6.1",
-		"react": "^15.6.1",
+		"react": "^16.0.0",
+		"react-dom": "^16.0.0",
+		"react-router": "^4.2.0",
 		"readts": "^0.1.0",
+		"systemjs": "^0.20.19",
 		"ts-node": "^3.3.0"
 	},
 	"homepage": "https://github.com/stackedapp/stacked-core#readme"

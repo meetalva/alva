@@ -18,9 +18,6 @@ var config = {
                 loader: 'babel-loader'
             }
         ]
-	 },
-	 node: {
-		 fs: 'empty'
 	 }
 };
 

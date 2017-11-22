@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "webpack",
-		"start-server": "node ./index.js",
+		"start": "./node_modules/.bin/electron .",
 		"type-test": "ts-node ./pattern-type.ts"
 	},
 	"repository": {
@@ -28,7 +28,7 @@
 	},
 	"dependencies": {
 		"cli": "^1.0.1",
-		"express": "^4.14.0",
+		"electron": "^1.7.9",
 		"optimist": "^0.6.1",
 		"react": "^16.0.0",
 		"react-dom": "^16.0.0",

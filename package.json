@@ -34,6 +34,7 @@
 		"react-dom": "^16.0.0",
 		"react-router": "^4.2.0",
 		"readts": "^0.1.0",
+		"styled-components": "^2.1.1",
 		"systemjs": "^0.20.19",
 		"ts-node": "^3.3.0"
 	},

@@ -17,6 +17,11 @@ class App extends React.Component {
 		this.patternFactories = {};
 	}
 
+	render() {
+		const pageModel = require(this.pagePath);
+		return this.createComponent(pageModel.root);
+	}
+
 	/**
 	 * Converts a JSON-serializable declaration of a pattern, primitive, or collection
 	 * into a React component (or primitive), deep-traversing through properties and children.
@@ -55,7 +60,6 @@ class App extends React.Component {
 		componentProps.children = this.createComponent(model.children);
 		
 		// Finally, build the component
-
 		const patternSrc = path.join(props.styleGuidePath, 'lib', 'patterns', model.patternSrc, 'index.js');
 		let patternFactory = this.patternFactories[patternSrc];
 		if (patternFactory == null) {
@@ -64,11 +68,6 @@ class App extends React.Component {
 		}
 
 		return patternFactory(componentProps);
-	}
-
-	render() {
-		const pageModel = require(this.pagePath);
-		return this.createComponent(pageModel.root);
 	}
 }
 

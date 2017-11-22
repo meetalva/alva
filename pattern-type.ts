@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as optimist from 'optimist';
 import * as ts from 'typescript';
-import { readFileSync } from "fs";
+import * as fs from 'fs';
 
 export class PatternType {
 	public property: Property[];
@@ -11,7 +11,7 @@ export class PatternType {
 		let type: PatternType = new PatternType();
 
 		let sourceFile: ts.SourceFile = ts.createSourceFile(path,
-			readFileSync(path).toString(), ts.ScriptTarget.ES2016, true);
+			fs.readFileSync(path).toString(), ts.ScriptTarget.ES2016, true);
 
 		sourceFile.forEachChild((node) => {
 			if (ts.isExportAssignment(node)) {

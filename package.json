@@ -5,7 +5,6 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "webpack",
-		"start": "./node_modules/.bin/electron .",
 		"type-test": "ts-node ./pattern-type.ts"
 	},
 	"repository": {

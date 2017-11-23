@@ -5,7 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "webpack",
-		"type-test": "ts-node ./pattern-type.ts"
+		"type-test": "ts-node ./pattern-type.ts",
+		"stacked": "./node_modules/.bin/electron ."
 	},
 	"repository": {
 		"type": "git",
@@ -33,7 +34,7 @@
 		"react-dom": "^16.0.0",
 		"react-router": "^4.2.0",
 		"readts": "^0.1.0",
-		"styled-components": "^2.1.1",
+		"stacked-example": "file:../stacked-example",
 		"systemjs": "^0.20.19",
 		"ts-node": "^3.3.0"
 	},

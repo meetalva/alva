@@ -60,12 +60,16 @@ class App extends React.Component {
 
 		// Finally, build the component
 		const patternFolder = path.join(this.styleGuidePath, 'lib', 'patterns', model.patternSrc);
+		const patternSrc = path.join(patternFolder, 'index.js');
 		let patternFactory = this.patternFactories[patternFolder];
 		if (patternFactory == null) {
 			const previousDir = process.cwd();
 			process.chdir(patternFolder);
-			console.log("Reading '" + patternFolder + "'");
-			patternFactory = eval(fs.readFileSync('index.js', 'utf8')).default;
+
+			console.log("Requiring '" + patternSrc + "'...");
+			patternFactory = require(patternSrc).default;
+			console.log("Requiring '" + patternSrc + "' done");
+
 			process.chdir(previousDir);
 
 			this.patternFactories[patternFolder] = patternFactory;

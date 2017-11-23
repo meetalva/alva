@@ -63,15 +63,7 @@ class App extends React.Component {
 		const patternSrc = path.join(patternFolder, 'index.js');
 		let patternFactory = this.patternFactories[patternFolder];
 		if (patternFactory == null) {
-			const previousDir = process.cwd();
-			process.chdir(patternFolder);
-
-			console.log("Requiring '" + patternSrc + "'...");
 			patternFactory = require(patternSrc).default;
-			console.log("Requiring '" + patternSrc + "' done");
-
-			process.chdir(previousDir);
-
 			this.patternFactories[patternFolder] = patternFactory;
 		}
 
@@ -79,4 +71,4 @@ class App extends React.Component {
 	}
 }
 
-ReactDom.render(<App />, document.getElementById('app'));
+ReactDom.render(React.createElement(App), document.getElementById('app'));

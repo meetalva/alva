@@ -31,11 +31,11 @@ class App extends React.Component {
 	 * @returns A React component in case of a pattern declaration, the primitive in case of a primitive,
 	 * or an array or object with values converted in the same manner, if an array resp. object is provided.
 	 */
-	createComponent(model) {
+	createComponent(model, key) {
 		if (Array.isArray(model)) {
 			// Handle arrays by returning a new array with recursively processed elements.
-			return model.map((element) => {
-				return this.createComponent(element);
+			return model.map((element, index) => {
+				return this.createComponent(element, index);
 			});
 		}
 
@@ -44,31 +44,39 @@ class App extends React.Component {
 			return model;
 		}
 
-		if (model.patternSrc == null) {
+		if (model['_type'] == 'pattern') {
+			// The model is a pattern declaration, create a React pattern component
+
+			// First, process the properties and children of the declaration recursively
+			const componentProps = this.createComponent(model.properties) || {};
+			componentProps.children = this.createComponent(model.children);
+			if (key != null) {
+				componentProps.key = key;
+			}
+
+			// Then, load the pattern factory
+			const patternFolder = path.join(this.styleGuidePath, 'lib', 'patterns', model.patternSrc);
+			const patternSrc = path.join(patternFolder, 'index.js');
+			let patternFactory = this.patternFactories[patternFolder];
+			if (patternFactory == null) {
+				console.log("Loading pattern '" + patternSrc + "'...");
+				patternFactory = require(patternSrc).default;
+				this.patternFactories[patternFolder] = patternFactory;
+			}
+
+			// Finally, build the component
+			return patternFactory(componentProps);
+		} else {
 			// The model is an object, but not a pattern declaration.
 			// Create a new object with recursively processed values.
-			return Object.entries(model).map(([key, value]) => {
-				return [key, this.createComponent(value)];
+			var result = {};
+			Object.keys(model).forEach((key) => {
+				result[key] = this.createComponent(model[key]);
 			});
+			return result;
 		}
 
-		// The model is a pattern declaration, create a React pattern component
-
-		// First, process the properties and children of the declaration recursively
-		const componentProps = this.createComponent(model.properties);
-		componentProps.children = this.createComponent(model.children);
-
-		// Finally, build the component
-		const patternFolder = path.join(this.styleGuidePath, 'lib', 'patterns', model.patternSrc);
-		const patternSrc = path.join(patternFolder, 'index.js');
-		let patternFactory = this.patternFactories[patternFolder];
-		if (patternFactory == null) {
-			patternFactory = require(patternSrc).default;
-			this.patternFactories[patternFolder] = patternFactory;
-		}
-
-		return patternFactory(componentProps);
 	}
 }
 
-ReactDom.render(React.createElement(App), document.getElementById('app'));
+ReactDom.render(<App />, document.getElementById('app'));

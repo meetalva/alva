@@ -21,15 +21,28 @@ const ListItem = styled.li`
 	}
 `;
 
+const Label = styled.span`
+	color: #00F;
+	padding-right 4px;
+`;
+
+const Value = styled.span`
+	color: #000;
+`;
+
 const createList = content => (
 	<List>
 		{
-			content.map(({label, children, active}, i) => {
+			content.map(({label, value, children, active}, i) => {
+				const labelComponent = label ? <Label>{label}:</Label> : null;
 				const nextLevel = children ? createList(children) : null;
-				return (<ListItem key={i} className={active ? 'active' : ''}>
-					{label}
-					{nextLevel}
-				</ListItem>)
+				return (
+					<ListItem key={i} className={active ? 'active' : ''}>
+						{labelComponent}
+						<Value>{value}</Value>
+						{nextLevel}
+					</ListItem>
+				)
 			})
 		}
 	</List>
@@ -38,11 +51,13 @@ const createList = content => (
 /**
  * Property 'content':
  * [{
- *   'label': 'My first project',
+ *   'label': 'Project',
+ *   'value': 'My first project',
  *   'active': true,
  *   'children': [
  *     {
- *       'label': 'My first project',
+ *       'label': 'Project',
+ *       'value': 'My first project',
  *       'active': true,
  *       'children': []
  *     }

@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDom from 'react-dom';
+import path from 'path';
+import fs from 'fs';
 import styled, { css } from 'styled-components';
 import List from './list';
 
@@ -9,7 +11,7 @@ const ColumnGroup = styled.div`
 	flex-direction: row;
 	height: 100%;
 	font-family: 'Segoe UI';
-	font-size: 12px;
+	font-size: 14px;
 	box-sizing: border-box;
 `;
 
@@ -84,7 +86,7 @@ class App extends React.Component {
 			}
 		];
 
-		const patterns = {
+		const patterns = [{
 			'label': 'My first pattern',
 			'active': true,
 			'children': [
@@ -94,14 +96,14 @@ class App extends React.Component {
 					'children': []
 				}
 			]
-		};
-/*
-		const pagePath = path.join(props.styleGuidePath, 'stacked', 'projects',
-		props.projectName, props.pageName + '.json');
-		const pageModel = JSON.parse(fs.readFileSync(this.pagePath, 'utf8'));
+		}];
 
-		const properties = this.createProperties(pageModel.root);*/
-		const properties = {};
+		const pagePath = path.join(this.props.styleGuidePath,
+			'stacked', 'projects',
+			this.props.projectName, this.props.pageName + '.json');
+		const pageModel = JSON.parse(fs.readFileSync(pagePath, 'utf8'));
+
+		const properties = [this.createListItemFromPattern('Root', pageModel.root)];
 
 		return (
 			<ColumnGroup>
@@ -129,41 +131,47 @@ class App extends React.Component {
 			</ColumnGroup>
 		);
 	}
-/*
-	createProperties(model) {
-		if (Array.isArray(model)) {
-			// Handle arrays by returning a new array with recursively processed elements.
-			return model.map((element, index) => {
-				return this.createComponent(element, index);
-			});
-		}
 
-		if (model === null || typeof model !== 'object') {
-			// Primitives stay primitives.
-			return model;
-		}
+	createListItemFromPattern(key, model) {
+		const items = [];
+		const properties = model.properties || {};
+		Object.entries(properties).forEach(([key, value]) => {
+			items.push(this.createListItemFromProperty(key, value));
+		});
+		const children = model.children || [];
+		children.forEach((value, index) => {
+			items.push(this.createListItemFromProperty(index + 1, value));
+		});
 
-		if (model['_type'] == 'pattern') {
+		return {
+			label: key + ': ' + model.patternSrc.replace(/^.*\//, ''),
+			children: items
+		};
+	}
+
+	createListItemFromProperty(key, value) {
+		if (Array.isArray(value)) {
 			const items = [];
-			model.properties.forEach(function() {
-
-			})
-
-			return {
-				label: model.patternSrc.replace(/^.*\//, ''),
-				children: items
-			};
-		} else {
-			// The model is an object, but not a pattern declaration.
-			// Create a new object with recursively processed values.
-			var result = {};
-			Object.keys(model).forEach((key) => {
-				result[key] = this.createComponent(model[key]);
+			value.forEach((child, index) => {
+				items.push(this.createListItemFromProperty('Child ' + (index + 1), child));
 			});
-			return result;
+			return {label: key, children: items};
+		}
+
+		if (value === null || typeof value !== 'object') {
+			return {label: key + ': ' + value};
+		}
+
+		if (value['_type'] === 'pattern') {
+			return this.createListItemFromPattern(key, value);
+		} else {
+			const items = [];
+			Object.entries(value).forEach(([childKey, childValue]) => {
+				items.push(this.createListItemFromProperty(childKey, childValue));
+			});
+			return {label: key, children: items};
 		}
 	}
-	*/
 }
 
 ReactDom.render(<App

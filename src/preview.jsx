@@ -40,7 +40,7 @@ class Preview extends React.Component {
 			return model;
 		}
 
-		if (model['_type'] == 'pattern') {
+		if (model['_type'] === 'pattern') {
 			// The model is a pattern declaration, create a React pattern component
 
 			// First, process the properties and children of the declaration recursively

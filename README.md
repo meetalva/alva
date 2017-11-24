@@ -1,4 +1,5 @@
 # stacked
+We enable cross-functional teams to design contextual digital experiences and code-based ecosystems.
 
 ---------------
 ## Next features ##

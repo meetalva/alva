@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import styled, { css } from 'styled-components';
-import Preview from './preview';
+import Preview from './dist/preview';
 
 
 const ColumnGroup = styled.div`
@@ -15,33 +15,43 @@ const LeftColumn = styled.div`
 	flex-direction: column;
 	flex: 1 0 0px;
 	border: 1px solid #ccc;
-	box-shadow: 3px 0 10px 0 rgba(0,0,0,.2);
 `;
 
 const ProjectsPane = styled.div`
 	flex: 2 0 0px;
 	border-bottom: 1px solid #ccc;
+	padding: 4px 0;
 `;
 
 const PatternsPane = styled.div`
 	flex: 3 0 0px;
+	padding: 4px 0;
 `;
 
 const PreviewPane = styled.div`
 	flex: 2 0 0px;
 	padding: 10px;
+	box-shadow: inset 0 0 10px 0 rgba(0,0,0,.25);
 `;
 
 const PropertiesPane = styled.div`
 	flex: 1 0 0px;
 	border: 1px solid #ccc;
-	box-shadow: -3px 0 10px 0 rgba(0,0,0,.2);
+	padding: 4px 0;
 `;
 
 const List = styled.ul`
+	padding: 0 0 0 12px;
+	margin: 0;
+	width: 100%;
 `;
 
 const ListItem = styled.li`
+	padding: 0;
+	margin: 4px 0;
+	font-family: Arial;
+	font-size: 15px;
+	list-style: none;
 `;
 
 

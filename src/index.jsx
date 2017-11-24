@@ -54,11 +54,11 @@ class App extends React.Component {
 			<ColumnGroup>
 				<LeftColumn>
 					<ProjectsPane>
-						<List />
+						<List content={[]}/>
 					</ProjectsPane>
-					
+
 					<PatternsPane>
-						<List />
+						<List content={[]}/>
 					</PatternsPane>
 				</LeftColumn>
 
@@ -67,7 +67,17 @@ class App extends React.Component {
 				</PreviewPane>
 
 				<PropertiesPane>
-					<List />
+					<List content={[{
+							'label': 'My first project',
+							'active': true,
+							'children': [
+								{
+									'label': 'My first project',
+									'active': true,
+									'children': []
+								}
+							]
+						}]}/>
 				</PropertiesPane>
 			</ColumnGroup>
 		);

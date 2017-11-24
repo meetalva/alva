@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 
+
 const List = styled.ul`
 	padding: 0;
 	margin: 0;
@@ -16,9 +17,23 @@ const ListItem = styled.li`
 	cursor: pointer;
 `;
 
+const createList = content => (
+	<List>
+		{
+			content.map(({label, children, active}, i) => {
+				const nextLevel = children ? createList(children) : null;
+				return (<ListItem key={i} className={active ? 'active' : ''}>
+					{label}
+					{nextLevel}
+				</ListItem>)
+			})
+		}
+	</List>
+)
+
 /**
  * Property 'content':
- * {
+ * [{
  *   'label': 'My first project',
  *   'active': true,
  *   'children': [
@@ -28,48 +43,9 @@ const ListItem = styled.li`
  *       'children': []
  *     }
  *   ]
- * }
+ * }]
  */
 
-class ListComponent extends React.Component {
-	constructor(props) {
-		super(props);
-	}
-
-	render() {
-		return (
-			<List>
-				<ListItem active={true}>
-					My first project
-					<List>
-						<ListItem active={true}>
-							My page
-						</ListItem>
-						<ListItem>
-							Another page
-						</ListItem>
-						<ListItem>
-							A fanstastic page
-						</ListItem>
-					</List>
-				</ListItem>
-				<ListItem>
-					Checkout process
-					<List>
-						<ListItem>
-							Start page
-						</ListItem>
-						<ListItem>
-							Confirmation page
-						</ListItem>
-						<ListItem>
-							Thank-you page
-						</ListItem>
-					</List>
-				</ListItem>
-			</List>
-		);
-	}
-}
+const ListComponent = props => createList(props.content);
 
 export default ListComponent;

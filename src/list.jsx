@@ -25,7 +25,7 @@ const ListItem = styled.li`
 	cursor: pointer;
 
 	&.active {
-		color: red;
+		background: #def;
 	}
 `;
 

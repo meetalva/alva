@@ -79,4 +79,4 @@ class Preview extends React.Component {
 	}
 }
 
-ReactDom.render(<Preview />, document.getElementById('app'));
+export default Preview;

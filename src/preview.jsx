@@ -7,17 +7,13 @@ class Preview extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.styleGuidePath = '../stacked-example';
-		this.projectName = 'my-project';
-		this.pageName = 'mypage';
-
-		this.pagePath = path.join(this.styleGuidePath, 'stacked', 'projects',
-			this.projectName, this.pageName + '.json');
+		this.pagePath = path.join(props.styleGuidePath, 'stacked', 'projects',
+			props.projectName, props.pageName + '.json');
 		this.patternFactories = {};
 	}
 
 	render() {
-		const pageModel = JSON.parse(fs.readFileSync(this.pagePath, 'utf8'));;
+		const pageModel = JSON.parse(fs.readFileSync(this.pagePath, 'utf8'));
 		return this.createComponent(pageModel.root);
 	}
 
@@ -55,7 +51,7 @@ class Preview extends React.Component {
 			}
 
 			// Then, load the pattern factory
-			const patternFolder = path.join(this.styleGuidePath, 'lib', 'patterns', model.patternSrc);
+			const patternFolder = path.join(props.styleGuidePath, 'lib', 'patterns', model.patternSrc);
 			const patternSrc = path.join(patternFolder, 'index.js');
 			let patternFactory = this.patternFactories[patternFolder];
 			if (patternFactory == null) {
@@ -75,7 +71,6 @@ class Preview extends React.Component {
 			});
 			return result;
 		}
-
 	}
 }
 

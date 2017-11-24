@@ -26,24 +26,21 @@ const LeftColumn = styled.div`
 const ProjectsPane = styled.div`
 	flex: 2 0 0px;
 	border-bottom: 1px solid #ccc;
-	padding: 6px 0;
 `;
 
 const PatternsPane = styled.div`
 	flex: 3 0 0px;
-	padding: 6px 0;
+`;
+
+const PropertiesPane = styled.div`
+	flex: 1 0 0px;
+	border: 1px solid #ccc;
 `;
 
 const PreviewPane = styled.div`
 	flex: 2 0 0px;
 	padding: 10px;
 	box-shadow: inset 0 0 10px 0 rgba(0,0,0,.25);
-`;
-
-const PropertiesPane = styled.div`
-	flex: 1 0 0px;
-	border: 1px solid #ccc;
-	padding: 6px 0;
 `;
 
 
@@ -67,20 +64,20 @@ class App extends React.Component {
 			<ColumnGroup>
 				<LeftColumn>
 					<ProjectsPane>
-						<List content={projects} />
+						<List headline="Projects" content={projects} />
 					</ProjectsPane>
 
 					<PatternsPane>
-						<List content={patterns} />
+						<List headline="Patterns" content={patterns} />
 					</PatternsPane>
 				</LeftColumn>
 
 				<PreviewPane>
 					<Preview />
 				</PreviewPane>
-
+				
 				<PropertiesPane>
-					<List content={properties} />
+					<List headline="Components" content={properties} />
 				</PropertiesPane>
 			</ColumnGroup>
 		);

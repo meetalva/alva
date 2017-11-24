@@ -15,6 +15,10 @@ const ListItem = styled.li`
 	line-height: 25px;
 	list-style: none;
 	cursor: pointer;
+
+	&.active {
+		color: red;
+	}
 `;
 
 const createList = content => (

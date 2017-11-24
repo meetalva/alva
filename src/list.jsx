@@ -16,6 +16,20 @@ const ListItem = styled.li`
 	cursor: pointer;
 `;
 
+/**
+ * Property 'content':
+ * {
+ *   'label': 'My first project',
+ *   'active': true,
+ *   'children': [
+ *     {
+ *       'label': 'My first project',
+ *       'active': true,
+ *       'children': []
+ *     }
+ *   ]
+ * }
+ */
 
 class ListComponent extends React.Component {
 	constructor(props) {

@@ -9,8 +9,10 @@ module.exports = () => {
     const command = path.join(__dirname, '../node_modules/.bin/babel src -d dist')
     exec(command, (err, info) => {
       if (err) {
-        throw err
+        //throw err
+        log.error(err)
       }
+      console.log(e)
       log.info(`running babel:\n${info}`)
     })
   });

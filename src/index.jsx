@@ -53,15 +53,13 @@ class App extends React.Component {
 	}
 
 	render() {
-		const projectsPath = path.join(this.props.styleGuidePath, 'stacked');
+		const projectsPath = path.join(styleGuidePath, 'stacked');
 		const projects = this.createProjectsFromFolders(projectsPath);
 		
-		const patternsPath = path.join(this.props.styleGuidePath, 'patterns');
+		const patternsPath = path.join(styleGuidePath, 'patterns');
 		const patterns = this.createPatternsFromFolders(patternsPath);
 		
-		const pagePath = path.join(this.props.styleGuidePath,
-			'stacked', 'projects',
-			this.props.projectName, this.props.pageName + '.json');
+		const pagePath = path.join(styleGuidePath, 'stacked', 'projects', projectName, pageName + '.json');
 		const pageModel = JSON.parse(fs.readFileSync(pagePath, 'utf8'));
 		const properties = [this.createListItemFromPattern('Root', pageModel.root)];
 
@@ -78,9 +76,7 @@ class App extends React.Component {
 				</LeftColumn>
 
 				<PreviewPane>
-					<Preview styleGuidePath={props.styleGuidePath}
-					projectName={props.projectName}
-					pageName={props.pageName}/>
+					<Preview />
 				</PreviewPane>
 
 				<PropertiesPane>
@@ -98,7 +94,7 @@ class App extends React.Component {
 		});
 		const children = model.children || [];
 		children.forEach((value, index) => {
-			items.push(this.createListItemFromProperty(index + 1, value));
+			items.push(this.createListItemFromProperty(children.length > 1 ? 'Child ' + (index + 1) : 'Child', value));
 		});
 
 		return {
@@ -112,7 +108,7 @@ class App extends React.Component {
 		if (Array.isArray(value)) {
 			const items = [];
 			value.forEach((child, index) => {
-				items.push(this.createListItemFromProperty('Child ' + (index + 1), child));
+				items.push(this.createListItemFromProperty((index + 1), child));
 			});
 			return {value: key, children: items};
 		}
@@ -160,9 +156,10 @@ class App extends React.Component {
 	}
 }
 
-ReactDom.render(<App
-	styleGuidePath='../stacked-example'
-	projectName='my-project'
-	pageName='mypage'/>,
-	document.getElementById('app')
+global.styleGuidePath = '../stacked-example';
+global.projectName = 'my-project';
+global.pageName = 'mypage';
+
+global.styleGuidePath = path.resolve(global.styleGuidePath);
+ReactDom.render(<App/>, document.getElementById('app')
 );

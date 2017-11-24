@@ -7,8 +7,7 @@ class Preview extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.pagePath = path.join(props.styleGuidePath, 'stacked', 'projects',
-			props.projectName, props.pageName + '.json');
+		this.pagePath = path.join(styleGuidePath, 'stacked', 'projects', projectName, pageName + '.json');
 		this.patternFactories = {};
 	}
 
@@ -51,7 +50,7 @@ class Preview extends React.Component {
 			}
 
 			// Then, load the pattern factory
-			const patternFolder = path.join(props.styleGuidePath, 'lib', 'patterns', model.patternSrc);
+			const patternFolder = path.join(styleGuidePath, 'lib', 'patterns', model.patternSrc);
 			const patternSrc = path.join(patternFolder, 'index.js');
 			let patternFactory = this.patternFactories[patternFolder];
 			if (patternFactory == null) {

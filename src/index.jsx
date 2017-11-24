@@ -15,7 +15,7 @@ const LeftColumn = styled.div`
 	flex-direction: column;
 	flex: 1 0 0px;
 	border: 1px solid #ccc;
-	box-shadow: 3px 0 10px 0 rgba(0,0,0,.25);
+	box-shadow: 3px 0 10px 0 rgba(0,0,0,.2);
 `;
 
 const ProjectsPane = styled.div`
@@ -35,7 +35,7 @@ const PreviewPane = styled.div`
 const PropertiesPane = styled.div`
 	flex: 1 0 0px;
 	border: 1px solid #ccc;
-	box-shadow: -3px 0 10px 0 rgba(0,0,0,.25);
+	box-shadow: -3px 0 10px 0 rgba(0,0,0,.2);
 `;
 
 const List = styled.ul`
@@ -57,9 +57,30 @@ class App extends React.Component {
 					<ProjectsPane>
 						<List>
 							<ListItem active={true}>
-								My Project
+								My first project
 								<List>
 									<ListItem active={true}>
+										My page
+									</ListItem>
+									<ListItem active={true}>
+										Another page
+									</ListItem>
+									<ListItem active={true}>
+										A fanstastic page
+									</ListItem>
+								</List>
+							</ListItem>
+							<ListItem active={true}>
+								Checkout process
+								<List>
+									<ListItem active={true}>
+										Start page
+									</ListItem>
+									<ListItem active={true}>
+										Confirmation page
+									</ListItem>
+									<ListItem active={true}>
+										Thank-you page
 									</ListItem>
 								</List>
 							</ListItem>
@@ -67,7 +88,6 @@ class App extends React.Component {
 					</ProjectsPane>
 					
 					<PatternsPane>
-						Hello world.
 					</PatternsPane>
 				</LeftColumn>
 
@@ -76,7 +96,6 @@ class App extends React.Component {
 				</PreviewPane>
 
 				<PropertiesPane>
-					Hello world.
 				</PropertiesPane>
 			</ColumnGroup>
 		);

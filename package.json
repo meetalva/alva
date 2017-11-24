@@ -7,7 +7,7 @@
 		"build": "babel src -d dist",
 		"type-test": "ts-node ./pattern-type.ts",
 		"start": "electron .",
-		"build-start": "npm build && npm start"
+		"build-start": "npm run build && npm run start"
 	},
 	"repository": {
 		"type": "git",

@@ -6,7 +6,8 @@
 	"scripts": {
 		"build": "babel src -d dist",
 		"type-test": "ts-node ./pattern-type.ts",
-		"stacked": "electron ."
+		"start": "electron .",
+		"build-start": "npm build && npm start"
 	},
 	"repository": {
 		"type": "git",
@@ -34,6 +35,7 @@
 		"react-dom": "^16.0.0",
 		"react-router": "^4.2.0",
 		"readts": "^0.1.0",
+		"styled-components": "^2.2.3",
 		"systemjs": "^0.20.19",
 		"ts-node": "^3.3.0"
 	},

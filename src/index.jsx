@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import styled, { css } from 'styled-components';
 import List from './list';
+import Preview from './preview';
 
 
 const ColumnGroup = styled.div`
@@ -77,11 +78,9 @@ class App extends React.Component {
 				</LeftColumn>
 
 				<PreviewPane>
-					{/*
-						<Preview styleGuidePath={styleGuidePath}
-						projectName={projectName}
-						pageName={pageName}
-					/>*/}
+					<Preview styleGuidePath={props.styleGuidePath}
+					projectName={props.projectName}
+					pageName={props.pageName}/>
 				</PreviewPane>
 
 				<PropertiesPane>
@@ -115,7 +114,7 @@ class App extends React.Component {
 			value.forEach((child, index) => {
 				items.push(this.createListItemFromProperty('Child ' + (index + 1), child));
 			});
-			return {label: 'ABC', value: key, children: items};
+			return {value: key, children: items};
 		}
 
 		if (value === null || typeof value !== 'object') {
@@ -129,7 +128,7 @@ class App extends React.Component {
 			Object.entries(value).forEach(([childKey, childValue]) => {
 				items.push(this.createListItemFromProperty(childKey, childValue));
 			});
-			return {label: 'ABC', value: key, children: items};
+			return {value: key, children: items};
 		}
 	}
 

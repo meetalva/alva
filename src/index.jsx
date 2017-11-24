@@ -20,6 +20,7 @@ const LeftColumn = styled.div`
 	display: flex;
 	flex-direction: column;
 	flex: 1 0 0px;
+	max-width: 300px;
 	border: 1px solid #ccc;
 `;
 
@@ -34,6 +35,7 @@ const PatternsPane = styled.div`
 
 const PropertiesPane = styled.div`
 	flex: 1 0 0px;
+	max-width: 350px;
 	border: 1px solid #ccc;
 `;
 

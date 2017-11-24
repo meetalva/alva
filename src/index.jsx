@@ -54,55 +54,53 @@ class App extends React.Component {
 	render() {
 		const projects = [
 			{
-				'label': 'My first project',
+				'label': 'Project',
+				'value': 'My first project',
 				'active': true,
 				'children': [
 					{
-						'label': 'My page',
+						'label': 'Page',
+						'value': 'My page',
 						'active': true,
 					},
 					{
-						'label': 'Another page'
+						'label': 'Page',
+						'value': 'Another page'
 					},
 					{
-						'label': 'A fantastic page'
+						'label': 'Page',
+						'value': 'A fantastic page'
 					}
 				]
 			},
 			{
-				'label': 'Checkout process',
+				'label': 'Project',
+				'value': 'Checkout process',
 				'children': [
 					{
-						'label': 'Start page',
+						'label': 'Page',
+						'value': 'Start page',
 						'active': true,
 					},
 					{
-						'label': 'Confirmation page'
+						'label': 'Page',
+						'value': 'Confirmation page'
 					},
 					{
-						'label': 'Thank-you page'
+						'label': 'Page',
+						'value': 'Thank-you page'
 					}
 				]
 			}
 		];
 
-		const patterns = [{
-			'label': 'My first pattern',
-			'active': true,
-			'children': [
-				{
-					'label': 'My first pattern',
-					'active': true,
-					'children': []
-				}
-			]
-		}];
-
+		const patternsPath = path.join(this.props.styleGuidePath, 'patterns');
+		const patterns = this.createPatternsFromFolders(patternsPath);
+		
 		const pagePath = path.join(this.props.styleGuidePath,
 			'stacked', 'projects',
 			this.props.projectName, this.props.pageName + '.json');
 		const pageModel = JSON.parse(fs.readFileSync(pagePath, 'utf8'));
-
 		const properties = [this.createListItemFromPattern('Root', pageModel.root)];
 
 		return (
@@ -144,7 +142,8 @@ class App extends React.Component {
 		});
 
 		return {
-			label: key + ': ' + model.patternSrc.replace(/^.*\//, ''),
+			label: key,
+			value: model.patternSrc.replace(/^.*\//, ''),
 			children: items
 		};
 	}
@@ -155,11 +154,11 @@ class App extends React.Component {
 			value.forEach((child, index) => {
 				items.push(this.createListItemFromProperty('Child ' + (index + 1), child));
 			});
-			return {label: key, children: items};
+			return {label: 'ABC', value: key, children: items};
 		}
 
 		if (value === null || typeof value !== 'object') {
-			return {label: key + ': ' + value};
+			return {label: key, value: value};
 		}
 
 		if (value['_type'] === 'pattern') {
@@ -169,8 +168,18 @@ class App extends React.Component {
 			Object.entries(value).forEach(([childKey, childValue]) => {
 				items.push(this.createListItemFromProperty(childKey, childValue));
 			});
-			return {label: key, children: items};
+			return {label: 'ABC', value: key, children: items};
 		}
+	}
+
+	createPatternsFromFolders(parentPath) {
+		return fs.readdirSync(parentPath)
+			.map(name => ({name: name, path: path.join(parentPath, name)}))
+			.filter(child => fs.lstatSync(child.path).isDirectory())
+			.map(folder => ({
+				value: folder.name,
+				children: this.createPatternsFromFolders(folder.path)
+			}));
 	}
 }
 

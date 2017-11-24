@@ -52,48 +52,9 @@ class App extends React.Component {
 	}
 
 	render() {
-		const projects = [
-			{
-				'label': 'Project',
-				'value': 'My first project',
-				'active': true,
-				'children': [
-					{
-						'label': 'Page',
-						'value': 'My page',
-						'active': true,
-					},
-					{
-						'label': 'Page',
-						'value': 'Another page'
-					},
-					{
-						'label': 'Page',
-						'value': 'A fantastic page'
-					}
-				]
-			},
-			{
-				'label': 'Project',
-				'value': 'Checkout process',
-				'children': [
-					{
-						'label': 'Page',
-						'value': 'Start page',
-						'active': true,
-					},
-					{
-						'label': 'Page',
-						'value': 'Confirmation page'
-					},
-					{
-						'label': 'Page',
-						'value': 'Thank-you page'
-					}
-				]
-			}
-		];
-
+		const projectsPath = path.join(this.props.styleGuidePath, 'stacked');
+		const projects = this.createProjectsFromFolders(projectsPath);
+		
 		const patternsPath = path.join(this.props.styleGuidePath, 'patterns');
 		const patterns = this.createPatternsFromFolders(patternsPath);
 		
@@ -170,6 +131,23 @@ class App extends React.Component {
 			});
 			return {label: 'ABC', value: key, children: items};
 		}
+	}
+
+	createProjectsFromFolders(modelPath) {
+		const projectsPath = path.join(modelPath, 'projects');
+		return fs.readdirSync(projectsPath)
+			.map(name => ({name: name, path: path.join(projectsPath, name)}))
+			.filter(child => fs.lstatSync(child.path).isDirectory())
+			.map(folder => ({
+				label: 'Project',
+				value: folder.name,
+				children: fs.readdirSync(folder.path)
+				.filter(child => child.match(/\.json$/))
+				.map(folder => ({
+					label: 'Page',
+					value: folder.replace(/\.json$/, '')
+				}))
+			}));
 	}
 
 	createPatternsFromFolders(parentPath) {

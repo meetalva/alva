@@ -72,11 +72,15 @@ class App extends React.Component {
 							'active': true,
 							'children': [
 								{
-									'label': 'My first project',
+									'label': 'Item 1',
 									'active': true,
 									'children': []
-								}
-							]
+								},
+								{
+									'label': 'Item 2',
+									'active': true,
+									'children': []
+								}]
 						}]}/>
 				</PropertiesPane>
 			</ColumnGroup>

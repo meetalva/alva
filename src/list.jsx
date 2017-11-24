@@ -2,6 +2,14 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 
+const Headline = styled.h1`
+	padding: 4px 0px 4px 14px;
+	margin: 0 0 4px;
+	width: calc(100% - 14px);
+	font-size: 14px;
+	background: #444;
+	color: #fff;
+`;
 
 const List = styled.ul`
 	padding: 0;
@@ -30,24 +38,6 @@ const Value = styled.span`
 	color: #000;
 `;
 
-const createList = content => (
-	<List>
-		{
-			content.map(({label, value, children, active}, i) => {
-				const labelComponent = label ? <Label>{label}:</Label> : null;
-				const nextLevel = children ? createList(children) : null;
-				return (
-					<ListItem key={i} className={active ? 'active' : ''}>
-						{labelComponent}
-						<Value>{value}</Value>
-						{nextLevel}
-					</ListItem>
-				)
-			})
-		}
-	</List>
-)
-
 /**
  * Property 'content':
  * [{
@@ -64,7 +54,39 @@ const createList = content => (
  *   ]
  * }]
  */
+class ListComponent extends React.Component {
+	constructor(props) {
+		super(props);
+	}
 
-const ListComponent = props => createList(props.content);
+	render() {
+		return (
+			<div>
+				<Headline key="headline">{this.props.headline}</Headline>
+				{this.createList(this.props.content)}
+			</div>
+		);
+	}
+
+	createList(content) {
+		return (
+			<List>
+				{
+					content.map(({label, value, children, active}, i) => {
+						const labelComponent = label ? <Label>{label}:</Label> : null;
+						const nextLevel = children ? this.createList(children) : null;
+						return (
+							<ListItem key={i} className={active ? 'active' : ''}>
+								{labelComponent}
+								<Value>{value}</Value>
+								{nextLevel}
+							</ListItem>
+						)
+					})
+				}
+			</List>
+		);
+	}
+}
 
 export default ListComponent;

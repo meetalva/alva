@@ -10,7 +10,7 @@ import Preview from './preview';
 const ColumnGroup = styled.div`
 	display: flex;
 	flex-direction: row;
-	height: 100%;
+	min-height: 100%;
 	font-family: 'Segoe UI';
 	font-size: 14px;
 	box-sizing: border-box;
@@ -19,8 +19,17 @@ const ColumnGroup = styled.div`
 const LeftColumn = styled.div`
 	display: flex;
 	flex-direction: column;
-	flex: 1 0 0px;
-	max-width: 300px;
+	flex-grow: 0;
+	flex-shrink: 1;
+	flex-basis: 300px;
+	border: 1px solid #ccc;
+`;
+
+const PropertiesPane = styled.div`
+	display: flex;
+	flex-grow: 0;
+	flex-shrink: 1;
+	flex-basis: 350px;
 	border: 1px solid #ccc;
 `;
 
@@ -33,11 +42,6 @@ const PatternsPane = styled.div`
 	flex: 3 0 0px;
 `;
 
-const PropertiesPane = styled.div`
-	flex: 1 0 0px;
-	max-width: 350px;
-	border: 1px solid #ccc;
-`;
 
 const PreviewPane = styled.div`
 	flex: 2 0 0px;
@@ -54,10 +58,10 @@ class App extends React.Component {
 	render() {
 		const projectsPath = path.join(styleGuidePath, 'stacked');
 		const projects = this.createProjectsFromFolders(projectsPath);
-		
+
 		const patternsPath = path.join(styleGuidePath, 'patterns');
 		const patterns = this.createPatternsFromFolders(patternsPath);
-		
+
 		const pagePath = path.join(styleGuidePath, 'stacked', 'projects', projectName, pageName + '.json');
 		const pageModel = JSON.parse(fs.readFileSync(pagePath, 'utf8'));
 		const properties = [this.createListItemFromPattern('Root', pageModel.root)];
@@ -77,8 +81,8 @@ class App extends React.Component {
 				<PreviewPane>
 					<Preview />
 				</PreviewPane>
-				
-				<PropertiesPane>
+
+				<PropertiesPane className="test">
 					<List headline="Components" content={properties} />
 				</PropertiesPane>
 			</ColumnGroup>

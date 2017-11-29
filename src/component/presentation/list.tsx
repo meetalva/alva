@@ -49,6 +49,7 @@ export interface ListPropsListItem {
 	value: string;
 	active?: boolean;
 	children?: ListPropsListItem[];
+	onClick?: (event: any) => void
 }
 
 
@@ -67,16 +68,18 @@ export default class List extends React.Component<ListProps> {
 	}
 
 	createList(items) {
+		const list = this;
 		return (
 			<Ul>
 				{
-					items.map(({ label, value, children, active }, i) => {
-						const labelComponent = label ? <Label>{label}:</Label> : null;
-						const nextLevel = children ? this.createList(children) : null;
+					items.map((item: ListPropsListItem, index: number) => {
+						const labelComponent = item.label ? <Label>{item.label}:</Label> : null;
+						const nextLevel = item.children ? this.createList(item.children) : null;
+
 						return (
-							<Li key={i} className={active ? 'active' : ''}>
+							<Li key={index} className={item.active ? 'active' : ''} onClick={item.onClick}>
 								{labelComponent}
-								<Value>{value}</Value>
+								<Value>{item.value}</Value>
 								{nextLevel}
 							</Li>
 						)

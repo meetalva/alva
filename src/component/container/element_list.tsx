@@ -1,6 +1,7 @@
 import { ElementValue } from '../../store/page/element_value';
 import List from '../presentation/list';
 import { ListPropsListItem } from '../presentation/list';
+import { observer } from 'mobx-react';
 import PageElement from '../../store/page/page_element';
 import React from 'react';
 import Store from '../../store';
@@ -10,6 +11,7 @@ interface ElementListProps {
 	store: Store
 }
 
+@observer
 export default class ElementList extends React.Component<ElementListProps> {
 	constructor(props: ElementListProps) {
 		super(props);

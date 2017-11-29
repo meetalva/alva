@@ -1,5 +1,6 @@
 import List from '../presentation/list';
 import { ListPropsListItem } from '../presentation/list';
+import { observer } from 'mobx-react';
 import React from 'react';
 import Store from '../../store';
 import Project from '../../store/project';
@@ -10,6 +11,7 @@ interface ProjectListProps {
 	store: Store
 }
 
+@observer
 export default class ProjectList extends React.Component<ProjectListProps> {
 	constructor(props: ProjectListProps) {
 		super(props);
@@ -22,7 +24,8 @@ export default class ProjectList extends React.Component<ProjectListProps> {
 			children: project.pages.map((page: PageRef) => ({
 				label: 'Page',
 				value: page.name,
-				children: []
+				children: [],
+				onClick: (item, event) => { this.props.store.openPage(project.id, page.id); }
 			}))
 		}));
 

@@ -1,12 +1,12 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
-const url = require('url');
-const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
+import { app, BrowserWindow } from 'electron';
+import * as devToolsInstaller from 'electron-devtools-installer';
+import path from 'path';
+import url from 'url';
 
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win;
+let win: BrowserWindow;
 
 function createWindow() {
 	// Create the browser window.
@@ -14,7 +14,7 @@ function createWindow() {
 
 	// and load the index.html of the app.
 	win.loadURL(url.format({
-		pathname: path.join(__dirname, 'index.html'),
+		pathname: path.join(__dirname, '..', '..', 'src', 'electron', 'index.html'),
 		protocol: 'file:',
 		slashes: true
 	}));
@@ -30,10 +30,9 @@ function createWindow() {
 		win = null
 	});
 
-	installExtension(REACT_DEVELOPER_TOOLS).then((name) => {
+	devToolsInstaller.default(devToolsInstaller.REACT_DEVELOPER_TOOLS).then((name) => {
 		console.log(`Added Extension:  ${name}`);
-	})
-	.catch((err) => {
+	}).catch((err) => {
 		console.log('An error occurred: ', err);
 	});
 }

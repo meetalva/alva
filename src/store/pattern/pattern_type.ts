@@ -1,13 +1,16 @@
 import * as path from 'path';
-import * as optimist from 'optimist';
 import * as ts from 'typescript';
 import * as fs from 'fs';
 
-export class PatternType {
-	public property: Property[];
-	public name: string;
 
-	public static parse(path: string): PatternType {
+// TODO: Integrate this file into "Pattern"
+
+
+export class PatternType {
+	property: Property[];
+	name: string;
+
+	static parse(path: string): PatternType {
 		let type: PatternType = new PatternType();
 
 		let sourceFile: ts.SourceFile = ts.createSourceFile(path,
@@ -49,19 +52,19 @@ export class PatternType {
 }
 
 export class Property {
-	public name: string;
-	public displayName: string;
-	public type: string;
-	public required: boolean;
+	name: string;
+	displayName: string;
+	type: string;
+	required: boolean;
 }
 
 export class EnumProperty extends Property {
-	public options: Option[];
+	options: Option[];
 }
 
 export class Option {
-	public name: string;
-	public displayName: string;
+	name: string;
+	displayName: string;
 }
 
 let kinds: { [kind: number]: string } = {};
@@ -69,6 +72,6 @@ Object.keys(ts.SyntaxKind).map((value: string, index: number, array: string[]) =
 	kinds[ts.SyntaxKind[value]] = value;
 });
 
-let [styleGuidePath, projectName, pageName] = optimist.argv._;
+let [styleGuidePath, projectName, pageName] = ['../stacked-example', 'my-project', 'mypage'];
 let declarationPath = path.join(styleGuidePath, 'lib', 'patterns', 'atoms', 'button', 'index.d.ts');
 let patternType: PatternType = PatternType.parse(declarationPath);

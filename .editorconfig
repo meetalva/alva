@@ -1,5 +1,11 @@
 [*]
+charset = utf-8
+continuation_indent_size = 1
+curly_bracket_next_line = false
 end_of_line = lf
-insert_final_newline = true
-trim_trailing_whitespace = true
 indent_style = tab
+insert_final_newline = true
+max_line_length = 120
+spaces_around_brackets = false
+spaces_around_operators = true
+trim_trailing_whitespace = true

@@ -1,8 +1,8 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styledComponents from 'styled-components';
 
 
-const Headline = styled.h1`
+const Headline = styledComponents.h1`
 	padding: 4px 0px 4px 14px;
 	margin: 0 0 4px;
 	width: calc(100% - 14px);
@@ -11,13 +11,13 @@ const Headline = styled.h1`
 	color: #fff;
 `;
 
-const List = styled.ul`
+const Ul = styledComponents.ul`
 	padding: 0;
 	margin: 0;
 	width: 100%;
 `;
 
-const ListItem = styled.li`
+const Li = styledComponents.li`
 	margin: 0 0 0 15px;
 	padding: 0;
 	line-height: 25px;
@@ -29,33 +29,31 @@ const ListItem = styled.li`
 	}
 `;
 
-const Label = styled.span`
+const Label = styledComponents.span`
 	color: #00F;
 	padding-right 4px;
 `;
 
-const Value = styled.span`
+const Value = styledComponents.span`
 	color: #000;
 `;
 
-/**
- * Property 'content':
- * [{
- *   'label': 'Project',
- *   'value': 'My first project',
- *   'active': true,
- *   'children': [
- *     {
- *       'label': 'Project',
- *       'value': 'My first project',
- *       'active': true,
- *       'children': []
- *     }
- *   ]
- * }]
- */
-class ListComponent extends React.Component {
-	constructor(props) {
+
+export interface ListProps {
+	items: ListPropsListItem[];
+	headline: string;
+}
+
+export interface ListPropsListItem {
+	label?: string;
+	value: string;
+	active?: boolean;
+	children?: ListPropsListItem[];
+}
+
+
+export default class List extends React.Component<ListProps> {
+	constructor(props: ListProps) {
 		super(props);
 	}
 
@@ -63,30 +61,28 @@ class ListComponent extends React.Component {
 		return (
 			<div>
 				<Headline key="headline">{this.props.headline}</Headline>
-				{this.createList(this.props.content)}
+				{this.createList(this.props.items)}
 			</div>
 		);
 	}
 
-	createList(content) {
+	createList(items) {
 		return (
-			<List>
+			<Ul>
 				{
-					content.map(({label, value, children, active}, i) => {
+					items.map(({ label, value, children, active }, i) => {
 						const labelComponent = label ? <Label>{label}:</Label> : null;
 						const nextLevel = children ? this.createList(children) : null;
 						return (
-							<ListItem key={i} className={active ? 'active' : ''}>
+							<Li key={i} className={active ? 'active' : ''}>
 								{labelComponent}
 								<Value>{value}</Value>
 								{nextLevel}
-							</ListItem>
+							</Li>
 						)
 					})
 				}
-			</List>
+			</Ul>
 		);
 	}
 }
-
-export default ListComponent;

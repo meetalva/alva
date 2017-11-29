@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "dist/electron/index.js",
 	"scripts": {
-		"build": "cd src && babel **/* -d ../dist",
+		"build": "cd src && babel **/* -d ../dist && babel **/**/* -d ../dist",
 		"start": "electron dist/electron",
 		"watch": "node scripts/watch"
 	},

@@ -1,14 +1,15 @@
 import fs from 'fs';
+import { observable } from 'mobx';
 import path from 'path';
 import Page from './page';
 import Project from './project';
 import PatternFolder from './pattern/pattern_folder';
 
 export default class Store {
-	currentPage: Page;
+	@observable currentPage: Page;
 	projects: Project[];
 	patterns: PatternFolder;
-	styleGuidePath: string;
+	@observable styleGuidePath: string;
 
 	getProjectsPath(): string {
 		return path.join(this.styleGuidePath, 'stacked', 'projects');
@@ -43,6 +44,5 @@ export default class Store {
 
 	openPage(projectId: string, pageId: string): void {
 		this.currentPage = new Page(this, projectId, pageId);
-		this.currentPage.load();
 	}
 }

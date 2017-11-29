@@ -1,5 +1,6 @@
 import List from '../presentation/list';
 import { ListPropsListItem } from '../presentation/list';
+import { observer } from 'mobx-react';
 import React from 'react';
 import Store from '../../store';
 import Pattern from '../../store/pattern';
@@ -10,6 +11,7 @@ interface PatternListProps {
 	store: Store
 }
 
+@observer
 export default class PatternList extends React.Component<PatternListProps> {
 	constructor(props: PatternListProps) {
 		super(props);

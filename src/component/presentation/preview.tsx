@@ -1,5 +1,6 @@
 import { ElementValue } from '../../store/page/element_value';
 import fs from 'fs';
+import { observer } from 'mobx-react';
 import Page from '../../store/page';
 import PageElement from '../../store/page/page_element';
 import path from 'path';
@@ -12,6 +13,7 @@ interface PreviewProps {
 	store: Store;
 }
 
+@observer
 export default class Preview extends React.Component<PreviewProps> {
 	/* TODO: Does not compile: private */patternFactories: { [folder: string]: Function };
 

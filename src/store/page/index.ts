@@ -15,6 +15,8 @@ export default class Page {
 		this.projectId = projectId;
 		this.pageId = pageId;
 		this.name = 'New page';
+
+		this.load();
 	}
 
 	load() {

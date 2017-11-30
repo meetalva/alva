@@ -3,12 +3,11 @@ import * as devToolsInstaller from 'electron-devtools-installer';
 import * as path from 'path';
 import * as url from 'url';
 
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win: BrowserWindow;
+let win: BrowserWindow | undefined;
 
-function createWindow() {
+function createWindow(): void {
 	// Create the browser window.
 	win = new BrowserWindow({ width: 1800, height: 800 });
 
@@ -20,19 +19,19 @@ function createWindow() {
 	}));
 
 	// Open the DevTools.
-	//win.webContents.openDevTools();
+	// win.webContents.openDevTools();
 
 	// Emitted when the window is closed.
 	win.on('closed', () => {
 		// Dereference the window object, usually you would store windows
 		// in an array if your app supports multi windows, this is the time
 		// when you should delete the corresponding element.
-		win = null
+		win = undefined;
 	});
 
-	devToolsInstaller.default(devToolsInstaller.REACT_DEVELOPER_TOOLS).then((name) => {
+	devToolsInstaller.default(devToolsInstaller.REACT_DEVELOPER_TOOLS).then(name => {
 		console.log(`Added Extension:  ${name}`);
-	}).catch((err) => {
+	}).catch(err => {
 		console.log('An error occurred: ', err);
 	});
 }
@@ -54,7 +53,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
 	// On macOS it's common to re-create a window in the app when the
 	// dock icon is clicked and there are no other windows open.
-	if (win === null) {
+	if (!win) {
 		createWindow();
 	}
 });

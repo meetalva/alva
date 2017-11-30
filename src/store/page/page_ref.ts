@@ -1,4 +1,4 @@
-export default class PageRef {
-	id: string;
-	name: string;
+export class PageRef {
+	public id: string;
+	public name: string;
 }

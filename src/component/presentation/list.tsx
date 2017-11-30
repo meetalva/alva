@@ -1,7 +1,6 @@
 import * as React from 'react';
 import styledComponents from 'styled-components';
 
-
 const Headline = styledComponents.h1`
 	padding: 4px 0px 4px 14px;
 	margin: 0 0 4px;
@@ -38,27 +37,26 @@ const Value = styledComponents.span`
 	color: #000;
 `;
 
-
 export interface ListProps {
 	items: ListPropsListItem[];
 	headline: string;
 }
 
 export interface ListPropsListItem {
-	label?: string;
-	value: string;
 	active?: boolean;
 	children?: ListPropsListItem[];
-	onClick?: (event: any) => void
+	label?: string;
+	value: string;
+
+	onClick?(event: {}): void;
 }
 
-
-export default class List extends React.Component<ListProps> {
-	constructor(props: ListProps) {
+export class List extends React.Component<ListProps> {
+	public constructor(props: ListProps) {
 		super(props);
 	}
 
-	render() {
+	public render(): JSX.Element {
 		return (
 			<div>
 				<Headline key="headline">{this.props.headline}</Headline>
@@ -67,7 +65,7 @@ export default class List extends React.Component<ListProps> {
 		);
 	}
 
-	createList(items) {
+	public createList(items: ListPropsListItem[]): JSX.Element {
 		return (
 			<Ul>
 				{
@@ -81,7 +79,7 @@ export default class List extends React.Component<ListProps> {
 								<Value>{item.value}</Value>
 								{nextLevel}
 							</Li>
-						)
+						);
 					})
 				}
 			</Ul>

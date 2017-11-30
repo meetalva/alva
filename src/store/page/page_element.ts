@@ -1,8 +1,8 @@
 import { ElementValue } from './element_value';
 
-export default class PageElement {
-	_type: string;
-	patternSrc/* TODO: Does not compile: ?*/: string;
-	properties: { [name: string]: ElementValue };
-	children: [PageElement];
+export class PageElement {
+	public _type: string;
+	public patternSrc?: string;
+	public properties: { [name: string]: ElementValue };
+	public children: [PageElement];
 }

@@ -1,65 +1,75 @@
 import { ElementValue } from '../../store/page/element_value';
-import List from '../presentation/list';
-import { ListPropsListItem } from '../presentation/list';
+import { List, ListPropsListItem } from '../presentation/list';
 import { observer } from 'mobx-react';
-import PageElement from '../../store/page/page_element';
+import { Page } from '../../store/page';
+import { PageElement } from '../../store/page/page_element';
 import * as React from 'react';
-import Store from '../../store';
-
+import { Store } from '../../store';
 
 export interface ElementListProps {
-	store: Store
+	store: Store;
 }
 
 @observer
-export default class ElementList extends React.Component<ElementListProps> {
-	constructor(props: ElementListProps) {
+export class ElementList extends React.Component<ElementListProps> {
+	public constructor(props: ElementListProps) {
 		super(props);
 	}
 
-	render() {
-		return (
-			<List headline="Elements" items={[this.createItemFromElement('Root', this.props.store.currentPage.root)]} />
-		);
+	public render(): JSX.Element | null {
+		const page: Page | undefined = this.props.store.currentPage;
+		if (page) {
+			const rootElement: PageElement = page.root as PageElement;
+			return (
+				<List headline="Elements" items={[this.createItemFromElement('Root', rootElement)]} />
+			);
+		} else {
+			return null;
+		}
 	}
 
-	createItemFromElement(key: string, element: PageElement): ListPropsListItem {
+	public createItemFromElement(key: string, element: PageElement): ListPropsListItem {
 		const items: ListPropsListItem[] = [];
 		const properties: { [name: string]: ElementValue } = element.properties || {};
-		Object.keys(properties).forEach((key: string) => {
-			items.push(this.createItemFromProperty(key, properties[key]));
+		Object.keys(properties).forEach((propertyKey: string) => {
+			items.push(this.createItemFromProperty(propertyKey, properties[propertyKey]));
 		});
 		const children: PageElement[] = element.children || [];
 		children.forEach((value: PageElement, index: number) => {
 			items.push(this.createItemFromProperty(children.length > 1 ? 'Child ' + (index + 1) : 'Child', value));
 		});
 
+		const patternSrc: string = element.patternSrc as string;
+
 		return {
 			label: key,
-			value: element.patternSrc.replace(/^.*\//, ''),
+			value: patternSrc.replace(/^.*\//, ''),
 			children: items
 		};
 	}
 
-	createItemFromProperty(key: string, value: /* TODO: Does not compile: ElementValue */ any): ListPropsListItem {
+	public createItemFromProperty(key: string, value: ElementValue): ListPropsListItem {
 		if (Array.isArray(value)) {
-			const items: any[] = [];
-			(value/* TODO: Does not compile:  as any[]*/).forEach((child, index: number) => {
+			const items: ListPropsListItem[] = [];
+			(value as (string | number)[]).forEach((child, index: number) => {
 				items.push(this.createItemFromProperty(String(index + 1), child));
 			});
 			return { value: key, children: items };
 		}
 
-		if (value === null || typeof value !== 'object') {
+		if (value === undefined || value === null || typeof value !== 'object') {
 			return { label: key, value: String(value) };
 		}
 
-		if (value['_type'] === 'pattern') {
-			return this.createItemFromElement(key, value/* TODO: Does not compile:  as PageElement*/);
+		// tslint:disable-next-line:no-any
+		const valueAsAny: any = value as any;
+
+		if (valueAsAny['_type'] === 'pattern') {
+			return this.createItemFromElement(key, value as PageElement);
 		} else {
 			const items: ListPropsListItem[] = [];
 			Object.keys(value).forEach((childKey: string) => {
-				items.push(this.createItemFromProperty(childKey, value[childKey]));
+				items.push(this.createItemFromProperty(childKey, valueAsAny[childKey]));
 			});
 			return { value: key, children: items };
 		}

@@ -1,48 +1,78 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
-import * as fs from 'fs';
-
 
 // TODO: Integrate this file into "Pattern"
 
+export class Property {
+	public name: string;
+	public displayName: string;
+	public type: string;
+	public required: boolean;
+}
+
+export class EnumProperty extends Property {
+	public options: Option[];
+}
+
+export class Option {
+	public name: string;
+	public displayName: string;
+}
 
 export class PatternType {
-	property: Property[];
-	name: string;
+	private static kinds: { [kind: number]: string };
+	public property: Property[];
+	public name: string;
 
-	static parse(path: string): PatternType {
-		let type: PatternType = new PatternType();
+	public static parse(patternPath: string): PatternType {
+		const type: PatternType = new PatternType();
 
-		let sourceFile: ts.SourceFile = ts.createSourceFile(path,
-			fs.readFileSync(path).toString(), ts.ScriptTarget.ES2016, true);
+		const sourceFile: ts.SourceFile = ts.createSourceFile(patternPath,
+			fs.readFileSync(patternPath).toString(), ts.ScriptTarget.ES2016, true);
 
-		sourceFile.forEachChild((node) => {
+		sourceFile.forEachChild(node => {
 			if (ts.isExportAssignment(node)) {
-				let assignment: ts.ExportAssignment = node;
+				const assignment: ts.ExportAssignment = node;
 				type.name = assignment.expression.getText();
 			}
 		});
 
-		let declaration: ts.InterfaceDeclaration;
-		sourceFile.forEachChild((node) => {
+		let declaration: ts.InterfaceDeclaration | undefined;
+		sourceFile.forEachChild(node => {
 			if (ts.isInterfaceDeclaration(node)) {
-				let candidate: ts.InterfaceDeclaration = node;
+				const candidate: ts.InterfaceDeclaration = node;
 				if (candidate.name.escapedText === type.name + 'Props') {
 					declaration = candidate;
 				}
 			}
 		});
 
+		if (!PatternType.kinds) {
+			// tslint:disable-next-line:no-any
+			const syntaxKind: any = ts.SyntaxKind as any;
+			Object.keys(ts.SyntaxKind).map((value: string, index: number, array: string[]) => {
+				PatternType.kinds[syntaxKind[value]] = value;
+			});
+		}
+
+		if (!declaration) {
+			throw new Error(`Invalid pattern "${patternPath}": No interface found`);
+		}
+
 		declaration.forEachChild((node: ts.Node) => {
-			console.log(kinds[node.kind]);
+			console.log(PatternType.kinds[node.kind]);
 			if (ts.isPropertySignature(node)) {
-				let signature: ts.PropertySignature = node;
-				let property: Property = new Property();
+				const signature: ts.PropertySignature = node;
+				const signatureType: ts.TypeNode | undefined = signature.type;
+				const property: Property = new Property();
 				property.name = signature.name.getText();
 				property.required = signature.questionToken === undefined;
-				console.log("Name: " + property.name);
-				console.log("Required: " + property.required);
-				console.log("Type: " + signature.type.getFullText());
+				console.log('Name: ' + property.name);
+				console.log('Required: ' + String(property.required));
+				if (signatureType) {
+					console.log('Type: ' + signatureType.getFullText());
+				}
 			}
 			console.log('');
 		});
@@ -51,27 +81,6 @@ export class PatternType {
 	}
 }
 
-export class Property {
-	name: string;
-	displayName: string;
-	type: string;
-	required: boolean;
-}
-
-export class EnumProperty extends Property {
-	options: Option[];
-}
-
-export class Option {
-	name: string;
-	displayName: string;
-}
-
-let kinds: { [kind: number]: string } = {};
-Object.keys(ts.SyntaxKind).map((value: string, index: number, array: string[]) => {
-	kinds[ts.SyntaxKind[value]] = value;
-});
-
-let styleGuidePath = '../stacked-example';
-let declarationPath = path.join(styleGuidePath, 'lib', 'patterns', 'atoms', 'button', 'index.d.ts');
+const styleGuidePath = '../stacked-example';
+const declarationPath = path.join(styleGuidePath, 'lib', 'patterns', 'atoms', 'button', 'index.d.ts');
 PatternType.parse(declarationPath);

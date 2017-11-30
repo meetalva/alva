@@ -1,30 +1,28 @@
-import List from '../presentation/list';
-import { ListPropsListItem } from '../presentation/list';
+import { List, ListPropsListItem } from '../presentation/list';
 import { observer } from 'mobx-react';
+import { Pattern } from '../../store/pattern';
+import { PatternFolder } from '../../store/pattern/pattern_folder';
 import * as React from 'react';
-import Store from '../../store';
-import Pattern from '../../store/pattern';
-import PatternFolder from '../../store/pattern/pattern_folder';
-
+import { Store } from '../../store';
 
 export interface PatternListProps {
-	store: Store
+	store: Store;
 }
 
 @observer
-export default class PatternList extends React.Component<PatternListProps> {
-	constructor(props: PatternListProps) {
+export class PatternList extends React.Component<PatternListProps> {
+	public constructor(props: PatternListProps) {
 		super(props);
 	}
 
-	render() {
+	public render(): JSX.Element {
 		const items: ListPropsListItem[] = this.createItemsFromFolder(this.props.store.patterns);
 		return (
 			<List headline="Patterns" items={items} />
 		);
 	}
 
-	createItemsFromFolder(parent: PatternFolder): ListPropsListItem[] {
+	public createItemsFromFolder(parent: PatternFolder): ListPropsListItem[] {
 		const result: ListPropsListItem[] = [];
 
 		parent.children.forEach((child: PatternFolder) => {

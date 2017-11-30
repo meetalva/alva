@@ -1,23 +1,21 @@
-import List from '../presentation/list';
-import { ListPropsListItem } from '../presentation/list';
+import { List, ListPropsListItem } from '../presentation/list';
 import { observer } from 'mobx-react';
+import { PageRef } from '../../store/page/page_ref';
+import { Project } from '../../store/project';
 import * as React from 'react';
-import Store from '../../store';
-import Project from '../../store/project';
-import PageRef from '../../store/page/page_ref';
-
+import { Store } from '../../store';
 
 export interface ProjectListProps {
-	store: Store
+	store: Store;
 }
 
 @observer
-export default class ProjectList extends React.Component<ProjectListProps> {
-	constructor(props: ProjectListProps) {
+export class ProjectList extends React.Component<ProjectListProps> {
+	public constructor(props: ProjectListProps) {
 		super(props);
 	}
 
-	render() {
+	public render(): JSX.Element {
 		const items: ListPropsListItem[] = this.props.store.projects.map((project: Project) => ({
 			label: 'Project',
 			value: project.name,
@@ -25,7 +23,7 @@ export default class ProjectList extends React.Component<ProjectListProps> {
 				label: 'Page',
 				value: page.name,
 				children: [],
-				onClick: event => { this.props.store.openPage(project.id, page.id); }
+				onClick: (event: React.MouseEvent<HTMLElement>) => { this.props.store.openPage(project.id, page.id); }
 			}))
 		}));
 

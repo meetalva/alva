@@ -90,7 +90,3 @@ store.openStyleguide('../stacked-example');
 store.openPage('my-project', 'mypage');
 
 ReactDom.render(<App store={store} />, document.getElementById('app'));
-
-window.setTimeout(function () {
-	store.openPage('my-project', 'mypage2');
-}, 2000);

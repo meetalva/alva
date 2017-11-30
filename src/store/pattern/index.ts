@@ -1,19 +1,19 @@
 import * as path from 'path';
-import PatternFolder from './pattern_folder';
-import Store from '..';
+import { PatternFolder } from './pattern_folder';
+import { Store } from '..';
 
-export default class Pattern {
-	name: string;
-	folder: PatternFolder;
-	store: Store;
+export class Pattern {
+	public name: string;
+	public folder: PatternFolder;
+	public store: Store;
 
-	constructor(store: Store, folder: PatternFolder, name: string) {
+	public constructor(store: Store, folder: PatternFolder, name: string) {
 		this.store = store;
 		this.folder = folder;
 		this.name = name;
 	}
 
-	getPath(): string {
+	public getPath(): string {
 		return path.join(this.folder.getPath(), this.name);
 	}
 }

@@ -1,16 +1,16 @@
 import * as fs from 'fs';
-import PageElement from './page_element';
+import { PageElement } from './page_element';
 import * as path from 'path';
-import Store from '..';
+import { Store } from '..';
 
-export default class Page {
-	name: string;
-	pageId: string;
-	projectId: string;
-	root/* TODO: Does not compile: ?*/: PageElement;
-	store: Store;
+export class Page {
+	public name: string;
+	public pageId: string;
+	public projectId: string;
+	public root?: PageElement;
+	public store: Store;
 
-	constructor(store: Store, projectId: string, pageId: string) {
+	public constructor(store: Store, projectId: string, pageId: string) {
 		this.store = store;
 		this.projectId = projectId;
 		this.pageId = pageId;
@@ -19,10 +19,13 @@ export default class Page {
 		this.load();
 	}
 
-	load() {
+	public load(): void {
 		const projectPath: string = path.join(this.store.getProjectsPath(), this.projectId);
-		const pagePath: string = path.join(projectPath, this.pageId + ".json");
+		const pagePath: string = path.join(projectPath, this.pageId + '.json');
+
+		// tslint:disable-next-line:no-any
 		const pageModel: any = JSON.parse(fs.readFileSync(pagePath, 'utf8'));
+
 		this.name = pageModel.name;
 		this.root = pageModel.root;
 	}

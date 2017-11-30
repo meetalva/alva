@@ -1,16 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import Pattern from '.';
-import Store from '..';
+import { Pattern } from '.';
+import { Store } from '..';
 
-export default class PatternFolder {
-	children: PatternFolder[];
-	name: string;
-	parent: PatternFolder;
-	patterns: Pattern[];
-	store: Store;
+export class PatternFolder {
+	public children: PatternFolder[];
+	public name: string;
+	public parent?: PatternFolder;
+	public patterns: Pattern[];
+	public store: Store;
 
-	constructor(store: Store, name: string, parent?: PatternFolder) {
+	public constructor(store: Store, name: string, parent?: PatternFolder) {
 		this.store = store;
 		this.name = name;
 		this.parent = parent;
@@ -18,7 +18,7 @@ export default class PatternFolder {
 		this.refresh();
 	}
 
-	getPath(): string {
+	public getPath(): string {
 		if (this.parent) {
 			return path.join(this.parent.getPath(), this.name);
 		} else {
@@ -26,7 +26,7 @@ export default class PatternFolder {
 		}
 	}
 
-	refresh(): void {
+	public refresh(): void {
 		this.patterns = [];
 		this.children = [];
 

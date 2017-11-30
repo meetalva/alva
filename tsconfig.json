@@ -24,6 +24,7 @@
 		"noEmit": false,
 		"noEmitOnError": false,
 		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": true,
 		"noImplicitReturns": true,
 		"noImplicitThis": true,
 		"noUnusedLocals": true,
@@ -32,13 +33,8 @@
 		"removeComments": false,
 		"rootDir": "src",
 		"sourceMap": true,
-		"target": "es2017"
-	},
-	"compilerOptions_disabled": {
-		"noImplicitAny": true,
-		"strict": true,
 		"strictNullChecks": true,
-		"strictFunctionTypes": true
+		"target": "es2017"
 	},
 	"include": [
 		"src/**/*.ts",

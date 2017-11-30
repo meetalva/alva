@@ -1,12 +1,11 @@
-import ElementList from './container/element_list';
-import PatternList from './container/pattern_list';
-import ProjectList from './container/project_list';
-import Preview from './presentation/preview';
+import { ElementList } from './container/element_list';
+import { PatternList } from './container/pattern_list';
+import { Preview } from './presentation/preview';
+import { ProjectList } from './container/project_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import Store from '../store';
+import { Store } from '../store';
 import styledComponents from 'styled-components';
-
 
 const ColumnGroup = styledComponents.div`
 	display: flex;
@@ -54,11 +53,11 @@ interface AppProps {
 }
 
 class App extends React.Component<AppProps> {
-	constructor(props: AppProps) {
+	public constructor(props: AppProps) {
 		super(props);
 	}
 
-	render() {
+	public render(): JSX.Element {
 		return (
 			<ColumnGroup>
 				<LeftColumn>

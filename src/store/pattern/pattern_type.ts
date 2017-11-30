@@ -33,7 +33,7 @@ export class PatternType {
 			}
 		});
 
-		declaration.forEachChild((node) => {
+		declaration.forEachChild((node: ts.Node) => {
 			console.log(kinds[node.kind]);
 			if (ts.isPropertySignature(node)) {
 				let signature: ts.PropertySignature = node;
@@ -72,6 +72,6 @@ Object.keys(ts.SyntaxKind).map((value: string, index: number, array: string[]) =
 	kinds[ts.SyntaxKind[value]] = value;
 });
 
-let [styleGuidePath, projectName, pageName] = ['../stacked-example', 'my-project', 'mypage'];
+let styleGuidePath = '../stacked-example';
 let declarationPath = path.join(styleGuidePath, 'lib', 'patterns', 'atoms', 'button', 'index.d.ts');
-let patternType: PatternType = PatternType.parse(declarationPath);
+PatternType.parse(declarationPath);

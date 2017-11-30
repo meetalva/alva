@@ -1,6 +1,6 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import PageElement from './page_element';
-import path from 'path';
+import * as path from 'path';
 import Store from '..';
 
 export default class Page {

@@ -3,11 +3,11 @@ import List from '../presentation/list';
 import { ListPropsListItem } from '../presentation/list';
 import { observer } from 'mobx-react';
 import PageElement from '../../store/page/page_element';
-import React from 'react';
+import * as React from 'react';
 import Store from '../../store';
 
 
-interface ElementListProps {
+export interface ElementListProps {
 	store: Store
 }
 
@@ -43,7 +43,7 @@ export default class ElementList extends React.Component<ElementListProps> {
 
 	createItemFromProperty(key: string, value: /* TODO: Does not compile: ElementValue */ any): ListPropsListItem {
 		if (Array.isArray(value)) {
-			const items = [];
+			const items: any[] = [];
 			(value/* TODO: Does not compile:  as any[]*/).forEach((child, index: number) => {
 				items.push(this.createItemFromProperty(String(index + 1), child));
 			});

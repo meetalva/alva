@@ -1,15 +1,13 @@
 import { ElementValue } from '../../store/page/element_value';
-import fs from 'fs';
 import { observer } from 'mobx-react';
 import Page from '../../store/page';
 import PageElement from '../../store/page/page_element';
-import path from 'path';
-import React from 'react';
-import ReactDom from 'react-dom';
+import * as path from 'path';
+import * as React from 'react';
 import Store from '../../store';
 
 
-interface PreviewProps {
+export interface PreviewProps {
 	store: Store;
 }
 

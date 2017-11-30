@@ -1,12 +1,12 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { observable } from 'mobx';
-import path from 'path';
+import * as path from 'path';
 import Page from './page';
 import Project from './project';
 import PatternFolder from './pattern/pattern_folder';
 
 export default class Store {
-	@observable currentPage: Page;
+	@observable currentPage?: Page;
 	projects: Project[];
 	patterns: PatternFolder;
 	@observable styleGuidePath: string;

@@ -1,0 +1,47 @@
+{
+	"compilerOptions": {
+		"allowJs": false,
+		"allowSyntheticDefaultImports": false,
+		"alwaysStrict": true,
+		"checkJs": false,
+		"declaration": true,
+		"downlevelIteration": true,
+		"emitDecoratorMetadata": false,
+		"experimentalDecorators": true,
+		"forceConsistentCasingInFileNames": true,
+		"importHelpers": false,
+		"inlineSourceMap": false,
+		"inlineSources": false,
+		"isolatedModules": false,
+		"jsx": "react",
+		"module": "commonjs",
+		"lib": [
+			"es2017",
+			"dom"
+		],
+		"moduleResolution": "node",
+		"outDir": "dist",
+		"noEmit": false,
+		"noEmitOnError": false,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": false,
+		"pretty": true,
+		"removeComments": false,
+		"rootDir": "src",
+		"sourceMap": true,
+		"target": "es2017"
+	},
+	"compilerOptions_disabled": {
+		"noImplicitAny": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx"
+	]
+}

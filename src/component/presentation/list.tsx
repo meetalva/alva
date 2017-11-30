@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import styledComponents from 'styled-components';
 
 
@@ -68,7 +68,6 @@ export default class List extends React.Component<ListProps> {
 	}
 
 	createList(items) {
-		const list = this;
 		return (
 			<Ul>
 				{

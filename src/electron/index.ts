@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import * as devToolsInstaller from 'electron-devtools-installer';
-import path from 'path';
-import url from 'url';
+import * as path from 'path';
+import * as url from 'url';
 
 
 // Keep a global reference of the window object, if you don't, the window will

@@ -1,11 +1,9 @@
 import ElementList from './container/element_list';
-import path from 'path';
 import PatternList from './container/pattern_list';
-import process from 'process';
 import ProjectList from './container/project_list';
 import Preview from './presentation/preview';
-import React from 'react';
-import ReactDom from 'react-dom';
+import * as React from 'react';
+import * as ReactDom from 'react-dom';
 import Store from '../store';
 import styledComponents from 'styled-components';
 

@@ -1,4 +1,5 @@
 import { ElementList } from './container/element_list';
+import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
 import { Preview } from './presentation/preview';
 import { ProjectList } from './container/project_list';
@@ -77,6 +78,8 @@ class App extends React.Component<AppProps> {
 				<ElementPane>
 					<ElementList store={this.props.store} />
 				</ElementPane>
+
+				<DevTools />
 			</ColumnGroup>
 		);
 	}

@@ -32,6 +32,7 @@
 		"@types/react": "^16.0.0",
 		"@types/react-dom": "^16.0.3",
 		"electron-devtools-installer": "^2.2.1",
+		"mobx-react-devtools": "^4.2.15",
 		"ts-config": "^15.0.0",
 		"tslint": "^5.8.0",
 		"typescript": "^2.6.2"

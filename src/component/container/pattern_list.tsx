@@ -17,9 +17,7 @@ export class PatternList extends React.Component<PatternListProps> {
 
 	public render(): JSX.Element {
 		const items: ListPropsListItem[] = this.createItemsFromFolder(this.props.store.patterns);
-		return (
-			<List headline="Patterns" items={items} />
-		);
+		return <List headline="Patterns" items={items} />;
 	}
 
 	public createItemsFromFolder(parent: PatternFolder): ListPropsListItem[] {

@@ -68,20 +68,18 @@ export class List extends React.Component<ListProps> {
 	public createList(items: ListPropsListItem[]): JSX.Element {
 		return (
 			<Ul>
-				{
-					items.map((item: ListPropsListItem, index: number) => {
-						const labelComponent = item.label ? <Label>{item.label}:</Label> : null;
-						const nextLevel = item.children ? this.createList(item.children) : null;
+				{items.map((item: ListPropsListItem, index: number) => {
+					const labelComponent = item.label ? <Label>{item.label}:</Label> : null;
+					const nextLevel = item.children ? this.createList(item.children) : null;
 
-						return (
-							<Li key={index} className={item.active ? 'active' : ''} onClick={item.onClick}>
-								{labelComponent}
-								<Value>{item.value}</Value>
-								{nextLevel}
-							</Li>
-						);
-					})
-				}
+					return (
+						<Li key={index} className={item.active ? 'active' : ''} onClick={item.onClick}>
+							{labelComponent}
+							<Value>{item.value}</Value>
+							{nextLevel}
+						</Li>
+					);
+				})}
 			</Ul>
 		);
 	}

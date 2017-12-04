@@ -28,8 +28,12 @@ export class PatternType {
 	public static parse(patternPath: string): PatternType {
 		const type: PatternType = new PatternType();
 
-		const sourceFile: ts.SourceFile = ts.createSourceFile(patternPath,
-			fs.readFileSync(patternPath).toString(), ts.ScriptTarget.ES2016, true);
+		const sourceFile: ts.SourceFile = ts.createSourceFile(
+			patternPath,
+			fs.readFileSync(patternPath).toString(),
+			ts.ScriptTarget.ES2016,
+			true
+		);
 
 		sourceFile.forEachChild(node => {
 			if (ts.isExportAssignment(node)) {
@@ -82,5 +86,12 @@ export class PatternType {
 }
 
 const styleGuidePath = '../stacked-example';
-const declarationPath = path.join(styleGuidePath, 'lib', 'patterns', 'atoms', 'button', 'index.d.ts');
+const declarationPath = path.join(
+	styleGuidePath,
+	'lib',
+	'patterns',
+	'atoms',
+	'button',
+	'index.d.ts'
+);
 PatternType.parse(declarationPath);

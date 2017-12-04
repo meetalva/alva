@@ -1,8 +1,8 @@
+import { PatternFolder } from './pattern/folder';
 import * as FileUtils from 'fs';
 import { observable } from 'mobx';
 import { Page } from './page';
 import * as PathUtils from 'path';
-import { PatternFolder } from './pattern/pattern_folder';
 import { Project } from './project';
 
 export class Store {

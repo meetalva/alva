@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import * as devToolsInstaller from 'electron-devtools-installer';
-import * as path from 'path';
+import * as PathUtils from 'path';
 import * as url from 'url';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -14,7 +14,7 @@ function createWindow(): void {
 	// and load the index.html of the app.
 	win.loadURL(
 		url.format({
-			pathname: path.join(__dirname, '..', '..', 'src', 'electron', 'index.html'),
+			pathname: PathUtils.join(__dirname, '..', '..', 'src', 'electron', 'index.html'),
 			protocol: 'file:',
 			slashes: true
 		})

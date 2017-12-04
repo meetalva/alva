@@ -1,6 +1,6 @@
-import * as fs from 'fs';
+import * as FileUtils from 'fs';
 import { PageElement } from './page_element';
-import * as path from 'path';
+import * as PathUtils from 'path';
 import { Store } from '..';
 
 export class Page {
@@ -20,11 +20,11 @@ export class Page {
 	}
 
 	public load(): void {
-		const projectPath: string = path.join(this.store.getProjectsPath(), this.projectId);
-		const pagePath: string = path.join(projectPath, this.pageId + '.json');
+		const projectPath: string = PathUtils.join(this.store.getProjectsPath(), this.projectId);
+		const pagePath: string = PathUtils.join(projectPath, this.pageId + '.json');
 
 		// tslint:disable-next-line:no-any
-		const pageModel: any = JSON.parse(fs.readFileSync(pagePath, 'utf8'));
+		const pageModel: any = JSON.parse(FileUtils.readFileSync(pagePath, 'utf8'));
 
 		this.name = pageModel.name;
 		this.root = pageModel.root;

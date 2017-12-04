@@ -1,7 +1,7 @@
+import { PatternFolder } from '../../store/pattern/folder';
 import { List, ListPropsListItem } from '../presentation/list';
 import { observer } from 'mobx-react';
 import { Pattern } from '../../store/pattern';
-import { PatternFolder } from '../../store/pattern/pattern_folder';
 import * as React from 'react';
 import { Store } from '../../store';
 

@@ -1,7 +1,7 @@
 import * as FileUtils from 'fs';
 import * as PathUtils from 'path';
-import { Pattern } from '.';
-import { Store } from '..';
+import { Pattern } from '..';
+import { Store } from '../..';
 
 export class PatternFolder {
 	public children: PatternFolder[];

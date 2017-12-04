@@ -1,0 +1,9 @@
+export enum PropertyType {
+	STRING,
+	STRING_ARRAY,
+	NUMBER,
+	NUMBER_ARRAY,
+	BOOLEAN,
+	OBJECT,
+	PATTERN
+}

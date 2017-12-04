@@ -20,6 +20,12 @@
 	"bugs": {
 		"url": "https://github.com/stackedapp/stacked/issues"
 	},
+	"prettier": {
+		"printWidth": 100,
+		"useTabs": true,
+		"tabWidth": 3,
+		"singleQuote": true
+	},
 	"devDependencies": {
 		"@types/electron-devtools-installer": "^2.0.2",
 		"@types/node": "^8.0.53",

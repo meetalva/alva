@@ -12,11 +12,13 @@ function createWindow(): void {
 	win = new BrowserWindow({ width: 1800, height: 800 });
 
 	// and load the index.html of the app.
-	win.loadURL(url.format({
-		pathname: path.join(__dirname, '..', '..', 'src', 'electron', 'index.html'),
-		protocol: 'file:',
-		slashes: true
-	}));
+	win.loadURL(
+		url.format({
+			pathname: path.join(__dirname, '..', '..', 'src', 'electron', 'index.html'),
+			protocol: 'file:',
+			slashes: true
+		})
+	);
 
 	// Open the DevTools.
 	// win.webContents.openDevTools();
@@ -29,11 +31,14 @@ function createWindow(): void {
 		win = undefined;
 	});
 
-	devToolsInstaller.default(devToolsInstaller.REACT_DEVELOPER_TOOLS).then(name => {
-		console.log(`Added Extension:  ${name}`);
-	}).catch(err => {
-		console.log('An error occurred: ', err);
-	});
+	devToolsInstaller
+		.default(devToolsInstaller.REACT_DEVELOPER_TOOLS)
+		.then(name => {
+			console.log(`Added Extension:  ${name}`);
+		})
+		.catch(err => {
+			console.log('An error occurred: ', err);
+		});
 }
 
 // This method will be called when Electron has finished

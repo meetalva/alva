@@ -23,12 +23,12 @@ export class ProjectList extends React.Component<ProjectListProps> {
 				label: 'Page',
 				value: page.name,
 				children: [],
-				onClick: (event: React.MouseEvent<HTMLElement>) => { this.props.store.openPage(project.id, page.id); }
+				onClick: (event: React.MouseEvent<HTMLElement>) => {
+					this.props.store.openPage(project.id, page.id);
+				}
 			}))
 		}));
 
-		return (
-			<List headline="Projects" items={items} />
-		);
+		return <List headline="Projects" items={items} />;
 	}
 }

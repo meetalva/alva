@@ -34,8 +34,10 @@ export class PatternFolder {
 		fs.readdirSync(parentPath).forEach(childName => {
 			const childPath = path.join(parentPath, childName);
 			if (fs.lstatSync(childPath).isDirectory()) {
-				if (fs.existsSync(path.join(childPath, 'index.d.ts'))
-					&& fs.existsSync(path.join(childPath, 'index.js'))) {
+				if (
+					fs.existsSync(path.join(childPath, 'index.d.ts')) &&
+					fs.existsSync(path.join(childPath, 'index.js'))
+				) {
 					this.patterns.push(new Pattern(this.store, this, childName));
 				} else {
 					const childFolder: PatternFolder = new PatternFolder(this.store, childName, this);

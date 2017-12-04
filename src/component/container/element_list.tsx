@@ -36,7 +36,12 @@ export class ElementList extends React.Component<ElementListProps> {
 		});
 		const children: PageElement[] = element.children || [];
 		children.forEach((value: PageElement, index: number) => {
-			items.push(this.createItemFromProperty(children.length > 1 ? 'Child ' + (index + 1) : 'Child', value));
+			items.push(
+				this.createItemFromProperty(
+					children.length > 1 ? 'Child ' + (index + 1) : 'Child',
+					value
+				)
+			);
 		});
 
 		const patternSrc: string = element.patternSrc as string;

@@ -61,8 +61,12 @@ export class Preview extends React.Component<PreviewProps> {
 			componentProps.children = this.createComponent(pageElement.children);
 
 			// Then, load the pattern factory
-			const patternFolder: string = path.join(this.props.store.styleGuidePath,
-				'lib', 'patterns', pageElement.patternSrc || '');
+			const patternFolder: string = path.join(
+				this.props.store.styleGuidePath,
+				'lib',
+				'patterns',
+				pageElement.patternSrc || ''
+			);
 			const patternSrc: string = path.join(patternFolder, 'index.js');
 			let patternFactory: React.StatelessComponent = this.patternFactories[patternFolder];
 			if (patternFactory == null) {

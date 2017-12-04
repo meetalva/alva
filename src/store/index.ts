@@ -21,19 +21,20 @@ export class Store {
 			styleGuidePath = path.join(__dirname, '..', '..', styleGuidePath);
 		}
 		this.styleGuidePath = styleGuidePath;
-
 		this.currentPage = undefined;
 		this.projects = [];
 		this.patterns = new PatternFolder(this, 'patterns');
 
 		const projectsPath = this.getProjectsPath();
-		this.projects = fs.readdirSync(projectsPath)
+		this.projects = fs
+			.readdirSync(projectsPath)
 			.map((name: string) => ({ name, path: path.join(projectsPath, name) }))
 			.filter(child => fs.lstatSync(child.path).isDirectory())
 			.map(folder => ({
 				id: folder.name,
 				name: folder.name,
-				pages: fs.readdirSync(folder.path)
+				pages: fs
+					.readdirSync(folder.path)
 					.filter(child => child.match(/\.json$/))
 					.map(file => ({
 						id: file.replace(/\.json$/, ''),

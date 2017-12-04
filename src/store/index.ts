@@ -1,7 +1,7 @@
-import * as fs from 'fs';
+import * as FileUtils from 'fs';
 import { observable } from 'mobx';
 import { Page } from './page';
-import * as path from 'path';
+import * as PathUtils from 'path';
 import { PatternFolder } from './pattern/pattern_folder';
 import { Project } from './project';
 
@@ -12,13 +12,13 @@ export class Store {
 	@observable public styleGuidePath: string;
 
 	public getProjectsPath(): string {
-		return path.join(this.styleGuidePath, 'stacked', 'projects');
+		return PathUtils.join(this.styleGuidePath, 'stacked', 'projects');
 	}
 
 	public openStyleguide(styleGuidePath: string): void {
-		if (!path.isAbsolute(styleGuidePath)) {
+		if (!PathUtils.isAbsolute(styleGuidePath)) {
 			// Currently, store is two levels below stacked, so go two up
-			styleGuidePath = path.join(__dirname, '..', '..', styleGuidePath);
+			styleGuidePath = PathUtils.join(__dirname, '..', '..', styleGuidePath);
 		}
 		this.styleGuidePath = styleGuidePath;
 		this.currentPage = undefined;
@@ -26,15 +26,13 @@ export class Store {
 		this.patterns = new PatternFolder(this, 'patterns');
 
 		const projectsPath = this.getProjectsPath();
-		this.projects = fs
-			.readdirSync(projectsPath)
-			.map((name: string) => ({ name, path: path.join(projectsPath, name) }))
-			.filter(child => fs.lstatSync(child.path).isDirectory())
+		this.projects = FileUtils.readdirSync(projectsPath)
+			.map((name: string) => ({ name, path: PathUtils.join(projectsPath, name) }))
+			.filter(child => FileUtils.lstatSync(child.path).isDirectory())
 			.map(folder => ({
 				id: folder.name,
 				name: folder.name,
-				pages: fs
-					.readdirSync(folder.path)
+				pages: FileUtils.readdirSync(folder.path)
 					.filter(child => child.match(/\.json$/))
 					.map(file => ({
 						id: file.replace(/\.json$/, ''),

@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as FileUtils from 'fs';
+import * as PathUtils from 'path';
 import { Pattern } from '.';
 import { Store } from '..';
 
@@ -20,9 +20,17 @@ export class PatternFolder {
 
 	public getPath(): string {
 		if (this.parent) {
-			return path.join(this.parent.getPath(), this.name);
+			return PathUtils.join(this.parent.getPath(), this.name);
 		} else {
-			return path.join(this.store.styleGuidePath, 'lib', this.name);
+			return PathUtils.join(this.store.styleGuidePath, 'lib', this.name);
+		}
+	}
+
+	public getStyleguideRelativePath(): string {
+		if (this.parent) {
+			return PathUtils.join(this.parent.getPath(), this.name);
+		} else {
+			return this.name;
 		}
 	}
 
@@ -31,14 +39,17 @@ export class PatternFolder {
 		this.children = [];
 
 		const parentPath: string = this.getPath();
-		fs.readdirSync(parentPath).forEach(childName => {
-			const childPath = path.join(parentPath, childName);
-			if (fs.lstatSync(childPath).isDirectory()) {
+		FileUtils.readdirSync(parentPath).forEach(childName => {
+			const childPath = PathUtils.join(parentPath, childName);
+			if (FileUtils.lstatSync(childPath).isDirectory()) {
 				if (
-					fs.existsSync(path.join(childPath, 'index.d.ts')) &&
-					fs.existsSync(path.join(childPath, 'index.js'))
+					FileUtils.existsSync(PathUtils.join(childPath, 'index.d.ts')) &&
+					FileUtils.existsSync(PathUtils.join(childPath, 'index.js'))
 				) {
-					this.patterns.push(new Pattern(this.store, this, childName));
+					const pattern: Pattern = new Pattern(this.store, this, childName);
+					if (pattern.valid) {
+						this.patterns.push(pattern);
+					}
 				} else {
 					const childFolder: PatternFolder = new PatternFolder(this.store, childName, this);
 					if (childFolder.patterns.length || childFolder.children.length) {

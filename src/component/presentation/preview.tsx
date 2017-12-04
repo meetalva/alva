@@ -2,7 +2,7 @@ import { ElementValue } from '../../store/page/element_value';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page';
 import { PageElement } from '../../store/page/page_element';
-import * as path from 'path';
+import * as PathUtils from 'path';
 import * as React from 'react';
 import { Store } from '../../store';
 
@@ -61,13 +61,13 @@ export class Preview extends React.Component<PreviewProps> {
 			componentProps.children = this.createComponent(pageElement.children);
 
 			// Then, load the pattern factory
-			const patternFolder: string = path.join(
+			const patternFolder: string = PathUtils.join(
 				this.props.store.styleGuidePath,
 				'lib',
 				'patterns',
 				pageElement.patternSrc || ''
 			);
-			const patternSrc: string = path.join(patternFolder, 'index.js');
+			const patternSrc: string = PathUtils.join(patternFolder, 'index.js');
 			let patternFactory: React.StatelessComponent = this.patternFactories[patternFolder];
 			if (patternFactory == null) {
 				console.log(`Loading pattern "${patternSrc}"...`);

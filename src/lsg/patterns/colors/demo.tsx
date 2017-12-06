@@ -49,9 +49,7 @@ const ColorSwatch: React.StatelessComponent<ColorSwatchProps> = (props): JSX.Ele
 		width: 100%;
 		${luminance(props.color.rgb) > threshold
 			? `box-shadow: 0 2px 4px ${colors.grey70.toString()};`
-			: ''
-		}
-		color: ${contrast(props.color.rgb)};
+			: ''} color: ${contrast(props.color.rgb)};
 
 		@media screen and (min-width: 320px) {
 			padding: 0;
@@ -63,16 +61,10 @@ const ColorSwatch: React.StatelessComponent<ColorSwatchProps> = (props): JSX.Ele
 	return (
 		<Styles>
 			<InnerStyles>
+				<div>{props.color.displayName}</div>
 				<div>
-					{props.color.displayName}
-				</div>
-				<div>
-					<div>
-						{props.color.toString('rgb')}
-					</div>
-					<div>
-						{props.color.toString('hex')}
-					</div>
+					<div>{props.color.toString('rgb')}</div>
+					<div>{props.color.toString('hex')}</div>
 				</div>
 			</InnerStyles>
 		</Styles>
@@ -80,9 +72,7 @@ const ColorSwatch: React.StatelessComponent<ColorSwatchProps> = (props): JSX.Ele
 };
 
 function contrast(rgb: RGB): string {
-	return isLight(rgb) ?
-		colors.black.toString() :
-		colors.white.toString();
+	return isLight(rgb) ? colors.black.toString() : colors.white.toString();
 }
 
 function isLight(rgb: RGB) {
@@ -96,5 +86,5 @@ function luminance(rgb: RGB): number {
 	const factorG = 0.7152;
 	const factorB = 0.0722;
 
-	return (factorR * r) + (factorG * g) + (factorB * b);
+	return factorR * r + factorG * g + factorB * b;
 }

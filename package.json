@@ -9,7 +9,9 @@
 		"start": "electron dist/electron",
 		"watch": "tsc --project . --watch",
 		"prewatch-start": "npm run build && npm run start",
-		"watch-start": "tsc --project . --watch"
+		"watch-start": "tsc --project . --watch",
+		"start-lsg": "npm run build-lsg && concurrently 'npm run build-lsg -- -w' 'patternplate start'",
+	        "build-lsg": "tsc --project lsg --outDir lsg/lib/patterns --sourceMap"
 	},
 	"repository": {
 		"type": "git",
@@ -27,13 +29,17 @@
 		"singleQuote": true
 	},
 	"devDependencies": {
+		"@patternplate/cli": "^2.0.0-4",
+		"@patternplate/render-styled-components": "^2.0.0-3",
 		"@types/electron-devtools-installer": "^2.0.2",
 		"@types/node": "^8.0.53",
 		"@types/react": "^16.0.0",
 		"@types/react-dom": "^16.0.3",
+		"concurrently": "^3.5.1",
 		"electron-devtools-installer": "^2.2.1",
 		"mobx-react-devtools": "^4.2.15",
 		"ts-config": "^15.0.0",
+		"tslib": "^1.8.0",
 		"tslint": "^5.8.0",
 		"typescript": "^2.6.2"
 	},

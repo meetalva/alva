@@ -6,10 +6,10 @@ import styled from 'styled-components';
 const StyledTestDiv = styled.div`
 	flex-grow: 1;
 	padding: 20px 10px;
-	background: ${colors.greenLight.toString()};
+	background: ${colors.grey90.toString()};
 
 	&:nth-child(odd) {
-		background: ${colors.greenDark.toString()};
+		background: ${colors.grey70.toString()};
 	}
 `;
 

@@ -1,5 +1,5 @@
 import { colors } from '../colors';
-import { Layout } from './index';
+import Layout from './index';
 import * as React from 'react';
 import styled from 'styled-components';
 

@@ -10,7 +10,7 @@
 		"watch": "tsc --project . --watch",
 		"watch-start": "npm run build && concurrently \"npm run start\" \"tsc --project . --watch\"",
 		"start-lsg":
-			"npm run build-lsg && concurrently 'npm run build-lsg -- -w' 'patternplate start'",
+			"npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
 		"build-lsg": "tsc --project src/lsg --outDir dist/lsg/patterns --sourceMap"
 	},
 	"repository": {

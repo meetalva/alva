@@ -22,12 +22,12 @@ const Li = styledComponents.li`
 `;
 
 const Label = styledComponents.span`
-	color: ${colors.green.toString()};
+	color: ${colors.black.toString()};
 	padding-right 4px;
 `;
 
 const Value = styledComponents.span`
-	color: ${colors.green.toString()};
+	color: ${colors.black.toString()};
 `;
 
 export interface ListProps {

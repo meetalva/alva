@@ -9,8 +9,7 @@
 		"start": "electron dist/electron",
 		"watch": "tsc --project . --watch",
 		"watch-start": "npm run build && concurrently \"npm run start\" \"tsc --project . --watch\"",
-		"start-lsg":
-			"npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
+		"start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
 		"build-lsg": "tsc --project src/lsg --outDir dist/lsg/patterns --sourceMap"
 	},
 	"repository": {
@@ -36,6 +35,7 @@
 		"@types/react": "^16.0.0",
 		"@types/react-dom": "^16.0.3",
 		"concurrently": "^3.5.1",
+		"cz-conventional-changelog": "^2.1.0",
 		"electron-devtools-installer": "^2.2.1",
 		"mobx-react-devtools": "^4.2.15",
 		"ts-config": "^15.0.0",
@@ -55,5 +55,10 @@
 		"styled-components": "^2.2.3",
 		"systemjs": "^0.20.19"
 	},
-	"homepage": "https://github.com/stackedapp/stacked#readme"
+	"homepage": "https://github.com/stackedapp/stacked#readme",
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
+	}
 }

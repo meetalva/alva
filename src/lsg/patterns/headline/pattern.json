@@ -1,0 +1,38 @@
+{
+	"name": "headline",
+	"displayName": "Headline",
+	"version": "1.0.0",
+	"tags": [
+		"atoms",
+		"headline"
+	],
+	"flag": "alpha",
+	"patterns": {
+		"fonts": "atoms/fonts",
+		"colors": "atoms/colors"
+	},
+	"properties": [
+		{
+			"name": "name",
+			"displayName": "Name",
+			"type": "string",
+			"required": true,
+			"max-length": 200
+		},
+		{
+			"name": "level",
+			"displayName": "Level",
+			"type": "enum",
+			"required": true,
+			"default": "H1",
+			"options": [
+				"H1",
+				"H2",
+				"H3",
+				"H4",
+				"H5",
+				"H6"
+			]
+		}
+	]
+}

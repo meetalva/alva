@@ -1,15 +1,7 @@
 import { colors } from '../../lsg/patterns/colors';
+import { Headline } from '../../lsg/patterns/headline';
 import * as React from 'react';
 import styledComponents from 'styled-components';
-
-const Headline = styledComponents.h1`
-	padding: 4px 0px 4px 14px;
-	margin: 0 0 4px;
-	width: calc(100% - 14px);
-	font-size: 14px;
-	background: ${colors.green.toString()};
-	color: #fff;
-`;
 
 const Ul = styledComponents.ul`
 	padding: 0;
@@ -60,7 +52,9 @@ export class List extends React.Component<ListProps> {
 	public render(): JSX.Element {
 		return (
 			<div>
-				<Headline key="headline">{this.props.headline}</Headline>
+				<Headline order={3} key="headline">
+					{this.props.headline}
+				</Headline>
 				{this.createList(this.props.items)}
 			</div>
 		);

@@ -50,17 +50,13 @@ export const colors = {
 		displayName: 'Black',
 		rgb: [51, 51, 51]
 	}),
-	greenDark: new Color({
-		displayName: 'Green Dark',
-		rgb: [30, 205, 151]
+	blue: new Color({
+		displayName: 'Blue',
+		rgb: [109, 158, 225]
 	}),
-	green: new Color({
-		displayName: 'Green',
-		rgb: [87, 218, 178]
-	}),
-	greenLight: new Color({
-		displayName: 'Green Light',
-		rgb: [123, 226, 195]
+	blueLight: new Color({
+		displayName: 'Blue Light',
+		rgb: [109, 158, 225]
 	}),
 	grey70: new Color({
 		displayName: 'Grey 70',

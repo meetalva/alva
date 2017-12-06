@@ -24,9 +24,8 @@ export default function ColorDemo() {
 				<ColorSwatch color={colors.white} />
 			</StyledList>
 			<StyledList>
-				<ColorSwatch color={colors.greenDark} />
-				<ColorSwatch color={colors.green} />
-				<ColorSwatch color={colors.greenLight} />
+				<ColorSwatch color={colors.blue} />
+				<ColorSwatch color={colors.blueLight} />
 			</StyledList>
 		</div>
 	);

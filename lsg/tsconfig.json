@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        "alwaysStrict": true,
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "importHelpers": true,
+        "lib": [
+    "dom",
+    "es5",
+    "es2015.core"
+        ],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noImplicitUseStrict": false,
+        "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "outDir": "./lib",
+        "preserveConstEnums": true,
+        "pretty": true,
+        "removeComments": true,
+        "sourceMap": true,
+        "strictNullChecks": true,
+        "target": "es5",
+        "watch": false,
+        "jsx": "react"
+    },
+    "exclude": [
+        "./node_modules",
+        "./lib"
+    ]
+}

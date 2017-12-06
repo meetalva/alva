@@ -1,3 +1,4 @@
+import colors from '../../lsg/patterns/colors';
 import * as React from 'react';
 import styledComponents from 'styled-components';
 
@@ -6,7 +7,7 @@ const Headline = styledComponents.h1`
 	margin: 0 0 4px;
 	width: calc(100% - 14px);
 	font-size: 14px;
-	background: #444;
+	background: ${colors.green.toString()};
 	color: #fff;
 `;
 
@@ -29,12 +30,12 @@ const Li = styledComponents.li`
 `;
 
 const Label = styledComponents.span`
-	color: #00F;
+	color: ${colors.green.toString()};
 	padding-right 4px;
 `;
 
 const Value = styledComponents.span`
-	color: #000;
+	color: ${colors.green.toString()};
 `;
 
 export interface ListProps {

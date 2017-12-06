@@ -11,7 +11,7 @@
 		"prewatch-start": "npm run build && npm run start",
 		"watch-start": "tsc --project . --watch",
 		"start-lsg": "npm run build-lsg && concurrently 'npm run build-lsg -- -w' 'patternplate start'",
-	        "build-lsg": "tsc --project lsg --outDir lsg/lib/patterns --sourceMap"
+	        "build-lsg": "tsc --project src/lsg --outDir dist/lsg/patterns --sourceMap"
 	},
 	"repository": {
 		"type": "git",

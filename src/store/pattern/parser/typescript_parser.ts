@@ -1,6 +1,7 @@
 import * as FileUtils from 'fs';
 import * as PathUtils from 'path';
 import { Property } from '../property';
+import { PropertyType } from '../property/type';
 import * as ts from 'typescript';
 import { PatternParser } from '.';
 import { Pattern } from '..';
@@ -8,23 +9,19 @@ import { Pattern } from '..';
 export class TypeScriptParser extends PatternParser {
 	private static kinds: { [kind: number]: string };
 
-	public constructor() {
-		super();
-	}
-
-	public parse(pattern: Pattern): boolean {
-		const folderPath: string = pattern.getPath();
+	public parse(pattern: Pattern): Property[] | undefined {
+		const folderPath: string = pattern.getAbsolutePath();
 		const declarationPath = PathUtils.join(folderPath, 'index.d.ts');
 		const implementationPath = PathUtils.join(folderPath, 'index.js');
 
 		if (!FileUtils.existsSync(declarationPath)) {
 			console.warn(`Invalid pattern "${declarationPath}": No index.d.ts found`);
-			return false;
+			return undefined;
 		}
 
 		if (!FileUtils.existsSync(implementationPath)) {
 			console.warn(`Invalid pattern "${declarationPath}": No index.js found`);
-			return false;
+			return undefined;
 		}
 
 		const sourceFile: ts.SourceFile = ts.createSourceFile(
@@ -44,7 +41,7 @@ export class TypeScriptParser extends PatternParser {
 
 		if (!typeName) {
 			console.warn(`Invalid pattern "${declarationPath}": No type name found`);
-			return false;
+			return undefined;
 		}
 
 		let declaration: ts.InterfaceDeclaration | undefined;
@@ -69,25 +66,24 @@ export class TypeScriptParser extends PatternParser {
 
 		if (!declaration) {
 			console.warn(`Invalid pattern "${declarationPath}": No props interface found`);
-			return false;
+			return undefined;
 		}
 
 		const properties: Property[] = [];
 		declaration.forEachChild((node: ts.Node) => {
 			if (ts.isPropertySignature(node)) {
 				const signature: ts.PropertySignature = node;
-				const property: Property = new Property();
-				property.name = signature.name.getText();
-				property.required = signature.questionToken === undefined;
-
-				// TODO: const signatureType: ts.TypeNode | undefined = signature.type;
-				// TODO: signatureType.getFullText());
+				const id: string = signature.name.getText();
+				// TODO: Replace by actual name
+				const name: string = signature.name.getText();
+				const required: boolean = signature.questionToken === undefined;
+				// TODO: Replace by actual type (using ts.TypeNode and/or signatureType.getFullText())
+				const type: PropertyType = PropertyType.STRING;
+				const property: Property = new Property(id, name, type, required);
 
 				properties.push(property);
 			}
 		});
-		pattern.properties = properties;
-
-		return true;
+		return properties;
 	}
 }

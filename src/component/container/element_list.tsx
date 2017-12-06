@@ -3,6 +3,8 @@ import { List, ListPropsListItem } from '../presentation/list';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page';
 import { PageElement } from '../../store/page/page_element';
+import { Pattern } from '../../store/pattern';
+import { Property } from '../../store/pattern/property';
 import * as React from 'react';
 import { Store } from '../../store';
 
@@ -17,9 +19,9 @@ export class ElementList extends React.Component<ElementListProps> {
 	}
 
 	public render(): JSX.Element | null {
-		const page: Page | undefined = this.props.store.currentPage;
+		const page: Page | undefined = this.props.store.getCurrentPage();
 		if (page) {
-			const rootElement: PageElement = page.root as PageElement;
+			const rootElement: PageElement = page.getRoot() as PageElement;
 			return (
 				<List headline="Elements" items={[this.createItemFromElement('Root', rootElement)]} />
 			);
@@ -29,12 +31,22 @@ export class ElementList extends React.Component<ElementListProps> {
 	}
 
 	public createItemFromElement(key: string, element: PageElement): ListPropsListItem {
+		if (!element.getPattern()) {
+			return {
+				label: key,
+				value: '(invalid)',
+				children: []
+			};
+		}
+
 		const items: ListPropsListItem[] = [];
-		const properties: { [name: string]: ElementValue } = element.properties || {};
-		Object.keys(properties).forEach((propertyKey: string) => {
-			items.push(this.createItemFromProperty(propertyKey, properties[propertyKey]));
+		const pattern: Pattern = element.getPattern() as Pattern;
+		const properties: Property[] = pattern.getProperties() || {};
+		properties.forEach(property => {
+			const propertyId: string = property.getId();
+			items.push(this.createItemFromProperty(propertyId, element.getProperty(propertyId)));
 		});
-		const children: PageElement[] = element.children || [];
+		const children: PageElement[] = element.getChildren() || [];
 		children.forEach((value: PageElement, index: number) => {
 			items.push(
 				this.createItemFromProperty(
@@ -44,11 +56,11 @@ export class ElementList extends React.Component<ElementListProps> {
 			);
 		});
 
-		const patternSrc: string = element.patternSrc as string;
+		const patternPath: string = element.getPatternPath() as string;
 
 		return {
 			label: key,
-			value: patternSrc.replace(/^.*\//, ''),
+			value: patternPath.replace(/^.*\//, ''),
 			children: items
 		};
 	}
@@ -66,15 +78,13 @@ export class ElementList extends React.Component<ElementListProps> {
 			return { label: key, value: String(value) };
 		}
 
-		// tslint:disable-next-line:no-any
-		const valueAsAny: any = value as any;
-
-		if (valueAsAny['_type'] === 'pattern') {
+		if (value instanceof PageElement) {
 			return this.createItemFromElement(key, value as PageElement);
 		} else {
 			const items: ListPropsListItem[] = [];
 			Object.keys(value).forEach((childKey: string) => {
-				items.push(this.createItemFromProperty(childKey, valueAsAny[childKey]));
+				// tslint:disable-next-line:no-any
+				items.push(this.createItemFromProperty(childKey, (value as any)[childKey]));
 			});
 			return { value: key, children: items };
 		}

@@ -2,8 +2,7 @@ import { PatternFolder } from './folder';
 import { PatternParser } from './parser';
 import * as PathUtils from 'path';
 import { Property } from './property';
-import { TypeScriptParser } from './parser/typescript-parser';
-import { Store } from '..';
+import { TypeScriptParser } from './parser/typescript_parser';
 
 export class Pattern {
 	private static parsers: PatternParser[];
@@ -11,63 +10,83 @@ export class Pattern {
 	/**
 	 * The name of the pattern folder.
 	 */
-	public name: string;
+	private name: string;
 
 	/**
 	 * The parent folder containing the pattern folder.
 	 */
-	public folder: PatternFolder;
+	private folder: PatternFolder;
 
 	/**
 	 * The properties this pattern supports.
 	 */
-	public properties: Property[];
-
-	/**
-	 * The application state store.
-	 */
-	public store: Store;
+	private properties: Property[];
 
 	/**
 	 * This is a valid pattern for Stacked (has been parsed successfully).
 	 */
-	public valid: boolean = false;
+	private valid: boolean = false;
 
-	public constructor(store: Store, folder: PatternFolder, name: string) {
-		this.store = store;
+	public constructor(folder: PatternFolder, name: string) {
 		this.folder = folder;
 		this.name = name;
 
-		this.refresh();
+		this.reload();
 	}
 
-	public refresh(): void {
+	public getAbsolutePath(): string {
+		return PathUtils.join(this.folder.getAbsolutePath(), this.name);
+	}
+
+	public getName(): string {
+		return this.name;
+	}
+
+	public getFolder(): PatternFolder {
+		return this.folder;
+	}
+
+	public getProperties(): Property[] {
+		return this.properties;
+	}
+
+	public getRelativePath(): string {
+		return PathUtils.join(this.folder.getRelativePath(), this.name);
+	}
+
+	public isValid(): boolean {
+		return this.valid;
+	}
+
+	public reload(): void {
 		if (!Pattern.parsers) {
 			Pattern.parsers = [new TypeScriptParser()];
 		}
 
-		if (Pattern.parsers.some(parser => parser.parse(this))) {
-			this.valid = true;
-		} else {
-			this.valid = false;
+		this.valid = false;
+		this.properties = [];
+		Pattern.parsers.some(parser => {
+			const result: Property[] | undefined = parser.parse(this);
+			if (result) {
+				this.properties = result;
+				this.valid = true;
+				return true;
+			} else {
+				return false;
+			}
+		});
+
+		if (!this.valid) {
 			console.warn(
-				`Failed to parse pattern "${this.getStyleguideRelativePath()}":` +
+				`Failed to parse pattern "${this.getRelativePath()}":` +
 					' Currently we support TypeScript patterns only' +
 					' (we require an index.js and an index.d.ts).'
 			);
 		}
 	}
 
-	public getPath(): string {
-		return PathUtils.join(this.folder.getPath(), this.name);
-	}
-
-	public getStyleguideRelativePath(): string {
-		return PathUtils.join(this.folder.getStyleguideRelativePath(), this.name);
-	}
-
 	public toString(): string {
-		const path = this.getStyleguideRelativePath();
+		const path = this.getRelativePath();
 		return `Pattern(name="${this.name}", path="${path}", properties="${this.properties}")`;
 	}
 }

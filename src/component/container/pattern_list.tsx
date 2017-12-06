@@ -16,21 +16,23 @@ export class PatternList extends React.Component<PatternListProps> {
 	}
 
 	public render(): JSX.Element {
-		const items: ListPropsListItem[] = this.createItemsFromFolder(this.props.store.patterns);
+		const items: ListPropsListItem[] = this.createItemsFromFolder(
+			this.props.store.getPatternRoot() as PatternFolder
+		);
 		return <List headline="Patterns" items={items} />;
 	}
 
 	public createItemsFromFolder(parent: PatternFolder): ListPropsListItem[] {
 		const result: ListPropsListItem[] = [];
 
-		parent.children.forEach((child: PatternFolder) => {
-			const childItem: ListPropsListItem = { value: child.name };
+		parent.getChildren().forEach((child: PatternFolder) => {
+			const childItem: ListPropsListItem = { value: child.getName() };
 			childItem.children = this.createItemsFromFolder(child);
 			result.push(childItem);
 		});
 
-		parent.patterns.forEach((pattern: Pattern) => {
-			result.push({ value: pattern.name });
+		parent.getPatterns().forEach((pattern: Pattern) => {
+			result.push({ value: pattern.getName() });
 		});
 
 		return result;

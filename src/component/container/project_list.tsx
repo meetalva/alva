@@ -16,15 +16,15 @@ export class ProjectList extends React.Component<ProjectListProps> {
 	}
 
 	public render(): JSX.Element {
-		const items: ListPropsListItem[] = this.props.store.projects.map((project: Project) => ({
+		const items: ListPropsListItem[] = this.props.store.getProjects().map((project: Project) => ({
 			label: 'Project',
-			value: project.name,
-			children: project.pages.map((page: PageRef) => ({
+			value: project.getName(),
+			children: project.getPages().map((page: PageRef) => ({
 				label: 'Page',
-				value: page.name,
+				value: page.getName(),
 				children: [],
 				onClick: (event: React.MouseEvent<HTMLElement>) => {
-					this.props.store.openPage(project.id, page.id);
+					this.props.store.openPage(project.getId(), page.getId());
 				}
 			}))
 		}));

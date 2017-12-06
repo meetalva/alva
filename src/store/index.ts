@@ -2,17 +2,43 @@ import { PatternFolder } from './pattern/folder';
 import * as FileUtils from 'fs';
 import { observable } from 'mobx';
 import { Page } from './page';
+import { PageRef } from './page/page_ref';
 import * as PathUtils from 'path';
+import { Pattern } from './pattern';
 import { Project } from './project';
 
 export class Store {
-	@observable public currentPage?: Page;
-	public projects: Project[];
-	public patterns: PatternFolder;
-	@observable public styleGuidePath: string;
+	@observable private currentPage?: Page;
+	private projects: Project[] = [];
+	private patternRoot: PatternFolder;
+	@observable private styleGuidePath: string;
+
+	public getCurrentPage(): Page | undefined {
+		return this.currentPage;
+	}
+
+	public getPattern(path: string): Pattern | undefined {
+		return this.patternRoot.getPattern(path);
+	}
+
+	public getPatternsPath(): string {
+		return PathUtils.join(this.styleGuidePath, 'lib');
+	}
+
+	public getPatternRoot(): PatternFolder | undefined {
+		return this.patternRoot;
+	}
+
+	public getProjects(): Project[] {
+		return this.projects;
+	}
 
 	public getProjectsPath(): string {
 		return PathUtils.join(this.styleGuidePath, 'stacked', 'projects');
+	}
+
+	public getStyleGuidePath(): string {
+		return this.styleGuidePath;
 	}
 
 	public openStyleguide(styleGuidePath: string): void {
@@ -23,22 +49,27 @@ export class Store {
 		this.styleGuidePath = styleGuidePath;
 		this.currentPage = undefined;
 		this.projects = [];
-		this.patterns = new PatternFolder(this, 'patterns');
+		this.patternRoot = new PatternFolder(this, 'patterns');
+
+		const projects: Project[] = [];
 
 		const projectsPath = this.getProjectsPath();
-		this.projects = FileUtils.readdirSync(projectsPath)
+		FileUtils.readdirSync(projectsPath)
 			.map((name: string) => ({ name, path: PathUtils.join(projectsPath, name) }))
 			.filter(child => FileUtils.lstatSync(child.path).isDirectory())
-			.map(folder => ({
-				id: folder.name,
-				name: folder.name,
-				pages: FileUtils.readdirSync(folder.path)
+			.forEach(folder => {
+				const pages: PageRef[] = [];
+				FileUtils.readdirSync(folder.path)
 					.filter(child => child.match(/\.json$/))
-					.map(file => ({
-						id: file.replace(/\.json$/, ''),
-						name: file.replace(/\.json$/, '')
-					}))
-			}));
+					.forEach(file => {
+						const pageId: string = file.replace(/\.json$/, '');
+						const pageName: string = file.replace(/\.json$/, '');
+						pages.push(new PageRef(pageId, pageName));
+					});
+
+				projects.push(new Project(folder.name, folder.name, pages));
+			});
+		this.projects = projects;
 	}
 
 	public openPage(projectId: string, pageId: string): void {

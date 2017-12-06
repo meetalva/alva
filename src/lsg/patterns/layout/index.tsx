@@ -15,8 +15,10 @@ const StyledLayout = styled.div`
 	}
 `;
 
-export const Layout: React.StatelessComponent<LayoutProps> = props => (
+const Layout: React.StatelessComponent<LayoutProps> = props => (
 	<StyledLayout className={props.className} directionVertical={props.directionVertical}>
 		{props.children}
 	</StyledLayout>
 );
+
+export default Layout;

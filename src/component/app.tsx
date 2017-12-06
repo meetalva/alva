@@ -1,5 +1,5 @@
 import { ElementList } from './container/element_list';
-import { Layout } from '../lsg/patterns/layout';
+import Layout from '../lsg/patterns/layout';
 import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
 import { Preview } from './presentation/preview';

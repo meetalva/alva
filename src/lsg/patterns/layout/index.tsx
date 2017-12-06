@@ -8,6 +8,7 @@ export interface LayoutProps {
 
 const StyledLayout = styled.div`
 	display: flex;
+	justify-content: space-between;
 	${(props: LayoutProps) => props.directionVertical
 		? 'flex-direction: column;'
 		: ''

@@ -4,6 +4,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 const StyledTestDiv = styled.div`
+	flex-grow: 1;
 	padding: 20px 10px;
 	background: ${colors.greenLight.toString()};
 
@@ -13,7 +14,7 @@ const StyledTestDiv = styled.div`
 `;
 
 const LayoutDemo: React.StatelessComponent<void> = (): JSX.Element => (
-	<Layout directionVertical={true}>
+	<div>
 		<Layout directionVertical={true}>
 			<StyledTestDiv>Vertical</StyledTestDiv>
 			<StyledTestDiv>Vertical</StyledTestDiv>
@@ -24,7 +25,7 @@ const LayoutDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<StyledTestDiv>Horizontal</StyledTestDiv>
 			<StyledTestDiv>Horizontal</StyledTestDiv>
 		</Layout>
-	</Layout>
+	</div>
 );
 
 export default LayoutDemo;

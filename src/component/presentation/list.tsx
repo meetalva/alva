@@ -1,4 +1,4 @@
-import colors from '../../lsg/patterns/colors';
+import { colors } from '../../lsg/patterns/colors';
 import * as React from 'react';
 import styledComponents from 'styled-components';
 

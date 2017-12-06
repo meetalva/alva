@@ -4,13 +4,12 @@
 	"description": "",
 	"main": "dist/electron/index.js",
 	"scripts": {
-		"prebuild": "tslint --project . -c tslint.json 'src/**/*.ts'",
-		"build": "tsc --project .",
-		"start": "electron dist/electron",
-		"watch": "tsc --project . --watch",
-		"watch-start": "npm run build && concurrently \"npm run start\" \"tsc --project . --watch\"",
-		"start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
-		"build-lsg": "tsc --project src/lsg --outDir dist/lsg/patterns --sourceMap"
+		"build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project .",
+		"start":
+			"npm run build && concurrently \"electron dist/electron\" \"tsc --project . --watch\"",
+		"build-lsg": "tsc --project src/lsg --outDir dist/lsg/patterns --sourceMap",
+		"start-lsg":
+			"npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\""
 	},
 	"repository": {
 		"type": "git",

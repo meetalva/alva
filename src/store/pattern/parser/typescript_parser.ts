@@ -7,8 +7,6 @@ import { PatternParser } from '.';
 import { Pattern } from '..';
 
 export class TypeScriptParser extends PatternParser {
-	private static kinds: { [kind: number]: string };
-
 	public parse(pattern: Pattern): Property[] | undefined {
 		const folderPath: string = pattern.getAbsolutePath();
 		const declarationPath = PathUtils.join(folderPath, 'index.d.ts');
@@ -54,16 +52,6 @@ export class TypeScriptParser extends PatternParser {
 			}
 		});
 
-		if (!TypeScriptParser.kinds) {
-			const kinds: { [kind: number]: string } = {};
-			// tslint:disable-next-line:no-any
-			const syntaxKind: any = ts.SyntaxKind as any;
-			Object.keys(ts.SyntaxKind).map((value: string, index: number, array: string[]) => {
-				kinds[syntaxKind[value]] = value;
-			});
-			TypeScriptParser.kinds = kinds;
-		}
-
 		if (!declaration) {
 			console.warn(`Invalid pattern "${declarationPath}": No props interface found`);
 			return undefined;
@@ -74,11 +62,45 @@ export class TypeScriptParser extends PatternParser {
 			if (ts.isPropertySignature(node)) {
 				const signature: ts.PropertySignature = node;
 				const id: string = signature.name.getText();
+
 				// TODO: Replace by actual name
 				const name: string = signature.name.getText();
+
 				const required: boolean = signature.questionToken === undefined;
-				// TODO: Replace by actual type (using ts.TypeNode and/or signatureType.getFullText())
-				const type: PropertyType = PropertyType.STRING;
+
+				const typeNode: ts.TypeNode | undefined = signature.type;
+				if (!typeNode) {
+					return;
+				}
+
+				let type: PropertyType;
+				switch (typeNode.kind) {
+					case ts.SyntaxKind.StringKeyword:
+						// TODO: if (isArray) {
+						// type = PropertyType.STRING_ARRAY;
+						// } else {
+						type = PropertyType.STRING;
+						// }
+						break;
+
+					case ts.SyntaxKind.NumberKeyword:
+						// TODO: if (isArray) {
+						// type = PropertyType.NUMBER_ARRAY;
+						// } else {
+						type = PropertyType.NUMBER;
+						// }
+						break;
+
+					case ts.SyntaxKind.BooleanKeyword:
+						type = PropertyType.BOOLEAN;
+						break;
+
+					// TODO: Pattern type
+
+					default:
+						type = PropertyType.OBJECT;
+				}
+
 				const property: Property = new Property(id, name, type, required);
 
 				properties.push(property);

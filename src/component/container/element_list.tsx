@@ -44,7 +44,7 @@ export class ElementList extends React.Component<ElementListProps> {
 		const properties: Property[] = pattern.getProperties() || {};
 		properties.forEach(property => {
 			const propertyId: string = property.getId();
-			items.push(this.createItemFromProperty(propertyId, element.getProperty(propertyId)));
+			items.push(this.createItemFromProperty(propertyId, element.getPropertyValue(propertyId)));
 		});
 		const children: PageElement[] = element.getChildren() || [];
 		children.forEach((value: PageElement, index: number) => {

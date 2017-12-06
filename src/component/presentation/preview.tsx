@@ -61,7 +61,7 @@ export class Preview extends React.Component<PreviewProps> {
 			// tslint:disable-next-line:no-any
 			const componentProps: any = {};
 			pattern.getProperties().forEach(property => {
-				componentProps[property.getId()] = pageElement.getProperty(property.getId());
+				componentProps[property.getId()] = pageElement.getPropertyValue(property.getId());
 			});
 
 			componentProps.children = this.createComponent(pageElement.getChildren());

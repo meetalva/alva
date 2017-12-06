@@ -6,7 +6,7 @@ export class PageElement {
 	private children: PageElement[] = [];
 	private patternPath: string;
 	private pattern?: Pattern;
-	private properties: { [id: string]: ElementValue } = {};
+	private propertyValues: { [id: string]: ElementValue } = {};
 
 	// tslint:disable-next-line:no-any
 	public constructor(json: any, store: Store) {
@@ -22,7 +22,7 @@ export class PageElement {
 			Object.keys(json.properties).forEach((propertyId: string) => {
 				// tslint:disable-next-line:no-any
 				const value: any = json.properties[propertyId];
-				this.properties[propertyId] = this.createElementOrValue(value, store);
+				this.propertyValues[propertyId] = this.createElementOrValue(value, store);
 			});
 		}
 
@@ -36,7 +36,11 @@ export class PageElement {
 
 	// tslint:disable-next-line:no-any
 	protected createElementOrValue(json: any, store: Store): PageElement | ElementValue {
-		return json && json['_type'] === 'pattern' ? new PageElement(json, store) : json;
+		if (json && json['_type'] === 'pattern') {
+			return new PageElement(json, store);
+		} else {
+			return json;
+		}
 	}
 
 	public getChildren(): PageElement[] {
@@ -51,7 +55,7 @@ export class PageElement {
 		return this.patternPath;
 	}
 
-	public getProperty(id: string): ElementValue {
-		return this.properties[id];
+	public getPropertyValue(id: string): ElementValue {
+		return this.propertyValues[id];
 	}
 }

@@ -1,4 +1,5 @@
 import { ElementList } from './container/element_list';
+import { Layout } from '../lsg/patterns/layout';
 import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
 import { Preview } from './presentation/preview';
@@ -7,24 +8,6 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
 import styledComponents from 'styled-components';
-
-const ColumnGroup = styledComponents.div`
-	display: flex;
-	flex-direction: row;
-	min-height: 100%;
-	font-family: 'Segoe UI';
-	font-size: 14px;
-	box-sizing: border-box;
-`;
-
-const LeftColumn = styledComponents.div`
-	display: flex;
-	flex-direction: column;
-	flex-grow: 0;
-	flex-shrink: 1;
-	flex-basis: 300px;
-	border: 1px solid #ccc;
-`;
 
 const ElementPane = styledComponents.div`
 	display: flex;
@@ -60,8 +43,8 @@ class App extends React.Component<AppProps> {
 
 	public render(): JSX.Element {
 		return (
-			<ColumnGroup>
-				<LeftColumn>
+			<Layout>
+				<Layout directionVertical>
 					<ProjectsPane>
 						<ProjectList store={this.props.store} />
 					</ProjectsPane>
@@ -69,7 +52,7 @@ class App extends React.Component<AppProps> {
 					<PatternsPane>
 						<PatternList store={this.props.store} />
 					</PatternsPane>
-				</LeftColumn>
+				</Layout>
 
 				<PreviewPane>
 					<Preview store={this.props.store} />
@@ -80,7 +63,7 @@ class App extends React.Component<AppProps> {
 				</ElementPane>
 
 				<DevTools />
-			</ColumnGroup>
+			</Layout>
 		);
 	}
 }

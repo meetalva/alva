@@ -1,0 +1,10 @@
+{
+  "name": "fonts",
+  "displayName": "Fonts",
+  "version": "1.0.0",
+  "tags": ["natural-laws", "font-face"],
+  "flag": "alpha",
+  "options": {
+    "hidden": true
+  }
+}

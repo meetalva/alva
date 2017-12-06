@@ -3,8 +3,6 @@ import { List, ListPropsListItem } from '../presentation/list';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page';
 import { PageElement } from '../../store/page/page_element';
-import { Pattern } from '../../store/pattern';
-import { Property } from '../../store/pattern/property';
 import * as React from 'react';
 import { Store } from '../../store';
 
@@ -40,12 +38,6 @@ export class ElementList extends React.Component<ElementListProps> {
 		}
 
 		const items: ListPropsListItem[] = [];
-		const pattern: Pattern = element.getPattern() as Pattern;
-		const properties: Property[] = pattern.getProperties() || {};
-		properties.forEach(property => {
-			const propertyId: string = property.getId();
-			items.push(this.createItemFromProperty(propertyId, element.getPropertyValue(propertyId)));
-		});
 		const children: PageElement[] = element.getChildren() || [];
 		children.forEach((value: PageElement, index: number) => {
 			items.push(

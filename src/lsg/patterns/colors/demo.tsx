@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import colors, { Color, RGB } from './index';
+import { Color, colors, RGB } from './index';
 
 interface ColorSwatchProps {
 	color: Color;

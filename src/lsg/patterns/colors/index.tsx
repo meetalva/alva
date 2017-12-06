@@ -20,13 +20,13 @@ export class Color {
 	}
 
 	public toString(format: 'rgb' | 'hex' = 'rgb', options?: { alpha?: number }): string {
-		const hasAlpha = options && typeof options === `object` && typeof options.alpha === `number`;
+		const hasAlpha = options && typeof options === 'object' && typeof options.alpha === 'number';
 		const alpha = options && hasAlpha ? options.alpha : undefined;
 		return !hasAlpha && format === 'hex' ? this.toHexString() : this.toRGBString(alpha);
 	}
 
 	public toRGBString(alpha?: number): string {
-		const a = typeof alpha === `number` ? alpha : this.alpha;
+		const a = typeof alpha === 'number' ? alpha : this.alpha;
 		return a === 1 ? `rgb(${this.rgb.join(', ')})` : `rgba(${this.rgb.join(', ')}, ${a})`;
 	}
 
@@ -45,7 +45,7 @@ export class Color {
 	}
 }
 
-const colors = {
+export const colors = {
 	black: new Color({
 		displayName: 'Black',
 		rgb: [51, 51, 51]
@@ -75,5 +75,3 @@ const colors = {
 		rgb: [255, 255, 255]
 	})
 };
-
-export default colors;

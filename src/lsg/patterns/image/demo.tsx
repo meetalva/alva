@@ -1,5 +1,5 @@
+import { Image } from './index';
 import * as React from 'react';
-import Image from './index';
 
 const ImageDemo = () => {
 	// example with srcset and props in object

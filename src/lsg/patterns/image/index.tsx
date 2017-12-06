@@ -11,8 +11,6 @@ const StyledImage = styled.img`
 	display: block;
 `;
 
-const Image: React.StatelessComponent<ImageProps> = props => {
-	return <StyledImage alt={props.alt} className={props.className} src={props.src} />;
-};
-
-export default Image;
+export const Image: React.StatelessComponent<ImageProps> = props => (
+	<StyledImage alt={props.alt} className={props.className} src={props.src} />
+);

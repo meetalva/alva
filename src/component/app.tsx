@@ -14,6 +14,7 @@ const ElementPane = styledComponents.div`
 	flex-grow: 0;
 	flex-shrink: 1;
 	flex-basis: 350px;
+	order: 2;
 	border: 1px solid #ccc;
 `;
 
@@ -54,13 +55,13 @@ class App extends React.Component<AppProps> {
 					</PatternsPane>
 				</Layout>
 
-				<PreviewPane>
-					<Preview store={this.props.store} />
-				</PreviewPane>
-
 				<ElementPane>
 					<ElementList store={this.props.store} />
 				</ElementPane>
+
+				<PreviewPane>
+					<Preview store={this.props.store} />
+				</PreviewPane>
 
 				<DevTools />
 			</Layout>

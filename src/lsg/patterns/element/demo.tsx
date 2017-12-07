@@ -1,4 +1,4 @@
-import { Element } from './index';
+import Element from './index';
 import * as React from 'react';
 import styled from 'styled-components';
 

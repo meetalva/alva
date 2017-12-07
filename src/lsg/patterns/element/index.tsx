@@ -28,7 +28,7 @@ const StyledElementChild = styled.div`
 	padding-left: 15px;
 `;
 
-export const Element: React.StatelessComponent<ElementProps> = props => {
+const Element: React.StatelessComponent<ElementProps> = props => {
 	const { children, title, active } = props;
 
 	return (
@@ -38,3 +38,5 @@ export const Element: React.StatelessComponent<ElementProps> = props => {
 		</StyledElement>
 	);
 };
+
+export default Element;

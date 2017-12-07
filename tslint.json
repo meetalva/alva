@@ -195,12 +195,7 @@
 		],
 		"prefer-function-over-method": [true, "allow-public", "allow-protected"],
 		"prefer-method-signature": true,
-		"prefer-switch": [
-			true,
-			{
-				"min-cases": 3
-			}
-		],
+		"prefer-switch": [false],
 		"prefer-template": [true, "allow-single-concat"],
 		"quotemark": [true, "single", "avoid-escape", "avoid-template", "jsx-double"],
 		"return-undefined": false,

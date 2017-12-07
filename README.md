@@ -39,7 +39,7 @@ https://github.com/stackedapp/stacked-example.
 
 * Clone this repository.
 * npm i
-* npm run start
+* npm start
 
 Currently, the prototype application expects that you also clone and build stacked-example into a
 folder next to stacked.

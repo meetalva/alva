@@ -1,12 +1,13 @@
 import { PageElement } from './page_element';
 
-export type ElementValue =
+export type PropertyValue =
+	// tslint:disable-next-line:no-any
+	| { [id: string]: any }
 	| string
 	| string[]
 	| number
 	| number[]
 	| boolean
-	| object
 	| PageElement
 	| undefined
 	| null;

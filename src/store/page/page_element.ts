@@ -1,12 +1,13 @@
-import { ElementValue } from './element_value';
 import { Pattern } from '../pattern';
+import { Property } from '../pattern/property';
+import { PropertyValue } from './property_value';
 import { Store } from '..';
 
 export class PageElement {
 	private children: PageElement[] = [];
 	private patternPath: string;
 	private pattern?: Pattern;
-	private propertyValues: { [id: string]: ElementValue } = {};
+	private propertyValues: { [id: string]: PropertyValue } = {};
 
 	// tslint:disable-next-line:no-any
 	public constructor(json: any, store: Store) {
@@ -22,7 +23,7 @@ export class PageElement {
 			Object.keys(json.properties).forEach((propertyId: string) => {
 				// tslint:disable-next-line:no-any
 				const value: any = json.properties[propertyId];
-				this.propertyValues[propertyId] = this.createElementOrValue(value, store);
+				this.setPropertyValue(propertyId, this.createElementOrValue(value, store));
 			});
 		}
 
@@ -35,7 +36,7 @@ export class PageElement {
 	}
 
 	// tslint:disable-next-line:no-any
-	protected createElementOrValue(json: any, store: Store): PageElement | ElementValue {
+	protected createElementOrValue(json: any, store: Store): PageElement | PropertyValue {
 		if (json && json['_type'] === 'pattern') {
 			return new PageElement(json, store);
 		} else {
@@ -55,7 +56,22 @@ export class PageElement {
 		return this.patternPath;
 	}
 
-	public getPropertyValue(id: string): ElementValue {
+	public getPropertyValue(id: string): PropertyValue {
 		return this.propertyValues[id];
+	}
+
+	// tslint:disable-next-line:no-any
+	public setPropertyValue(id: string, value: any): void {
+		if (!this.pattern) {
+			throw new Error('This element has no pattern');
+		}
+
+		const property: Property | undefined = this.pattern.getProperty(id);
+		if (!property) {
+			console.warn(`Ignoring unknown property "${id}"`);
+			return;
+		}
+
+		this.propertyValues[id] = (property as Property).coerceValue(value);
 	}
 }

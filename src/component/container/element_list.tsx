@@ -1,9 +1,9 @@
 import Element from '../../lsg/patterns/element';
-import { ElementValue } from '../../store/page/element_value';
 import { ListPropsListItem } from '../presentation/list';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page';
 import { PageElement } from '../../store/page/page_element';
+import { PropertyValue } from '../../store/page/property_value';
 import * as React from 'react';
 import { Store } from '../../store';
 
@@ -64,7 +64,7 @@ export class ElementList extends React.Component<ElementListProps> {
 		};
 	}
 
-	public createItemFromProperty(key: string, value: ElementValue): ListPropsListItem {
+	public createItemFromProperty(key: string, value: PropertyValue): ListPropsListItem {
 		if (Array.isArray(value)) {
 			const items: ListPropsListItem[] = [];
 			(value as (string | number)[]).forEach((child, index: number) => {

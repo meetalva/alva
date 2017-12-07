@@ -1,7 +1,14 @@
+// TODO: import { StringArrayProperty } from '../property/string_array_property';
+import { BooleanProperty } from '../property/boolean_property';
 import * as FileUtils from 'fs';
+import { NumberProperty } from '../property/number_property';
+// TODO: import { NumberArrayProperty } from '../property/number_array_property';
+import { ObjectProperty } from '../property/object_property';
 import * as PathUtils from 'path';
 import { Property } from '../property';
-import { PropertyType } from '../property/type';
+import { StringProperty } from '../property/string_property';
+// TODO: import { PatternProperty } from '../property/pattern_property';
+// TODO: import { EnumProperty } from '../property/enum_property';
 import * as ts from 'typescript';
 import { PatternParser } from '.';
 import { Pattern } from '..';
@@ -73,13 +80,13 @@ export class TypeScriptParser extends PatternParser {
 					return;
 				}
 
-				let type: PropertyType;
+				let property: Property;
 				switch (typeNode.kind) {
 					case ts.SyntaxKind.StringKeyword:
 						// TODO: if (isArray) {
 						// type = PropertyType.STRING_ARRAY;
 						// } else {
-						type = PropertyType.STRING;
+						property = new StringProperty(id, name, required);
 						// }
 						break;
 
@@ -87,21 +94,19 @@ export class TypeScriptParser extends PatternParser {
 						// TODO: if (isArray) {
 						// type = PropertyType.NUMBER_ARRAY;
 						// } else {
-						type = PropertyType.NUMBER;
+						property = new NumberProperty(id, name, required);
 						// }
 						break;
 
 					case ts.SyntaxKind.BooleanKeyword:
-						type = PropertyType.BOOLEAN;
+						property = new BooleanProperty(id, name, required);
 						break;
 
 					// TODO: Pattern type
 
 					default:
-						type = PropertyType.OBJECT;
+						property = new ObjectProperty(id, name, required);
 				}
-
-				const property: Property = new Property(id, name, type, required);
 
 				properties.push(property);
 			}

@@ -23,6 +23,11 @@ export class Pattern {
 	private properties: Property[];
 
 	/**
+	 * The properties this pattern supports.
+	 */
+	private propertiesById: { [id: string]: Property } = {};
+
+	/**
 	 * This is a valid pattern for Stacked (has been parsed successfully).
 	 */
 	private valid: boolean = false;
@@ -50,6 +55,10 @@ export class Pattern {
 		return this.properties;
 	}
 
+	public getProperty(id: string): Property | undefined {
+		return this.propertiesById[id];
+	}
+
 	public getRelativePath(): string {
 		return PathUtils.join(this.folder.getRelativePath(), this.name);
 	}
@@ -69,6 +78,11 @@ export class Pattern {
 			const result: Property[] | undefined = parser.parse(this);
 			if (result) {
 				this.properties = result;
+				this.propertiesById = {};
+				this.properties.forEach(pattern => {
+					this.propertiesById[pattern.getId()] = pattern;
+				});
+
 				this.valid = true;
 				return true;
 			} else {

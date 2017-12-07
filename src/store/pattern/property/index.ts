@@ -1,18 +1,62 @@
-import { PropertyType } from './type';
-
-export class Property {
+export abstract class Property {
 	private id: string;
 	private name: string;
 	private required: boolean;
-	private type: PropertyType;
 
-	// tslint:disable-next-line:no-any
-	public constructor(id: string, name: string, type: PropertyType, required: boolean) {
+	public constructor(id: string, name: string, required: boolean) {
 		this.id = id;
 		this.name = name;
-		this.type = type;
 		this.required = required;
 	}
+
+	// tslint:disable-next-line:no-any
+	protected arraysAndEqual(value1: any, value2: any): boolean {
+		if (!Array.isArray(value1) || !Array.isArray(value2)) {
+			return false;
+		}
+
+		// tslint:disable-next-line:no-any
+		const array1: any[] = value1;
+		// tslint:disable-next-line:no-any
+		const array2: any[] = value2;
+		if (array1.length !== array2.length) {
+			return false;
+		}
+
+		for (let i = 0; i < array1.length; i++) {
+			if (array1[i] !== array2[i]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	// tslint:disable-next-line:no-any
+	protected coerceArrayValue(value: any, elementCoercion: (value: any) => any): any {
+		// tslint:disable-next-line:no-any
+		let result: any[];
+		if (Array.isArray(value)) {
+			result = value;
+		} else {
+			result = [value];
+		}
+
+		// tslint:disable-next-line:no-any
+		result = value.filter(
+			// tslint:disable-next-line:no-any
+			(element: any) => value !== null && value !== undefined && value !== ''
+		);
+
+		// tslint:disable-next-line:no-any
+		result = result.map(elementCoercion);
+
+		// Ensure that unmodified arrays stay the same
+		return this.arraysAndEqual(value, result) ? value : result;
+	}
+
+	// tslint:disable-next-line:no-any
+	public abstract coerceValue(value: any): any;
 
 	public getId(): string {
 		return this.id;
@@ -26,11 +70,5 @@ export class Property {
 		return this.required;
 	}
 
-	public getType(): PropertyType {
-		return this.type;
-	}
-
-	public toString(): string {
-		return `Property(id="${this.id}", type="${this.type}", required="${this.required}")`;
-	}
+	public abstract getType(): string;
 }

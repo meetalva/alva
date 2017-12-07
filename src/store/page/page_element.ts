@@ -72,6 +72,6 @@ export class PageElement {
 			return;
 		}
 
-		this.propertyValues[id] = (property as Property).coerceValue(value);
+		this.propertyValues[id] = property.coerceValue(value);
 	}
 }

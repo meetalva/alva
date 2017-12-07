@@ -12,6 +12,16 @@ const StyledTestDiv = styled.div`
 const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<div>
 		<StyledTestDiv>
+			Default
+			<Element title="Active Element" />
+		</StyledTestDiv>
+		<StyledTestDiv>
+			Active
+			<Element active title="Active Element" />
+		</StyledTestDiv>
+
+		<StyledTestDiv>
+			With Child and clickhandler
 			<Element
 				handleIconClick={() => {
 					console.log('Clicked');
@@ -22,14 +32,19 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			</Element>
 		</StyledTestDiv>
 		<StyledTestDiv>
+			With Child and open
 			<Element title="Element Open" open>
 				Child
 			</Element>
 		</StyledTestDiv>
 		<StyledTestDiv>
-			<Element active title="Active Element" />
+			With child and active
+			<Element active title="Active Element">
+				Child
+			</Element>
 		</StyledTestDiv>
 		<StyledTestDiv>
+			With child, active and open
 			<Element active open title="Active Element">
 				Child
 			</Element>

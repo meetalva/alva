@@ -1,8 +1,8 @@
-import { ElementValue } from '../../store/page/element_value';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page';
 import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern';
+import { PropertyValue } from '../../store/page/property_value';
 import * as React from 'react';
 import { Store } from '../../store';
 
@@ -33,11 +33,11 @@ export class Preview extends React.Component<PreviewProps> {
 	 * @returns A React component in case of a page element, the primitive in case of a primitive,
 	 * or an array or object with values converted in the same manner, if an array resp. object is provided.
 	 */
-	private createComponent(value: ElementValue, key?: string): React.Component | ElementValue {
+	private createComponent(value: PropertyValue, key?: string): React.Component | PropertyValue {
 		if (Array.isArray(value)) {
 			const array: (string | number)[] = value;
 			// Handle arrays by returning a new array with recursively processed elements.
-			return array.map((element: ElementValue, index: number) =>
+			return array.map((element: PropertyValue, index: number) =>
 				this.createComponent(element, String(index))
 			);
 		}

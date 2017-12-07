@@ -10,15 +10,12 @@
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": false,
-		"inlineSourceMap": false,
+		"inlineSourceMap": true,
 		"inlineSources": false,
 		"isolatedModules": false,
 		"jsx": "react",
 		"module": "commonjs",
-		"lib": [
-			"es2017",
-			"dom"
-		],
+		"lib": ["es2017", "dom"],
 		"moduleResolution": "node",
 		"outDir": "dist",
 		"noEmit": false,
@@ -32,12 +29,8 @@
 		"pretty": true,
 		"removeComments": false,
 		"rootDir": "src",
-		"sourceMap": true,
 		"strictNullChecks": true,
 		"target": "es2017"
 	},
-	"include": [
-		"src/**/*.ts",
-		"src/**/*.tsx"
-	]
+	"include": ["src/**/*.ts", "src/**/*.tsx"]
 }

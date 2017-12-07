@@ -1,5 +1,6 @@
+import Element from '../../lsg/patterns/element';
 import { ElementValue } from '../../store/page/element_value';
-import { List, ListPropsListItem } from '../presentation/list';
+import { ListPropsListItem } from '../presentation/list';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page';
 import { PageElement } from '../../store/page/page_element';
@@ -20,12 +21,18 @@ export class ElementList extends React.Component<ElementListProps> {
 		const page: Page | undefined = this.props.store.getCurrentPage();
 		if (page) {
 			const rootElement: PageElement = page.getRoot() as PageElement;
-			return (
-				<List headline="Elements" items={[this.createItemFromElement('Root', rootElement)]} />
-			);
+			return this.renderList(this.createItemFromElement('Root', rootElement));
 		} else {
 			return null;
 		}
+	}
+
+	public renderList(item: ListPropsListItem, key?: number): JSX.Element {
+		return (
+			<Element title={item.value} key={key}>
+				{item.children && item.children.map((child, index) => this.renderList(child, index))}
+			</Element>
+		);
 	}
 
 	public createItemFromElement(key: string, element: PageElement): ListPropsListItem {

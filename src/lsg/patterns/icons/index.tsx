@@ -64,22 +64,23 @@ const StyledIcon = styled.svg`
 const IconRegistrySymbol: React.StatelessComponent<IconRegistrySymbolProps> = props =>
 	(
 		<symbol
-		id={`${props.id}`}
-		viewBox="0 0 24 24" >
-		{props.children}
+			id={`${props.id}`}
+			viewBox="0 0 24 24"
+		>
+			{props.children}
 		</symbol>
 	);
 
 export const IconRegistry: React.StatelessComponent<IconRegistryProps> = (props): JSX.Element =>
 (
 	<StyledIconRegistry>
-	{reduce(props.names, (name, e) => {
-		const iconReg = icons[e];
+		{reduce(props.names, (name, e) => {
+			const iconReg = icons[e];
 
-		return [
-			<IconRegistrySymbol id={name} key={`${name}`}>{iconReg}</IconRegistrySymbol>
-		];
-	})}
+			return [
+				<IconRegistrySymbol id={name} key={`${name}`}>{iconReg}</IconRegistrySymbol>
+			];
+		})}
 	</StyledIconRegistry>
 );
 
@@ -91,17 +92,16 @@ export const Icon: React.StatelessComponent<IconProps> = (props): JSX.Element =>
 	const icon = typeof props.name === 'number' ? IconName[props.name] : null;
 	return (
 		<StyledIcon className={props.className} iconColor={props.color} size={props.size}>
-		{icon !== null && <use xlinkHref={getIconRef(icon)} />}
+			{icon !== null && <use xlinkHref={getIconRef(icon)} />}
 		</StyledIcon>
 	);
 };
 
 export function reduce(e: typeof IconName, cb: (name: string, e: number) => JSX.Element[]): JSX.Element[] {
 	const results = [];
-
-	for (const n in e) {
-		if (isNaN(Number(n))) {
-		results.push(...cb(n, Number(e[n])));
+	for (const name in e) {
+		if (isNaN(Number(name))) {
+			results.push(...cb(name, Number(e[name])));
 		}
 	}
 

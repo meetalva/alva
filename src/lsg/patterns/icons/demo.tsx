@@ -3,26 +3,26 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 const StyledDemoIconList = styled.ul`
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding-left: 0;
-  width: 100%;
-  list-style: none;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	padding-left: 0;
+	width: 100%;
+	list-style: none;
 `;
 
 const StyledDemoListItem = styled.li`
-  margin-top: 20px;
-  width: 20%;
-  min-width: 51px;
-  text-align: center;
-`;
+	margin-top: 20px;
+	width: 20%;
+	min-width: 51px;
+	text-align: center;
+	`;
 
 const StyledIcon = styled(Icon)`
-  margin-bottom: 20px;
+	margin-bottom: 20px;
 `;
 
 interface DemoIconsProps {
@@ -31,7 +31,6 @@ interface DemoIconsProps {
 }
 
 const DemoIcons = (props: DemoIconsProps) => (
-	<div>
 	<StyledDemoIconList>
 		{reduce(props.names, (name, id) => [
 			<StyledDemoListItem key={name}>
@@ -39,7 +38,6 @@ const DemoIcons = (props: DemoIconsProps) => (
 			</StyledDemoListItem>
 		])}
 	</StyledDemoIconList>
-	</div>
 );
 
 const IconRegistryDemo: React.StatelessComponent<void> = (): JSX.Element => (

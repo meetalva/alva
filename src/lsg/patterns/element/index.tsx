@@ -1,6 +1,7 @@
 import { colors } from '../colors';
 import { Icon, IconName, Size as IconSize } from '../icons';
 import * as React from 'react';
+import { getSpace, Size } from '../space';
 import styled from 'styled-components';
 
 export interface ElementProps {
@@ -19,9 +20,8 @@ const StyledElement = styled.div`
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	padding: 0 15px;
+	padding: 0 ${getSpace(Size.M)}px;
 	line-height: 30px;
-	margin-top: 0;
 	border-radius: 3px;
 	${(props: ElementProps) =>
 		props.active
@@ -37,7 +37,7 @@ const StyledElement = styled.div`
 
 const StyledElementChild = styled.div`
 	flex-basis: 100%;
-	padding-left: 15px;
+	padding-left: ${getSpace(Size.M)}px;
 	${(props: StyledElementChildProps) => (props.open ? 'display: block;' : 'display: none;')};
 `;
 

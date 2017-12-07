@@ -48,7 +48,7 @@ export class TypeScriptParser extends PatternParser {
 	}
 
 	protected getPropsTypeName(): string {
-		return this.typeName + 'Props';
+		return `${this.typeName} Props`;
 	}
 
 	public parse(pattern: Pattern): Property[] | undefined {

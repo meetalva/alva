@@ -1,4 +1,4 @@
-import Element from '../../lsg/patterns/element';
+import { ElementWrapper } from './elementWrapper';
 import { ListPropsListItem } from '../presentation/list';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page';
@@ -29,9 +29,9 @@ export class ElementList extends React.Component<ElementListProps> {
 
 	public renderList(item: ListPropsListItem, key?: number): JSX.Element {
 		return (
-			<Element title={item.value} key={key}>
+			<ElementWrapper title={item.value} key={key}>
 				{item.children && item.children.map((child, index) => this.renderList(child, index))}
-			</Element>
+			</ElementWrapper>
 		);
 	}
 

@@ -11,7 +11,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": false,
 		"inlineSourceMap": true,
-		"inlineSources": false,
+		"inlineSources": true,
 		"isolatedModules": false,
 		"jsx": "react",
 		"module": "commonjs",

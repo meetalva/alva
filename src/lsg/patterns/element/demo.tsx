@@ -21,7 +21,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 		</StyledTestDiv>
 
 		<StyledTestDiv>
-			With Child and clickhandler
+			With Child and handleIconClick
 			<Element
 				handleIconClick={() => {
 					console.log('Clicked');

@@ -30,7 +30,9 @@ export class ElementList extends React.Component<ElementListProps> {
 	public renderList(item: ListPropsListItem, key?: number): JSX.Element {
 		return (
 			<ElementWrapper title={item.value} key={key}>
-				{item.children && item.children.map((child, index) => this.renderList(child, index))}
+				{item.children &&
+					item.children.length > 0 &&
+					item.children.map((child, index) => this.renderList(child, index))}
 			</ElementWrapper>
 		);
 	}

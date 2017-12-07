@@ -17,11 +17,7 @@ export interface StyledElementChildProps {
 }
 
 const StyledElement = styled.div`
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
 	padding: 0 ${getSpace(Size.M)}px;
-	line-height: 30px;
 	border-radius: 3px;
 	${(props: ElementProps) =>
 		props.active
@@ -33,6 +29,12 @@ const StyledElement = styled.div`
 				color: ${colors.black.toString()};
 				background: ${colors.grey90.toString()};
 			`};
+`;
+
+const StyledElementLabel = styled.div`
+	display: flex;
+	min-height: 30px;
+	align-items: center;
 `;
 
 const StyledElementChild = styled.div`
@@ -51,14 +53,18 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 
 	return (
 		<StyledElement title={title} active={active}>
-			<StyledIcon
-				handleClick={handleIconClick}
-				name={IconName.Robo}
-				size={IconSize.XS}
-				color={colors.grey70}
-			/>
-			{title}
-			<StyledElementChild open={open}>{children}</StyledElementChild>
+			<StyledElementLabel>
+				{children && (
+					<StyledIcon
+						handleClick={handleIconClick}
+						name={IconName.Robo}
+						size={IconSize.XS}
+						color={colors.grey70}
+					/>
+				)}
+				{title}
+			</StyledElementLabel>
+			{children && <StyledElementChild open={open}>{children}</StyledElementChild>}
 		</StyledElement>
 	);
 };

@@ -60,11 +60,12 @@ class App extends React.Component<AppProps> {
 					<ElementList store={this.props.store} />
 				</ElementPane>
 
+				<IconRegistry names={IconName} />
+
 				<PreviewPane>
 					<Preview store={this.props.store} />
 				</PreviewPane>
 
-				<IconRegistry names={IconName} />
 				<DevTools />
 			</Layout>
 		);

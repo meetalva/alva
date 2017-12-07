@@ -7,7 +7,7 @@ export class BooleanProperty extends Property {
 
 	// tslint:disable-next-line:no-any
 	public coerceValue(value: any): any {
-		return value && (value === true || value === 'true' || value === 1);
+		return value === true || value === 'true' || value === 1;
 	}
 
 	public getType(): string {

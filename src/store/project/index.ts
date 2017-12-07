@@ -1,9 +1,10 @@
+import * as MobX from 'mobx';
 import { PageRef } from '../page/page_ref';
 
 export class Project {
-	private id: string;
-	private name: string;
-	private pages: PageRef[];
+	@MobX.observable private id: string;
+	@MobX.observable private name: string;
+	@MobX.observable private pages: PageRef[] = [];
 
 	public constructor(id: string, name: string, pages: PageRef[]) {
 		this.id = id;

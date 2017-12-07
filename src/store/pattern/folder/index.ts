@@ -1,15 +1,14 @@
 import * as FileUtils from 'fs';
+import * as MobX from 'mobx';
 import * as PathUtils from 'path';
 import { Pattern } from '..';
 import { Store } from '../..';
 
 export class PatternFolder {
-	private children: PatternFolder[];
-	private childrenByName: { [name: string]: PatternFolder } = {};
+	@MobX.observable private children: Map<string, PatternFolder> = new Map();
 	private name: string;
 	private parent?: PatternFolder;
-	private patterns: Pattern[];
-	private patternsByName: { [id: string]: Pattern } = {};
+	@MobX.observable private patterns: Map<string, Pattern> = new Map();
 	private store: Store;
 
 	public constructor(store: Store, name: string, parent?: PatternFolder) {
@@ -27,11 +26,11 @@ export class PatternFolder {
 	public getChild(path: string): PatternFolder | undefined {
 		const slashPos: number = path.indexOf('/');
 		if (slashPos < 0) {
-			return this.childrenByName[path];
+			return this.children.get(path);
 		}
 
 		const folderName: string = path.substring(0, slashPos);
-		const folder: PatternFolder | undefined = this.childrenByName[folderName];
+		const folder: PatternFolder | undefined = this.children.get(folderName);
 		if (!folder) {
 			return undefined;
 		}
@@ -41,7 +40,7 @@ export class PatternFolder {
 	}
 
 	public getChildren(): PatternFolder[] {
-		return this.children;
+		return Array.from(this.children.values());
 	}
 
 	public getName(): string {
@@ -53,17 +52,17 @@ export class PatternFolder {
 	}
 
 	public getPatterns(): Pattern[] {
-		return this.patterns;
+		return Array.from(this.patterns.values());
 	}
 
 	public getPattern(path: string): Pattern | undefined {
 		const slashPos: number = path.indexOf('/');
 		if (slashPos < 0) {
-			return this.patternsByName[path];
+			return this.patterns.get(path);
 		}
 
 		const folderName: string = path.substring(0, slashPos);
-		const folder: PatternFolder | undefined = this.childrenByName[folderName];
+		const folder: PatternFolder | undefined = this.children.get(folderName);
 		if (!folder) {
 			return undefined;
 		}
@@ -81,30 +80,30 @@ export class PatternFolder {
 	}
 
 	public reload(): void {
-		this.patterns = [];
-		this.children = [];
+		MobX.transaction(() => {
+			this.patterns.clear();
+			this.children.clear();
 
-		const parentPath: string = this.getAbsolutePath();
-		FileUtils.readdirSync(parentPath).forEach(childName => {
-			const childPath = PathUtils.join(parentPath, childName);
-			if (FileUtils.lstatSync(childPath).isDirectory()) {
-				if (
-					FileUtils.existsSync(PathUtils.join(childPath, 'index.d.ts')) &&
-					FileUtils.existsSync(PathUtils.join(childPath, 'index.js'))
-				) {
-					const pattern: Pattern = new Pattern(this, childName);
-					if (pattern.isValid()) {
-						this.patterns.push(pattern);
-						this.patternsByName[childName] = pattern;
-					}
-				} else {
-					const childFolder: PatternFolder = new PatternFolder(this.store, childName, this);
-					if (childFolder.patterns.length || childFolder.children.length) {
-						this.children.push(childFolder);
-						this.childrenByName[childName] = childFolder;
+			const parentPath: string = this.getAbsolutePath();
+			FileUtils.readdirSync(parentPath).forEach(childName => {
+				const childPath = PathUtils.join(parentPath, childName);
+				if (FileUtils.lstatSync(childPath).isDirectory()) {
+					if (
+						FileUtils.existsSync(PathUtils.join(childPath, 'index.d.ts')) &&
+						FileUtils.existsSync(PathUtils.join(childPath, 'index.js'))
+					) {
+						const pattern: Pattern = new Pattern(this, childName);
+						if (pattern.isValid()) {
+							this.patterns.set(childName, pattern);
+						}
+					} else {
+						const childFolder: PatternFolder = new PatternFolder(this.store, childName, this);
+						if (childFolder.patterns.size > 0 || childFolder.children.size > 0) {
+							this.children.set(childName, childFolder);
+						}
 					}
 				}
-			}
+			});
 		});
 	}
 }

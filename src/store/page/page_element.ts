@@ -18,6 +18,7 @@ export class PageElement {
 			this.pattern = pattern;
 		} else {
 			console.warn(`Ignoring unknown pattern ${this.patternPath}`);
+			return;
 		}
 
 		if (json.properties) {
@@ -66,7 +67,7 @@ export class PageElement {
 	// tslint:disable-next-line:no-any
 	public setPropertyValue(id: string, value: any): void {
 		if (!this.pattern) {
-			throw new Error('This element has no pattern');
+			throw new Error('This element has no valid pattern');
 		}
 
 		const property: Property | undefined = this.pattern.getProperty(id);

@@ -5,8 +5,6 @@ import { Property } from './property';
 import { TypeScriptParser } from './parser/typescript_parser';
 
 export class Pattern {
-	private static parsers: PatternParser[];
-
 	/**
 	 * The name of the pattern folder.
 	 */
@@ -63,13 +61,11 @@ export class Pattern {
 	}
 
 	public reload(): void {
-		if (!Pattern.parsers) {
-			Pattern.parsers = [new TypeScriptParser()];
-		}
+		const parsers: PatternParser[] = [new TypeScriptParser()];
 
 		this.valid = false;
 		this.properties.clear();
-		Pattern.parsers.some(parser => {
+		parsers.some(parser => {
 			const result: Property[] | undefined = parser.parse(this);
 			if (result) {
 				result.forEach(property => {

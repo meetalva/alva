@@ -1,13 +1,14 @@
+import * as MobX from 'mobx';
 import { Pattern } from '../pattern';
 import { Property } from '../pattern/property';
 import { PropertyValue } from './property_value';
 import { Store } from '..';
 
 export class PageElement {
-	private children: PageElement[] = [];
+	@MobX.observable private children: PageElement[] = [];
 	private patternPath: string;
 	private pattern?: Pattern;
-	private propertyValues: { [id: string]: PropertyValue } = {};
+	@MobX.observable private propertyValues: Map<string, PropertyValue> = new Map();
 
 	// tslint:disable-next-line:no-any
 	public constructor(json: any, store: Store) {
@@ -57,7 +58,9 @@ export class PageElement {
 	}
 
 	public getPropertyValue(id: string): PropertyValue {
-		return this.propertyValues[id];
+		const value: PropertyValue = this.propertyValues.get(id);
+
+		return value;
 	}
 
 	// tslint:disable-next-line:no-any
@@ -72,6 +75,6 @@ export class PageElement {
 			return;
 		}
 
-		this.propertyValues[id] = property.coerceValue(value);
+		this.propertyValues.set(id, value);
 	}
 }

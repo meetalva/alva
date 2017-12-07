@@ -11,7 +11,7 @@ export abstract class Property {
 
 	// tslint:disable-next-line:no-any
 	protected arraysAndEqual(value1: any, value2: any): boolean {
-		if (!Array.isArray(value1) || !Array.isArray(value2)) {
+		if (!(value1 instanceof Array) || !(value2 instanceof Array)) {
 			return false;
 		}
 
@@ -36,7 +36,7 @@ export abstract class Property {
 	protected coerceArrayValue(value: any, elementCoercion: (value: any) => any): any {
 		// tslint:disable-next-line:no-any
 		let result: any[];
-		if (Array.isArray(value)) {
+		if (value instanceof Array) {
 			result = value;
 		} else {
 			result = [value];

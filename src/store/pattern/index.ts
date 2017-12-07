@@ -20,12 +20,7 @@ export class Pattern {
 	/**
 	 * The properties this pattern supports.
 	 */
-	private properties: Property[];
-
-	/**
-	 * The properties this pattern supports.
-	 */
-	private propertiesById: { [id: string]: Property } = {};
+	private properties: Map<string, Property> = new Map();
 
 	/**
 	 * This is a valid pattern for Stacked (has been parsed successfully).
@@ -52,11 +47,11 @@ export class Pattern {
 	}
 
 	public getProperties(): Property[] {
-		return this.properties;
+		return Array.from(this.properties.values());
 	}
 
 	public getProperty(id: string): Property | undefined {
-		return this.propertiesById[id];
+		return this.properties.get(id);
 	}
 
 	public getRelativePath(): string {
@@ -73,14 +68,12 @@ export class Pattern {
 		}
 
 		this.valid = false;
-		this.properties = [];
+		this.properties.clear();
 		Pattern.parsers.some(parser => {
 			const result: Property[] | undefined = parser.parse(this);
 			if (result) {
-				this.properties = result;
-				this.propertiesById = {};
-				this.properties.forEach(pattern => {
-					this.propertiesById[pattern.getId()] = pattern;
+				result.forEach(property => {
+					this.properties.set(property.getId(), property);
 				});
 
 				this.valid = true;

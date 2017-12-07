@@ -65,7 +65,7 @@ export class ElementList extends React.Component<ElementListProps> {
 	}
 
 	public createItemFromProperty(key: string, value: PropertyValue): ListPropsListItem {
-		if (Array.isArray(value)) {
+		if (value instanceof Array) {
 			const items: ListPropsListItem[] = [];
 			(value as (string | number)[]).forEach((child, index: number) => {
 				items.push(this.createItemFromProperty(String(index + 1), child));

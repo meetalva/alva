@@ -34,7 +34,7 @@ export class Preview extends React.Component<PreviewProps> {
 	 * or an array or object with values converted in the same manner, if an array resp. object is provided.
 	 */
 	private createComponent(value: PropertyValue, key?: string): React.Component | PropertyValue {
-		if (Array.isArray(value)) {
+		if (value instanceof Array) {
 			const array: (string | number)[] = value;
 			// Handle arrays by returning a new array with recursively processed elements.
 			return array.map((element: PropertyValue, index: number) =>

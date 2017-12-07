@@ -1,6 +1,6 @@
 import { PatternFolder } from './pattern/folder';
 import * as FileUtils from 'fs';
-import { observable } from 'mobx';
+import * as MobX from 'mobx';
 import { Page } from './page';
 import { PageElement } from './page/page_element';
 import { PageRef } from './page/page_ref';
@@ -9,11 +9,11 @@ import { Pattern } from './pattern';
 import { Project } from './project';
 
 export class Store {
-	@observable private currentPage?: Page;
-	@observable private selectedElement?: PageElement;
-	private projects: Project[] = [];
+	@MobX.observable private currentPage?: Page;
+	@MobX.observable private projects: Project[] = [];
 	private patternRoot: PatternFolder;
-	@observable private styleGuidePath: string;
+	@MobX.observable private selectedElement?: PageElement;
+	@MobX.observable private styleGuidePath: string;
 
 	public getCurrentPage(): Page | undefined {
 		return this.currentPage;
@@ -48,39 +48,43 @@ export class Store {
 	}
 
 	public openStyleguide(styleGuidePath: string): void {
-		if (!PathUtils.isAbsolute(styleGuidePath)) {
-			// Currently, store is two levels below stacked, so go two up
-			styleGuidePath = PathUtils.join(__dirname, '..', '..', styleGuidePath);
-		}
-		this.styleGuidePath = styleGuidePath;
-		this.currentPage = undefined;
-		this.projects = [];
-		this.patternRoot = new PatternFolder(this, 'patterns');
+		MobX.transaction(() => {
+			if (!PathUtils.isAbsolute(styleGuidePath)) {
+				// Currently, store is two levels below stacked, so go two up
+				styleGuidePath = PathUtils.join(__dirname, '..', '..', styleGuidePath);
+			}
+			this.styleGuidePath = styleGuidePath;
+			this.currentPage = undefined;
+			this.projects = [];
+			this.patternRoot = new PatternFolder(this, 'patterns');
 
-		const projects: Project[] = [];
+			const projects: Project[] = [];
 
-		const projectsPath = this.getProjectsPath();
-		FileUtils.readdirSync(projectsPath)
-			.map((name: string) => ({ name, path: PathUtils.join(projectsPath, name) }))
-			.filter(child => FileUtils.lstatSync(child.path).isDirectory())
-			.forEach(folder => {
-				const pages: PageRef[] = [];
-				FileUtils.readdirSync(folder.path)
-					.filter(child => child.match(/\.json$/))
-					.forEach(file => {
-						const pageId: string = file.replace(/\.json$/, '');
-						const pageName: string = file.replace(/\.json$/, '');
-						pages.push(new PageRef(pageId, pageName));
-					});
+			const projectsPath = this.getProjectsPath();
+			FileUtils.readdirSync(projectsPath)
+				.map((name: string) => ({ name, path: PathUtils.join(projectsPath, name) }))
+				.filter(child => FileUtils.lstatSync(child.path).isDirectory())
+				.forEach(folder => {
+					const pages: PageRef[] = [];
+					FileUtils.readdirSync(folder.path)
+						.filter(child => child.match(/\.json$/))
+						.forEach(file => {
+							const pageId: string = file.replace(/\.json$/, '');
+							const pageName: string = file.replace(/\.json$/, '');
+							pages.push(new PageRef(pageId, pageName));
+						});
 
-				projects.push(new Project(folder.name, folder.name, pages));
-			});
-		this.projects = projects;
+					projects.push(new Project(folder.name, folder.name, pages));
+				});
+			this.projects = projects;
+		});
 	}
 
 	public openPage(projectId: string, pageId: string): void {
-		this.currentPage = new Page(this, projectId, pageId);
-		this.selectedElement = undefined;
+		MobX.transaction(() => {
+			this.currentPage = new Page(this, projectId, pageId);
+			this.selectedElement = undefined;
+		});
 	}
 
 	public setSelectedElement(selectedElement: PageElement): void {

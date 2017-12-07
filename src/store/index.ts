@@ -2,6 +2,7 @@ import { PatternFolder } from './pattern/folder';
 import * as FileUtils from 'fs';
 import { observable } from 'mobx';
 import { Page } from './page';
+import { PageElement } from './page/page_element';
 import { PageRef } from './page/page_ref';
 import * as PathUtils from 'path';
 import { Pattern } from './pattern';
@@ -9,6 +10,7 @@ import { Project } from './project';
 
 export class Store {
 	@observable private currentPage?: Page;
+	@observable private selectedElement?: PageElement;
 	private projects: Project[] = [];
 	private patternRoot: PatternFolder;
 	@observable private styleGuidePath: string;
@@ -35,6 +37,10 @@ export class Store {
 
 	public getProjectsPath(): string {
 		return PathUtils.join(this.styleGuidePath, 'stacked', 'projects');
+	}
+
+	public getSelectedElement(): PageElement | undefined {
+		return this.selectedElement;
 	}
 
 	public getStyleGuidePath(): string {
@@ -74,5 +80,10 @@ export class Store {
 
 	public openPage(projectId: string, pageId: string): void {
 		this.currentPage = new Page(this, projectId, pageId);
+		this.selectedElement = undefined;
+	}
+
+	public setSelectedElement(selectedElement: PageElement): void {
+		this.selectedElement = selectedElement;
 	}
 }

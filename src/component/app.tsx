@@ -1,4 +1,5 @@
 import { ElementList } from './container/element_list';
+import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import Layout from '../lsg/patterns/layout';
 import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
@@ -63,6 +64,7 @@ class App extends React.Component<AppProps> {
 					<Preview store={this.props.store} />
 				</PreviewPane>
 
+				<IconRegistry names={IconName} />
 				<DevTools />
 			</Layout>
 		);

@@ -55,7 +55,7 @@ const SpaceDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				<InsetSpace size={Size.S} inside={true}><Content>{Size[Size.S]}</Content></InsetSpace>
 			</Space>
 			<Space size={Size.XS}>
-				<InsetSpace size={Size.M} inside={true}><Content>{Size[Size.L]}</Content></InsetSpace>
+				<InsetSpace size={Size.M} inside={true}><Content>{Size[Size.M]}</Content></InsetSpace>
 			</Space>
 			<Space size={Size.XS}>
 				<InsetSpace size={Size.L} inside={true}><Content>{Size[Size.L]}</Content></InsetSpace>
@@ -80,7 +80,7 @@ const SpaceDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				<InlineSpace sizeRight={Size.S} inside={true}><Content>{Size[Size.S]}</Content></InlineSpace>
 			</Space>
 			<Space size={Size.XS}>
-				<InlineSpace sizeRight={Size.M} inside={true}><Content>{Size[Size.L]}</Content></InlineSpace>
+				<InlineSpace sizeRight={Size.M} inside={true}><Content>{Size[Size.M]}</Content></InlineSpace>
 			</Space>
 			<Space size={Size.XS}>
 				<InlineSpace sizeRight={Size.L} inside={true}><Content>{Size[Size.L]}</Content></InlineSpace>
@@ -105,7 +105,7 @@ const SpaceDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				<StackSpace sizeBottom={Size.S} inside={true}><Content>{Size[Size.S]}</Content></StackSpace>
 			</Space>
 			<Space size={Size.XS}>
-				<StackSpace sizeBottom={Size.M} inside={true}><Content>{Size[Size.L]}</Content></StackSpace>
+				<StackSpace sizeBottom={Size.M} inside={true}><Content>{Size[Size.M]}</Content></StackSpace>
 			</Space>
 			<Space size={Size.XS}>
 				<StackSpace sizeBottom={Size.L} inside={true}><Content>{Size[Size.L]}</Content></StackSpace>

@@ -18,6 +18,7 @@ export interface IconProps {
 }
 
 export enum Size {
+	XXS = 6,
 	XS = 24,
 	S = 38
 }

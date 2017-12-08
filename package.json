@@ -5,11 +5,9 @@
 	"main": "dist/electron/index.js",
 	"scripts": {
 		"build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project .",
-		"start":
-			"npm run build && concurrently \"electron dist/electron\" \"tsc --project . --watch\"",
+		"start": "npm run build && concurrently \"electron dist/electron\" \"tsc --project . --watch\"",
 		"build-lsg": "tsc --project src/lsg --outDir dist/lsg/patterns --sourceMap",
-		"start-lsg":
-			"npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\""
+		"start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\""
 	},
 	"repository": {
 		"type": "git",
@@ -51,6 +49,7 @@
 		"react-dom": "^16.0.0",
 		"react-router": "^4.2.0",
 		"readts": "^0.1.0",
+		"serializr": "^1.1.14",
 		"styled-components": "^2.2.3",
 		"systemjs": "^0.20.19"
 	},

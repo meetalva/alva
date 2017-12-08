@@ -87,6 +87,7 @@ function calculate(property: string, space: Size[]): string {
 }
 
 const StyledSpace = styled.div`
+	box-sizing: border-box;
 	${(props: StyledSpaceProps) =>
 		calculate(props.inside
 			? 'padding'

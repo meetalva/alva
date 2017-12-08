@@ -19,20 +19,24 @@ export interface TabNavigationItemProps {
 const StyledTabNavigation = styled.div`
 	display: flex;
 	flex-wrap: wrap;
+	width: 100%;
+	border: 1px solid ${colors.grey70.toString()};
+	border-radius: 3px;
 `;
 
 const StyledTabNavigationItem = styled.div`
-	margin-right: ${getSpace(Size.L)}px;
+	flex-grow: 1;
+	padding: ${getSpace(Size.XS)}px ${getSpace(Size.M)}px;
 	${(props: TabNavigationItemProps) => props.active
-		? `color: ${colors.blue.toString()};`
-		: `color: ${colors.grey90.toString()};`
+		? `background: ${colors.grey70.toString()};
+			color: ${colors.white.toString()};`
+		: `background: ${colors.white.toString()};
+			color: ${colors.grey70.toString()};`
 	}
 	font-family: ${fonts().NORMAL_FONT};
+	font-size: 12px;
+	text-align: center;
 	cursor: pointer;
-
-	&:last-child {
-		margin-right: 0;
-	}
 `;
 
 export const TabNavigationItem: React.StatelessComponent<TabNavigationItemProps> = (props): JSX.Element => (

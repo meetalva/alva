@@ -3,15 +3,17 @@ import { remote } from 'electron';
 import { ElementList } from './container/element_list';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import Layout from '../lsg/patterns/layout';
+import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
-import {PatternNavigation} from './container/pattern_navigation';
+// import {PatternNavigation} from './container/pattern_navigation';
 import { ProjectList } from './container/project_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
 import styledComponents from 'styled-components';
+import TabNavigation, {TabNavigationItem} from '../lsg/patterns/tab-navigation';
 
 const ElementPane = styledComponents.div`
 	display: flex;
@@ -39,8 +41,20 @@ interface AppProps {
 
 @observer
 class App extends React.Component<AppProps> {
+	private static PatternListID = 'patternlist';
+	private static PropertiesListID = 'propertieslist';
+	@observable protected activeTab: string = App.PatternListID;
+	@computed protected get isPatternListVisible(): boolean {
+		return Boolean(this.activeTab === App.PatternListID);
+	}
+	@computed protected get isPropertiesListVisible(): boolean {
+		return Boolean(this.activeTab === App.PropertiesListID);
+	}
+
 	public constructor(props: AppProps) {
 		super(props);
+
+		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
 	}
 
 	public render(): JSX.Element {
@@ -58,11 +72,23 @@ class App extends React.Component<AppProps> {
 							<ProjectList store={this.props.store} />
 						</ProjectsPane>
 
-						<PatternsPane>
-							<PatternNavigation store={this.props.store} />
+					<PatternsPane>
+						<Layout>
+							<TabNavigation>
+								<TabNavigationItem active={this.isPatternListVisible} onClick={event => this.handleTabNaviagtionClick(event, App.PatternListID)} tabText="Patterns" />
+								<TabNavigationItem active={this.isPropertiesListVisible} onClick={event => this.handleTabNaviagtionClick(event, App.PropertiesListID)} tabText="Properties" />
+							</TabNavigation>
+						</Layout>
+						{this.isPatternListVisible &&
 							<PatternList store={this.props.store} />
-						</PatternsPane>
-					</Layout>
+						}
+						{this.isPropertiesListVisible &&
+							<div>
+								Properties
+							</div>
+						}
+					</PatternsPane >
+				</Layout>
 
 					<PreviewPane
 						dangerouslySetInnerHTML={{
@@ -81,6 +107,9 @@ class App extends React.Component<AppProps> {
 				<DevTools />
 			</Layout>
 		);
+	}
+	@action protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
+		this.activeTab = id;
 	}
 }
 

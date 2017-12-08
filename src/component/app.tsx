@@ -10,7 +10,6 @@ import { Store } from '../store';
 import styledComponents from 'styled-components';
 
 const ElementPane = styledComponents.div`
-	display: flex;
 	flex-grow: 0;
 	flex-shrink: 1;
 	flex-basis: 350px;

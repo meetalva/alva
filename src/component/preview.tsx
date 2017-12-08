@@ -1,9 +1,11 @@
+import { ipcMain } from 'electron';
 import Layout from '../lsg/patterns/layout';
 import DevTools from 'mobx-react-devtools';
+import { Page } from '../store/page';
 import { Preview } from './presentation/preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Store } from '../store';
+import * as Serializr from 'serializr';
 import styledComponents from 'styled-components';
 
 const PreviewPane = styledComponents.div`
@@ -12,20 +14,30 @@ const PreviewPane = styledComponents.div`
 	box-shadow: inset 0 0 10px 0 rgba(0,0,0,.25);
 `;
 
-interface AppProps {
-	store: Store;
+interface PreviewAppState {
+	page?: Page;
 }
 
-class App extends React.Component<AppProps> {
-	public constructor(props: AppProps) {
+class PreviewApp extends React.Component<{}, PreviewAppState> {
+	public constructor(props: {}) {
 		super(props);
+
+		this.state = {
+			page: undefined
+		};
+
+		ipcMain.on('update-preview', (event: {}, pageJson: string) => {
+			this.setState({
+				page: Serializr.deserialize({}, pageJson)
+			});
+		});
 	}
 
 	public render(): JSX.Element {
 		return (
 			<Layout>
 				<PreviewPane>
-					<Preview store={this.props.store} />
+					<Preview page={this.state.page} />
 				</PreviewPane>
 				<DevTools />
 			</Layout>
@@ -33,8 +45,4 @@ class App extends React.Component<AppProps> {
 	}
 }
 
-const store = new Store();
-store.openStyleguide('../stacked-example');
-store.openPage('my-project', 'mypage');
-
-ReactDom.render(<App store={store} />, document.getElementById('app'));
+ReactDom.render(<PreviewApp />, document.getElementById('app'));

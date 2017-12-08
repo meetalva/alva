@@ -4,10 +4,9 @@ import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern';
 import { PropertyValue } from '../../store/page/property_value';
 import * as React from 'react';
-import { Store } from '../../store';
 
 export interface PreviewProps {
-	store: Store;
+	page?: Page;
 }
 
 @observer
@@ -20,8 +19,7 @@ export class Preview extends React.Component<PreviewProps> {
 	}
 
 	public render(): JSX.Element {
-		const page: Page | undefined = this.props.store.getCurrentPage();
-		return this.createComponent(page ? page.getRoot() : undefined) as JSX.Element;
+		return this.createComponent(this.props.page) as JSX.Element;
 	}
 
 	/**

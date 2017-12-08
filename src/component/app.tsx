@@ -3,7 +3,6 @@ import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import Layout from '../lsg/patterns/layout';
 import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
-import { Preview } from './presentation/preview';
 import { ProjectList } from './container/project_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
@@ -30,8 +29,6 @@ const PatternsPane = styledComponents.div`
 
 const PreviewPane = styledComponents.div`
 	flex: 2 0 0px;
-	padding: 10px;
-	box-shadow: inset 0 0 10px 0 rgba(0,0,0,.25);
 `;
 
 interface AppProps {
@@ -62,10 +59,12 @@ class App extends React.Component<AppProps> {
 
 				<IconRegistry names={IconName} />
 
-				<PreviewPane>
-					<Preview store={this.props.store} />
-				</PreviewPane>
-
+				<PreviewPane
+					dangerouslySetInnerHTML={{
+						__html:
+							'<webview style="height: 100%;" src="./preview.html" partition="electron" nodeintegration />'
+					}}
+				/>
 				<DevTools />
 			</Layout>
 		);

@@ -1,20 +1,21 @@
+import { Chrome } from './container/chrome';
+import { remote } from 'electron';
 import { ElementList } from './container/element_list';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import Layout from '../lsg/patterns/layout';
-import { Chrome } from './container/chrome';
+import { observer } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
+import {PatternNavigation} from './container/pattern_navigation';
 import { ProjectList } from './container/project_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { remote } from 'electron';
-import { observer } from 'mobx-react';
 import { Store } from '../store';
 import styledComponents from 'styled-components';
 
 const ElementPane = styledComponents.div`
-	flex-grow: 0;
-	flex-shrink: 1;
+	display: flex;
+	flex-direction: column;
 	flex-basis: 350px;
 	border: 1px solid #ccc;
 `;
@@ -58,6 +59,7 @@ class App extends React.Component<AppProps> {
 						</ProjectsPane>
 
 						<PatternsPane>
+							<PatternNavigation store={this.props.store} />
 							<PatternList store={this.props.store} />
 						</PatternsPane>
 					</Layout>
@@ -88,4 +90,3 @@ store.openPage('my-project', 'mypage');
 store.setAppTitle(remote.getCurrentWindow().getTitle());
 
 ReactDom.render(<App store={store} />, document.getElementById('app'));
-

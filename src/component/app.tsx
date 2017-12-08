@@ -1,17 +1,17 @@
 import { Chrome } from './container/chrome';
-import { remote } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { ElementList } from './container/element_list';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import Layout from '../lsg/patterns/layout';
-import { action, computed, observable } from 'mobx';
+import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
-// import {PatternNavigation} from './container/pattern_navigation';
 import { ProjectList } from './container/project_list';
 import { PropertyList } from './container/property_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import * as Serializr from 'serializr';
 import { Store } from '../store';
 import styledComponents from 'styled-components';
 import TabNavigation, { TabNavigationItem } from '../lsg/patterns/tab-navigation';
@@ -41,19 +41,19 @@ interface AppProps {
 class App extends React.Component<AppProps> {
 	private static PatternListID = 'patternlist';
 	private static PropertiesListID = 'propertieslist';
-	@observable protected activeTab: string = App.PatternListID;
-	@computed
+
+	@MobX.observable protected activeTab: string = App.PatternListID;
+	@MobX.computed
 	protected get isPatternListVisible(): boolean {
 		return Boolean(this.activeTab === App.PatternListID);
 	}
-	@computed
+	@MobX.computed
 	protected get isPropertiesListVisible(): boolean {
 		return Boolean(this.activeTab === App.PropertiesListID);
 	}
 
 	public constructor(props: AppProps) {
 		super(props);
-
 		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
 	}
 
@@ -113,7 +113,8 @@ class App extends React.Component<AppProps> {
 			</Layout>
 		);
 	}
-	@action
+
+	@MobX.action
 	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
 		this.activeTab = id;
 	}
@@ -123,5 +124,9 @@ const store = new Store();
 store.openStyleguide('../stacked-example');
 store.openPage('my-project', 'mypage');
 store.setAppTitle(remote.getCurrentWindow().getTitle());
+
+MobX.observe(store, () => {
+	ipcRenderer.send('update-preview', Serializr.serialize(store.getCurrentPage()));
+});
 
 ReactDom.render(<App store={store} />, document.getElementById('app'));

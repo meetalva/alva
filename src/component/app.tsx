@@ -14,7 +14,6 @@ const ElementPane = styledComponents.div`
 	flex-grow: 0;
 	flex-shrink: 1;
 	flex-basis: 350px;
-	order: 2;
 	border: 1px solid #ccc;
 `;
 
@@ -53,18 +52,19 @@ class App extends React.Component<AppProps> {
 					</PatternsPane>
 				</Layout>
 
-				<ElementPane>
-					<ElementList store={this.props.store} />
-				</ElementPane>
-
-				<IconRegistry names={IconName} />
-
 				<PreviewPane
 					dangerouslySetInnerHTML={{
 						__html:
 							'<webview style="height: 100%;" src="./preview.html" partition="electron" nodeintegration />'
 					}}
 				/>
+
+				<ElementPane>
+					<ElementList store={this.props.store} />
+				</ElementPane>
+
+				<IconRegistry names={IconName} />
+
 				<DevTools />
 			</Layout>
 		);

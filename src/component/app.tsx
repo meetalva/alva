@@ -7,6 +7,8 @@ import { PatternList } from './container/pattern_list';
 import { ProjectList } from './container/project_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import { remote } from 'electron';
+import { observer } from 'mobx-react';
 import { Store } from '../store';
 import styledComponents from 'styled-components';
 
@@ -32,21 +34,23 @@ const PreviewPane = styledComponents.div`
 
 interface AppProps {
 	store: Store;
-	title: string;
 }
 
+@observer
 class App extends React.Component<AppProps> {
 	public constructor(props: AppProps) {
 		super(props);
 	}
 
 	public render(): JSX.Element {
+		// Todo: project and page don't update on page change
+		const project = this.props.store.getCurrentProject();
 		const page = this.props.store.getCurrentPage();
-		const pageName = page ? page.getName() : '';
+		const title = `${project && project.getName()} - ${page && page.getName()}`;
 
 		return (
 			<Layout directionVertical>
-				<Chrome title={pageName} />
+				<Chrome title={title} />
 				<Layout>
 					<Layout directionVertical>
 						<ProjectsPane>
@@ -81,7 +85,7 @@ class App extends React.Component<AppProps> {
 const store = new Store();
 store.openStyleguide('../stacked-example');
 store.openPage('my-project', 'mypage');
-// store.setAppTitle(remote.getCurrentWindow().getTitle());
+store.setAppTitle(remote.getCurrentWindow().getTitle());
 
-ReactDom.render(<App store={store} title={document.title} />, document.getElementById('app'));
+ReactDom.render(<App store={store} />, document.getElementById('app'));
 

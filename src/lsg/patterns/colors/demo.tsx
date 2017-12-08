@@ -19,6 +19,7 @@ export default function ColorDemo() {
 		<div>
 			<StyledList>
 				<ColorSwatch color={colors.black} />
+				<ColorSwatch color={colors.grey36} />
 				<ColorSwatch color={colors.grey70} />
 				<ColorSwatch color={colors.grey90} />
 				<ColorSwatch color={colors.white} />

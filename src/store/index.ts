@@ -14,6 +14,11 @@ export class Store {
 	private patternRoot: PatternFolder;
 	@MobX.observable private selectedElement?: PageElement;
 	@MobX.observable private styleGuidePath: string;
+	@MobX.observable private appTitle: string;
+
+	public getAppTitle(): string {
+		return this.appTitle;
+	}
 
 	public getCurrentPage(): Page | undefined {
 		return this.currentPage;
@@ -96,6 +101,10 @@ export class Store {
 			this.currentPage = new Page(this, projectId, pageId);
 			this.selectedElement = undefined;
 		});
+	}
+
+	public setAppTitle(title: string): void {
+		this.appTitle = title;
 	}
 
 	public setSelectedElement(selectedElement: PageElement): void {

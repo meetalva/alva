@@ -1,5 +1,5 @@
 import * as React from 'react';
-//import { colors } from '../colors';
+import { colors } from '../colors';
 import { fonts } from '../fonts';
 import Space, { Size } from '../space';
 import styled from 'styled-components';
@@ -25,7 +25,8 @@ const StyledChrome = styled(Space).attrs({
 const StyledChromeTitle = styled.div`
 	display: flex;
 	align-items: center;
-	margin-right: auto;
+	margin: 0 auto;
+	color: ${colors.grey36.toString()};
 `;
 
 export default class Chrome extends React.Component<ChromeProps> {

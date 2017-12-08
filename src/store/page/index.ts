@@ -43,6 +43,6 @@ export class Page {
 		const pageModel: any = JSON.parse(FileUtils.readFileSync(pagePath, 'utf8'));
 
 		this.name = pageModel.name;
-		this.root = new PageElement(pageModel.root, this.store);
+		this.root = new PageElement(this.store, pageModel.root);
 	}
 }

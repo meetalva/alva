@@ -6,18 +6,21 @@ import { Store } from '..';
 
 export class PageElement {
 	@MobX.observable private children: PageElement[] = [];
+	private parent: PageElement | undefined;
 	private patternPath: string;
 	private pattern?: Pattern;
 	@MobX.observable private propertyValues: Map<string, PropertyValue> = new Map();
 
 	// tslint:disable-next-line:no-any
-	public constructor(json: any, store: Store) {
+	public constructor(store: Store, json: any, parent?: PageElement) {
+		this.parent = parent;
+
 		this.patternPath = json['pattern'];
 		const pattern: Pattern | undefined = store.getPattern(this.patternPath);
 		if (pattern) {
 			this.pattern = pattern;
 		} else {
-			console.warn(`Ignoring unknown pattern ${this.patternPath}`);
+			console.warn(`Ignoring unknown pattern "${this.patternPath}"`);
 			return;
 		}
 
@@ -40,7 +43,7 @@ export class PageElement {
 	// tslint:disable-next-line:no-any
 	protected createElementOrValue(json: any, store: Store): PageElement | PropertyValue {
 		if (json && json['_type'] === 'pattern') {
-			return new PageElement(json, store);
+			return new PageElement(store, json, this);
 		} else {
 			return json;
 		}
@@ -48,6 +51,10 @@ export class PageElement {
 
 	public getChildren(): PageElement[] {
 		return this.children;
+	}
+
+	public getParent(): PageElement | undefined {
+		return this.parent;
 	}
 
 	public getPattern(): Pattern | undefined {
@@ -62,6 +69,10 @@ export class PageElement {
 		const value: PropertyValue = this.propertyValues.get(id);
 
 		return value;
+	}
+
+	public isRoot(): boolean {
+		return this.parent === undefined;
 	}
 
 	// tslint:disable-next-line:no-any

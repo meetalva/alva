@@ -1,6 +1,7 @@
 import { ElementList } from './container/element_list';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import Layout from '../lsg/patterns/layout';
+import { Chrome } from './container/chrome';
 import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
 import { Preview } from './presentation/preview';
@@ -36,6 +37,7 @@ const PreviewPane = styledComponents.div`
 
 interface AppProps {
 	store: Store;
+	title: string;
 }
 
 class App extends React.Component<AppProps> {
@@ -44,29 +46,35 @@ class App extends React.Component<AppProps> {
 	}
 
 	public render(): JSX.Element {
+		const page = this.props.store.getCurrentPage();
+		const pageName = page ? page.getName() : '';
+
 		return (
-			<Layout>
-				<Layout directionVertical>
-					<ProjectsPane>
-						<ProjectList store={this.props.store} />
-					</ProjectsPane>
+			<Layout directionVertical>
+				<Chrome title={pageName} />
+				<Layout>
+					<Layout directionVertical>
+						<ProjectsPane>
+							<ProjectList store={this.props.store} />
+						</ProjectsPane>
 
-					<PatternsPane>
-						<PatternList store={this.props.store} />
-					</PatternsPane>
+						<PatternsPane>
+							<PatternList store={this.props.store} />
+						</PatternsPane>
+					</Layout>
+
+					<ElementPane>
+						<ElementList store={this.props.store} />
+					</ElementPane>
+
+					<IconRegistry names={IconName} />
+
+					<PreviewPane>
+						<Preview store={this.props.store} />
+					</PreviewPane>
+
+					<DevTools />
 				</Layout>
-
-				<ElementPane>
-					<ElementList store={this.props.store} />
-				</ElementPane>
-
-				<IconRegistry names={IconName} />
-
-				<PreviewPane>
-					<Preview store={this.props.store} />
-				</PreviewPane>
-
-				<DevTools />
 			</Layout>
 		);
 	}
@@ -75,5 +83,7 @@ class App extends React.Component<AppProps> {
 const store = new Store();
 store.openStyleguide('../stacked-example');
 store.openPage('my-project', 'mypage');
+store.setAppTitle(remote.getCurrentWindow().getTitle());
 
-ReactDom.render(<App store={store} />, document.getElementById('app'));
+ReactDom.render(<App store={store} title={document.title} />, document.getElementById('app'));
+

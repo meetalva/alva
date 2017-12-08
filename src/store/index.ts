@@ -10,13 +10,17 @@ import { Project } from './project';
 
 export class Store {
 	@MobX.observable private currentPage?: Page;
-	@MobX.observable private projects: Project[] = [];
+	@MobX.observable private projects: Map<string, Project> = new Map();
 	private patternRoot: PatternFolder;
 	@MobX.observable private selectedElement?: PageElement;
 	@MobX.observable private styleGuidePath: string;
 
 	public getCurrentPage(): Page | undefined {
 		return this.currentPage;
+	}
+
+	public getCurrentProject(): Project | undefined {
+		return this.currentPage ? this.getProjectById(this.currentPage.getProjectId()) : undefined;
 	}
 
 	public getPattern(path: string): Pattern | undefined {
@@ -31,8 +35,12 @@ export class Store {
 		return this.patternRoot;
 	}
 
+	public getProjectById(id: string): Project | undefined {
+		return this.projects.get(id);
+	}
+
 	public getProjects(): Project[] {
-		return this.projects;
+		return Array.from(this.projects.values());
 	}
 
 	public getProjectsPath(): string {
@@ -55,7 +63,7 @@ export class Store {
 			}
 			this.styleGuidePath = styleGuidePath;
 			this.currentPage = undefined;
-			this.projects = [];
+			this.projects.clear();
 			this.patternRoot = new PatternFolder(this, 'patterns');
 
 			const projects: Project[] = [];
@@ -76,7 +84,10 @@ export class Store {
 
 					projects.push(new Project(folder.name, folder.name, pages));
 				});
-			this.projects = projects;
+
+			projects.forEach(project => {
+				this.projects.set(project.getId(), project);
+			});
 		});
 	}
 

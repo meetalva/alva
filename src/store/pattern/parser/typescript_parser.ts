@@ -139,6 +139,7 @@ export class TypeScriptParser extends PatternParser {
 
 		if (!property) {
 			property = new ObjectProperty(id, name, required);
+			// TODO: Parse properties
 		}
 
 		this.properties.push(property);

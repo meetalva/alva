@@ -4,7 +4,6 @@ import Layout from '../lsg/patterns/layout';
 import { Chrome } from './container/chrome';
 import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
-import { Preview } from './presentation/preview';
 import { ProjectList } from './container/project_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
@@ -12,11 +11,9 @@ import { Store } from '../store';
 import styledComponents from 'styled-components';
 
 const ElementPane = styledComponents.div`
-	display: flex;
 	flex-grow: 0;
 	flex-shrink: 1;
 	flex-basis: 350px;
-	order: 2;
 	border: 1px solid #ccc;
 `;
 
@@ -31,8 +28,6 @@ const PatternsPane = styledComponents.div`
 
 const PreviewPane = styledComponents.div`
 	flex: 2 0 0px;
-	padding: 10px;
-	box-shadow: inset 0 0 10px 0 rgba(0,0,0,.25);
 `;
 
 interface AppProps {
@@ -63,18 +58,21 @@ class App extends React.Component<AppProps> {
 						</PatternsPane>
 					</Layout>
 
+					<PreviewPane
+						dangerouslySetInnerHTML={{
+							__html:
+								'<webview style="height: 100%;" src="./preview.html" partition="electron" nodeintegration />'
+						}}
+					/>
+
 					<ElementPane>
 						<ElementList store={this.props.store} />
 					</ElementPane>
 
 					<IconRegistry names={IconName} />
 
-					<PreviewPane>
-						<Preview store={this.props.store} />
-					</PreviewPane>
-
-					<DevTools />
 				</Layout>
+				<DevTools />
 			</Layout>
 		);
 	}
@@ -83,7 +81,7 @@ class App extends React.Component<AppProps> {
 const store = new Store();
 store.openStyleguide('../stacked-example');
 store.openPage('my-project', 'mypage');
-store.setAppTitle(remote.getCurrentWindow().getTitle());
+// store.setAppTitle(remote.getCurrentWindow().getTitle());
 
 ReactDom.render(<App store={store} title={document.title} />, document.getElementById('app'));
 

@@ -1,6 +1,8 @@
 import { Property } from '.';
 
 export class ObjectProperty extends Property {
+	private properties: Map<string, Property> = new Map();
+
 	public constructor(id: string, name: string, required: boolean) {
 		super(id, name, required);
 	}
@@ -12,6 +14,14 @@ export class ObjectProperty extends Property {
 		}
 
 		return value;
+	}
+
+	public getProperties(): Property[] {
+		return Array.from(this.properties.values());
+	}
+
+	public getProperty(id: string): Property | undefined {
+		return this.properties.get(id);
 	}
 
 	public getType(): string {

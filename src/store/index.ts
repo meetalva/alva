@@ -1,5 +1,6 @@
 import { PatternFolder } from './pattern/folder';
 import * as FileUtils from 'fs';
+import { JsonObject } from './json';
 import * as MobX from 'mobx';
 import { Page } from './page';
 import { PageElement } from './page/page_element';
@@ -14,11 +15,6 @@ export class Store {
 	private patternRoot: PatternFolder;
 	@MobX.observable private selectedElement?: PageElement;
 	@MobX.observable private styleGuidePath: string;
-	@MobX.observable private appTitle: string;
-
-	public getAppTitle(): string {
-		return this.appTitle;
-	}
 
 	public getCurrentPage(): Page | undefined {
 		return this.currentPage;
@@ -98,13 +94,28 @@ export class Store {
 
 	public openPage(projectId: string, pageId: string): void {
 		MobX.transaction(() => {
-			this.currentPage = new Page(this, projectId, pageId);
+			const projectPath: string = PathUtils.join(this.getProjectsPath(), projectId);
+			const pagePath: string = PathUtils.join(projectPath, pageId + '.json');
+			const json: JsonObject = JSON.parse(FileUtils.readFileSync(pagePath, 'utf8'));
+			this.currentPage = Page.fromJson(json, projectId, pageId, this);
+
 			this.selectedElement = undefined;
 		});
 	}
 
-	public setAppTitle(title: string): void {
-		this.appTitle = title;
+	public savePage(): void {
+		if (!this.currentPage) {
+			throw new Error('Cannot save page: No page open');
+		}
+
+		this.currentPage.save();
+	}
+
+	public setPageFromJsonInternal(json: JsonObject, projectId: string, pageId: string): void {
+		MobX.transaction(() => {
+			this.currentPage = json ? Page.fromJson(json, projectId, pageId, this) : undefined;
+			this.selectedElement = undefined;
+		});
 	}
 
 	public setSelectedElement(selectedElement: PageElement): void {

@@ -19,7 +19,11 @@ export class Preview extends React.Component<PreviewProps> {
 	}
 
 	public render(): JSX.Element {
-		return this.createComponent(this.props.page) as JSX.Element;
+		if (this.props.page) {
+			return this.createComponent(this.props.page.getRoot()) as JSX.Element;
+		} else {
+			return <div>(empty)</div>;
+		}
 	}
 
 	/**
@@ -31,15 +35,7 @@ export class Preview extends React.Component<PreviewProps> {
 	 * @returns A React component in case of a page element, the primitive in case of a primitive,
 	 * or an array or object with values converted in the same manner, if an array resp. object is provided.
 	 */
-	private createComponent(value: PropertyValue, key?: string): React.Component | PropertyValue {
-		if (value instanceof Array) {
-			const array: (string | number)[] = value;
-			// Handle arrays by returning a new array with recursively processed elements.
-			return array.map((element: PropertyValue, index: number) =>
-				this.createComponent(element, String(index))
-			);
-		}
-
+	private createComponent(value: PropertyValue, key?: string): JSX.Element | PropertyValue {
 		if (value === undefined || value === null || typeof value !== 'object') {
 			// Primitives stay primitives.
 			return value;
@@ -65,7 +61,9 @@ export class Preview extends React.Component<PreviewProps> {
 				);
 			});
 
-			componentProps.children = this.createComponent(pageElement.getChildren());
+			componentProps.children = pageElement
+				.getChildren()
+				.map((child, index) => this.createComponent(child, String(index)));
 
 			// Then, load the pattern factory
 			const patternPath: string = pattern.getAbsolutePath();

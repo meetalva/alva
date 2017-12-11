@@ -1,13 +1,13 @@
 import { PageElement } from './page_element';
 
 export type PropertyValue =
-	// tslint:disable-next-line:no-any
-	| { [id: string]: any }
+	| { [id: string]: PropertyValue }
 	| string
 	| string[]
 	| number
 	| number[]
 	| boolean
 	| PageElement
+	| PageElement[]
 	| undefined
 	| null;

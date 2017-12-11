@@ -1,5 +1,6 @@
 {
 	"name": "string-item",
 	"displayName": "String Item",
-	"version": "1.0.0"
+	"version": "1.0.0",
+	"tags": ["property"]
 }

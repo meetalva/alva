@@ -29,7 +29,7 @@ export class ElementList extends React.Component<ElementListProps> {
 
 	public renderList(item: ListPropsListItem, key?: number): JSX.Element {
 		return (
-			<ElementWrapper title={item.value} key={key}>
+			<ElementWrapper title={item.value} key={key} handleClick={item.onClick}>
 				{item.children &&
 					item.children.length > 0 &&
 					item.children.map((child, index) => this.renderList(child, index))}
@@ -59,9 +59,15 @@ export class ElementList extends React.Component<ElementListProps> {
 
 		const patternPath: string = element.getPatternPath() as string;
 
+		const updatePageElement: React.MouseEventHandler<HTMLElement> = event => {
+			event.stopPropagation();
+			this.props.store && this.props.store.setSelectedElement(element);
+		};
+
 		return {
 			label: key,
 			value: patternPath.replace(/^.*\//, ''),
+			onClick: updatePageElement,
 			children: items
 		};
 	}

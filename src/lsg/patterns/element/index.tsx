@@ -9,6 +9,7 @@ export interface ElementProps {
 	open?: boolean;
 	title: string;
 
+	handleClick?: React.MouseEventHandler<HTMLElement>;
 	handleIconClick?: React.MouseEventHandler<SVGSVGElement>;
 }
 
@@ -52,10 +53,10 @@ const StyledIcon = styled(Icon)`
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => {
-	const { children, title, active, open, handleIconClick } = props;
+	const { children, title, active, open, handleClick, handleIconClick } = props;
 
 	return (
-		<StyledElement title={title} active={active}>
+		<StyledElement onClick={handleClick} title={title} active={active}>
 			<StyledElementLabel>
 				{children && (
 					<StyledIcon

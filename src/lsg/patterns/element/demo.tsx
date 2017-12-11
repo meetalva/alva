@@ -23,8 +23,12 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 		<StyledTestDiv>
 			With Child and handleIconClick
 			<Element
+				handleClick={e => {
+					console.log('Clicked', e);
+					e.stopPropagation();
+				}}
 				handleIconClick={() => {
-					console.log('Clicked');
+					console.log('Icon Clicked');
 				}}
 				title="Element"
 			>

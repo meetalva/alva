@@ -6,8 +6,9 @@ import styled from 'styled-components';
 
 export interface EnumItemProps {
 	label: string;
-	selectedValue: string;
+	selectedValue?: string;
 	values: string[];
+	required?: boolean;
 	className?: string;
 	handleChange?: React.ChangeEventHandler<HTMLSelectElement>;
 }
@@ -25,12 +26,17 @@ const StyledLabel = styled.span`
 `;
 
 export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
-	const { className, values, selectedValue, handleChange, label } = props;
+	const { className, values, selectedValue, handleChange, label, required } = props;
 
 	return (
 		<StyledEnumItem className={className}>
 			<StyledLabel>{label}</StyledLabel>
-			<select className={className} onChange={handleChange} value={selectedValue}>
+			<select
+				className={className}
+				onChange={handleChange}
+				value={selectedValue || 'emptyValue'}
+			>
+				{!required && <option key="emptyValue" value="emptyValue" />}
 				{values.map(value => (
 					<option value={value} key={value}>
 						{value}

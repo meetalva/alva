@@ -40,8 +40,17 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 					<EnumItem
 						label="Label"
 						values={this.state.values}
+						handleChange={this.handleChange}
+					/>
+				</StyledDemo>
+				<StyledDemo>
+					Required
+					<EnumItem
+						label="Label"
+						values={this.state.values}
 						selectedValue={this.state.selectedItem}
 						handleChange={this.handleChange}
+						required
 					/>
 				</StyledDemo>
 			</div>

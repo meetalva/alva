@@ -13,7 +13,7 @@ function createWindow(): void {
 		width: 1800,
 		height: 800,
 		titleBarStyle: 'hiddenInset',
-		title: 'Stacked'
+		title: 'Alva'
 	});
 
 	// and load the index.html of the app.

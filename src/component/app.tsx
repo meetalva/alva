@@ -35,6 +35,7 @@ const MainArea = styledComponents(Layout)`
 
 const SideBar = styledComponents(Layout)`
 	flex-basis: 240px;
+	overflow-y: scroll;
 `;
 
 const ElementPane = styledComponents.div`

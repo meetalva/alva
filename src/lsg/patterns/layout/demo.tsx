@@ -15,7 +15,7 @@ const StyledTestDiv = styled.div`
 
 const LayoutDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<div>
-		<Layout directionVertical={true}>
+		<Layout directionVertical>
 			<StyledTestDiv>Vertical</StyledTestDiv>
 			<StyledTestDiv>Vertical</StyledTestDiv>
 			<StyledTestDiv>Vertical</StyledTestDiv>
@@ -24,6 +24,11 @@ const LayoutDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<StyledTestDiv>Horizontal</StyledTestDiv>
 			<StyledTestDiv>Horizontal</StyledTestDiv>
 			<StyledTestDiv>Horizontal</StyledTestDiv>
+		</Layout>
+		<Layout directionVertical hasMargins>
+			<StyledTestDiv>Vertical with margins</StyledTestDiv>
+			<StyledTestDiv>Vertical with margins</StyledTestDiv>
+			<StyledTestDiv>Vertical with margins</StyledTestDiv>
 		</Layout>
 	</div>
 );

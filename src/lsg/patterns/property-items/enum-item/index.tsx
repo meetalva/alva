@@ -1,21 +1,43 @@
+import { getSpace, Size } from '../../space/index';
+import { fonts } from '../../fonts/index';
+import { colors } from '../../colors/index';
 import * as React from 'react';
+import styled from 'styled-components';
 
 export interface EnumItemProps {
+	label: string;
 	selectedValue: string;
 	values: string[];
 	className?: string;
 	handleChange?: React.ChangeEventHandler<HTMLSelectElement>;
 }
 
+const StyledEnumItem = styled.div`
+	width: 100%;
+`;
+
+const StyledLabel = styled.span`
+	display: block;
+	margin-bottom: ${getSpace(Size.XS)}px;
+	font-size: 14px;
+	font-family: ${fonts().NORMAL_FONT};
+	color: ${colors.grey70.toString()};
+`;
+
 export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
-	const { className, values, selectedValue, handleChange } = props;
+	const { className, values, selectedValue, handleChange, label } = props;
 
 	return (
-		<select className={className} onChange={handleChange} value={selectedValue}>
-			{values.map(value =>
-				<option value={value} key={value}>{value}</option>
-			)};
-		</select>
+		<StyledEnumItem className={className}>
+			<StyledLabel>{label}</StyledLabel>
+			<select className={className} onChange={handleChange} value={selectedValue}>
+				{values.map(value => (
+					<option value={value} key={value}>
+						{value}
+					</option>
+				))};
+			</select>
+		</StyledEnumItem>
 	);
 };
 

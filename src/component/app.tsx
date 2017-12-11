@@ -58,13 +58,11 @@ class App extends React.Component<AppProps> {
 	}
 
 	public componentDidMount(): void {
-		console.log('mount');
-		// const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
-		window.setTimeout(() => {
-			console.log('load');
+		const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
+		webviewTag.addEventListener('did-stop-loading', () => {
 			store.openStyleguide('../stacked-example');
 			store.openPage('my-project', 'mypage');
-		}, 1000);
+		});
 	}
 
 	public render(): JSX.Element {

@@ -49,7 +49,6 @@
 		"react-dom": "^16.0.0",
 		"react-router": "^4.2.0",
 		"readts": "^0.1.0",
-		"serializr": "^1.1.14",
 		"styled-components": "^2.2.3",
 		"systemjs": "^0.20.19"
 	},

@@ -1,17 +1,17 @@
 import { Chrome } from './container/chrome';
-import { ipcRenderer, remote } from 'electron';
+import { WebviewTag } from 'electron';
 import { ElementList } from './container/element_list';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import Layout from '../lsg/patterns/layout';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
+import { Page } from '../store/page';
 import { PatternList } from './container/pattern_list';
 import { ProjectList } from './container/project_list';
 import { PropertyList } from './container/property_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import * as Serializr from 'serializr';
 import { Store } from '../store';
 import styledComponents from 'styled-components';
 import TabNavigation, { TabNavigationItem } from '../lsg/patterns/tab-navigation';
@@ -57,6 +57,16 @@ class App extends React.Component<AppProps> {
 		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
 	}
 
+	public componentDidMount(): void {
+		console.log('mount');
+		// const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
+		window.setTimeout(() => {
+			console.log('load');
+			store.openStyleguide('../stacked-example');
+			store.openPage('my-project', 'mypage');
+		}, 1000);
+	}
+
 	public render(): JSX.Element {
 		// Todo: project and page don't update on page change
 		const project = this.props.store.getCurrentProject();
@@ -99,7 +109,7 @@ class App extends React.Component<AppProps> {
 					<PreviewPane
 						dangerouslySetInnerHTML={{
 							__html:
-								'<webview style="height: 100%;" src="./preview.html" partition="electron" nodeintegration />'
+								'<webview id="preview" style="height: 100%;" src="./preview.html" partition="electron" nodeintegration />'
 						}}
 					/>
 
@@ -121,12 +131,25 @@ class App extends React.Component<AppProps> {
 }
 
 const store = new Store();
-store.openStyleguide('../stacked-example');
-store.openPage('my-project', 'mypage');
-store.setAppTitle(remote.getCurrentWindow().getTitle());
 
-MobX.observe(store, () => {
-	ipcRenderer.send('update-preview', Serializr.serialize(store.getCurrentPage()));
+MobX.observe(store, (change: MobX.IObjectChange) => {
+	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
+	if (!webviewTag || !webviewTag.send) {
+		return;
+	}
+
+	if (change.object === store && change.name === 'styleGuidePath') {
+		webviewTag.send('open-styleguide', {
+			styleGuidePath: store.getStyleGuidePath()
+		});
+	} else {
+		const page: Page | undefined = store.getCurrentPage();
+		webviewTag.send('page-change', {
+			page: page ? page.toJson() : undefined,
+			pageId: page ? page.getPageId() : undefined,
+			projectId: page ? page.getProjectId() : undefined
+		});
+	}
 });
 
 ReactDom.render(<App store={store} />, document.getElementById('app'));

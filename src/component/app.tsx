@@ -9,11 +9,12 @@ import DevTools from 'mobx-react-devtools';
 import { PatternList } from './container/pattern_list';
 // import {PatternNavigation} from './container/pattern_navigation';
 import { ProjectList } from './container/project_list';
+import { PropertyList } from './container/property_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
 import styledComponents from 'styled-components';
-import TabNavigation, {TabNavigationItem} from '../lsg/patterns/tab-navigation';
+import TabNavigation, { TabNavigationItem } from '../lsg/patterns/tab-navigation';
 
 const ElementPane = styledComponents.div`
 	display: flex;
@@ -44,10 +45,12 @@ class App extends React.Component<AppProps> {
 	private static PatternListID = 'patternlist';
 	private static PropertiesListID = 'propertieslist';
 	@observable protected activeTab: string = App.PatternListID;
-	@computed protected get isPatternListVisible(): boolean {
+	@computed
+	protected get isPatternListVisible(): boolean {
 		return Boolean(this.activeTab === App.PatternListID);
 	}
-	@computed protected get isPropertiesListVisible(): boolean {
+	@computed
+	protected get isPropertiesListVisible(): boolean {
 		return Boolean(this.activeTab === App.PropertiesListID);
 	}
 
@@ -72,23 +75,29 @@ class App extends React.Component<AppProps> {
 							<ProjectList store={this.props.store} />
 						</ProjectsPane>
 
-					<PatternsPane>
-						<Layout>
-							<TabNavigation>
-								<TabNavigationItem active={this.isPatternListVisible} onClick={event => this.handleTabNaviagtionClick(event, App.PatternListID)} tabText="Patterns" />
-								<TabNavigationItem active={this.isPropertiesListVisible} onClick={event => this.handleTabNaviagtionClick(event, App.PropertiesListID)} tabText="Properties" />
-							</TabNavigation>
-						</Layout>
-						{this.isPatternListVisible &&
-							<PatternList store={this.props.store} />
-						}
-						{this.isPropertiesListVisible &&
-							<div>
-								Properties
-							</div>
-						}
-					</PatternsPane >
-				</Layout>
+						<PatternsPane>
+							<Layout>
+								<TabNavigation>
+									<TabNavigationItem
+										active={this.isPatternListVisible}
+										onClick={event =>
+											this.handleTabNaviagtionClick(event, App.PatternListID)
+										}
+										tabText="Patterns"
+									/>
+									<TabNavigationItem
+										active={this.isPropertiesListVisible}
+										onClick={event =>
+											this.handleTabNaviagtionClick(event, App.PropertiesListID)
+										}
+										tabText="Properties"
+									/>
+								</TabNavigation>
+							</Layout>
+							{this.isPatternListVisible && <PatternList store={this.props.store} />}
+							{this.isPropertiesListVisible && <PropertyList store={this.props.store} />}
+						</PatternsPane>
+					</Layout>
 
 					<PreviewPane
 						dangerouslySetInnerHTML={{
@@ -102,13 +111,13 @@ class App extends React.Component<AppProps> {
 					</ElementPane>
 
 					<IconRegistry names={IconName} />
-
 				</Layout>
 				<DevTools />
 			</Layout>
 		);
 	}
-	@action protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
+	@action
+	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
 		this.activeTab = id;
 	}
 }

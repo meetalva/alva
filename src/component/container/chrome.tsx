@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { observer } from 'mobx-react';
 import ChromeComponent from '../../lsg/patterns/chrome';
-
+import { observer } from 'mobx-react';
+import * as React from 'react';
 
 export interface ChromeProps {
 	title: string;

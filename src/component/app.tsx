@@ -2,6 +2,7 @@ import { Chrome } from './container/chrome';
 import { WebviewTag } from 'electron';
 import { ElementList } from './container/element_list';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
+import { fonts } from '../lsg/patterns/fonts/index';
 import Layout from '../lsg/patterns/layout';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
@@ -22,7 +23,7 @@ injectGlobal`
 	body {
 		margin: 0;
 		background-color: #f7f7f7;
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+		font-family: ${fonts().NORMAL_FONT};
 		font-size: 12px;
 	}
 `;

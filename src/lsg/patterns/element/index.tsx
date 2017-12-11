@@ -28,7 +28,6 @@ const StyledElement = styled.div`
 			`
 			: `
 				color: ${colors.black.toString()};
-				background: ${colors.grey90.toString()};
 			`};
 `;
 
@@ -42,7 +41,7 @@ const StyledElementLabel = styled.div`
 
 const StyledElementChild = styled.div`
 	flex-basis: 100%;
-	padding-left: ${getSpace(Size.XL)}px;
+	padding-left: ${getSpace(Size.L)}px;
 	${(props: StyledElementChildProps) => (props.open ? 'display: block;' : 'display: none;')};
 `;
 

@@ -19,10 +19,12 @@ import TabNavigation, { TabNavigationItem } from '../lsg/patterns/tab-navigation
 // Global style
 // tslint:disable-next-line:no-unused-expression
 injectGlobal`
-  body {
-    margin: 0;
-    background-color: #ffffff;
-  }
+	body {
+		margin: 0;
+		background-color: #ffffff;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+		font-size: 12px;
+	}
 `;
 
 const ElementPane = styledComponents(Layout)`

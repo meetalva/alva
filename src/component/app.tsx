@@ -15,7 +15,6 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
 import styledComponents, { injectGlobal } from 'styled-components';
-import TabNavigation, { TabNavigationItem } from '../lsg/patterns/tab-navigation';
 
 // Global style
 // tslint:disable-next-line:no-unused-expression
@@ -34,16 +33,23 @@ const MainArea = styledComponents(Layout)`
 	padding-top: 38px;
 `;
 
-const ElementPane = styledComponents(Layout)`
-	flex-basis: 350px;
+const SideBar = styledComponents(Layout)`
+	flex-basis: 240px;
 `;
 
-const ProjectsPane = styledComponents.div`
+const ElementPane = styledComponents.div`
 	flex: 2 0 0px;
-	border-bottom: 1px solid #ccc;
+`;
+
+const PropertyPane = styledComponents.div`
+	flex: 2 0 0px;
 `;
 
 const PatternsPane = styledComponents.div`
+	flex: 3 0 0px;
+`;
+
+const ProjectPane = styledComponents.div`
 	flex: 3 0 0px;
 `;
 
@@ -97,39 +103,14 @@ class App extends React.Component<AppProps> {
 			<Layout directionVertical>
 				<Chrome title={title} />
 				<MainArea>
-					<Layout directionVertical hasMargins>
-						<ProjectsPane>
-							<ProjectList store={this.props.store} />
-						</ProjectsPane>
-
+					<SideBar directionVertical hasMargins>
+						<ElementPane>
+							<ElementList store={this.props.store} />
+						</ElementPane>
 						<PatternsPane>
-							<Layout>
-								<TabNavigation>
-									<TabNavigationItem
-										active={this.isPatternListVisible}
-										onClick={event =>
-											this.handleTabNaviagtionClick(event, App.PatternListID)
-										}
-										tabText="Patterns"
-									/>
-									<TabNavigationItem
-										active={this.isPropertiesListVisible}
-										onClick={event =>
-											this.handleTabNaviagtionClick(event, App.PropertiesListID)
-										}
-										tabText="Properties"
-									/>
-								</TabNavigation>
-							</Layout>
-							{this.isPatternListVisible && <PatternList store={this.props.store} />}
-							{this.isPropertiesListVisible && (
-								<PropertyList
-									handlePropertyChange={handleStoreChange}
-									store={this.props.store}
-								/>
-							)}
+							<PatternList store={this.props.store} />
 						</PatternsPane>
-					</Layout>
+					</SideBar>
 
 					<PreviewPane
 						dangerouslySetInnerHTML={{
@@ -137,11 +118,17 @@ class App extends React.Component<AppProps> {
 								'<webview id="preview" style="height: 100%;" src="./preview.html" partition="electron" nodeintegration />'
 						}}
 					/>
-
-					<ElementPane directionVertical hasMargins>
-						<ElementList store={this.props.store} />
-					</ElementPane>
-
+					<SideBar directionVertical hasMargins>
+						<PropertyPane>
+							<PropertyList
+							handlePropertyChange={handleStoreChange}
+							store={this.props.store}
+							/>
+						</PropertyPane>
+						<ProjectPane>
+							<ProjectList store={this.props.store} />
+						</ProjectPane>
+					</SideBar>
 					<IconRegistry names={IconName} />
 				</MainArea>
 				<DevTools />

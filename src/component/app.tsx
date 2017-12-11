@@ -16,11 +16,8 @@ import { Store } from '../store';
 import styledComponents from 'styled-components';
 import TabNavigation, { TabNavigationItem } from '../lsg/patterns/tab-navigation';
 
-const ElementPane = styledComponents.div`
-	display: flex;
-	flex-direction: column;
+const ElementPane = styledComponents(Layout)`
 	flex-basis: 350px;
-	border: 1px solid #ccc;
 `;
 
 const ProjectsPane = styledComponents.div`
@@ -70,7 +67,7 @@ class App extends React.Component<AppProps> {
 			<Layout directionVertical>
 				<Chrome title={title} />
 				<Layout>
-					<Layout directionVertical>
+					<Layout directionVertical hasMargins>
 						<ProjectsPane>
 							<ProjectList store={this.props.store} />
 						</ProjectsPane>
@@ -106,7 +103,7 @@ class App extends React.Component<AppProps> {
 						}}
 					/>
 
-					<ElementPane>
+					<ElementPane directionVertical hasMargins>
 						<ElementList store={this.props.store} />
 					</ElementPane>
 

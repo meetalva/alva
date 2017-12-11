@@ -12,8 +12,11 @@ const StyledChrome = styled(Space).attrs({
 	size: Size.XS,
 	sizeLeft: Size.XXL * 3,
 	inside: true
-}) `
+})`
+	position: absolute;
+	top: 0;
 	display: flex;
+	width: 100%;
 	align-items: center;
 	font-family: ${fonts().NORMAL_FONT};
 	height: 38px;

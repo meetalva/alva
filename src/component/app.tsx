@@ -28,6 +28,12 @@ injectGlobal`
 	}
 `;
 
+const MainArea = styledComponents(Layout)`
+	box-sizing: border-box;
+	height: 100vh;
+	padding-top: 38px;
+`;
+
 const ElementPane = styledComponents(Layout)`
 	flex-basis: 350px;
 `;
@@ -90,7 +96,7 @@ class App extends React.Component<AppProps> {
 		return (
 			<Layout directionVertical>
 				<Chrome title={title} />
-				<Layout>
+				<MainArea>
 					<Layout directionVertical hasMargins>
 						<ProjectsPane>
 							<ProjectList store={this.props.store} />
@@ -137,7 +143,7 @@ class App extends React.Component<AppProps> {
 					</ElementPane>
 
 					<IconRegistry names={IconName} />
-				</Layout>
+				</MainArea>
 				<DevTools />
 			</Layout>
 		);

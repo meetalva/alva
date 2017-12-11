@@ -80,7 +80,7 @@ export class PropertyList extends React.Component<PropertyListProps> {
 								/>
 							);
 						default:
-							return <div>Unknown type: {type}</div>;
+							return <div key={id}>Unknown type: {type}</div>;
 					}
 				})}
 			</div>

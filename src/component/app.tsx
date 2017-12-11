@@ -112,7 +112,12 @@ class App extends React.Component<AppProps> {
 								</TabNavigation>
 							</Layout>
 							{this.isPatternListVisible && <PatternList store={this.props.store} />}
-							{this.isPropertiesListVisible && <PropertyList store={this.props.store} />}
+							{this.isPropertiesListVisible && (
+								<PropertyList
+									handlePropertyChange={handleStoreChange}
+									store={this.props.store}
+								/>
+							)}
 						</PatternsPane>
 					</Layout>
 
@@ -142,6 +147,16 @@ class App extends React.Component<AppProps> {
 
 const store = new Store();
 
+const handleStoreChange = () => {
+	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
+	const page: Page | undefined = store.getCurrentPage();
+	webviewTag.send('page-change', {
+		page: page ? page.toJson() : undefined,
+		pageId: page ? page.getPageId() : undefined,
+		projectId: page ? page.getProjectId() : undefined
+	});
+};
+
 MobX.observe(store, (change: MobX.IObjectChange) => {
 	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
 	if (!webviewTag || !webviewTag.send) {
@@ -149,16 +164,12 @@ MobX.observe(store, (change: MobX.IObjectChange) => {
 	}
 
 	if (change.object === store && change.name === 'styleGuidePath') {
+		console.log('open-styleguide');
 		webviewTag.send('open-styleguide', {
 			styleGuidePath: store.getStyleGuidePath()
 		});
 	} else {
-		const page: Page | undefined = store.getCurrentPage();
-		webviewTag.send('page-change', {
-			page: page ? page.toJson() : undefined,
-			pageId: page ? page.getPageId() : undefined,
-			projectId: page ? page.getProjectId() : undefined
-		});
+		handleStoreChange();
 	}
 });
 

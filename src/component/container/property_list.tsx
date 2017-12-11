@@ -9,6 +9,7 @@ import { Store } from '../../store';
 
 export interface PropertyListProps {
 	store: Store;
+	handlePropertyChange(): void;
 }
 
 @observer
@@ -49,6 +50,7 @@ export class PropertyList extends React.Component<PropertyListProps> {
 									checked={value as boolean}
 									handleChange={event => {
 										selectedElement.setPropertyValue(id, !value);
+										this.props.handlePropertyChange();
 									}}
 								/>
 							);
@@ -60,6 +62,7 @@ export class PropertyList extends React.Component<PropertyListProps> {
 									value={value as string}
 									handleChange={event => {
 										selectedElement.setPropertyValue(id, event.currentTarget.value);
+										this.props.handlePropertyChange();
 									}}
 								/>
 							);
@@ -76,6 +79,7 @@ export class PropertyList extends React.Component<PropertyListProps> {
 									values={options}
 									handleChange={event => {
 										selectedElement.setPropertyValue(id, event.currentTarget.value);
+										this.props.handlePropertyChange();
 									}}
 								/>
 							);

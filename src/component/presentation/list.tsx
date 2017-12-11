@@ -41,7 +41,7 @@ export interface ListPropsListItem {
 	label?: string;
 	value: string;
 
-	onClick?(event: {}): void;
+	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 export class List extends React.Component<ListProps> {

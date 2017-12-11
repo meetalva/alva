@@ -21,7 +21,7 @@ import TabNavigation, { TabNavigationItem } from '../lsg/patterns/tab-navigation
 injectGlobal`
 	body {
 		margin: 0;
-		background-color: #ffffff;
+		background-color: #f7f7f7;
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 		font-size: 12px;
 	}
@@ -42,7 +42,8 @@ const PatternsPane = styledComponents.div`
 
 const PreviewPane = styledComponents.div`
 	flex: 2 0 0px;
-	border-radius: 10px;
+	background-color: #ffffff;
+	border-radius: 10px 10px 0 0;
 	box-shadow: 0 2px 10px 0 rgba(0,0,0,.13);
 	overflow: hidden;
 `;

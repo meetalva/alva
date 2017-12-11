@@ -17,11 +17,7 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 	public constructor(props: {}) {
 		super(props);
 
-		const values = [
-			'Medium',
-			'Rare',
-			'Solid Shoe'
-		];
+		const values = ['Medium', 'Rare', 'Solid Shoe'];
 
 		this.state = {
 			values,
@@ -42,6 +38,7 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 			<div>
 				<StyledDemo>
 					<EnumItem
+						label="Label"
 						values={this.state.values}
 						selectedValue={this.state.selectedItem}
 						handleChange={this.handleChange}

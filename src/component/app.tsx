@@ -13,8 +13,17 @@ import { PropertyList } from './container/property_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
-import styledComponents from 'styled-components';
+import styledComponents, { injectGlobal } from 'styled-components';
 import TabNavigation, { TabNavigationItem } from '../lsg/patterns/tab-navigation';
+
+// Global style
+// tslint:disable-next-line:no-unused-expression
+injectGlobal`
+  body {
+    margin: 0;
+    background-color: #ffffff;
+  }
+`;
 
 const ElementPane = styledComponents(Layout)`
 	flex-basis: 350px;

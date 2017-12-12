@@ -71,6 +71,7 @@ export class Store {
 			this.currentPage = undefined;
 			this.projects.clear();
 			this.patternRoot = new PatternFolder(this, '');
+			this.patternRoot.addTextPattern();
 
 			const projects: Project[] = [];
 

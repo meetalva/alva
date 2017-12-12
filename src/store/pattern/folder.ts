@@ -1,6 +1,7 @@
 import * as FileUtils from 'fs';
 import * as MobX from 'mobx';
 import * as PathUtils from 'path';
+import { TextPattern } from './text_pattern';
 import { Pattern } from '.';
 import { Store } from '..';
 
@@ -17,6 +18,11 @@ export class PatternFolder {
 		this.parent = parent;
 
 		this.reload();
+	}
+
+	public addTextPattern(): void {
+		const pattern: Pattern = new TextPattern(this);
+		this.patterns.set(pattern.getName(), pattern);
 	}
 
 	public getAbsolutePath(): string {

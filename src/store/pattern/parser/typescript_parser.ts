@@ -47,6 +47,20 @@ export class TypeScriptParser extends PatternParser {
 		});
 	}
 
+	protected getJsDocValue(node: ts.Node, tagName: string): string | undefined {
+		const jsDocTags: ReadonlyArray<ts.JSDocTag> | undefined = ts.getJSDocTags(node);
+		let result: string | undefined;
+		if (jsDocTags) {
+			jsDocTags.forEach(jsDocTag => {
+				if (jsDocTag.tagName && jsDocTag.tagName.text === tagName) {
+					result = jsDocTag.comment;
+				}
+			});
+		}
+
+		return result;
+	}
+
 	protected getPropsTypeName(): string {
 		return `${this.typeName}Props`;
 	}
@@ -99,8 +113,10 @@ export class TypeScriptParser extends PatternParser {
 		const required: boolean = signature.questionToken === undefined;
 
 		const id: string = signature.name.getText();
-		// TODO: Replace by actual name
-		const name: string = id;
+		let name: string | undefined = this.getJsDocValue(signature, 'name');
+		if (name === undefined) {
+			name = id;
+		}
 
 		const typeNode: ts.TypeNode | undefined = signature.type;
 		if (!typeNode) {

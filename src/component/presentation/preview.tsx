@@ -56,7 +56,7 @@ export class Preview extends React.Component<PreviewProps> {
 			const componentProps: any = {};
 			pattern.getProperties().forEach(property => {
 				componentProps[property.getId()] = this.createComponent(
-					pageElement.getPropertyValue(property.getId()),
+					property.convertToProperty(pageElement.getPropertyValue(property.getId())),
 					property.getId()
 				);
 			});

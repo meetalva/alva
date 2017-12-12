@@ -5,21 +5,21 @@ const { Menu, shell, app } = remote;
 export function createMenu(store: Store): void {
 	const template: MenuItemConstructorOptions[] = [
 		{
-			label: 'File',
+			label: '&File',
 			submenu: [
 				{
-					label: 'New Page',
+					label: 'New &Page',
 					accelerator: 'CmdOrCtrl+N'
 				},
 				{
-					label: 'New Composition',
+					label: 'New P&roject',
 					accelerator: 'CmdOrCtrl+Shift+N'
 				},
 				{
 					type: 'separator'
 				},
 				{
-					label: 'Save',
+					label: '&Save',
 					accelerator: 'CmdOrCtrl+S',
 					role: 'save',
 					click: () => {
@@ -27,29 +27,29 @@ export function createMenu(store: Store): void {
 					}
 				},
 				{
-					label: 'Rename',
+					label: '&Rename',
 					role: 'rename'
 				},
 				{
 					type: 'separator'
 				},
 				{
-					label: 'Close',
+					label: '&Close',
 					accelerator: 'CmdOrCtrl+W',
 					role: 'close'
 				}
 			]
 		},
 		{
-			label: 'Edit',
+			label: '&Edit',
 			submenu: [
 				{
-					label: 'Undo',
+					label: '&Undo',
 					accelerator: 'CmdOrCtrl+Z',
 					role: 'undo'
 				},
 				{
-					label: 'Redo',
+					label: '&Redo',
 					accelerator: 'Shift+CmdOrCtrl+Z',
 					role: 'redo'
 				},
@@ -57,32 +57,32 @@ export function createMenu(store: Store): void {
 					type: 'separator'
 				},
 				{
-					label: 'Cut',
+					label: '&Cut',
 					accelerator: 'CmdOrCtrl+X',
 					role: 'cut'
 				},
 				{
-					label: 'Copy',
+					label: 'C&opy',
 					accelerator: 'CmdOrCtrl+C',
 					role: 'copy'
 				},
 				{
-					label: 'Paste',
+					label: '&Paste',
 					accelerator: 'CmdOrCtrl+V',
 					role: 'paste'
 				},
 				{
-					label: 'Select All',
+					label: '&Select All',
 					accelerator: 'CmdOrCtrl+A',
 					role: 'selectall'
 				}
 			]
 		},
 		{
-			label: 'View',
+			label: '&View',
 			submenu: [
 				{
-					label: 'Reload',
+					label: '&Reload',
 					accelerator: 'CmdOrCtrl+R',
 					// tslint:disable-next-line:no-any
 					click: (item: any, focusedWindow: any) => {
@@ -92,7 +92,7 @@ export function createMenu(store: Store): void {
 					}
 				},
 				{
-					label: 'Toggle Full Screen',
+					label: 'Toggle &Full Screen',
 					accelerator: (() => {
 						if (process.platform === 'darwin') {
 							return 'Ctrl+Command+F';
@@ -108,7 +108,7 @@ export function createMenu(store: Store): void {
 					}
 				},
 				{
-					label: 'Toggle Developer Tools',
+					label: 'Toggle &Developer Tools',
 					accelerator: (() => {
 						if (process.platform === 'darwin') {
 							return 'Alt+Command+I';
@@ -126,36 +126,31 @@ export function createMenu(store: Store): void {
 			]
 		},
 		{
-			label: 'Window',
+			label: '&Window',
 			role: 'window',
 			submenu: [
 				{
-					label: 'Minimize',
+					label: '&Minimize',
 					accelerator: 'CmdOrCtrl+M',
 					role: 'minimize'
-				},
-				{
-					label: 'Close',
-					accelerator: 'CmdOrCtrl+W',
-					role: 'close'
 				}
 			]
 		},
 		{
-			label: 'Help',
+			label: '&Help',
 			role: 'help',
 			submenu: [
 				{
-					label: 'Github'
+					label: '&Github'
 				},
 				{
-					label: 'Quickstart'
+					label: '&Quickstart'
 				},
 				{
-					label: 'Feedback'
+					label: '&Feedback'
 				},
 				{
-					label: 'Learn More',
+					label: '&Learn More',
 					click: () => {
 						shell.openExternal('https://meetalva.github.io/');
 					}

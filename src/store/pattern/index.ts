@@ -60,6 +60,10 @@ export class Pattern {
 		return this.valid;
 	}
 
+	public matches(term: string): boolean {
+		return this.name.toLowerCase().indexOf(term.toLowerCase()) >= 0;
+	}
+
 	public reload(): void {
 		const parsers: PatternParser[] = [new TypeScriptParser()];
 

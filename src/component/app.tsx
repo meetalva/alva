@@ -90,7 +90,7 @@ class App extends React.Component<AppProps> {
 		const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
 		webviewTag.addEventListener('did-stop-loading', () => {
 			store.openStyleguide('../designkit');
-			store.openPage('my-project', 'mypage');
+			store.openPage('meet-alva', 'get-started');
 		});
 	}
 

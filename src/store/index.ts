@@ -13,7 +13,7 @@ export class Store {
 	@MobX.observable private currentPage?: Page;
 	@MobX.observable private patternSearchTerm: string;
 	@MobX.observable private projects: Map<string, Project> = new Map();
-	private patternRoot: PatternFolder;
+	@MobX.observable private patternRoot: PatternFolder;
 	@MobX.observable private selectedElement?: PageElement;
 	@MobX.observable private styleGuidePath: string;
 

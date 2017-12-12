@@ -34,7 +34,7 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 			<select
 				className={className}
 				onChange={handleChange}
-				value={selectedValue || 'emptyValue'}
+				defaultValue={selectedValue || 'emptyValue'}
 			>
 				{!required && <option key="emptyValue" value="emptyValue" />}
 				{values.map(value => (

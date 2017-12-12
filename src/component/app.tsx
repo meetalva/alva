@@ -3,6 +3,7 @@ import { WebviewTag } from 'electron';
 import { ElementList } from './container/element_list';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import { fonts } from '../lsg/patterns/fonts/index';
+import { JsonObject } from '../store/json';
 import Layout from '../lsg/patterns/layout';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
@@ -121,10 +122,7 @@ class App extends React.Component<AppProps> {
 					/>
 					<SideBar directionVertical hasMargins>
 						<PropertyPane>
-							<PropertyList
-								handlePropertyChange={handleStoreChange}
-								store={this.props.store}
-							/>
+							<PropertyList store={this.props.store} />
 						</PropertyPane>
 						<ProjectPane>
 							<ProjectList store={this.props.store} />
@@ -145,29 +143,30 @@ class App extends React.Component<AppProps> {
 
 const store = new Store();
 
-const handleStoreChange = () => {
-	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
+MobX.autorun(() => {
+	console.log('Autorun page change');
+
 	const page: Page | undefined = store.getCurrentPage();
-	webviewTag.send('page-change', {
+	const message: JsonObject = {
 		page: page ? page.toJson() : undefined,
 		pageId: page ? page.getPageId() : undefined,
 		projectId: page ? page.getProjectId() : undefined
-	});
-};
+	};
 
-MobX.observe(store, (change: MobX.IObjectChange) => {
 	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
-	if (!webviewTag || !webviewTag.send) {
-		return;
+	if (webviewTag && webviewTag.send) {
+		webviewTag.send('page-change', message);
 	}
+});
 
-	if (change.object === store && change.name === 'styleGuidePath') {
-		console.log('open-styleguide');
-		webviewTag.send('open-styleguide', {
-			styleGuidePath: store.getStyleGuidePath()
-		});
-	} else {
-		handleStoreChange();
+MobX.autorun(() => {
+	console.log('Autorun styleguide change');
+
+	const message: JsonObject = { styleGuidePath: store.getStyleGuidePath() };
+
+	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
+	if (webviewTag && webviewTag.send) {
+		webviewTag.send('open-styleguide', message);
 	}
 });
 

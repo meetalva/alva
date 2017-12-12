@@ -106,4 +106,19 @@ export class PatternFolder {
 			});
 		});
 	}
+
+	public searchPatterns(term: string): Pattern[] {
+		let result: Pattern[] = [];
+		this.patterns.forEach(pattern => {
+			if (pattern.matches(term)) {
+				result.push(pattern);
+			}
+		});
+
+		this.children.forEach(child => {
+			result = result.concat(child.searchPatterns(term));
+		});
+
+		return result;
+	}
 }

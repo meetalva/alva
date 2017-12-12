@@ -11,6 +11,7 @@ import { Project } from './project';
 
 export class Store {
 	@MobX.observable private currentPage?: Page;
+	@MobX.observable private patternSearchTerm: string;
 	@MobX.observable private projects: Map<string, Project> = new Map();
 	private patternRoot: PatternFolder;
 	@MobX.observable private selectedElement?: PageElement;
@@ -34,6 +35,10 @@ export class Store {
 
 	public getPatternRoot(): PatternFolder | undefined {
 		return this.patternRoot;
+	}
+
+	public getPatternSearchTerm(): string {
+		return this.patternSearchTerm;
 	}
 
 	public getProjectById(id: string): Project | undefined {
@@ -111,11 +116,19 @@ export class Store {
 		this.currentPage.save();
 	}
 
+	public searchPatterns(term: string): Pattern[] {
+		return this.patternRoot.searchPatterns(term);
+	}
+
 	public setPageFromJsonInternal(json: JsonObject, projectId: string, pageId: string): void {
 		MobX.transaction(() => {
 			this.currentPage = json ? Page.fromJson(json, projectId, pageId, this) : undefined;
 			this.selectedElement = undefined;
 		});
+	}
+
+	public setPatternSearchTerm(patternSearchTerm: string): void {
+		this.patternSearchTerm = patternSearchTerm;
 	}
 
 	public setSelectedElement(selectedElement: PageElement): void {

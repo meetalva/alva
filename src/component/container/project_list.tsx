@@ -1,6 +1,6 @@
 import List, { ListItemProps } from '../../lsg/patterns/list';
 import { observer } from 'mobx-react';
-import { PageRef } from '../../store/page/page_ref';
+import { PageRef } from '../../store/project/page_ref';
 import { Project } from '../../store/project';
 import * as React from 'react';
 import { Store } from '../../store';
@@ -24,7 +24,7 @@ export class ProjectList extends React.Component<ProjectListProps> {
 				value: page.getName(),
 				children: [],
 				onClick: (event: React.MouseEvent<HTMLElement>) => {
-					this.props.store.openPage(project.getId(), page.getId());
+					this.props.store.openPage(page.getId());
 				}
 			}))
 		}));

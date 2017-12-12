@@ -1,10 +1,11 @@
 import { PatternFolder } from './pattern/folder';
 import * as FileUtils from 'fs';
-import { JsonObject } from './json';
+import { JsonArray, JsonObject } from './json';
 import * as MobX from 'mobx';
+import { IObservableArray } from 'mobx/lib/types/observablearray';
 import { Page } from './page';
 import { PageElement } from './page/page_element';
-import { PageRef } from './page/page_ref';
+import { PageRef } from './project/page_ref';
 import * as PathUtils from 'path';
 import { Pattern } from './pattern';
 import { Project } from './project';
@@ -12,17 +13,43 @@ import { Project } from './project';
 export class Store {
 	@MobX.observable private currentPage?: Page;
 	@MobX.observable private patternSearchTerm: string = '';
-	@MobX.observable private projects: Map<string, Project> = new Map();
+	@MobX.observable private projects: Project[] = [];
 	@MobX.observable private patternRoot: PatternFolder;
 	@MobX.observable private selectedElement?: PageElement | undefined;
 	@MobX.observable private styleGuidePath: string;
+
+	public addProject(project: Project): void {
+		this.projects.push(project);
+	}
 
 	public getCurrentPage(): Page | undefined {
 		return this.currentPage;
 	}
 
+	public getCurrentPageRef(): PageRef | undefined {
+		if (!this.currentPage) {
+			return undefined;
+		}
+
+		const currentPageId: string = this.currentPage.getId();
+		for (const project of this.projects) {
+			for (const pageRef of project.getPages()) {
+				if (pageRef.getId() === currentPageId) {
+					return pageRef;
+				}
+			}
+		}
+
+		return undefined;
+	}
+
 	public getCurrentProject(): Project | undefined {
-		return this.currentPage ? this.getProjectById(this.currentPage.getProjectId()) : undefined;
+		const pageRef: PageRef | undefined = this.getCurrentPageRef();
+		return pageRef ? pageRef.getProject() : undefined;
+	}
+
+	public getPagesPath(): string {
+		return PathUtils.join(this.styleGuidePath, 'alva');
 	}
 
 	public getPattern(path: string): Pattern | undefined {
@@ -41,16 +68,8 @@ export class Store {
 		return this.patternSearchTerm;
 	}
 
-	public getProjectById(id: string): Project | undefined {
-		return this.projects.get(id);
-	}
-
 	public getProjects(): Project[] {
-		return Array.from(this.projects.values());
-	}
-
-	public getProjectsPath(): string {
-		return PathUtils.join(this.styleGuidePath, 'alva', 'projects');
+		return this.projects;
 	}
 
 	public getSelectedElement(): PageElement | undefined {
@@ -69,44 +88,31 @@ export class Store {
 			}
 			this.styleGuidePath = styleGuidePath;
 			this.currentPage = undefined;
-			this.projects.clear();
 			this.patternRoot = new PatternFolder(this, '');
 			this.patternRoot.addTextPattern();
 
-			const projects: Project[] = [];
-
-			const projectsPath = this.getProjectsPath();
-			FileUtils.readdirSync(projectsPath)
-				.map((name: string) => ({ name, path: PathUtils.join(projectsPath, name) }))
-				.filter(child => FileUtils.lstatSync(child.path).isDirectory())
-				.forEach(folder => {
-					const pages: PageRef[] = [];
-					FileUtils.readdirSync(folder.path)
-						.filter(child => child.match(/\.json$/))
-						.forEach(file => {
-							const pageId: string = file.replace(/\.json$/, '');
-							const pageName: string = file.replace(/\.json$/, '');
-							pages.push(new PageRef(pageId, pageName));
-						});
-
-					projects.push(new Project(folder.name, folder.name, pages));
-				});
-
-			projects.forEach(project => {
-				this.projects.set(project.getId(), project);
+			(this.projects as IObservableArray<Project>).clear();
+			const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.json');
+			const projectsJson: JsonObject = JSON.parse(FileUtils.readFileSync(projectsPath, 'utf8'));
+			(projectsJson.projects as JsonArray).forEach((projectJson: JsonObject) => {
+				const project: Project = Project.fromJsonObject(projectJson, this);
+				this.addProject(project);
 			});
 		});
 	}
 
-	public openPage(projectId: string, pageId: string): void {
+	public openPage(id: string): void {
 		MobX.transaction(() => {
-			const projectPath: string = PathUtils.join(this.getProjectsPath(), projectId);
-			const pagePath: string = PathUtils.join(projectPath, pageId + '.json');
+			const pagePath: string = PathUtils.join(this.getPagesPath(), `page-${id}.json`);
 			const json: JsonObject = JSON.parse(FileUtils.readFileSync(pagePath, 'utf8'));
-			this.currentPage = Page.fromJsonObject(json, projectId, pageId, this);
+			this.currentPage = Page.fromJsonObject(json, id, this);
 
 			this.selectedElement = undefined;
 		});
+	}
+
+	public removeProject(project: Project): void {
+		(this.projects as IObservableArray<Project>).remove(project);
 	}
 
 	public savePage(): void {
@@ -121,9 +127,9 @@ export class Store {
 		return this.patternRoot ? this.patternRoot.searchPatterns(term) : [];
 	}
 
-	public setPageFromJsonInternal(json: JsonObject, projectId: string, pageId: string): void {
+	public setPageFromJsonInternal(json: JsonObject, id: string): void {
 		MobX.transaction(() => {
-			this.currentPage = json ? Page.fromJsonObject(json, projectId, pageId, this) : undefined;
+			this.currentPage = json ? Page.fromJsonObject(json, id, this) : undefined;
 			this.selectedElement = undefined;
 		});
 	}

@@ -18,10 +18,15 @@ export class Page {
 		this.name = 'New Page';
 	}
 
-	public static fromJson(json: JsonObject, projectId: string, pageId: string, store: Store): Page {
+	public static fromJsonObject(
+		json: JsonObject,
+		projectId: string,
+		pageId: string,
+		store: Store
+	): Page {
 		const page = new Page(projectId, pageId, store);
 		page.name = json.name as string;
-		page.root = PageElement.fromJson(json.root as JsonObject, store);
+		page.root = PageElement.fromJsonObject(json.root as JsonObject, store);
 
 		return page;
 	}
@@ -45,11 +50,11 @@ export class Page {
 	public save(): void {
 		const projectPath: string = PathUtils.join(this.store.getProjectsPath(), this.projectId);
 		const pagePath: string = PathUtils.join(projectPath, this.pageId + '.json');
-		const json: JsonObject = this.toJson();
-		FileUtils.writeFileSync(pagePath, json, 'utf8');
+		const json: JsonObject = this.toJsonObject();
+		FileUtils.writeFileSync(pagePath, JSON.stringify(json), 'utf8');
 	}
 
-	public toJson(): JsonObject {
-		return { name: this.name, root: this.root ? this.root.toJson() : undefined };
+	public toJsonObject(): JsonObject {
+		return { name: this.name, root: this.root ? this.root.toJsonObject() : undefined };
 	}
 }

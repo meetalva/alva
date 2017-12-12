@@ -102,7 +102,7 @@ export class Store {
 			const projectPath: string = PathUtils.join(this.getProjectsPath(), projectId);
 			const pagePath: string = PathUtils.join(projectPath, pageId + '.json');
 			const json: JsonObject = JSON.parse(FileUtils.readFileSync(pagePath, 'utf8'));
-			this.currentPage = Page.fromJson(json, projectId, pageId, this);
+			this.currentPage = Page.fromJsonObject(json, projectId, pageId, this);
 
 			this.selectedElement = undefined;
 		});
@@ -122,7 +122,7 @@ export class Store {
 
 	public setPageFromJsonInternal(json: JsonObject, projectId: string, pageId: string): void {
 		MobX.transaction(() => {
-			this.currentPage = json ? Page.fromJson(json, projectId, pageId, this) : undefined;
+			this.currentPage = json ? Page.fromJsonObject(json, projectId, pageId, this) : undefined;
 			this.selectedElement = undefined;
 		});
 	}

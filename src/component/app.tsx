@@ -147,8 +147,6 @@ class App extends React.Component<AppProps> {
 const store = new Store();
 
 MobX.autorun(() => {
-	console.log('Autorun page change');
-
 	const page: Page | undefined = store.getCurrentPage();
 	const message: JsonObject = {
 		page: page ? page.toJsonObject() : undefined,
@@ -163,8 +161,6 @@ MobX.autorun(() => {
 });
 
 MobX.autorun(() => {
-	console.log('Autorun styleguide change');
-
 	const message: JsonObject = { styleGuidePath: store.getStyleGuidePath() };
 
 	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;

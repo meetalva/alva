@@ -1,4 +1,4 @@
-import { List, ListPropsListItem } from '../presentation/list';
+import List, { ListItemProps } from '../../lsg/patterns/list';
 import { observer } from 'mobx-react';
 import { PageRef } from '../../store/page/page_ref';
 import { Project } from '../../store/project';
@@ -16,7 +16,7 @@ export class ProjectList extends React.Component<ProjectListProps> {
 	}
 
 	public render(): JSX.Element {
-		const items: ListPropsListItem[] = this.props.store.getProjects().map((project: Project) => ({
+		const items: ListItemProps[] = this.props.store.getProjects().map((project: Project) => ({
 			label: 'Project',
 			value: project.getName(),
 			children: project.getPages().map((page: PageRef) => ({

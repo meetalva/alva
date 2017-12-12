@@ -1,6 +1,6 @@
 import Input from '../../lsg/patterns/input/';
 import { PatternFolder } from '../../store/pattern/folder';
-import { List, ListPropsListItem } from '../presentation/list';
+import List, {ListItemProps} from '../../lsg/patterns/list';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { Pattern } from '../../store/pattern';
@@ -13,7 +13,7 @@ export interface PatternListProps {
 
 @observer
 export class PatternList extends React.Component<PatternListProps> {
-	public items: ListPropsListItem[] = [];
+	public items: ListItemProps[] = [];
 	public constructor(props: PatternListProps) {
 		super(props);
 
@@ -36,12 +36,12 @@ export class PatternList extends React.Component<PatternListProps> {
 		);
 	}
 
-	public createItemsFromFolder(folder: PatternFolder): ListPropsListItem[] {
-		const result: ListPropsListItem[] = [];
+	public createItemsFromFolder(folder: PatternFolder): ListItemProps[] {
+		const result: ListItemProps[] = [];
 
 		if (folder) {
 			folder.getChildren().forEach((child: PatternFolder) => {
-				const childItem: ListPropsListItem = { value: child.getName() };
+				const childItem: ListItemProps = { value: child.getName() };
 				childItem.children = this.createItemsFromFolder(child);
 				result.push(childItem);
 			});

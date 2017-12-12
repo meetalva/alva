@@ -1,5 +1,5 @@
 import { ElementWrapper } from './elementWrapper';
-import { ListPropsListItem } from '../presentation/list';
+import { ListItemProps } from '../../lsg/patterns/list';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page';
 import { PageElement } from '../../store/page/page_element';
@@ -29,7 +29,7 @@ export class ElementList extends React.Component<ElementListProps> {
 		}
 	}
 
-	public renderList(item: ListPropsListItem, key?: number): JSX.Element {
+	public renderList(item: ListItemProps, key?: number): JSX.Element {
 		return (
 			<ElementWrapper
 				title={item.value}
@@ -48,7 +48,7 @@ export class ElementList extends React.Component<ElementListProps> {
 		key: string,
 		element: PageElement,
 		selectedElement?: PageElement
-	): ListPropsListItem {
+	): ListItemProps {
 		if (!element.getPattern()) {
 			return {
 				label: key,
@@ -57,7 +57,7 @@ export class ElementList extends React.Component<ElementListProps> {
 			};
 		}
 
-		const items: ListPropsListItem[] = [];
+		const items: ListItemProps[] = [];
 		const children: PageElement[] = element.getChildren() || [];
 		children.forEach((value: PageElement, index: number) => {
 			items.push(
@@ -94,9 +94,9 @@ export class ElementList extends React.Component<ElementListProps> {
 		key: string,
 		value: PropertyValue,
 		selectedElement?: PageElement
-	): ListPropsListItem {
+	): ListItemProps {
 		if (value instanceof Array) {
-			const items: ListPropsListItem[] = [];
+			const items: ListItemProps[] = [];
 			(value as (string | number)[]).forEach((child, index: number) => {
 				items.push(this.createItemFromProperty(String(index + 1), child));
 			});
@@ -110,7 +110,7 @@ export class ElementList extends React.Component<ElementListProps> {
 		if (value instanceof PageElement) {
 			return this.createItemFromElement(key, value as PageElement, selectedElement);
 		} else {
-			const items: ListPropsListItem[] = [];
+			const items: ListItemProps[] = [];
 			Object.keys(value).forEach((childKey: string) => {
 				// tslint:disable-next-line:no-any
 				items.push(this.createItemFromProperty(childKey, (value as any)[childKey]));

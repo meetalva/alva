@@ -21,7 +21,9 @@ export class ElementList extends React.Component<ElementListProps> {
 		const page: Page | undefined = this.props.store.getCurrentPage();
 		if (page) {
 			const rootElement: PageElement = page.getRoot() as PageElement;
-			return this.renderList(this.createItemFromElement('Root', rootElement));
+			const selectedElement = this.props.store.getSelectedElement();
+
+			return this.renderList(this.createItemFromElement('Root', rootElement, selectedElement));
 		} else {
 			return null;
 		}
@@ -29,7 +31,12 @@ export class ElementList extends React.Component<ElementListProps> {
 
 	public renderList(item: ListPropsListItem, key?: number): JSX.Element {
 		return (
-			<ElementWrapper title={item.value} key={key} handleClick={item.onClick}>
+			<ElementWrapper
+				title={item.value}
+				key={key}
+				handleClick={item.onClick}
+				active={item.active}
+			>
 				{item.children &&
 					item.children.length > 0 &&
 					item.children.map((child, index) => this.renderList(child, index))}
@@ -37,7 +44,11 @@ export class ElementList extends React.Component<ElementListProps> {
 		);
 	}
 
-	public createItemFromElement(key: string, element: PageElement): ListPropsListItem {
+	public createItemFromElement(
+		key: string,
+		element: PageElement,
+		selectedElement?: PageElement
+	): ListPropsListItem {
 		if (!element.getPattern()) {
 			return {
 				label: key,
@@ -52,7 +63,8 @@ export class ElementList extends React.Component<ElementListProps> {
 			items.push(
 				this.createItemFromProperty(
 					children.length > 1 ? 'Child ' + (index + 1) : 'Child',
-					value
+					value,
+					selectedElement
 				)
 			);
 		});
@@ -68,11 +80,16 @@ export class ElementList extends React.Component<ElementListProps> {
 			label: key,
 			value: patternPath.replace(/^.*\//, ''),
 			onClick: updatePageElement,
-			children: items
+			children: items,
+			active: element === selectedElement
 		};
 	}
 
-	public createItemFromProperty(key: string, value: PropertyValue): ListPropsListItem {
+	public createItemFromProperty(
+		key: string,
+		value: PropertyValue,
+		selectedElement?: PageElement
+	): ListPropsListItem {
 		if (value instanceof Array) {
 			const items: ListPropsListItem[] = [];
 			(value as (string | number)[]).forEach((child, index: number) => {
@@ -86,7 +103,7 @@ export class ElementList extends React.Component<ElementListProps> {
 		}
 
 		if (value instanceof PageElement) {
-			return this.createItemFromElement(key, value as PageElement);
+			return this.createItemFromElement(key, value as PageElement, selectedElement);
 		} else {
 			const items: ListPropsListItem[] = [];
 			Object.keys(value).forEach((childKey: string) => {

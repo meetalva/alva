@@ -33,7 +33,7 @@ Inside the style guide, Alva creates a new folder name 'alva', putting projects 
 subfolders.
 
 You can find an example patterglate style guide with Alva designs at
-https://github.com/meetalva/stacked-example.
+https://github.com/meetalva/designkit.
 
 ## Source-based installation
 
@@ -41,7 +41,7 @@ https://github.com/meetalva/stacked-example.
 * npm i
 * npm start
 
-Currently, the prototype application expects that you also clone and build stacked-example into a
+Currently, the prototype application expects that you also clone and build alva-example into a
 folder next to alva.
 
 ## Notes

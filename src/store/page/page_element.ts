@@ -1,5 +1,6 @@
 import { JsonArray, JsonObject, JsonValue } from '../json';
 import * as MobX from 'mobx';
+import * as PathUtils from 'path';
 import { Pattern } from '../pattern';
 import { Property } from '../pattern/property';
 import { PropertyValue } from './property_value';
@@ -12,19 +13,25 @@ export class PageElement {
 	private pattern?: Pattern;
 	@MobX.observable private propertyValues: Map<string, PropertyValue> = new Map();
 
-	public static fromJsonObject(json: JsonObject, store: Store, parent?: PageElement): PageElement {
-		const element = new PageElement();
-		element.parent = parent;
+	public constructor(pattern?: Pattern) {
+		this.pattern = pattern;
+		this.patternPath = pattern ? pattern.getRelativePath().replace(PathUtils.sep, '/') : '';
+	}
 
-		element.patternPath = json['pattern'] as string;
-		if (store) {
-			const pattern: Pattern | undefined = store.getPattern(element.patternPath);
-			if (pattern) {
-				element.pattern = pattern;
-			} else {
-				console.warn(`Ignoring unknown pattern "${element.patternPath}"`);
-				return element;
-			}
+	public static fromJsonObject(
+		json: JsonObject,
+		store: Store,
+		parent?: PageElement
+	): PageElement | undefined {
+		const patternPath: string = json['pattern'] as string;
+		const pattern: Pattern | undefined = store.getPattern(patternPath);
+		const element = new PageElement(pattern);
+		element.setParent(parent);
+
+		if (!pattern) {
+			console.warn(`Ignoring unknown pattern "${patternPath}"`);
+			element.patternPath = patternPath;
+			return element;
 		}
 
 		if (json.properties) {
@@ -75,6 +82,34 @@ export class PageElement {
 
 	public isRoot(): boolean {
 		return this.parent === undefined;
+	}
+
+	public remove(): void {
+		this.setParent(undefined);
+	}
+
+	public setIndex(index: number): void {
+		this.setParent(this.parent, index);
+	}
+
+	public setParent(parent?: PageElement, index?: number): void {
+		if (index !== undefined && this.parent === parent && this.children.indexOf(this) === index) {
+			return;
+		}
+
+		if (this.parent) {
+			(this.parent.children as MobX.IObservableArray<PageElement>).remove(this);
+		}
+
+		this.parent = parent;
+
+		if (parent) {
+			if (index === undefined || index >= parent.children.length) {
+				parent.children.push(this);
+			} else {
+				parent.children.splice(index < 0 ? 0 : index, 0, this);
+			}
+		}
 	}
 
 	// tslint:disable-next-line:no-any

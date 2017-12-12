@@ -20,6 +20,7 @@ export interface StyledElementChildProps {
 const StyledElement = styled.div`
 	padding: 0 ${getSpace(Size.XS)}px;
 	border-radius: 3px;
+	cursor: default;
 	${(props: ElementProps) =>
 		props.active
 			? `

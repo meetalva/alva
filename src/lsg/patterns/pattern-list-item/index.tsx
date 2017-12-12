@@ -13,6 +13,7 @@ export interface PatternListItemProps {
 const StyledPatternListItem = styled.div`
 	display: flex;
 	align-items: center;
+	cursor: default;
 	padding: ${getSpace(Size.S)}px;
 	border: 1px solid ${colors.grey90.toString()};
 	border-radius: 3px;

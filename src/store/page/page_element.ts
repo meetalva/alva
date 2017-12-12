@@ -12,7 +12,7 @@ export class PageElement {
 	private pattern?: Pattern;
 	@MobX.observable private propertyValues: Map<string, PropertyValue> = new Map();
 
-	public static fromJson(json: JsonObject, store: Store, parent?: PageElement): PageElement {
+	public static fromJsonObject(json: JsonObject, store: Store, parent?: PageElement): PageElement {
 		const element = new PageElement();
 		element.parent = parent;
 
@@ -45,7 +45,7 @@ export class PageElement {
 
 	protected createElementOrValue(json: JsonValue, store: Store): PageElement | PropertyValue {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
-			return PageElement.fromJson(json as JsonObject, store, this);
+			return PageElement.fromJsonObject(json as JsonObject, store, this);
 		} else {
 			return json as PropertyValue;
 		}
@@ -89,12 +89,13 @@ export class PageElement {
 		this.propertyValues.set(id, value);
 	}
 
-	public toJson(): JsonObject {
+	public toJsonObject(): JsonObject {
 		const json: JsonObject = { _type: 'pattern', pattern: this.patternPath };
 
 		json.children = this.children.map(
-			// tslint:disable-next-line:no-any
-			(element: PageElement) => (element.toJson ? element.toJson() : (element as any))
+			(element: PageElement) =>
+				// tslint:disable-next-line:no-any
+				element.toJsonObject ? element.toJsonObject() : (element as any)
 		);
 		json.properties = {};
 
@@ -108,7 +109,7 @@ export class PageElement {
 
 	protected valueToJson(value: PropertyValue): JsonValue {
 		if (value instanceof PageElement) {
-			return value.toJson();
+			return value.toJsonObject();
 		} else if (value instanceof Object) {
 			const jsonObject: JsonObject = {};
 			Object.keys(value).forEach((propertyId: string) => {

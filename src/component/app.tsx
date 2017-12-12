@@ -1,5 +1,5 @@
 import { Chrome } from './container/chrome';
-import { WebviewTag } from 'electron';
+import { MenuItemConstructorOptions, remote, WebviewTag } from 'electron';
 import { ElementList } from './container/element_list';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import { fonts } from '../lsg/patterns/fonts/index';
@@ -16,6 +16,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
 import styledComponents, { injectGlobal } from 'styled-components';
+const { Menu } = remote;
 
 // Global style
 // tslint:disable-next-line:no-unused-expression
@@ -93,6 +94,42 @@ class App extends React.Component<AppProps> {
 			store.openStyleguide('../designkit');
 			store.openPage('meet-alva', 'homepage');
 		});
+
+		const menuTemplate: MenuItemConstructorOptions[] = [
+			{
+				label: 'Alva',
+				submenu: []
+			},
+			{
+				label: 'Edit',
+				submenu: [
+					{
+						label: 'Save',
+						accelerator: 'Cmd+S',
+						role: 'save',
+						click: () => {
+							store.savePage();
+						}
+					}
+				]
+			},
+			{
+				label: 'View',
+				submenu: [
+					{
+						label: 'Toggle Developer Tools',
+						accelerator: 'Cmd+Alt+I',
+						role: 'save',
+						click: () => {
+							remote.getCurrentWindow().webContents.openDevTools();
+						}
+					}
+				]
+			}
+		];
+
+		const menu = Menu.buildFromTemplate(menuTemplate);
+		Menu.setApplicationMenu(menu);
 	}
 
 	public render(): JSX.Element {
@@ -148,7 +185,7 @@ MobX.autorun(() => {
 
 	const page: Page | undefined = store.getCurrentPage();
 	const message: JsonObject = {
-		page: page ? page.toJson() : undefined,
+		page: page ? page.toJsonObject() : undefined,
 		pageId: page ? page.getPageId() : undefined,
 		projectId: page ? page.getProjectId() : undefined
 	};

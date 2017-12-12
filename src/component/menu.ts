@@ -1,69 +1,26 @@
 import { MenuItemConstructorOptions, remote } from 'electron';
 import { Store } from '../store';
-const { Menu } = remote;
+const { Menu, shell, app } = remote;
 
 export function createMenu(store: Store): void {
-	const menuTemplate: MenuItemConstructorOptions[] = [
-		{
-			label: 'Alva',
-			submenu: [
-				{
-					label: 'About Alva',
-					role: 'about'
-				},
-				{
-					type: 'separator'
-				},
-				{
-					label: 'Preferences…',
-					accelerator: 'Cmd+,',
-					role: 'preferences'
-				},
-				{
-					type: 'separator'
-				},
-				{
-					label: 'Hide Alva',
-					accelerator: 'Cmd+H',
-					role: 'hide'
-				},
-				{
-					label: 'Hide Others',
-					accelerator: 'Alt+Cmd+H',
-					role: 'hideothers'
-				},
-				{
-					type: 'separator'
-				},
-				{
-					label: 'Quit',
-					accelerator: 'Cmd+Q',
-					role: 'quit'
-				}
-			]
-		},
+	const template: MenuItemConstructorOptions[] = [
 		{
 			label: 'File',
 			submenu: [
 				{
 					label: 'New Page',
-					accelerator: 'Cmd+N'
+					accelerator: 'CmdOrCtrl+N'
 				},
 				{
 					label: 'New Composition',
-					accelerator: 'Cmd+Shift+N'
-				},
-				{
-					label: 'Close',
-					accelerator: 'Cmd+W',
-					role: 'close'
+					accelerator: 'CmdOrCtrl+Shift+N'
 				},
 				{
 					type: 'separator'
 				},
 				{
 					label: 'Save',
-					accelerator: 'Cmd+S',
+					accelerator: 'CmdOrCtrl+S',
 					role: 'save',
 					click: () => {
 						store.savePage();
@@ -72,6 +29,14 @@ export function createMenu(store: Store): void {
 				{
 					label: 'Rename',
 					role: 'rename'
+				},
+				{
+					type: 'separator'
+				},
+				{
+					label: 'Close',
+					accelerator: 'CmdOrCtrl+W',
+					role: 'close'
 				}
 			]
 		},
@@ -80,39 +45,36 @@ export function createMenu(store: Store): void {
 			submenu: [
 				{
 					label: 'Undo',
-					accelerator: 'Cmd+Z',
+					accelerator: 'CmdOrCtrl+Z',
 					role: 'undo'
 				},
 				{
 					label: 'Redo',
-					accelerator: 'Shift+Cmd+Z',
-					role: 'Redo'
+					accelerator: 'Shift+CmdOrCtrl+Z',
+					role: 'redo'
 				},
 				{
 					type: 'separator'
 				},
 				{
 					label: 'Cut',
-					accelerator: 'Cmd+X',
+					accelerator: 'CmdOrCtrl+X',
 					role: 'cut'
 				},
 				{
 					label: 'Copy',
-					accelerator: 'Cmd+C',
+					accelerator: 'CmdOrCtrl+C',
 					role: 'copy'
 				},
 				{
 					label: 'Paste',
-					accelerator: 'Cmd+V',
+					accelerator: 'CmdOrCtrl+V',
 					role: 'paste'
 				},
 				{
 					label: 'Select All',
-					accelerator: 'Cmd+A',
+					accelerator: 'CmdOrCtrl+A',
 					role: 'selectall'
-				},
-				{
-					type: 'separator'
 				}
 			]
 		},
@@ -120,30 +82,46 @@ export function createMenu(store: Store): void {
 			label: 'View',
 			submenu: [
 				{
-					label: 'Full Screen',
-					accelerator: 'Ctrl+Cmd+F',
-					role: 'togglefullscreen'
-				},
-				{
-					type: 'separator'
-				},
-				{
 					label: 'Reload',
-					accelerator: 'Cmd+R',
-					role: 'reload'
+					accelerator: 'CmdOrCtrl+R',
+					// tslint:disable-next-line:no-any
+					click: (item: any, focusedWindow: any) => {
+						if (focusedWindow) {
+							focusedWindow.reload();
+						}
+					}
 				},
 				{
-					label: 'Force Reload',
-					accelerator: 'Shift+Cmd+R',
-					role: 'forcereload'
-				},
-				{
-					type: 'separator'
+					label: 'Toggle Full Screen',
+					accelerator: (() => {
+						if (process.platform === 'darwin') {
+							return 'Ctrl+Command+F';
+						} else {
+							return 'F11';
+						}
+					})(),
+					// tslint:disable-next-line:no-any
+					click: (item: any, focusedWindow: any) => {
+						if (focusedWindow) {
+							focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
+						}
+					}
 				},
 				{
 					label: 'Toggle Developer Tools',
-					accelerator: 'Cmd+Alt+I',
-					role: 'toggledevtools'
+					accelerator: (() => {
+						if (process.platform === 'darwin') {
+							return 'Alt+Command+I';
+						} else {
+							return 'Ctrl+Shift+I';
+						}
+					})(),
+					// tslint:disable-next-line:no-any
+					click: (item: any, focusedWindow: any) => {
+						if (focusedWindow) {
+							focusedWindow.toggleDevTools();
+						}
+					}
 				}
 			]
 		},
@@ -153,11 +131,13 @@ export function createMenu(store: Store): void {
 			submenu: [
 				{
 					label: 'Minimize',
-					accelerator: 'Cmd+M',
+					accelerator: 'CmdOrCtrl+M',
 					role: 'minimize'
 				},
 				{
-					type: 'separator'
+					label: 'Close',
+					accelerator: 'CmdOrCtrl+W',
+					role: 'close'
 				}
 			]
 		},
@@ -173,11 +153,84 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: 'Feedback'
+				},
+				{
+					label: 'Learn More',
+					click: () => {
+						shell.openExternal('https://meetalva.github.io/');
+					}
 				}
 			]
 		}
 	];
 
-	const menu = Menu.buildFromTemplate(menuTemplate);
+	if (process.platform === 'darwin') {
+		const name = app.getName();
+		template.unshift({
+			label: name,
+			submenu: [
+				{
+					label: 'About ' + name,
+					role: 'about'
+				},
+				{
+					type: 'separator'
+				},
+				{
+					label: 'Preferences…',
+					accelerator: 'Cmd+,',
+					role: 'preferences'
+				},
+				{
+					label: 'Services',
+					role: 'services',
+					submenu: []
+				},
+				{
+					type: 'separator'
+				},
+				{
+					label: 'Hide ' + name,
+					accelerator: 'Command+H',
+					role: 'hide'
+				},
+				{
+					label: 'Hide Others',
+					accelerator: 'Command+Shift+H',
+					role: 'hideothers'
+				},
+				{
+					label: 'Show All',
+					role: 'unhide'
+				},
+				{
+					type: 'separator'
+				},
+				{
+					label: 'Quit',
+					accelerator: 'Command+Q',
+					click: () => {
+						app.quit();
+					}
+				}
+			]
+		});
+		const windowMenu = template.find(m => m.role === 'window');
+		if (windowMenu) {
+			windowMenu.submenu &&
+				// tslint:disable-next-line:no-any
+				(windowMenu.submenu as any).push(
+					{
+						type: 'separator'
+					},
+					{
+						label: 'Bring All to Front',
+						role: 'front'
+					}
+				);
+		}
+	}
+
+	const menu = Menu.buildFromTemplate(template);
 	Menu.setApplicationMenu(menu);
 }

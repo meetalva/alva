@@ -1,8 +1,8 @@
 import { Chrome } from './container/chrome';
 import { WebviewTag } from 'electron';
 import { ElementList } from './container/element_list';
+import globalStyles from '../lsg/patterns/global-styles';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
-import { fonts } from '../lsg/patterns/fonts/index';
 import { JsonObject } from '../store/json';
 import Layout, {MainArea, SideBar} from '../lsg/patterns/layout';
 import { createMenu } from './menu';
@@ -16,18 +16,9 @@ import { PropertyList } from './container/property_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
-import styledComponents, { injectGlobal } from 'styled-components';
+import styledComponents from 'styled-components';
 
-// Global style
-// tslint:disable-next-line:no-unused-expression
-injectGlobal`
-	body {
-		margin: 0;
-		background-color: #f7f7f7;
-		font-family: ${fonts().NORMAL_FONT};
-		font-size: 12px;
-	}
-`;
+globalStyles();
 
 const ElementPane = styledComponents.div`
 	flex: 2 0 0px;

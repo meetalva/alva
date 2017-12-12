@@ -61,6 +61,9 @@ export class Pattern {
 	}
 
 	public matches(term: string): boolean {
+		if (!term || !this.name) {
+			return false;
+		}
 		return this.name.toLowerCase().indexOf(term.toLowerCase()) >= 0;
 	}
 

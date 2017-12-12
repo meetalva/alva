@@ -11,7 +11,7 @@ import { Project } from './project';
 
 export class Store {
 	@MobX.observable private currentPage?: Page;
-	@MobX.observable private patternSearchTerm: string;
+	@MobX.observable private patternSearchTerm: string = '';
 	@MobX.observable private projects: Map<string, Project> = new Map();
 	@MobX.observable private patternRoot: PatternFolder;
 	@MobX.observable private selectedElement?: PageElement;
@@ -117,7 +117,7 @@ export class Store {
 	}
 
 	public searchPatterns(term: string): Pattern[] {
-		return this.patternRoot.searchPatterns(term);
+		return this.patternRoot ? this.patternRoot.searchPatterns(term) : [];
 	}
 
 	public setPageFromJsonInternal(json: JsonObject, projectId: string, pageId: string): void {

@@ -1,5 +1,7 @@
+import Input from '../../lsg/patterns/input/';
 import { PatternFolder } from '../../store/pattern/folder';
 import { List, ListPropsListItem } from '../presentation/list';
+import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { Pattern } from '../../store/pattern';
 import * as React from 'react';
@@ -11,15 +13,27 @@ export interface PatternListProps {
 
 @observer
 export class PatternList extends React.Component<PatternListProps> {
+	public items: ListPropsListItem[] = [];
 	public constructor(props: PatternListProps) {
 		super(props);
+
+		this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
 	}
 
 	public render(): JSX.Element {
-		const items: ListPropsListItem[] = this.createItemsFromFolder(
-			this.props.store.getPatternRoot() as PatternFolder
+		if (this.props.store.getPatternSearchTerm() === '') {
+			this.items = this.createItemsFromFolder(
+				this.props.store.getPatternRoot() as PatternFolder
+			);
+		} else {
+			this.items = this.props.store.searchPatterns(this.props.store.getPatternSearchTerm()).map(pattern => ({ value: pattern.getName() }));
+		}
+		return (
+			<div>
+				<Input handleChange={this.handleSearchInputChange}/>
+				<List headline="Patterns" items={this.items} />
+			</div>
 		);
-		return <List headline="Patterns" items={items} />;
 	}
 
 	public createItemsFromFolder(folder: PatternFolder): ListPropsListItem[] {
@@ -38,5 +52,9 @@ export class PatternList extends React.Component<PatternListProps> {
 		}
 
 		return result;
+	}
+	@action
+	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
+		this.props.store.setPatternSearchTerm(evt.target.value);
 	}
 }

@@ -164,11 +164,14 @@ export class TypeScriptParser extends PatternParser {
 		}
 
 		const options: Option[] = [];
-		enumDeclaration.members.forEach(enumMember => {
+		enumDeclaration.members.forEach((enumMember, index) => {
 			const enumMemberId = enumMember.name.getText();
 			// TODO: Replace by actual name
 			const enumMemberName = enumMemberId;
-			options.push(new Option(enumMemberId, enumMemberName));
+			const enumMemberOrdinal: number = enumMember.initializer
+				? parseInt(enumMember.initializer.getText(), 10)
+				: index;
+			options.push(new Option(enumMemberId, enumMemberName, enumMemberOrdinal));
 		});
 
 		return new EnumProperty(id, name, required, options);

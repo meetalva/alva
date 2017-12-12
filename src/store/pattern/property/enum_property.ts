@@ -2,10 +2,20 @@ import { Property } from '.';
 
 export class EnumProperty extends Property {
 	private options: Option[];
+	private ordinalById: { [id: string]: number } = {};
 
 	public constructor(id: string, name: string, required: boolean, options: Option[]) {
 		super(id, name, required);
 		this.options = options;
+		this.options.forEach((option: Option) => {
+			this.ordinalById[option.getId()] = option.getOrdinal();
+		});
+	}
+
+	// tslint:disable-next-line:no-any
+	public convertToProperty(value: any): any {
+		console.log(`Converted from ${value} to ${this.ordinalById[value as string]}`);
+		return this.ordinalById[value as string];
 	}
 
 	// tslint:disable-next-line:no-any
@@ -33,10 +43,12 @@ export class EnumProperty extends Property {
 export class Option {
 	private id: string;
 	private name: string;
+	private ordinal: number;
 
-	public constructor(id: string, name: string) {
+	public constructor(id: string, name: string, ordinal: number) {
 		this.id = id;
 		this.name = name;
+		this.ordinal = ordinal;
 	}
 
 	public getId(): string {
@@ -45,6 +57,10 @@ export class Option {
 
 	public getName(): string {
 		return this.name;
+	}
+
+	public getOrdinal(): number {
+		return this.ordinal;
 	}
 
 	public toString(): string {

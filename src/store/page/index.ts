@@ -51,7 +51,7 @@ export class Page {
 		const projectPath: string = PathUtils.join(this.store.getProjectsPath(), this.projectId);
 		const pagePath: string = PathUtils.join(projectPath, this.pageId + '.json');
 		const json: JsonObject = this.toJsonObject();
-		FileUtils.writeFileSync(pagePath, JSON.stringify(json), 'utf8');
+		FileUtils.writeFileSync(pagePath, JSON.stringify(json, null, '\t'), 'utf8');
 	}
 
 	public toJsonObject(): JsonObject {

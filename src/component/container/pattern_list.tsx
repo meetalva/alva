@@ -1,8 +1,9 @@
 import Input from '../../lsg/patterns/input/';
 import { PatternFolder } from '../../store/pattern/folder';
-import List, {ListItemProps} from '../../lsg/patterns/list';
+import List, { ListItemProps } from '../../lsg/patterns/list';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
+import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern';
 import * as React from 'react';
 import { Store } from '../../store';
@@ -18,6 +19,7 @@ export class PatternList extends React.Component<PatternListProps> {
 		super(props);
 
 		this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
+		this.handlePatternClick = this.handlePatternClick.bind(this);
 	}
 
 	public render(): JSX.Element {
@@ -26,11 +28,13 @@ export class PatternList extends React.Component<PatternListProps> {
 				this.props.store.getPatternRoot() as PatternFolder
 			);
 		} else {
-			this.items = this.props.store.searchPatterns(this.props.store.getPatternSearchTerm()).map(pattern => ({ value: pattern.getName() }));
+			this.items = this.props.store
+				.searchPatterns(this.props.store.getPatternSearchTerm())
+				.map(pattern => ({ value: pattern.getName() }));
 		}
 		return (
 			<div>
-				<Input handleChange={this.handleSearchInputChange}/>
+				<Input handleChange={this.handleSearchInputChange} />
 				<List headline="Patterns" items={this.items} />
 			</div>
 		);
@@ -47,7 +51,12 @@ export class PatternList extends React.Component<PatternListProps> {
 			});
 
 			folder.getPatterns().forEach((pattern: Pattern) => {
-				result.push({ value: pattern.getName() });
+				result.push({
+					value: pattern.getName(),
+					onClick: () => {
+						this.handlePatternClick(pattern);
+					}
+				});
 			});
 		}
 
@@ -56,5 +65,9 @@ export class PatternList extends React.Component<PatternListProps> {
 	@action
 	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
 		this.props.store.setPatternSearchTerm(evt.target.value);
+	}
+	@action
+	protected handlePatternClick(pattern: Pattern): void {
+		new PageElement(pattern).setParent(this.props.store.getSelectedElement());
 	}
 }

@@ -35,11 +35,7 @@ class PreviewApp extends React.Component<PreviewAppProps, PreviewAppState> {
 const store = new Store();
 
 ipcRenderer.on('page-change', (event: {}, message: JsonObject) => {
-	store.setPageFromJsonInternal(
-		message.page as JsonObject,
-		message.pageId as string,
-		message.propertyId as string
-	);
+	store.setPageFromJsonInternal(message.page as JsonObject, message.pageId as string);
 });
 
 ipcRenderer.on('open-styleguide', (event: {}, message: JsonObject) => {

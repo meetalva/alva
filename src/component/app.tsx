@@ -4,7 +4,7 @@ import { ElementList } from './container/element_list';
 import globalStyles from '../lsg/patterns/global-styles';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import { JsonObject } from '../store/json';
-import Layout, {MainArea, SideBar} from '../lsg/patterns/layout';
+import Layout, { MainArea, SideBar } from '../lsg/patterns/layout';
 import { createMenu } from './menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
@@ -72,7 +72,7 @@ class App extends React.Component<AppProps> {
 		const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
 		webviewTag.addEventListener('did-stop-loading', () => {
 			store.openStyleguide('../designkit');
-			store.openPage('meet-alva', 'homepage');
+			store.openPage('homepage');
 		});
 
 		createMenu(store);
@@ -130,8 +130,7 @@ MobX.autorun(() => {
 	const page: Page | undefined = store.getCurrentPage();
 	const message: JsonObject = {
 		page: page ? page.toJsonObject() : undefined,
-		pageId: page ? page.getPageId() : undefined,
-		projectId: page ? page.getProjectId() : undefined
+		pageId: page ? page.getId() : undefined
 	};
 
 	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;

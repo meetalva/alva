@@ -6,25 +6,18 @@ import { Store } from '..';
 
 export class Page {
 	private name: string;
-	private pageId: string;
-	private projectId: string;
+	private id: string;
 	private root?: PageElement;
 	private store: Store;
 
-	public constructor(projectId: string, pageId: string, store: Store) {
-		this.pageId = pageId;
-		this.projectId = projectId;
+	public constructor(id: string, store: Store) {
+		this.id = id;
 		this.store = store;
 		this.name = 'New Page';
 	}
 
-	public static fromJsonObject(
-		json: JsonObject,
-		projectId: string,
-		pageId: string,
-		store: Store
-	): Page {
-		const page = new Page(projectId, pageId, store);
+	public static fromJsonObject(json: JsonObject, id: string, store: Store): Page {
+		const page = new Page(id, store);
 		page.name = json.name as string;
 		page.root = PageElement.fromJsonObject(json.root as JsonObject, store);
 
@@ -35,12 +28,8 @@ export class Page {
 		return this.name;
 	}
 
-	public getPageId(): string {
-		return this.pageId;
-	}
-
-	public getProjectId(): string {
-		return this.projectId;
+	public getId(): string {
+		return this.id;
 	}
 
 	public getRoot(): PageElement {
@@ -48,8 +37,7 @@ export class Page {
 	}
 
 	public save(): void {
-		const projectPath: string = PathUtils.join(this.store.getProjectsPath(), this.projectId);
-		const pagePath: string = PathUtils.join(projectPath, this.pageId + '.json');
+		const pagePath: string = PathUtils.join(this.store.getPagesPath(), `page-${this.id}.json`);
 		const json: JsonObject = this.toJsonObject();
 		FileUtils.writeFileSync(pagePath, JSON.stringify(json, null, '\t'), 'utf8');
 	}

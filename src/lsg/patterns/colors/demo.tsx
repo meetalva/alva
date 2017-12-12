@@ -1,3 +1,4 @@
+import DemoContainer from '../demo-container';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -16,7 +17,7 @@ const StyledList = styled.ul`
 
 export default function ColorDemo() {
 	return (
-		<div>
+		<DemoContainer title="Colors">
 			<StyledList>
 				<ColorSwatch color={colors.black} />
 				<ColorSwatch color={colors.grey36} />
@@ -28,7 +29,7 @@ export default function ColorDemo() {
 				<ColorSwatch color={colors.blue} />
 				<ColorSwatch color={colors.blueLight} />
 			</StyledList>
-		</div>
+		</DemoContainer>
 	);
 }
 

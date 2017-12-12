@@ -1,4 +1,5 @@
 import { Color, colors } from '../colors';
+import DemoContainer from '../demo-container';
 import Space, { Size } from './index';
 import * as React from 'react';
 import styled from 'styled-components';
@@ -42,7 +43,7 @@ const Content = styled.div`
 `;
 
 const SpaceDemo: React.StatelessComponent<void> = (): JSX.Element => (
-	<div>
+	<DemoContainer title="Space">
 		<Space>Inset</Space>
 		<DemoTileSpace size={[Size.L, Size.None]}>
 			<Space size={Size.XS}>
@@ -117,7 +118,7 @@ const SpaceDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				<StackSpace sizeBottom={Size.XXL} inside={true}><Content>{Size[Size.XXL]}</Content></StackSpace>
 			</Space>
 		</Space>
-	</div>
+	</DemoContainer>
 );
 
 export default SpaceDemo;

@@ -1,3 +1,4 @@
+import DemoContainer from '../demo-container';
 import { IconName, IconRegistry } from '../icons';
 import Element from './index';
 import * as React from 'react';
@@ -10,7 +11,7 @@ const StyledTestDiv = styled.div`
 `;
 
 const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
-	<div>
+	<DemoContainer title="Element">
 		<StyledTestDiv>
 			Default
 			<Element title="Active Element" />
@@ -55,7 +56,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 		</StyledTestDiv>
 
 		<IconRegistry names={IconName} />
-	</div>
+	</DemoContainer>
 );
 
 export default ElementDemo;

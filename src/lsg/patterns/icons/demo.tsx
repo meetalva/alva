@@ -1,3 +1,4 @@
+import DemoContainer from '../demo-container';
 import {Icon, IconName, IconRegistry, reduce, Size as IconSize} from './index';
 import * as React from 'react';
 import styled from 'styled-components';
@@ -41,11 +42,11 @@ const DemoIcons = (props: DemoIconsProps) => (
 );
 
 const IconRegistryDemo: React.StatelessComponent<void> = (): JSX.Element => (
-	<div>
+	<DemoContainer title="Icons">
 		<DemoIcons size={IconSize.XS} names={IconName}/>
 		<DemoIcons size={IconSize.S} names={IconName}/>
 		<IconRegistry names={IconName}/>
-	</div>
+	</DemoContainer>
 );
 
 export default IconRegistryDemo;

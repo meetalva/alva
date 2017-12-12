@@ -1,0 +1,7 @@
+{
+	"name": "demo-container",
+	"displayName": "Demo Container",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": ["demo-container"]
+ }

@@ -13,15 +13,27 @@ export interface ElementProps {
 	handleIconClick?: React.MouseEventHandler<SVGSVGElement>;
 }
 
+interface StyledElementLabelProps {
+	active?: boolean;
+}
+
 export interface StyledElementChildProps {
 	open?: boolean;
 }
 
 const StyledElement = styled.div`
-	padding: 0 ${getSpace(Size.XS)}px;
-	border-radius: 3px;
 	cursor: default;
-	${(props: ElementProps) =>
+`;
+
+const StyledElementLabel = styled.div`
+	position: relative;
+	display: flex;
+	min-height: 30px;
+	padding: 0 ${getSpace(Size.L)}px;
+	border-radius: 3px;
+	cursor: pointer;
+	align-items: center;
+	${(props: StyledElementLabelProps) =>
 		props.active
 			? `
 				color: ${colors.white.toString()};
@@ -32,23 +44,15 @@ const StyledElement = styled.div`
 			`};
 `;
 
-const StyledElementLabel = styled.div`
-	position: relative;
-	display: flex;
-	padding-left: ${getSpace(Size.S)}px;
-	min-height: 30px;
-	align-items: center;
-`;
-
 const StyledElementChild = styled.div`
 	flex-basis: 100%;
-	padding-left: ${getSpace(Size.L)}px;
+	padding-left: ${getSpace(Size.S)}px;
 	${(props: StyledElementChildProps) => (props.open ? 'display: block;' : 'display: none;')};
 `;
 
 const StyledIcon = styled(Icon)`
 	position: absolute;
-	left: 0;
+	left: ${getSpace(Size.L) / 2}px;
 	fill: ${colors.grey70.toString()};
 `;
 
@@ -56,8 +60,8 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 	const { children, title, active, open, handleClick, handleIconClick } = props;
 
 	return (
-		<StyledElement onClick={handleClick} title={title} active={active}>
-			<StyledElementLabel>
+		<StyledElement title={title}>
+			<StyledElementLabel active={active} onClick={handleClick}>
 				{children && (
 					<StyledIcon
 						handleClick={handleIconClick}

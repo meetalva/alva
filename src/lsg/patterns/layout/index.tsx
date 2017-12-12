@@ -15,6 +15,37 @@ const StyledLayout = styled.div`
 	${(props: LayoutProps) => (props.hasMargins ? `margin: 0 ${getSpace(Size.L)}px` : '')};
 `;
 
+const StyledMainArea = styled(StyledLayout)`
+	box-sizing: border-box;
+	height: 100vh;
+	padding-top: 38px;
+`;
+
+const StyledSideBar = styled(StyledLayout)`
+	flex-basis: 240px;
+	overflow-y: scroll;
+`;
+
+export const MainArea: React.StatelessComponent<LayoutProps> = props => (
+	<StyledMainArea
+		className={props.className}
+		directionVertical={props.directionVertical}
+		hasMargins={props.hasMargins}
+	>
+		{props.children}
+	</StyledMainArea>
+);
+
+export const SideBar: React.StatelessComponent<LayoutProps> = props => (
+	<StyledSideBar
+		className={props.className}
+		directionVertical={props.directionVertical}
+		hasMargins={props.hasMargins}
+	>
+		{props.children}
+	</StyledSideBar>
+);
+
 const Layout: React.StatelessComponent<LayoutProps> = props => (
 	<StyledLayout
 		className={props.className}

@@ -4,7 +4,7 @@ import { ElementList } from './container/element_list';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import { fonts } from '../lsg/patterns/fonts/index';
 import { JsonObject } from '../store/json';
-import Layout from '../lsg/patterns/layout';
+import Layout, {MainArea, SideBar} from '../lsg/patterns/layout';
 import { createMenu } from './menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
@@ -27,17 +27,6 @@ injectGlobal`
 		font-family: ${fonts().NORMAL_FONT};
 		font-size: 12px;
 	}
-`;
-
-const MainArea = styledComponents(Layout)`
-	box-sizing: border-box;
-	height: 100vh;
-	padding-top: 38px;
-`;
-
-const SideBar = styledComponents(Layout)`
-	flex-basis: 240px;
-	overflow-y: scroll;
 `;
 
 const ElementPane = styledComponents.div`

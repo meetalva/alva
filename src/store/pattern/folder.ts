@@ -1,8 +1,8 @@
 import * as FileUtils from 'fs';
 import * as MobX from 'mobx';
 import * as PathUtils from 'path';
-import { Pattern } from '..';
-import { Store } from '../..';
+import { Pattern } from '.';
+import { Store } from '..';
 
 export class PatternFolder {
 	@MobX.observable private children: Map<string, PatternFolder> = new Map();
@@ -24,7 +24,8 @@ export class PatternFolder {
 	}
 
 	public getChild(path: string): PatternFolder | undefined {
-		const slashPos: number = path.indexOf('/');
+		path = path.replace('/', PathUtils.sep);
+		const slashPos: number = path.indexOf(PathUtils.sep);
 		if (slashPos < 0) {
 			return this.children.get(path);
 		}
@@ -35,7 +36,7 @@ export class PatternFolder {
 			return undefined;
 		}
 
-		const remainingPath: string = path.substring(slashPos + 1);
+		const remainingPath: string = path.substring(slashPos + PathUtils.sep.length);
 		return folder.getChild(remainingPath);
 	}
 
@@ -56,7 +57,8 @@ export class PatternFolder {
 	}
 
 	public getPattern(path: string): Pattern | undefined {
-		const slashPos: number = path.indexOf('/');
+		path = path.replace('/', PathUtils.sep);
+		const slashPos: number = path.indexOf(PathUtils.sep);
 		if (slashPos < 0) {
 			return this.patterns.get(path);
 		}
@@ -67,7 +69,7 @@ export class PatternFolder {
 			return undefined;
 		}
 
-		const remainingPath: string = path.substring(slashPos + 1);
+		const remainingPath: string = path.substring(slashPos + PathUtils.sep.length);
 		return folder.getPattern(remainingPath);
 	}
 
@@ -75,7 +77,7 @@ export class PatternFolder {
 		if (this.parent) {
 			return PathUtils.join(this.parent.getRelativePath(), this.name);
 		} else {
-			return this.name;
+			return '';
 		}
 	}
 

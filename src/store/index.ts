@@ -30,7 +30,7 @@ export class Store {
 	}
 
 	public getPatternsPath(): string {
-		return PathUtils.join(this.styleGuidePath, 'lib');
+		return PathUtils.join(this.styleGuidePath, 'lib', 'patterns');
 	}
 
 	public getPatternRoot(): PatternFolder | undefined {
@@ -70,7 +70,7 @@ export class Store {
 			this.styleGuidePath = styleGuidePath;
 			this.currentPage = undefined;
 			this.projects.clear();
-			this.patternRoot = new PatternFolder(this, 'patterns');
+			this.patternRoot = new PatternFolder(this, '');
 
 			const projects: Project[] = [];
 

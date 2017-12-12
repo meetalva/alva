@@ -72,8 +72,13 @@ export class ElementList extends React.Component<ElementListProps> {
 		const patternPath: string = element.getPatternPath() as string;
 
 		const updatePageElement: React.MouseEventHandler<HTMLElement> = event => {
-			event.stopPropagation();
-			this.props.store && this.props.store.setSelectedElement(element);
+			if (this.props.store.getSelectedElement() === element) {
+				event.stopPropagation();
+				this.props.store && this.props.store.unsetSelectedElement();
+			} else {
+				event.stopPropagation();
+				this.props.store && this.props.store.setSelectedElement(element);
+			}
 		};
 
 		return {

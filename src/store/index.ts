@@ -14,7 +14,7 @@ export class Store {
 	@MobX.observable private patternSearchTerm: string = '';
 	@MobX.observable private projects: Map<string, Project> = new Map();
 	@MobX.observable private patternRoot: PatternFolder;
-	@MobX.observable private selectedElement?: PageElement;
+	@MobX.observable private selectedElement?: PageElement | undefined;
 	@MobX.observable private styleGuidePath: string;
 
 	public getCurrentPage(): Page | undefined {
@@ -133,5 +133,9 @@ export class Store {
 
 	public setSelectedElement(selectedElement: PageElement): void {
 		this.selectedElement = selectedElement;
+	}
+
+	public unsetSelectedElement(): void {
+		this.selectedElement = undefined;
 	}
 }

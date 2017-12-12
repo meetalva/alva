@@ -9,7 +9,6 @@ import { Store } from '../../store';
 
 export interface PropertyListProps {
 	store: Store;
-	handlePropertyChange(): void;
 }
 
 @observer
@@ -50,10 +49,10 @@ export class PropertyList extends React.Component<PropertyListProps> {
 									checked={value as boolean}
 									handleChange={event => {
 										selectedElement.setPropertyValue(id, !value);
-										this.props.handlePropertyChange();
 									}}
 								/>
 							);
+
 						case 'string':
 							return (
 								<StringItem
@@ -62,10 +61,10 @@ export class PropertyList extends React.Component<PropertyListProps> {
 									value={value as string}
 									handleChange={event => {
 										selectedElement.setPropertyValue(id, event.currentTarget.value);
-										this.props.handlePropertyChange();
 									}}
 								/>
 							);
+
 						case 'enum':
 							const options = (property as EnumProperty)
 								.getOptions()
@@ -79,10 +78,10 @@ export class PropertyList extends React.Component<PropertyListProps> {
 									values={options}
 									handleChange={event => {
 										selectedElement.setPropertyValue(id, event.currentTarget.value);
-										this.props.handlePropertyChange();
 									}}
 								/>
 							);
+
 						default:
 							return <div key={id}>Unknown type: {type}</div>;
 					}

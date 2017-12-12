@@ -89,7 +89,7 @@ class App extends React.Component<AppProps> {
 	public componentDidMount(): void {
 		const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
 		webviewTag.addEventListener('did-stop-loading', () => {
-			store.openStyleguide('../stacked-example');
+			store.openStyleguide('../designkit');
 			store.openPage('my-project', 'mypage');
 		});
 	}
@@ -122,8 +122,8 @@ class App extends React.Component<AppProps> {
 					<SideBar directionVertical hasMargins>
 						<PropertyPane>
 							<PropertyList
-							handlePropertyChange={handleStoreChange}
-							store={this.props.store}
+								handlePropertyChange={handleStoreChange}
+								store={this.props.store}
 							/>
 						</PropertyPane>
 						<ProjectPane>

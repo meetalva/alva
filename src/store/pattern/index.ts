@@ -21,7 +21,7 @@ export class Pattern {
 	private properties: Map<string, Property> = new Map();
 
 	/**
-	 * This is a valid pattern for Stacked (has been parsed successfully).
+	 * This is a valid pattern for Alva (has been parsed successfully).
 	 */
 	private valid: boolean = false;
 

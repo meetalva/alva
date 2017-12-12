@@ -50,7 +50,7 @@ export class Store {
 	}
 
 	public getProjectsPath(): string {
-		return PathUtils.join(this.styleGuidePath, 'stacked', 'projects');
+		return PathUtils.join(this.styleGuidePath, 'alva', 'projects');
 	}
 
 	public getSelectedElement(): PageElement | undefined {
@@ -64,7 +64,7 @@ export class Store {
 	public openStyleguide(styleGuidePath: string): void {
 		MobX.transaction(() => {
 			if (!PathUtils.isAbsolute(styleGuidePath)) {
-				// Currently, store is two levels below stacked, so go two up
+				// Currently, store is two levels below alva, so go two up
 				styleGuidePath = PathUtils.join(__dirname, '..', '..', styleGuidePath);
 			}
 			this.styleGuidePath = styleGuidePath;

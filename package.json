@@ -1,5 +1,5 @@
 {
-	"name": "alva-app",
+	"name": "meetalva",
 	"version": "0.1.0",
 	"description": "",
 	"main": "dist/electron/index.js",

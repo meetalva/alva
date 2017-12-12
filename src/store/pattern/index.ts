@@ -6,24 +6,24 @@ import { TypeScriptParser } from './parser/typescript_parser';
 
 export class Pattern {
 	/**
-	 * The name of the pattern folder.
+	 * The name of the pattern within the folder.
 	 */
-	private name: string;
+	protected name: string;
 
 	/**
 	 * The parent folder containing the pattern folder.
 	 */
-	private folder: PatternFolder;
+	protected folder: PatternFolder;
 
 	/**
 	 * The properties this pattern supports.
 	 */
-	private properties: Map<string, Property> = new Map();
+	protected properties: Map<string, Property> = new Map();
 
 	/**
 	 * This is a valid pattern for Alva (has been parsed successfully).
 	 */
-	private valid: boolean = false;
+	protected valid: boolean = false;
 
 	public constructor(folder: PatternFolder, name: string) {
 		this.folder = folder;

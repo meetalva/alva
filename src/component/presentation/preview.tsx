@@ -4,6 +4,7 @@ import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern';
 import { PropertyValue } from '../../store/page/property_value';
 import * as React from 'react';
+import { TextPattern } from '../../store/pattern/text_pattern';
 
 export interface PreviewProps {
 	page?: Page;
@@ -51,6 +52,9 @@ export class Preview extends React.Component<PreviewProps> {
 			}
 
 			const pattern: Pattern = pageElement.getPattern() as Pattern;
+			if (pattern instanceof TextPattern) {
+				return pageElement.getPropertyValue('text');
+			}
 
 			// tslint:disable-next-line:no-any
 			const componentProps: any = {};

@@ -13,9 +13,10 @@ export class PageElement {
 	private pattern?: Pattern;
 	@MobX.observable private propertyValues: Map<string, PropertyValue> = new Map();
 
-	public constructor(pattern?: Pattern) {
+	public constructor(pattern?: Pattern, parent?: PageElement) {
 		this.pattern = pattern;
 		this.patternPath = pattern ? pattern.getRelativePath().replace(PathUtils.sep, '/') : '';
+		this.setParent(parent);
 	}
 
 	public static fromJsonObject(
@@ -25,8 +26,7 @@ export class PageElement {
 	): PageElement | undefined {
 		const patternPath: string = json['pattern'] as string;
 		const pattern: Pattern | undefined = store.getPattern(patternPath);
-		const element = new PageElement(pattern);
-		element.setParent(parent);
+		const element = new PageElement(pattern, parent);
 
 		if (!pattern) {
 			console.warn(`Ignoring unknown pattern "${patternPath}"`);
@@ -37,20 +37,37 @@ export class PageElement {
 		if (json.properties) {
 			Object.keys(json.properties as JsonObject).forEach((propertyId: string) => {
 				const value: JsonValue = (json.properties as JsonObject)[propertyId];
-				element.setPropertyValue(propertyId, element.createElementOrValue(value, store));
+				element.setPropertyValue(
+					propertyId,
+					element.createPropertyElementOrValue(value, store)
+				);
 			});
 		}
 
 		if (json.children) {
 			element.children = (json.children as JsonArray).map(
-				(childJson: JsonObject) => element.createElementOrValue(childJson, store) as PageElement
+				(childJson: JsonObject) =>
+					element.createChildElementOrValue(childJson, store) as PageElement
 			);
 		}
 
 		return element;
 	}
 
-	protected createElementOrValue(json: JsonValue, store: Store): PageElement | PropertyValue {
+	protected createChildElementOrValue(json: JsonValue, store: Store): PageElement | PropertyValue {
+		if (json && (json as JsonObject)['_type'] === 'pattern') {
+			return PageElement.fromJsonObject(json as JsonObject, store, this);
+		} else {
+			const element: PageElement = new PageElement(store.getPattern('text'), this);
+			element.setPropertyValue('text', String(json));
+			return element;
+		}
+	}
+
+	protected createPropertyElementOrValue(
+		json: JsonValue,
+		store: Store
+	): PageElement | PropertyValue {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
 			return PageElement.fromJsonObject(json as JsonObject, store, this);
 		} else {
@@ -136,20 +153,20 @@ export class PageElement {
 
 		this.propertyValues.forEach((value: PropertyValue, key: string) => {
 			(json.properties as JsonObject)[key] =
-				value !== null && value !== undefined ? this.valueToJson(value) : value;
+				value !== null && value !== undefined ? this.propertyToJsonValue(value) : value;
 		});
 
 		return json;
 	}
 
-	protected valueToJson(value: PropertyValue): JsonValue {
+	protected propertyToJsonValue(value: PropertyValue): JsonValue {
 		if (value instanceof PageElement) {
 			return value.toJsonObject();
 		} else if (value instanceof Object) {
 			const jsonObject: JsonObject = {};
 			Object.keys(value).forEach((propertyId: string) => {
 				// tslint:disable-next-line:no-any
-				jsonObject[propertyId] = this.valueToJson((value as any)[propertyId]);
+				jsonObject[propertyId] = this.propertyToJsonValue((value as any)[propertyId]);
 			});
 			return jsonObject;
 		} else {

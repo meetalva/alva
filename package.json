@@ -1,22 +1,24 @@
 {
-	"name": "stacked-app",
+	"name": "alva-app",
 	"version": "0.1.0",
 	"description": "",
 	"main": "dist/electron/index.js",
 	"scripts": {
 		"build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project .",
-		"start": "npm run build && concurrently \"electron dist/electron\" \"tsc --project . --watch\"",
+		"start":
+			"npm run build && concurrently \"electron dist/electron\" \"tsc --project . --watch\"",
 		"build-lsg": "tsc --project src/lsg --outDir dist/lsg/patterns --sourceMap",
-		"start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\""
+		"start-lsg":
+			"npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\""
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/stackedapp/stacked.git"
+		"url": "git+https://github.com/meetalva/alva.git"
 	},
 	"author": "",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/stackedapp/stacked/issues"
+		"url": "https://github.com/meetalva/alva/issues"
 	},
 	"prettier": {
 		"printWidth": 100,
@@ -52,7 +54,7 @@
 		"styled-components": "^2.2.3",
 		"systemjs": "^0.20.19"
 	},
-	"homepage": "https://github.com/stackedapp/stacked#readme",
+	"homepage": "https://meetalva.github.io/",
 	"config": {
 		"commitizen": {
 			"path": "./node_modules/cz-conventional-changelog"

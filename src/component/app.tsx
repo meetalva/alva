@@ -1,10 +1,11 @@
 import { Chrome } from './container/chrome';
-import { MenuItemConstructorOptions, remote, WebviewTag } from 'electron';
+import { WebviewTag } from 'electron';
 import { ElementList } from './container/element_list';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import { fonts } from '../lsg/patterns/fonts/index';
 import { JsonObject } from '../store/json';
 import Layout from '../lsg/patterns/layout';
+import { createMenu } from './menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
@@ -16,7 +17,6 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
 import styledComponents, { injectGlobal } from 'styled-components';
-const { Menu } = remote;
 
 // Global style
 // tslint:disable-next-line:no-unused-expression
@@ -95,41 +95,7 @@ class App extends React.Component<AppProps> {
 			store.openPage('meet-alva', 'homepage');
 		});
 
-		const menuTemplate: MenuItemConstructorOptions[] = [
-			{
-				label: 'Alva',
-				submenu: []
-			},
-			{
-				label: 'Edit',
-				submenu: [
-					{
-						label: 'Save',
-						accelerator: 'Cmd+S',
-						role: 'save',
-						click: () => {
-							store.savePage();
-						}
-					}
-				]
-			},
-			{
-				label: 'View',
-				submenu: [
-					{
-						label: 'Toggle Developer Tools',
-						accelerator: 'Cmd+Alt+I',
-						role: 'save',
-						click: () => {
-							remote.getCurrentWindow().webContents.openDevTools();
-						}
-					}
-				]
-			}
-		];
-
-		const menu = Menu.buildFromTemplate(menuTemplate);
-		Menu.setApplicationMenu(menu);
+		createMenu(store);
 	}
 
 	public render(): JSX.Element {

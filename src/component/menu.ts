@@ -107,6 +107,11 @@ export function createMenu(store: Store): void {
 					role: 'paste'
 				},
 				{
+					label: 'Select All',
+					accelerator: 'Cmd+A',
+					role: 'selectall'
+				},
+				{
 					type: 'separator'
 				}
 			]

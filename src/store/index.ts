@@ -91,7 +91,7 @@ export class Store {
 			this.patternRoot.addTextPattern();
 
 			(this.projects as IObservableArray<Project>).clear();
-			const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.json');
+			const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.yaml');
 			const projectsJsonObject: JsonObject = Persister.loadYamlOrJson(projectsPath);
 			(projectsJsonObject.projects as JsonArray).forEach((projectJson: JsonObject) => {
 				const project: Project = Project.fromJsonObject(projectJson, this);
@@ -102,7 +102,7 @@ export class Store {
 
 	public openPage(id: string): void {
 		MobX.transaction(() => {
-			const pagePath: string = PathUtils.join(this.getPagesPath(), `page-${id}.json`);
+			const pagePath: string = PathUtils.join(this.getPagesPath(), `page-${id}.yaml`);
 			const json: JsonObject = Persister.loadYamlOrJson(pagePath);
 			this.currentPage = Page.fromJsonObject(json, id, this);
 

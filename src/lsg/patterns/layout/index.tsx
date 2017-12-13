@@ -18,7 +18,7 @@ const StyledLayout = styled.div`
 const StyledMainArea = styled(StyledLayout)`
 	box-sizing: border-box;
 	height: 100vh;
-	padding-top: 38px;
+	padding-top: 54px;
 `;
 
 const StyledSideBar = styled(StyledLayout)`

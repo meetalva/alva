@@ -54,6 +54,10 @@ export class PageElement {
 		return element;
 	}
 
+	public addChild(child: PageElement, index?: number): void {
+		child.setParent(this, index);
+	}
+
 	protected createChildElementOrValue(json: JsonValue, store: Store): PageElement | PropertyValue {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
 			return PageElement.fromJsonObject(json as JsonObject, store, this);

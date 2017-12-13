@@ -1,4 +1,4 @@
-import List, { ListItemProps } from '../../lsg/patterns/list';
+import List, { Label, Li, ListItemProps, Ul, Value } from '../../lsg/patterns/list';
 import { observer } from 'mobx-react';
 import { PageRef } from '../../store/project/page_ref';
 import { Project } from '../../store/project';
@@ -29,6 +29,33 @@ export class ProjectList extends React.Component<ProjectListProps> {
 			}))
 		}));
 
-		return <List headline="Projects" items={items} />;
+		const list = this.createList(items);
+
+		return <List headline="Projects">{list}</List>;
+	}
+
+	public createList(items: ListItemProps[]): JSX.Element {
+		return (
+			<Ul>
+				{items.map((props: ListItemProps, index: number) => {
+					const labelComponent = props.label ? <Label>{props.label}:</Label> : null;
+					const nextLevel = props.children ? this.createList(props.children) : null;
+
+					return (
+						<Li
+							draggable={props.draggable}
+							onDragStart={props.handleDragStart}
+							key={index}
+							active={props.active}
+							onClick={props.onClick}
+						>
+							{labelComponent}
+							<Value>{props.value}</Value>
+							{nextLevel}
+						</Li>
+					);
+				})}
+			</Ul>
+		);
 	}
 }

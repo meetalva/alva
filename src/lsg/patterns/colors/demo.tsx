@@ -15,7 +15,7 @@ const StyledList = styled.ul`
 	padding: 48px;
 `;
 
-export default function ColorDemo() {
+export default function ColorDemo(): JSX.Element {
 	return (
 		<DemoContainer title="Colors">
 			<StyledList>
@@ -76,7 +76,7 @@ function contrast(rgb: RGB): string {
 	return isLight(rgb) ? colors.black.toString() : colors.white.toString();
 }
 
-function isLight(rgb: RGB) {
+function isLight(rgb: RGB): boolean {
 	const threshold = 100;
 	return luminance(rgb) > threshold;
 }

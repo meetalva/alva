@@ -60,21 +60,18 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 	}
 
 	private handleDragEnterForChild(e: React.DragEvent<HTMLElement>): void {
-		console.log('handleDragEnterForChild');
 		this.setState({
 			highlightPlaceholder: true
 		});
 	}
 
 	private handleDragLeaveForChild(e: React.DragEvent<HTMLElement>): void {
-		console.log('handleDragLeaveForChild');
 		this.setState({
 			highlightPlaceholder: false
 		});
 	}
 
 	private handleDragDropForChild(e: React.DragEvent<HTMLElement>): void {
-		console.log('handleDragDropForChild');
 		this.setState({
 			highlightPlaceholder: false
 		});

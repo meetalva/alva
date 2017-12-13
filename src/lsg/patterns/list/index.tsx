@@ -27,28 +27,68 @@ interface StyledListItemProps {
 	draggable?: boolean;
 }
 
-export const Ul = styledComponents.ul`
+const StyledUl = styledComponents.ul`
 	box-sizing: border-box;
 	padding: 0 0 0 15px;
 	margin: 0;
 	width: 100%;
 `;
 
-export const Li = styledComponents.li`
+const StyledLi = styledComponents.li`
 	line-height: 25px;
 	list-style: none;
 	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')}
 	${(props: StyledListItemProps) => (props.active ? 'background: #def' : '')}
 `;
 
-export const Label = styledComponents.span`
+const StyledLabel = styledComponents.span`
 	color: ${colors.black.toString()};
 	padding-right 4px;
 `;
 
-export const Value = styledComponents.span`
+const StyledValue	 = styledComponents.span`
 	color: ${colors.black.toString()};
 `;
+
+export class Ul extends React.Component<{}> {
+	public render(): JSX.Element {
+		return (
+		<StyledUl>
+			{this.props.children}
+		</StyledUl>
+		);
+	}
+}
+
+export class Li extends React.Component<{}> {
+	public render(): JSX.Element {
+		return (
+		<StyledLi>
+			{this.props.children}
+		</StyledLi>
+		);
+	}
+}
+
+export class Label extends React.Component<{}> {
+	public render(): JSX.Element {
+		return (
+		<StyledLabel>
+			{this.props.children}
+		</StyledLabel>
+		);
+	}
+}
+
+export class Value extends React.Component<{}> {
+	public render(): JSX.Element {
+		return (
+		<StyledValue>
+			{this.props.children}
+		</StyledValue>
+		);
+	}
+}
 
 export default class List extends React.Component<ListProps> {
 	public constructor(props: ListProps) {

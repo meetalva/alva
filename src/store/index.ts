@@ -10,6 +10,7 @@ import { Pattern } from './pattern';
 import { Project } from './project';
 
 export class Store {
+	@MobX.observable private clipboardElement?: PageElement | undefined;
 	@MobX.observable private currentPage?: Page;
 	@MobX.observable private patternSearchTerm: string = '';
 	@MobX.observable private projects: Project[] = [];
@@ -23,6 +24,10 @@ export class Store {
 
 	public closePage(): void {
 		this.currentPage = undefined;
+	}
+
+	public getClipboardElement(): PageElement | undefined {
+		return this.clipboardElement;
 	}
 
 	public getCurrentPage(): Page | undefined {
@@ -148,6 +153,10 @@ export class Store {
 
 	public setPatternSearchTerm(patternSearchTerm: string): void {
 		this.patternSearchTerm = patternSearchTerm;
+	}
+
+	public setClipboardElement(clipboardElement: PageElement): void {
+		this.clipboardElement = clipboardElement;
 	}
 
 	public setSelectedElement(selectedElement: PageElement): void {

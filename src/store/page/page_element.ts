@@ -83,6 +83,13 @@ export class PageElement {
 		return this.children;
 	}
 
+	public getIndex(): number {
+		if (!this.parent) {
+			throw new Error('This element has no parent');
+		}
+		return this.parent.getChildren().indexOf(this);
+	}
+
 	public getParent(): PageElement | undefined {
 		return this.parent;
 	}

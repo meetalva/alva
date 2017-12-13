@@ -1,4 +1,4 @@
-import { MenuItemConstructorOptions, remote } from 'electron';
+import { BrowserWindow, MenuItem, MenuItemConstructorOptions, remote, WebContents } from 'electron';
 import { Store } from '../store';
 const { Menu, shell, app } = remote;
 
@@ -84,8 +84,7 @@ export function createMenu(store: Store): void {
 				{
 					label: '&Reload',
 					accelerator: 'CmdOrCtrl+R',
-					// tslint:disable-next-line:no-any
-					click: (item: any, focusedWindow: any) => {
+					click: (item: MenuItem, focusedWindow: BrowserWindow) => {
 						if (focusedWindow) {
 							focusedWindow.reload();
 						}
@@ -100,8 +99,7 @@ export function createMenu(store: Store): void {
 							return 'F11';
 						}
 					})(),
-					// tslint:disable-next-line:no-any
-					click: (item: any, focusedWindow: any) => {
+					click: (item: MenuItem, focusedWindow: BrowserWindow) => {
 						if (focusedWindow) {
 							focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
 						}
@@ -116,8 +114,7 @@ export function createMenu(store: Store): void {
 							return 'Ctrl+Shift+I';
 						}
 					})(),
-					// tslint:disable-next-line:no-any
-					click: (item: any, focusedWindow: any) => {
+					click: (item: MenuItem, focusedWindow: WebContents) => {
 						if (focusedWindow) {
 							focusedWindow.toggleDevTools();
 						}
@@ -213,8 +210,7 @@ export function createMenu(store: Store): void {
 		const windowMenu = template.find(m => m.role === 'window');
 		if (windowMenu) {
 			windowMenu.submenu &&
-				// tslint:disable-next-line:no-any
-				(windowMenu.submenu as any).push(
+				(windowMenu.submenu as MenuItemConstructorOptions[]).push(
 					{
 						type: 'separator'
 					},

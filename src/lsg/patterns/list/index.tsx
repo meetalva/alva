@@ -37,7 +37,7 @@ export interface LiProps {
 
 const StyledUl = styledComponents.ul`
 	box-sizing: border-box;
-	padding: 0 0 0 15px;
+	padding: 0;
 	margin: 0;
 	width: 100%;
 `;

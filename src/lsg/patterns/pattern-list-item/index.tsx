@@ -1,11 +1,12 @@
 import { colors } from '../colors';
 import { fonts } from '../fonts';
 import { Icon, IconName, Size as IconSize } from '../icons';
+import { LiProps } from '../list';
 import * as React from 'react';
 import { getSpace, Size } from '../space';
 import styled from 'styled-components';
 
-export interface PatternListItemProps {
+export interface PatternListItemProps extends LiProps {
 	className?: string;
 	icon?: string;
 }
@@ -16,6 +17,7 @@ const StyledPatternListItem = styled.li`
 	cursor: default;
 	padding: ${getSpace(Size.S)}px;
 	border: 1px solid ${colors.grey90.toString()};
+	margin: 0 0 ${getSpace(Size.S)}px 0;
 	border-radius: 3px;
 	background: ${colors.white.toString()};
 	font-family: ${fonts().NORMAL_FONT};
@@ -33,10 +35,10 @@ const StyledIcon = styled(Icon)`
 `;
 
 const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => (
-	<StyledPatternListItem className={props.className}>
+	<StyledPatternListItem {...props}>
 		{props.icon
 			? <StyledSVG>
-				<use xlinkHref={props.icon} />
+				{props.icon}
 			</StyledSVG>
 			: <StyledIcon name={IconName.Robo} size={IconSize.XS} color={colors.grey70} />
 		}

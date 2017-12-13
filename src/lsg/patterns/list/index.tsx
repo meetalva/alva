@@ -27,14 +27,13 @@ interface StyledListItemProps {
 }
 
 export const Ul = styledComponents.ul`
-	padding: 0;
+	box-sizing: border-box;
+	padding: 0 0 0 15px;
 	margin: 0;
 	width: 100%;
 `;
 
 export const Li = styledComponents.li`
-	margin: 0 0 0 15px;
-	padding: 0;
 	line-height: 25px;
 	list-style: none;
 	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')}

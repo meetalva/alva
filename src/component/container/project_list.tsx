@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { PageRef } from '../../store/project/page_ref';
 import { Project } from '../../store/project';
 import * as React from 'react';
+import Space, { Size } from '../../lsg/patterns/space';
 import { Store } from '../../store';
 
 export interface ProjectListProps {
@@ -36,25 +37,27 @@ export class ProjectList extends React.Component<ProjectListProps> {
 
 	public createList(items: ListItemProps[]): JSX.Element {
 		return (
-			<Ul>
-				{items.map((props: ListItemProps, index: number) => {
-					const labelComponent = props.label ? <Label>{props.label}:</Label> : null;
-					const nextLevel = props.children ? this.createList(props.children) : null;
+			<Space sizeLeft={Size.M}>
+				<Ul>
+					{items.map((props: ListItemProps, index: number) => {
+						const labelComponent = props.label ? <Label>{props.label}:</Label> : null;
+						const nextLevel = props.children ? this.createList(props.children) : null;
 
-					return (
-						<Li
-							handleDragStart={props.handleDragStart}
-							key={index}
-							active={props.active}
-							onClick={props.onClick}
-						>
-							{labelComponent}
-							<Value>{props.value}</Value>
-							{nextLevel}
-						</Li>
-					);
-				})}
-			</Ul>
+						return (
+							<Li
+								handleDragStart={props.handleDragStart}
+								key={index}
+								active={props.active}
+								onClick={props.onClick}
+							>
+								{labelComponent}
+								<Value>{props.value}</Value>
+								{nextLevel}
+							</Li>
+						);
+					})}
+				</Ul>
+			</Space>
 		);
 	}
 }

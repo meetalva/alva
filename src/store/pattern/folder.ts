@@ -22,7 +22,7 @@ export class PatternFolder {
 
 	public addTextPattern(): void {
 		const pattern: Pattern = new TextPattern(this);
-		this.patterns.set(pattern.getName(), pattern);
+		this.patterns.set(pattern.getId(), pattern);
 	}
 
 	public getAbsolutePath(): string {
@@ -100,7 +100,7 @@ export class PatternFolder {
 						FileUtils.existsSync(PathUtils.join(childPath, 'index.d.ts')) &&
 						FileUtils.existsSync(PathUtils.join(childPath, 'index.js'))
 					) {
-						const pattern: Pattern = new Pattern(this, childName);
+						const pattern: Pattern = new Pattern(this, childName, childName);
 						if (pattern.isValid()) {
 							this.patterns.set(childName, pattern);
 						}

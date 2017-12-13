@@ -3,8 +3,8 @@ import { Property } from '.';
 export class ObjectProperty extends Property {
 	private properties: Map<string, Property> = new Map();
 
-	public constructor(id: string, name: string, required: boolean) {
-		super(id, name, required);
+	public constructor(id: string) {
+		super(id);
 	}
 
 	// tslint:disable-next-line:no-any

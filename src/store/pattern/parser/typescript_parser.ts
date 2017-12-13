@@ -16,7 +16,6 @@ import { Pattern } from '..';
 export class TypeScriptParser extends PatternParser {
 	protected enums: { [name: string]: ts.EnumDeclaration } = {};
 	protected propsDeclaration?: ts.InterfaceDeclaration;
-	protected properties: Property[] = [];
 	protected sourceFile?: ts.SourceFile;
 	protected typeName?: string;
 
@@ -47,6 +46,48 @@ export class TypeScriptParser extends PatternParser {
 		});
 	}
 
+	protected createProperty(signature: ts.PropertySignature): Property | undefined {
+		const typeNode: ts.TypeNode | undefined = signature.type;
+		if (!typeNode) {
+			return undefined;
+		}
+
+		const id: string = signature.name.getText();
+
+		let property: Property | undefined;
+		switch (typeNode.kind) {
+			case ts.SyntaxKind.StringKeyword:
+				return new StringProperty(id);
+
+			case ts.SyntaxKind.NumberKeyword:
+				return new NumberProperty(id);
+
+			case ts.SyntaxKind.BooleanKeyword:
+				return new BooleanProperty(id);
+
+			case ts.SyntaxKind.ArrayType:
+				switch ((typeNode as ts.ArrayTypeNode).elementType.kind) {
+					case ts.SyntaxKind.StringKeyword:
+						return new StringArrayProperty(id);
+
+					case ts.SyntaxKind.NumberKeyword:
+						return new NumberArrayProperty(id);
+				}
+				break;
+
+			case ts.SyntaxKind.TypeReference:
+				const referenceNode = typeNode as ts.TypeReferenceNode;
+				property = this.processTypeProperty(id, referenceNode);
+		}
+
+		if (!property) {
+			property = new ObjectProperty(id);
+			// TODO: Parse properties
+		}
+
+		return property;
+	}
+
 	protected getJsDocValue(node: ts.Node, tagName: string): string | undefined {
 		const jsDocTags: ReadonlyArray<ts.JSDocTag> | undefined = ts.getJSDocTags(node);
 		let result: string | undefined;
@@ -65,9 +106,8 @@ export class TypeScriptParser extends PatternParser {
 		return `${this.typeName}Props`;
 	}
 
-	public parse(pattern: Pattern): Property[] | undefined {
+	public parse(pattern: Pattern): boolean {
 		this.sourceFile = undefined;
-		this.properties = [];
 
 		const folderPath: string = pattern.getAbsolutePath();
 		const declarationPath = PathUtils.join(folderPath, 'index.d.ts');
@@ -75,12 +115,12 @@ export class TypeScriptParser extends PatternParser {
 
 		if (!FileUtils.existsSync(declarationPath)) {
 			console.warn(`Invalid pattern "${declarationPath}": No index.d.ts found`);
-			return undefined;
+			return false;
 		}
 
 		if (!FileUtils.existsSync(implementationPath)) {
 			console.warn(`Invalid pattern "${declarationPath}": No index.js found`);
-			return undefined;
+			return false;
 		}
 
 		this.sourceFile = ts.createSourceFile(
@@ -93,78 +133,48 @@ export class TypeScriptParser extends PatternParser {
 		this.analyzeDeclarations();
 		if (!this.typeName) {
 			console.warn(`Invalid pattern "${declarationPath}": No type name found`);
-			return undefined;
+			return false;
 		}
 		if (!this.propsDeclaration) {
 			console.warn(`Invalid pattern "${declarationPath}": No props interface found`);
-			return undefined;
+			return false;
+		}
+
+		const patternName: string | undefined = this.getJsDocValue(this.propsDeclaration, 'name');
+		if (patternName !== undefined && pattern.getName() === pattern.getId()) {
+			pattern.setName(patternName);
 		}
 
 		this.propsDeclaration.forEachChild((node: ts.Node) => {
 			if (ts.isPropertySignature(node)) {
-				this.processProperty(node);
+				this.processProperty(node, pattern);
 			}
 		});
 
-		return this.properties;
+		return true;
 	}
 
-	protected processProperty(signature: ts.PropertySignature): void {
-		const required: boolean = signature.questionToken === undefined;
-
-		const id: string = signature.name.getText();
-		let name: string | undefined = this.getJsDocValue(signature, 'name');
-		if (name === undefined) {
-			name = id;
-		}
-
-		const typeNode: ts.TypeNode | undefined = signature.type;
-		if (!typeNode) {
-			return;
-		}
-
-		let property: Property | undefined;
-		switch (typeNode.kind) {
-			case ts.SyntaxKind.StringKeyword:
-				property = new StringProperty(id, name, required);
-				break;
-
-			case ts.SyntaxKind.NumberKeyword:
-				property = new NumberProperty(id, name, required);
-				break;
-
-			case ts.SyntaxKind.BooleanKeyword:
-				property = new BooleanProperty(id, name, required);
-				break;
-
-			case ts.SyntaxKind.ArrayType:
-				switch ((typeNode as ts.ArrayTypeNode).elementType.kind) {
-					case ts.SyntaxKind.StringKeyword:
-						property = new StringArrayProperty(id, name, required);
-						break;
-
-					case ts.SyntaxKind.NumberKeyword:
-						property = new NumberArrayProperty(id, name, required);
-				}
-				break;
-
-			case ts.SyntaxKind.TypeReference:
-				const referenceNode = typeNode as ts.TypeReferenceNode;
-				property = this.processTypeProperty(id, name, required, referenceNode);
-		}
-
+	protected processProperty(signature: ts.PropertySignature, pattern: Pattern): void {
+		let property: Property | undefined = pattern.getProperty(signature.name.getText());
 		if (!property) {
-			property = new ObjectProperty(id, name, required);
-			// TODO: Parse properties
+			property = this.createProperty(signature);
+			if (!property) {
+				return;
+			}
+
+			pattern.addProperty(property);
 		}
 
-		this.properties.push(property);
+		const name: string | undefined = this.getJsDocValue(signature, 'name');
+		if (name !== undefined && property.getName() !== property.getId()) {
+			property.setName(name);
+		}
+
+		property.setRequired(signature.questionToken === undefined);
 	}
 
 	protected processTypeProperty(
 		id: string,
-		name: string,
-		required: boolean,
 		referenceNode: ts.TypeReferenceNode
 	): Property | undefined {
 		if (!referenceNode.typeName) {
@@ -182,14 +192,18 @@ export class TypeScriptParser extends PatternParser {
 		const options: Option[] = [];
 		enumDeclaration.members.forEach((enumMember, index) => {
 			const enumMemberId = enumMember.name.getText();
-			// TODO: Replace by actual name
-			const enumMemberName = enumMemberId;
+			let enumMemberName = this.getJsDocValue(enumMember, 'name');
+			if (enumMemberName === undefined) {
+				enumMemberName = enumMemberId;
+			}
 			const enumMemberOrdinal: number = enumMember.initializer
 				? parseInt(enumMember.initializer.getText(), 10)
 				: index;
 			options.push(new Option(enumMemberId, enumMemberName, enumMemberOrdinal));
 		});
 
-		return new EnumProperty(id, name, required, options);
+		const result: EnumProperty = new EnumProperty(id);
+		result.setOptions(options);
+		return result;
 	}
 }

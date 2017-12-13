@@ -6,14 +6,19 @@ import { TypeScriptParser } from './parser/typescript_parser';
 
 export class Pattern {
 	/**
-	 * The name of the pattern within the folder.
+	 * The ID of the pattern (also the folder name within the parent folder).
 	 */
-	protected name: string;
+	protected id: string;
 
 	/**
 	 * The parent folder containing the pattern folder.
 	 */
 	protected folder: PatternFolder;
+
+	/**
+	 * The human-readable name of the pattern.
+	 */
+	protected name: string;
 
 	/**
 	 * The properties this pattern supports.
@@ -25,23 +30,32 @@ export class Pattern {
 	 */
 	protected valid: boolean = false;
 
-	public constructor(folder: PatternFolder, name: string) {
+	public constructor(folder: PatternFolder, id: string, name: string) {
 		this.folder = folder;
+		this.id = id;
 		this.name = name;
 
 		this.reload();
 	}
 
-	public getAbsolutePath(): string {
-		return PathUtils.join(this.folder.getAbsolutePath(), this.name);
+	public addProperty(property: Property): void {
+		this.properties.set(property.getId(), property);
 	}
 
-	public getName(): string {
-		return this.name;
+	public getAbsolutePath(): string {
+		return PathUtils.join(this.folder.getAbsolutePath(), this.id);
+	}
+
+	public getId(): string {
+		return this.id;
 	}
 
 	public getFolder(): PatternFolder {
 		return this.folder;
+	}
+
+	public getName(): string {
+		return this.name;
 	}
 
 	public getProperties(): Property[] {
@@ -53,7 +67,7 @@ export class Pattern {
 	}
 
 	public getRelativePath(): string {
-		return PathUtils.join(this.folder.getRelativePath(), this.name);
+		return PathUtils.join(this.folder.getRelativePath(), this.id);
 	}
 
 	public isValid(): boolean {
@@ -72,17 +86,9 @@ export class Pattern {
 
 		this.valid = false;
 		this.properties.clear();
-		parsers.some(parser => {
-			const result: Property[] | undefined = parser.parse(this);
-			if (result) {
-				result.forEach(property => {
-					this.properties.set(property.getId(), property);
-				});
-
+		parsers.forEach(parser => {
+			if (parser.parse(this)) {
 				this.valid = true;
-				return true;
-			} else {
-				return false;
 			}
 		});
 
@@ -95,8 +101,12 @@ export class Pattern {
 		}
 	}
 
+	public setName(name: string): void {
+		this.name = name;
+	}
+
 	public toString(): string {
 		const path = this.getRelativePath();
-		return `Pattern(name="${this.name}", path="${path}", properties="${this.properties}")`;
+		return `Pattern(id="${this.id}", path="${path}", properties="${this.properties}")`;
 	}
 }

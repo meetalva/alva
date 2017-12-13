@@ -5,7 +5,7 @@ export class PatternProperty extends Property {
 	private pattern: Pattern;
 
 	public constructor(id: string, name: string, required: boolean, pattern: Pattern) {
-		super(id, name, required);
+		super(id);
 		this.pattern = pattern;
 	}
 

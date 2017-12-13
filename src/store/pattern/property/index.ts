@@ -1,12 +1,12 @@
 export abstract class Property {
 	private id: string;
 	private name: string;
-	private required: boolean;
+	private required: boolean = false;
 
-	public constructor(id: string, name: string, required: boolean) {
+	public constructor(id: string) {
 		this.id = id;
-		this.name = name;
-		this.required = required;
+		// sic: We start with the ID as name
+		this.name = id;
 	}
 
 	// tslint:disable-next-line:no-any
@@ -71,9 +71,17 @@ export abstract class Property {
 		return this.name;
 	}
 
+	public abstract getType(): string;
+
 	public isRequired(): boolean {
 		return this.required;
 	}
 
-	public abstract getType(): string;
+	public setName(name: string): void {
+		this.name = name;
+	}
+
+	public setRequired(required: boolean): void {
+		this.required = required;
+	}
 }

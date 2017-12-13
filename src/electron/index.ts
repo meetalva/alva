@@ -39,10 +39,10 @@ function createWindow(): void {
 	devToolsInstaller
 		.default(devToolsInstaller.REACT_DEVELOPER_TOOLS)
 		.then(name => {
-			console.log(`Added Extension:  ${name}`);
+			console.info(`Added Extension:  ${name}`);
 		})
 		.catch(err => {
-			console.log('An error occurred: ', err);
+			console.warn('An error occurred: ', err);
 		});
 }
 

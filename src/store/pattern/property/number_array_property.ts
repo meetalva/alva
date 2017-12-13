@@ -1,8 +1,8 @@
 import { Property } from '.';
 
 export class NumberArrayProperty extends Property {
-	public constructor(id: string, name: string, required: boolean) {
-		super(id, name, required);
+	public constructor(id: string) {
+		super(id);
 	}
 
 	// tslint:disable-next-line:no-any

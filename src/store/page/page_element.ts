@@ -112,6 +112,21 @@ export class PageElement {
 		return this.parent === undefined;
 	}
 
+	protected propertyToJsonValue(value: PropertyValue): JsonValue {
+		if (value instanceof PageElement) {
+			return value.toJsonObject();
+		} else if (value instanceof Object) {
+			const jsonObject: JsonObject = {};
+			Object.keys(value).forEach((propertyId: string) => {
+				// tslint:disable-next-line:no-any
+				jsonObject[propertyId] = this.propertyToJsonValue((value as any)[propertyId]);
+			});
+			return jsonObject;
+		} else {
+			return value as JsonValue;
+		}
+	}
+
 	public remove(): void {
 		this.setParent(undefined);
 	}
@@ -168,20 +183,5 @@ export class PageElement {
 		});
 
 		return json;
-	}
-
-	protected propertyToJsonValue(value: PropertyValue): JsonValue {
-		if (value instanceof PageElement) {
-			return value.toJsonObject();
-		} else if (value instanceof Object) {
-			const jsonObject: JsonObject = {};
-			Object.keys(value).forEach((propertyId: string) => {
-				// tslint:disable-next-line:no-any
-				jsonObject[propertyId] = this.propertyToJsonValue((value as any)[propertyId]);
-			});
-			return jsonObject;
-		} else {
-			return value as JsonValue;
-		}
 	}
 }

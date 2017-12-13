@@ -25,12 +25,9 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			With Child and handleIconClick
 			<Element
 				handleClick={e => {
-					console.log('Clicked', e);
 					e.stopPropagation();
 				}}
-				handleIconClick={() => {
-					console.log('Icon Clicked');
-				}}
+				handleIconClick={() => {}}
 				title="Element"
 			>
 				Child

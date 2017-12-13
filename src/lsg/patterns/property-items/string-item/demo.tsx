@@ -10,18 +10,11 @@ const StyledDemo = styled.div`
 const StringItemDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<div>
 		<StyledDemo>
-			<StringItem
-				handleChange={e => {
-					console.log(e.currentTarget.value);
-				}}
-				label="Text"
-			/>
+			<StringItem handleChange={e => {}} label="Text" />
 		</StyledDemo>
 		<StyledDemo>
 			<StringItem
-				handleChange={e => {
-					console.log(e.currentTarget.value);
-				}}
+				handleChange={e => {}}
 				label="Text"
 				value="this is a very long example text to test text overflow and stuff"
 			/>

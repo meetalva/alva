@@ -43,7 +43,6 @@ export class ProjectList extends React.Component<ProjectListProps> {
 
 					return (
 						<Li
-							draggable={props.draggable}
 							handleDragStart={props.handleDragStart}
 							key={index}
 							active={props.active}

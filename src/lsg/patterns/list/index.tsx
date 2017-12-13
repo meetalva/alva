@@ -16,6 +16,7 @@ export interface ListItemProps {
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	handleDragDrop?: React.DragEventHandler<HTMLElement>;
+	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
 	draggable?: boolean;
 }
 

@@ -58,6 +58,17 @@ export class PageElement {
 		child.setParent(this, index);
 	}
 
+	public clone(): PageElement {
+		const clone = new PageElement(this.pattern);
+		this.children.forEach(child => {
+			clone.addChild(child.clone());
+		});
+		this.propertyValues.forEach((value: PropertyValue, id: string) => {
+			clone.setPropertyValue(id, value);
+		});
+		return clone;
+	}
+
 	protected createChildElementOrValue(json: JsonValue, store: Store): PageElement | PropertyValue {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
 			return PageElement.fromJsonObject(json as JsonObject, store, this);

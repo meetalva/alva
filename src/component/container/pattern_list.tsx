@@ -5,6 +5,7 @@ import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern';
+import PatternListItem from '../../lsg/patterns/pattern-list-item';
 import * as React from 'react';
 import { Store } from '../../store';
 
@@ -36,7 +37,7 @@ export class PatternList extends React.Component<PatternListProps> {
 		const list = this.createList(this.items);
 		return (
 			<div>
-				<Input handleChange={this.handleSearchInputChange} />
+				<Input handleChange={this.handleSearchInputChange} placeholder="Search"/>
 				<List headline="Patterns">{list}</List>
 			</div>
 		);
@@ -75,20 +76,29 @@ export class PatternList extends React.Component<PatternListProps> {
 				{items.map((props: ListItemProps, index: number) => {
 					const labelComponent = props.label ? <Label>{props.label}:</Label> : null;
 					const nextLevel = props.children ? this.createList(props.children) : null;
-
-					return (
-						<Li
-							draggable={props.draggable}
-							handleDragStart={props.handleDragStart}
-							key={index}
-							active={props.active}
-							onClick={props.onClick}
-						>
-							{labelComponent}
-							<Value>{props.value}</Value>
-							{nextLevel}
-						</Li>
-					);
+					if (nextLevel) {
+						return (
+							<Li key={index}>
+								{labelComponent}
+								<Value>{props.value}</Value>
+								{nextLevel}
+							</Li>
+						);
+					} else {
+						return (
+							<PatternListItem
+								draggable={props.draggable}
+								handleDragStart={props.handleDragStart}
+								key={index}
+								active={props.active}
+								onClick={props.onClick}
+							>
+								{labelComponent}
+								<Value>{props.value}</Value>
+								{nextLevel}
+							</PatternListItem>
+						);
+					}
 				})}
 			</Ul>
 		);

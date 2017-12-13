@@ -39,8 +39,8 @@ const ProjectPane = styledComponents.div`
 const PreviewPane = styledComponents.div`
 	flex: 2 0 0px;
 	background-color: #ffffff;
-	border-radius: 10px 10px 0 0;
-	box-shadow: 0 2px 10px 0 rgba(0,0,0,.13);
+	border-radius: 6px 6px 0 0;
+	box-shadow: 0 3px 9px 0 rgba(0,0,0,.15);
 	overflow: hidden;
 `;
 

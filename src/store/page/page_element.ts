@@ -87,7 +87,7 @@ export class PageElement {
 		if (!this.parent) {
 			throw new Error('This element has no parent');
 		}
-		return this.parent.getChildren().indexOf(this);
+		return this.parent.children.indexOf(this);
 	}
 
 	public getParent(): PageElement | undefined {

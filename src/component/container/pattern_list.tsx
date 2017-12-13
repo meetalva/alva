@@ -20,6 +20,7 @@ export class PatternList extends React.Component<PatternListProps> {
 
 		this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
 		this.handlePatternClick = this.handlePatternClick.bind(this);
+		this.handleDragStart = this.handleDragStart.bind(this);
 	}
 
 	public render(): JSX.Element {
@@ -53,6 +54,10 @@ export class PatternList extends React.Component<PatternListProps> {
 			folder.getPatterns().forEach((pattern: Pattern) => {
 				result.push({
 					value: pattern.getName(),
+					draggable: true,
+					handleDragStart: (e: React.DragEvent<HTMLElement>) => {
+						this.handleDragStart(e, pattern);
+					},
 					onClick: () => {
 						this.handlePatternClick(pattern);
 					}
@@ -72,5 +77,10 @@ export class PatternList extends React.Component<PatternListProps> {
 		if (selectedElement) {
 			selectedElement.addChild(new PageElement(pattern));
 		}
+	}
+	@action
+	protected handleDragStart(e: React.DragEvent<HTMLElement>, pattern: Pattern): void {
+		const data = pattern.getRelativePath();
+		e.dataTransfer.setData('patternPath', data);
 	}
 }

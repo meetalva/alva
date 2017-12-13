@@ -36,6 +36,7 @@ export class ElementList extends React.Component<ElementListProps> {
 				key={key}
 				handleClick={item.onClick}
 				active={item.active}
+				handleDragDrop={item.handleDragDrop}
 			>
 				{item.children &&
 					item.children.length > 0 &&
@@ -85,6 +86,10 @@ export class ElementList extends React.Component<ElementListProps> {
 			label: key,
 			value: patternPath.replace(/^.*\//, ''),
 			onClick: updatePageElement,
+			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
+				const transfePatternPath = e.dataTransfer.getData('patternPath');
+				element.addChild(new PageElement(this.props.store.getPattern(transfePatternPath)));
+			},
 			children: items,
 			active: element === selectedElement
 		};

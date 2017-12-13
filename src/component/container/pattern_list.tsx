@@ -1,10 +1,12 @@
 import Input from '../../lsg/patterns/input/';
 import { PatternFolder } from '../../store/pattern/folder';
-import List, { ListItemProps } from '../../lsg/patterns/list';
+// import { Headline } from '../../lsg/patterns/headline';
+import List, { Label, Li, ListItemProps, Ul, Value } from '../../lsg/patterns/list';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern';
+// import PatternListItem from '../../lsg/patterns/pattern-list-item';
 import * as React from 'react';
 import { Store } from '../../store';
 
@@ -33,10 +35,13 @@ export class PatternList extends React.Component<PatternListProps> {
 				.searchPatterns(this.props.store.getPatternSearchTerm())
 				.map(pattern => ({ value: pattern.getName() }));
 		}
+		const list = this.createList(this.items);
 		return (
 			<div>
 				<Input handleChange={this.handleSearchInputChange} />
-				<List headline="Patterns" items={this.items} />
+				<List headline="Patterns">
+					{list}
+				</List>
 			</div>
 		);
 	}
@@ -67,6 +72,32 @@ export class PatternList extends React.Component<PatternListProps> {
 
 		return result;
 	}
+
+	public createList(items: ListItemProps[]): JSX.Element {
+		return (
+			<Ul>
+				{items.map((props: ListItemProps, index: number) => {
+					const labelComponent = props.label ? <Label>{props.label}:</Label> : null;
+					const nextLevel = props.children ? this.createList(props.children) : null;
+
+					return (
+						<Li
+							draggable={props.draggable}
+							onDragStart={props.handleDragStart}
+							key={index}
+							active={props.active}
+							onClick={props.onClick}
+						>
+							{labelComponent}
+							<Value>{props.value}</Value>
+							{nextLevel}
+						</Li>
+					);
+				})}
+			</Ul>
+		);
+	}
+
 	@action
 	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
 		this.props.store.setPatternSearchTerm(evt.target.value);

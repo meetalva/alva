@@ -4,7 +4,6 @@ import * as React from 'react';
 import styledComponents from 'styled-components';
 
 export interface ListProps {
-	items: ListItemProps[];
 	headline: string;
 }
 
@@ -27,13 +26,13 @@ interface StyledListItemProps {
 	draggable?: boolean;
 }
 
-const Ul = styledComponents.ul`
+export const Ul = styledComponents.ul`
 	padding: 0;
 	margin: 0;
 	width: 100%;
 `;
 
-const Li = styledComponents.li`
+export const Li = styledComponents.li`
 	margin: 0 0 0 15px;
 	padding: 0;
 	line-height: 25px;
@@ -42,12 +41,12 @@ const Li = styledComponents.li`
 	${(props: StyledListItemProps) => (props.active ? 'background: #def' : '')}
 `;
 
-const Label = styledComponents.span`
+export const Label = styledComponents.span`
 	color: ${colors.black.toString()};
 	padding-right 4px;
 `;
 
-const Value = styledComponents.span`
+export const Value = styledComponents.span`
 	color: ${colors.black.toString()};
 `;
 
@@ -62,33 +61,8 @@ export default class List extends React.Component<ListProps> {
 				<Headline order={3} key="headline">
 					{this.props.headline}
 				</Headline>
-				{this.createList(this.props.items)}
+				{this.props.children}
 			</div>
-		);
-	}
-
-	public createList(items: ListItemProps[]): JSX.Element {
-		return (
-			<Ul>
-				{items.map((props: ListItemProps, index: number) => {
-					const labelComponent = props.label ? <Label>{props.label}:</Label> : null;
-					const nextLevel = props.children ? this.createList(props.children) : null;
-
-					return (
-						<Li
-							draggable={props.draggable}
-							onDragStart={props.handleDragStart}
-							key={index}
-							active={props.active}
-							onClick={props.onClick}
-						>
-							{labelComponent}
-							<Value>{props.value}</Value>
-							{nextLevel}
-						</Li>
-					);
-				})}
-			</Ul>
 		);
 	}
 }

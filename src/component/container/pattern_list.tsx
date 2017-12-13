@@ -1,12 +1,10 @@
 import Input from '../../lsg/patterns/input/';
 import { PatternFolder } from '../../store/pattern/folder';
-// import { Headline } from '../../lsg/patterns/headline';
 import List, { Label, Li, ListItemProps, Ul, Value } from '../../lsg/patterns/list';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern';
-// import PatternListItem from '../../lsg/patterns/pattern-list-item';
 import * as React from 'react';
 import { Store } from '../../store';
 
@@ -39,9 +37,7 @@ export class PatternList extends React.Component<PatternListProps> {
 		return (
 			<div>
 				<Input handleChange={this.handleSearchInputChange} />
-				<List headline="Patterns">
-					{list}
-				</List>
+				<List headline="Patterns">{list}</List>
 			</div>
 		);
 	}
@@ -83,7 +79,7 @@ export class PatternList extends React.Component<PatternListProps> {
 					return (
 						<Li
 							draggable={props.draggable}
-							onDragStart={props.handleDragStart}
+							handleDragStart={props.handleDragStart}
 							key={index}
 							active={props.active}
 							onClick={props.onClick}

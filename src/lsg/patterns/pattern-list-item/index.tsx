@@ -10,7 +10,7 @@ export interface PatternListItemProps {
 	icon?: string;
 }
 
-const StyledPatternListItem = styled.div`
+const StyledPatternListItem = styled.li`
 	display: flex;
 	align-items: center;
 	cursor: default;

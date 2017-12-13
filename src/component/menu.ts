@@ -1,4 +1,5 @@
 import { BrowserWindow, MenuItem, MenuItemConstructorOptions, remote, WebContents } from 'electron';
+import { PageElement } from '../store/page/page_element';
 import { Store } from '../store';
 const { Menu, shell, app } = remote;
 
@@ -59,22 +60,56 @@ export function createMenu(store: Store): void {
 				{
 					label: '&Cut',
 					accelerator: 'CmdOrCtrl+X',
-					role: 'cut'
+					role: 'cut',
+					click: () => {
+						const selectedElement: PageElement | undefined = store.getSelectedElement();
+						if (selectedElement) {
+							store.setClipboardElement(selectedElement);
+							selectedElement.remove();
+						}
+					}
 				},
 				{
 					label: 'C&opy',
 					accelerator: 'CmdOrCtrl+C',
-					role: 'copy'
+					role: 'copy',
+					click: () => {
+						const selectedElement: PageElement | undefined = store.getSelectedElement();
+						if (selectedElement) {
+							store.setClipboardElement(selectedElement);
+						}
+					}
 				},
 				{
 					label: '&Paste',
 					accelerator: 'CmdOrCtrl+V',
-					role: 'paste'
+					role: 'paste',
+					click: () => {
+						const selectedElement: PageElement | undefined = store.getSelectedElement();
+						const clipboardElement: PageElement | undefined = store.getClipboardElement();
+						if (selectedElement && clipboardElement) {
+							selectedElement.addChild(clipboardElement.clone());
+						}
+					}
 				},
 				{
 					label: '&Select All',
 					accelerator: 'CmdOrCtrl+A',
 					role: 'selectall'
+				},
+				{
+					type: 'separator'
+				},
+				{
+					label: '&Delete',
+					accelerator: 'Del',
+					role: 'delete',
+					click: () => {
+						const selectedElement: PageElement | undefined = store.getSelectedElement();
+						if (selectedElement) {
+							selectedElement.remove();
+						}
+					}
 				}
 			]
 		},

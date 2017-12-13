@@ -1,17 +1,14 @@
-import { JsonObject, Persister } from '../json';
+import { JsonObject } from '../json';
 import { PageElement } from './page_element';
-import * as PathUtils from 'path';
 import { Store } from '..';
 
 export class Page {
 	private name: string;
 	private id: string;
 	private root?: PageElement;
-	private store: Store;
 
 	public constructor(id: string, store: Store) {
 		this.id = id;
-		this.store = store;
 		this.name = 'New Page';
 	}
 
@@ -33,12 +30,6 @@ export class Page {
 
 	public getRoot(): PageElement {
 		return this.root as PageElement;
-	}
-
-	public save(): void {
-		const pagePath: string = PathUtils.join(this.store.getPagesPath(), `page-${this.id}.yaml`);
-		const jsonObject: JsonObject = this.toJsonObject();
-		Persister.saveYaml(pagePath, jsonObject);
 	}
 
 	public toJsonObject(): JsonObject {

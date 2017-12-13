@@ -23,7 +23,7 @@ export function createMenu(store: Store): void {
 					accelerator: 'CmdOrCtrl+S',
 					role: 'save',
 					click: () => {
-						store.savePage();
+						store.save();
 					}
 				},
 				{

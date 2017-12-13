@@ -21,6 +21,10 @@ export class Store {
 		this.projects.push(project);
 	}
 
+	public closePage(): void {
+		this.currentPage = undefined;
+	}
+
 	public getCurrentPage(): Page | undefined {
 		return this.currentPage;
 	}
@@ -114,12 +118,21 @@ export class Store {
 		(this.projects as IObservableArray<Project>).remove(project);
 	}
 
-	public savePage(): void {
-		if (!this.currentPage) {
-			throw new Error('Cannot save page: No page open');
+	public save(): void {
+		if (this.currentPage) {
+			const pagePath: string = PathUtils.join(
+				this.getPagesPath(),
+				`page-${this.currentPage.getId()}.yaml`
+			);
+			Persister.saveYaml(pagePath, this.currentPage.toJsonObject());
 		}
 
-		this.currentPage.save();
+		const projectsJsonObject: JsonObject = { projects: [] };
+		this.projects.forEach(project => {
+			(projectsJsonObject.projects as JsonArray).push(project.toJsonObject());
+		});
+		const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.yaml');
+		Persister.saveYaml(projectsPath, projectsJsonObject);
 	}
 
 	public searchPatterns(term: string): Pattern[] {

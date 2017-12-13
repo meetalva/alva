@@ -96,7 +96,7 @@ export class ElementList extends React.Component<ElementListProps> {
 
 				parentElement.addChild(
 					new PageElement(this.props.store.getPattern(transfePatternPath)),
-					parentElement.getChildren().indexOf(element)
+					element.getIndex()
 				);
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {

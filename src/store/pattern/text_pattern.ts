@@ -5,10 +5,11 @@ import { Pattern } from '.';
 
 export class TextPattern extends Pattern {
 	public constructor(folder: PatternFolder) {
-		super(folder, 'text');
+		super(folder, 'text', 'Text');
 
-		const property: Property = new StringProperty('text', 'Text', false);
-		this.properties.set(property.getId(), property);
+		const property: Property = new StringProperty('text');
+		property.setName('Text');
+		this.addProperty(property);
 	}
 
 	public reload(): void {

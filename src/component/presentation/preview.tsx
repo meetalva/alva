@@ -73,7 +73,6 @@ export class Preview extends React.Component<PreviewProps> {
 			const patternPath: string = pattern.getAbsolutePath();
 			let patternFactory: React.StatelessComponent = this.patternFactories[patternPath];
 			if (patternFactory == null) {
-				console.log(`Loading pattern "${patternPath}"...`);
 				patternFactory = require(patternPath).default;
 				this.patternFactories[patternPath] = patternFactory;
 			}

@@ -1,4 +1,4 @@
-import { EnumProperty } from '../../store/pattern/property/enum_property';
+import { EnumProperty, Option } from '../../store/pattern/property/enum_property';
 import { Property } from '../../store/pattern/property/index';
 import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item/index';
 import { StringItem } from '../../lsg/patterns/property-items/string-item/index';
@@ -66,15 +66,16 @@ export class PropertyList extends React.Component<PropertyListProps> {
 							);
 
 						case 'enum':
-							const options = (property as EnumProperty)
-								.getOptions()
-								.map(option => option.getName());
+							const options = (property as EnumProperty).getOptions();
+							const option: Option | undefined = (property as EnumProperty).getOptionById(
+								value as string
+							);
 
 							return (
 								<EnumItem
 									key={id}
 									label={name}
-									selectedValue={value as string}
+									selectedValue={option}
 									values={options}
 									handleChange={event => {
 										selectedElement.setPropertyValue(id, event.currentTarget.value);

@@ -31,7 +31,7 @@ export class PatternList extends React.Component<PatternListProps> {
 		} else {
 			this.items = this.props.store
 				.searchPatterns(this.props.store.getPatternSearchTerm())
-				.map(pattern => ({ value: pattern.getName() }));
+				.map(pattern => ({ value: pattern.getId() }));
 		}
 		const list = this.createList(this.items);
 		return (
@@ -54,7 +54,7 @@ export class PatternList extends React.Component<PatternListProps> {
 
 			folder.getPatterns().forEach((pattern: Pattern) => {
 				result.push({
-					value: pattern.getName(),
+					value: pattern.getId(),
 					draggable: true,
 					handleDragStart: (e: React.DragEvent<HTMLElement>) => {
 						this.handleDragStart(e, pattern);

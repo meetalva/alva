@@ -4,17 +4,12 @@ export class EnumProperty extends Property {
 	private options: Option[];
 	private ordinalById: { [id: string]: number } = {};
 
-	public constructor(id: string, name: string, required: boolean, options: Option[]) {
-		super(id, name, required);
-		this.options = options;
-		this.options.forEach((option: Option) => {
-			this.ordinalById[option.getId()] = option.getOrdinal();
-		});
+	public constructor(id: string) {
+		super(id);
 	}
 
 	// tslint:disable-next-line:no-any
 	public convertToProperty(value: any): any {
-		console.log(`Converted from ${value} to ${this.ordinalById[value as string]}`);
 		return this.ordinalById[value as string];
 	}
 
@@ -27,12 +22,29 @@ export class EnumProperty extends Property {
 		return String(value);
 	}
 
+	public getOptionById(id: string): Option | undefined {
+		for (const option of this.options) {
+			if (option.getId() === id) {
+				return option;
+			}
+		}
+
+		return undefined;
+	}
+
 	public getOptions(): Option[] {
 		return this.options;
 	}
 
 	public getType(): string {
 		return 'enum';
+	}
+
+	public setOptions(options: Option[]): void {
+		this.options = options;
+		this.options.forEach((option: Option) => {
+			this.ordinalById[option.getId()] = option.getOrdinal();
+		});
 	}
 
 	public toString(): string {
@@ -45,10 +57,10 @@ export class Option {
 	private name: string;
 	private ordinal: number;
 
-	public constructor(id: string, name: string, ordinal: number) {
+	public constructor(id: string, name?: string, ordinal?: number) {
 		this.id = id;
-		this.name = name;
-		this.ordinal = ordinal;
+		this.name = name !== undefined ? name : id;
+		this.ordinal = ordinal !== undefined ? ordinal : 0;
 	}
 
 	public getId(): string {

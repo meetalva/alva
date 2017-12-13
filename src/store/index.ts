@@ -1,6 +1,5 @@
 import { PatternFolder } from './pattern/folder';
-import * as FileUtils from 'fs';
-import { JsonArray, JsonObject } from './json';
+import { JsonArray, JsonObject, Persister } from './json';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
 import { Page } from './page';
@@ -93,8 +92,8 @@ export class Store {
 
 			(this.projects as IObservableArray<Project>).clear();
 			const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.json');
-			const projectsJson: JsonObject = JSON.parse(FileUtils.readFileSync(projectsPath, 'utf8'));
-			(projectsJson.projects as JsonArray).forEach((projectJson: JsonObject) => {
+			const projectsJsonObject: JsonObject = Persister.loadYamlOrJson(projectsPath);
+			(projectsJsonObject.projects as JsonArray).forEach((projectJson: JsonObject) => {
 				const project: Project = Project.fromJsonObject(projectJson, this);
 				this.addProject(project);
 			});
@@ -104,7 +103,7 @@ export class Store {
 	public openPage(id: string): void {
 		MobX.transaction(() => {
 			const pagePath: string = PathUtils.join(this.getPagesPath(), `page-${id}.json`);
-			const json: JsonObject = JSON.parse(FileUtils.readFileSync(pagePath, 'utf8'));
+			const json: JsonObject = Persister.loadYamlOrJson(pagePath);
 			this.currentPage = Page.fromJsonObject(json, id, this);
 
 			this.selectedElement = undefined;

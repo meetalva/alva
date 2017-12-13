@@ -1,5 +1,4 @@
-import * as FileUtils from 'fs';
-import { JsonObject } from '../json';
+import { JsonObject, Persister } from '../json';
 import { PageElement } from './page_element';
 import * as PathUtils from 'path';
 import { Store } from '..';
@@ -38,8 +37,8 @@ export class Page {
 
 	public save(): void {
 		const pagePath: string = PathUtils.join(this.store.getPagesPath(), `page-${this.id}.json`);
-		const json: JsonObject = this.toJsonObject();
-		FileUtils.writeFileSync(pagePath, JSON.stringify(json, null, '\t'), 'utf8');
+		const jsonObject: JsonObject = this.toJsonObject();
+		Persister.saveYaml(pagePath, jsonObject);
 	}
 
 	public toJsonObject(): JsonObject {

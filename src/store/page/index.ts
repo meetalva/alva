@@ -36,7 +36,7 @@ export class Page {
 	}
 
 	public save(): void {
-		const pagePath: string = PathUtils.join(this.store.getPagesPath(), `page-${this.id}.json`);
+		const pagePath: string = PathUtils.join(this.store.getPagesPath(), `page-${this.id}.yaml`);
 		const jsonObject: JsonObject = this.toJsonObject();
 		Persister.saveYaml(pagePath, jsonObject);
 	}

@@ -43,4 +43,11 @@ export class PageRef {
 			project.getPagesInternal().push(this);
 		}
 	}
+
+	public toJsonObject(): JsonObject {
+		return {
+			id: this.id,
+			name: this.name
+		};
+	}
 }

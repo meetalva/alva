@@ -39,4 +39,17 @@ export class Project {
 	public getPagesInternal(): MobX.IObservableArray<PageRef> {
 		return this.pages as MobX.IObservableArray<PageRef>;
 	}
+
+	public toJsonObject(): JsonObject {
+		const pagesJsonObject: JsonObject[] = [];
+		this.pages.forEach(pageRef => {
+			pagesJsonObject.push(pageRef.toJsonObject());
+		});
+
+		return {
+			id: this.id,
+			name: this.name,
+			pages: pagesJsonObject
+		};
+	}
 }

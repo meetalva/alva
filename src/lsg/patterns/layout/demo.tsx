@@ -26,7 +26,7 @@ const LayoutDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<StyledTestDiv>Horizontal</StyledTestDiv>
 			<StyledTestDiv>Horizontal</StyledTestDiv>
 		</Layout>
-		<Layout directionVertical hasMargins>
+		<Layout directionVertical hasPaddings>
 			<StyledTestDiv>Vertical with margins</StyledTestDiv>
 			<StyledTestDiv>Vertical with margins</StyledTestDiv>
 			<StyledTestDiv>Vertical with margins</StyledTestDiv>

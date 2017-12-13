@@ -1,4 +1,5 @@
 import { Chrome } from './container/chrome';
+import { colors } from '../lsg/patterns/colors';
 import { WebviewTag } from 'electron';
 import { ElementList } from './container/element_list';
 import globalStyles from '../lsg/patterns/global-styles';
@@ -17,7 +18,6 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
 import styledComponents from 'styled-components';
-import { colors } from '../lsg/patterns/colors';
 
 globalStyles();
 
@@ -35,6 +35,7 @@ const PatternsPane = styledComponents.div`
     overflow: scroll;
     border-top: 2px solid ${colors.grey70.toString()};
     box-sizing: border-box;
+	 padding: 18px 0;
 `;
 
 const ProjectPane = styledComponents.div`
@@ -93,7 +94,7 @@ class App extends React.Component<AppProps> {
 			<Layout directionVertical>
 				<Chrome title={title} />
 				<MainArea>
-					<SideBar directionVertical hasMargins>
+					<SideBar directionVertical hasPaddings>
 						<ElementPane>
 							<ElementList store={this.props.store} />
 						</ElementPane>
@@ -108,7 +109,7 @@ class App extends React.Component<AppProps> {
 								'<webview id="preview" style="height: 100%;" src="./preview.html" partition="electron" nodeintegration />'
 						}}
 					/>
-					<SideBar directionVertical hasMargins>
+					<SideBar directionVertical hasPaddings>
 						<PropertyPane>
 							<PropertyList store={this.props.store} />
 						</PropertyPane>

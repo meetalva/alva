@@ -70,7 +70,17 @@ export class Li extends React.Component<LiProps> {
 	}
 
 	public render(): JSX.Element {
-		return <StyledLi {...this.props}>{this.props.children}</StyledLi>;
+		const { active, draggable, onClick, handleDragStart } = this.props;
+		return (
+			<StyledLi
+				active={active}
+				draggable={draggable}
+				onClick={onClick}
+				onDragStart={handleDragStart}
+			>
+				{this.props.children}
+			</StyledLi>
+		);
 	}
 }
 

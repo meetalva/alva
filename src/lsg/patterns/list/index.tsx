@@ -15,11 +15,16 @@ export interface ListItemProps {
 	value: string;
 
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	handleDragStart?: React.DragEventHandler<HTMLElement>;
+	handleDragDrop?: React.DragEventHandler<HTMLElement>;
+	draggable?: boolean;
 }
 
 interface StyledListItemProps {
 	active?: boolean;
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	handleDragStart?: React.DragEventHandler<HTMLElement>;
+	draggable?: boolean;
 }
 
 const Ul = styledComponents.ul`
@@ -33,14 +38,8 @@ const Li = styledComponents.li`
 	padding: 0;
 	line-height: 25px;
 	list-style: none;
-	${(props: StyledListItemProps) => props.onClick
-		? 'cursor: pointer;'
-		: ''
-	}
-	${(props: StyledListItemProps) => props.active
-		? 'background: #def'
-		: ''
-	}
+	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')}
+	${(props: StyledListItemProps) => (props.active ? 'background: #def' : '')}
 `;
 
 const Label = styledComponents.span`
@@ -76,7 +75,13 @@ export default class List extends React.Component<ListProps> {
 					const nextLevel = props.children ? this.createList(props.children) : null;
 
 					return (
-						<Li key={index} active={props.active} onClick={props.onClick}>
+						<Li
+							draggable={props.draggable}
+							onDragStart={props.handleDragStart}
+							key={index}
+							active={props.active}
+							onClick={props.onClick}
+						>
 							{labelComponent}
 							<Value>{props.value}</Value>
 							{nextLevel}

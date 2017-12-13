@@ -7,14 +7,19 @@ import styled from 'styled-components';
 export interface ElementProps {
 	active?: boolean;
 	open?: boolean;
+	highlight?: boolean;
 	title: string;
 
 	handleClick?: React.MouseEventHandler<HTMLElement>;
 	handleIconClick?: React.MouseEventHandler<SVGSVGElement>;
+	handleDragEnter?: React.DragEventHandler<HTMLElement>;
+	handleDragLeave?: React.DragEventHandler<HTMLElement>;
+	handleDragDrop?: React.DragEventHandler<HTMLElement>;
 }
 
 interface StyledElementLabelProps {
 	active?: boolean;
+	highlight?: boolean;
 }
 
 export interface StyledElementChildProps {
@@ -42,6 +47,13 @@ const StyledElementLabel = styled.div`
 			: `
 				color: ${colors.black.toString()};
 			`};
+	${(props: StyledElementLabelProps) =>
+		props.highlight
+			? `
+			color: ${colors.white.toString()};
+			background: ${colors.blueLight.toString()};
+		`
+			: ''};
 `;
 
 const StyledElementChild = styled.div`
@@ -57,11 +69,32 @@ const StyledIcon = styled(Icon)`
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => {
-	const { children, title, active, open, handleClick, handleIconClick } = props;
+	const {
+		children,
+		title,
+		active,
+		open,
+		highlight,
+		handleClick,
+		handleIconClick,
+		handleDragEnter,
+		handleDragLeave,
+		handleDragDrop
+	} = props;
 
 	return (
 		<StyledElement title={title}>
-			<StyledElementLabel active={active} onClick={handleClick}>
+			<StyledElementLabel
+				onDragOver={(e: React.DragEvent<HTMLElement>) => {
+					e.preventDefault();
+				}}
+				onDragEnter={handleDragEnter}
+				onDragLeave={handleDragLeave}
+				onDrop={handleDragDrop}
+				active={active}
+				highlight={highlight}
+				onClick={handleClick}
+			>
 				{children && (
 					<StyledIcon
 						handleClick={handleIconClick}

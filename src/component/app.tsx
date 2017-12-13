@@ -17,11 +17,13 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
 import styledComponents from 'styled-components';
+import { colors } from '../lsg/patterns/colors';
 
 globalStyles();
 
 const ElementPane = styledComponents.div`
-	flex: 2 0 0px;
+	flex: 3 0 60%;
+    overflow: scroll;
 `;
 
 const PropertyPane = styledComponents.div`
@@ -29,7 +31,10 @@ const PropertyPane = styledComponents.div`
 `;
 
 const PatternsPane = styledComponents.div`
-	flex: 3 0 0px;
+	flex: 2 0 40%;
+    overflow: scroll;
+    border-top: 2px solid ${colors.grey70.toString()};
+    box-sizing: border-box;
 `;
 
 const ProjectPane = styledComponents.div`
@@ -82,7 +87,7 @@ class App extends React.Component<AppProps> {
 		// Todo: project and page don't update on page change
 		const project = this.props.store.getCurrentProject();
 		const page = this.props.store.getCurrentPage();
-		const title = `${project && project.getName()} - ${page && page.getName()}`;
+		const title = `${project && project.getName()} > ${page && page.getName()}`;
 
 		return (
 			<Layout directionVertical>

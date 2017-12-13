@@ -19,7 +19,7 @@ const StyledChrome = styled(Space).attrs({
 	width: 100%;
 	align-items: center;
 	font-family: ${fonts().NORMAL_FONT};
-	height: 38px;
+	height: 54px;
 	-webkit-app-region: drag;
 	-webkit-user-select: none;
 	user-select: none;
@@ -30,6 +30,7 @@ const StyledChromeTitle = styled.div`
 	align-items: center;
 	margin: 0 auto;
 	color: ${colors.grey36.toString()};
+    font-size: 15px;
 `;
 
 export default class Chrome extends React.Component<ChromeProps> {

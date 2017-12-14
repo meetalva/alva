@@ -22,6 +22,7 @@ export enum Size {
 	// Explicity set enum values to indicate that they will be used later on as
 	// array indicies.
 	None = 0,
+    XXS  = 3,
 	XS   = 6,
 	S    = 12,
 	M    = 15,

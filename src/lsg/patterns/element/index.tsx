@@ -44,12 +44,14 @@ const StyledElement = styled.div`
 const StyledElementLabel = styled.div`
 	position: relative;
 	display: flex;
-	min-height: 20px;
-	padding: 0 ${getSpace(Size.L)}px;
+	padding: 9px ${getSpace(Size.L)}px;
 	border-radius: 3px;
 	cursor: pointer;
 	align-items: center;
-	color: ${colors.black.toString()};
+	color: ${colors.black.toString()};    
+    position: relative;
+    z-index: 10;
+    
 	${(props: StyledElementLabelProps) =>
 		props.active
 			? `
@@ -66,7 +68,11 @@ const StyledElementLabel = styled.div`
 `;
 
 const StyledPlaceholder = styled.div`
-	height: 10px;
+	position: relative;
+    z-index: 15;
+    height: 10px;
+    margin-top: -5px;
+    margin-bottom: -5px;
 	border-radius: 3px;
 	${(props: StyledPlaceholder) =>
 		props.highlightPlaceholder
@@ -78,14 +84,16 @@ const StyledPlaceholder = styled.div`
 
 const StyledElementChild = styled.div`
 	flex-basis: 100%;
-	padding-left: ${getSpace(Size.S)}px;
+	padding-left: ${getSpace(Size.L)}px;
 	${(props: StyledElementChildProps) => (props.open ? 'display: block;' : 'display: none;')};
 `;
 
 const StyledIcon = styled(Icon)`
 	position: absolute;
-	left: ${getSpace(Size.L) / 2}px;
-	fill: ${colors.grey70.toString()};
+	left: ${getSpace(Size.XS)}px;
+	fill: ${colors.grey36.toString()};
+    width: 12px;
+    height: 12px;
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => {
@@ -131,7 +139,7 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 				{children && (
 					<StyledIcon
 						handleClick={handleIconClick}
-						name={IconName.Robo}
+						name={IconName.ArrowFill}
 						size={IconSize.XXS}
 						color={colors.grey70}
 					/>

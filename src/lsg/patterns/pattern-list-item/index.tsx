@@ -1,14 +1,16 @@
 import { colors } from '../colors';
 import { fonts } from '../fonts';
 import { Icon, IconName, Size as IconSize } from '../icons';
-import { LiProps } from '../list';
 import * as React from 'react';
 import { getSpace, Size } from '../space';
 import styled from 'styled-components';
 
-export interface PatternListItemProps extends LiProps {
+export interface PatternListItemProps {
 	className?: string;
+	draggable?: boolean;
+	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	icon?: string;
+	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 const StyledPatternListItem = styled.li`
@@ -35,11 +37,16 @@ const StyledIcon = styled(Icon)`
 `;
 
 const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
-	const { handleDragStart, ...other } = props;
+	const { className, draggable, handleDragStart, icon, onClick } = props;
 	return (
-		<StyledPatternListItem {...other} onDragStart={handleDragStart}>
-			{props.icon ? (
-				<StyledSVG>{props.icon}</StyledSVG>
+		<StyledPatternListItem
+			onDragStart={handleDragStart}
+			className={className}
+			draggable={draggable}
+			onClick={onClick}
+		>
+			{icon ? (
+				<StyledSVG>{icon}</StyledSVG>
 			) : (
 				<StyledIcon name={IconName.Robo} size={IconSize.XS} color={colors.grey70} />
 			)}

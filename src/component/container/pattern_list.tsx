@@ -95,7 +95,6 @@ export class PatternList extends React.Component<PatternListProps> {
 								draggable={props.draggable}
 								handleDragStart={props.handleDragStart}
 								key={index}
-								active={props.active}
 								onClick={props.onClick}
 							>
 								{labelComponent}

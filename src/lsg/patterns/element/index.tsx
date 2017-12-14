@@ -114,6 +114,9 @@ const StyledIcon = styled(Icon)`
 	fill: ${colors.grey36.toString()};
     width: 12px;
     height: 12px;
+    transition: transform 0.2s;
+    
+    ${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => {
@@ -162,6 +165,7 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 						name={IconName.ArrowFill}
 						size={IconSize.XXS}
 						color={colors.grey70}
+                        open={open}
 					/>
 				)}
 				{title}

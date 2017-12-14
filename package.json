@@ -5,15 +5,16 @@
 		"Alva is a radically new design tool that enables cross-functional teams to design digital products.",
 	"main": "./dist/electron/index.js",
 	"scripts": {
-		"build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project .",
+		"build":
+			"tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && npm run copy-html",
 		"start":
 			"npm run build && concurrently \"electron dist/electron\" \"tsc --project . --watch\"",
 		"build-lsg": "tsc --project src/lsg --outDir dist/lsg/patterns --sourceMap",
 		"start-lsg":
 			"npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
 		"copy-html": "cp src/electron/*.html dist/electron/",
-		"pack": "npm run copy-html && npm run build && electron-builder --dir",
-		"dist": "npm run copy-html && npm run build && electron-builder"
+		"pack": "npm run build && electron-builder --dir",
+		"dist": "npm run build && electron-builder"
 	},
 	"repository": {
 		"type": "git",

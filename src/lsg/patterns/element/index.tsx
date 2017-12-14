@@ -55,7 +55,6 @@ const StyledElementLabel = styled.div`
 	align-items: center;
 	color: ${colors.black.toString()};
 	position: relative;
-	z-index: 10;
 
 	${(props: StyledElementLabelProps) =>
 		props.active
@@ -74,7 +73,6 @@ const StyledElementLabel = styled.div`
 
 const StyledPlaceholder = styled.div`
 	position: relative;
-	z-index: 15;
 	height: 10px;
 	width: 100%;
 	margin-top: -5px;
@@ -90,7 +88,7 @@ const StyledPlaceholder = styled.div`
 		left: 0;
 		top: 0;
 		background: ${colors.grey90.toString()};
-		transform: scale(1, 0);
+		transform: scaleY(0);
 		transition: transform 0.2s;
 	}
 
@@ -98,7 +96,7 @@ const StyledPlaceholder = styled.div`
 		props.highlightPlaceholder
 			? `
 			&:after {
-				transform: scale(1,1);
+				transform: scaleY(1);
 			}
 		`
 			: ''};

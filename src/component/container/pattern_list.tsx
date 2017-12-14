@@ -121,7 +121,6 @@ export class PatternList extends React.Component<PatternListProps> {
 	}
 	@action
 	protected handleDragStart(e: React.DragEvent<HTMLElement>, pattern: Pattern): void {
-		console.log('asdf');
 		const data = pattern.getRelativePath();
 		e.dataTransfer.setData('patternPath', data);
 	}

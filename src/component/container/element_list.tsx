@@ -45,6 +45,7 @@ export class ElementList extends React.Component<ElementListProps> {
 				key={key}
 				handleClick={item.onClick}
 				active={item.active}
+				handleDragStart={item.handleDragStart}
 				handleDragDropForChild={item.handleDragDropForChild}
 				handleDragDrop={item.handleDragDrop}
 			>
@@ -92,10 +93,25 @@ export class ElementList extends React.Component<ElementListProps> {
 			label: key,
 			value: patternPath.replace(/^.*\//, ''),
 			onClick: updatePageElement,
+			handleDragStart: (e: React.DragEvent<HTMLElement>) => {
+				console.log('this', element);
+				this.props.store.setClipboardElement(element);
+			},
 			handleDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
 				const transfePatternPath = e.dataTransfer.getData('patternPath');
 				const parentElement = element.getParent();
 				if (!parentElement) {
+					return;
+				}
+
+				if (!transfePatternPath) {
+					const elementListElement = this.props.store.getClipboardElement();
+					if (elementListElement) {
+						parentElement.addChild(
+							elementListElement,
+							element.getIndex()
+						);
+					}
 					return;
 				}
 
@@ -106,6 +122,13 @@ export class ElementList extends React.Component<ElementListProps> {
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
 				const transfePatternPath = e.dataTransfer.getData('patternPath');
+				if (!transfePatternPath) {
+					const elementListElement = this.props.store.getClipboardElement();
+					if (elementListElement) {
+						element.addChild(elementListElement);
+					}
+					return;
+				}
 				element.addChild(new PageElement(this.props.store.getPattern(transfePatternPath)));
 			},
 			children: items,

@@ -11,6 +11,7 @@ import { Project } from './project';
 
 export class Store {
 	@MobX.observable private clipboardElement?: PageElement | undefined;
+	@MobX.observable private rearrangeElement?: PageElement | undefined;
 	@MobX.observable private currentPage?: Page;
 	@MobX.observable private patternSearchTerm: string = '';
 	@MobX.observable private projects: Project[] = [];
@@ -29,6 +30,10 @@ export class Store {
 
 	public getClipboardElement(): PageElement | undefined {
 		return this.clipboardElement;
+	}
+
+	public getRearrangeElement(): PageElement | undefined {
+		return this.rearrangeElement;
 	}
 
 	public getCurrentPage(): Page | undefined {
@@ -162,6 +167,10 @@ export class Store {
 
 	public setClipboardElement(clipboardElement: PageElement): void {
 		this.clipboardElement = clipboardElement;
+	}
+
+	public setRearrangeElement(rearrangeElement: PageElement): void {
+		this.rearrangeElement = rearrangeElement;
 	}
 
 	public setSelectedElement(selectedElement: PageElement): void {

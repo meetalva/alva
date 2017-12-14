@@ -1,6 +1,6 @@
 import { Chrome } from './container/chrome';
-import { colors } from '../lsg/patterns/colors';
 import { WebviewTag } from 'electron';
+import ElementPane from '../lsg/patterns/panes/element-pane';
 import { ElementList } from './container/element_list';
 import globalStyles from '../lsg/patterns/global-styles';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
@@ -12,43 +12,17 @@ import { observer } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
 import { Page } from '../store/page';
 import { PatternList } from './container/pattern_list';
+import PatternsPane from '../lsg/patterns/panes/patterns-pane';
+import PreviewPane from '../lsg/patterns/panes/preview-pane';
+import ProjectPane from '../lsg/patterns/panes/project-pane';
 import { ProjectList } from './container/project_list';
+import PropertyPane from '../lsg/patterns/panes/property-pane';
 import { PropertyList } from './container/property_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Store } from '../store';
-import styledComponents from 'styled-components';
 
 globalStyles();
-
-const ElementPane = styledComponents.div`
-	flex: 3 0 60%;
-    overflow: scroll;
-`;
-
-const PropertyPane = styledComponents.div`
-	flex: 2 0 0px;
-`;
-
-const PatternsPane = styledComponents.div`
-	flex: 2 0 40%;
-    overflow: scroll;
-    border-top: 2px solid ${colors.grey70.toString()};
-    box-sizing: border-box;
-    padding: 18px 0;
-`;
-
-const ProjectPane = styledComponents.div`
-	flex: 3 0 0px;
-`;
-
-const PreviewPane = styledComponents.div`
-	flex: 2 0 0px;
-	background-color: #ffffff;
-	border-radius: 6px 6px 0 0;
-	box-shadow: 0 3px 9px 0 rgba(0,0,0,.15);
-	overflow: hidden;
-`;
 
 interface AppProps {
 	store: Store;
@@ -103,12 +77,7 @@ class App extends React.Component<AppProps> {
 						</PatternsPane>
 					</SideBar>
 
-					<PreviewPane
-						dangerouslySetInnerHTML={{
-							__html:
-								'<webview id="preview" style="height: 100%;" src="./preview.html" partition="electron" nodeintegration />'
-						}}
-					/>
+					<PreviewPane />
 					<SideBar directionVertical hasPaddings>
 						<PropertyPane>
 							<PropertyList store={this.props.store} />

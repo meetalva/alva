@@ -16,6 +16,7 @@ export class Store {
 	@MobX.observable private projects: Project[] = [];
 	@MobX.observable private patternRoot: PatternFolder;
 	@MobX.observable private selectedElement?: PageElement | undefined;
+	@MobX.observable private elementHasFocus?: boolean = false;
 	@MobX.observable private styleGuidePath: string;
 
 	public addProject(project: Project): void {
@@ -82,6 +83,10 @@ export class Store {
 
 	public getSelectedElement(): PageElement | undefined {
 		return this.selectedElement;
+	}
+
+	public getElementFocus(): boolean | undefined {
+		return this.elementHasFocus;
 	}
 
 	public getStyleGuidePath(): string {
@@ -165,5 +170,9 @@ export class Store {
 
 	public unsetSelectedElement(): void {
 		this.selectedElement = undefined;
+	}
+
+	public setElementFocus(state: boolean): void {
+		this.elementHasFocus = state;
 	}
 }

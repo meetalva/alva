@@ -1,0 +1,10 @@
+{
+	"name": "patterns-pane",
+	"displayName": "Patterns Pane",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": ["atom", "patterns-pane"],
+	"patterns": {
+		"color": "color"
+	}
+ }

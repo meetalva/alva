@@ -26,6 +26,11 @@ interface StyledElementLabelProps {
 	highlight?: boolean;
 }
 
+interface StyledIconProps {
+	active?: boolean;
+	open?: boolean;
+}
+
 export interface StyledElementChildProps {
 	open?: boolean;
 }
@@ -48,10 +53,10 @@ const StyledElementLabel = styled.div`
 	border-radius: 3px;
 	cursor: pointer;
 	align-items: center;
-	color: ${colors.black.toString()};    
-    position: relative;
-    z-index: 10;
-    
+	color: ${colors.black.toString()};
+	position: relative;
+	z-index: 10;
+
 	${(props: StyledElementLabelProps) =>
 		props.active
 			? `
@@ -69,35 +74,32 @@ const StyledElementLabel = styled.div`
 
 const StyledPlaceholder = styled.div`
 	position: relative;
-    z-index: 15;
-    height: 10px;
-    width: 100%;
-    margin-top: -5px;
-    margin-bottom: -5px;
+	z-index: 15;
+	height: 10px;
+	width: 100%;
+	margin-top: -5px;
+	margin-bottom: -5px;
 	border-radius: 3px;
-    
-    &::after {
-        content:'';
-        display: block;
-        position: absolute;
-        height: 100%;
-        width: 100%;
-        left: 0;
-        top: 0;
-        background: ${colors.grey90.toString()};
-        transform: scale(1,0);
-        transition: transform 0.2s;
-    }
-    
-    
+
+	&::after {
+		content: '';
+		display: block;
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		left: 0;
+		top: 0;
+		background: ${colors.grey90.toString()};
+		transform: scale(1, 0);
+		transition: transform 0.2s;
+	}
+
 	${(props: StyledPlaceholder) =>
 		props.highlightPlaceholder
 			? `
-			
-
-            &:after {
-                transform: scale(1,1);
-            }
+			&:after {
+				transform: scale(1,1);
+			}
 		`
 			: ''};
 `;
@@ -112,12 +114,12 @@ const StyledIcon = styled(Icon)`
 	position: absolute;
 	left: ${getSpace(Size.XS)}px;
 	fill: ${colors.grey70.toString()};
-    width: 12px;
-    height: 12px;
-    transition: transform 0.2s;
-    
-    ${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
-    ${(props: StyledIconProps) => (props.active ? 'fill: white' : '')};
+	width: 12px;
+	height: 12px;
+	transition: transform 0.2s;
+
+	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
+	${(props: StyledIconProps) => (props.active ? 'fill: white' : '')};
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => {
@@ -166,8 +168,8 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 						name={IconName.ArrowFill}
 						size={IconSize.XXS}
 						color={colors.grey70}
-                        open={open}
-                        active={active}
+						open={open}
+						active={active}
 					/>
 				)}
 				{title}

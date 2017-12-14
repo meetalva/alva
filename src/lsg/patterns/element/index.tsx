@@ -111,12 +111,13 @@ const StyledElementChild = styled.div`
 const StyledIcon = styled(Icon)`
 	position: absolute;
 	left: ${getSpace(Size.XS)}px;
-	fill: ${colors.grey36.toString()};
+	fill: ${colors.grey70.toString()};
     width: 12px;
     height: 12px;
     transition: transform 0.2s;
     
     ${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
+    ${(props: StyledIconProps) => (props.active ? 'fill: white' : '')};
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => {
@@ -166,6 +167,7 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 						size={IconSize.XXS}
 						color={colors.grey70}
                         open={open}
+                        active={active}
 					/>
 				)}
 				{title}

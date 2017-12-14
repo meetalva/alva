@@ -39,7 +39,7 @@ export class PatternList extends React.Component<PatternListProps> {
 		return (
 			<div>
 				<Space sizeBottom={Size.L}>
-					<Input handleChange={this.handleSearchInputChange} placeholder="Search"/>
+					<Input handleChange={this.handleSearchInputChange} placeholder="Search" />
 				</Space>
 				<Space sizeBottom={Size.L}>
 					<List>{list}</List>
@@ -122,6 +122,7 @@ export class PatternList extends React.Component<PatternListProps> {
 	}
 	@action
 	protected handleDragStart(e: React.DragEvent<HTMLElement>, pattern: Pattern): void {
+		console.log('asdf');
 		const data = pattern.getRelativePath();
 		e.dataTransfer.setData('patternPath', data);
 	}

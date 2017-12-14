@@ -34,16 +34,18 @@ const StyledIcon = styled(Icon)`
 	margin-right: ${getSpace(Size.L)}px;
 `;
 
-const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => (
-	<StyledPatternListItem {...props}>
-		{props.icon
-			? <StyledSVG>
-				{props.icon}
-			</StyledSVG>
-			: <StyledIcon name={IconName.Robo} size={IconSize.XS} color={colors.grey70} />
-		}
-		{props.children}
-	</StyledPatternListItem>
-);
+const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
+	const { handleDragStart, ...other } = props;
+	return (
+		<StyledPatternListItem {...other} onDragStart={handleDragStart}>
+			{props.icon ? (
+				<StyledSVG>{props.icon}</StyledSVG>
+			) : (
+				<StyledIcon name={IconName.Robo} size={IconSize.XS} color={colors.grey70} />
+			)}
+			{props.children}
+		</StyledPatternListItem>
+	);
+};
 
 export default PatternListItem;

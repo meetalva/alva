@@ -49,14 +49,6 @@ class App extends React.Component<AppProps> {
 		this.handleMainWindowClick = this.handleMainWindowClick.bind(this);
 	}
 
-	public componentDidMount(): void {
-		const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
-		webviewTag.addEventListener('did-stop-loading', () => {
-			store.openStyleguide('../designkit');
-			store.openPage('homepage');
-		});
-	}
-
 	private handleMainWindowClick(): void {
 		this.props.store.setElementFocus(false);
 		createMenu(store);

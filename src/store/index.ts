@@ -102,7 +102,7 @@ export class Store {
 		MobX.transaction(() => {
 			if (!PathUtils.isAbsolute(styleGuidePath)) {
 				// Currently, store is two levels below alva, so go two up
-				styleGuidePath = PathUtils.join(__dirname, '..', '..', styleGuidePath);
+				styleGuidePath = PathUtils.join(styleGuidePath);
 			}
 			this.styleGuidePath = styleGuidePath;
 			this.currentPage = undefined;

@@ -3,8 +3,5 @@
 	"displayName": "Global Styles",
 	"version": "1.0.0",
 	"tags": ["global-styles"],
-	"flag": "alpha",
-	"patterns": {
-	  "fonts": "fonts"
-	}
+	"flag": "alpha"
  }

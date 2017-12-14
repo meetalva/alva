@@ -1,6 +1,6 @@
-import * as React from 'react';
 import { colors } from '../colors';
 import { fonts } from '../fonts';
+import * as React from 'react';
 import Space, { Size } from '../space';
 import styled from 'styled-components';
 

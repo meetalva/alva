@@ -1,7 +1,7 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
-import { getSpace, Size } from '../../space/index';
 import * as React from 'react';
+import { getSpace, Size } from '../../space';
 import styled from 'styled-components';
 
 export interface StringItemProps {

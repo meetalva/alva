@@ -3,10 +3,5 @@
 	"displayName": "Tab Navigation",
 	"flag": "alpha",
 	"version": "1.0.0",
-	"tags": ["tab-navigation"],
-	"patterns": {
-		"colors": "colors",
-		"fonts": "fonts",
-		"space": "space"
-	}
+	"tags": ["tab-navigation"]
 }

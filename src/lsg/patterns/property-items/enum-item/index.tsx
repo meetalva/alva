@@ -1,8 +1,8 @@
+import { colors } from '../../colors';
 import { Option } from '../../../../store/pattern/property/enum_property';
-import { getSpace, Size } from '../../space/index';
-import { fonts } from '../../fonts/index';
-import { colors } from '../../colors/index';
+import { fonts } from '../../fonts';
 import * as React from 'react';
+import { getSpace, Size } from '../../space';
 import styled from 'styled-components';
 
 export interface EnumItemProps {

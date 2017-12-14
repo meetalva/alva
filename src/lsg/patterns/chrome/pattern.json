@@ -2,11 +2,5 @@
 	"name": "chrome",
 	"displayName": "Chrome",
 	"version": "1.0.0",
-	"flag": "alpha",
-	"patterns": {
-		"colors": "colors",
-		"fonts": "fonts",
-		"space": "space",
-		"tab-navigation": "tab-navigation"
-	}
+	"flag": "alpha"
 }

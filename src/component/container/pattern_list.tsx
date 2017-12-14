@@ -7,6 +7,7 @@ import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern';
 import PatternListItem from '../../lsg/patterns/pattern-list-item';
 import * as React from 'react';
+import Space, { Size } from '../../lsg/patterns/space';
 import { Store } from '../../store';
 
 export interface PatternListProps {
@@ -37,8 +38,12 @@ export class PatternList extends React.Component<PatternListProps> {
 		const list = this.createList(this.items);
 		return (
 			<div>
-				<Input handleChange={this.handleSearchInputChange} placeholder="Search"/>
-				<List headline="Patterns">{list}</List>
+				<Space sizeBottom={Size.L}>
+					<Input handleChange={this.handleSearchInputChange} placeholder="Search"/>
+				</Space>
+				<Space sizeBottom={Size.L}>
+					<List>{list}</List>
+				</Space>
 			</div>
 		);
 	}

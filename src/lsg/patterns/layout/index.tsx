@@ -23,7 +23,7 @@ const StyledMainArea = styled(StyledLayout)`
 
 const StyledSideBar = styled(StyledLayout)`
 	flex-basis: 240px;
-	overflow-y: scroll;
+	overflow-y: hidden;
 `;
 
 export const MainArea: React.StatelessComponent<LayoutProps> = props => (

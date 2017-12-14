@@ -25,9 +25,8 @@ export class Preview extends React.Component<PreviewProps> {
 		} else {
 			return (
 				<div>
-					Checkout or download the alva{' '}
-					<a href="https://github.com/meetalva/designkit">designkit</a> and open it as a
-					project
+					Checkout or download the alva designkit(https://github.com/meetalva/designkit) and
+					open it as a project
 				</div>
 			);
 		}

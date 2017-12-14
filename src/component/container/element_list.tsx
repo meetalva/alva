@@ -94,42 +94,31 @@ export class ElementList extends React.Component<ElementListProps> {
 			value: patternPath.replace(/^.*\//, ''),
 			onClick: updatePageElement,
 			handleDragStart: (e: React.DragEvent<HTMLElement>) => {
-				console.log('this', element);
 				this.props.store.setClipboardElement(element);
 			},
 			handleDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
-				const transfePatternPath = e.dataTransfer.getData('patternPath');
+				const transferPatternPath = e.dataTransfer.getData('patternPath');
 				const parentElement = element.getParent();
-				if (!parentElement) {
-					return;
-				}
+				const pageElement = transferPatternPath ? new PageElement(this.props.store.getPattern(transferPatternPath)) : this.props.store.getClipboardElement();
 
-				if (!transfePatternPath) {
-					const elementListElement = this.props.store.getClipboardElement();
-					if (elementListElement) {
-						parentElement.addChild(
-							elementListElement,
-							element.getIndex()
-						);
-					}
+				if (!parentElement || !pageElement) {
 					return;
 				}
 
 				parentElement.addChild(
-					new PageElement(this.props.store.getPattern(transfePatternPath)),
+					pageElement,
 					element.getIndex()
 				);
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
-				const transfePatternPath = e.dataTransfer.getData('patternPath');
-				if (!transfePatternPath) {
-					const elementListElement = this.props.store.getClipboardElement();
-					if (elementListElement) {
-						element.addChild(elementListElement);
-					}
+				const transferPatternPath = e.dataTransfer.getData('patternPath');
+				const pageElement = transferPatternPath ? new PageElement(this.props.store.getPattern(transferPatternPath)) : this.props.store.getClipboardElement();
+
+				if (!pageElement) {
 					return;
 				}
-				element.addChild(new PageElement(this.props.store.getPattern(transfePatternPath)));
+
+				element.addChild(pageElement);
 			},
 			children: items,
 			active: element === selectedElement

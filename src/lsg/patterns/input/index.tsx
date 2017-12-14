@@ -1,3 +1,4 @@
+import { colors } from '../colors';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -19,14 +20,25 @@ export enum InputTypes {
 const StyledInput = styled.input`
 	/* reset Styles */
 	-webkit-appearance:textfield;
+	outline: none;
 
 	box-sizing: border-box;
 	display: block;
 	width: 100%;
-	padding: 10px;
+	padding: 8px 11px;
+  	border: 1px solid ${colors.grey90.toString()};
+	color: ${colors.grey70.toString()};
+	:focus {
+		box-shadow: 0 0 10px ${colors.blue.toRGBString(0.5)};
+		padding: 8px 11px;
+		border: 1px solid ${colors.blue.toString()};
+	}
 
-	::-webkit-search-decoration
-		{
+	::placeholder {
+		color: ${colors.grey90.toString()};
+	}
+
+	::-webkit-search-decoration {
 			display:none;
 		}
 `;

@@ -16,7 +16,6 @@ export interface PatternListItemProps {
 const StyledPatternListItem = styled.li`
 	display: flex;
 	align-items: center;
-	cursor: default;
 	padding: ${getSpace(Size.S)}px;
 	border: 1px solid ${colors.grey90.toString()};
 	margin: 0 0 ${getSpace(Size.S)}px 0;
@@ -25,6 +24,9 @@ const StyledPatternListItem = styled.li`
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 12px;
 	color: ${colors.black.toString()};
+
+	${(props: PatternListItemProps) =>
+		props.draggable ? 'cursor: move;' : props.onClick ? 'cursor: pointer;' : ''};
 `;
 
 const StyledSVG = styled.svg`

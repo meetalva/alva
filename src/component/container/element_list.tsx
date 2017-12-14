@@ -99,20 +99,21 @@ export class ElementList extends React.Component<ElementListProps> {
 			handleDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
 				const transferPatternPath = e.dataTransfer.getData('patternPath');
 				const parentElement = element.getParent();
-				const pageElement = transferPatternPath ? new PageElement(this.props.store.getPattern(transferPatternPath)) : this.props.store.getRearrangeElement();
+				const pageElement = transferPatternPath
+					? new PageElement(this.props.store.getPattern(transferPatternPath))
+					: this.props.store.getRearrangeElement();
 
 				if (!parentElement || !pageElement) {
 					return;
 				}
 
-				parentElement.addChild(
-					pageElement,
-					element.getIndex()
-				);
+				parentElement.addChild(pageElement, element.getIndex());
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
 				const transferPatternPath = e.dataTransfer.getData('patternPath');
-				const pageElement = transferPatternPath ? new PageElement(this.props.store.getPattern(transferPatternPath)) : this.props.store.getRearrangeElement();
+				const pageElement = transferPatternPath
+					? new PageElement(this.props.store.getPattern(transferPatternPath))
+					: this.props.store.getRearrangeElement();
 
 				if (!pageElement) {
 					return;

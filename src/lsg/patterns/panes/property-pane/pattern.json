@@ -3,7 +3,5 @@
 	"displayName": "Property Pane",
 	"flag": "alpha",
 	"version": "1.0.0",
-	"tags": ["atom", "property-pane"],
-	"patterns": {
-	}
+	"tags": ["atom", "property-pane"]
  }

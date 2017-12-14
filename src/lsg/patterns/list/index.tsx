@@ -4,7 +4,7 @@ import * as React from 'react';
 import styledComponents from 'styled-components';
 
 export interface ListProps {
-	headline: string;
+	headline?: string;
 }
 
 export interface ListItemProps {

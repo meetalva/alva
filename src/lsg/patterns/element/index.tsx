@@ -56,6 +56,7 @@ const StyledElementLabel = styled.div`
 	align-items: center;
 	color: ${colors.black.toString()};
 	position: relative;
+	text-transform: capitalize;
 
 	&:hover {
 		background: ${colors.grey90.toString()};

@@ -168,10 +168,6 @@ export class Store {
 		this.selectedElement = selectedElement;
 	}
 
-	public unsetSelectedElement(): void {
-		this.selectedElement = undefined;
-	}
-
 	public setElementFocus(state: boolean): void {
 		this.elementHasFocus = state;
 	}

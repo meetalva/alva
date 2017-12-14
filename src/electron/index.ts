@@ -19,7 +19,7 @@ function createWindow(): void {
 	// and load the index.html of the app.
 	win.loadURL(
 		url.format({
-			pathname: PathUtils.join(__dirname, '..', '..', 'src', 'electron', 'index.html'),
+			pathname: PathUtils.join(__dirname, '..', 'electron', 'index.html'),
 			protocol: 'file:',
 			slashes: true
 		})

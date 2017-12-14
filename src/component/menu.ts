@@ -1,13 +1,22 @@
 import { BrowserWindow, MenuItem, MenuItemConstructorOptions, remote, WebContents } from 'electron';
 import { PageElement } from '../store/page/page_element';
 import { Store } from '../store';
-const { Menu, shell, app } = remote;
+const { Menu, shell, app, dialog } = remote;
 
 export function createMenu(store: Store): void {
 	const template: MenuItemConstructorOptions[] = [
 		{
 			label: '&File',
 			submenu: [
+				{
+					label: '&Open Project',
+					click: () => {
+						dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
+							store.openStyleguide(filePaths[0]);
+							store.openPage('homepage');
+						});
+					}
+				},
 				{
 					label: 'New &Page',
 					accelerator: 'CmdOrCtrl+N'

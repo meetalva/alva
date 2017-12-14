@@ -44,6 +44,7 @@ export interface StyledPlaceholder {
 
 const StyledElement = styled.div`
 	cursor: default;
+    position: relative;
 `;
 
 const StyledElementLabel = styled.div`
@@ -56,11 +57,20 @@ const StyledElementLabel = styled.div`
 	color: ${colors.black.toString()};
 	position: relative;
 
+    &:hover {
+        background: ${colors.grey90.toString()};
+    }
+
+
 	${(props: StyledElementLabelProps) =>
 		props.active
 			? `
 				color: ${colors.white.toString()};
 				background: ${colors.blue.toString()};
+
+                &:hover {
+                    background: ${colors.blue.toString()};
+                }
 			`
 			: ''};
 	${(props: StyledElementLabelProps) =>

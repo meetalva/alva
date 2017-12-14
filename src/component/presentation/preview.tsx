@@ -23,7 +23,13 @@ export class Preview extends React.Component<PreviewProps> {
 		if (this.props.page) {
 			return this.createComponent(this.props.page.getRoot()) as JSX.Element;
 		} else {
-			return <div>(empty)</div>;
+			return (
+				<div>
+					Checkout or download the alva{' '}
+					<a href="https://github.com/meetalva/designkit">designkit</a> and open it as a
+					project
+				</div>
+			);
 		}
 	}
 

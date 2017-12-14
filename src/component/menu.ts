@@ -10,6 +10,7 @@ export function createMenu(store: Store): void {
 			submenu: [
 				{
 					label: '&Open Project',
+					accelerator: 'CmdOrCtrl+O',
 					click: () => {
 						dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
 							store.openStyleguide(filePaths[0]);

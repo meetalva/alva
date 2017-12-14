@@ -35,7 +35,7 @@ const PatternsPane = styledComponents.div`
     overflow: scroll;
     border-top: 2px solid ${colors.grey70.toString()};
     box-sizing: border-box;
-	 padding: 18px 0;
+    padding: 18px 0;
 `;
 
 const ProjectPane = styledComponents.div`

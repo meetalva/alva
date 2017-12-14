@@ -32,6 +32,7 @@
 		"singleQuote": true
 	},
 	"build": {
+		"productName": "Alva",
 		"appId": "io.github.meetalva",
 		"copyright": "Copyright (c) 2017 SinnerSchrader Deutschland GmbH",
 		"mac": {

@@ -49,7 +49,7 @@ const StyledElement = styled.div`
 const StyledElementLabel = styled.div`
 	position: relative;
 	display: flex;
-	padding: 9px ${getSpace(Size.L)}px;
+	padding: 9px ${getSpace(Size.L)}px 9px ${getSpace(Size.XL)}px;
 	border-radius: 3px;
 	cursor: pointer;
 	align-items: center;

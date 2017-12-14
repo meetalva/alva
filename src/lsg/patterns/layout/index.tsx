@@ -6,6 +6,7 @@ export interface LayoutProps {
 	className?: string;
 	directionVertical?: boolean;
 	hasPaddings?: boolean;
+	handleClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 const StyledLayout = styled.div`
@@ -51,6 +52,7 @@ const Layout: React.StatelessComponent<LayoutProps> = props => (
 		className={props.className}
 		directionVertical={props.directionVertical}
 		hasPaddings={props.hasPaddings}
+		onClick={props.handleClick}
 	>
 		{props.children}
 	</StyledLayout>

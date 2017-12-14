@@ -60,36 +60,36 @@ export function createMenu(store: Store): void {
 				{
 					label: '&Cut',
 					accelerator: 'CmdOrCtrl+X',
-					role: 'cut',
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
-						if (selectedElement) {
+						if (selectedElement && store.getElementFocus()) {
 							store.setClipboardElement(selectedElement);
 							selectedElement.remove();
 						}
+						Menu.sendActionToFirstResponder('cut:');
 					}
 				},
 				{
 					label: 'C&opy',
 					accelerator: 'CmdOrCtrl+C',
-					role: 'copy',
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
-						if (selectedElement) {
+						if (selectedElement && store.getElementFocus()) {
 							store.setClipboardElement(selectedElement);
 						}
+						Menu.sendActionToFirstResponder('copy:');
 					}
 				},
 				{
 					label: '&Paste',
 					accelerator: 'CmdOrCtrl+V',
-					role: 'paste',
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						const clipboardElement: PageElement | undefined = store.getClipboardElement();
-						if (selectedElement && clipboardElement) {
+						if (selectedElement && clipboardElement && store.getElementFocus()) {
 							selectedElement.addChild(clipboardElement.clone());
 						}
+						Menu.sendActionToFirstResponder('paste:');
 					}
 				},
 				{
@@ -102,12 +102,14 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: '&Delete',
-					accelerator: 'Del',
-					role: 'delete',
+					accelerator: 'Backspace',
 					click: () => {
+						console.log('delete');
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						if (selectedElement) {
 							selectedElement.remove();
+						} else {
+							Menu.sendActionToFirstResponder('Backspace');
 						}
 					}
 				}

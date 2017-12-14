@@ -1,5 +1,6 @@
 import { ElementWrapper } from './elementWrapper';
 import { ListItemProps } from '../../lsg/patterns/list';
+import { createMenu } from '../menu';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page';
 import { PageElement } from '../../store/page/page_element';
@@ -27,6 +28,14 @@ export class ElementList extends React.Component<ElementListProps> {
 		} else {
 			return null;
 		}
+	}
+
+	public componentDidMount(): void {
+		createMenu(this.props.store);
+	}
+
+	public componentWillUpdate(newProps: ElementListProps): void {
+		createMenu(newProps.store);
 	}
 
 	public renderList(item: ListItemProps, key?: number): JSX.Element {
@@ -76,10 +85,12 @@ export class ElementList extends React.Component<ElementListProps> {
 		const updatePageElement: React.MouseEventHandler<HTMLElement> = event => {
 			if (this.props.store.getSelectedElement() === element) {
 				event.stopPropagation();
-				this.props.store && this.props.store.unsetSelectedElement();
+				this.props.store.unsetSelectedElement();
+				this.props.store.setElementFocus(false);
 			} else {
 				event.stopPropagation();
-				this.props.store && this.props.store.setSelectedElement(element);
+				this.props.store.setSelectedElement(element);
+				this.props.store.setElementFocus(true);
 			}
 		};
 

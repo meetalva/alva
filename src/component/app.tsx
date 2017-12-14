@@ -46,6 +46,7 @@ class App extends React.Component<AppProps> {
 	public constructor(props: AppProps) {
 		super(props);
 		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
+		this.handleMainWindowClick = this.handleMainWindowClick.bind(this);
 	}
 
 	public componentDidMount(): void {
@@ -54,7 +55,10 @@ class App extends React.Component<AppProps> {
 			store.openStyleguide('../designkit');
 			store.openPage('homepage');
 		});
+	}
 
+	private handleMainWindowClick(): void {
+		this.props.store.setElementFocus(false);
 		createMenu(store);
 	}
 
@@ -65,7 +69,7 @@ class App extends React.Component<AppProps> {
 		const title = `${project && project.getName()} > ${page && page.getName()}`;
 
 		return (
-			<Layout directionVertical>
+			<Layout directionVertical handleClick={this.handleMainWindowClick}>
 				<Chrome title={title} />
 				<MainArea>
 					<SideBar directionVertical hasPaddings>

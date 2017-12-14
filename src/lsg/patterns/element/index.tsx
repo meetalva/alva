@@ -11,8 +11,10 @@ export interface ElementProps {
 	highlightPlaceholder?: boolean;
 	title: string;
 
+	draggable?: boolean;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
 	handleIconClick?: React.MouseEventHandler<SVGSVGElement>;
+	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	handleDragEnter?: React.DragEventHandler<HTMLElement>;
 	handleDragLeave?: React.DragEventHandler<HTMLElement>;
 	handleDragDrop?: React.DragEventHandler<HTMLElement>;
@@ -138,8 +140,10 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 		active,
 		open,
 		highlight,
+		draggable,
 		handleClick,
 		handleIconClick,
+		handleDragStart,
 		handleDragEnter,
 		handleDragLeave,
 		handleDragDrop,
@@ -164,6 +168,8 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 				onDragOver={(e: React.DragEvent<HTMLElement>) => {
 					e.preventDefault();
 				}}
+				draggable={draggable}
+				onDragStart={handleDragStart}
 				onDragEnter={handleDragEnter}
 				onDragLeave={handleDragLeave}
 				onDrop={handleDragDrop}

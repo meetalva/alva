@@ -71,13 +71,33 @@ const StyledPlaceholder = styled.div`
 	position: relative;
     z-index: 15;
     height: 10px;
+    width: 100%;
     margin-top: -5px;
     margin-bottom: -5px;
 	border-radius: 3px;
+    
+    &::after {
+        content:'';
+        display: block;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        left: 0;
+        top: 0;
+        background: ${colors.grey90.toString()};
+        transform: scale(1,0);
+        transition: transform 0.2s;
+    }
+    
+    
 	${(props: StyledPlaceholder) =>
 		props.highlightPlaceholder
 			? `
-			background: ${colors.grey90.toString()};
+			
+
+            &:after {
+                transform: scale(1,1);
+            }
 		`
 			: ''};
 `;

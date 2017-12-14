@@ -25,15 +25,24 @@ export class PatternList extends React.Component<PatternListProps> {
 		this.handleDragStart = this.handleDragStart.bind(this);
 	}
 
+	public search(listItem: ListItemProps[], term: string): ListItemProps[] {
+		const result: ListItemProps[] = [];
+
+		listItem.map(item => {
+			if (item.value.indexOf(term) !== -1 && !item.children) {
+				result.push(item);
+			} else if (item.children) {
+				const folder = { value: item.value, children: [] };
+				result.push(folder, ...this.search(item.children, term));
+			}
+		});
+		return result;
+	}
+
 	public render(): JSX.Element {
-		if (this.props.store.getPatternSearchTerm() === '') {
-			this.items = this.createItemsFromFolder(
-				this.props.store.getPatternRoot() as PatternFolder
-			);
-		} else {
-			this.items = this.props.store
-				.searchPatterns(this.props.store.getPatternSearchTerm())
-				.map(pattern => ({ value: pattern.getId() }));
+		this.items = this.createItemsFromFolder(this.props.store.getPatternRoot() as PatternFolder);
+		if (this.props.store.getPatternSearchTerm() !== '') {
+			this.items = this.search(this.items, this.props.store.getPatternSearchTerm());
 		}
 		const list = this.createList(this.items);
 		return (

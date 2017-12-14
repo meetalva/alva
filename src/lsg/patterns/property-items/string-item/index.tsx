@@ -18,7 +18,7 @@ const StyledStringItem = styled.div`
 const StyledLabel = styled.span`
 	display: block;
 	margin-bottom: ${getSpace(Size.XS)}px;
-	font-size: 14px;
+	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey70.toString()};
 `;
@@ -28,6 +28,23 @@ const StyledInput = styled.input`
 	box-sizing: border-box;
 	width: 100%;
 	text-overflow: ellipsis;
+    border: none;
+    border-bottom: 1px solid ${colors.grey70.toString()};
+    background: transparent;
+    font-family: ${fonts().NORMAL_FONT};
+    font-size: 15px;
+    padding-bottom: ${getSpace(Size.M)/2}px;
+    color: ${colors.grey36.toString()};
+    
+    ::-webkit-input-placeholder {
+        color: ${colors.grey70.toString()};
+    }
+    
+    &:focus {
+        outline: none;
+        border-color: ${colors.blue.toString()};
+        color: ${colors.black.toString()};
+    }
 `;
 
 export const StringItem: React.StatelessComponent<StringItemProps> = props => {
@@ -37,7 +54,7 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 		<StyledStringItem className={className}>
 			<label>
 				<StyledLabel>{label}</StyledLabel>
-				<StyledInput onChange={handleChange} type="textarea" defaultValue={value} />
+				<StyledInput onChange={handleChange} type="textarea" defaultValue={value} placeholder="Type in"/>
 			</label>
 		</StyledStringItem>
 	);

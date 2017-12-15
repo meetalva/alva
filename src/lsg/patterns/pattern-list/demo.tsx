@@ -5,11 +5,9 @@ import * as React from 'react';
 
 const PatternListItemDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer title="Pattern List Item">
-		<PatternListItem>
-			Copy
-		</PatternListItem>
+		<PatternListItem>Copy</PatternListItem>
 
-		<IconRegistry names={IconName}/>
+		<IconRegistry names={IconName} />
 	</DemoContainer>
 );
 

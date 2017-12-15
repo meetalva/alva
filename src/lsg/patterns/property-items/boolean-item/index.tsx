@@ -2,6 +2,7 @@ import { colors } from '../../colors';
 import { fonts } from '../../fonts';
 import * as React from 'react';
 import styled from 'styled-components';
+import { getSpace, Size } from '../../space';
 
 export interface BooleanItemProps {
 	label: string;
@@ -22,6 +23,8 @@ const StyledLabelWrapper = styled.label`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+
+    margin-bottom: ${getSpace(Size.XXL)}px;
 `;
 
 const indicatorWidth = 18;

@@ -36,6 +36,8 @@ const StyledInput = styled.input`
     padding-bottom: ${getSpace(Size.M)/2}px;
     color: ${colors.grey36.toString()};
     
+    margin-bottom: ${getSpace(Size.XXL)}px;
+    
     ::-webkit-input-placeholder {
         color: ${colors.grey70.toString()};
     }

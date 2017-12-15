@@ -25,8 +25,21 @@ export class Preview extends React.Component<PreviewProps> {
 		} else {
 			return (
 				<div>
-					Checkout or download the alva designkit(https://github.com/meetalva/designkit) and
-					open it as a project
+					<h1>Welcome to Alva.</h1>
+					<p>
+						Alva is a radically new design tool that enables cross-functional teams to design
+						digital products.
+					</p>
+					<p>
+						To get started, you need a style-guide project (like a Patternplate project), or
+						alternatively, you can download a prototype style-guide (design kit) from:
+					</p>
+					<p>
+						<a href="https://github.com/meetalva/designkit">
+							https://github.com/meetalva/designkit
+						</a>
+					</p>
+					<p>Then, click File &gt; Open Styleguide to open it.</p>
 				</div>
 			);
 		}

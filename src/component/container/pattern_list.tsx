@@ -125,7 +125,9 @@ export class PatternList extends React.Component<PatternListProps> {
 	protected handlePatternClick(pattern: Pattern): void {
 		const selectedElement: PageElement | undefined = this.props.store.getSelectedElement();
 		if (selectedElement) {
-			selectedElement.addChild(new PageElement(pattern));
+			const newPageElement = new PageElement(pattern);
+			selectedElement.addChild(newPageElement);
+			this.props.store.setSelectedElement(newPageElement);
 		}
 	}
 	@action

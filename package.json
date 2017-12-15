@@ -42,6 +42,13 @@
 		"directories": {
 			"buildResources": "src/resources",
 			"output": "dist"
+		},
+		"nsis": {
+			"artifactName": "${productName}-${version}.${ext}",
+			"oneClick": false,
+			"perMachine": true,
+			"allowElevation": true,
+			"allowToChangeInstallationDirectory": true
 		}
 	},
 	"devDependencies": {

@@ -3,20 +3,18 @@
 	"version": "0.1.0",
 	"description":
 		"Alva is a radically new design tool that enables cross-functional teams to design digital products.",
-	"main": "./dist/electron/index.js",
+	"main": "./build/electron/index.js",
 	"scripts": {
 		"build":
-			"tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && npm run copy-html",
+			"tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/*.html build/electron/",
+		"build-lsg": "tsc --project src/lsg --outDir build/lsg/patterns --sourceMap",
 		"start":
-			"npm run build && concurrently \"electron dist/electron\" \"tsc --project . --watch\"",
-		"build-lsg": "tsc --project src/lsg --outDir dist/lsg/patterns --sourceMap",
+			"npm run build && concurrently \"electron build/electron\" \"tsc --project . --watch\"",
 		"start-lsg":
 			"npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
-		"clean": "rm -rf dist",
+		"clean": "rm -rf build && rm -rf dist",
 		"clean-build": "npm run clean && npm run build",
-		"copy-html": "cp src/electron/*.html dist/electron/",
-		"pack": "npm run build && electron-builder --dir",
-		"dist": "npm run build && electron-builder"
+		"dist": "npm run clean-build && electron-builder"
 	},
 	"repository": {
 		"type": "git",
@@ -34,16 +32,16 @@
 		"singleQuote": true
 	},
 	"build": {
-		"productName": "Alva",
 		"appId": "io.github.meetalva",
+		"productName": "Alva",
 		"copyright": "Copyright (c) 2017 SinnerSchrader Deutschland GmbH",
 		"mac": {
 			"category": "public.app-category.graphics-design"
 		},
-		"files": ["dist/**/*", "package.json"],
+		"files": ["build/**/*", "package.json"],
 		"directories": {
-			"buildResources": "resources",
-			"output": "build"
+			"buildResources": "src/resources",
+			"output": "dist"
 		}
 	},
 	"devDependencies": {

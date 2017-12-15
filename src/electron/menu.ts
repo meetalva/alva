@@ -100,7 +100,9 @@ export function createMenu(store: Store): void {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						const clipboardElement: PageElement | undefined = store.getClipboardElement();
 						if (selectedElement && clipboardElement && store.getElementFocus()) {
-							selectedElement.addChild(clipboardElement.clone());
+							const newPageElement = clipboardElement.clone();
+							selectedElement.addChild(newPageElement);
+							store.setSelectedElement(newPageElement);
 						}
 						Menu.sendActionToFirstResponder('paste:');
 					}
@@ -116,7 +118,9 @@ export function createMenu(store: Store): void {
 						if (selectedElement && store.getElementFocus()) {
 							const parentElement: PageElement | undefined = selectedElement.getParent();
 							if (parentElement) {
-								parentElement.addChild(selectedElement.clone(), selectedElement.getIndex());
+								const newPageElement = selectedElement.clone();
+								parentElement.addChild(newPageElement, selectedElement.getIndex());
+								store.setSelectedElement(newPageElement);
 							}
 						}
 					}

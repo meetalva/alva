@@ -108,6 +108,7 @@ export class ElementList extends React.Component<ElementListProps> {
 				}
 
 				parentElement.addChild(pageElement, element.getIndex());
+				this.props.store.setSelectedElement(pageElement);
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
 				const transferPatternPath = e.dataTransfer.getData('patternPath');
@@ -120,6 +121,7 @@ export class ElementList extends React.Component<ElementListProps> {
 				}
 
 				element.addChild(pageElement);
+				this.props.store.setSelectedElement(pageElement);
 			},
 			children: items,
 			active: element === selectedElement

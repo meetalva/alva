@@ -28,25 +28,25 @@ const StyledInput = styled.input`
 	box-sizing: border-box;
 	width: 100%;
 	text-overflow: ellipsis;
-    border: none;
-    border-bottom: 1px solid ${colors.grey70.toString()};
-    background: transparent;
-    font-family: ${fonts().NORMAL_FONT};
-    font-size: 15px;
-    padding-bottom: ${getSpace(Size.M)/2}px;
-    color: ${colors.grey36.toString()};
-    
-    margin-bottom: ${getSpace(Size.XXL)}px;
-    
-    ::-webkit-input-placeholder {
-        color: ${colors.grey70.toString()};
-    }
-    
-    &:focus {
-        outline: none;
-        border-color: ${colors.blue.toString()};
-        color: ${colors.black.toString()};
-    }
+	border: none;
+	border-bottom: 1px solid ${colors.grey70.toString()};
+	background: transparent;
+	font-family: ${fonts().NORMAL_FONT};
+	font-size: 15px;
+	padding-bottom: ${getSpace(Size.M)/2}px;
+	color: ${colors.grey36.toString()};
+	
+	margin-bottom: ${getSpace(Size.XXL)}px;
+	
+	::-webkit-input-placeholder {
+		color: ${colors.grey70.toString()};
+	}
+	
+	&:focus {
+		outline: none;
+		border-color: ${colors.blue.toString()};
+		color: ${colors.black.toString()};
+	}
 `;
 
 export const StringItem: React.StatelessComponent<StringItemProps> = props => {

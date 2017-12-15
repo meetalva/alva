@@ -23,8 +23,7 @@ const StyledLabelWrapper = styled.label`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-
-    margin-bottom: ${getSpace(Size.XXL)}px;
+	margin-bottom: ${getSpace(Size.XXL)}px;
 `;
 
 const indicatorWidth = 18;

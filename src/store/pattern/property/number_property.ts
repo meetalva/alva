@@ -19,6 +19,6 @@ export class NumberProperty extends Property {
 	}
 
 	public toString(): string {
-		return `NumberProperty(id="${this.getId()}", required="${this.isRequired()}")`;
+		return `NumberProperty(${super.toString()})`;
 	}
 }

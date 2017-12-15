@@ -24,6 +24,6 @@ export class PatternProperty extends Property {
 	}
 
 	public toString(): string {
-		return `PatternProperty(id="${this.getId()}", required="${this.isRequired()}")`;
+		return `PatternProperty(${super.toString()})`;
 	}
 }

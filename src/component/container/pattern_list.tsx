@@ -120,15 +120,17 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
 		this.props.store.setPatternSearchTerm(evt.target.value);
 	}
+
 	@action
 	protected handlePatternClick(pattern: Pattern): void {
 		const selectedElement: PageElement | undefined = this.props.store.getSelectedElement();
 		if (selectedElement) {
-			const newPageElement = new PageElement(pattern);
+			const newPageElement = new PageElement(pattern, true);
 			selectedElement.addChild(newPageElement);
 			this.props.store.setSelectedElement(newPageElement);
 		}
 	}
+
 	@action
 	protected handleDragStart(e: React.DragEvent<HTMLElement>, pattern: Pattern): void {
 		const data = pattern.getRelativePath();

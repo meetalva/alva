@@ -19,6 +19,6 @@ export class StringProperty extends Property {
 	}
 
 	public toString(): string {
-		return `StringProperty(id="${this.getId()}", required="${this.isRequired()}")`;
+		return `StringProperty(${super.toString()})`;
 	}
 }

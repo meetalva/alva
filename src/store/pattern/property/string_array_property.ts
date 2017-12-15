@@ -16,6 +16,6 @@ export class StringArrayProperty extends Property {
 	}
 
 	public toString(): string {
-		return `StringArrayProperty(id="${this.getId()}", required="${this.isRequired()}")`;
+		return `StringArrayProperty(${super.toString()})`;
 	}
 }

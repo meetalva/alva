@@ -106,6 +106,25 @@ export function createMenu(store: Store): void {
 					}
 				},
 				{
+					type: 'separator'
+				},
+				{
+					label: '&Duplicate',
+					accelerator: 'CmdOrCtrl+D',
+					click: () => {
+						const selectedElement: PageElement | undefined = store.getSelectedElement();
+						if (selectedElement && store.getElementFocus()) {
+							const parentElement: PageElement | undefined = selectedElement.getParent();
+							if (parentElement) {
+								parentElement.addChild(selectedElement.clone(), selectedElement.getIndex());
+							}
+						}
+					}
+				},
+				{
+					type: 'separator'
+				},
+				{
 					label: '&Select All',
 					accelerator: 'CmdOrCtrl+A',
 					role: 'selectall'

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/meetalva/alva/compare/v0.2.1...v0.3.0) (2017-12-15)
+
+
+### Features
+
+* **component:** auto select new created page elements ([92ed1ce](https://github.com/meetalva/alva/commit/92ed1ce))
+
+
+
 <a name="0.2.1"></a>
 ## [0.2.1](https://github.com/meetalva/alva/compare/v0.2.0...v0.2.1) (2017-12-15)
 

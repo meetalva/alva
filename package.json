@@ -10,7 +10,7 @@
     "start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
     "clean": "rm -rf build && rm -rf dist",
     "clean-build": "npm run clean && npm run build",
-    "dist": "npm run clean-build && electron-builder -mwl && standard-version"
+    "dist": "standard-version && npm run clean-build && electron-builder -mwl"
   },
   "repository": {
     "type": "git",

@@ -17,7 +17,7 @@
 		"module": "commonjs",
 		"lib": ["es2017", "dom"],
 		"moduleResolution": "node",
-		"outDir": "dist",
+		"outDir": "build",
 		"noEmit": false,
 		"noEmitOnError": false,
 		"noFallthroughCasesInSwitch": true,

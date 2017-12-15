@@ -6,12 +6,23 @@ import { getSpace, Size } from '../space';
 import styled from 'styled-components';
 
 export interface PatternListItemProps {
-	className?: string;
 	draggable?: boolean;
 	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	icon?: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 }
+
+const StyledPatternList = styled.ul`
+	box-sizing: border-box;
+	display: block;
+	padding: 0;
+	margin: 0;
+`;
+
+const StyledPatternLabel = styled.div`
+	margin-bottom: ${getSpace(Size.S)}px;
+	color: ${colors.grey70.toString()};
+`;
 
 const StyledPatternListItem = styled.li`
 	display: flex;
@@ -38,15 +49,10 @@ const StyledIcon = styled(Icon)`
 	margin-right: ${getSpace(Size.L)}px;
 `;
 
-const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
-	const { className, draggable, handleDragStart, icon, onClick } = props;
+export const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
+	const { draggable, handleDragStart, icon, onClick } = props;
 	return (
-		<StyledPatternListItem
-			onDragStart={handleDragStart}
-			className={className}
-			draggable={draggable}
-			onClick={onClick}
-		>
+		<StyledPatternListItem onDragStart={handleDragStart} draggable={draggable} onClick={onClick}>
 			{icon ? (
 				<StyledSVG>{icon}</StyledSVG>
 			) : (
@@ -57,4 +63,12 @@ const PatternListItem: React.StatelessComponent<PatternListItemProps> = props =>
 	);
 };
 
-export default PatternListItem;
+export const PatternLabel: React.StatelessComponent<{}> = props => (
+	<StyledPatternLabel>{props.children}</StyledPatternLabel>
+);
+
+const PatternList: React.StatelessComponent<{}> = props => (
+	<StyledPatternList>{props.children}</StyledPatternList>
+);
+
+export default PatternList;

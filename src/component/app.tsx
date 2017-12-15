@@ -11,7 +11,7 @@ import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
 import { Page } from '../store/page';
-import { PatternList } from './container/pattern_list';
+import { PatternListContainer } from './container/pattern_list';
 import PatternsPane from '../lsg/patterns/panes/patterns-pane';
 import PreviewPane from '../lsg/patterns/panes/preview-pane';
 import ProjectPane from '../lsg/patterns/panes/project-pane';
@@ -69,7 +69,7 @@ class App extends React.Component<AppProps> {
 							<ElementList store={this.props.store} />
 						</ElementPane>
 						<PatternsPane>
-							<PatternList store={this.props.store} />
+							<PatternListContainer store={this.props.store} />
 						</PatternsPane>
 					</SideBar>
 

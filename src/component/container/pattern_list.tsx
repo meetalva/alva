@@ -1,23 +1,30 @@
 import Input from '../../lsg/patterns/input/';
 import { PatternFolder } from '../../store/pattern/folder';
-import List, { Label, Li, ListItemProps, Ul, Value } from '../../lsg/patterns/list';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern';
-import PatternListItem from '../../lsg/patterns/pattern-list-item';
+import PatternList, { PatternLabel, PatternListItem } from '../../lsg/patterns/pattern-list';
 import * as React from 'react';
 import Space, { Size } from '../../lsg/patterns/space';
 import { Store } from '../../store';
 
-export interface PatternListProps {
+export interface PatternListContainerProps {
 	store: Store;
 }
 
+export interface PatternFoo {
+	children?: PatternFoo[];
+	draggable?: boolean;
+	handleDragStart?: React.DragEventHandler<HTMLElement>;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+	value: string;
+}
+
 @observer
-export class PatternList extends React.Component<PatternListProps> {
-	public items: ListItemProps[] = [];
-	public constructor(props: PatternListProps) {
+export class PatternListContainer extends React.Component<PatternListContainerProps> {
+	public items: PatternFoo[] = [];
+	public constructor(props: PatternListContainerProps) {
 		super(props);
 
 		this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
@@ -25,8 +32,8 @@ export class PatternList extends React.Component<PatternListProps> {
 		this.handleDragStart = this.handleDragStart.bind(this);
 	}
 
-	public search(listItem: ListItemProps[], term: string): ListItemProps[] {
-		const result: ListItemProps[] = [];
+	public search(listItem: PatternFoo[], term: string): PatternFoo[] {
+		const result: PatternFoo[] = [];
 
 		listItem.map(item => {
 			if (item.value.indexOf(term) !== -1 && !item.children) {
@@ -50,19 +57,16 @@ export class PatternList extends React.Component<PatternListProps> {
 				<Space sizeBottom={Size.L}>
 					<Input handleChange={this.handleSearchInputChange} placeholder="Search" />
 				</Space>
-				<Space sizeBottom={Size.L}>
-					<List>{list}</List>
-				</Space>
+				<Space sizeBottom={Size.L}>{list}</Space>
 			</div>
 		);
 	}
 
-	public createItemsFromFolder(folder: PatternFolder): ListItemProps[] {
-		const result: ListItemProps[] = [];
-
+	public createItemsFromFolder(folder: PatternFolder): PatternFoo[] {
+		const result: PatternFoo[] = [];
 		if (folder) {
 			folder.getChildren().forEach((child: PatternFolder) => {
-				const childItem: ListItemProps = { value: child.getName() };
+				const childItem: PatternFoo = { value: child.getName() };
 				childItem.children = this.createItemsFromFolder(child);
 				result.push(childItem);
 			});
@@ -84,19 +88,16 @@ export class PatternList extends React.Component<PatternListProps> {
 		return result;
 	}
 
-	public createList(items: ListItemProps[]): JSX.Element {
+	public createList(items: PatternFoo[]): JSX.Element {
 		return (
-			<Ul>
-				{items.map((props: ListItemProps, index: number) => {
-					const labelComponent = props.label ? <Label>{props.label}:</Label> : null;
-					const nextLevel = props.children ? this.createList(props.children) : null;
-					if (nextLevel) {
+			<div>
+				{items.map((props: PatternFoo, index: number) => {
+					if (props.children) {
 						return (
-							<Li key={index}>
-								{labelComponent}
-								<Value>{props.value}</Value>
-								{nextLevel}
-							</Li>
+							<div>
+								<PatternLabel key={index}>{props.value}</PatternLabel>
+								<PatternList>{this.createList(props.children)}</PatternList>
+							</div>
 						);
 					} else {
 						return (
@@ -106,14 +107,12 @@ export class PatternList extends React.Component<PatternListProps> {
 								key={index}
 								onClick={props.onClick}
 							>
-								{labelComponent}
-								<Value>{props.value}</Value>
-								{nextLevel}
+								{props.value}
 							</PatternListItem>
 						);
 					}
 				})}
-			</Ul>
+			</div>
 		);
 	}
 

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/meetalva/alva/compare/v0.1.1...v0.2.0) (2017-12-15)
+
+
+### Features
+
+* **menu:** add duplicate function for elements ([0abb6fe](https://github.com/meetalva/alva/commit/0abb6fe))
+
+
+
 <a name="0.1.1"></a>
 
 # 0.1.0 (2017-12-15)

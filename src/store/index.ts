@@ -119,6 +119,19 @@ export class Store {
 		});
 	}
 
+	public openFirstPage(): void {
+		if (!this.projects.length) {
+			return;
+		}
+
+		const pages: PageRef[] = this.projects[0].getPages();
+		if (!pages.length) {
+			return;
+		}
+
+		this.openPage(pages[0].getId());
+	}
+
 	public openPage(id: string): void {
 		MobX.transaction(() => {
 			const pagePath: string = PathUtils.join(this.getPagesPath(), `page-${id}.yaml`);

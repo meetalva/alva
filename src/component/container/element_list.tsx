@@ -1,6 +1,6 @@
 import { ElementWrapper } from './elementWrapper';
 import { ListItemProps } from '../../lsg/patterns/list';
-import { createMenu } from '../menu';
+import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page';
 import { PageElement } from '../../store/page/page_element';

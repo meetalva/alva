@@ -6,7 +6,7 @@ import globalStyles from '../lsg/patterns/global-styles';
 import { IconName, IconRegistry } from '../lsg/patterns/icons';
 import { JsonObject } from '../store/json';
 import Layout, { MainArea, SideBar } from '../lsg/patterns/layout';
-import { createMenu } from './menu';
+import { createMenu } from '../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';

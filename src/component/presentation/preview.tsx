@@ -35,7 +35,7 @@ export class Preview extends React.Component<PreviewProps> {
 						alternatively, you can download a prototype style-guide (design kit) from:
 					</p>
 					<p>
-						<a href="https://github.com/meetalva/designkit">
+						<a href="https://github.com/meetalva/designkit/archive/master.zip">
 							https://github.com/meetalva/designkit
 						</a>
 					</p>

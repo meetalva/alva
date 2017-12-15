@@ -21,6 +21,11 @@ export class Pattern {
 	protected name: string;
 
 	/**
+	 * The absolute icon of the pattern.
+	 */
+	protected iconPath?: string;
+
+	/**
 	 * The properties this pattern supports.
 	 */
 	protected properties: Map<string, Property> = new Map();
@@ -52,6 +57,10 @@ export class Pattern {
 
 	public getFolder(): PatternFolder {
 		return this.folder;
+	}
+
+	public getIconPath(): string | undefined {
+		return this.iconPath;
 	}
 
 	public getName(): string {
@@ -99,6 +108,10 @@ export class Pattern {
 					' (we require an index.js and an index.d.ts).'
 			);
 		}
+	}
+
+	public setIconPath(iconPath?: string): void {
+		this.iconPath = iconPath;
 	}
 
 	public setName(name: string): void {

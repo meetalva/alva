@@ -110,6 +110,11 @@ export class TypeScriptParser extends PatternParser {
 		this.sourceFile = undefined;
 
 		const folderPath: string = pattern.getAbsolutePath();
+		const iconPath: string = PathUtils.join(folderPath, 'icon.svg');
+		if (FileUtils.existsSync(iconPath)) {
+			pattern.setIconPath(iconPath);
+		}
+
 		const declarationPath = PathUtils.join(folderPath, 'index.d.ts');
 		const implementationPath = PathUtils.join(folderPath, 'index.js');
 

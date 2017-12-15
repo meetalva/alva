@@ -12,6 +12,8 @@
 		"build-lsg": "tsc --project src/lsg --outDir dist/lsg/patterns --sourceMap",
 		"start-lsg":
 			"npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
+		"clean": "rm -rf dist",
+		"clean-build": "npm run clean && npm run build",
 		"copy-html": "cp src/electron/*.html dist/electron/",
 		"pack": "npm run build && electron-builder --dir",
 		"dist": "npm run build && electron-builder"

@@ -41,9 +41,10 @@ const StyledSelect = styled.select`
 const StyledLabel = styled.span`
 	display: block;
 	margin-bottom: ${getSpace(Size.XS)}px;
-	font-size: 14px;
+	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey70.toString()};
+	text-transform: capitalize;
 `;
 
 export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {

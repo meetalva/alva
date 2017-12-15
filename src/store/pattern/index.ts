@@ -98,6 +98,11 @@ export class Pattern {
 		parsers.forEach(parser => {
 			if (parser.parse(this)) {
 				this.valid = true;
+				console.debug(`Successfully parsed pattern "${this.getRelativePath()}", properties:`);
+				this.properties.forEach(property => {
+					console.debug(property.toString());
+				});
+				console.debug('');
 			}
 		});
 

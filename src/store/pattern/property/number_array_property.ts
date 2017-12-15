@@ -16,6 +16,6 @@ export class NumberArrayProperty extends Property {
 	}
 
 	public toString(): string {
-		return `NumberArrayProperty(id="${this.getId()}", required="${this.isRequired()}")`;
+		return `NumberArrayProperty(${super.toString()})`;
 	}
 }

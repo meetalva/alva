@@ -13,9 +13,21 @@ export class PageElement {
 	private pattern?: Pattern;
 	@MobX.observable private propertyValues: Map<string, PropertyValue> = new Map();
 
-	public constructor(pattern?: Pattern, parent?: PageElement) {
+	public constructor(pattern?: Pattern, setDefaults?: boolean, parent?: PageElement) {
 		this.pattern = pattern;
 		this.patternPath = pattern ? pattern.getRelativePath().replace(PathUtils.sep, '/') : '';
+
+		if (setDefaults && this.pattern) {
+			this.pattern.getProperties().forEach(property => {
+				this.setPropertyValue(property.getId(), property.getDefaultValue());
+				console.log(
+					`Property ${property.getId()}: Set default ${JSON.stringify(
+						this.getPropertyValue(property.getId())
+					)}`
+				);
+			});
+		}
+
 		this.setParent(parent);
 	}
 
@@ -26,7 +38,7 @@ export class PageElement {
 	): PageElement | undefined {
 		const patternPath: string = json['pattern'] as string;
 		const pattern: Pattern | undefined = store.getPattern(patternPath);
-		const element = new PageElement(pattern, parent);
+		const element = new PageElement(pattern, false, parent);
 
 		if (!pattern) {
 			console.warn(`Ignoring unknown pattern "${patternPath}"`);
@@ -80,7 +92,7 @@ export class PageElement {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
 			return PageElement.fromJsonObject(json as JsonObject, store, this);
 		} else {
-			const element: PageElement = new PageElement(store.getPattern('text'), this);
+			const element: PageElement = new PageElement(store.getPattern('text'), false, this);
 			element.setPropertyValue('text', String(json));
 			return element;
 		}

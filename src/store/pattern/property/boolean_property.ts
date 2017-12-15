@@ -15,6 +15,6 @@ export class BooleanProperty extends Property {
 	}
 
 	public toString(): string {
-		return `BooleanProperty(id="${this.getId()}", required="${this.isRequired()}")`;
+		return `BooleanProperty(${super.toString()})`;
 	}
 }

@@ -1,4 +1,6 @@
 export abstract class Property {
+	// tslint:disable-next-line:no-any
+	private defaultValue: any;
 	private id: string;
 	private name: string;
 	private required: boolean = false;
@@ -63,6 +65,11 @@ export abstract class Property {
 		return value;
 	}
 
+	// tslint:disable-next-line:no-any
+	public getDefaultValue(): any {
+		return this.defaultValue;
+	}
+
 	public getId(): string {
 		return this.id;
 	}
@@ -77,11 +84,32 @@ export abstract class Property {
 		return this.required;
 	}
 
+	// tslint:disable-next-line:no-any
+	public setDefaultValue(defaultValue: any): void {
+		this.defaultValue = defaultValue;
+	}
+
 	public setName(name: string): void {
 		this.name = name;
 	}
 
 	public setRequired(required: boolean): void {
 		this.required = required;
+	}
+
+	// tslint:disable-next-line:no-any
+	protected getToStringProperties(): [string, any][] {
+		return [
+			['id', this.id],
+			['name', this.name],
+			['required', this.required],
+			['default', this.defaultValue]
+		];
+	}
+
+	public toString(): string {
+		// tslint:disable-next-line:no-any
+		const properties: [string, any][] = this.getToStringProperties();
+		return properties.map(([id, value]) => `${id}=${JSON.stringify(value)}`).join(', ');
 	}
 }

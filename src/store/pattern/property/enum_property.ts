@@ -19,6 +19,18 @@ export class EnumProperty extends Property {
 			return undefined;
 		}
 
+		for (const option of this.options) {
+			if (option.getId() === value.toString()) {
+				return option.getId();
+			}
+		}
+
+		for (const option of this.options) {
+			if (option.getName() === value.toString()) {
+				return option.getId();
+			}
+		}
+
 		return String(value);
 	}
 
@@ -47,8 +59,15 @@ export class EnumProperty extends Property {
 		});
 	}
 
+	// tslint:disable-next-line:no-any
+	protected getToStringProperties(): [string, any][] {
+		const result = super.getToStringProperties();
+		result.push(['options', this.options]);
+		return result;
+	}
+
 	public toString(): string {
-		return `EnumProperty(id="${this.getId()}", required="${this.isRequired()}")`;
+		return `EnumProperty(${super.toString()})`;
 	}
 }
 
@@ -76,6 +95,6 @@ export class Option {
 	}
 
 	public toString(): string {
-		return `Option(id="${this.id}", name="${this.name}")`;
+		return `Option(id="${this.id}", name="${this.name}", ordinal="${this.ordinal}")`;
 	}
 }

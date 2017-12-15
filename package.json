@@ -1,20 +1,16 @@
 {
   "name": "meetalva",
-  "version": "0.1.1",
-  "description":
-    "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
+  "version": "0.1.2",
+  "description": "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
   "main": "./build/electron/index.js",
   "scripts": {
-    "build":
-      "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/*.html build/electron/",
+    "build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/*.html build/electron/",
     "build-lsg": "tsc --project src/lsg --outDir build/lsg/patterns --sourceMap",
-    "start":
-      "npm run build && concurrently \"electron build/electron\" \"tsc --project . --watch\"",
-    "start-lsg":
-      "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
+    "start": "npm run build && concurrently \"electron build/electron\" \"tsc --project . --watch\"",
+    "start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
     "clean": "rm -rf build && rm -rf dist",
     "clean-build": "npm run clean && npm run build",
-    "dist": "npm run clean-build && electron-builder -mwl && standard-version"
+    "dist": "standard-version"
   },
   "repository": {
     "type": "git",
@@ -38,7 +34,10 @@
     "mac": {
       "category": "public.app-category.graphics-design"
     },
-    "files": ["build/**/*", "package.json"],
+    "files": [
+      "build/**/*",
+      "package.json"
+    ],
     "directories": {
       "buildResources": "src/resources",
       "output": "dist"

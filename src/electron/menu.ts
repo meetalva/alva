@@ -9,14 +9,17 @@ export function createMenu(store: Store): void {
 			label: '&File',
 			submenu: [
 				{
-					label: '&Open Project',
+					label: '&Open Styleguide',
 					accelerator: 'CmdOrCtrl+O',
 					click: () => {
 						dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
 							store.openStyleguide(filePaths[0]);
-							store.openPage('homepage');
+							store.openFirstPage();
 						});
 					}
+				},
+				{
+					type: 'separator'
 				},
 				{
 					label: 'New &Page',

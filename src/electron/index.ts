@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import * as devToolsInstaller from 'electron-devtools-installer';
+import { autoUpdater } from 'electron-updater';
 import * as PathUtils from 'path';
 import * as url from 'url';
 
@@ -65,5 +66,9 @@ app.on('activate', () => {
 	// dock icon is clicked and there are no other windows open.
 	if (!win) {
 		createWindow();
+		// tslint:disable-next-line:no-any
+		autoUpdater.checkForUpdatesAndNotify().catch((e: any) => {
+			console.log('There was a error:', e);
+		});
 	}
 });

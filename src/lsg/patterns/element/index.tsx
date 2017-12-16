@@ -64,7 +64,6 @@ const StyledElementLabel = styled.div`
 		background: ${colors.grey90.toString()};
 	}
 
-
 	${(props: StyledElementLabelProps) =>
 		props.active
 			? `
@@ -123,10 +122,11 @@ const StyledElementChild = styled.div`
 
 const StyledIcon = styled(Icon)`
 	position: absolute;
-	left: ${getSpace(Size.XS)}px;
+	left: 0;
 	fill: ${colors.grey70.toString()};
 	width: 12px;
 	height: 12px;
+	padding: ${getSpace(Size.XS)}px;
 	transition: transform 0.2s;
 
 	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};

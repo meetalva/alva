@@ -21,7 +21,7 @@ const StyledBooleanItem = styled.div`
 
 const StyledLabelWrapper = styled.label`
 	display: block;
-	margin-bottom: ${getSpace(Size.XXL)}px;
+	margin-bottom: ${getSpace(Size.L)}px;
 `;
 
 const indicatorWidth = 42;

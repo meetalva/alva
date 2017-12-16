@@ -17,7 +17,7 @@ export interface EnumItemProps {
 const StyledEnumItem = styled.div`
 	width: 100%;
 `;
-    
+
 const StyledSelect = styled.select`
 	appearance: none;
 	border: none;
@@ -28,15 +28,15 @@ const StyledSelect = styled.select`
 	color: ${colors.grey36.toString()};
 	font-size: 15px;
 	border-bottom: 1px solid transparent;
-	padding-bottom: ${getSpace(Size.M)/2}px;
+	padding-bottom: ${getSpace(Size.M) / 2}px;
 	margin-bottom: ${getSpace(Size.L)}px;
 	transition: all 0.2s;
-	
+
 	&:hover {
 		color: ${colors.black.toString()};
 		border-color: ${colors.grey70.toString()};
 	}
-	
+
 	&:focus {
 		outline: none;
 		border-color: ${colors.blue.toString()};
@@ -62,7 +62,7 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 			<StyledSelect
 				className={className}
 				onChange={handleChange}
-				defaultValue={selectedValue ? selectedValue.getId() : ''}
+				value={selectedValue ? selectedValue.getId() : ''}
 			>
 				{!required && <option key="empty" value="" />}
 				{values.map(value => (

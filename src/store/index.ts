@@ -186,7 +186,7 @@ export class Store {
 		this.rearrangeElement = rearrangeElement;
 	}
 
-	public setSelectedElement(selectedElement: PageElement): void {
+	public setSelectedElement(selectedElement: PageElement | undefined): void {
 		this.selectedElement = selectedElement;
 	}
 

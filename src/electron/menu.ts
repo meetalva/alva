@@ -144,6 +144,7 @@ export function createMenu(store: Store): void {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						if (selectedElement) {
 							selectedElement.remove();
+							store.setSelectedElement(undefined);
 						} else {
 							Menu.sendActionToFirstResponder('Backspace');
 						}

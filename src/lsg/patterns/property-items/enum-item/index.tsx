@@ -27,9 +27,15 @@ const StyledSelect = styled.select`
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
 	font-size: 15px;
-	border-bottom: 1px solid ${colors.grey70.toString()};
+	border-bottom: 1px solid transparent;
 	padding-bottom: ${getSpace(Size.M)/2}px;
-	margin-bottom: ${getSpace(Size.XXL)}px;
+	margin-bottom: ${getSpace(Size.L)}px;
+	transition: all 0.2s;
+	
+	&:hover {
+		color: ${colors.black.toString()};
+		border-color: ${colors.grey70.toString()};
+	}
 	
 	&:focus {
 		outline: none;

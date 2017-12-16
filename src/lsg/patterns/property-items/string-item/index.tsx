@@ -34,11 +34,11 @@ const StyledInput = styled.input`
 	background: transparent;
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 15px;
-	padding-bottom: ${getSpace(Size.M)/2}px;
+	padding-bottom: ${getSpace(Size.M) / 2}px;
 	color: ${colors.grey36.toString()};
 	margin-bottom: ${getSpace(Size.L)}px;
 	transition: all 0.2s;
-	
+
 	::-webkit-input-placeholder {
 		color: ${colors.grey70.toString()};
 	}
@@ -47,7 +47,7 @@ const StyledInput = styled.input`
 		color: ${colors.black.toString()};
 		border-color: ${colors.grey70.toString()};
 	}
-	
+
 	&:focus {
 		outline: none;
 		border-color: ${colors.blue.toString()};
@@ -62,7 +62,12 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 		<StyledStringItem className={className}>
 			<label>
 				<StyledLabel>{label}</StyledLabel>
-				<StyledInput onChange={handleChange} type="textarea" defaultValue={value} placeholder="Type in"/>
+				<StyledInput
+					onChange={handleChange}
+					type="textarea"
+					value={value}
+					placeholder="Type in"
+				/>
 			</label>
 		</StyledStringItem>
 	);

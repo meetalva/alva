@@ -11,7 +11,7 @@ let win: BrowserWindow | undefined;
 function createWindow(): void {
 	// Create the browser window.
 	win = new BrowserWindow({
-		width: 1800,
+		width: 1280,
 		height: 800,
 		titleBarStyle: 'hiddenInset',
 		title: 'Alva'

@@ -58,6 +58,13 @@ export class PageElement {
 		child.setParent(this, index);
 	}
 
+	public addSibling(child: PageElement): void {
+		const parentElement: PageElement | undefined = this.getParent();
+		if (parentElement) {
+			child.setParent(parentElement, this.getIndex() + 1);
+		}
+	}
+
 	public clone(): PageElement {
 		const clone = new PageElement(this.pattern);
 		this.children.forEach(child => {

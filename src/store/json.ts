@@ -28,7 +28,7 @@ export class Persister {
 	}
 
 	public static saveYaml(path: string, jsonObject: JsonObject): void {
-		const fileContent: string = JsYaml.safeDump(jsonObject, { noRefs: true });
+		const fileContent: string = JsYaml.safeDump(jsonObject, { skipInvalid: true, noRefs: true });
 		FileUtils.writeFileSync(path, fileContent, 'utf8');
 	}
 }

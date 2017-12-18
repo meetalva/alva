@@ -31,8 +31,8 @@ export class Preview extends React.Component<PreviewProps> {
 						digital products.
 					</p>
 					<p>
-						To get started, you need a style-guide project (like a Patternplate project), or
-						alternatively, you can download a prototype style-guide (design kit) from:
+						To get started, you need a styleguide project (like a Patternplate project), or
+						alternatively, you can download a prototype styleguide (design kit) from:
 					</p>
 					<p>
 						<a href="https://github.com/meetalva/designkit/archive/master.zip">

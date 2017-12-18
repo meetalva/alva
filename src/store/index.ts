@@ -2,11 +2,13 @@ import { PatternFolder } from './pattern/folder';
 import { JsonArray, JsonObject, Persister } from './json';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
+import * as OsUtils from 'os';
 import { Page } from './page';
 import { PageElement } from './page/page_element';
 import { PageRef } from './project/page_ref';
 import * as PathUtils from 'path';
 import { Pattern } from './pattern';
+import { Preferences } from './preferences';
 import { Project } from './project';
 
 export class Store {
@@ -16,9 +18,34 @@ export class Store {
 	@MobX.observable private patternSearchTerm: string = '';
 	@MobX.observable private projects: Project[] = [];
 	@MobX.observable private patternRoot: PatternFolder;
+	@MobX.observable private preferences: Preferences;
 	@MobX.observable private selectedElement?: PageElement | undefined;
 	@MobX.observable private elementHasFocus?: boolean = false;
 	@MobX.observable private styleGuidePath: string;
+
+	public constructor() {
+		try {
+			this.preferences = Preferences.fromJsonObject(
+				Persister.loadYamlOrJson(this.getPreferencesPath())
+			);
+		} catch (error) {
+			this.preferences = new Preferences();
+		}
+
+		try {
+			const lastStyleguidePath = this.preferences.getLastStyleguidePath();
+			if (lastStyleguidePath) {
+				this.openStyleguide(lastStyleguidePath);
+
+				const lastPageId = this.preferences.getLastPageId();
+				if (lastPageId) {
+					this.openPage(lastPageId);
+				}
+			}
+		} catch (error) {
+			console.error(`Failed to open last styleguide or page: ${error}`);
+		}
+	}
 
 	public addProject(project: Project): void {
 		this.projects.push(project);
@@ -82,6 +109,10 @@ export class Store {
 		return this.patternSearchTerm;
 	}
 
+	public getPreferencesPath(): string {
+		return PathUtils.join(OsUtils.homedir(), '.alva-prefs.yaml');
+	}
+
 	public getProjects(): Project[] {
 		return this.projects;
 	}
@@ -98,13 +129,13 @@ export class Store {
 		return this.styleGuidePath;
 	}
 
-	public openStyleguide(styleGuidePath: string): void {
+	public openStyleguide(styleguidePath: string): void {
 		MobX.transaction(() => {
-			if (!PathUtils.isAbsolute(styleGuidePath)) {
+			if (!PathUtils.isAbsolute(styleguidePath)) {
 				// Currently, store is two levels below alva, so go two up
-				styleGuidePath = PathUtils.join(styleGuidePath);
+				styleguidePath = PathUtils.join(styleguidePath);
 			}
-			this.styleGuidePath = styleGuidePath;
+			this.styleGuidePath = styleguidePath;
 			this.currentPage = undefined;
 			this.patternRoot = new PatternFolder(this, '');
 			this.patternRoot.addTextPattern();
@@ -117,6 +148,9 @@ export class Store {
 				this.addProject(project);
 			});
 		});
+
+		this.preferences.setLastStyleguidePath(styleguidePath);
+		this.savePreferences();
 	}
 
 	public openFirstPage(): void {
@@ -140,6 +174,9 @@ export class Store {
 
 			this.selectedElement = undefined;
 		});
+
+		this.preferences.setLastPageId(this.currentPage ? this.currentPage.getId() : undefined);
+		this.savePreferences();
 	}
 
 	public removeProject(project: Project): void {
@@ -161,6 +198,10 @@ export class Store {
 		});
 		const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.yaml');
 		Persister.saveYaml(projectsPath, projectsJsonObject);
+	}
+
+	private savePreferences(): void {
+		Persister.saveYaml(this.getPreferencesPath(), this.preferences.toJsonObject());
 	}
 
 	public searchPatterns(term: string): Pattern[] {

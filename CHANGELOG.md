@@ -2,6 +2,50 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/meetalva/alva/compare/v0.3.0...v0.4.0) (2017-12-18)
+
+
+### Bug Fixes
+
+* **component:** completly remove mobx devtools for now ([54970fe](https://github.com/meetalva/alva/commit/54970fe))
+* **component:** readd mobx devtools ([3423ec7](https://github.com/meetalva/alva/commit/3423ec7))
+* **component:** remove unused const ([a1939b1](https://github.com/meetalva/alva/commit/a1939b1))
+* **components:** remove developer tools in production ([813ddd8](https://github.com/meetalva/alva/commit/813ddd8))
+* **lsg:** broken intendantion ([2bad46f](https://github.com/meetalva/alva/commit/2bad46f))
+* **lsg:** element property update on property patterns ([822b2b2](https://github.com/meetalva/alva/commit/822b2b2)), closes [#57](https://github.com/meetalva/alva/issues/57)
+* **store:** clear selected element after element deletion ([5a21e46](https://github.com/meetalva/alva/commit/5a21e46)), closes [#58](https://github.com/meetalva/alva/issues/58)
+
+
+### Features
+
+* **component:** add direct download link to designkit ([e31dead](https://github.com/meetalva/alva/commit/e31dead))
+* **component:** add pattern as next sibling of selected element when clicking on pattern item ([943cc5d](https://github.com/meetalva/alva/commit/943cc5d)), closes [#63](https://github.com/meetalva/alva/issues/63)
+* **lsg:** add hover to property items ([2c1d6ee](https://github.com/meetalva/alva/commit/2c1d6ee))
+* **lsg:** add styling to property boolean ([0bc168d](https://github.com/meetalva/alva/commit/0bc168d))
+* **lsg:** add styling to property enum and add spacing to property items ([590e21b](https://github.com/meetalva/alva/commit/590e21b))
+* **lsg:** bigger click-area for open/close icon on page-element ([#62](https://github.com/meetalva/alva/issues/62)) ([b78a347](https://github.com/meetalva/alva/commit/b78a347)), closes [#61](https://github.com/meetalva/alva/issues/61)
+* **lsg:** change icon size ([bc0ff66](https://github.com/meetalva/alva/commit/bc0ff66))
+* **lsg:** introduce dropdown component ([5c60539](https://github.com/meetalva/alva/commit/5c60539))
+* **lsg:** when dragging a pattern only the icon should be visible under the cursor ([c63db83](https://github.com/meetalva/alva/commit/c63db83))
+* **menu:** add pasted page-elements as siblings ([602f5c6](https://github.com/meetalva/alva/commit/602f5c6)), closes [#63](https://github.com/meetalva/alva/issues/63)
+* **menu:** menu item to create a new copy of the designkit at specific location ([1144b25](https://github.com/meetalva/alva/commit/1144b25))
+* **menu:** windows should use delete key for removing patterns ([#77](https://github.com/meetalva/alva/issues/77)) ([26d8e9d](https://github.com/meetalva/alva/commit/26d8e9d))
+* **resources:** renew icon ([c56d159](https://github.com/meetalva/alva/commit/c56d159))
+* **store:** add new function to add child as sibling to selected element ([c9d373b](https://github.com/meetalva/alva/commit/c9d373b))
+* **store:** auto-saving page when switching to another page or styleguide ([1c96caf](https://github.com/meetalva/alva/commit/1c96caf))
+* **store:** hiding of properties per meta-data ([0bab560](https://github.com/meetalva/alva/commit/0bab560))
+* **store:** open first page of a given project ([3517990](https://github.com/meetalva/alva/commit/3517990))
+* **store:** page element ancestry methods for drag-drop checks ([f3c9cd7](https://github.com/meetalva/alva/commit/f3c9cd7))
+* **store:** save preference of last opened styleguide and page ([d833658](https://github.com/meetalva/alva/commit/d833658))
+* **store:** support for default property values ([da599c8](https://github.com/meetalva/alva/commit/da599c8))
+* **update:** add notification when there is a new version and try to auto update ([32c259c](https://github.com/meetalva/alva/commit/32c259c))
+* add dropdown to pages, rename visible to open ([5b18a8a](https://github.com/meetalva/alva/commit/5b18a8a))
+* add project list dropdown to chrome ([1017ddf](https://github.com/meetalva/alva/commit/1017ddf))
+* remove lsg interface from component, make pattern list component independent from list compone ([245df6d](https://github.com/meetalva/alva/commit/245df6d))
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/meetalva/alva/compare/v0.2.1...v0.3.0) (2017-12-15)
 

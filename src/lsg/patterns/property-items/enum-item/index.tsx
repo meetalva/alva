@@ -49,7 +49,7 @@ const StyledLabel = styled.span`
 	margin-bottom: ${getSpace(Size.XS)}px;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey70.toString()};
+	color: ${colors.grey36.toString()};
 	text-transform: capitalize;
 `;
 

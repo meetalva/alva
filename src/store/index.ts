@@ -156,12 +156,19 @@ export class Store {
 		this.savePreferences();
 	}
 
-	public openFirstPage(): void {
+	public openFirstPage(projectId?: string): void {
 		if (!this.projects.length) {
 			return;
 		}
 
-		const pages: PageRef[] = this.projects[0].getPages();
+		let project: Project = this.projects[0];
+		this.projects.forEach(candidate => {
+			if (candidate.getId() === projectId) {
+				project = candidate;
+			}
+		});
+
+		const pages: PageRef[] = project.getPages();
 		if (!pages.length) {
 			return;
 		}

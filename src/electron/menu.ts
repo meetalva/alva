@@ -101,7 +101,7 @@ export function createMenu(store: Store): void {
 						const clipboardElement: PageElement | undefined = store.getClipboardElement();
 						if (selectedElement && clipboardElement && store.getElementFocus()) {
 							const newPageElement = clipboardElement.clone();
-							selectedElement.addChild(newPageElement);
+							selectedElement.addSibling(newPageElement);
 							store.setSelectedElement(newPageElement);
 						}
 						Menu.sendActionToFirstResponder('paste:');
@@ -116,12 +116,9 @@ export function createMenu(store: Store): void {
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						if (selectedElement && store.getElementFocus()) {
-							const parentElement: PageElement | undefined = selectedElement.getParent();
-							if (parentElement) {
-								const newPageElement = selectedElement.clone();
-								parentElement.addChild(newPageElement, selectedElement.getIndex());
-								store.setSelectedElement(newPageElement);
-							}
+							const newPageElement = selectedElement.clone();
+							selectedElement.addSibling(newPageElement);
+							store.setSelectedElement(newPageElement);
 						}
 					}
 				},

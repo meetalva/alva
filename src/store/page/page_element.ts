@@ -138,6 +138,20 @@ export class PageElement {
 		return value;
 	}
 
+	public isAncestorOf(child?: PageElement): boolean {
+		if (!child) {
+			return false;
+		} else if (child === this) {
+			return true;
+		} else {
+			return this.isAncestorOf(child.getParent());
+		}
+	}
+
+	public isDescendentOf(parent?: PageElement): boolean {
+		return parent ? parent.isAncestorOf(this) : false;
+	}
+
 	public isRoot(): boolean {
 		return this.parent === undefined;
 	}

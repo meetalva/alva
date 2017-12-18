@@ -2,6 +2,7 @@ export abstract class Property {
 	// tslint:disable-next-line:no-any
 	private defaultValue: any;
 	private id: string;
+	private hidden: boolean = false;
 	private name: string;
 	private required: boolean = false;
 
@@ -78,7 +79,21 @@ export abstract class Property {
 		return this.name;
 	}
 
+	// tslint:disable-next-line:no-any
+	protected getToStringProperties(): [string, any][] {
+		return [
+			['id', this.id],
+			['name', this.name],
+			['required', this.required],
+			['default', this.defaultValue]
+		];
+	}
+
 	public abstract getType(): string;
+
+	public isHidden(): boolean {
+		return this.hidden;
+	}
 
 	public isRequired(): boolean {
 		return this.required;
@@ -89,22 +104,16 @@ export abstract class Property {
 		this.defaultValue = defaultValue;
 	}
 
+	public setHidden(hidden: boolean): void {
+		this.hidden = hidden;
+	}
+
 	public setName(name: string): void {
 		this.name = name;
 	}
 
 	public setRequired(required: boolean): void {
 		this.required = required;
-	}
-
-	// tslint:disable-next-line:no-any
-	protected getToStringProperties(): [string, any][] {
-		return [
-			['id', this.id],
-			['name', this.name],
-			['required', this.required],
-			['default', this.defaultValue]
-		];
 	}
 
 	public toString(): string {

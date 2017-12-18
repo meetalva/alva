@@ -90,17 +90,19 @@ export class TypeScriptParser extends PatternParser {
 
 	protected getJsDocValue(node: ts.Node, tagName: string): string | undefined {
 		const jsDocTags: ReadonlyArray<ts.JSDocTag> | undefined = ts.getJSDocTags(node);
-		let result = '';
+		let result: string | undefined;
 		if (jsDocTags) {
 			jsDocTags.forEach(jsDocTag => {
 				if (jsDocTag.tagName && jsDocTag.tagName.text === tagName) {
+					if (result === undefined) {
+						result = '';
+					}
 					result += ` ${jsDocTag.comment}`;
 				}
 			});
 		}
 
-		result = result.trim();
-		return result.length > 0 ? result : undefined;
+		return result === undefined ? undefined : result.trim();
 	}
 
 	protected getPropsTypeName(): string {
@@ -177,6 +179,7 @@ export class TypeScriptParser extends PatternParser {
 		}
 
 		property.setRequired(signature.questionToken === undefined);
+		property.setHidden(this.getJsDocValue(signature, 'hidden') !== undefined);
 
 		const defaultValue: string | undefined = this.getJsDocValue(signature, 'default');
 		if (defaultValue !== undefined) {

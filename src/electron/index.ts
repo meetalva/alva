@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import * as PathUtils from 'path';
 import * as url from 'url';
@@ -51,12 +51,56 @@ function createWindow(): void {
 				console.warn('An error occurred: ', err);
 			});
 	}
+
+	autoUpdater.checkForUpdatesAndNotify().catch(() => {
+		sendStatusToWindow('Error in auto-updater.');
+	});
 }
+function sendStatusToWindow(text: string): void {
+	if (win) {
+		win.webContents.send('message', text);
+	}
+}
+
+const log = require('electron-log');
+log.transports.file.level = 'info';
+autoUpdater.logger = log;
+log.info('App starting...');
+
+autoUpdater.on('checking-for-update', info => {
+	sendStatusToWindow('Checking for update...');
+});
+
+autoUpdater.on('update-available', info => {
+	sendStatusToWindow('Update available.');
+	dialog.showMessageBox({ message: `There is a new Alva version: ${info.version}` });
+});
+
+autoUpdater.on('update-not-available', info => {
+	sendStatusToWindow('Update not available.');
+});
+
+autoUpdater.on('error', err => {
+	sendStatusToWindow(`Error in auto-updater. ${err}`);
+});
+
+autoUpdater.on('download-progress', progressObj => {
+	let log_message = `Download speed: ${progressObj.bytesPerSecond}`;
+	log_message = `${log_message} - Downloaded ${progressObj.percent}%`;
+	log_message = `${log_message} (${progressObj.transferred}/${progressObj.total})`;
+	sendStatusToWindow(log_message);
+});
+
+autoUpdater.on('update-downloaded', info => {
+	sendStatusToWindow('Update downloaded');
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', () => {
+	createWindow();
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -72,9 +116,5 @@ app.on('activate', () => {
 	// dock icon is clicked and there are no other windows open.
 	if (!win) {
 		createWindow();
-		// tslint:disable-next-line:no-any
-		autoUpdater.checkForUpdatesAndNotify().catch((e: any) => {
-			console.log('There was a error:', e);
-		});
 	}
 });

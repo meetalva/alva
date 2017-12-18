@@ -1,5 +1,7 @@
 import { BrowserWindow, MenuItem, MenuItemConstructorOptions, remote, WebContents } from 'electron';
+import * as FileExtraUtils from 'fs-extra';
 import { PageElement } from '../store/page/page_element';
+import * as PathUtils from 'path';
 import { Store } from '../store';
 const { Menu, shell, app, dialog } = remote;
 
@@ -8,6 +10,19 @@ export function createMenu(store: Store): void {
 		{
 			label: '&File',
 			submenu: [
+				{
+					label: '&Create Styleguide',
+					click: () => {
+						dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
+							FileExtraUtils.copySync(
+								PathUtils.join('resources', 'app.asar.unpacked', 'build', 'designkit'),
+								PathUtils.join(filePaths[0], 'designkit')
+							);
+							store.openStyleguide(`${filePaths[0]}/designkit`);
+							store.openFirstPage();
+						});
+					}
+				},
 				{
 					label: '&Open Styleguide',
 					accelerator: 'CmdOrCtrl+O',

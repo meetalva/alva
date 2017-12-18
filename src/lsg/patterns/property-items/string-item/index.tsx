@@ -21,7 +21,7 @@ const StyledLabel = styled.span`
 	font-size: 12px;
 	text-transform: capitalize;
 	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey70.toString()};
+	color: ${colors.black.toString()};
 `;
 
 const StyledInput = styled.input`

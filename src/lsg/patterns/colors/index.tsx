@@ -59,8 +59,12 @@ export const colors = {
 		rgb: [109, 158, 225]
 	}),
 	grey36: new Color({
-		displayName: 'Grey 70',
+		displayName: 'Grey 36',
 		rgb: [92, 92, 92]
+	}),
+	grey50: new Color({
+		displayName: 'Grey 50',
+		rgb: [128, 128, 128]
 	}),
 	grey70: new Color({
 		displayName: 'Grey 70',

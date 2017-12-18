@@ -33,7 +33,7 @@ const StyledIndicator = styled.span`
 	display: block;
 	width: ${indicatorWidth}px;
 	height: ${indicatorHeight}px;
-	border-radius: ${indicatorHeight/2}px;
+	border-radius: ${indicatorHeight / 2}px;
 	background: ${colors.grey90.toString()};
 	box-sizing: border-box;
 	box-shadow: inset 0 0 0 ${indicatorBorderWidth}px ${colors.grey70.toString()};
@@ -69,7 +69,7 @@ const StyledLabel = styled.span`
 	display: block;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey70.toString()};
+	color: ${colors.black.toString()};
 	text-transform: capitalize;
 	margin-bottom: ${getSpace(Size.XS)}px;
 `;

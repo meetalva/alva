@@ -137,6 +137,12 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	@action
 	protected handleDragStart(e: React.DragEvent<HTMLElement>, pattern: Pattern): void {
 		const data = pattern.getRelativePath();
+		e.dataTransfer.dropEffect = 'copy';
+		e.dataTransfer.setDragImage(
+			e.currentTarget.querySelector('.pattern__icon') as Element,
+			12,
+			12
+		);
 		e.dataTransfer.setData('patternPath', data);
 	}
 }

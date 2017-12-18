@@ -54,9 +54,14 @@ export const PatternListItem: React.StatelessComponent<PatternListItemProps> = p
 	return (
 		<StyledPatternListItem onDragStart={handleDragStart} draggable={draggable} onClick={onClick}>
 			{icon ? (
-				<StyledSVG>{icon}</StyledSVG>
+				<StyledSVG className="pattern__icon">{icon}</StyledSVG>
 			) : (
-				<StyledIcon name={IconName.Robo} size={IconSize.XS} color={colors.grey70} />
+				<StyledIcon
+					className="pattern__icon"
+					name={IconName.Robo}
+					size={IconSize.XS}
+					color={colors.grey70}
+				/>
 			)}
 			{props.children}
 		</StyledPatternListItem>

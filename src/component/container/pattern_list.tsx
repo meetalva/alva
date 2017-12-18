@@ -13,8 +13,8 @@ export interface PatternListContainerProps {
 	store: Store;
 }
 
-export interface PatternFoo {
-	children?: PatternFoo[];
+export interface PatternListContainerItemProps {
+	children?: PatternListContainerItemProps[];
 	draggable?: boolean;
 	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
@@ -23,7 +23,7 @@ export interface PatternFoo {
 
 @observer
 export class PatternListContainer extends React.Component<PatternListContainerProps> {
-	public items: PatternFoo[] = [];
+	public items: PatternListContainerItemProps[] = [];
 	public constructor(props: PatternListContainerProps) {
 		super(props);
 
@@ -32,8 +32,11 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 		this.handleDragStart = this.handleDragStart.bind(this);
 	}
 
-	public search(listItem: PatternFoo[], term: string): PatternFoo[] {
-		const result: PatternFoo[] = [];
+	public search(
+		listItem: PatternListContainerItemProps[],
+		term: string
+	): PatternListContainerItemProps[] {
+		const result: PatternListContainerItemProps[] = [];
 
 		listItem.map(item => {
 			if (item.value.indexOf(term) !== -1 && !item.children) {
@@ -62,11 +65,11 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 		);
 	}
 
-	public createItemsFromFolder(folder: PatternFolder): PatternFoo[] {
-		const result: PatternFoo[] = [];
+	public createItemsFromFolder(folder: PatternFolder): PatternListContainerItemProps[] {
+		const result: PatternListContainerItemProps[] = [];
 		if (folder) {
 			folder.getChildren().forEach((child: PatternFolder) => {
-				const childItem: PatternFoo = { value: child.getName() };
+				const childItem: PatternListContainerItemProps = { value: child.getName() };
 				childItem.children = this.createItemsFromFolder(child);
 				result.push(childItem);
 			});
@@ -88,10 +91,10 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 		return result;
 	}
 
-	public createList(items: PatternFoo[]): JSX.Element {
+	public createList(items: PatternListContainerItemProps[]): JSX.Element {
 		return (
 			<div>
-				{items.map((props: PatternFoo, index: number) => {
+				{items.map((props: PatternListContainerItemProps, index: number) => {
 					if (props.children) {
 						return (
 							<div>

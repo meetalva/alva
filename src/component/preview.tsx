@@ -1,7 +1,6 @@
 import { ipcRenderer } from 'electron';
 import { JsonObject } from '../store/json';
 import { observer } from 'mobx-react';
-import DevTools from 'mobx-react-devtools';
 import { Page } from '../store/page';
 import { Preview } from './presentation/preview';
 import * as React from 'react';
@@ -23,10 +22,18 @@ class PreviewApp extends React.Component<PreviewAppProps, PreviewAppState> {
 	}
 
 	public render(): JSX.Element {
+		let DevTools;
+		try {
+			const DevToolsExports = require('mobx-react-devtools');
+			DevTools = DevToolsExports ? DevToolsExports.default : undefined;
+		} catch (error) {
+			// Ignored
+		}
+
 		return (
 			<div>
 				<Preview page={this.props.store.getCurrentPage()} />
-				<DevTools />
+				{DevTools ? <DevTools.default /> : <div />}
 			</div>
 		);
 	}

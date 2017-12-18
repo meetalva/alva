@@ -9,7 +9,6 @@ import Layout, { MainArea, SideBar } from '../lsg/patterns/layout';
 import { createMenu } from '../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
-import DevTools from 'mobx-react-devtools';
 import { Page } from '../store/page';
 import { PatternListContainer } from './container/pattern_list';
 import PatternsPane from '../lsg/patterns/panes/patterns-pane';
@@ -60,6 +59,14 @@ class App extends React.Component<AppProps> {
 		const page = this.props.store.getCurrentPage();
 		const title = `${project && project.getName()} > ${page && page.getName()}`;
 
+		let DevTools;
+		try {
+			const DevToolsExports = require('mobx-react-devtools');
+			DevTools = DevToolsExports ? DevToolsExports.default : undefined;
+		} catch (error) {
+			// Ignored
+		}
+
 		return (
 			<Layout directionVertical handleClick={this.handleMainWindowClick}>
 				<Chrome title={title} />
@@ -84,7 +91,7 @@ class App extends React.Component<AppProps> {
 					</SideBar>
 					<IconRegistry names={IconName} />
 				</MainArea>
-				<DevTools />
+				{DevTools ? <DevTools /> : <div />}
 			</Layout>
 		);
 	}

@@ -22,9 +22,18 @@ class PreviewApp extends React.Component<PreviewAppProps, PreviewAppState> {
 	}
 
 	public render(): JSX.Element {
+		let DevTools;
+		try {
+			const DevToolsExports = require('mobx-react-devtools');
+			DevTools = DevToolsExports ? DevToolsExports.default : undefined;
+		} catch (error) {
+			// Ignored
+		}
+
 		return (
 			<div>
 				<Preview page={this.props.store.getCurrentPage()} />
+				{DevTools ? <DevTools /> : ''}
 			</div>
 		);
 	}

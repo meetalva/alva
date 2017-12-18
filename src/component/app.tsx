@@ -95,7 +95,7 @@ class App extends React.Component<AppProps> {
 					</SideBar>
 					<IconRegistry names={IconName} />
 				</MainArea>
-				{DevTools ? <DevTools /> : <div />}
+				{DevTools ? <DevTools /> : ''}
 			</Layout>
 		);
 	}

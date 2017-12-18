@@ -10,6 +10,7 @@ import { createMenu } from '../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import { Page } from '../store/page';
+import { PageList } from './container/page_list';
 import { PatternListContainer } from './container/pattern_list';
 import PatternsPane from '../lsg/patterns/panes/patterns-pane';
 import PreviewPane from '../lsg/patterns/panes/preview-pane';
@@ -75,11 +76,12 @@ class App extends React.Component<AppProps> {
 					handleClick={this.handleChromeToggle}
 					open={this.projectListVisible}
 				>
-					<ProjectList store={this.props.store} visible={this.projectListVisible} />
+					<ProjectList store={this.props.store} open={this.projectListVisible} />
 				</Chrome>
 				<MainArea>
 					<SideBar directionVertical hasPaddings>
 						<ElementPane>
+							<PageList store={this.props.store} />
 							<ElementList store={this.props.store} />
 						</ElementPane>
 						<PatternsPane>

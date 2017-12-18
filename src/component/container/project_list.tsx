@@ -11,7 +11,7 @@ import { Store } from '../../store';
 
 export interface ProjectListProps {
 	store: Store;
-	visible?: boolean;
+	open?: boolean;
 }
 
 @observer
@@ -24,7 +24,7 @@ export class ProjectList extends React.Component<ProjectListProps> {
 
 	public render(): JSX.Element {
 		return (
-			<Dropdown chrome visible={this.props.visible}>
+			<Dropdown chrome open={this.props.open}>
 				{this.props.store.getProjects().map((project: Project, index) => (
 					<DropdownItem
 						name={project.getName()}

@@ -58,7 +58,6 @@ class App extends React.Component<AppProps> {
 	public render(): JSX.Element {
 		// Todo: project and page don't update on page change
 		const project = this.props.store.getCurrentProject();
-		const page = this.props.store.getCurrentPage();
 		const title = `${project && project.getName()}`;
 
 		let DevTools;

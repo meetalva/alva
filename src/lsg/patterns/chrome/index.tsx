@@ -53,7 +53,7 @@ const StyledChromeIcon = styled(Icon)`
 	fill: ${colors.grey36.toString()};
 	transition: transform 0.2s;
 
-	${(props: StyledChromeIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
+	${(props: StyledChromeIconProps) => (props.open ? 'transform: rotate(-90deg)' : 'transform: rotate(90deg)')};
 `;
 
 export default class Chrome extends React.Component<ChromeProps> {

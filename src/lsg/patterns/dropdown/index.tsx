@@ -51,7 +51,7 @@ const StyledIcon = styled(Icon)`
 	fill: ${colors.grey36.toString()};
 	transition: transform 0.2s;
 
-	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
+	${(props: StyledIconProps) => (props.open ? 'transform: rotate(-90deg)' : 'transform: rotate(90deg)')};
 `;
 
 const StyledFlyout = styled.div`

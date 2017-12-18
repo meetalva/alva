@@ -20,7 +20,7 @@ const StyledTabNavigation = styled.div`
 	display: flex;
 	flex-wrap: wrap;
 	width: 100%;
-	border: 1px solid ${colors.grey70.toString()};
+	border: 1px solid ${colors.grey60.toString()};
 	border-radius: 3px;
 `;
 
@@ -28,10 +28,10 @@ const StyledTabNavigationItem = styled.div`
 	flex-grow: 1;
 	padding: ${getSpace(Size.XS)}px ${getSpace(Size.M)}px;
 	${(props: TabNavigationItemProps) => props.active
-		? `background: ${colors.grey70.toString()};
+		? `background: ${colors.grey60.toString()};
 			color: ${colors.white.toString()};`
 		: `background: ${colors.white.toString()};
-			color: ${colors.grey70.toString()};`
+			color: ${colors.grey60.toString()};`
 	}
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 12px;

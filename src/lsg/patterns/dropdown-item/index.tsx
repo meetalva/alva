@@ -36,7 +36,7 @@ const StyledDropdownItemLink = styled.a`
 		props.color ? `color: ${props.color.toString()}` : 'color: inherit'};
 
 	:hover {
-		color: ${colors.blueLight.toString()};
+		color: ${colors.blue40.toString()};
 	}
 `;
 
@@ -53,12 +53,12 @@ const StyledDropdownItemLinkAttribute = styled.div`
 
 const StyledDropdownItemLinkAttributeItem = styled.a`
 	font-size: 10px;
-	color: ${colors.grey70.toString()};
+	color: ${colors.grey60.toString()};
 	margin-right: ${getSpace(SpaceSize.XXS)}px;
 	cursor: pointer;
 
 	:hover {
-		color: ${colors.blueLight.toString()};
+		color: ${colors.blue40.toString()};
 	}
 `;
 

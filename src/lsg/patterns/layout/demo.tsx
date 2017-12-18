@@ -10,7 +10,7 @@ const StyledTestDiv = styled.div`
 	background: ${colors.grey90.toString()};
 
 	&:nth-child(odd) {
-		background: ${colors.grey70.toString()};
+		background: ${colors.grey60.toString()};
 	}
 `;
 

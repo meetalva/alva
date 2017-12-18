@@ -21,13 +21,13 @@ export default function ColorDemo(): JSX.Element {
 			<StyledList>
 				<ColorSwatch color={colors.black} />
 				<ColorSwatch color={colors.grey36} />
-				<ColorSwatch color={colors.grey70} />
+				<ColorSwatch color={colors.grey60} />
 				<ColorSwatch color={colors.grey90} />
 				<ColorSwatch color={colors.white} />
 			</StyledList>
 			<StyledList>
-				<ColorSwatch color={colors.blue} />
-				<ColorSwatch color={colors.blueLight} />
+				<ColorSwatch color={colors.blue40} />
+				<ColorSwatch color={colors.blue40} />
 			</StyledList>
 		</DemoContainer>
 	);
@@ -49,7 +49,7 @@ const ColorSwatch: React.StatelessComponent<ColorSwatchProps> = (props): JSX.Ele
 		padding-bottom: 50%;
 		width: 100%;
 		${luminance(props.color.rgb) > threshold
-			? `box-shadow: 0 2px 4px ${colors.grey70.toString()};`
+			? `box-shadow: 0 2px 4px ${colors.grey60.toString()};`
 			: ''} color: ${contrast(props.color.rgb)};
 
 		@media screen and (min-width: 320px) {

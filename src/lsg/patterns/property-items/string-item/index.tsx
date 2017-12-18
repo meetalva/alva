@@ -40,17 +40,17 @@ const StyledInput = styled.input`
 	transition: all 0.2s;
 
 	::-webkit-input-placeholder {
-		color: ${colors.grey70.toString()};
+		color: ${colors.grey60.toString()};
 	}
 
 	&:hover {
 		color: ${colors.black.toString()};
-		border-color: ${colors.grey70.toString()};
+		border-color: ${colors.grey60.toString()};
 	}
 
 	&:focus {
 		outline: none;
-		border-color: ${colors.blue.toString()};
+		border-color: ${colors.blue40.toString()};
 		color: ${colors.black.toString()};
 	}
 `;

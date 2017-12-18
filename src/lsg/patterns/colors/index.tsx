@@ -48,31 +48,43 @@ export class Color {
 export const colors = {
 	black: new Color({
 		displayName: 'Black',
-		rgb: [51, 51, 51]
+		rgb: [1, 12, 22]
 	}),
 	blue: new Color({
 		displayName: 'Blue',
-		rgb: [109, 158, 225]
+		rgb: [0, 112, 214]
 	}),
-	blueLight: new Color({
-		displayName: 'Blue Light',
-		rgb: [109, 158, 225]
+	blue20: new Color({
+		displayName: 'Blue 20',
+		rgb: [51, 141, 222]
+	}),
+	blue40: new Color({
+		displayName: 'Blue 40',
+		rgb: [102, 169, 230]
+	}),
+	grey20: new Color({
+		displayName: 'Grey 20',
+		rgb: [52, 61, 69]
 	}),
 	grey36: new Color({
 		displayName: 'Grey 36',
 		rgb: [92, 92, 92]
 	}),
 	grey50: new Color({
-		displayName: 'Grey 50',
-		rgb: [128, 128, 128]
+		displayName: 'Grey 40',
+		rgb: [103, 109, 115]
 	}),
-	grey70: new Color({
+	grey60: new Color({
 		displayName: 'Grey 70',
-		rgb: [179, 179, 179]
+		rgb: [153, 158, 162]
+	}),
+	grey80: new Color({
+		displayName: 'Grey 80',
+		rgb: [204, 206, 208]
 	}),
 	grey90: new Color({
 		displayName: 'Grey 90',
-		rgb: [227, 227, 227]
+		rgb: [229, 230, 231]
 	}),
 	white: new Color({
 		displayName: 'White',

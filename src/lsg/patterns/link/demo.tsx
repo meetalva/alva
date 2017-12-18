@@ -14,14 +14,14 @@ const LinkDemo: React.StatelessComponent<void> = (): JSX.Element => (
 		</Space>
 		<Space size={Size.L}>
 			<Link
-				color={colors.blue}
+				color={colors.blue40}
 			>
 				Link with color
 			</Link>
 		</Space>
 		<Space size={Size.L}>
 			<Link
-				color={colors.blue}
+				color={colors.blue40}
 				onClick={clickHandler}
 			>
 				Link with clickHandler
@@ -29,7 +29,7 @@ const LinkDemo: React.StatelessComponent<void> = (): JSX.Element => (
 		</Space>
 		<Space size={Size.L}>
 			<Link
-				color={colors.blue}
+				color={colors.blue40}
 				onClick={clickHandler}
 				uppercase={true}
 			>

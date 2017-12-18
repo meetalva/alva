@@ -21,7 +21,7 @@ const StyledPatternList = styled.ul`
 
 const StyledPatternLabel = styled.div`
 	margin-bottom: ${getSpace(Size.S)}px;
-	color: ${colors.grey70.toString()};
+	color: ${colors.grey60.toString()};
 `;
 
 const StyledPatternListItem = styled.li`
@@ -42,7 +42,7 @@ const StyledPatternListItem = styled.li`
 
 const StyledSVG = styled.svg`
 	margin-right: ${getSpace(Size.L)}px;
-	fill: ${colors.grey70.toString()};
+	fill: ${colors.grey60.toString()};
 `;
 
 const StyledIcon = styled(Icon)`
@@ -60,7 +60,7 @@ export const PatternListItem: React.StatelessComponent<PatternListItemProps> = p
 					className="pattern__icon"
 					name={IconName.Robo}
 					size={IconSize.XS}
-					color={colors.grey70}
+					color={colors.grey60}
 				/>
 			)}
 			{props.children}

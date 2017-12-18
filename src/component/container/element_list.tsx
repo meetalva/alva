@@ -103,7 +103,7 @@ export class ElementList extends React.Component<ElementListProps> {
 					? new PageElement(this.props.store.getPattern(transferPatternPath), true)
 					: this.props.store.getRearrangeElement();
 
-				if (!parentElement || !pageElement) {
+				if (!parentElement || !pageElement || pageElement.isAncestorOf(parentElement)) {
 					return;
 				}
 
@@ -116,7 +116,7 @@ export class ElementList extends React.Component<ElementListProps> {
 					? new PageElement(this.props.store.getPattern(transferPatternPath), true)
 					: this.props.store.getRearrangeElement();
 
-				if (!pageElement) {
+				if (!pageElement || pageElement.isAncestorOf(element)) {
 					return;
 				}
 

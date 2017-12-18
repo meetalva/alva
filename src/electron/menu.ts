@@ -135,15 +135,24 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: '&Delete',
-					accelerator: 'Backspace',
+					accelerator: (() => {
+						if (process.platform === 'darwin') {
+							return 'Backspace';
+						} else {
+							return 'Delete';
+						}
+					})(),
 					click: () => {
-						console.log('delete');
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						if (selectedElement) {
 							selectedElement.remove();
 							store.setSelectedElement(undefined);
 						} else {
-							Menu.sendActionToFirstResponder('Backspace');
+							if (process.platform === 'darwin') {
+								Menu.sendActionToFirstResponder('Backspace');
+							} else {
+								Menu.sendActionToFirstResponder('Delete');
+							}
 						}
 					}
 				}

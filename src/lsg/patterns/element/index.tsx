@@ -102,6 +102,7 @@ const StyledPlaceholder = styled.div`
 		background: ${colors.grey90.toString()};
 		transform: scaleY(0);
 		transition: transform 0.2s;
+		z-index: 50;
 	}
 
 	${(props: StyledPlaceholder) =>

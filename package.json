@@ -10,8 +10,8 @@
     "start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
     "clean": "rm -rf build && rm -rf dist && rm -rf designkit",
     "clean-build": "npm run clean && npm run build",
-    "copy-designkit": "cp -r ../designkit/ designkit",
-    "dist": "standard-version && npm run copy-designkit && npm run clean-build && electron-builder -mwl"
+    "copy-designkit": "cp -r ../designkit/ build/designkit",
+    "dist": "standard-version && npm run clean-build && npm run copy-designkit && electron-builder -mwl"
   },
   "repository": {
     "type": "git",
@@ -43,6 +43,9 @@
       "buildResources": "src/resources",
       "output": "dist"
     },
+    "asarUnpack": [
+      "build/designkit/**"
+    ],
     "nsis": {
       "artifactName": "${productName}-${version}.${ext}",
       "oneClick": false,
@@ -60,10 +63,11 @@
     "@patternplate/cli": "^2.0.0-4",
     "@patternplate/render-styled-components": "^2.0.0-3",
     "@types/electron-devtools-installer": "^2.0.2",
+    "@types/fs-extra": "^5.0.0",
     "@types/js-yaml": "^3.10.1",
     "@types/node": "^8.0.53",
-    "@types/react": "^16.0.0",
     "@types/react-dom": "^16.0.3",
+    "@types/react": "^16.0.0",
     "concurrently": "^3.5.1",
     "cz-conventional-changelog": "^2.1.0",
     "electron": "^1.7.9",
@@ -77,6 +81,7 @@
   "dependencies": {
     "cli": "^1.0.1",
     "electron-updater": "^2.17.6",
+    "fs-extra": "^5.0.0",
     "js-yaml": "^3.10.0",
     "mobx": "^3.3.2",
     "mobx-react": "^4.3.5",

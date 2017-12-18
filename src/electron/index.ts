@@ -1,5 +1,4 @@
 import { app, BrowserWindow } from 'electron';
-import * as devToolsInstaller from 'electron-devtools-installer';
 import { autoUpdater } from 'electron-updater';
 import * as PathUtils from 'path';
 import * as url from 'url';
@@ -37,14 +36,21 @@ function createWindow(): void {
 		win = undefined;
 	});
 
-	devToolsInstaller
-		.default(devToolsInstaller.REACT_DEVELOPER_TOOLS)
-		.then(name => {
-			console.info(`Added Extension:  ${name}`);
-		})
-		.catch(err => {
-			console.warn('An error occurred: ', err);
-		});
+	let devToolsInstaller;
+	try {
+		devToolsInstaller = require('electron-devtools-installer');
+	} catch (error) {
+		// Ignored
+	}
+
+	if (devToolsInstaller) {
+		devToolsInstaller
+			.default(devToolsInstaller.REACT_DEVELOPER_TOOLS)
+			// tslint:disable-next-line:no-any
+			.catch((err: any) => {
+				console.warn('An error occurred: ', err);
+			});
+	}
 }
 
 // This method will be called when Electron has finished

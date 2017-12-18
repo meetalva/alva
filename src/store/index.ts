@@ -130,6 +130,9 @@ export class Store {
 	}
 
 	public openStyleguide(styleguidePath: string): void {
+		// TODO: Replace workaround by proper dirty-check handling
+		this.save();
+
 		MobX.transaction(() => {
 			if (!PathUtils.isAbsolute(styleguidePath)) {
 				// Currently, store is two levels below alva, so go two up
@@ -167,6 +170,9 @@ export class Store {
 	}
 
 	public openPage(id: string): void {
+		// TODO: Replace workaround by proper dirty-check handling
+		this.save();
+
 		MobX.transaction(() => {
 			const pagePath: string = PathUtils.join(this.getPagesPath(), `page-${id}.yaml`);
 			const json: JsonObject = Persister.loadYamlOrJson(pagePath);
@@ -184,12 +190,17 @@ export class Store {
 	}
 
 	public save(): void {
-		if (this.currentPage) {
+		if (!this.getStyleGuidePath()) {
+			return;
+		}
+
+		const currentPage: Page | undefined = this.getCurrentPage();
+		if (currentPage) {
 			const pagePath: string = PathUtils.join(
 				this.getPagesPath(),
-				`page-${this.currentPage.getId()}.yaml`
+				`page-${currentPage.getId()}.yaml`
 			);
-			Persister.saveYaml(pagePath, this.currentPage.toJsonObject());
+			Persister.saveYaml(pagePath, currentPage.toJsonObject());
 		}
 
 		const projectsJsonObject: JsonObject = { projects: [] };

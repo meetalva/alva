@@ -27,11 +27,11 @@ const StyledInput = styled.input`
 	width: 100%;
 	padding: 8px 11px;
   	border: 1px solid ${colors.grey90.toString()};
-	color: ${colors.grey70.toString()};
+	color: ${colors.grey60.toString()};
 	:focus {
-		box-shadow: 0 0 10px ${colors.blue.toRGBString(0.5)};
+		box-shadow: 0 0 10px ${colors.blue40.toRGBString(0.5)};
 		padding: 8px 11px;
-		border: 1px solid ${colors.blue.toString()};
+		border: 1px solid ${colors.blue40.toString()};
 	}
 
 	::placeholder {

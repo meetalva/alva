@@ -4,7 +4,7 @@ import Space, { Size } from './index';
 import * as React from 'react';
 import styled from 'styled-components';
 
-const blue: Color = new Color({displayName: 'Demo Blue', rgb: [91, 177, 255]});
+const blue40: Color = new Color({displayName: 'Demo Blue', rgb: [91, 177, 255]});
 const green: Color = new Color({displayName: 'Demo Green', rgb: [91, 255, 151]});
 const violet: Color = new Color({displayName: 'Demo Violet', rgb: [181, 91, 255]});
 
@@ -21,7 +21,7 @@ const DemoRowSpace = styled(Space)`
 `;
 
 const InsetSpace = styled(Space)`
-	background-color: ${blue.toString()};
+	background-color: ${blue40.toString()};
 	width: 250px;
 	height: 250px;
 `;

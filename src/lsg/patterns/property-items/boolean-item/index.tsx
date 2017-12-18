@@ -36,14 +36,14 @@ const StyledIndicator = styled.span`
 	border-radius: ${indicatorHeight / 2}px;
 	background: ${colors.grey90.toString()};
 	box-sizing: border-box;
-	box-shadow: inset 0 0 0 ${indicatorBorderWidth}px ${colors.grey70.toString()};
+	box-shadow: inset 0 0 0 ${indicatorBorderWidth}px ${colors.grey60.toString()};
 
 	&:after {
 		content: '';
 		display: block;
 		width: ${indicatorHeight}px;
 		height: ${indicatorHeight}px;
-		border: ${indicatorBorderWidth}px solid ${colors.grey70.toString()};
+		border: ${indicatorBorderWidth}px solid ${colors.grey60.toString()};
 		transform: translateX(0px);
 		border-radius: 100%;
 		background: ${colors.white.toString()};
@@ -53,13 +53,13 @@ const StyledIndicator = styled.span`
 	${(props: IndicatorProps) =>
 		props.checked
 			? `
-			background: ${colors.blue.toString()};
-			box-shadow: inset 0 0 0 ${indicatorBorderWidth}px ${colors.blue.toString()};
+			background: ${colors.blue40.toString()};
+			box-shadow: inset 0 0 0 ${indicatorBorderWidth}px ${colors.blue40.toString()};
 
 			&:after {
 				transform: translateX(${indicatorWidth - indicatorHeight}px);
 				background: ${colors.white.toString()};
-				border-color: ${colors.blue.toString()};
+				border-color: ${colors.blue40.toString()};
 			}
 		`
 			: ''};

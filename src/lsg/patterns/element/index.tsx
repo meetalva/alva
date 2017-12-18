@@ -68,10 +68,10 @@ const StyledElementLabel = styled.div`
 		props.active
 			? `
 				color: ${colors.white.toString()};
-				background: ${colors.blue.toString()};
+				background: ${colors.blue40.toString()};
 
                 &:hover {
-                    background: ${colors.blue.toString()};
+                    background: ${colors.blue40.toString()};
                 }
 			`
 			: ''};
@@ -124,7 +124,7 @@ const StyledElementChild = styled.div`
 const StyledIcon = styled(Icon)`
 	position: absolute;
 	left: 0;
-	fill: ${colors.grey70.toString()};
+	fill: ${colors.grey60.toString()};
 	width: 12px;
 	height: 12px;
 	padding: ${getSpace(Size.XS)}px;
@@ -183,7 +183,7 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 						handleClick={handleIconClick}
 						name={IconName.ArrowFill}
 						size={IconSize.XXS}
-						color={colors.grey70}
+						color={colors.grey60}
 						open={open}
 						active={active}
 					/>

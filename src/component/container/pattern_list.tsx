@@ -129,7 +129,7 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 		const selectedElement: PageElement | undefined = this.props.store.getSelectedElement();
 		if (selectedElement) {
 			const newPageElement = new PageElement(pattern, true);
-			selectedElement.addChild(newPageElement);
+			selectedElement.addSibling(newPageElement);
 			this.props.store.setSelectedElement(newPageElement);
 		}
 	}

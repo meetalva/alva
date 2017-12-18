@@ -8,9 +8,10 @@
     "build-lsg": "tsc --project src/lsg --outDir build/lsg/patterns --sourceMap",
     "start": "npm run build && concurrently \"electron build/electron\" \"tsc --project . --watch\"",
     "start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
-    "clean": "rm -rf build && rm -rf dist",
+    "clean": "rm -rf build && rm -rf dist && rm -rf designkit",
     "clean-build": "npm run clean && npm run build",
-    "dist": "standard-version && npm run clean-build && electron-builder -mwl"
+    "copy-designkit": "cp -r ../designkit/ designkit",
+    "dist": "standard-version && npm run copy-designkit && npm run clean-build && electron-builder -mwl"
   },
   "repository": {
     "type": "git",

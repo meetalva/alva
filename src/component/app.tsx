@@ -13,7 +13,6 @@ import { Page } from '../store/page';
 import { PatternListContainer } from './container/pattern_list';
 import PatternsPane from '../lsg/patterns/panes/patterns-pane';
 import PreviewPane from '../lsg/patterns/panes/preview-pane';
-import ProjectPane from '../lsg/patterns/panes/project-pane';
 import { ProjectList } from './container/project_list';
 import PropertyPane from '../lsg/patterns/panes/property-pane';
 import { PropertyList } from './container/property_list';
@@ -33,6 +32,7 @@ class App extends React.Component<AppProps> {
 	private static PropertiesListID = 'propertieslist';
 
 	@MobX.observable protected activeTab: string = App.PatternListID;
+	@MobX.observable protected projectListVisible: boolean = false;
 	@MobX.computed
 	protected get isPatternListVisible(): boolean {
 		return Boolean(this.activeTab === App.PatternListID);
@@ -46,6 +46,7 @@ class App extends React.Component<AppProps> {
 		super(props);
 		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
 		this.handleMainWindowClick = this.handleMainWindowClick.bind(this);
+		this.handleChromeToggle = this.handleChromeToggle.bind(this);
 	}
 
 	private handleMainWindowClick(): void {
@@ -69,7 +70,13 @@ class App extends React.Component<AppProps> {
 
 		return (
 			<Layout directionVertical handleClick={this.handleMainWindowClick}>
-				<Chrome title={title} />
+				<Chrome
+					title={title}
+					handleClick={this.handleChromeToggle}
+					open={this.projectListVisible}
+				>
+					<ProjectList store={this.props.store} visible={this.projectListVisible} />
+				</Chrome>
 				<MainArea>
 					<SideBar directionVertical hasPaddings>
 						<ElementPane>
@@ -85,9 +92,6 @@ class App extends React.Component<AppProps> {
 						<PropertyPane>
 							<PropertyList store={this.props.store} />
 						</PropertyPane>
-						<ProjectPane>
-							<ProjectList store={this.props.store} />
-						</ProjectPane>
 					</SideBar>
 					<IconRegistry names={IconName} />
 				</MainArea>
@@ -99,6 +103,11 @@ class App extends React.Component<AppProps> {
 	@MobX.action
 	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
 		this.activeTab = id;
+	}
+
+	@MobX.action
+	protected handleChromeToggle(evt: React.MouseEvent<HTMLElement>): void {
+		this.projectListVisible = !this.projectListVisible;
 	}
 }
 

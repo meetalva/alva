@@ -11,10 +11,8 @@ export interface DropdownItemProps {
 	icon?: IconName;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
 }
-
 export interface StyledDropdownItemLinkProps {
 	color?: Color;
-	handleClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 const StyledDropdownItem = styled.div`
@@ -68,7 +66,7 @@ export default class DropdownItem extends React.Component<DropdownItemProps> {
 	public render(): JSX.Element {
 		return (
 			<StyledDropdownItem>
-				<StyledDropdownItemLink handleClick={this.props.handleClick}>
+				<StyledDropdownItemLink onClick={this.props.handleClick}>
 					{this.props.icon && (
 						<StyledDropdownItemIcon size={IconSize.XXS} name={this.props.icon} />
 					)}

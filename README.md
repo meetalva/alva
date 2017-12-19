@@ -5,7 +5,7 @@ We enable cross-functional teams to design contextual digital experiences and co
 Alva is a design tool that works with your production frontend components, adding up-to-date,
 responsive, and interactive designs to your living style guide.
 
-You can start with a minimal set of components to sketch concepts like wireframes and do fast
+You can start with a minimal set of components to sketch concepts and do fast
 iterations with your development team to create and enrich components, from atoms to modules and
 entire pages and a full-featured style guide. But you can also add Alva designs to existing style
 guides.
@@ -15,6 +15,8 @@ of the components to the developers, providing a single source of truth for both
 
 There is no such thing as out-dated and static PNG screens, as the current version of both the
 design models and the component implementation always render to up-to-date web pages instead.
+
+Read more about alva at [meetalva.io](https://meetalva.io)
 
 ## Requirements
 
@@ -27,7 +29,7 @@ implementation of each pattern.
 Below 'lib/patterns', you may structure your style guide as you like (e.g. using
 'atoms'/'molecules'/'modules', or any other type of structure).
 
-Patternplate (https://github.com/sinnerschrader/patternplate) fulfills these requirements.
+[Patternplate](https://github.com/sinnerschrader/patternplate) fulfills these requirements.
 
 Inside the style guide, Alva creates a new folder name 'alva', putting projects and pages into
 subfolders.
@@ -35,14 +37,26 @@ subfolders.
 You can find an example patterglate style guide with Alva designs at
 https://github.com/meetalva/designkit.
 
-## Source-based installation
+## Source based installation
 
-* Clone this repository.
-* npm i
-* npm start
+```shell
+# Clone this repository
+$ git clone https://github.com/meetalva/alva.git
 
-Currently, the prototype application expects that you also clone and build alva-example into a
-folder next to alva.
+# Go into the repository
+$ cd alva
+
+# Install dependencies
+$ npm install
+
+# Run alva
+$ npm start
+```
+Use the [exemplary UI Kit](https://github.com/meetalva/designkit) to showcase the possibilities of Alva.
+
+## Download
+
+You can [download](https://github.com/meetalva/alva/releases/) the latest release of Alva for Windows, macOS and Linux.
 
 ## Notes
 

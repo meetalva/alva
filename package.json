@@ -12,7 +12,8 @@
     "clean-build": "npm run clean && npm run build",
     "copy-designkit": "cp -r ../designkit/ build/designkit",
     "dist": "standard-version && npm run clean-build && npm run copy-designkit && electron-builder -mwl",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "commitmsg": "commitlint -e $GIT_PARAMS"
   },
   "repository": {
     "type": "git",
@@ -77,6 +78,7 @@
     "electron": "^1.7.9",
     "electron-builder": "^19.49.0",
     "electron-devtools-installer": "^2.2.1",
+    "husky": "^0.14.3",
     "mobx-react-devtools": "^4.2.15",
     "standard-version": "^4.2.0",
     "ts-config": "^15.0.0",

@@ -194,7 +194,7 @@ export class Store {
 	}
 
 	public removePage(page: PageRef): void {
-		FileUtils.unlinkSync(
+		FileUtils.removeSync(
 			PathUtils.join(this.styleGuidePath, 'alva', `page-${page.getId()}.yaml`)
 		);
 		page.remove();
@@ -202,24 +202,10 @@ export class Store {
 	}
 
 	public removeProject(project: Project): void {
-		for (const page of project.getPages()) {
-			FileUtils.remove(
-				PathUtils.join(this.styleGuidePath, 'alva', `page-${page.getId()}.yaml`),
-				err => {
-					if (err) {
-						throw err;
-					}
-					console.log(
-						`successfully deleted ${PathUtils.join(
-							this.styleGuidePath,
-							'alva',
-							`page-${page.getId()}.yaml`
-						)}`
-					);
-				}
-			);
-			page.remove();
-		}
+		Array.from(project.getPages())
+			.map(page => PathUtils.join(this.styleGuidePath, 'alva', `page-${page.getId()}.yaml`))
+			.map(fileToRemove => FileUtils.removeSync(fileToRemove));
+
 		(this.projects as IObservableArray<Project>).remove(project);
 		this.save();
 	}

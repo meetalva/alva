@@ -2,6 +2,7 @@ import { BrowserWindow, MenuItem, MenuItemConstructorOptions, remote, WebContent
 import * as FileExtraUtils from 'fs-extra';
 import { PageElement } from '../store/page/page_element';
 import * as PathUtils from 'path';
+import * as ProcessUtils from 'process';
 import { Store } from '../store';
 const { Menu, shell, app, dialog } = remote;
 
@@ -13,9 +14,20 @@ export function createMenu(store: Store): void {
 				{
 					label: '&Create Styleguide',
 					click: () => {
+						let appPath: string = app.getAppPath().replace('.asar', '.asar.unpacked');
+						if (appPath.indexOf('node_modules') >= 0) {
+							appPath = ProcessUtils.cwd();
+						}
+
+						const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
+						console.log(`Design kit path is: ${designkitPath}`);
 						dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
+							if (filePaths.length <= 0) {
+								return;
+							}
+
 							FileExtraUtils.copySync(
-								PathUtils.join('resources', 'app.asar.unpacked', 'build', 'designkit'),
+								designkitPath,
 								PathUtils.join(filePaths[0], 'designkit')
 							);
 							store.openStyleguide(`${filePaths[0]}/designkit`);

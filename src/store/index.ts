@@ -198,7 +198,12 @@ export class Store {
 	}
 
 	public removeProject(project: Project): void {
-		(this.projects as IObservableArray<Project>).remove(project);
+		if (this.getCurrentProject() === project) {
+			(this.projects as IObservableArray<Project>).remove(project);
+			this.openFirstPage();
+		} else {
+			(this.projects as IObservableArray<Project>).remove(project);
+		}
 	}
 
 	public save(): void {

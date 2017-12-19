@@ -15,12 +15,13 @@ export interface PatternListItemProps {
 const StyledPatternList = styled.ul`
 	box-sizing: border-box;
 	display: block;
-	padding: 0;
+	padding: 0 ${getSpace(Size.L)}px;
 	margin: 0;
 
 	> div {
 		display: flex;
 		flex-wrap: wrap;
+		justify-content: space-between;
 	}
 `;
 
@@ -30,6 +31,10 @@ const StyledPatternLabel = styled.div`
 	margin-left: ${getSpace(Size.L)}px;
 	color: ${colors.grey60.toString()};
 	text-transform: capitalize;
+
+	&:first-of-type {
+		margin-top: ${getSpace(Size.S)}px;
+	}
 `;
 
 const StyledPatternListItem = styled.li`
@@ -41,18 +46,12 @@ const StyledPatternListItem = styled.li`
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 12px;
 	color: ${colors.black.toString()};
-	width: calc(50% - ${getSpace(Size.XS)/2}px - ${getSpace(Size.L)}px);
+	width: calc(50% - ${getSpace(Size.XS)/2}px);
 	box-sizing: border-box;
 	text-align: center;
 
 	box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15);
-	margin-left: ${getSpace(Size.L)}px;
 	transition: box-shadow 0.2s;
-
-	&:nth-of-type(2n) {
-		margin-left: ${getSpace(Size.XS)}px;
-		margin-right: ${getSpace(Size.L)}px;
-	}
 
 	&:hover {
 		box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);

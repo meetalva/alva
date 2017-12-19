@@ -4,6 +4,15 @@ import { PatternParser } from './parser/pattern_parser';
 import { Property } from './property/property';
 import { TypeScriptParser } from './parser/typescript_parser';
 
+/**
+ * A pattern represents a reusable, styled component (e.g. a React component) of the styleguide.
+ * Patterns are parsed from the lib folder of the styleguide, supporting a set of properties
+ * of various types, like strings, numbers, page elements, etc.
+ * The designer then creates page elements within a page using these patterns as a basis.
+ * Patterns may be structured into folders (like 'atoms', 'modules', etc.).
+ * Depending on the pattern parser used, various styleguide formats are supported,
+ * e.g. Patternplate.
+ */
 export class Pattern {
 	/**
 	 * The ID of the pattern (also the folder name within the parent folder).
@@ -35,6 +44,12 @@ export class Pattern {
 	 */
 	protected valid: boolean = false;
 
+	/**
+	 * Creates a new pattern.
+	 * @param folder The parent folder containing the pattern folder.
+	 * @param id The ID of the pattern (also the folder name within the parent folder).
+	 * @param name The human-readable name of the pattern.
+	 */
 	public constructor(folder: PatternFolder, id: string, name: string) {
 		this.folder = folder;
 		this.id = id;
@@ -43,10 +58,19 @@ export class Pattern {
 		this.reload();
 	}
 
+	/**
+	 * Adds a property to this pattern. This method is called by the pattern parser only.
+	 * @param property The new property to add.
+	 */
 	public addProperty(property: Property): void {
 		this.properties.set(property.getId(), property);
 	}
 
+	/**
+	 * Returns the absolute and OS-dependent file-system path to the folder containing
+	 * the built pattern sources.
+	 * @return The absolute path;
+	 */
 	public getAbsolutePath(): string {
 		return PathUtils.join(this.folder.getAbsolutePath(), this.id);
 	}
@@ -75,6 +99,11 @@ export class Pattern {
 		return this.properties.get(id);
 	}
 
+	/**
+	 * Returns the OS-dependent file-system path to the folder containing
+	 * the built pattern sources, relative to the styleguide's pattern folder.
+	 * @return The relative path;
+	 */
 	public getRelativePath(): string {
 		return PathUtils.join(this.folder.getRelativePath(), this.id);
 	}

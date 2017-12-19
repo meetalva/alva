@@ -31,6 +31,11 @@ export class PageElement {
 		this.setParent(parent);
 	}
 
+	/**
+	 * Loads and returns a page element from a given JSON object.
+	 * @param jsonObject The JSON object to load from.
+	 * @return A new page element object containing the loaded data.
+	 */
 	public static fromJsonObject(
 		json: JsonObject,
 		store: Store,
@@ -211,6 +216,10 @@ export class PageElement {
 		this.propertyValues.set(id, value);
 	}
 
+	/**
+	 * Serializes the page element into a JSON object for persistence.
+	 * @return The JSON object to be persisted.
+	 */
 	public toJsonObject(): JsonObject {
 		const json: JsonObject = { _type: 'pattern', pattern: this.patternPath };
 

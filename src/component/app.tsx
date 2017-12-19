@@ -51,7 +51,7 @@ class App extends React.Component<AppProps> {
 	}
 
 	private handleMainWindowClick(): void {
-		this.props.store.setElementFocus(false);
+		this.props.store.setElementFocussed(false);
 		createMenu(store);
 	}
 

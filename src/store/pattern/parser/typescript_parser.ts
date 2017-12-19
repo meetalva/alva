@@ -13,6 +13,38 @@ import { StringArrayProperty } from '../property/string_array_property';
 import { StringProperty } from '../property/string_property';
 import * as ts from 'typescript';
 
+/**
+ * Pattern parser implementation for TypeScript patterns.
+ * The TypeScript pattern parser expects directories in the following structure:
+ * <ul>
+ * <li>A directory named 'patterns' at styleguide top-level.</li>
+ * <li>Inside that, a directory per pattern folder</li>
+ * <li>Inside that, maybe a deeper structure of pattern folders</li>
+ * <li>Finally inside that, a directory per pattern</li>
+ * </ul>
+ * Each pattern directory must have an 'index.js' and an 'index.d.ts' file,
+ * containing the implementation, and the typings.
+ * Each pattern typing must have a props interface with the same name as the pattern, plus 'Props'.
+ * Each property must be of one of the following types:
+ * <ul>
+ * <li>string</li>
+ * <li>string[]</li>
+ * <li>number</li>
+ * <li>number[]</li>
+ * <li>boolean</li>
+ * <li>enum (with a TypeScript enum type declared in the same file)</li>
+ * </ul>
+ * All other properties are ignored for now.
+ * Properties may be optional ('?'), and the parser considers that.
+ * Additionally, you may add JSDoc annotations to signal meta-data:
+ * <ul>
+ * <li>@name to override the human-friendly name</li>
+ * <li>@default to provide an initial value for Alva</li>
+ * <li>@hidden to hide the property from Alva</li>
+ * </ul>
+ * You can also specify the @name annotation on enum members,
+ * and you can add it to the props interface to rename the entire pattern.
+ */
 export class TypeScriptParser extends PatternParser {
 	protected enums: { [name: string]: ts.EnumDeclaration } = {};
 	protected propsDeclaration?: ts.InterfaceDeclaration;

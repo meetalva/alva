@@ -76,7 +76,7 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 
 			folder.getPatterns().forEach((pattern: Pattern) => {
 				result.push({
-					value: pattern.getId(),
+					value: pattern.getName(),
 					draggable: true,
 					handleDragStart: (e: React.DragEvent<HTMLElement>) => {
 						this.handleDragStart(e, pattern);

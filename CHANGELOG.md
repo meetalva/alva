@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/meetalva/alva/compare/v0.4.1...v0.5.0) (2017-12-19)
+
+
+### Bug Fixes
+
+* **component:** convert search term to lower case ([6d38ede](https://github.com/meetalva/alva/commit/6d38ede))
+
+
+### Features
+
+* **lsg:** new styling for pattern pane ([19b411e](https://github.com/meetalva/alva/commit/19b411e))
+* **menu:** add functionality to also create a folder while selecting a space for the creation of th ([389c098](https://github.com/meetalva/alva/commit/389c098))
+
+
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://github.com/meetalva/alva/compare/v0.4.0...v0.4.1) (2017-12-18)
 

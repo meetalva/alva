@@ -202,7 +202,7 @@ export class Store {
 	}
 
 	public removeProject(project: Project): void {
-		project.getPages().forEach((page: PageRef) => {
+		for (const page of project.getPages()) {
 			FileUtils.remove(
 				PathUtils.join(this.styleGuidePath, 'alva', `page-${page.getId()}.yaml`),
 				err => {
@@ -219,7 +219,7 @@ export class Store {
 				}
 			);
 			page.remove();
-		});
+		}
 		(this.projects as IObservableArray<Project>).remove(project);
 		this.save();
 	}

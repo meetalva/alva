@@ -1,0 +1,7 @@
+{
+	"name": "splash-screen",
+	"displayName": "Splash Screen",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": ["splash-screen"]
+}

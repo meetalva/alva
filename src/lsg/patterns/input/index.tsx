@@ -1,4 +1,5 @@
 import { colors } from '../colors';
+import { getSpace, Size } from '../space';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -21,26 +22,33 @@ const StyledInput = styled.input`
 	/* reset Styles */
 	-webkit-appearance:textfield;
 	outline: none;
+	border: none;
+	background: transparent;
+
+	margin: 0 ${getSpace(Size.L)}px;
+	font-size: 15px;
 
 	box-sizing: border-box;
 	display: block;
-	width: 100%;
-	padding: 8px 11px;
-  	border: 1px solid ${colors.grey90.toString()};
-	color: ${colors.grey60.toString()};
-	:focus {
-		box-shadow: 0 0 10px ${colors.blue40.toRGBString(0.5)};
-		padding: 8px 11px;
-		border: 1px solid ${colors.blue40.toString()};
-	}
+	width: calc(100% - ${getSpace(Size.M)*2}px);
+	color: ${colors.black.toString()};
+
+	font-weight: 500;
+	transition: color 0.2s;
 
 	::placeholder {
-		color: ${colors.grey90.toString()};
+		color: ${colors.grey50.toString()};
+	}
+
+	:hover {
+		::placeholder {
+			color: ${colors.black.toString()};
+		}
 	}
 
 	::-webkit-search-decoration {
 			display:none;
-		}
+	}
 `;
 
 const Input: React.StatelessComponent<InputProps> = props => (

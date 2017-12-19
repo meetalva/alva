@@ -21,8 +21,8 @@ export interface IconProps {
 
 export enum Size {
 	XXS = 12,
-	XS = 24,
-	S = 38
+	XS = 18,
+	S = 24
 }
 
 interface StyledIconProps {

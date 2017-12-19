@@ -9,7 +9,7 @@ const StyledPatternsPane = styled.div`
 	flex-shrink: 0;
 	flex-basis: 40%;
 	padding: ${getSpace(Size.M)}px 0;
-	border-top: 1px solid ${colors.grey80.toString()};
+	border-top: 1px solid ${colors.grey90.toString()};
 	overflow: scroll;
 	margin-left: -${getSpace(Size.L)}px;
 	margin-right: -${getSpace(Size.L)}px;

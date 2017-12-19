@@ -128,7 +128,7 @@ Properties may be optional ("`?`"), and Alva considers that. Additionally, you m
 
 Examples:
 
-```
+```javascript
 /**
  * @name Button text
  * @default Click me!
@@ -136,7 +136,7 @@ Examples:
 buttonText: string;
 ```
 
-```
+```javascript
 /**
  * @hidden
  */

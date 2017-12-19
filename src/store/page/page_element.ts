@@ -1,10 +1,10 @@
 import { JsonArray, JsonObject, JsonValue } from '../json';
 import * as MobX from 'mobx';
 import * as PathUtils from 'path';
-import { Pattern } from '../pattern';
-import { Property } from '../pattern/property';
+import { Pattern } from '../pattern/pattern';
+import { Property } from '../pattern/property/property';
 import { PropertyValue } from './property_value';
-import { Store } from '..';
+import { Store } from '../store';
 
 export class PageElement {
 	@MobX.observable private children: PageElement[] = [];

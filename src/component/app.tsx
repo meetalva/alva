@@ -9,7 +9,7 @@ import Layout, { MainArea, SideBar } from '../lsg/patterns/layout';
 import { createMenu } from '../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
-import { Page } from '../store/page';
+import { Page } from '../store/page/page';
 import { PageList } from './container/page_list';
 import { PatternListContainer } from './container/pattern_list';
 import PatternsPane from '../lsg/patterns/panes/patterns-pane';
@@ -19,7 +19,7 @@ import PropertyPane from '../lsg/patterns/panes/property-pane';
 import { PropertyList } from './container/property_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Store } from '../store';
+import { Store } from '../store/store';
 
 globalStyles();
 

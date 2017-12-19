@@ -1,11 +1,11 @@
 import { ipcRenderer } from 'electron';
 import { JsonObject } from '../store/json';
 import { observer } from 'mobx-react';
-import { Page } from '../store/page';
+import { Page } from '../store/page/page';
 import { Preview } from './presentation/preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Store } from '../store';
+import { Store } from '../store/store';
 
 interface PreviewAppProps {
 	store: Store;

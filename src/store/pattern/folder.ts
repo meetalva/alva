@@ -1,9 +1,9 @@
 import * as FileUtils from 'fs';
 import * as MobX from 'mobx';
 import * as PathUtils from 'path';
+import { Pattern } from './pattern';
+import { Store } from '../store';
 import { TextPattern } from './text_pattern';
-import { Pattern } from '.';
-import { Store } from '..';
 
 export class PatternFolder {
 	@MobX.observable private children: Map<string, PatternFolder> = new Map();

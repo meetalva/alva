@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
-import { Page } from '../../store/page';
+import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page_element';
-import { Pattern } from '../../store/pattern';
+import { Pattern } from '../../store/pattern/pattern';
 import { PropertyValue } from '../../store/page/property_value';
 import * as React from 'react';
 import { TextPattern } from '../../store/pattern/text_pattern';

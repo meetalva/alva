@@ -6,12 +6,12 @@ import { NumberArrayProperty } from '../property/number_array_property';
 import { NumberProperty } from '../property/number_property';
 import { ObjectProperty } from '../property/object_property';
 import * as PathUtils from 'path';
-import { Property } from '../property';
+import { Pattern } from '../pattern';
+import { PatternParser } from './pattern_parser';
+import { Property } from '../property/property';
 import { StringArrayProperty } from '../property/string_array_property';
 import { StringProperty } from '../property/string_property';
 import * as ts from 'typescript';
-import { PatternParser } from '.';
-import { Pattern } from '..';
 
 export class TypeScriptParser extends PatternParser {
 	protected enums: { [name: string]: ts.EnumDeclaration } = {};

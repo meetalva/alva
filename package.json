@@ -2,7 +2,7 @@
   "name": "meetalva",
   "version": "0.4.1",
   "description": "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
-  "main": "./build/electron/index.js",
+  "main": "./build/electron/electron.js",
   "scripts": {
     "build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/*.html build/electron/",
     "build-lsg": "tsc --project src/lsg --outDir build/lsg/patterns --sourceMap",

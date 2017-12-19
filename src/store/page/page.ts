@@ -1,6 +1,6 @@
 import { JsonObject } from '../json';
 import { PageElement } from './page_element';
-import { Store } from '..';
+import { Store } from '../store';
 
 export class Page {
 	private name: string;

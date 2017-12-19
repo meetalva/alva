@@ -1,7 +1,7 @@
 import { JsonArray, JsonObject } from '../json';
 import * as MobX from 'mobx';
 import { PageRef } from './page_ref';
-import { Store } from '..';
+import { Store } from '../store';
 
 export class Project {
 	@MobX.observable private id: string;

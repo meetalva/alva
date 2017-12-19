@@ -1,4 +1,4 @@
-import { Property } from '.';
+import { Property } from './property';
 
 export class StringProperty extends Property {
 	public constructor(id: string) {

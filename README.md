@@ -85,7 +85,7 @@ Feel free to dive in! Open an [issue](https://github.com/meetalva/alva/issues/ne
 
 Alva follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
-Issues should be provided as branches starting with "feat/", as merge requests.
+Issues should be provided as branches starting with "feat/", as pull requests.
 
 We use strict TSC and TSLint rules, as well as Prettier. When naming things, we follow the [TypeScript guidelines](https://github.com/Microsoft/TypeScript/wiki/Coding-guidelines), and we do not abbreviate names (except for trivial names like HTML).
 

@@ -70,8 +70,15 @@ To add a contribution to Alva (improve its features, fix issues), get the source
 
 * Clone this repository.
 * Clone the designkit repository (git@github.com:meetalva/designkit.git)
-* Run "npm i" and "npm run build" in the designkit repository
-* Run "npm i" and "npm start" in the main (Alva) repository
+* Run in the designkit repository:
+```shell
+npm i && npm run build
+```
+* Run in the main (Alva) respository:
+```shell
+npm i && npm start
+```
+
 
 Feel free to dive in! Open an [issue](https://github.com/meetalva/alva/issues/new) or submit a
 [Pull Request](https://github.com/meetalva/alva/compare). ❤️

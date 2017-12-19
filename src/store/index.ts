@@ -194,20 +194,11 @@ export class Store {
 	}
 
 	public removePage(page: PageRef): void {
-		FileUtils.removeSync(
-			PathUtils.join(this.styleGuidePath, 'alva', `page-${page.getId()}.yaml`)
-		);
 		page.remove();
-		this.save();
 	}
 
 	public removeProject(project: Project): void {
-		Array.from(project.getPages())
-			.map(page => PathUtils.join(this.styleGuidePath, 'alva', `page-${page.getId()}.yaml`))
-			.map(fileToRemove => FileUtils.removeSync(fileToRemove));
-
 		(this.projects as IObservableArray<Project>).remove(project);
-		this.save();
 	}
 
 	public save(): void {

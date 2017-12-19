@@ -19,30 +19,11 @@ export class Preview extends React.Component<PreviewProps> {
 		this.patternFactories = {};
 	}
 
-	public render(): JSX.Element {
+	public render(): JSX.Element | null {
 		if (this.props.page) {
 			return this.createComponent(this.props.page.getRoot()) as JSX.Element;
-		} else {
-			return (
-				<div>
-					<h1>Welcome to Alva.</h1>
-					<p>
-						Alva is a radically new design tool that enables cross-functional teams to design
-						digital products.
-					</p>
-					<p>
-						To get started, you need a styleguide project (like a Patternplate project), or
-						alternatively, you can download a prototype styleguide (design kit) from:
-					</p>
-					<p>
-						<a href="https://github.com/meetalva/designkit/archive/master.zip">
-							https://github.com/meetalva/designkit
-						</a>
-					</p>
-					<p>Then, click File &gt; Open Styleguide to open it.</p>
-				</div>
-			);
 		}
+		return null;
 	}
 
 	/**

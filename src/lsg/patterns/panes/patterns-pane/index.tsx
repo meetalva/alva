@@ -8,9 +8,11 @@ const StyledPatternsPane = styled.div`
 	flex-grow: 2;
 	flex-shrink: 0;
 	flex-basis: 40%;
-	padding: ${getSpace(Size.L)}px 0;
-	border-top: 2px solid ${colors.grey60.toString()};
+	padding: ${getSpace(Size.M)}px 0;
+	border-top: 1px solid ${colors.grey80.toString()};
 	overflow: scroll;
+	margin-left: -${getSpace(Size.L)}px;
+	margin-right: -${getSpace(Size.L)}px;
 `;
 
 const PatternsPane: React.StatelessComponent<{}> = props => <StyledPatternsPane>{props.children}</StyledPatternsPane>;

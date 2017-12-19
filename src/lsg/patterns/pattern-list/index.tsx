@@ -17,24 +17,46 @@ const StyledPatternList = styled.ul`
 	display: block;
 	padding: 0;
 	margin: 0;
+
+	> div {
+		display: flex;
+		flex-wrap: wrap;
+	}
 `;
 
 const StyledPatternLabel = styled.div`
 	margin-bottom: ${getSpace(Size.S)}px;
+	margin-top: ${getSpace(Size.L)}px;
+	margin-left: ${getSpace(Size.L)}px;
 	color: ${colors.grey60.toString()};
+	text-transform: capitalize;
 `;
 
 const StyledPatternListItem = styled.li`
-	display: flex;
-	align-items: center;
+	display: block;
 	padding: ${getSpace(Size.S)}px;
-	border: 1px solid ${colors.grey90.toString()};
-	margin: 0 0 ${getSpace(Size.S)}px 0;
+	margin: 0 0 ${getSpace(Size.XS)}px 0;
 	border-radius: 3px;
 	background: ${colors.white.toString()};
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 12px;
 	color: ${colors.black.toString()};
+	width: calc(50% - ${getSpace(Size.XS)/2}px - ${getSpace(Size.L)}px);
+	box-sizing: border-box;
+	text-align: center;
+
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15);
+	margin-left: ${getSpace(Size.L)}px;
+	transition: box-shadow 0.2s;
+
+	&:nth-of-type(2n) {
+		margin-left: ${getSpace(Size.XS)}px;
+		margin-right: ${getSpace(Size.L)}px;
+	}
+
+	&:hover {
+		box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);
+	}
 
 	${(props: PatternListItemProps) =>
 		props.draggable ? 'cursor: move;' : props.onClick ? 'cursor: pointer;' : ''};
@@ -42,11 +64,21 @@ const StyledPatternListItem = styled.li`
 
 const StyledSVG = styled.svg`
 	margin-right: ${getSpace(Size.L)}px;
-	fill: ${colors.grey60.toString()};
+	fill: ${colors.grey50.toString()};
 `;
 
 const StyledIcon = styled(Icon)`
-	margin-right: ${getSpace(Size.L)}px;
+	margin: 0 auto;
+	display: block;
+	margin-bottom: ${getSpace(Size.XS)}px;
+`;
+
+const StyledPatternListItemLabel = styled.div`
+	text-align: center;
+	width: 100%;
+	display: block;
+	text-transform: capitalize;
+	color: ${colors.grey36.toString()};
 `;
 
 export const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
@@ -63,7 +95,7 @@ export const PatternListItem: React.StatelessComponent<PatternListItemProps> = p
 					color={colors.grey60}
 				/>
 			)}
-			{props.children}
+			<StyledPatternListItemLabel>{props.children}</StyledPatternListItemLabel>
 		</StyledPatternListItem>
 	);
 };

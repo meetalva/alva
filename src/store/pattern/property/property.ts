@@ -1,3 +1,5 @@
+import { Store } from '../../../store/store';
+
 export abstract class Property {
 	// tslint:disable-next-line:no-any
 	private defaultValue: any;
@@ -8,8 +10,7 @@ export abstract class Property {
 
 	public constructor(id: string) {
 		this.id = id;
-		// sic: We start with the ID as name
-		this.name = id;
+		this.name = Store.guessName(id, name);
 	}
 
 	// tslint:disable-next-line:no-any

@@ -2,6 +2,7 @@ import { PatternFolder } from './folder';
 import * as PathUtils from 'path';
 import { PatternParser } from './parser/pattern_parser';
 import { Property } from './property/property';
+import { Store } from '../../store/store';
 import { TypeScriptParser } from './parser/typescript_parser';
 
 /**
@@ -50,10 +51,10 @@ export class Pattern {
 	 * @param id The ID of the pattern (also the folder name within the parent folder).
 	 * @param name The human-readable name of the pattern.
 	 */
-	public constructor(folder: PatternFolder, id: string, name: string) {
+	public constructor(folder: PatternFolder, id: string, name?: string) {
 		this.folder = folder;
 		this.id = id;
-		this.name = name;
+		this.name = Store.guessName(id, name);
 
 		this.reload();
 	}

@@ -19,7 +19,6 @@ const StyledLabel = styled.span`
 	display: block;
 	margin-bottom: ${getSpace(Size.XS)}px;
 	font-size: 12px;
-	text-transform: capitalize;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.black.toString()};
 `;

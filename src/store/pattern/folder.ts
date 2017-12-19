@@ -100,7 +100,7 @@ export class PatternFolder {
 						FileUtils.existsSync(PathUtils.join(childPath, 'index.d.ts')) &&
 						FileUtils.existsSync(PathUtils.join(childPath, 'index.js'))
 					) {
-						const pattern: Pattern = new Pattern(this, childName, childName);
+						const pattern: Pattern = new Pattern(this, childName);
 						if (pattern.isValid()) {
 							this.patterns.set(childName, pattern);
 						}

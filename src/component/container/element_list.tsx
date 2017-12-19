@@ -4,6 +4,7 @@ import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page_element';
+import { Pattern } from '../../store/pattern/pattern';
 import { PropertyValue } from '../../store/page/property_value';
 import * as React from 'react';
 import { Store } from '../../store/store';
@@ -61,7 +62,8 @@ export class ElementList extends React.Component<ElementListProps> {
 		element: PageElement,
 		selectedElement?: PageElement
 	): ListItemProps {
-		if (!element.getPattern()) {
+		const pattern: Pattern | undefined = element.getPattern();
+		if (!pattern) {
 			return {
 				label: key,
 				value: '(invalid)',
@@ -81,8 +83,6 @@ export class ElementList extends React.Component<ElementListProps> {
 			);
 		});
 
-		const patternPath: string = element.getPatternPath() as string;
-
 		const updatePageElement: React.MouseEventHandler<HTMLElement> = event => {
 			event.stopPropagation();
 			this.props.store.setSelectedElement(element);
@@ -91,7 +91,7 @@ export class ElementList extends React.Component<ElementListProps> {
 
 		return {
 			label: key,
-			value: patternPath.replace(/^.*\//, ''),
+			value: pattern.getName(),
 			onClick: updatePageElement,
 			handleDragStart: (e: React.DragEvent<HTMLElement>) => {
 				this.props.store.setRearrangeElement(element);

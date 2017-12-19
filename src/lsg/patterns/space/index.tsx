@@ -22,21 +22,22 @@ export enum Size {
 	// Explicity set enum values to indicate that they will be used later on as
 	// array indicies.
 	None = 0,
-    XXS  = 3,
-	XS   = 6,
-	S    = 12,
-	M    = 15,
-	L    = 18,
-	XL   = 24,
-	XXL  = 32
+	XXS = 3,
+	XS = 6,
+	S = 12,
+	M = 15,
+	L = 18,
+	XL = 24,
+	XXL = 32,
+	XXXL = 42
 }
 
 export enum PageInset {
 	// Defines global page gutter used in header and footer components
 	XS = 24,
-	S  = 42,
-	M  = 60,
-	L  = 78,
+	S = 42,
+	M = 60,
+	L = 78,
 	XL = 96
 }
 
@@ -57,14 +58,14 @@ function expand<T>(source: T[] | T): T[] {
 
 	switch (values.length) {
 		case 1: // [a]          => [a, a, a, a]
-		return [values[0], values[0], values[0], values[0]];
+			return [values[0], values[0], values[0], values[0]];
 		case 2: // [a, b]       => [a, b, a, b]
-		return [...values, ...values];
+			return [...values, ...values];
 		case 3: // [a, b, c]    => [a, b, c, b]
-		return [...values, values[1]];
+			return [...values, values[1]];
 		case 4: // [a, b, c, d] => [a, b, c, d]
 		default:
-		return values.slice(0, 4);
+			return values.slice(0, 4);
 	}
 }
 
@@ -89,13 +90,7 @@ function calculate(property: string, space: Size[]): string {
 
 const StyledSpace = styled.div`
 	box-sizing: border-box;
-	${(props: StyledSpaceProps) =>
-		calculate(props.inside
-			? 'padding'
-			: 'margin'
-			, props.spaceSize
-		)
-	}
+	${(props: StyledSpaceProps) => calculate(props.inside ? 'padding' : 'margin', props.spaceSize)};
 `;
 
 const Space: React.StatelessComponent<SpaceProps> = props => {

@@ -94,9 +94,10 @@ export class Preview extends React.Component<PreviewProps> {
 				patternFactory = require(patternPath).default;
 				this.patternFactories[patternPath] = patternFactory;
 			}
+			const reactComponent = patternFactory(componentProps);
 
 			// Finally, build the component
-			return patternFactory(componentProps);
+			return <PatternWrapper key={key}>{reactComponent}</PatternWrapper>;
 		} else {
 			// The model is an object, but not a pattern declaration.
 			// Create a new object with recursively processed values.
@@ -108,6 +109,29 @@ export class Preview extends React.Component<PreviewProps> {
 				result[objectKey] = this.createComponent((value as any)[objectKey]);
 			});
 			return result;
+		}
+	}
+}
+
+interface PatternWrapperState {
+	errorMessage?: string;
+}
+
+class PatternWrapper extends React.Component<{}, PatternWrapperState> {
+	public constructor(props: {}) {
+		super(props);
+		this.state = {};
+	}
+
+	public componentDidCatch(error: Error): void {
+		this.setState({ errorMessage: error.message });
+	}
+
+	public render(): React.ReactNode {
+		if (this.state.errorMessage) {
+			return <span>{this.state.errorMessage}</span>;
+		} else {
+			return this.props.children;
 		}
 	}
 }

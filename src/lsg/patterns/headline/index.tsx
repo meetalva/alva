@@ -1,15 +1,18 @@
+import { Color } from '../colors';
 import { fonts } from '../fonts';
 import * as React from 'react';
 import styled, { css, StyledComponentClass } from 'styled-components';
 
 export interface HeadlineProps {
 	className?: string;
+	textColor?: Color;
 	order?: 1 | 2 | 3;
 	tagName?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div';
 }
 
 interface StyledHeadlineProps {
 	className?: string;
+	textColor?: Color;
 	order?: 1 | 2 | 3;
 }
 
@@ -17,6 +20,8 @@ const StyledHeadline = styled.div`
 	margin-top: 0;
 	font-family: ${fonts().NORMAL_FONT};
 	font-weight: 500;
+	${(props: StyledHeadlineProps) =>
+		props.textColor ? `color: ${props.textColor.toString()};` : ''};
 
 	${(props: HeadlineProps) => {
 		switch (props.order) {
@@ -48,7 +53,7 @@ export const Headline: React.StatelessComponent<HeadlineProps> = props => {
 	> = StyledHeadline.withComponent(tagName);
 
 	return (
-		<Component className={props.className} order={props.order}>
+		<Component className={props.className} textColor={props.textColor} order={props.order}>
 			{props.children}
 		</Component>
 	);

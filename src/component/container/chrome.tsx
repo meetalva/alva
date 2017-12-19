@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import * as React from 'react';
 
 export interface ChromeProps {
-	title: string;
+	title?: string;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
 	open?: boolean;
 }

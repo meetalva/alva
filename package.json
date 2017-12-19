@@ -10,7 +10,8 @@
     "start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
     "clean": "rm -rf build && rm -rf dist",
     "clean-build": "npm run clean && npm run build",
-    "dist": "standard-version && npm run clean-build && cd build && mkdir designkit && cp -r ../../designkit/patterns ../../designkit/alva ../../designkit/*.* designkit/ && cd designkit && npm i && npm run build && rm -rf node_modules && npm i --production && cd ../.. && electron-builder -mwl"
+    "dist": "standard-version && npm run clean-build && cd build && mkdir designkit && cp -r ../../designkit/patterns ../../designkit/alva ../../designkit/*.* designkit/ && cd designkit && npm i && npm run build && rm -rf node_modules && npm i --production && cd ../.. && electron-builder -mwl",
+    "commit": "git-cz"
   },
   "repository": {
     "type": "git",
@@ -59,14 +60,17 @@
     }
   },
   "devDependencies": {
+    "@commitlint/cli": "^5.2.5",
+    "@commitlint/config-conventional": "^5.2.3",
     "@patternplate/cli": "^2.0.0-4",
     "@patternplate/render-styled-components": "^2.0.0-3",
     "@types/electron-devtools-installer": "^2.0.2",
     "@types/fs-extra": "^5.0.0",
     "@types/js-yaml": "^3.10.1",
     "@types/node": "^8.0.53",
-    "@types/react-dom": "^16.0.3",
     "@types/react": "^16.0.0",
+    "@types/react-dom": "^16.0.3",
+    "commitizen": "^2.9.6",
     "concurrently": "^3.5.1",
     "cz-conventional-changelog": "^2.1.0",
     "electron": "^1.7.9",

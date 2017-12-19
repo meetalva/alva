@@ -3,13 +3,13 @@ import { JsonArray, JsonObject, Persister } from './json';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
 import * as OsUtils from 'os';
-import { Page } from './page';
+import { Page } from './page/page';
 import { PageElement } from './page/page_element';
 import { PageRef } from './project/page_ref';
 import * as PathUtils from 'path';
-import { Pattern } from './pattern';
+import { Pattern } from './pattern/pattern';
 import { Preferences } from './preferences';
-import { Project } from './project';
+import { Project } from './project//project';
 
 export class Store {
 	@MobX.observable private clipboardElement?: PageElement | undefined;

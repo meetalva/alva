@@ -1,7 +1,7 @@
 import { PatternFolder } from './folder';
-import { PatternParser } from './parser';
 import * as PathUtils from 'path';
-import { Property } from './property';
+import { PatternParser } from './parser/pattern_parser';
+import { Property } from './property/property';
 import { TypeScriptParser } from './parser/typescript_parser';
 
 export class Pattern {

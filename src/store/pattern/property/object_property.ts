@@ -1,4 +1,4 @@
-import { Property } from '.';
+import { Property } from './property';
 
 export class ObjectProperty extends Property {
 	private properties: Map<string, Property> = new Map();

@@ -1,11 +1,11 @@
 import { EnumProperty, Option } from '../../store/pattern/property/enum_property';
-import { Property } from '../../store/pattern/property/index';
 import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item/index';
 import { StringItem } from '../../lsg/patterns/property-items/string-item/index';
 import { EnumItem } from '../../lsg/patterns/property-items/enum-item/index';
 import { observer } from 'mobx-react';
+import { Property } from '../../store/pattern/property/property';
 import * as React from 'react';
-import { Store } from '../../store';
+import { Store } from '../../store/store';
 
 export interface PropertyListProps {
 	store: Store;

@@ -1,7 +1,7 @@
 import { PatternFolder } from './folder';
-import { Property } from './property/index';
+import { Pattern } from './pattern';
+import { Property } from './property/property';
 import { StringProperty } from './property/string_property';
-import { Pattern } from '.';
 
 export class TextPattern extends Pattern {
 	public constructor(folder: PatternFolder) {

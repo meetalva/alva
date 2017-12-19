@@ -5,9 +5,9 @@ import DropdownItem, {
 } from '../../lsg/patterns/dropdown-item';
 import { IconName } from '../../lsg/patterns/icons';
 import { observer } from 'mobx-react';
-import { Project } from '../../store/project';
+import { Project } from '../../store/project/project';
 import * as React from 'react';
-import { Store } from '../../store';
+import { Store } from '../../store/store';
 
 export interface ProjectListProps {
 	store: Store;

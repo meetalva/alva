@@ -3,7 +3,7 @@ import * as FileExtraUtils from 'fs-extra';
 import { PageElement } from '../store/page/page_element';
 import * as PathUtils from 'path';
 import * as ProcessUtils from 'process';
-import { Store } from '../store';
+import { Store } from '../store/store';
 const { Menu, shell, app, dialog } = remote;
 
 export function createMenu(store: Store): void {

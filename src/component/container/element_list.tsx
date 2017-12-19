@@ -1,12 +1,12 @@
-import { ElementWrapper } from './elementWrapper';
+import { ElementWrapper } from './element_wrapper';
 import { ListItemProps } from '../../lsg/patterns/list';
 import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';
-import { Page } from '../../store/page';
+import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page_element';
 import { PropertyValue } from '../../store/page/property_value';
 import * as React from 'react';
-import { Store } from '../../store';
+import { Store } from '../../store/store';
 
 export interface ElementListProps {
 	store: Store;

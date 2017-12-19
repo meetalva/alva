@@ -1,5 +1,5 @@
 import { JsonObject } from '../json';
-import { Project } from '.';
+import { Project } from './project';
 
 export class PageRef {
 	private id: string;

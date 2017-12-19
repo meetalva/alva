@@ -1,5 +1,5 @@
-import { Property } from '.';
-import { Pattern } from '..';
+import { Pattern } from '../pattern';
+import { Property } from './property';
 
 export class PatternProperty extends Property {
 	private pattern: Pattern;

@@ -1,4 +1,5 @@
 import { PatternFolder } from './pattern/folder';
+import * as FileUtils from 'fs-extra';
 import { JsonArray, JsonObject, Persister } from './json';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
@@ -192,8 +193,21 @@ export class Store {
 		this.savePreferences();
 	}
 
+	public removePage(page: PageRef): void {
+		FileUtils.removeSync(
+			PathUtils.join(this.styleGuidePath, 'alva', `page-${page.getId()}.yaml`)
+		);
+		page.remove();
+		this.save();
+	}
+
 	public removeProject(project: Project): void {
+		Array.from(project.getPages())
+			.map(page => PathUtils.join(this.styleGuidePath, 'alva', `page-${page.getId()}.yaml`))
+			.map(fileToRemove => FileUtils.removeSync(fileToRemove));
+
 		(this.projects as IObservableArray<Project>).remove(project);
+		this.save();
 	}
 
 	public save(): void {

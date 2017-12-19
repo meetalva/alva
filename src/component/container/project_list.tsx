@@ -36,7 +36,14 @@ export class ProjectList extends React.Component<ProjectListProps> {
 					>
 						<DropdownItemLinkAttribute>
 							<DropdownItemLinkAttributeItem>Edit</DropdownItemLinkAttributeItem>
-							<DropdownItemLinkAttributeItem>Delete</DropdownItemLinkAttributeItem>
+							<DropdownItemLinkAttributeItem
+								handleClick={(e: React.MouseEvent<HTMLElement>) => {
+									e.preventDefault();
+									this.handleDeleteProjectClick(project);
+								}}
+							>
+								Delete
+							</DropdownItemLinkAttributeItem>
 						</DropdownItemLinkAttribute>
 					</DropdownItem>
 				))}
@@ -46,5 +53,8 @@ export class ProjectList extends React.Component<ProjectListProps> {
 	}
 	protected handleProjectClick(id: string): void {
 		this.props.store.openFirstPage(id);
+	}
+	protected handleDeleteProjectClick(project: Project): void {
+		this.props.store.removeProject(project);
 	}
 }

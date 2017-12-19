@@ -48,7 +48,14 @@ export class PageList extends React.Component<PageListProps> {
 					>
 						<DropdownItemLinkAttribute>
 							<DropdownItemLinkAttributeItem>Edit</DropdownItemLinkAttributeItem>
-							<DropdownItemLinkAttributeItem>Delete</DropdownItemLinkAttributeItem>
+							<DropdownItemLinkAttributeItem
+								handleClick={(e: React.MouseEvent<HTMLElement>) => {
+									e.preventDefault();
+									this.handleDeletePageClick(page);
+								}}
+							>
+								Delete
+							</DropdownItemLinkAttributeItem>
 						</DropdownItemLinkAttribute>
 					</DropdownItem>
 				))}
@@ -73,5 +80,10 @@ export class PageList extends React.Component<PageListProps> {
 
 	protected handlePageClick(id: string): void {
 		this.props.store.openPage(id);
+	}
+
+	protected handleDeletePageClick(page: PageRef): void {
+		console.log(page);
+		this.props.store.removePage(page);
 	}
 }

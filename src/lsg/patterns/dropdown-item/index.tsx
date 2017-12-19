@@ -15,6 +15,10 @@ export interface StyledDropdownItemLinkProps {
 	color?: Color;
 }
 
+export interface DropdownItemLinkAttributeItemProps {
+	handleClick?: React.MouseEventHandler<HTMLElement>;
+}
+
 const StyledDropdownItem = styled.div`
 	display: flex;
 	align-items: center;
@@ -86,10 +90,12 @@ export class DropdownItemLinkAttribute extends React.Component<{}> {
 	}
 }
 
-export class DropdownItemLinkAttributeItem extends React.Component<{}> {
+export class DropdownItemLinkAttributeItem extends React.Component<
+	DropdownItemLinkAttributeItemProps
+> {
 	public render(): JSX.Element {
 		return (
-			<StyledDropdownItemLinkAttributeItem>
+			<StyledDropdownItemLinkAttributeItem onClick={this.props.handleClick}>
 				{this.props.children}
 			</StyledDropdownItemLinkAttributeItem>
 		);

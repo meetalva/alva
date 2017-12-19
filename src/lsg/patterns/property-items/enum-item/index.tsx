@@ -50,7 +50,6 @@ const StyledLabel = styled.span`
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
-	text-transform: capitalize;
 `;
 
 export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {

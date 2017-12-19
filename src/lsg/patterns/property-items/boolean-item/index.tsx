@@ -70,7 +70,6 @@ const StyledLabel = styled.span`
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.black.toString()};
-	text-transform: capitalize;
 	margin-bottom: ${getSpace(Size.XS)}px;
 `;
 

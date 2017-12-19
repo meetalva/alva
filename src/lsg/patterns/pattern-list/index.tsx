@@ -30,7 +30,6 @@ const StyledPatternLabel = styled.div`
 	margin-top: ${getSpace(Size.L)}px;
 	margin-left: ${getSpace(Size.L)}px;
 	color: ${colors.grey60.toString()};
-	text-transform: capitalize;
 
 	&:first-of-type {
 		margin-top: ${getSpace(Size.S)}px;
@@ -46,15 +45,15 @@ const StyledPatternListItem = styled.li`
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 12px;
 	color: ${colors.black.toString()};
-	width: calc(50% - ${getSpace(Size.XS)/2}px);
+	width: calc(50% - ${getSpace(Size.XS) / 2}px);
 	box-sizing: border-box;
 	text-align: center;
 
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15);
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15);
 	transition: box-shadow 0.2s;
 
 	&:hover {
-		box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);
+		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
 	}
 
 	${(props: PatternListItemProps) =>
@@ -76,7 +75,6 @@ const StyledPatternListItemLabel = styled.div`
 	text-align: center;
 	width: 100%;
 	display: block;
-	text-transform: capitalize;
 	color: ${colors.grey36.toString()};
 `;
 

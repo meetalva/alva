@@ -181,7 +181,7 @@ export class TypeScriptParser extends PatternParser {
 		}
 
 		const patternName: string | undefined = this.getJsDocValue(this.propsDeclaration, 'name');
-		if (patternName !== undefined && pattern.getName() === pattern.getId()) {
+		if (patternName !== undefined && patternName !== '') {
 			pattern.setName(patternName);
 		}
 
@@ -206,7 +206,7 @@ export class TypeScriptParser extends PatternParser {
 		}
 
 		const name: string | undefined = this.getJsDocValue(signature, 'name');
-		if (name !== undefined && property.getName() !== property.getId()) {
+		if (name !== undefined && name !== '') {
 			property.setName(name);
 		}
 

@@ -108,6 +108,25 @@ export class Store {
 	}
 
 	/**
+	 * Tries to guess a human-friendly name from an ID by splitting words at camel-case positions,
+	 * and capitalizing the first letter. If an actual name is provided, this comes first.
+	 * @param id The technical (internal) ID.
+	 * @param name The human-friendly name.
+	 * @return The guessed (or given) human-friendly name.
+	 */
+	public static guessName(id: string, name?: string): string {
+		if (name) {
+			return name;
+		}
+
+		const guessedName = id
+			.replace(/[_-]+/, ' ')
+			.replace(/([a-z])([A-Z])/g, '$1 $2')
+			.toLowerCase();
+		return guessedName.substring(0, 1).toUpperCase() + guessedName.substring(1);
+	}
+
+	/**
 	 * Add a new project definition to the list of projects.
 	 * Note: Changes to the projects and page references are saved only when calling save().
 	 * @param project The new project.

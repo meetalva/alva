@@ -38,6 +38,7 @@ const StyledInput = styled.input`
 
 	::placeholder {
 		color: ${colors.grey50.toString()};
+		transition: color 0.2s;
 	}
 
 	:hover {

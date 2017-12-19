@@ -86,7 +86,7 @@ export class ElementList extends React.Component<ElementListProps> {
 		const updatePageElement: React.MouseEventHandler<HTMLElement> = event => {
 			event.stopPropagation();
 			this.props.store.setSelectedElement(element);
-			this.props.store.setElementFocus(true);
+			this.props.store.setElementFocussed(true);
 		};
 
 		return {

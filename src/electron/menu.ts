@@ -102,7 +102,7 @@ export function createMenu(store: Store): void {
 					accelerator: 'CmdOrCtrl+X',
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
-						if (selectedElement && store.getElementFocus()) {
+						if (selectedElement && store.isElementFocussed()) {
 							store.setClipboardElement(selectedElement);
 							selectedElement.remove();
 						}
@@ -114,7 +114,7 @@ export function createMenu(store: Store): void {
 					accelerator: 'CmdOrCtrl+C',
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
-						if (selectedElement && store.getElementFocus()) {
+						if (selectedElement && store.isElementFocussed()) {
 							store.setClipboardElement(selectedElement);
 						}
 						Menu.sendActionToFirstResponder('copy:');
@@ -126,7 +126,7 @@ export function createMenu(store: Store): void {
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						const clipboardElement: PageElement | undefined = store.getClipboardElement();
-						if (selectedElement && clipboardElement && store.getElementFocus()) {
+						if (selectedElement && clipboardElement && store.isElementFocussed()) {
 							const newPageElement = clipboardElement.clone();
 							selectedElement.addSibling(newPageElement);
 							store.setSelectedElement(newPageElement);
@@ -142,7 +142,7 @@ export function createMenu(store: Store): void {
 					accelerator: 'CmdOrCtrl+D',
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
-						if (selectedElement && store.getElementFocus()) {
+						if (selectedElement && store.isElementFocussed()) {
 							const newPageElement = selectedElement.clone();
 							selectedElement.addSibling(newPageElement);
 							store.setSelectedElement(newPageElement);

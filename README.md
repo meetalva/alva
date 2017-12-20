@@ -1,12 +1,3 @@
-- [Meet Alva](#meet-alva)
-- [Installation and usage](#installation-and-usage)
-    - [As a designer](#as-a-designer)
-    - [As a pattern developer](#as-a-pattern-developer)
-    - [As a contributor to Alva](#as-a-contributor-to-alva)
-    - [Pattern requirements and configuration](#pattern-requirements-and-configuration)
-    - [Source-code structure and architecture](#source-code-structure-and-architecture)
-- [Next features](#next-features)
-
 # Meet Alva
 
 We enable cross-functional teams to design contextual digital experiences and code-based ecosystems.
@@ -25,11 +16,19 @@ of the components to the developers, providing a single source of truth for both
 There is no such thing as out-dated and static PNG screens, as the current version of both the
 design models and the component implementation always render to up-to-date web pages instead.
 
-# Installation and usage
+- [Installation and usage](#installation-and-usage)
+	- [As a designer](#as-a-designer)
+	- [As a pattern developer](#as-a-pattern-developer)
+	- [As a contributor to Alva](#as-a-contributor-to-alva)
+	- [Pattern requirements and configuration](#pattern-requirements-and-configuration)
+	- [Source-code structure and architecture](#source-code-structure-and-architecture)
+- [Next features](#next-features)
+
+## Installation and usage
 
 Please follow the installation and usage guidelines matching your purpose for Alva.
 
-## As a designer
+### As a designer
 
 [Download](https://github.com/meetalva/alva/releases) the pre-built release of Alva.
 
@@ -39,7 +38,7 @@ If you want to work on a production styleguide, together with your developers te
 
 Either way, after the download and installation, start Alva and choose "Open Styleguide" to get started.
 
-## As a pattern developer
+### As a pattern developer
 
 Also [download](https://github.com/meetalva/alva/releases) the pre-built release of Alva.
 
@@ -64,7 +63,7 @@ Instruct the designer team on how to add, commit, and push these files. The styl
 You can find an example patterglate styleguide with Alva designs at
 https://github.com/meetalva/designkit.
 
-## As a contributor to Alva
+### As a contributor to Alva
 
 To add a contribution to Alva (improve its features, fix issues), get the source of both the application itself, and the kickstart styleguide (designkit):
 
@@ -91,7 +90,7 @@ We use strict TSC and TSLint rules, as well as Prettier. When naming things, we 
 
 We are not using webpack as a build tool, as this prevents the Electron app from requiring external components like the styleguide patterns.
 
-## Pattern requirements and configuration
+### Pattern requirements and configuration
 
 Alva tries hard to understand the structure of your styleguide, including the pattern folders, patterns, and properties.
 
@@ -145,7 +144,7 @@ className?: string;
 
 You can also specify the @name annotation on enum members, and you can add it to the props interface to rename the entire pattern.
 
-## Source-code structure and architecture
+### Source-code structure and architecture
 
 Alva is a React application using MobX as state management and Electron to provide a stand-alone application.
 
@@ -159,7 +158,7 @@ All the source of Alva is located at `src`, divided into the following folders:
 * **resources**: Resources are files related to the build, like the icons.
 * **store**: The store is the data-center and business logic of Alva. The model. The store is a collection of MobX observables and does not contain any UI elements like React components. Instead, all components bind their props to this store by decorating with @observer.
 
-# Next features
+## Next features
 
 [See Issues](https://github.com/meetalva/alva/issues?q=is%3Aopen+is%3Aissue)
 

@@ -1,10 +1,7 @@
 # Welcome contributors to Alva
-First of all, we'd love for you to contribute to our source code.
+💓 First of all, we'd love for you to contribute to our source code. 💓
 
-# Code of Conduct
-First of all, we'd love for you to contribute to our source code.
-
-
+## Code of Conduct
 We belive in a welcoming and inclusive environment / community, that's why we enforce our Code of Conduct.
 For more information -> [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
@@ -87,10 +84,6 @@ https://github.com/marionebl/commitlint
 https://github.com/commitizen/cz-cli
 
 
-# @todoDoc not sure where to put this - anyone any ideas?
-We are not using webpack as a build tool, as this prevents the Electron app from requiring external components like the styleguide patterns.
-
-
 ## Team
 * Alexander Peschel
 * Julius Walther
@@ -101,4 +94,4 @@ We are not using webpack as a build tool, as this prevents the Electron app from
 
 
 ## Questions?
-Just drop us an [email](alva@sinnerschrader.com), write us a direct message on Twitter [@meetalva](https://twitter.com/meetalva) or write an issue with the label "question"
+Just drop us an [email](alva@sinnerschrader.com) or write a direct message on Twitter to [@meetalva](https://twitter.com/meetalva)

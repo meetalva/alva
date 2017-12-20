@@ -83,7 +83,6 @@ export class PageList extends React.Component<PageListProps> {
 	}
 
 	protected handleDeletePageClick(page: PageRef): void {
-		console.log(page);
 		this.props.store.removePage(page);
 	}
 }

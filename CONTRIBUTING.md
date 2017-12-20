@@ -77,8 +77,8 @@ Issues should be provided as branches starting with "feat/", as pull requests.
 
 ## Style Guide / Coding conventions
 ### Coding conventions & guidelines
-#### TSC & TSLint
-We use strict TSC and TSLint rules, as well as Prettier. When it comes to naming things, we follow the [TypeScript guidelines](https://github.com/Microsoft/TypeScript/wiki/Coding-guidelines), and we do not abbreviate names (except for trivial names like HTML).
+#### TypeScript & TSLint
+We use strict tsconfig and TSLint rules, as well as Prettier. When it comes to naming things, we follow the [TypeScript guidelines](https://github.com/Microsoft/TypeScript/wiki/Coding-guidelines), and we do not abbreviate names (except for trivial names like HTML).
 
 #### We use .editorconfig
 Editorconfig helps developers define and maintain consistent coding styles between different editors and IDEs.

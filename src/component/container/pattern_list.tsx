@@ -61,7 +61,7 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 				<Space sizeBottom={Size.XXS}>
 					<Input handleChange={this.handleSearchInputChange} placeholder="Search patterns" />
 				</Space>
-				<Space size={[Size.L, Size.XL]}>{list}</Space>
+				<Space size={[0, Size.L]}>{list}</Space>
 			</div>
 		);
 	}

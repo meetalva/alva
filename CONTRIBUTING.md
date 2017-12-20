@@ -28,24 +28,24 @@ For more information -> [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.m
 To add a contribution to Alva (improve its features, fix issues),
 get the source of the application itself, and if you don´t already have a Alva compatible styleguide, the kickstart styleguide (designkit):
 
-* Clone the [alva](https://github.com/meetalva/alva) repository:
+1. Clone the [alva](https://github.com/meetalva/alva) repository:
 ```shell
 git clone git@github.com:meetalva/alva.git
 ```
-* Run in the main (Alva) respository:
+2. Run in the main (Alva) respository:
 ```shell
 npm i && npm start
 ```
-* Now open a compatible styleguide or if you don´t already have one, follow the steps below
-	* Clone the [designkit](https://github.com/meetalva/designkit) repository:
+3. Now open a compatible styleguide. If you don´t have any, follow the next steps
+  1. Clone the [designkit](https://github.com/meetalva/designkit) repository:
 	```shell
 	git clone git@github.com:meetalva/designkit.git
 	```
-	* Run this command to build the designkit for Alva:
+  2. Run this command to build the designkit for Alva:
 	```shell
 	npm i && npm start
 	```
-	* Now you should be able to open the designkit inside Alva
+	Now you should be able to open the designkit inside Alva
 
 
 ## Issues

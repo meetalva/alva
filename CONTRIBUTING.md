@@ -2,23 +2,29 @@
 First of all, we'd love for you to contribute to our source code.
 
 # Code of Conduct
+First of all, we'd love for you to contribute to our source code.
+
+
 We belive in a welcoming and inclusive environment / community, that's why we enforce our Code of Conduct.
 For more information -> [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
 
-# Table of Contents
-# like [Reporting Bugs](#reporting-bugs).
+## Table of Contents
+- [Link collection](#short-collection-of-links-to-important-resources)
+- [Setup for contributers](#setup-for-contributers)
+- [Issues](#issues)
+	- [Good first issue for Contributors](#good-first-issue)
+	- [Lable structur](#labels)
+	- [Working on issues](#working-on-issues)
+- [Style Guide / Coding conventions](#style-guide-/-coding-conventions)
+	- [Coding conventions & guidelines](#coding-conventions-&-guidelines)
 
-# Short Links to Important Resources:
-   * docs: https://github.com/meetalva/alva/wiki
-   * bugs / issues: https://github.com/meetalva/alva/issues
+
+## Short collection of Links to Important Resources
+   * bugs / feature requests: https://github.com/meetalva/alva/issues
+   * website: https://meetalva.io
    * sprint board: https://github.com/meetalva/alva/projects/2
-   * backlog: https://github.com/meetalva/alva/projects/3
-   * comms: forum link, developer list, IRC/email
-
-
-# @todoDoc Testing
-how to test the project?, where the tests are located in directories?
+   * backlog board: https://github.com/meetalva/alva/projects/3
 
 
 ## Setup for contributers
@@ -37,29 +43,14 @@ npm i && npm run build
 npm i && npm start
 ```
 
-## @todoDoc How to submit changes
-Pull Request protocol etc.
 
-
-## @todoDoc How to report a bug
-Explain how to report a bug, what should contributer tell us? do we have a "debug" mode or tips for debugging?
-
-## Templates
-* create a template for bug issues
-* create a template for featue issues
-
-
-## Good first issue for Contributors
-A good first contribution issue could be
+## Issues
+### Good first issue
+A good first issues for contribution could be
 * reporting a bug
 * create a feature request
 * work on an issue with the label *good first issue*
 
-
-## How to request an "enhancement"
-- enhancements are features that you might like to suggest to a project, but aren't necessarily bugs/problems with the existing code; there is a "label" for enhancments in Github's Issues (where you report bugs), so you can tag issues as "enhancement," and thereby allow contributors to prioritize issues/bugs reported to the project. See Atom's example section.
-
-## Issues
 ### Labels
 - *good first issue* - if you are new to *Alva* or open source this could be a good first issue
 - *help wanted* - issue where we need help
@@ -77,7 +68,6 @@ A good first contribution issue could be
 Issues should be provided as branches starting with "feat/", as pull requests.
 
 
-
 ## Style Guide / Coding conventions
 ### Coding conventions & guidelines
 #### TSC & TSLint
@@ -89,8 +79,9 @@ There are a lot of plugins for editors/IDEs that support .editorconfig.
 
 You'll find more informations, extentions for editors and IDEs at the [editorconfig page](http://editorconfig.org/).
 
-### commit messages
-For commit message we use the angular [commit guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits)
+
+### Commit message conventions
+For commit message we use the [angular commit guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits)
 #### commitizen & commitlint
 https://github.com/marionebl/commitlint
 https://github.com/commitizen/cz-cli

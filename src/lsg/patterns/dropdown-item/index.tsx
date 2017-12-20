@@ -19,17 +19,13 @@ const StyledDropdownItem = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-bottom: ${getSpace(SpaceSize.S)}px;
-
-	:last-child {
-		margin-bottom: 0;
-	}
 `;
 
 const StyledDropdownItemLink = styled.a`
 	display: flex;
 	align-items: center;
 	flex-grow: 1;
+	padding-bottom: ${getSpace(SpaceSize.S)}px;
 	font-size: 12px;
 	cursor: pointer;
 	${(props: StyledDropdownItemLinkProps) =>
@@ -68,7 +64,7 @@ export default class DropdownItem extends React.Component<DropdownItemProps> {
 			<StyledDropdownItem>
 				<StyledDropdownItemLink onClick={this.props.handleClick}>
 					{this.props.icon && (
-						<StyledDropdownItemIcon size={IconSize.XXS} name={this.props.icon} />
+						<StyledDropdownItemIcon size={IconSize.S} name={this.props.icon} />
 					)}
 					{this.props.name}
 				</StyledDropdownItemLink>

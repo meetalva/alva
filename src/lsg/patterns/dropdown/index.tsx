@@ -51,12 +51,13 @@ const StyledIcon = styled(Icon)`
 	fill: ${colors.grey36.toString()};
 	transition: transform 0.2s;
 
-	${(props: StyledIconProps) => (props.open ? 'transform: rotate(-90deg)' : 'transform: rotate(90deg)')};
+	${(props: StyledIconProps) =>
+		props.open ? 'transform: rotate(-90deg)' : 'transform: rotate(90deg)'};
 `;
 
 const StyledFlyout = styled.div`
 	${(props: StyledFlyoutProps) => (props.open ? 'display: block' : 'display: none')};
-	padding: 0 ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.L)}px;
+	padding: 0 ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.XS)}px;
 `;
 
 const StyledChromeDropdown = styled(StyledDropdown)`
@@ -65,7 +66,7 @@ const StyledChromeDropdown = styled(StyledDropdown)`
 	top: 45px;
 	left: 50%;
 	min-width: 200px;
-	padding: ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.L)}px;
+	padding: ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.XS)}px;
 	transform: translateX(-50%);
 `;
 

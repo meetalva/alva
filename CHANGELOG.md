@@ -2,6 +2,48 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/meetalva/alva/compare/v0.5.0...v0.6.0) (2017-12-20)
+
+
+### Bug Fixes
+
+* pattern and property names: Automatic name guessing, and [@name](https://github.com/name) annotation ([3754a8c](https://github.com/meetalva/alva/commit/3754a8c))
+* **build:** electron should now always find the correct js file ([#116](https://github.com/meetalva/alva/issues/116)) ([cd2e76d](https://github.com/meetalva/alva/commit/cd2e76d)), closes [#106](https://github.com/meetalva/alva/issues/106)
+* **component:** adjust patternlist spacing ([#105](https://github.com/meetalva/alva/issues/105)) ([ed8d14e](https://github.com/meetalva/alva/commit/ed8d14e))
+* **component:** fix pattern list search ([45cc05d](https://github.com/meetalva/alva/commit/45cc05d))
+* **lsg:** remove fonts import ([9736df8](https://github.com/meetalva/alva/commit/9736df8))
+
+
+### Features
+
+* **component:** add error wrapper around preview components ([0325ea6](https://github.com/meetalva/alva/commit/0325ea6))
+* **component:** add spacing ([5c52909](https://github.com/meetalva/alva/commit/5c52909))
+* **component:** integrate icon in pattern list ([6f6cac1](https://github.com/meetalva/alva/commit/6f6cac1)), closes [#91](https://github.com/meetalva/alva/issues/91)
+* **component:** move splash screen from preview to app main section, create styled splash screen ([b559d1b](https://github.com/meetalva/alva/commit/b559d1b))
+* **component:** remove edit delete and add from page list ([2b51ee6](https://github.com/meetalva/alva/commit/2b51ee6))
+* **component:** remove edit delete and add from project list ([29059da](https://github.com/meetalva/alva/commit/29059da))
+* **component/app:** add spacing to page list ([#103](https://github.com/meetalva/alva/issues/103)) ([5df49bc](https://github.com/meetalva/alva/commit/5df49bc))
+* **lsg:** add more clickable space to dropdown items ([84de0d1](https://github.com/meetalva/alva/commit/84de0d1))
+* **lsg:** add textColor property to headline ([f75189a](https://github.com/meetalva/alva/commit/f75189a))
+* **lsg:** adjust pattern list styling ([ff04ed0](https://github.com/meetalva/alva/commit/ff04ed0))
+* **lsg:** change fallback pattern icon ([#119](https://github.com/meetalva/alva/issues/119)) ([4b352e4](https://github.com/meetalva/alva/commit/4b352e4))
+* **lsg:** introduce button component ([78bd656](https://github.com/meetalva/alva/commit/78bd656))
+* **lsg:** introduce copy component ([ed2fc0e](https://github.com/meetalva/alva/commit/ed2fc0e))
+* **lsg:** introduce splash screen component ([f8a44aa](https://github.com/meetalva/alva/commit/f8a44aa))
+* **lsg:** load external pattern icon as image source, adjust styling ([1642d7b](https://github.com/meetalva/alva/commit/1642d7b)), closes [#91](https://github.com/meetalva/alva/issues/91)
+* **lsg:** remove left section from splash screen ([224fa86](https://github.com/meetalva/alva/commit/224fa86))
+* **lsg:** remove margin from pattern list items ([c7a6b75](https://github.com/meetalva/alva/commit/c7a6b75))
+* **store:** add get pattern icon path ([051990c](https://github.com/meetalva/alva/commit/051990c)), closes [#91](https://github.com/meetalva/alva/issues/91)
+* make title property optional ([e6f38bf](https://github.com/meetalva/alva/commit/e6f38bf))
+
+
+### Reverts
+
+* **component): fix(component:** fix pattern list search, convert pattern name to lowercase ([#102](https://github.com/meetalva/alva/issues/102)) ([867e8d0](https://github.com/meetalva/alva/commit/867e8d0))
+
+
+
 <a name="0.5.0"></a>
 # [0.5.0](https://github.com/meetalva/alva/compare/v0.4.1...v0.5.0) (2017-12-19)
 

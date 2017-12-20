@@ -1,4 +1,4 @@
-# Welcome contributors to alva
+# Welcome contributors to Alva
 First of all, we'd love for you to contribute to our source code.
 
 # Code of Conduct
@@ -61,10 +61,10 @@ A good first contribution issue could be
 
 ## Issues
 ### Labels
-- *good first issue* - if you are new to *alva* or open source this could be a good first issue
+- *good first issue* - if you are new to *Alva* or open source this could be a good first issue
 - *help wanted* - issue where we need help
-- *type: bug* - issue for an error/ failure of alva
-- *type: feature* - issue for eature request
+- *type: bug* - issue for an error/ failure of Alva
+- *type: feature* - issue for feature request
 - *type: design* - issue for a design todo
 - *type: documentation* - issue for needed, missing or unclear documentation
 - *status: in progress* - issue is currently in progress

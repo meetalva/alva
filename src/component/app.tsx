@@ -19,6 +19,7 @@ import PropertyPane from '../lsg/patterns/panes/property-pane';
 import { PropertyList } from './container/property_list';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import Space, { Size } from '../lsg/patterns/space';
 import { Store } from '../store/store';
 
 globalStyles();
@@ -80,7 +81,9 @@ class App extends React.Component<AppProps> {
 				<MainArea>
 					<SideBar directionVertical hasPaddings>
 						<ElementPane>
-							<PageList store={this.props.store} />
+							<Space sizeBottom={Size.XL}>
+								<PageList store={this.props.store} />
+							</Space>
 							<ElementList store={this.props.store} />
 						</ElementPane>
 						<PatternsPane>

@@ -93,7 +93,7 @@ class App extends React.Component<AppProps> {
 					<MainArea>
 						<SideBar directionVertical hasPaddings>
 							<ElementPane>
-								<Space sizeBottom={SpaceSize.XL}>
+								<Space sizeBottom={SpaceSize.L}>
 									<PageList store={this.props.store} />
 								</Space>
 								<ElementList store={this.props.store} />

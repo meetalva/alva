@@ -80,9 +80,9 @@ export const PatternListItem: React.StatelessComponent<PatternListItemProps> = p
 			) : (
 				<StyledIcon
 					className="pattern__icon"
-					name={IconName.Robo}
-					size={IconSize.XS}
-					color={colors.grey60}
+					name={IconName.Pattern}
+					size={IconSize.S}
+					color={colors.grey50}
 				/>
 			)}
 			<StyledPatternListItemLabel>{props.children}</StyledPatternListItemLabel>

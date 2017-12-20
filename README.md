@@ -1,3 +1,7 @@
+<h1 align="center">Meet Alva</h1>
+<p align="center">Alva is a radically new digital design tool built for cross-functional product teams.</p>
+<img src="https://meetalva.io/assets/images/alva-hero.png" style="box-shadow: 0 5px 30px rgba(0,0,0,0.15);">
+
 # Meet Alva
 
 We enable cross-functional teams to design contextual digital experiences and code-based ecosystems.

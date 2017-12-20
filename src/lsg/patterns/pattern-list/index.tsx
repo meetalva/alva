@@ -12,23 +12,18 @@ export interface PatternListItemProps {
 	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
-const StyledPatternList = styled.ul`
+const StyledPatternList = styled.div`
 	box-sizing: border-box;
-	display: block;
-	padding: 0 ${getSpace(Size.L)}px;
+	display: flex;
+	flex-wrap: wrap;
+	flex-basis: 100%;
 	margin: 0;
-
-	> div {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
-	}
 `;
 
 const StyledPatternLabel = styled.div`
-	margin-bottom: ${getSpace(Size.S)}px;
+	flex-basis: 100%;
 	margin-top: ${getSpace(Size.L)}px;
-	margin-left: ${getSpace(Size.L)}px;
+	margin-bottom: ${getSpace(Size.S)}px;
 	color: ${colors.grey60.toString()};
 
 	&:first-of-type {
@@ -36,17 +31,15 @@ const StyledPatternLabel = styled.div`
 	}
 `;
 
-const StyledPatternListItem = styled.li`
-	display: block;
+const StyledPatternListItem = styled.div`
+	box-sizing: border-box;
+	width: calc(50% - ${getSpace(Size.XS) / 2}px);
 	padding: ${getSpace(Size.S)}px;
-	margin: 0 0 ${getSpace(Size.XS)}px 0;
+	margin: 0 ${getSpace(Size.XS)}px ${getSpace(Size.XS)}px 0;
 	border-radius: 3px;
 	background: ${colors.white.toString()};
-	font-family: ${fonts().NORMAL_FONT};
 	font-size: 12px;
 	color: ${colors.black.toString()};
-	width: calc(50% - ${getSpace(Size.XS) / 2}px);
-	box-sizing: border-box;
 	text-align: center;
 
 	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15);
@@ -54,6 +47,10 @@ const StyledPatternListItem = styled.li`
 
 	&:hover {
 		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+	}
+
+	:nth-child(2n) {
+		margin-right: 0;
 	}
 
 	${(props: PatternListItemProps) =>
@@ -66,15 +63,12 @@ const StyledSVG = styled.svg`
 `;
 
 const StyledIcon = styled(Icon)`
-	margin: 0 auto;
 	display: block;
-	margin-bottom: ${getSpace(Size.XS)}px;
+	margin: 0 auto ${getSpace(Size.XS)}px;
 `;
 
 const StyledPatternListItemLabel = styled.div`
 	text-align: center;
-	width: 100%;
-	display: block;
 	color: ${colors.grey36.toString()};
 `;
 

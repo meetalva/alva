@@ -4,7 +4,11 @@ import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern/pattern';
-import PatternList, { PatternLabel, PatternListItem } from '../../lsg/patterns/pattern-list';
+import PatternList, {
+	PatternLabel,
+	PatternListItem,
+	PatternListItemProps
+} from '../../lsg/patterns/pattern-list';
 import * as React from 'react';
 import Space, { Size } from '../../lsg/patterns/space';
 import { Store } from '../../store/store';
@@ -13,11 +17,8 @@ export interface PatternListContainerProps {
 	store: Store;
 }
 
-export interface PatternListContainerItemProps {
+export interface PatternListContainerItemProps extends PatternListItemProps {
 	children?: PatternListContainerItemProps[];
-	draggable?: boolean;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
-	onClick?: React.MouseEventHandler<HTMLElement>;
 	value: string;
 }
 
@@ -60,7 +61,7 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 				<Space sizeBottom={Size.XXS}>
 					<Input handleChange={this.handleSearchInputChange} placeholder="Search patterns" />
 				</Space>
-				<Space sizeBottom={Size.L}>{list}</Space>
+				<Space size={[Size.L, Size.XL]}>{list}</Space>
 			</div>
 		);
 	}
@@ -93,29 +94,28 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 
 	public createList(items: PatternListContainerItemProps[]): JSX.Element {
 		return (
-			<div>
+			<PatternList>
 				{items.map((props: PatternListContainerItemProps, index: number) => {
 					if (props.children) {
 						return (
-							<div>
+							<PatternList>
 								<PatternLabel key={index}>{props.value}</PatternLabel>
-								<PatternList>{this.createList(props.children)}</PatternList>
-							</div>
-						);
-					} else {
-						return (
-							<PatternListItem
-								draggable={props.draggable}
-								handleDragStart={props.handleDragStart}
-								key={index}
-								onClick={props.onClick}
-							>
-								{props.value}
-							</PatternListItem>
+								{this.createList(props.children)}
+							</PatternList>
 						);
 					}
+					return (
+						<PatternListItem
+							draggable={props.draggable}
+							handleDragStart={props.handleDragStart}
+							key={index}
+							onClick={props.onClick}
+						>
+							{props.value}
+						</PatternListItem>
+					);
 				})}
-			</div>
+			</PatternList>
 		);
 	}
 

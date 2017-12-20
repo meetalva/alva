@@ -64,31 +64,8 @@ You can find an example patterglate styleguide with Alva designs at
 https://github.com/meetalva/designkit.
 
 ### As a contributor to Alva
+Please read our [contributing guidelines](https://github.com/meetalva/alva/blob/master/CONTRIBUTING.md#Setup-for-contributers). There you will find also the setup for contributers.
 
-To add a contribution to Alva (improve its features, fix issues), get the source of both the application itself, and the kickstart styleguide (designkit):
-
-* Clone this repository.
-* Clone the designkit repository (git@github.com:meetalva/designkit.git)
-* Run in the designkit repository:
-```shell
-npm i && npm run build
-```
-* Run in the main (Alva) respository:
-```shell
-npm i && npm start
-```
-
-
-Feel free to dive in! Open an [issue](https://github.com/meetalva/alva/issues/new) or submit a
-[Pull Request](https://github.com/meetalva/alva/compare). ❤️
-
-Alva follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
-
-Issues should be provided as branches starting with "feat/", as pull requests.
-
-We use strict TSC and TSLint rules, as well as Prettier. When naming things, we follow the [TypeScript guidelines](https://github.com/Microsoft/TypeScript/wiki/Coding-guidelines), and we do not abbreviate names (except for trivial names like HTML).
-
-We are not using webpack as a build tool, as this prevents the Electron app from requiring external components like the styleguide patterns.
 
 ### Pattern requirements and configuration
 
@@ -161,6 +138,13 @@ All the source of Alva is located at `src`, divided into the following folders:
 ## Next features
 
 [See Issues](https://github.com/meetalva/alva/issues?q=is%3Aopen+is%3Aissue)
+
+---
+
+Feel free to dive in! Open an [issue](https://github.com/meetalva/alva/issues/new) or submit a
+[Pull Request](https://github.com/meetalva/alva/compare). ❤️
+
+Alva follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 

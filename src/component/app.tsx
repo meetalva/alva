@@ -93,7 +93,9 @@ class App extends React.Component<AppProps> {
 					<MainArea>
 						<SideBar directionVertical hasPaddings>
 							<ElementPane>
-								<PageList store={this.props.store} />
+								<Space sizeBottom={SpaceSize.L}>
+									<PageList store={this.props.store} />
+								</Space>
 								<ElementList store={this.props.store} />
 							</ElementPane>
 							<PatternsPane>

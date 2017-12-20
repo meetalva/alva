@@ -79,6 +79,7 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 				result.push({
 					value: pattern.getId(),
 					draggable: true,
+					icon: pattern.getIconPath(),
 					handleDragStart: (e: React.DragEvent<HTMLElement>) => {
 						this.handleDragStart(e, pattern);
 					},
@@ -109,6 +110,7 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 							draggable={props.draggable}
 							handleDragStart={props.handleDragStart}
 							key={index}
+							icon={props.icon}
 							onClick={props.onClick}
 						>
 							{props.value}

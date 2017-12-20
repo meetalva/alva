@@ -5,7 +5,8 @@ import styled from 'styled-components';
 export enum IconName {
 	Arrow,
 	ArrowFill,
-	Robo
+	Robo,
+	Pattern
 }
 export interface IconRegistryProps {
 	names: typeof IconName;
@@ -42,7 +43,11 @@ const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
 	[IconName.ArrowFill]: [[<path key="arrowFill" d="M8 4l8 8-8 8z" />]],
 	[IconName.Robo]: [
 		[<path key="robo" d="M0 0h24v24H0V0zm15 5v5h5V5h-5zM4 20h16v-1H4v1zM4 5v5h5V5H4z" />]
+	],
+	[IconName.Pattern]: [
+		[<path key="pattern" d="M6 15h5v2H6v-2zm0-8h10v1H6V7zm0 3h7v1H6v-1zM4 5v14h16V5H4zm0-1h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" />]
 	]
+	
 };
 
 const StyledIconRegistry = styled.svg`

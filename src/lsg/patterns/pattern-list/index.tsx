@@ -53,13 +53,15 @@ const StyledPatternListItem = styled.div`
 		props.draggable ? 'cursor: move;' : props.onClick ? 'cursor: pointer;' : ''};
 `;
 
-const StyledSVG = styled.svg`
-	margin-right: ${getSpace(Size.L)}px;
-	fill: ${colors.grey50.toString()};
-`;
-
 const StyledIcon = styled(Icon)`
 	display: block;
+	margin: 0 auto ${getSpace(Size.XS)}px;
+`;
+
+const StyledImg = styled.img`
+	display: block;
+	width: 18px;
+	height: 18px;
 	margin: 0 auto ${getSpace(Size.XS)}px;
 `;
 
@@ -73,7 +75,7 @@ export const PatternListItem: React.StatelessComponent<PatternListItemProps> = p
 	return (
 		<StyledPatternListItem onDragStart={handleDragStart} draggable={draggable} onClick={onClick}>
 			{icon ? (
-				<StyledSVG className="pattern__icon">{icon}</StyledSVG>
+				<StyledImg className="pattern__icon" src={icon} />
 			) : (
 				<StyledIcon
 					className="pattern__icon"

@@ -224,6 +224,10 @@ export class Store {
 		return PathUtils.join(this.styleGuidePath, 'lib', 'patterns');
 	}
 
+	public getPatternsIconPath(): string {
+		return PathUtils.join(this.styleGuidePath, 'patterns');
+	}
+
 	/**
 	 * Returns the root folder of the patterns of the currently opened styleguide.
 	 * @return The root folder object.

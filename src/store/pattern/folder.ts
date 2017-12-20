@@ -29,6 +29,10 @@ export class PatternFolder {
 		return PathUtils.join(this.store.getPatternsPath(), this.getRelativePath());
 	}
 
+	public getAbsoluteIconPath(): string {
+		return PathUtils.join(this.store.getPatternsIconPath(), this.getRelativePath());
+	}
+
 	public getChild(path: string): PatternFolder | undefined {
 		path = path.replace('/', PathUtils.sep);
 		const slashPos: number = path.indexOf(PathUtils.sep);

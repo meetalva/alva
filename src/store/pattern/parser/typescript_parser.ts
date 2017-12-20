@@ -145,7 +145,9 @@ export class TypeScriptParser extends PatternParser {
 		this.sourceFile = undefined;
 
 		const folderPath: string = pattern.getAbsolutePath();
-		const iconPath: string = PathUtils.join(folderPath, 'icon.svg');
+
+		const folderIconPath: string = pattern.getAbsoluteIconPath();
+		const iconPath: string = PathUtils.join(folderIconPath, 'icon.svg');
 		if (FileUtils.existsSync(iconPath)) {
 			pattern.setIconPath(iconPath);
 		}

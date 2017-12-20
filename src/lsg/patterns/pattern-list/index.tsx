@@ -16,6 +16,7 @@ const StyledPatternList = styled.div`
 	display: flex;
 	flex-wrap: wrap;
 	flex-basis: 100%;
+	justify-content: space-between;
 	margin: 0;
 `;
 
@@ -34,7 +35,7 @@ const StyledPatternListItem = styled.div`
 	box-sizing: border-box;
 	width: calc(50% - ${getSpace(Size.XS) / 2}px);
 	padding: ${getSpace(Size.S)}px;
-	margin: 0 ${getSpace(Size.XS)}px ${getSpace(Size.XS)}px 0;
+	margin-bottom: ${getSpace(Size.XS)}px;
 	border-radius: 3px;
 	background: ${colors.white.toString()};
 	font-size: 12px;
@@ -46,10 +47,6 @@ const StyledPatternListItem = styled.div`
 
 	&:hover {
 		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-	}
-
-	:nth-child(2n) {
-		margin-right: 0;
 	}
 
 	${(props: PatternListItemProps) =>

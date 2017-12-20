@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/*.html build/electron/",
     "build-lsg": "tsc --project src/lsg --outDir build/lsg/patterns --sourceMap",
-    "start": "npm run build && concurrently \"electron build/electron\" \"tsc --project . --watch\"",
+    "start": "npm run build && concurrently \"electron build/electron/electron.js\" \"tsc --project . --watch\"",
     "start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
     "clean": "rm -rf build && rm -rf dist",
     "clean-build": "npm run clean && npm run build",

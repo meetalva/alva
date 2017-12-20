@@ -40,7 +40,7 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 		const result: PatternListContainerItemProps[] = [];
 
 		listItem.map(item => {
-			if (item.value.indexOf(term.toLowerCase()) !== -1 && !item.children) {
+			if (item.value.toLowerCase().indexOf(term.toLowerCase()) !== -1 && !item.children) {
 				result.push(item);
 			} else if (item.children) {
 				const folder = { value: item.value, children: [] };
@@ -77,7 +77,7 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 
 			folder.getPatterns().forEach((pattern: Pattern) => {
 				result.push({
-					value: pattern.getId(),
+					value: pattern.getName(),
 					draggable: true,
 					icon: pattern.getIconPath(),
 					handleDragStart: (e: React.DragEvent<HTMLElement>) => {

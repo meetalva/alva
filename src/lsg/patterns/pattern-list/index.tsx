@@ -25,6 +25,7 @@ const StyledPatternLabel = styled.div`
 	margin-top: ${getSpace(Size.L)}px;
 	margin-bottom: ${getSpace(Size.S)}px;
 	color: ${colors.grey60.toString()};
+	text-transform: capitalize;
 
 	&:first-of-type {
 		margin-top: ${getSpace(Size.S)}px;

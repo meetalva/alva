@@ -10,7 +10,7 @@
     "start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
     "clean": "rm -rf build && rm -rf dist",
     "clean-build": "npm run clean && npm run build",
-    "dist": "standard-version && npm run clean-build && cd build && mkdir designkit && cp -r ../../designkit/patterns ../../designkit/alva ../../designkit/*.* designkit/ && cd designkit && npm i && npm run build && rm -rf node_modules && npm i --production && cd ../.. && electron-builder -mwl",
+    "dist": "standard-version --no-verify && npm run clean-build && cd build && mkdir designkit && cp -r ../../designkit/patterns ../../designkit/alva ../../designkit/*.* designkit/ && cd designkit && npm i && npm run build && rm -rf node_modules && npm i --production && cd ../.. && electron-builder -mwl",
     "commit": "git-cz",
     "commitmsg": "commitlint -e $GIT_PARAMS"
   },

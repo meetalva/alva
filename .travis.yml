@@ -1,0 +1,6 @@
+# .travis.yml
+language: node_js
+before_install: git fetch --unshallow
+script:
+  - ./node_modules/.bin/commitlint --from=HEAD~1
+  - npm test

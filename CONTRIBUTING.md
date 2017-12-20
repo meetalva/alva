@@ -36,12 +36,15 @@ git clone git@github.com:meetalva/alva.git
 ```shell
 npm i && npm start
 ```
-3. Now open a compatible styleguide. If you don´t have any, follow the next steps
-  1. Clone the [designkit](https://github.com/meetalva/designkit) repository:
+
+3. Now open a compatible styleguide.
+
+If you don´t have any, follow the next steps
+1. Clone the [designkit](https://github.com/meetalva/designkit) repository:
 	```shell
 	git clone git@github.com:meetalva/designkit.git
 	```
-  2. Run this command to build the designkit for Alva:
+2. Run this command to build the designkit for Alva:
 	```shell
 	npm i && npm start
 	```

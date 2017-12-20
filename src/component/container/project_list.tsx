@@ -1,9 +1,5 @@
 import Dropdown from '../../lsg/patterns/dropdown';
-import DropdownItem, {
-	DropdownItemLinkAttribute,
-	DropdownItemLinkAttributeItem
-} from '../../lsg/patterns/dropdown-item';
-import { IconName } from '../../lsg/patterns/icons';
+import DropdownItem from '../../lsg/patterns/dropdown-item';
 import { observer } from 'mobx-react';
 import { Project } from '../../store/project/project';
 import * as React from 'react';
@@ -33,14 +29,8 @@ export class ProjectList extends React.Component<ProjectListProps> {
 							e.preventDefault();
 							this.handleProjectClick(project.getId());
 						}}
-					>
-						<DropdownItemLinkAttribute>
-							<DropdownItemLinkAttributeItem>Edit</DropdownItemLinkAttributeItem>
-							<DropdownItemLinkAttributeItem>Delete</DropdownItemLinkAttributeItem>
-						</DropdownItemLinkAttribute>
-					</DropdownItem>
+					/>
 				))}
-				<DropdownItem name="New project" icon={IconName.Robo} />
 			</Dropdown>
 		);
 	}

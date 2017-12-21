@@ -2,7 +2,7 @@
 <p align="center">Alva is a radically new digital design tool built for cross-functional product teams.</p>
 <img src="https://meetalva.io/assets/images/application.png">
 
-Alva is a design tool that works with your production frontend components, adding up-to-date, responsive, and interactive designs to your living styleguide.
+Alva works with your production frontend components, adding up-to-date, responsive, and interactive designs to your living styleguide.
 
 You can start with a minimal set of components to sketch concepts and do fast iterations with your development team to create and enrich components, from atoms to modules and entire pages and a full-featured styleguide. But you can also add Alva designs to existing style
 guides.

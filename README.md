@@ -1,24 +1,15 @@
 <h1 align="center">Meet Alva</h1>
 <p align="center">Alva is a radically new digital design tool built for cross-functional product teams.</p>
-<img src="https://meetalva.io/assets/images/alva-hero.png" style="box-shadow: 0 5px 30px rgba(0,0,0,0.15);">
+<img src="https://meetalva.io/assets/images/application.png">
 
-# Meet Alva
+Alva is a design tool that works with your production frontend components, adding up-to-date, responsive, and interactive designs to your living styleguide.
 
-We enable cross-functional teams to design contextual digital experiences and code-based ecosystems.
-
-Alva is a design tool that works with your production frontend components, adding up-to-date,
-responsive, and interactive designs to your living styleguide.
-
-You can start with a minimal set of components to sketch concepts like wireframes and do fast
-iterations with your development team to create and enrich components, from atoms to modules and
-entire pages and a full-featured styleguide. But you can also add Alva designs to existing style
+You can start with a minimal set of components to sketch concepts and do fast iterations with your development team to create and enrich components, from atoms to modules and entire pages and a full-featured styleguide. But you can also add Alva designs to existing style
 guides.
 
-Alva focuses on the arrangement and content editing of pages, while it leaves the implementation
-of the components to the developers, providing a single source of truth for both.
+Alva focuses on the arrangement and content editing of pages, while it leaves the implementation of the components to the developers, providing a single source of truth for both.
 
-There is no such thing as out-dated and static PNG screens, as the current version of both the
-design models and the component implementation always render to up-to-date web pages instead.
+There is no such thing as out-dated and static PNG screens, as the current version of both the design models and the component implementation always render to up-to-date web pages instead.
 
 - [Installation and usage](#installation-and-usage)
 	- [As a designer](#as-a-designer)
@@ -49,8 +40,7 @@ Also [download](https://github.com/meetalva/alva/releases) the pre-built release
 Alva requires a styleguide project containing compiled React components in a folder named
 `lib/patterns`.
 
-Each pattern must provide an index.d.ts and an index.js, to get both meta-data and the
-implementation of each pattern.
+Each pattern must provide an index.d.ts and an index.js, to get both meta-data and the implementation of each pattern.
 
 Below `lib/patterns`, you may structure your styleguide as you like (e.g. using
 `atoms`/`molecules`/`modules`, or any other type of structure).
@@ -59,13 +49,11 @@ Below `lib/patterns`, you may structure your styleguide as you like (e.g. using
 
 For more information about Alva's current requirements regarding styleguide patterns, and the abilities to provide meta-data, see [Pattern requirements and configuration](#pattern-requirements-and-configuration).
 
-Inside the styleguide, Alva creates a new folder name `alva`, putting projects and pages into
-subfolders.
+Inside the styleguide, Alva creates a new folder name `alva`, putting projects and pages into subfolders.
 
 Instruct the designer team on how to add, commit, and push these files. The styleguide repository is your common base of interchange. You should both work on the same feature branches and integrate frequently. For example, let the designer add a place-holder element into a page, and then you replace it by an actual new pattern. This is a minimal and quick design-development roundtrip.
 
-You can find an example patterglate styleguide with Alva designs at
-https://github.com/meetalva/designkit.
+You can find an example patterglate styleguide with Alva designs at https://github.com/meetalva/designkit.
 
 ### As a contributor to Alva
 Please read our [contributing guidelines](https://github.com/meetalva/alva/blob/master/CONTRIBUTING.md#Setup-for-contributers). There you will find also the setup for contributers.

@@ -10,5 +10,5 @@ spaces_around_brackets = false
 spaces_around_operators = true
 trim_trailing_whitespace = true
 
-[package.json]
+[{package.json,.travis.yml}]
 indent_style = space

@@ -113,7 +113,7 @@
 			"allow-string",
 			"allow-number"
 		],
-		"strict-type-predicates": true,
+		"strict-type-predicates": false,
 		"switch-default": false,
 		"triple-equals": [true, "allow-null-check"],
 		"use-default-type-parameter": true,

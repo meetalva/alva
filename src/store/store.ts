@@ -309,7 +309,9 @@ export class Store {
 	 */
 	public openStyleguide(styleguidePath: string): void {
 		// TODO: Replace workaround by proper dirty-check handling
-		this.save();
+		if (this.currentPage) {
+			this.save();
+		}
 
 		MobX.transaction(() => {
 			if (!PathUtils.isAbsolute(styleguidePath)) {

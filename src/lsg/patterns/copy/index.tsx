@@ -19,8 +19,8 @@ export enum Size {
 
 const StyledCopy = styled.p`
 	margin: 0;
-	${(props: StyledCopyProps) => (props.size ? `font-size: ${props.size}px;` : '')};
-	${(props: StyledCopyProps) => (props.textColor ? `color: ${props.textColor.toString()};` : '')};
+	${(props: StyledCopyProps) => (typeof props.size !== 'undefined' ? `font-size: ${props.size}px;` : '')};
+	${(props: StyledCopyProps) => (typeof props.textColor !== 'undefined' ? `color: ${props.textColor.toString()};` : '')};
 	line-height: 22px;
 `;
 

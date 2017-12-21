@@ -1,12 +1,11 @@
 import DemoContainer from '../demo-container';
 import { IconName, IconRegistry } from '../icons';
-import PatternListItem from './index';
+import PatternList from './index';
 import * as React from 'react';
 
 const PatternListItemDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer title="Pattern List Item">
-		<PatternListItem>Copy</PatternListItem>
-
+		<PatternList>Copy</PatternList>
 		<IconRegistry names={IconName} />
 	</DemoContainer>
 );

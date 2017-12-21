@@ -90,11 +90,11 @@ export const PatternListItem: React.StatelessComponent<PatternListItemProps> = p
 	);
 };
 
-export const PatternLabel: React.StatelessComponent<{}> = props => (
+export const PatternLabel: React.StatelessComponent = props => (
 	<StyledPatternLabel>{props.children}</StyledPatternLabel>
 );
 
-const PatternList: React.StatelessComponent<{}> = props => (
+const PatternList: React.StatelessComponent = props => (
 	<StyledPatternList>{props.children}</StyledPatternList>
 );
 

@@ -15,6 +15,6 @@ const StyledPatternsPane = styled.div`
 	margin-right: -${getSpace(Size.L)}px;
 `;
 
-const PatternsPane: React.StatelessComponent<{}> = props => <StyledPatternsPane>{props.children}</StyledPatternsPane>;
+const PatternsPane: React.StatelessComponent = props => <StyledPatternsPane>{props.children}</StyledPatternsPane>;
 
 export default PatternsPane;

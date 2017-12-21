@@ -65,7 +65,7 @@ class App extends React.Component<AppProps> {
 
 	private handleMainWindowClick(): void {
 		this.props.store.setElementFocussed(false);
-		createMenu(store);
+		createMenu(this.props.store);
 	}
 
 	public render(): JSX.Element {
@@ -171,15 +171,15 @@ class App extends React.Component<AppProps> {
 			}
 
 			FileExtraUtils.copySync(designkitPath, PathUtils.join(filePaths[0], 'designkit'));
-			store.openStyleguide(`${filePaths[0]}/designkit`);
-			store.openFirstPage();
+			this.props.store.openStyleguide(`${filePaths[0]}/designkit`);
+			this.props.store.openFirstPage();
 		});
 	}
 
 	protected handleOpenSpaceClick(): void {
 		dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
-			store.openStyleguide(filePaths[0]);
-			store.openFirstPage();
+			this.props.store.openStyleguide(filePaths[0]);
+			this.props.store.openFirstPage();
 		});
 	}
 }

@@ -11,9 +11,13 @@ const StyledPreviewPane = styled.div`
 	overflow: hidden;
 `;
 
-const PreviewPane: React.StatelessComponent = props => <StyledPreviewPane dangerouslySetInnerHTML={{
-	__html:
-		'<webview id="preview" style="height: 100%;" src="./preview.html" partition="electron" nodeintegration />'
-}} />;
+const PreviewPane: React.StatelessComponent = props => (
+	<StyledPreviewPane
+		dangerouslySetInnerHTML={{
+			__html:
+				'<webview id="preview" style="height: 100%; border-radius: 6px 6px 0 0; overflow: hidden;" src="./preview.html" partition="electron" nodeintegration />'
+		}}
+	/>
+);
 
 export default PreviewPane;

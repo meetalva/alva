@@ -6,6 +6,25 @@ import { PropertyValue } from '../../store/page/property_value';
 import * as React from 'react';
 import { TextPattern } from '../../store/pattern/text_pattern';
 
+class PatternWrapper extends React.Component<{}, PatternWrapperState> {
+	public constructor(props: {}) {
+		super(props);
+		this.state = {};
+	}
+
+	public componentDidCatch(error: Error): void {
+		this.setState({ errorMessage: error.message });
+	}
+
+	public render(): React.ReactNode {
+		if (this.state.errorMessage) {
+			return <span>{this.state.errorMessage}</span>;
+		} else {
+			return this.props.children;
+		}
+	}
+}
+
 export interface PreviewProps {
 	page?: Page;
 }
@@ -45,7 +64,7 @@ export class Preview extends React.Component<PreviewProps> {
 			// The model is a page element, create a React pattern component
 
 			// First, process the properties and children of the declaration recursively
-			const pageElement: PageElement = value as PageElement;
+			const pageElement: PageElement = value;
 			if (!pageElement.getPattern()) {
 				return null;
 			}
@@ -71,7 +90,7 @@ export class Preview extends React.Component<PreviewProps> {
 			// Then, load the pattern factory
 			const patternPath: string = pattern.getAbsolutePath();
 			let patternFactory: React.StatelessComponent = this.patternFactories[patternPath];
-			if (patternFactory == null) {
+			if (patternFactory == null) { // tslint:disable-line
 				patternFactory = require(patternPath).default;
 				this.patternFactories[patternPath] = patternFactory;
 			}
@@ -96,23 +115,4 @@ export class Preview extends React.Component<PreviewProps> {
 
 interface PatternWrapperState {
 	errorMessage?: string;
-}
-
-class PatternWrapper extends React.Component<{}, PatternWrapperState> {
-	public constructor(props: {}) {
-		super(props);
-		this.state = {};
-	}
-
-	public componentDidCatch(error: Error): void {
-		this.setState({ errorMessage: error.message });
-	}
-
-	public render(): React.ReactNode {
-		if (this.state.errorMessage) {
-			return <span>{this.state.errorMessage}</span>;
-		} else {
-			return this.props.children;
-		}
-	}
 }

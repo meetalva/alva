@@ -57,22 +57,14 @@ const StyledChromeIcon = styled(Icon)`
 		props.open ? 'transform: rotate(-90deg)' : 'transform: rotate(90deg)'};
 `;
 
-export default class Chrome extends React.Component<ChromeProps> {
-	public render(): JSX.Element {
-		const { title, handleClick } = this.props;
+const ChromeComponent: React.StatelessComponent<ChromeProps> = props => (
+	<StyledChrome>
+		<StyledChromeTitle onClick={props.handleClick}>
+			{props.title}
+			<StyledChromeIcon size={IconSize.XXS} name={IconName.ArrowFill} open={props.open} />
+		</StyledChromeTitle>
+		{props.children}
+	</StyledChrome>
+);
 
-		return (
-			<StyledChrome>
-				<StyledChromeTitle onClick={handleClick}>
-					{title}
-					<StyledChromeIcon
-						size={IconSize.XXS}
-						name={IconName.ArrowFill}
-						open={this.props.open}
-					/>
-				</StyledChromeTitle>
-				{this.props.children}
-			</StyledChrome>
-		);
-	}
-}
+export default ChromeComponent;

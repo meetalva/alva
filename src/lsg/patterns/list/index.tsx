@@ -1,7 +1,7 @@
 import { colors } from '../colors';
 import { Headline } from '../headline';
 import * as React from 'react';
-import styledComponents from 'styled-components';
+import styled from 'styled-components';
 
 export interface ListProps {
 	headline?: string;
@@ -35,30 +35,30 @@ export interface LiProps {
 	handleDragStart?: React.DragEventHandler<HTMLElement>;
 }
 
-const StyledUl = styledComponents.ul`
+const StyledUl = styled.ul`
 	box-sizing: border-box;
 	padding: 0;
 	margin: 0;
 	width: 100%;
 `;
 
-const StyledLi = styledComponents.li`
+const StyledLi = styled.li`
 	line-height: 25px;
 	list-style: none;
 	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')}
 	${(props: StyledListItemProps) => (props.active ? 'background: #def' : '')}
 `;
 
-const StyledLabel = styledComponents.span`
+const StyledLabel = styled.span`
 	color: ${colors.black.toString()};
 	padding-right 4px;
 `;
 
-const StyledValue = styledComponents.span`
+const StyledValue = styled.span`
 	color: ${colors.black.toString()};
 `;
 
-export class Ul extends React.Component<{}> {
+export class Ul extends React.Component {
 	public render(): JSX.Element {
 		return <StyledUl>{this.props.children}</StyledUl>;
 	}
@@ -84,13 +84,13 @@ export class Li extends React.Component<LiProps> {
 	}
 }
 
-export class Label extends React.Component<{}> {
+export class Label extends React.Component {
 	public render(): JSX.Element {
 		return <StyledLabel>{this.props.children}</StyledLabel>;
 	}
 }
 
-export class Value extends React.Component<{}> {
+export class Value extends React.Component {
 	public render(): JSX.Element {
 		return <StyledValue>{this.props.children}</StyledValue>;
 	}

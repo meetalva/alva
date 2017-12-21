@@ -1,8 +1,8 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
 import * as React from 'react';
-import styled from 'styled-components';
 import { getSpace, Size } from '../../space';
+import styled from 'styled-components';
 
 export interface BooleanItemProps {
 	label: string;

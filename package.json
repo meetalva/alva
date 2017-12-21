@@ -13,6 +13,7 @@
     "dist": "standard-version --no-verify && npm run clean-build && cd build && mkdir designkit && cp -r ../../designkit/patterns ../../designkit/alva ../../designkit/*.* designkit/ && cd designkit && npm i && npm run build && rm -rf node_modules && npm i --production && cd ../.. && electron-builder -mwl",
     "commit": "commit",
     "commitmsg": "commitlint -e $GIT_PARAMS",
+    "precommit": "lint-staged",
     "lint": "tslint --project ."
   },
   "repository": {
@@ -23,6 +24,13 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/meetalva/alva/issues"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "tslint -c tsconfig.json --fix",
+      "git add"
+    ]
   },
   "prettier": {
     "printWidth": 100,
@@ -79,6 +87,7 @@
     "electron-builder": "^19.49.0",
     "electron-devtools-installer": "^2.2.1",
     "husky": "^0.14.3",
+    "lint-staged": "^6.0.0",
     "mobx-react-devtools": "^4.2.15",
     "prettier": "^1.9.2",
     "standard-version": "^4.2.0",

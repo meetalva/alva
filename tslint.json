@@ -93,7 +93,7 @@
 				"allow-destructuring": true
 			}
 		],
-		"no-unbound-method": [true, "ignore-static"],
+		"no-unbound-method": false,
 		"no-unnecessary-class": false,
 		"no-unsafe-any": false,
 		"no-unsafe-finally": true,

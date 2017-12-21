@@ -20,7 +20,7 @@ export class Color {
 	}
 
 	public toString(format: 'rgb' | 'hex' = 'rgb', options?: { alpha?: number }): string {
-		const hasAlpha = options && typeof options === 'object' && typeof options.alpha === 'number';
+		const hasAlpha = options && typeof options === 'object' && 'alpha' in options && typeof options.alpha === 'number';
 		const alpha = options && hasAlpha ? options.alpha : undefined;
 		return !hasAlpha && format === 'hex' ? this.toHexString() : this.toRGBString(alpha);
 	}

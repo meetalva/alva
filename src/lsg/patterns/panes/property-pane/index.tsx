@@ -7,6 +7,6 @@ const StyledPropertyPane = styled.div`
 	flex-basis: 40%;
 `;
 
-const PropertyPane: React.StatelessComponent<{}> = props => <StyledPropertyPane>{props.children}</StyledPropertyPane>;
+const PropertyPane: React.StatelessComponent = props => <StyledPropertyPane>{props.children}</StyledPropertyPane>;
 
 export default PropertyPane;

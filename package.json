@@ -11,7 +11,7 @@
     "clean": "rm -rf build && rm -rf dist",
     "clean-build": "npm run clean && npm run build",
     "dist": "standard-version --no-verify && npm run clean-build && cd build && mkdir designkit && cp -r ../../designkit/patterns ../../designkit/alva ../../designkit/*.* designkit/ && cd designkit && npm i && npm run build && rm -rf node_modules && npm i --production && cd ../.. && electron-builder -mwl",
-    "commit": "git-cz",
+    "commit": "commit",
     "commitmsg": "commitlint -e $GIT_PARAMS"
   },
   "repository": {
@@ -63,6 +63,8 @@
   "devDependencies": {
     "@commitlint/cli": "^5.2.5",
     "@commitlint/config-conventional": "^5.2.3",
+    "@commitlint/prompt": "^5.2.5",
+    "@commitlint/travis-cli": "^5.2.5",
     "@patternplate/cli": "^2.0.0-4",
     "@patternplate/render-styled-components": "^2.0.0-3",
     "@types/electron-devtools-installer": "^2.0.2",
@@ -71,9 +73,7 @@
     "@types/node": "^8.0.53",
     "@types/react": "^16.0.0",
     "@types/react-dom": "^16.0.3",
-    "commitizen": "^2.9.6",
     "concurrently": "^3.5.1",
-    "cz-conventional-changelog": "^2.1.0",
     "electron": "^1.7.9",
     "electron-builder": "^19.49.0",
     "electron-devtools-installer": "^2.2.1",
@@ -100,10 +100,5 @@
     "tslib": "^1.8.0",
     "typescript": "^2.6.2"
   },
-  "homepage": "https://meetalva.github.io/",
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  }
+  "homepage": "https://meetalva.github.io/"
 }

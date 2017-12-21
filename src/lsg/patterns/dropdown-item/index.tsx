@@ -74,7 +74,7 @@ export default class DropdownItem extends React.Component<DropdownItemProps> {
 	}
 }
 
-export class DropdownItemLinkAttribute extends React.Component<{}> {
+export class DropdownItemLinkAttribute extends React.Component {
 	public render(): JSX.Element {
 		return (
 			<StyledDropdownItemLinkAttribute>{this.props.children}</StyledDropdownItemLinkAttribute>
@@ -82,7 +82,7 @@ export class DropdownItemLinkAttribute extends React.Component<{}> {
 	}
 }
 
-export class DropdownItemLinkAttributeItem extends React.Component<{}> {
+export class DropdownItemLinkAttributeItem extends React.Component {
 	public render(): JSX.Element {
 		return (
 			<StyledDropdownItemLinkAttributeItem>

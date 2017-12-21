@@ -47,7 +47,6 @@ const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
 	[IconName.Pattern]: [
 		[<path key="pattern" d="M6 15h5v2H6v-2zm0-8h10v1H6V7zm0 3h7v1H6v-1zM4 5v14h16V5H4zm0-1h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" />]
 	]
-	
 };
 
 const StyledIconRegistry = styled.svg`

@@ -12,7 +12,8 @@
     "clean-build": "npm run clean && npm run build",
     "dist": "standard-version --no-verify && npm run clean-build && cd build && mkdir designkit && cp -r ../../designkit/patterns ../../designkit/alva ../../designkit/*.* designkit/ && cd designkit && npm i && npm run build && rm -rf node_modules && npm i --production && cd ../.. && electron-builder -mwl",
     "commit": "commit",
-    "commitmsg": "commitlint -e $GIT_PARAMS"
+    "commitmsg": "commitlint -e $GIT_PARAMS",
+    "lint": "tslint --project ."
   },
   "repository": {
     "type": "git",
@@ -79,6 +80,7 @@
     "electron-devtools-installer": "^2.2.1",
     "husky": "^0.14.3",
     "mobx-react-devtools": "^4.2.15",
+    "prettier": "^1.9.2",
     "standard-version": "^4.2.0",
     "ts-config": "^15.0.0",
     "tslint": "^5.8.0"

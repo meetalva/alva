@@ -15,24 +15,6 @@ const StyledList = styled.ul`
 	padding: 48px;
 `;
 
-export default function ColorDemo(): JSX.Element {
-	return (
-		<DemoContainer title="Colors">
-			<StyledList>
-				<ColorSwatch color={colors.black} />
-				<ColorSwatch color={colors.grey36} />
-				<ColorSwatch color={colors.grey60} />
-				<ColorSwatch color={colors.grey90} />
-				<ColorSwatch color={colors.white} />
-			</StyledList>
-			<StyledList>
-				<ColorSwatch color={colors.blue40} />
-				<ColorSwatch color={colors.blue40} />
-			</StyledList>
-		</DemoContainer>
-	);
-}
-
 const InnerStyles = styled.div`
 	display: flex;
 	flex-direction: column;
@@ -88,4 +70,22 @@ function luminance(rgb: RGB): number {
 	const factorB = 0.0722;
 
 	return factorR * r + factorG * g + factorB * b;
+}
+
+export default function ColorDemo(): JSX.Element {
+	return (
+		<DemoContainer title="Colors">
+			<StyledList>
+				<ColorSwatch color={colors.black} />
+				<ColorSwatch color={colors.grey36} />
+				<ColorSwatch color={colors.grey60} />
+				<ColorSwatch color={colors.grey90} />
+				<ColorSwatch color={colors.white} />
+			</StyledList>
+			<StyledList>
+				<ColorSwatch color={colors.blue40} />
+				<ColorSwatch color={colors.blue40} />
+			</StyledList>
+		</DemoContainer>
+	);
 }

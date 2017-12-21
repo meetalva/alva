@@ -22,7 +22,7 @@ export class ElementList extends React.Component<ElementListProps> {
 	public render(): JSX.Element | null {
 		const page: Page | undefined = this.props.store.getCurrentPage();
 		if (page) {
-			const rootElement: PageElement = page.getRoot() as PageElement;
+			const rootElement: PageElement = page.getRoot();
 			const selectedElement = this.props.store.getSelectedElement();
 
 			return this.renderList(this.createItemFromElement('Root', rootElement, selectedElement));
@@ -76,7 +76,7 @@ export class ElementList extends React.Component<ElementListProps> {
 		children.forEach((value: PageElement, index: number) => {
 			items.push(
 				this.createItemFromProperty(
-					children.length > 1 ? 'Child ' + (index + 1) : 'Child',
+					children.length > 1 ? `Child ${index + 1}` : 'Child',
 					value,
 					selectedElement
 				)
@@ -146,7 +146,7 @@ export class ElementList extends React.Component<ElementListProps> {
 		}
 
 		if (value instanceof PageElement) {
-			return this.createItemFromElement(key, value as PageElement, selectedElement);
+			return this.createItemFromElement(key, value, selectedElement);
 		} else {
 			const items: ListItemProps[] = [];
 			Object.keys(value).forEach((childKey: string) => {

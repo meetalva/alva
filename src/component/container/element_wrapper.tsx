@@ -46,7 +46,9 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 		this.setState({
 			highlight: true
 		});
-		this.props.handleDragStart && this.props.handleDragStart(e);
+		if (typeof this.props.handleDragStart === 'function') {
+			this.props.handleDragStart(e);
+		}
 	}
 
 	private handleDragEnter(e: React.DragEvent<HTMLElement>): void {
@@ -65,7 +67,9 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 		this.setState({
 			highlight: false
 		});
-		this.props.handleDragDrop && this.props.handleDragDrop(e);
+		if (typeof this.props.handleDragDrop === 'function') {
+			this.props.handleDragDrop(e);
+		}
 	}
 
 	private handleDragEnterForChild(e: React.DragEvent<HTMLElement>): void {
@@ -84,7 +88,9 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 		this.setState({
 			highlightPlaceholder: false
 		});
-		this.props.handleDragDropForChild && this.props.handleDragDropForChild(e);
+		if (typeof this.props.handleDragDropForChild === 'function') {
+			this.props.handleDragDropForChild(e);
+		}
 	}
 
 	public render(): JSX.Element {

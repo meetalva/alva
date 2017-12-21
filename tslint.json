@@ -93,7 +93,7 @@
 				"allow-destructuring": true
 			}
 		],
-		"no-unbound-method": [true, "ignore-static"],
+		"no-unbound-method": false,
 		"no-unnecessary-class": false,
 		"no-unsafe-any": false,
 		"no-unsafe-finally": true,
@@ -113,7 +113,7 @@
 			"allow-string",
 			"allow-number"
 		],
-		"strict-type-predicates": true,
+		"strict-type-predicates": false,
 		"switch-default": false,
 		"triple-equals": [true, "allow-null-check"],
 		"use-default-type-parameter": true,

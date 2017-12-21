@@ -3,7 +3,7 @@ import { IconName, IconRegistry } from '../icons';
 import List, { Li, Ul } from './index';
 import * as React from 'react';
 
-const ListDemo: React.StatelessComponent<{}> = (): JSX.Element => (
+const ListDemo: React.StatelessComponent = (): JSX.Element => (
 	<DemoContainer title="List Demo">
 		<List headline="Default List">
 			<Ul>

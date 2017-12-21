@@ -17,7 +17,7 @@ const StyledLeftSection = styled.div`
 	flex-basis: 45%;
 `;
 
-const SplashScreen: React.StatelessComponent<{}> = props => (
+const SplashScreen: React.StatelessComponent = props => (
 	<StyledSplashScreen>
 		<StyledLeftSection>{props.children}</StyledLeftSection>
 	</StyledSplashScreen>

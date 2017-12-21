@@ -7,6 +7,6 @@ const StyledProjectPane = styled.div`
 	flex-basis: 60%;
 `;
 
-const ProjectPane: React.StatelessComponent<{}> = props => <StyledProjectPane>{props.children}</StyledProjectPane>;
+const ProjectPane: React.StatelessComponent = props => <StyledProjectPane>{props.children}</StyledProjectPane>;
 
 export default ProjectPane;

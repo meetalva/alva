@@ -99,8 +99,8 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 				{items.map((props: PatternListContainerItemProps, index: number) => {
 					if (props.children) {
 						return (
-							<PatternList>
-								<PatternLabel key={index}>{props.value}</PatternLabel>
+							<PatternList key={index}>
+								<PatternLabel>{props.value}</PatternLabel>
 								{this.createList(props.children)}
 							</PatternList>
 						);

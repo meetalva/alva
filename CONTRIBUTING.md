@@ -8,13 +8,13 @@ For more information -> [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.m
 
 ## Table of Contents
 - [Link collection](#short-collection-of-links-to-important-resources)
-- [Setup for contributors](#setup-for-contributers)
+- [Setup for contributors](#setup-for-contributors)
 - [Issues](#issues)
 	- [Good first issue for Contributors](#good-first-issue)
 	- [Label structure](#labels)
 	- [Working on issues](#working-on-issues)
-- [Style Guide / Coding conventions](#style-guide-/-coding-conventions)
-	- [Coding conventions & guidelines](#coding-conventions-&-guidelines)
+- [Style Guide / Coding conventions](#style-guide--coding-conventions)
+	- [Coding conventions & guidelines](#coding-conventions--guidelines)
 
 
 ## Short collection of Links to Important Resources

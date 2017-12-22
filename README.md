@@ -56,7 +56,7 @@ Instruct the designer team on how to add, commit, and push these files. The styl
 You can find an example patterglate styleguide with Alva designs at https://github.com/meetalva/designkit.
 
 ### As a contributor to Alva
-Please read our [contributing guidelines](https://github.com/meetalva/alva/blob/master/CONTRIBUTING.md#Setup-for-contributers). There you will find also the setup for contributers.
+Please read our [contributing guidelines](https://github.com/meetalva/alva/blob/master/CONTRIBUTING.md#Setup-for-contributers). There you will find also the setup for contributors.
 
 
 ### Pattern requirements and configuration
@@ -121,7 +121,7 @@ Additionally, it ships with a living styleguide project, with consists of Patter
 
 All the source of Alva is located at `src`, divided into the following folders:
 
-* **components**: All React components for the project, page, page-element, and property panes, as well as the design preview in the middle of the page. Components may be smart (they may contain their own state), but only as long as the state is nothing global, related to multiple componnets, or fundamental enough. In this case, the state is maintained by the store (see below).
+* **components**: All React components for the project, page, page-element, and property panes, as well as the design preview in the middle of the page. Components may be smart (they may contain their own state), but only as long as the state is nothing global, related to multiple components, or fundamental enough. In this case, the state is maintained by the store (see below).
 * **electron**: The bootstrap code to start the Electron App, including the container HTML, and the main menu.
 * **lsg**: The styled components Alva uses, as a living styleguide. Do not mixup this styleguide with the designkit (with also is a styleguide). The LSG are the styled, data-logic-less components used by the Alva UI. The designkit is the patterns the designer uses to create a basic design (wireframes).
 * **resources**: Resources are files related to the build, like the icons.

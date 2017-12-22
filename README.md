@@ -117,15 +117,15 @@ You can also specify the @name annotation on enum members, and you can add it to
 
 Alva is a React application using MobX as state management and Electron to provide a stand-alone application.
 
-Additionally, it ships with a living styleguide project, with consists of Patternplate React components.
+Additionally, it ships with a living styleguide project, which consists of Patternplate React components.
 
-All the source of Alva is located at `src`, divided into the following folders:
+All the sources of Alva are located in `src`, divided into the following folders:
 
 * **components**: All React components for the project, page, page-element, and property panes, as well as the design preview in the middle of the page. Components may be smart (they may contain their own state), but only as long as the state is nothing global, related to multiple components, or fundamental enough. In this case, the state is maintained by the store (see below).
 * **electron**: The bootstrap code to start the Electron App, including the container HTML, and the main menu.
-* **lsg**: The styled components Alva uses, as a living styleguide. Do not mixup this styleguide with the designkit (with also is a styleguide). The LSG are the styled, data-logic-less components used by the Alva UI. The designkit is the patterns the designer uses to create a basic design (wireframes).
+* **lsg**: The styled components Alva uses, as a living styleguide. Do not mixup this styleguide with the designkit (which also is a styleguide). The LSG contains the styled, logic-less components which are used by the Alva UI. The designkit contains the patterns the designer uses to create a basic design (wireframes).
 * **resources**: Resources are files related to the build, like the icons.
-* **store**: The store is the data-center and business logic of Alva. The model. The store is a collection of MobX observables and does not contain any UI elements like React components. Instead, all components bind their props to this store by decorating with @observer.
+* **store**: The store is the data-center and business logic of Alva. The model. The store is a collection of MobX observables and does not contain any UI elements like React components. Instead, all components bind their props to this store by decorating with `@observer`.
 
 ## Next features
 

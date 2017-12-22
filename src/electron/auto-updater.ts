@@ -17,10 +17,13 @@ export function checkForUpdates(win: BrowserWindow): void {
 	});
 
 	autoUpdater.on('download-progress', progressObj => {
-		win.setProgressBar(progressObj.percent);
+		win.setProgressBar(progressObj.percent / 100);
 	});
 
 	autoUpdater.on('update-downloaded', info => {
 		dialog.showMessageBox({ message: 'Update downloaded. Will be installed on next restart' });
+
+		// remove progress bar
+		win.setProgressBar(-1);
 	});
 }

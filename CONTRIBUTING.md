@@ -2,16 +2,16 @@
 💓 First of all, we'd love for you to contribute to our source code. 💓
 
 ## Code of Conduct
-We belive in a welcoming and inclusive environment / community, that's why we enforce our Code of Conduct.
+We believe in a welcoming and inclusive environment / community, that's why we enforce our Code of Conduct.
 For more information -> [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
 
 ## Table of Contents
 - [Link collection](#short-collection-of-links-to-important-resources)
-- [Setup for contributers](#setup-for-contributers)
+- [Setup for contributors](#setup-for-contributers)
 - [Issues](#issues)
 	- [Good first issue for Contributors](#good-first-issue)
-	- [Lable structur](#labels)
+	- [Label structure](#labels)
 	- [Working on issues](#working-on-issues)
 - [Style Guide / Coding conventions](#style-guide-/-coding-conventions)
 	- [Coding conventions & guidelines](#coding-conventions-&-guidelines)
@@ -24,7 +24,7 @@ For more information -> [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.m
    * backlog board: https://github.com/meetalva/alva/projects/3
 
 
-## Setup for contributers
+## Setup for contributors
 To add a contribution to Alva (improve its features, fix issues),
 get the source of the application itself, and if you don´t already have a Alva compatible styleguide, the kickstart styleguide (designkit):
 
@@ -32,7 +32,7 @@ get the source of the application itself, and if you don´t already have a Alva 
 ```shell
 git clone git@github.com:meetalva/alva.git
 ```
-2. Run in the main (Alva) respository:
+2. Run in the main (Alva) repository:
 ```shell
 npm i && npm start
 ```
@@ -84,7 +84,7 @@ We use strict tsconfig and TSLint rules, as well as Prettier. When it comes to n
 Editorconfig helps developers define and maintain consistent coding styles between different editors and IDEs.
 There are a lot of plugins for editors/IDEs that support .editorconfig.
 
-You'll find more informations, extentions for editors and IDEs at the [editorconfig page](http://editorconfig.org/).
+You'll find more information, extensions for editors and IDEs at the [editorconfig page](http://editorconfig.org/).
 
 
 ### Commit message conventions

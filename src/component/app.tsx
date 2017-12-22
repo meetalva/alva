@@ -2,7 +2,7 @@ import Button, { Order } from '../lsg/patterns/button';
 import { Chrome } from './container/chrome';
 import { colors } from '../lsg/patterns/colors';
 import Copy, { Size as CopySize } from '../lsg/patterns/copy';
-import { remote, WebviewTag } from 'electron';
+import { remote, webFrame, WebviewTag } from 'electron';
 import ElementPane from '../lsg/patterns/panes/element-pane';
 import { ElementList } from './container/element_list';
 import * as FileExtraUtils from 'fs-extra';
@@ -31,6 +31,10 @@ import * as ReactDom from 'react-dom';
 import Space, { Size as SpaceSize } from '../lsg/patterns/space';
 import SplashScreen from '../lsg/patterns/splash-screen';
 import { Store } from '../store/store';
+
+// prevent app zooming
+webFrame.setVisualZoomLevelLimits(1, 1);
+webFrame.setLayoutZoomLevelLimits(0, 0);
 
 globalStyles();
 

@@ -69,7 +69,7 @@ const StyledLabel = styled.span`
 	display: block;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.black.toString()};
+	color: ${colors.grey36.toString()};
 	margin-bottom: ${getSpace(Size.XS)}px;
 `;
 

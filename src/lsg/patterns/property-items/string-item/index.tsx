@@ -20,7 +20,7 @@ const StyledLabel = styled.span`
 	margin-bottom: ${getSpace(Size.XS)}px;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.black.toString()};
+	color: ${colors.grey36.toString()};
 `;
 
 const StyledInput = styled.input`

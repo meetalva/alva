@@ -1,3 +1,4 @@
+import { checkForUpdates } from './auto-updater';
 import { BrowserWindow, MenuItem, MenuItemConstructorOptions, remote, WebContents } from 'electron';
 import * as FileExtraUtils from 'fs-extra';
 import { PageElement } from '../store/page/page_element';
@@ -21,18 +22,21 @@ export function createMenu(store: Store): void {
 
 						const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
 						console.log(`Design kit path is: ${designkitPath}`);
-						dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] }, filePaths => {
-							if (filePaths.length <= 0) {
-								return;
-							}
+						dialog.showOpenDialog(
+							{ properties: ['openDirectory', 'createDirectory'] },
+							filePaths => {
+								if (filePaths.length <= 0) {
+									return;
+								}
 
-							FileExtraUtils.copySync(
-								designkitPath,
-								PathUtils.join(filePaths[0], 'designkit')
-							);
-							store.openStyleguide(`${filePaths[0]}/designkit`);
-							store.openFirstPage();
-						});
+								FileExtraUtils.copySync(
+									designkitPath,
+									PathUtils.join(filePaths[0], 'designkit')
+								);
+								store.openStyleguide(`${filePaths[0]}/designkit`);
+								store.openFirstPage();
+							}
+						);
 					}
 				},
 				{
@@ -271,6 +275,12 @@ export function createMenu(store: Store): void {
 				{
 					label: 'About ' + name,
 					role: 'about'
+				},
+				{
+					label: 'Check for Updates',
+					click: () => {
+						checkForUpdates(remote.getCurrentWindow());
+					}
 				},
 				{
 					type: 'separator'

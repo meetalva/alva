@@ -51,12 +51,7 @@ function createWindow(): void {
 				console.warn('An error occurred: ', err);
 			});
 	}
-	checkForUpdates();
-}
-export function sendStatusToWindow(text: string): void {
-	if (win) {
-		win.webContents.send('message', text);
-	}
+	checkForUpdates(win);
 }
 
 const log = require('electron-log');

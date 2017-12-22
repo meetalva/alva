@@ -139,5 +139,6 @@ Feel free to dive in! Open an [issue](https://github.com/meetalva/alva/issues/ne
 Alva follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
+Proudly powered by [SinnerSchrader](https://github.com/sinnerschrader).
 
-Copyright 2017. Proudly powered by [SinnerSchrader](https://github.com/sinnerschrader). Released under the MIT license.
+Copyright 2017. Released under the MIT license.

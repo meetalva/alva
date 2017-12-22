@@ -129,7 +129,7 @@ All the source of Alva is located at `src`, divided into the following folders:
 
 ## Next features
 
-[See Issues](https://github.com/meetalva/alva/issues?q=is%3Aopen+is%3Aissue) or [our backlog](https://github.com/meetalva/alva/projects/3).
+See [issues](https://github.com/meetalva/alva/issues?q=is%3Aopen+is%3Aissue) or our [backlog](https://github.com/meetalva/alva/projects/3).
 
 ---
 

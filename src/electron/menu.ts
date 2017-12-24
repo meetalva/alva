@@ -260,7 +260,7 @@ export function createMenu(store: Store): void {
 				{
 					label: '&Learn More',
 					click: () => {
-						shell.openExternal('https://meetalva.github.io/');
+						shell.openExternal('https://meetalva.io/');
 					}
 				}
 			]

@@ -66,7 +66,7 @@ A good first issues for contribution could be
 - *type: design* - issue for a design todo
 - *type: documentation* - issue for needed, missing or unclear documentation
 - *type: feedback* - issue for feedback and task where we need to figure out if it's a bug or we want it as a feature (or something else)
-- *type: question* - issue for open question (most time, they need to be answered by core team)
+- *type: question* - issue for open question (most of the time, they need to be answered by core team)
 - *status: in progress* - issue is currently in progress
 - *status: has PR* - issue has already an open pull request
 - *priority: low* - issue which is a nice to have, like a backlog issue

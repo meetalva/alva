@@ -36,6 +36,11 @@ function createWindow(): void {
 		win = undefined;
 	});
 
+	// Disable navigation on the host window object, triggered by system drag and drop
+	win.webContents.on('will-navigate', e => {
+		e.preventDefault();
+	});
+
 	let devToolsInstaller;
 	try {
 		devToolsInstaller = require('electron-devtools-installer');

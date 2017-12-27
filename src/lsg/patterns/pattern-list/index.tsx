@@ -64,11 +64,14 @@ const StyledImg = styled.img`
 	width: 18px;
 	height: 18px;
 	margin: 0 auto ${getSpace(Size.XS)}px;
+	user-drag: none;
+	user-select: none;
 `;
 
 const StyledPatternListItemLabel = styled.div`
 	text-align: center;
 	color: ${colors.grey36.toString()};
+	user-select: none;
 `;
 
 export const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {

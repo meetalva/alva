@@ -77,25 +77,20 @@ class App extends React.Component<AppProps> {
 		const project = this.props.store.getCurrentProject();
 		const title = `${project && project.getName()}`;
 
-		let DevTools;
-		try {
-			const DevToolsExports = require('mobx-react-devtools');
-			DevTools = DevToolsExports ? DevToolsExports.default : undefined;
-		} catch (error) {
-			// Ignored
-		}
-		if (project) {
-			return (
-				<Layout directionVertical handleClick={this.handleMainWindowClick}>
-					<Chrome
-						title={title}
-						handleClick={this.handleChromeToggle}
-						open={this.projectListVisible}
-					>
-						<ProjectList store={this.props.store} open={this.projectListVisible} />
-					</Chrome>
-					<MainArea>
-						<SideBar directionVertical hasPaddings>
+		const DevTools = getDevTools();
+
+		return (
+			<Layout directionVertical handleClick={this.handleMainWindowClick}>
+				<Chrome
+					title={title}
+					handleClick={this.handleChromeToggle}
+					open={this.projectListVisible}
+				>
+					{project && <ProjectList store={this.props.store} open={this.projectListVisible} />}
+				</Chrome>
+				<MainArea>
+					{project && [
+						<SideBar key="left" directionVertical hasPaddings>
 							<ElementPane>
 								<Space sizeBottom={SpaceSize.L}>
 									<PageList store={this.props.store} />
@@ -105,24 +100,15 @@ class App extends React.Component<AppProps> {
 							<PatternsPane>
 								<PatternListContainer store={this.props.store} />
 							</PatternsPane>
-						</SideBar>
-
-						<PreviewPane />
-						<SideBar directionVertical hasPaddings>
+						</SideBar>,
+						<PreviewPane key="center" />,
+						<SideBar key="right" directionVertical hasPaddings>
 							<PropertyPane>
 								<PropertyList store={this.props.store} />
 							</PropertyPane>
 						</SideBar>
-						<IconRegistry names={IconName} />
-					</MainArea>
-					{DevTools ? <DevTools /> : ''}
-				</Layout>
-			);
-		} else {
-			return (
-				<Layout directionVertical handleClick={this.handleMainWindowClick}>
-					<Chrome />
-					<MainArea>
+					]}
+					{!project && (
 						<SplashScreen>
 							<Space sizeBottom={SpaceSize.L}>
 								<Headline textColor={colors.grey20} order={2}>
@@ -144,11 +130,12 @@ class App extends React.Component<AppProps> {
 								<Copy size={CopySize.S}>or open existing Alva space</Copy>
 							</Link>
 						</SplashScreen>
-					</MainArea>
-					{DevTools ? <DevTools /> : ''}
-				</Layout>
-			);
-		}
+					)}
+				</MainArea>
+				<IconRegistry names={IconName} />
+				{DevTools ? <DevTools /> : null}
+			</Layout>
+		);
 	}
 
 	@MobX.action
@@ -185,6 +172,15 @@ class App extends React.Component<AppProps> {
 			this.props.store.openStyleguide(filePaths[0]);
 			this.props.store.openFirstPage();
 		});
+	}
+}
+
+function getDevTools(): React.StatelessComponent | null {
+	try {
+		const DevToolsExports = require('mobx-react-devtools');
+		return DevToolsExports ? DevToolsExports.default : undefined;
+	} catch (error) {
+		return null;
 	}
 }
 

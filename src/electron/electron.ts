@@ -56,7 +56,7 @@ function createWindow(): void {
 				console.warn('An error occurred: ', err);
 			});
 	}
-	checkForUpdates(win);
+	checkForUpdates(win, false);
 }
 
 const log = require('electron-log');
@@ -88,6 +88,6 @@ app.on('activate', () => {
 
 ipcMain.on('request-check-for-updates', () => {
 	if (win) {
-		checkForUpdates(win);
+		checkForUpdates(win, true);
 	}
 });

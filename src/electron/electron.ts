@@ -1,5 +1,5 @@
 import { checkForUpdates } from './auto-updater';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import * as PathUtils from 'path';
 import * as url from 'url';
 
@@ -83,5 +83,11 @@ app.on('activate', () => {
 	// dock icon is clicked and there are no other windows open.
 	if (!win) {
 		createWindow();
+	}
+});
+
+ipcMain.on('request-check-for-updates', () => {
+	if (win) {
+		checkForUpdates(win);
 	}
 });

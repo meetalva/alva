@@ -2,28 +2,60 @@ import { BrowserWindow, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 
 // autoUpdater.logger = log;
+let showUpdateNotAvailable = false;
+let window: BrowserWindow;
 
-export function checkForUpdates(win: BrowserWindow): void {
+export function checkForUpdates(win: BrowserWindow, updateNotAvailable?: boolean): void {
+	autoUpdater.autoDownload = false;
+	showUpdateNotAvailable = updateNotAvailable || false;
+	window = win;
 	autoUpdater.checkForUpdatesAndNotify().catch(() => {
 		dialog.showErrorBox('Check for Updates', 'Error while checking for updates');
 	});
-
-	autoUpdater.on('update-available', info => {
-		dialog.showMessageBox({ message: `There is a new Alva version: ${info.version}` });
-	});
-
-	autoUpdater.on('error', () => {
-		dialog.showErrorBox('Check for Updates', 'Error on receiving update. Please try manually');
-	});
-
-	autoUpdater.on('download-progress', progressObj => {
-		win.setProgressBar(progressObj.percent / 100);
-	});
-
-	autoUpdater.on('update-downloaded', info => {
-		dialog.showMessageBox({ message: 'Update downloaded. Will be installed on next restart' });
-
-		// remove progress bar
-		win.setProgressBar(-1);
-	});
 }
+
+autoUpdater.on('update-available', info => {
+	dialog.showMessageBox(
+		{
+			type: 'info',
+			message: `There is a new version available: ${
+				info.version
+			} \nShould Alva download the update?`,
+			buttons: ['yes', 'no']
+		},
+		buttonIndex => {
+			if (buttonIndex === 0) {
+				autoUpdater.downloadUpdate().catch(() => {
+					dialog.showErrorBox(
+						'Check for Updates',
+						'An error occured while updating. Please try again manually'
+					);
+				});
+			}
+		}
+	);
+});
+
+autoUpdater.on('update-not-available', info => {
+	if (showUpdateNotAvailable) {
+		dialog.showMessageBox({ message: 'Alva is up-to-date.' });
+	}
+});
+
+autoUpdater.on('error', () => {
+	dialog.showErrorBox(
+		'Check for Updates',
+		'An error occured while updating. Please try again manually'
+	);
+});
+
+autoUpdater.on('download-progress', progressObj => {
+	window.setProgressBar(progressObj.percent / 100);
+});
+
+autoUpdater.on('update-downloaded', info => {
+	dialog.showMessageBox({ message: 'Update downloaded. Will be installed on next restart' });
+
+	// remove progress bar
+	window.setProgressBar(-1);
+});

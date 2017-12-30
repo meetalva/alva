@@ -85,7 +85,7 @@
     "@types/react-dom": "^16.0.3",
     "concurrently": "^3.5.1",
     "electron": "^1.7.10",
-    "electron-builder": "^19.49.0",
+    "electron-builder": "19.49.0",
     "electron-devtools-installer": "^2.2.1",
     "husky": "^0.14.3",
     "lint-staged": "^6.0.0",
@@ -99,7 +99,7 @@
   "dependencies": {
     "cli": "^1.0.1",
     "electron-log": "^2.2.12",
-    "electron-updater": "^2.17.6",
+    "electron-updater": "2.17.6",
     "fs-extra": "^5.0.0",
     "js-yaml": "^3.10.0",
     "mobx": "^3.3.2",

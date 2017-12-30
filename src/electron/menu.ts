@@ -1,5 +1,11 @@
-import { checkForUpdates } from './auto-updater';
-import { BrowserWindow, MenuItem, MenuItemConstructorOptions, remote, WebContents } from 'electron';
+import {
+	BrowserWindow,
+	ipcRenderer,
+	MenuItem,
+	MenuItemConstructorOptions,
+	remote,
+	WebContents
+} from 'electron';
 import * as FileExtraUtils from 'fs-extra';
 import { PageElement } from '../store/page/page_element';
 import * as PathUtils from 'path';
@@ -279,7 +285,7 @@ export function createMenu(store: Store): void {
 				{
 					label: 'Check for Updates',
 					click: () => {
-						checkForUpdates(remote.getCurrentWindow());
+						ipcRenderer.send('request-check-for-updates');
 					}
 				},
 				{

@@ -19,6 +19,7 @@ export class Project {
 
 	/**
 	 * The human-friendly name of the project.
+	 * In the frontend, to be displayed instead of the ID.
 	 */
 	@MobX.observable private name: string;
 
@@ -65,6 +66,7 @@ export class Project {
 
 	/**
 	 * Returns the human-friendly name of the project.
+	 * In the frontend, to be displayed instead of the ID.
 	 * @return The human-friendly name of the project.
 	 */
 	public getName(): string {

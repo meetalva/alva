@@ -25,12 +25,12 @@ export class PatternFolder {
 		this.patterns.set(pattern.getId(), pattern);
 	}
 
-	public getAbsolutePath(): string {
-		return PathUtils.join(this.store.getPatternsPath(), this.getRelativePath());
+	public getAbsoluteSourcePath(): string {
+		return PathUtils.join(this.store.getPatternsSourcePath(), this.getRelativePath());
 	}
 
-	public getAbsoluteIconPath(): string {
-		return PathUtils.join(this.store.getPatternsIconPath(), this.getRelativePath());
+	public getAbsolutePath(): string {
+		return PathUtils.join(this.store.getPatternsPath(), this.getRelativePath());
 	}
 
 	public getChild(path: string): PatternFolder | undefined {

@@ -76,8 +76,8 @@ export class Pattern {
 		return PathUtils.join(this.folder.getAbsolutePath(), this.id);
 	}
 
-	public getAbsoluteIconPath(): string {
-		return PathUtils.join(this.folder.getAbsoluteIconPath(), this.id);
+	public getAbsoluteSourcePath(): string {
+		return PathUtils.join(this.folder.getAbsoluteSourcePath(), this.id);
 	}
 
 	public getId(): string {

@@ -216,19 +216,6 @@ export class Store {
 	}
 
 	/**
-	 * Returns the path of the root folder of the patterns (like atoms, modules etc.)
-	 * in the currently opened styleguide.
-	 * @return The patterns root path.
-	 */
-	public getPatternsPath(): string {
-		return PathUtils.join(this.styleGuidePath, 'lib', 'patterns');
-	}
-
-	public getPatternsIconPath(): string {
-		return PathUtils.join(this.styleGuidePath, 'patterns');
-	}
-
-	/**
 	 * Returns the root folder of the patterns of the currently opened styleguide.
 	 * @return The root folder object.
 	 */
@@ -242,6 +229,24 @@ export class Store {
 	 */
 	public getPatternSearchTerm(): string {
 		return this.patternSearchTerm;
+	}
+
+	/**
+	 * Returns the path of the root folder of the built patterns (like atoms, modules etc.)
+	 * in the currently opened styleguide.
+	 * @return The patterns root path.
+	 */
+	public getPatternsPath(): string {
+		return PathUtils.join(this.styleGuidePath, 'lib', 'patterns');
+	}
+
+	/**
+	 * Returns the path of the root folder of the patterns source code in the currently opened
+	 * styleguide.
+	 * @return The patterns source root path.
+	 */
+	public getPatternsSourcePath(): string {
+		return PathUtils.join(this.styleGuidePath, 'patterns');
 	}
 
 	/**

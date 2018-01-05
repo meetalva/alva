@@ -143,4 +143,4 @@ Alva follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 ---
 Proudly powered by [SinnerSchrader](https://github.com/sinnerschrader).
 
-Copyright 2017. Released under the MIT license.
+Copyright 2017-2018. Released under the MIT license.

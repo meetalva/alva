@@ -15,7 +15,10 @@
 		"isolatedModules": false,
 		"jsx": "react",
 		"module": "commonjs",
-		"lib": ["es2017", "dom"],
+		"lib": [
+			"es2017",
+			"dom"
+		],
 		"moduleResolution": "node",
 		"outDir": "build",
 		"noEmit": false,
@@ -32,5 +35,24 @@
 		"strictNullChecks": true,
 		"target": "es2017"
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx"]
+	"typedocOptions": {
+		"mode": "file",
+		"out": "build/docs",
+		"ignoreCompilerErrors": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"target": "ES5",
+		"moduleResolution": "node",
+		"preserveConstEnums": true,
+		"stripInternal": true,
+		"suppressExcessPropertyErrors": true,
+		"suppressImplicitAnyIndexErrors": true,
+		"excludeNotExported": true,
+		"excludePrivate": true,
+		"excludeExternal": true
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx"
+	]
 }

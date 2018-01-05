@@ -56,7 +56,7 @@ function createWindow(): void {
 				console.warn('An error occurred: ', err);
 			});
 	}
-	checkForUpdates(win, false);
+	checkForUpdates(win);
 }
 
 const log = require('electron-log');

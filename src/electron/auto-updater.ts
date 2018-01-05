@@ -5,12 +5,12 @@ import { autoUpdater } from 'electron-updater';
 let showUpdateNotAvailable = false;
 let window: BrowserWindow;
 
-export function checkForUpdates(win: BrowserWindow, updateNotAvailable?: boolean): void {
+export function checkForUpdates(win: BrowserWindow, startedByUser?: boolean): void {
 	autoUpdater.autoDownload = false;
-	showUpdateNotAvailable = updateNotAvailable || false;
+	showUpdateNotAvailable = startedByUser || false;
 	window = win;
 	autoUpdater.checkForUpdatesAndNotify().catch(() => {
-		dialog.showErrorBox('Check for Updates', 'Error while checking for updates');
+		dialog.showErrorBox('Check for Updates', 'Error while checking for updates.');
 	});
 }
 
@@ -28,7 +28,7 @@ autoUpdater.on('update-available', info => {
 				autoUpdater.downloadUpdate().catch(() => {
 					dialog.showErrorBox(
 						'Check for Updates',
-						'An error occured while updating. Please try again manually'
+						'An error occured while updating. Please try again manually.'
 					);
 				});
 			}
@@ -45,7 +45,7 @@ autoUpdater.on('update-not-available', info => {
 autoUpdater.on('error', () => {
 	dialog.showErrorBox(
 		'Check for Updates',
-		'An error occured while updating. Please try again manually'
+		'An error occured while updating. Please try again manually.'
 	);
 });
 
@@ -54,7 +54,7 @@ autoUpdater.on('download-progress', progressObj => {
 });
 
 autoUpdater.on('update-downloaded', info => {
-	dialog.showMessageBox({ message: 'Update downloaded. Will be installed on next restart' });
+	dialog.showMessageBox({ message: 'Update downloaded. Will be installed on next restart.' });
 
 	// remove progress bar
 	window.setProgressBar(-1);

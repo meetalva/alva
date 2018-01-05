@@ -141,19 +141,26 @@ export class TypeScriptParser extends PatternParser {
 		return `${this.typeName}Props`;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public parse(pattern: Pattern): boolean {
 		this.sourceFile = undefined;
 
 		const folderPath: string = pattern.getAbsolutePath();
-
-		const folderIconPath: string = pattern.getAbsoluteIconPath();
-		const iconPath: string = PathUtils.join(folderIconPath, 'icon.svg');
-		if (FileUtils.existsSync(iconPath)) {
-			pattern.setIconPath(iconPath);
-		}
-
 		const declarationPath = PathUtils.join(folderPath, 'index.d.ts');
 		const implementationPath = PathUtils.join(folderPath, 'index.js');
+
+		let iconPath: string = PathUtils.join(folderPath, 'icon.svg');
+		if (FileUtils.existsSync(iconPath)) {
+			pattern.setIconPath(iconPath);
+		} else {
+			const sourceFolderPath: string = pattern.getAbsoluteSourcePath();
+			iconPath = PathUtils.join(sourceFolderPath, 'icon.svg');
+			if (FileUtils.existsSync(iconPath)) {
+				pattern.setIconPath(iconPath);
+			}
+		}
 
 		if (!FileUtils.existsSync(declarationPath)) {
 			console.warn(`Invalid pattern "${declarationPath}": No index.d.ts found`);

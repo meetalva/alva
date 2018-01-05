@@ -3,6 +3,11 @@ import * as MobX from 'mobx';
 import { PageElement } from './page_element';
 import { Store } from '../store';
 
+/**
+ * The current actually loaded page of a project. It consists of a tree of page elements,
+ * which in turn provide the properties data for the pattern components.
+ * @see PageRef
+ */
 export class Page {
 	/**
 	 * The technical (internal) ID of the page.
@@ -11,6 +16,7 @@ export class Page {
 
 	/**
 	 * The human-friendly name of the page.
+	 * In the frontend, to be displayed instead of the ID.
 	 */
 	@MobX.observable private name: string;
 
@@ -52,6 +58,7 @@ export class Page {
 
 	/**
 	 * Returns the human-friendly name of the page.
+	 * In the frontend, to be displayed instead of the ID.
 	 * @return The human-friendly name of the page.
 	 */
 	public getName(): string {

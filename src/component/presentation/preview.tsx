@@ -78,7 +78,7 @@ export class Preview extends React.Component<PreviewProps> {
 			const componentProps: any = {};
 			pattern.getProperties().forEach(property => {
 				componentProps[property.getId()] = this.createComponent(
-					property.convertToProperty(pageElement.getPropertyValue(property.getId())),
+					property.convertToRender(pageElement.getPropertyValue(property.getId())),
 					property.getId()
 				);
 			});
@@ -90,7 +90,8 @@ export class Preview extends React.Component<PreviewProps> {
 			// Then, load the pattern factory
 			const patternPath: string = pattern.getAbsolutePath();
 			let patternFactory: React.StatelessComponent = this.patternFactories[patternPath];
-			if (patternFactory == null) { // tslint:disable-line
+			if (patternFactory == null) {
+				// tslint:disable-line
 				patternFactory = require(patternPath).default;
 				this.patternFactories[patternPath] = patternFactory;
 			}

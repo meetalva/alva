@@ -10,6 +10,7 @@
     "start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
     "clean": "rm -rf build && rm -rf dist",
     "clean-build": "npm run clean && npm run build",
+    "docs": "typedoc src",
     "dist": "standard-version --no-verify && npm run clean-build && cd build && mkdir designkit && cp -r ../../designkit/patterns ../../designkit/alva ../../designkit/*.* designkit/ && cd designkit && npm i && npm run build && rm -rf node_modules && npm i --production && cd ../.. && electron-builder -mwl",
     "commit": "commit",
     "commitmsg": "commitlint -e $GIT_PARAMS",
@@ -92,7 +93,8 @@
     "prettier": "^1.9.2",
     "standard-version": "^4.2.0",
     "ts-config": "^15.0.0",
-    "tslint": "^5.8.0"
+    "tslint": "^5.8.0",
+    "typedoc": "^0.9.0"
   },
   "dependencies": {
     "cli": "^1.0.1",

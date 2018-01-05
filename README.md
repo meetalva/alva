@@ -13,13 +13,13 @@ Alva focuses on the arrangement and content editing of pages, while it leaves th
 
 There is no such thing as out-dated and static PNG screens, as the current version of both the design models and the component implementation always render to up-to-date web pages instead.
 
-- [Installation and usage](#installation-and-usage)
-	- [As a designer](#as-a-designer)
-	- [As a pattern developer](#as-a-pattern-developer)
-	- [As a contributor to Alva](#as-a-contributor-to-alva)
-	- [Pattern requirements and configuration](#pattern-requirements-and-configuration)
-	- [Source-code structure and architecture](#source-code-structure-and-architecture)
-- [Next features](#next-features)
+* [Installation and usage](#installation-and-usage)
+  * [As a designer](#as-a-designer)
+  * [As a pattern developer](#as-a-pattern-developer)
+  * [As a contributor to Alva](#as-a-contributor-to-alva)
+  * [Pattern requirements and configuration](#pattern-requirements-and-configuration)
+  * [Source-code structure and architecture](#source-code-structure-and-architecture)
+* [Next features](#next-features)
 
 ## Installation and usage
 
@@ -58,8 +58,8 @@ Instruct the designer team on how to add, commit, and push these files. The styl
 You can find an example patterglate styleguide with Alva designs at https://github.com/meetalva/designkit.
 
 ### As a contributor to Alva
-Please read our [contributing guidelines](https://github.com/meetalva/alva/blob/master/CONTRIBUTING.md#Setup-for-contributers). There you will find also the setup for contributors.
 
+Please read our [contributing guidelines](https://github.com/meetalva/alva/blob/master/CONTRIBUTING.md#Setup-for-contributers). There you will find also the setup for contributors.
 
 ### Pattern requirements and configuration
 
@@ -141,6 +141,7 @@ Feel free to dive in! Open an [issue](https://github.com/meetalva/alva/issues/ne
 Alva follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
+
 Proudly powered by [SinnerSchrader](https://github.com/sinnerschrader).
 
-Copyright 2017. Released under the MIT license.
+Copyright 2017-2018. Released under the MIT license.

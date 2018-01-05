@@ -8,6 +8,7 @@ import { Project } from './project';
  * The store can load the page from its YAML file when required (open page).
  * A page reference (like a page) belongs to exactly one project, and each project
  * belongs to exactly one styleguide (styleguide Alva folder > projects > pages).
+ * @see Page
  */
 export class PageRef {
 	/**
@@ -17,6 +18,7 @@ export class PageRef {
 
 	/**
 	 * The human-friendly name of the page.
+	 * In the frontend, to be displayed instead of the ID.
 	 */
 	@MobX.observable private name: string;
 
@@ -56,6 +58,7 @@ export class PageRef {
 
 	/**
 	 * Returns the human-friendly name of the page.
+	 * In the frontend, to be displayed instead of the ID.
 	 * @return The human-friendly name of the page.
 	 */
 	public getName(): string {

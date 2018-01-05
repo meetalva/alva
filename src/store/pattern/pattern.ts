@@ -16,24 +16,25 @@ import { TypeScriptParser } from './parser/typescript_parser';
  */
 export class Pattern {
 	/**
-	 * The ID of the pattern (also the folder name within the parent folder).
-	 */
-	protected id: string;
-
-	/**
 	 * The parent folder containing the pattern folder.
 	 */
 	protected folder: PatternFolder;
 
 	/**
-	 * The human-readable name of the pattern.
+	 * The ID of the pattern (also the folder name within the parent folder).
 	 */
-	protected name: string;
+	protected id: string;
 
 	/**
-	 * The absolute icon of the pattern.
+	 * The absolute path to the icon of the pattern, if provided by the implementation.
 	 */
 	protected iconPath?: string;
+
+	/**
+	 * The human-readable name of the pattern.
+	 * In the frontend, to be displayed instead of the ID.
+	 */
+	protected name: string;
 
 	/**
 	 * The properties this pattern supports.
@@ -69,37 +70,68 @@ export class Pattern {
 
 	/**
 	 * Returns the absolute and OS-dependent file-system path to the folder containing
-	 * the built pattern sources.
-	 * @return The absolute path;
+	 * the built pattern files.
+	 * @return The absolute source path.
 	 */
 	public getAbsolutePath(): string {
 		return PathUtils.join(this.folder.getAbsolutePath(), this.id);
 	}
 
+	/**
+	 * Returns the absolute and OS-dependent file-system path to the folder containing
+	 * the pattern source files.
+	 * @return The absolute source path.
+	 */
 	public getAbsoluteSourcePath(): string {
 		return PathUtils.join(this.folder.getAbsoluteSourcePath(), this.id);
 	}
 
-	public getId(): string {
-		return this.id;
-	}
-
+	/**
+	 * Returns the parent folder containing the pattern folder.
+	 * @return The parent folder containing the pattern folder.
+	 */
 	public getFolder(): PatternFolder {
 		return this.folder;
 	}
 
+	/**
+	 * Returns the absolute path to the icon of the pattern, if provided by the implementation.
+	 * @return The absolute path to the icon of the pattern.
+	 */
 	public getIconPath(): string | undefined {
 		return this.iconPath;
 	}
 
+	/**
+	 * Returns the ID of the pattern (also the folder name within the parent folder).
+	 * @return The ID of the pattern.
+	 */
+	public getId(): string {
+		return this.id;
+	}
+
+	/**
+	 * Returns the human-readable name of the pattern.
+	 * In the frontend, to be displayed instead of the ID.
+	 * @return The human-readable name of the pattern.
+	 */
 	public getName(): string {
 		return this.name;
 	}
 
+	/**
+	 * Returns the properties this pattern supports.
+	 * @return The properties this pattern supports.
+	 */
 	public getProperties(): Property[] {
 		return Array.from(this.properties.values());
 	}
 
+	/**
+	 * Returns a property this pattern supports, by its ID.
+	 * @param id The ID of the property.
+	 * @return The property for the given ID, if it exists.
+	 */
 	public getProperty(id: string): Property | undefined {
 		return this.properties.get(id);
 	}
@@ -113,10 +145,21 @@ export class Pattern {
 		return PathUtils.join(this.folder.getRelativePath(), this.id);
 	}
 
+	/**
+	 * Returns whether the pattern parsers decided that the pattern is compatible to Alva.
+	 * Internal flag used while parsing. The list of pattern of a folder always contains valid
+	 * patterns only, so no need to check in the components.
+	 * @return Whether the pattern is valid for Alva.
+	 */
 	public isValid(): boolean {
 		return this.valid;
 	}
 
+	/**
+	 * Returns whether this pattern matches a given search string.
+	 * @param term The search string as provided by the user.
+	 * @return Whether the pattern matches the string.
+	 */
 	public matches(term: string): boolean {
 		if (!term || !this.name) {
 			return false;
@@ -124,6 +167,12 @@ export class Pattern {
 		return this.name.toLowerCase().indexOf(term.toLowerCase()) >= 0;
 	}
 
+	/**
+	 * Loads (or reloads) this pattern from its implemetation.
+	 * This methods delegates to all registered pattern parsers to read all meta-information
+	 * provided, parsing name, ID, properties, etc. of the pattern.
+	 * All parsers may contribute to the final pattern information.
+	 */
 	public reload(): void {
 		const parsers: PatternParser[] = [new TypeScriptParser()];
 
@@ -155,14 +204,28 @@ export class Pattern {
 		}
 	}
 
+	/**
+	 * Sets the absolute path to the icon of the pattern.
+	 * This method is called by any pattern parser implementation to enrich meta-information.
+	 * @param iconPath The absolute path to the icon of the pattern.
+	 */
 	public setIconPath(iconPath?: string): void {
 		this.iconPath = iconPath;
 	}
 
+	/**
+	 * Sets the human-readable name of the pattern.
+	 * This method is called by any pattern parser implementation to enrich meta-information.
+	 * @param name Sets the human-readable name of the pattern.
+	 */
 	public setName(name: string): void {
 		this.name = name;
 	}
 
+	/**
+	 * Returns a string representation of this pattern.
+	 * @return The string representation.
+	 */
 	public toString(): string {
 		const path = this.getRelativePath();
 		return `Pattern(id="${this.id}", path="${path}", properties="${this.properties}")`;

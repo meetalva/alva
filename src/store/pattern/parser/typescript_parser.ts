@@ -141,6 +141,9 @@ export class TypeScriptParser extends PatternParser {
 		return `${this.typeName}Props`;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public parse(pattern: Pattern): boolean {
 		this.sourceFile = undefined;
 

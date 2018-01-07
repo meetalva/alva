@@ -33,6 +33,8 @@ export class PageElement {
 	 */
 	private patternPath: string;
 
+	private id: number;
+
 	/**
 	 * The pattern property values of this element's component instance.
 	 * Each key represents the property ID of the pattern, while the value holds the content
@@ -64,6 +66,8 @@ export class PageElement {
 		}
 
 		this.setParent(parent);
+
+		this.id = Math.random() + new Date().valueOf();
 	}
 
 	/**

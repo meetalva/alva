@@ -133,6 +133,10 @@ export class ElementList extends React.Component<ElementListProps> {
 		value: PropertyValue,
 		selectedElement?: PageElement
 	): ListItemProps {
+		// if (value === this.props.store.selectedElement) {
+		// 	console.log('element list, selected -->', value, value === this.props.store.selectedElement)
+		// }
+
 		if (value instanceof Array) {
 			const items: ListItemProps[] = [];
 			(value as (string | number)[]).forEach((child, index: number) => {

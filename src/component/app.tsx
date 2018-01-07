@@ -16,6 +16,7 @@ import { createMenu } from '../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import { Page } from '../store/page/page';
+// import { PageElement } from '../store/page/page_element';
 import { PageList } from './container/page_list';
 import * as PathUtils from 'path';
 import { PatternListContainer } from './container/pattern_list';
@@ -197,6 +198,17 @@ MobX.autorun(() => {
 	if (webviewTag && webviewTag.send) {
 		webviewTag.send('page-change', message);
 	}
+});
+
+MobX.autorun(() => {
+	const selectedElement = store.getSelectedElement();
+
+	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
+	if (webviewTag && webviewTag.send) {
+		webviewTag.send('page-highlight', selectedElement.id);
+	}
+
+	console.log('selectedElement ->', selectedElement);
 });
 
 MobX.autorun(() => {

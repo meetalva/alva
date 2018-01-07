@@ -74,6 +74,8 @@ export class Store {
 	 */
 	@MobX.observable private selectedElement?: PageElement;
 
+	@MobX.observable private highlightedElement?: number;
+
 	/**
 	 * The absolute and OS-dependent file-system path to the currently opened styleguide.
 	 * May be undefined if no styleguide is open.
@@ -516,5 +518,9 @@ export class Store {
 	 */
 	public setSelectedElement(selectedElement: PageElement | undefined): void {
 		this.selectedElement = selectedElement;
+	}
+
+	public setHighlightedElement(highlightedElement: number): void {
+		this.highlightedElement = highlightedElement;
 	}
 }

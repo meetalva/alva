@@ -4,6 +4,7 @@ import { PageElement } from '../../store/page/page_element';
 import { Pattern } from '../../store/pattern/pattern';
 import { PropertyValue } from '../../store/page/property_value';
 import * as React from 'react';
+import { Store } from '../../store/store';
 import { TextPattern } from '../../store/pattern/text_pattern';
 
 class PatternWrapper extends React.Component<{}, PatternWrapperState> {
@@ -27,6 +28,7 @@ class PatternWrapper extends React.Component<{}, PatternWrapperState> {
 
 export interface PreviewProps {
 	page?: Page;
+	store: Store;
 }
 
 @observer
@@ -86,6 +88,12 @@ export class Preview extends React.Component<PreviewProps> {
 			componentProps.children = pageElement
 				.getChildren()
 				.map((child, index) => this.createComponent(child, String(index)));
+
+			// console.log(value.id, this.props.store.highlightedElement);
+			//
+			// if (value.id === this.props.store.highlightedElement) {
+			// 	console.log('FOUNDNNNDNDNDNNDNDNNDNND!', value);
+			// }
 
 			// Then, load the pattern factory
 			const patternPath: string = pattern.getAbsolutePath();

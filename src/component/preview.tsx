@@ -32,7 +32,7 @@ class PreviewApp extends React.Component<PreviewAppProps, PreviewAppState> {
 
 		return (
 			<div>
-				<Preview page={this.props.store.getCurrentPage()} />
+				<Preview page={this.props.store.getCurrentPage()} store={this.props.store} />
 				{DevTools ? <DevTools /> : ''}
 			</div>
 		);
@@ -43,6 +43,12 @@ const store = new Store();
 
 ipcRenderer.on('page-change', (event: {}, message: JsonObject) => {
 	store.setPageFromJsonInternal(message.page as JsonObject, message.pageId as string);
+});
+
+ipcRenderer.on('page-highlight', (event: {}, id: number) => {
+	// store.setSelectedElement(message.selectedElement as PageElement);
+	console.log(id);
+	store.setHighlightedElement(id);
 });
 
 ipcRenderer.on('open-styleguide', (event: {}, message: JsonObject) => {

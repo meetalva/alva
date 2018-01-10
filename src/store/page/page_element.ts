@@ -55,11 +55,6 @@ export class PageElement {
 		if (setDefaults && this.pattern) {
 			this.pattern.getProperties().forEach(property => {
 				this.setPropertyValue(property.getId(), property.getDefaultValue());
-				// console.log(
-				// 	`Property ${property.getId()}: Set default ${JSON.stringify(
-				// 		this.getPropertyValue(property.getId())
-				// 	)}`
-				// );
 			});
 		}
 
@@ -81,7 +76,7 @@ export class PageElement {
 		const element = new PageElement(pattern, false, parent);
 
 		if (!pattern) {
-			// console.warn(`Ignoring unknown pattern "${patternPath}"`);
+			console.warn(`Ignoring unknown pattern "${patternPath}"`);
 			element.patternPath = patternPath;
 			return element;
 		}

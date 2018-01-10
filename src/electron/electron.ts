@@ -53,7 +53,7 @@ function createWindow(): void {
 			.default(devToolsInstaller.REACT_DEVELOPER_TOOLS)
 			// tslint:disable-next-line:no-any
 			.catch((err: any) => {
-				throw err;
+				console.warn('An error occurred: ', err);
 			});
 	}
 	checkForUpdates(win);

@@ -3,7 +3,7 @@ import Link from './index';
 import * as React from 'react';
 import Space, { Size } from '../space';
 
-const clickHandler = (event: React.MouseEvent<HTMLElement>): void => {}; //console.log(event);
+const clickHandler = (event: React.MouseEvent<HTMLElement>): void => console.log(event);
 const LinkDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<Space size={Size.L}>
 		<Space size={Size.L}>

@@ -189,9 +189,7 @@ export class Pattern {
 			}
 		});
 
-		if (this.valid) {
-			this.properties.forEach(property => {});
-		} else {
+		if (this.valid === false) {
 			console.warn(
 				`Failed to parse pattern "${this.getRelativePath()}":` +
 					' Currently we support TypeScript patterns only' +

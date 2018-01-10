@@ -103,7 +103,7 @@ export class Store {
 				}
 			}
 		} catch (error) {
-			console.error(`Failed to open last styleguide or page: ${error}`);
+			throw new Error(`Failed to open last styleguide or page: ${error}`);
 		}
 	}
 

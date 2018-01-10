@@ -21,7 +21,7 @@ export function createMenu(store: Store): void {
 						}
 
 						const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
-						console.log(`Design kit path is: ${designkitPath}`);
+						// console.log(`Design kit path is: ${designkitPath}`);
 						dialog.showOpenDialog(
 							{ properties: ['openDirectory', 'createDirectory'] },
 							filePaths => {

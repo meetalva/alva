@@ -163,12 +163,12 @@ export class TypeScriptParser extends PatternParser {
 		}
 
 		if (!FileUtils.existsSync(declarationPath)) {
-			console.warn(`Invalid pattern "${declarationPath}": No index.d.ts found`);
+			// console.warn(`Invalid pattern "${declarationPath}": No index.d.ts found`);
 			return false;
 		}
 
 		if (!FileUtils.existsSync(implementationPath)) {
-			console.warn(`Invalid pattern "${declarationPath}": No index.js found`);
+			// console.warn(`Invalid pattern "${declarationPath}": No index.js found`);
 			return false;
 		}
 
@@ -181,11 +181,11 @@ export class TypeScriptParser extends PatternParser {
 
 		this.analyzeDeclarations();
 		if (!this.typeName) {
-			console.warn(`Invalid pattern "${declarationPath}": No type name found`);
+			// console.warn(`Invalid pattern "${declarationPath}": No type name found`);
 			return false;
 		}
 		if (!this.propsDeclaration) {
-			console.warn(`Invalid pattern "${declarationPath}": No props interface found`);
+			// console.warn(`Invalid pattern "${declarationPath}": No props interface found`);
 			return false;
 		}
 

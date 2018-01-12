@@ -79,6 +79,18 @@ export function createMenu(store: Store): void {
 					type: 'separator'
 				},
 				{
+					label: 'Se&ttings',
+					visible: process.platform !== 'darwin',
+					accelerator: 'Cmd+,',
+					click: () => {
+						shell.openItem(store.getPreferencesPath());
+					}
+				},
+				{
+					type: 'separator',
+					visible: process.platform !== 'darwin'
+				},
+				{
 					label: '&Close',
 					accelerator: 'CmdOrCtrl+W',
 					role: 'close'
@@ -286,9 +298,11 @@ export function createMenu(store: Store): void {
 					type: 'separator'
 				},
 				{
-					label: 'Preferences…',
+					label: 'Settings',
 					accelerator: 'Cmd+,',
-					role: 'preferences'
+					click: () => {
+						shell.openItem(store.getPreferencesPath());
+					}
 				},
 				{
 					label: 'Services',

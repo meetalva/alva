@@ -338,9 +338,7 @@ export function createMenu(store: Store): void {
 				{
 					label: 'Quit',
 					accelerator: 'Command+Q',
-					click: () => {
-						app.quit();
-					}
+					role: 'quit'
 				}
 			]
 		});

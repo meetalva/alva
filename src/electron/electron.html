@@ -2,12 +2,8 @@
 
 <body>
 	<script>
-		const { ipcRenderer } = require('electron');
-
-		ipcRenderer.on('message', function (event, text) {
-			console.log('auto-updater message:', text);
-		})
-	</script>
+	const { ipcRenderer } = require('electron');
+</script>
 	<div id="app"></div>
 	<script>require('../../build/component/app.js')</script>
 </body>

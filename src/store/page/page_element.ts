@@ -55,11 +55,6 @@ export class PageElement {
 		if (setDefaults && this.pattern) {
 			this.pattern.getProperties().forEach(property => {
 				this.setPropertyValue(property.getId(), property.getDefaultValue());
-				console.log(
-					`Property ${property.getId()}: Set default ${JSON.stringify(
-						this.getPropertyValue(property.getId())
-					)}`
-				);
 			});
 		}
 

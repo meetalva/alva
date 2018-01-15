@@ -69,8 +69,8 @@ export class Page {
 	 * Returns the root element of the page, the first pattern element of the content tree.
 	 * @return The root element of the page.
 	 */
-	public getRoot(): PageElement {
-		return this.root as PageElement;
+	public getRoot(): PageElement | undefined {
+		return this.root;
 	}
 
 	/*

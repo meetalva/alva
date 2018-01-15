@@ -2,11 +2,11 @@ import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
-import { Pattern } from '../../store/pattern/pattern';
+import { PatternType } from '../../store/pattern/pattern-type';
 import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { TextPattern } from '../../store/pattern/text-pattern';
+import { ReactPattern } from '../../store/styleguide/typescript-react-analyzer/react-pattern';
 
 class PatternWrapper extends React.Component<{}, PatternWrapperState> {
 	public constructor(props: {}) {
@@ -38,7 +38,7 @@ export interface PreviewProps {
 
 @observer
 export class Preview extends React.Component<PreviewProps> {
-	private patternFactories: { [folder: string]: React.StatelessComponent };
+	private patternFactories: { [id: string]: React.StatelessComponent | ObjectConstructor };
 	@observable private highlightArea: HighlightAreaProps;
 
 	public constructor(props: PreviewProps) {
@@ -105,13 +105,17 @@ export class Preview extends React.Component<PreviewProps> {
 
 			// First, process the properties and children of the declaration recursively
 			const pageElement: PageElement = value;
-			if (!pageElement.getPattern()) {
+			const pattern = pageElement.getPattern();
+
+			if (!pattern) {
 				return null;
 			}
 
-			const pattern: Pattern = pageElement.getPattern() as Pattern;
-			if (pattern instanceof TextPattern) {
-				return pageElement.getPropertyValue('text');
+			if (pattern.getType() === PatternType.synthetic) {
+				switch (pattern.getId()) {
+					case 'text':
+						return pageElement.getPropertyValue('text');
+				}
 			}
 
 			// tslint:disable-next-line:no-any
@@ -127,15 +131,25 @@ export class Preview extends React.Component<PreviewProps> {
 				.getChildren()
 				.map((child, index) => this.createComponent(child, String(index)));
 
-			// Then, load the pattern factory
-			const patternPath: string = pattern.getAbsolutePath();
-			let patternFactory: React.StatelessComponent = this.patternFactories[patternPath];
-			if (patternFactory == null) {
-				// tslint:disable-line
-				patternFactory = require(patternPath).default;
-				this.patternFactories[patternPath] = patternFactory;
+			if (pattern.getType() !== PatternType.react) {
+				return null;
 			}
-			const reactComponent = patternFactory(componentProps);
+
+			const reactPattern = pattern as ReactPattern;
+
+			// Then, load the pattern factory
+			const patternPath: string = reactPattern.fileInfo.jsFilePath;
+			let patternFactory: React.StatelessComponent | ObjectConstructor = this.patternFactories[
+				pattern.getId()
+			];
+			if (patternFactory == null) {
+				const exportName = reactPattern.exportInfo.name || 'default';
+				const module = require(patternPath);
+				patternFactory = module[exportName];
+				this.patternFactories[pattern.getId()] = patternFactory;
+			}
+
+			const reactComponent = React.createElement(patternFactory, componentProps);
 
 			// Finally, build the component
 			if (

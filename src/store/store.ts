@@ -1,5 +1,6 @@
-import { PatternFolder } from './pattern/folder';
 import * as FileUtils from 'fs';
+import { TypescriptReactAnalyzer } from './styleguide/typescript-react-analyzer/index';
+import { SyntheticAnalyzer } from './styleguide/synthetic-analyzer/index';
 import { JsonArray, JsonObject, Persister } from './json';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
@@ -11,6 +12,7 @@ import * as PathUtils from 'path';
 import { Pattern } from './pattern/pattern';
 import { Preferences } from './preferences';
 import { Project } from './project//project';
+import { Styleguide } from './styleguide/styleguide';
 
 /**
  * The central entry-point for all application state, managed by MobX.
@@ -53,7 +55,7 @@ export class Store {
 	/**
 	 * The root folder of the patterns of the currently opened styleguide.
 	 */
-	@MobX.observable private patternRoot: PatternFolder;
+	@MobX.observable private styleguide: Styleguide = new Styleguide('');
 
 	/**
 	 * The internal data storage for preferences, i.e. personal settings
@@ -251,21 +253,10 @@ export class Store {
 	}
 
 	/**
-	 * Returns a parsed pattern information object for a given relative pattern path.
-	 * @param path The path to the pattern. May be a simple ID for top-level patterns,
-	 * or a slash-separated list of pattern folders and finally the pattern's ID.
-	 * @return The resolved pattern, or undefined, if no such path exists.
+	 * Returns the specified styleguide by id.
 	 */
-	public getPattern(path: string): Pattern | undefined {
-		return this.patternRoot.getPattern(path);
-	}
-
-	/**
-	 * Returns the root folder of the patterns of the currently opened styleguide.
-	 * @return The root folder object.
-	 */
-	public getPatternRoot(): PatternFolder | undefined {
-		return this.patternRoot;
+	public getStyleguide(): Styleguide {
+		return this.styleguide;
 	}
 
 	/**
@@ -370,8 +361,17 @@ export class Store {
 			}
 			this.styleGuidePath = styleguidePath;
 			this.currentPage = undefined;
-			this.patternRoot = new PatternFolder(this, '');
-			this.patternRoot.addTextPattern();
+
+			const typescriptReactAnalyzer = new TypescriptReactAnalyzer('react');
+			const syntheticAnalyzer = new SyntheticAnalyzer('synthetic');
+
+			const styleguide = new Styleguide(styleguidePath, [
+				typescriptReactAnalyzer,
+				syntheticAnalyzer
+			]);
+
+			this.styleguide = styleguide;
+			this.styleguide.load();
 
 			(this.projects as IObservableArray<Project>).clear();
 			const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.yaml');
@@ -513,7 +513,7 @@ export class Store {
 	 * @return All patterns that match.
 	 */
 	public searchPatterns(term: string): Pattern[] {
-		return this.patternRoot ? this.patternRoot.searchPatterns(term) : [];
+		return this.styleguide.searchPatterns(term);
 	}
 
 	/**

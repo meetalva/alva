@@ -1,6 +1,5 @@
 import { JsonArray, JsonObject, JsonValue } from '../json';
 import * as MobX from 'mobx';
-import * as PathUtils from 'path';
 import { Pattern } from '../pattern/pattern';
 import { Property } from '../pattern/property/property';
 import { PropertyValue } from './property-value';
@@ -29,11 +28,6 @@ export class PageElement {
 	private pattern?: Pattern;
 
 	/**
-	 * The relative path to the built pattern files folder, in terms of Pattern.getRelativePath().
-	 */
-	private patternPath: string;
-
-	/**
 	 * The pattern property values of this element's component instance.
 	 * Each key represents the property ID of the pattern, while the value holds the content
 	 * as provided by the designer.
@@ -50,7 +44,6 @@ export class PageElement {
 	 */
 	public constructor(pattern?: Pattern, setDefaults?: boolean, parent?: PageElement) {
 		this.pattern = pattern;
-		this.patternPath = pattern ? pattern.getRelativePath().replace(PathUtils.sep, '/') : '';
 
 		if (setDefaults && this.pattern) {
 			this.pattern.getProperties().forEach(property => {
@@ -72,17 +65,40 @@ export class PageElement {
 	 * @return A new page element object containing the loaded data.
 	 */
 	public static fromJsonObject(
-		json: JsonObject,
+		json: JsonObject | undefined,
 		store: Store,
 		parent?: PageElement
 	): PageElement | undefined {
-		const patternPath: string = json['pattern'] as string;
-		const pattern: Pattern | undefined = store.getPattern(patternPath);
+		if (!json) {
+			return;
+		}
+
+		let patternId = json['pattern'] as string;
+		let analyzerId = json['analyzer'] as string | undefined;
+
+		// Map patterns without styleguide and analyzer id to default ones.
+		// Convert old react pattern ids to the new schema as used by the TypescriptReactAnalyzer.
+		// TODO: Implement upgrade path for page files of older versions
+		if (!analyzerId) {
+			if (patternId === 'text') {
+				analyzerId = 'synthetic';
+			} else {
+				patternId = `lib/patterns/${patternId}/index`;
+				analyzerId = 'react';
+			}
+		}
+
+		const styleguide = store.getStyleguide();
+
+		if (!styleguide) {
+			return;
+		}
+
+		const pattern: Pattern | undefined = styleguide.findPattern(analyzerId, patternId);
 		const element = new PageElement(pattern, false, parent);
 
 		if (!pattern) {
-			console.warn(`Ignoring unknown pattern "${patternPath}"`);
-			element.patternPath = patternPath;
+			console.warn(`Ignoring unknown pattern "${patternId}"`);
 			return element;
 		}
 
@@ -150,7 +166,13 @@ export class PageElement {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
 			return PageElement.fromJsonObject(json as JsonObject, store, this);
 		} else {
-			const element: PageElement = new PageElement(store.getPattern('text'), false, this);
+			const styleguide = store.getStyleguide();
+
+			const element: PageElement = new PageElement(
+				styleguide.findPattern('synthetic', 'text'),
+				false,
+				this
+			);
 			element.setPropertyValue('text', String(json));
 			return element;
 		}
@@ -222,15 +244,6 @@ export class PageElement {
 	 */
 	public getPattern(): Pattern | undefined {
 		return this.pattern;
-	}
-
-	/**
-	 * Returns the relative path to the built pattern files folder,
-	 * in terms of Pattern.getRelativePath().
-	 * @return The relative path to the built pattern files folder.
-	 */
-	public getPatternPath(): string {
-		return this.patternPath;
 	}
 
 	/**
@@ -369,7 +382,11 @@ export class PageElement {
 	 * @return The JSON object to be persisted.
 	 */
 	public toJsonObject(): JsonObject {
-		const json: JsonObject = { _type: 'pattern', pattern: this.patternPath };
+		const json: JsonObject = {
+			_type: 'pattern',
+			pattern: this.pattern && this.pattern.getId(),
+			analyzer: this.pattern && this.pattern.getAnalyzer().getId()
+		};
 
 		json.children = this.children.map(
 			(element: PageElement) =>

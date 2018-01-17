@@ -6,6 +6,9 @@ import { Property } from './property';
  * "true" and "false", and the numbers 1 and 0, as well (see coerceValue()).
  * @see Property
  */
+
+export type BooleanPropertyType = boolean | number | string;
+
 export class BooleanProperty extends Property {
 	/**
 	 * Creates a new boolean property.
@@ -19,8 +22,7 @@ export class BooleanProperty extends Property {
 	/**
 	 * @inheritdoc
 	 */
-	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
+	public coerceValue(value: BooleanPropertyType): boolean {
 		return value === true || value === 'true' || value === 1;
 	}
 

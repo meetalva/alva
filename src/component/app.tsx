@@ -76,6 +76,9 @@ class App extends React.Component<AppProps> {
 		// Todo: project and page don't update on page change
 		const project = this.props.store.getCurrentProject();
 		const title = `${project && project.getName()}`;
+		const previewFrame = project && project.getPreviewFrame();
+		const previewFramePath =
+			previewFrame && PathUtils.join(this.props.store.getStyleGuidePath(), 'alva', previewFrame);
 
 		const DevTools = getDevTools();
 
@@ -101,7 +104,7 @@ class App extends React.Component<AppProps> {
 								<PatternListContainer store={this.props.store} />
 							</PatternsPane>
 						</SideBar>,
-						<PreviewPane key="center" />,
+						<PreviewPane key="center" previewFrame={previewFramePath} />,
 						<SideBar key="right" directionVertical hasPaddings>
 							<PropertyPane>
 								<PropertyList store={this.props.store} />

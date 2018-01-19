@@ -3,7 +3,7 @@ import * as MobX from 'mobx';
 import * as PathUtils from 'path';
 import { Pattern } from '../pattern/pattern';
 import { Property } from '../pattern/property/property';
-import { PropertyValue } from './property_value';
+import { PropertyValue } from './property-value';
 import { Store } from '../store';
 
 /**

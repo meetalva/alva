@@ -1,4 +1,4 @@
-import { PageElement } from './page_element';
+import { PageElement } from './page-element';
 
 /**
  * The valid types for each property value, mainly primitives, objects of primitives,

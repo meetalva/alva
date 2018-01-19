@@ -1,6 +1,6 @@
 import { JsonObject } from '../json';
 import * as MobX from 'mobx';
-import { PageElement } from './page_element';
+import { PageElement } from './page-element';
 import { Store } from '../store';
 
 /**

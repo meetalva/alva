@@ -1,6 +1,6 @@
 import { JsonArray, JsonObject } from '../json';
 import * as MobX from 'mobx';
-import { PageRef } from './page_ref';
+import { PageRef } from './page-ref';
 import { Store } from '../store';
 
 /**

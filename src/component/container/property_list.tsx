@@ -1,4 +1,4 @@
-import { EnumProperty, Option } from '../../store/pattern/property/enum_property';
+import { EnumProperty, Option } from '../../store/pattern/property/enum-property';
 import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item/index';
 import { StringItem } from '../../lsg/patterns/property-items/string-item/index';
 import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item/index';

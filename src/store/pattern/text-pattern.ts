@@ -1,7 +1,7 @@
 import { PatternFolder } from './folder';
 import { Pattern } from './pattern';
 import { Property } from './property/property';
-import { StringProperty } from './property/string_property';
+import { StringProperty } from './property/string-property';
 
 /**
  * A pseudo-pattern representing text-node content of another pattern's children property.

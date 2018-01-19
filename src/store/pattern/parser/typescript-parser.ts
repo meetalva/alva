@@ -10,7 +10,7 @@ import { Pattern } from '../pattern';
 import { PatternParser } from './pattern-parser';
 import { Property } from '../property/property';
 import { StringArrayProperty } from '../property/string-array-property';
-import { StringProperty } from '../property/string_property';
+import { StringProperty } from '../property/string-property';
 import * as ts from 'typescript';
 
 /**

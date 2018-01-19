@@ -3,9 +3,9 @@ import { ListItemProps } from '../../lsg/patterns/list';
 import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
-import { PageElement } from '../../store/page/page_element';
+import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/pattern/pattern';
-import { PropertyValue } from '../../store/page/property_value';
+import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
 import { Store } from '../../store/store';
 

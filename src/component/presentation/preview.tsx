@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
-import { PageElement } from '../../store/page/page_element';
+import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/pattern/pattern';
-import { PropertyValue } from '../../store/page/property_value';
+import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
-import { TextPattern } from '../../store/pattern/text_pattern';
+import { TextPattern } from '../../store/pattern/text-pattern';
 
 class PatternWrapper extends React.Component<{}, PatternWrapperState> {
 	public constructor(props: {}) {

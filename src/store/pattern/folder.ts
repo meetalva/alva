@@ -3,7 +3,7 @@ import * as MobX from 'mobx';
 import * as PathUtils from 'path';
 import { Pattern } from './pattern';
 import { Store } from '../store';
-import { TextPattern } from './text_pattern';
+import { TextPattern } from './text-pattern';
 
 /**
  * A folder within the styleguide containing patterns.

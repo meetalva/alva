@@ -1,9 +1,9 @@
 import { PatternFolder } from './folder';
 import * as PathUtils from 'path';
-import { PatternParser } from './parser/pattern_parser';
+import { PatternParser } from './parser/pattern-parser';
 import { Property } from './property/property';
 import { Store } from '../../store/store';
-import { TypeScriptParser } from './parser/typescript_parser';
+import { TypeScriptParser } from './parser/typescript-parser';
 
 /**
  * A pattern represents a reusable, styled component (e.g. a React component) of the styleguide.

@@ -2,7 +2,7 @@ import Input from '../../lsg/patterns/input/';
 import { PatternFolder } from '../../store/pattern/folder';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
-import { PageElement } from '../../store/page/page_element';
+import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/pattern/pattern';
 import PatternList, {
 	PatternLabel,

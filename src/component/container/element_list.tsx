@@ -1,3 +1,4 @@
+import { elementMenu } from '../../electron/context-menus';
 import { ElementWrapper } from './element_wrapper';
 import { ListItemProps } from '../../lsg/patterns/list';
 import { createMenu } from '../../electron/menu';
@@ -45,6 +46,7 @@ export class ElementList extends React.Component<ElementListProps> {
 				title={item.value}
 				key={key}
 				handleClick={item.onClick}
+				handleContextMenu={item.onContextMenu}
 				active={item.active}
 				handleDragStart={item.handleDragStart}
 				handleDragDropForChild={item.handleDragDropForChild}
@@ -93,6 +95,9 @@ export class ElementList extends React.Component<ElementListProps> {
 			label: key,
 			value: pattern.getName(),
 			onClick: updatePageElement,
+			onContextMenu: () => {
+				elementMenu(this.props.store, element);
+			},
 			handleDragStart: (e: React.DragEvent<HTMLElement>) => {
 				this.props.store.setRearrangeElement(element);
 			},

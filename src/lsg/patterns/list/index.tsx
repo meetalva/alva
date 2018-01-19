@@ -14,6 +14,7 @@ export interface ListItemProps {
 	value: string;
 
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	onContextMenu?: React.MouseEventHandler<HTMLElement>;
 	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	handleDragDrop?: React.DragEventHandler<HTMLElement>;
 	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
@@ -45,13 +46,14 @@ const StyledUl = styled.ul`
 const StyledLi = styled.li`
 	line-height: 25px;
 	list-style: none;
-	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')}
-	${(props: StyledListItemProps) => (props.active ? 'background: #def' : '')}
+	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')} ${(
+			props: StyledListItemProps
+		) => (props.active ? 'background: #def' : '')};
 `;
 
 const StyledLabel = styled.span`
 	color: ${colors.black.toString()};
-	padding-right 4px;
+	padding-right: 4px;
 `;
 
 const StyledValue = styled.span`

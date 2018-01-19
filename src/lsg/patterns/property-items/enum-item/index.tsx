@@ -1,14 +1,18 @@
 import { colors } from '../../colors';
-import { Option } from '../../../../store/pattern/property/enum_property';
 import { fonts } from '../../fonts';
 import * as React from 'react';
 import { getSpace, Size } from '../../space';
 import styled from 'styled-components';
 
+export interface Values {
+	id: string;
+	name: string;
+}
+
 export interface EnumItemProps {
 	label: string;
-	selectedValue?: Option;
-	values: Option[];
+	selectedValue?: string;
+	values: Values[];
 	required?: boolean;
 	className?: string;
 	handleChange?: React.ChangeEventHandler<HTMLSelectElement>;
@@ -61,12 +65,12 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 			<StyledSelect
 				className={className}
 				onChange={handleChange}
-				value={selectedValue ? selectedValue.getId() : ''}
+				value={selectedValue ? selectedValue : ''}
 			>
 				{!required && <option key="empty" value="" />}
 				{values.map(value => (
-					<option key={value.getId()} value={value.getId()}>
-						{value.getName()}
+					<option key={value.id} value={value.id}>
+						{value.name}
 					</option>
 				))};
 			</StyledSelect>

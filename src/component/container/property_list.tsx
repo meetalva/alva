@@ -1,7 +1,7 @@
 import { EnumProperty, Option } from '../../store/pattern/property/enum_property';
 import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item/index';
 import { StringItem } from '../../lsg/patterns/property-items/string-item/index';
-import { EnumItem } from '../../lsg/patterns/property-items/enum-item/index';
+import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item/index';
 import { observer } from 'mobx-react';
 import { Property } from '../../store/pattern/property/property';
 import * as React from 'react';
@@ -15,6 +15,13 @@ export interface PropertyListProps {
 export class PropertyList extends React.Component<PropertyListProps> {
 	public constructor(props: PropertyListProps) {
 		super(props);
+	}
+
+	public convertOptionsToValues(options: Option[]): Values[] {
+		return options.map(option => ({
+			id: option.getId(),
+			name: option.getName()
+		}));
 	}
 
 	public render(): JSX.Element {
@@ -75,8 +82,8 @@ export class PropertyList extends React.Component<PropertyListProps> {
 								<EnumItem
 									key={id}
 									label={name}
-									selectedValue={option}
-									values={options}
+									selectedValue={option && option.getId()}
+									values={this.convertOptionsToValues(options)}
 									handleChange={event => {
 										selectedElement.setPropertyValue(id, event.currentTarget.value);
 									}}

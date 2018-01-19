@@ -5,7 +5,7 @@
   "main": "./build/electron/electron.js",
   "scripts": {
     "build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/*.html build/electron/",
-    "build-lsg": "tsc --project src/lsg --outDir build/lsg/patterns --sourceMap",
+    "build-lsg": "tsc --project src/lsg --outDir build/lsg/patterns",
     "start": "npm run build && concurrently \"electron build/electron/electron.js --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\"",
     "start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
     "clean": "rm -rf build && rm -rf dist",

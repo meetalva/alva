@@ -31,13 +31,20 @@ export class Project {
 	@MobX.observable private pages: PageRef[] = [];
 
 	/**
+	 * Path to the preview frame, relative to the projects.yaml file.
+	 */
+	@MobX.observable private previewFrame: string;
+
+	/**
 	 * Creates a new project.
 	 * @param id The technical (internal) ID of the project.
 	 * @param name The human-friendly name of the project.
+	 * @param previewFrame Path to the preview frame, relative to the projects.yaml file.
 	 */
-	public constructor(id: string, name: string) {
+	public constructor(id: string, name: string, previewFrame: string) {
 		this.id = id;
 		this.name = name;
+		this.previewFrame = previewFrame;
 	}
 
 	/**
@@ -46,7 +53,11 @@ export class Project {
 	 * @return A new project object containing the loaded data.
 	 */
 	public static fromJsonObject(json: JsonObject, store: Store): Project {
-		const project: Project = new Project(json.id as string, json.name as string);
+		const project: Project = new Project(
+			json.id as string,
+			json.name as string,
+			json.previewFrame as string
+		);
 
 		const pages: PageRef[] = [];
 		(json.pages as JsonArray).forEach((pageJson: JsonObject) => {
@@ -92,6 +103,14 @@ export class Project {
 	}
 
 	/**
+	 * Returns the configured path to the preview frame, relative to the projects.yaml file.
+	 * @return Path to the configured preview frame
+	 */
+	public getPreviewFrame(): string {
+		return this.previewFrame;
+	}
+
+	/**
 	 * Serializes the project into a JSON object for persistence.
 	 * @return The JSON object to be persisted.
 	 */
@@ -104,6 +123,7 @@ export class Project {
 		return {
 			id: this.id,
 			name: this.name,
+			previewFrame: this.previewFrame,
 			pages: pagesJsonObject
 		};
 	}

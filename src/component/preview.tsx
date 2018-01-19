@@ -49,4 +49,6 @@ ipcRenderer.on('open-styleguide', (event: {}, message: JsonObject) => {
 	store.openStyleguide(message.styleGuidePath as string);
 });
 
-ReactDom.render(<PreviewApp store={store} />, document.getElementById('app'));
+window.onload = () => {
+	ReactDom.render(<PreviewApp store={store} />, document.getElementById('app'));
+};

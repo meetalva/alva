@@ -12,6 +12,7 @@ export interface ElementWrapperProps {
 	open?: boolean;
 	title: string;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
+	handleContextMenu?: React.MouseEventHandler<HTMLElement>;
 	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	handleDragDrop?: React.DragEventHandler<HTMLElement>;
 	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
@@ -94,7 +95,7 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 	}
 
 	public render(): JSX.Element {
-		const { active, children, handleClick, title } = this.props;
+		const { active, children, handleClick, handleContextMenu, title } = this.props;
 		return (
 			<Element
 				title={title}
@@ -103,6 +104,7 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 				highlight={this.state.highlight}
 				highlightPlaceholder={this.state.highlightPlaceholder}
 				handleClick={handleClick}
+				handleContextMenu={handleContextMenu}
 				draggable
 				handleIconClick={this.handleIconClick}
 				handleDragStart={this.handleDragStart}

@@ -13,6 +13,7 @@ export interface ElementProps {
 
 	draggable?: boolean;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
+	handleContextMenu?: React.MouseEventHandler<HTMLElement>;
 	handleIconClick?: React.MouseEventHandler<SVGSVGElement>;
 	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	handleDragEnter?: React.DragEventHandler<HTMLElement>;
@@ -142,6 +143,7 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 		highlight,
 		draggable,
 		handleClick,
+		handleContextMenu,
 		handleIconClick,
 		handleDragStart,
 		handleDragEnter,
@@ -176,6 +178,7 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 				active={active}
 				highlight={highlight}
 				onClick={handleClick}
+				onContextMenu={handleContextMenu}
 			>
 				{children && (
 					<StyledIcon

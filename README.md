@@ -23,6 +23,8 @@ There is no such thing as out-dated and static PNG screens, as the current versi
 
 ## Installation and usage
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/meetalva/alva.svg)](https://greenkeeper.io/)
+
 Please follow the installation and usage guidelines matching your purpose for Alva.
 
 ### As a designer

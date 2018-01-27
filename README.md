@@ -23,8 +23,6 @@ There is no such thing as out-dated and static PNG screens, as the current versi
 
 ## Installation and usage
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/meetalva/alva.svg)](https://greenkeeper.io/)
-
 Please follow the installation and usage guidelines matching your purpose for Alva.
 
 ### As a designer
@@ -147,3 +145,5 @@ Alva follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 Proudly powered by [SinnerSchrader](https://github.com/sinnerschrader).
 
 Copyright 2017-2018. Released under the MIT license.
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/meetalva/alva.svg)](https://greenkeeper.io/)

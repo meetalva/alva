@@ -4,14 +4,15 @@ import {
 	MenuItem,
 	MenuItemConstructorOptions,
 	remote,
-	WebContents
+	WebContents,
+	WebviewTag
 } from 'electron';
 import * as FileExtraUtils from 'fs-extra';
 import { PageElement } from '../store/page/page-element';
 import * as PathUtils from 'path';
 import * as ProcessUtils from 'process';
 import { Store } from '../store/store';
-const { Menu, shell, app, dialog } = remote;
+const { screen, Menu, shell, app, dialog } = remote;
 
 export function createMenu(store: Store): void {
 	const template: MenuItemConstructorOptions[] = [
@@ -90,6 +91,53 @@ export function createMenu(store: Store): void {
 					accelerator: 'Cmd+,',
 					click: () => {
 						shell.openItem(store.getPreferencesPath());
+					}
+				},
+				{
+					label: 'Export page as PNG',
+					click: () => {
+						const webview = document.getElementById('preview') as WebviewTag;
+
+						// code that gets executed inside the webview to get
+						// the actual size of the preview body
+						const code = `
+							bodyTag = document.querySelector('body');
+							r = {};
+							r.pageHeight = bodyTag.getBoundingClientRect().height;
+							r.pageWidth = bodyTag.getBoundingClientRect().width;
+							r;
+						`;
+
+						webview.executeJavaScript(code, false, webviewSize => {
+							// set the height of the webview tag to the preview body height
+							// This is needed because capturePage can not capture anything that renders
+							// outside the webview area (https://github.com/electron/electron/issues/9845)
+							webview.style.height = webviewSize.pageHeight;
+
+							dialog.showSaveDialog({}, filename => {
+								if (!filename) {
+									return;
+								}
+
+								const scaleFactor = screen.getPrimaryDisplay().scaleFactor;
+								webview.capturePage(
+									{
+										x: 0,
+										y: 0,
+										// round the numbers to remove possible floating numbers
+										// also multiply by scaleFactor for devices with higher pixel ratio:
+										// https://github.com/electron/electron/issues/8314
+										width: Math.round(webviewSize.pageWidth * scaleFactor),
+										height: Math.round(webviewSize.pageHeight * scaleFactor)
+									},
+									capture => {
+										FileExtraUtils.writeFileSync(filename, capture.toPNG());
+										// reset the webview height
+										webview.style.height = '100%';
+									}
+								);
+							});
+						});
 					}
 				},
 				{

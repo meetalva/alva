@@ -111,7 +111,7 @@
     "styled-components": "^3.0.2",
     "systemjs": "^0.20.19",
     "tslib": "^1.8.0",
-    "typescript": "^2.6.2"
+    "typescript": "2.6.2"
   },
   "homepage": "https://meetalva.github.io/"
 }

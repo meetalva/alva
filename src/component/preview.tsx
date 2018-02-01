@@ -50,3 +50,19 @@ ipcRenderer.on('open-styleguide', (event: {}, message: JsonObject) => {
 });
 
 ReactDom.render(<PreviewApp store={store} />, document.getElementById('app'));
+
+// Disable drag and drop from outside the application
+document.addEventListener(
+	'dragover',
+	event => {
+		event.preventDefault();
+	},
+	false
+);
+document.addEventListener(
+	'drop',
+	event => {
+		event.preventDefault();
+	},
+	false
+);

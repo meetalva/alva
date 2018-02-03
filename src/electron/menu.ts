@@ -4,7 +4,6 @@ import {
 	MenuItem,
 	MenuItemConstructorOptions,
 	remote,
-	WebContents,
 	WebviewTag
 } from 'electron';
 import * as FileExtraUtils from 'fs-extra';
@@ -298,9 +297,9 @@ export function createMenu(store: Store): void {
 							return 'Ctrl+Shift+I';
 						}
 					})(),
-					click: (item: MenuItem, focusedWindow: WebContents) => {
+					click: (item: MenuItem, focusedWindow: BrowserWindow) => {
 						if (focusedWindow) {
-							focusedWindow.toggleDevTools();
+							focusedWindow.webContents.toggleDevTools();
 						}
 					}
 				}

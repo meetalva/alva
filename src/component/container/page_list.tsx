@@ -19,6 +19,39 @@ export interface PageListItemProps {
 }
 
 @observer
+export class PageListItem extends React.Component<PageListItemProps> {
+	@MobX.observable protected pageElementEditable: boolean = false;
+
+	public constructor(props: PageListItemProps) {
+		super(props);
+
+		this.handlePageClick = this.handlePageClick.bind(this);
+		this.handlePageDoubleClick = this.handlePageDoubleClick.bind(this);
+	}
+	public render(): JSX.Element {
+		return (
+			<DropdownItemEditableLink
+				editable={this.pageElementEditable}
+				name={this.props.name}
+				handleClick={(e: React.MouseEvent<HTMLElement>) => {
+					e.preventDefault();
+					this.handlePageClick(this.props.id);
+				}}
+				handleDoubleClick={this.handlePageDoubleClick}
+			/>
+		);
+	}
+
+	protected handlePageClick(id: string): void {
+		this.props.store.openPage(id);
+	}
+
+	protected handlePageDoubleClick(e: React.MouseEvent<HTMLElement>): void {
+		this.pageElementEditable = !this.pageElementEditable;
+	}
+}
+
+@observer
 export class PageList extends React.Component<PageListProps> {
 	@MobX.observable protected pageListVisible: boolean = false;
 	public constructor(props: PageListProps) {
@@ -63,38 +96,5 @@ export class PageList extends React.Component<PageListProps> {
 	@MobX.action
 	protected handleDropdownToggle(): void {
 		this.pageListVisible = !this.pageListVisible;
-	}
-}
-
-@observer
-export class PageListItem extends React.Component<PageListItemProps> {
-	@MobX.observable protected pageElementEditable: boolean = false;
-
-	public constructor(props: PageListItemProps) {
-		super(props);
-
-		this.handlePageClick = this.handlePageClick.bind(this);
-		this.handlePageDoubleClick = this.handlePageDoubleClick.bind(this);
-	}
-	public render(): JSX.Element {
-		return (
-			<DropdownItemEditableLink
-				editable={this.pageElementEditable}
-				name={this.props.name}
-				handleClick={(e: React.MouseEvent<HTMLElement>) => {
-					e.preventDefault();
-					this.handlePageClick(this.props.id);
-				}}
-				handleDoubleClick={this.handlePageDoubleClick}
-			/>
-		);
-	}
-
-	protected handlePageClick(id: string): void {
-		this.props.store.openPage(id);
-	}
-
-	protected handlePageDoubleClick(e: React.MouseEvent<HTMLElement>): void {
-		this.pageElementEditable = !this.pageElementEditable;
 	}
 }

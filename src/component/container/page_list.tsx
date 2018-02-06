@@ -25,6 +25,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 	public constructor(props: PageListItemProps) {
 		super(props);
 
+		this.handleKeyDown = this.handleKeyDown.bind(this);
 		this.handlePageClick = this.handlePageClick.bind(this);
 		this.handlePageDoubleClick = this.handlePageDoubleClick.bind(this);
 	}
@@ -38,6 +39,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 					this.handlePageClick(this.props.id);
 				}}
 				handleDoubleClick={this.handlePageDoubleClick}
+				handleKeyDown={this.handleKeyDown}
 			/>
 		);
 	}
@@ -46,8 +48,15 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		this.props.store.openPage(id);
 	}
 
-	protected handlePageDoubleClick(e: React.MouseEvent<HTMLElement>): void {
+	protected handlePageDoubleClick(): void {
 		this.pageElementEditable = !this.pageElementEditable;
+	}
+
+	protected handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
+		if (e.key !== 'Enter') {
+			return;
+		}
+		console.log(e.key, 'this is a key press!!!');
 	}
 }
 

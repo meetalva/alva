@@ -24,6 +24,7 @@ export interface DropdownItemEditableProps {
 	icon?: IconName;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
 	handleDoubleClick?: React.MouseEventHandler<HTMLElement>;
+	handleKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
 }
 
 export interface StyledDropdownItemLinkProps {
@@ -117,7 +118,11 @@ export const DropdownItemEditableLink: React.StatelessComponent<DropdownItemEdit
 				{props.name}
 			</StyledDropdownItemLink>
 		) : (
-			<Input type={InputTypes.string} placeholder="Edit Page name" />
+			<Input
+				handleKeyDown={props.handleKeyDown}
+				placeholder="rename page"
+				type={InputTypes.string}
+			/>
 		)}
 	</StyledDropdownItem>
 );

@@ -9,6 +9,7 @@ export interface InputProps {
 	type?: InputTypes;
 	value?: string | number;
 	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
+	handleKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 	placeholder?: string;
 }
 
@@ -20,7 +21,7 @@ export enum InputTypes {
 
 const StyledInput = styled.input`
 	/* reset Styles */
-	-webkit-appearance:textfield;
+	-webkit-appearance: textfield;
 	outline: none;
 	border: none;
 	background: transparent;
@@ -48,7 +49,7 @@ const StyledInput = styled.input`
 	}
 
 	::-webkit-search-decoration {
-			display:none;
+		display: none;
 	}
 `;
 
@@ -59,6 +60,7 @@ const Input: React.StatelessComponent<InputProps> = props => (
 		type={props.type}
 		value={props.value}
 		onChange={props.handleChange}
+		onKeyDown={props.handleKeyDown}
 		placeholder={props.placeholder}
 	/>
 );

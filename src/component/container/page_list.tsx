@@ -14,7 +14,6 @@ export interface PageListProps {
 
 export interface PageListItemProps {
 	id: string;
-	index: number;
 	name: string;
 	store: Store;
 }
@@ -43,7 +42,7 @@ export class PageList extends React.Component<PageListProps> {
 				{this.getProjectPages().map((page: PageRef, index) => (
 					<PageListItem
 						id={page.getId()}
-						index={index}
+						key={index}
 						name={page.getName()}
 						store={this.props.store}
 					/>
@@ -81,7 +80,6 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		return (
 			<DropdownItemEditableLink
 				editable={this.pageElementEditable}
-				key={this.props.index}
 				name={this.props.name}
 				handleClick={(e: React.MouseEvent<HTMLElement>) => {
 					e.preventDefault();
@@ -98,6 +96,5 @@ export class PageListItem extends React.Component<PageListItemProps> {
 
 	protected handlePageDoubleClick(e: React.MouseEvent<HTMLElement>): void {
 		this.pageElementEditable = !this.pageElementEditable;
-		console.log('###', this.pageElementEditable);
 	}
 }

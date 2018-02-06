@@ -56,7 +56,8 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		if (e.key !== 'Enter') {
 			return;
 		}
-		console.log(e.key, 'this is a key press!!!');
+		this.pageElementEditable = false;
+		console.log(e.key, 'enter key was pressed!!!');
 	}
 }
 

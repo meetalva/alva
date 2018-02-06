@@ -1,5 +1,6 @@
 import Dropdown from '../../lsg/patterns/dropdown';
-import DropdownItem from '../../lsg/patterns/dropdown-item';
+import { DropdownItemEditableLink } from '../../lsg/patterns/dropdown-item';
+// import Input from '../../lsg/patterns/input';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import { PageRef } from '../../store/project/page-ref';
@@ -11,6 +12,13 @@ export interface PageListProps {
 	store: Store;
 }
 
+export interface PageListItemProps {
+	id: string;
+	index: number;
+	name: string;
+	store: Store;
+}
+
 @observer
 export class PageList extends React.Component<PageListProps> {
 	@MobX.observable protected pageListVisible: boolean = false;
@@ -18,7 +26,6 @@ export class PageList extends React.Component<PageListProps> {
 		super(props);
 
 		this.handleDropdownToggle = this.handleDropdownToggle.bind(this);
-		this.handlePageClick = this.handlePageClick.bind(this);
 	}
 
 	public render(): JSX.Element {
@@ -34,13 +41,11 @@ export class PageList extends React.Component<PageListProps> {
 				open={this.pageListVisible}
 			>
 				{this.getProjectPages().map((page: PageRef, index) => (
-					<DropdownItem
+					<PageListItem
+						id={page.getId()}
+						index={index}
 						name={page.getName()}
-						key={index}
-						handleClick={(e: React.MouseEvent<HTMLElement>) => {
-							e.preventDefault();
-							this.handlePageClick(page.getId());
-						}}
+						store={this.props.store}
 					/>
 				))}
 			</Dropdown>
@@ -60,8 +65,39 @@ export class PageList extends React.Component<PageListProps> {
 	protected handleDropdownToggle(): void {
 		this.pageListVisible = !this.pageListVisible;
 	}
+}
+
+@observer
+export class PageListItem extends React.Component<PageListItemProps> {
+	@MobX.observable protected pageElementEditable: boolean = false;
+
+	public constructor(props: PageListItemProps) {
+		super(props);
+
+		this.handlePageClick = this.handlePageClick.bind(this);
+		this.handlePageDoubleClick = this.handlePageDoubleClick.bind(this);
+	}
+	public render(): JSX.Element {
+		return (
+			<DropdownItemEditableLink
+				editable={this.pageElementEditable}
+				key={this.props.index}
+				name={this.props.name}
+				handleClick={(e: React.MouseEvent<HTMLElement>) => {
+					e.preventDefault();
+					this.handlePageClick(this.props.id);
+				}}
+				handleDoubleClick={this.handlePageDoubleClick}
+			/>
+		);
+	}
 
 	protected handlePageClick(id: string): void {
 		this.props.store.openPage(id);
+	}
+
+	protected handlePageDoubleClick(e: React.MouseEvent<HTMLElement>): void {
+		this.pageElementEditable = !this.pageElementEditable;
+		console.log('###', this.pageElementEditable);
 	}
 }

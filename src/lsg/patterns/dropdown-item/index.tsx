@@ -1,5 +1,7 @@
 import { Color, colors } from '../colors';
+
 import { Icon, IconName, Size as IconSize } from '../icons';
+import Input, { InputTypes } from '../input';
 import * as React from 'react';
 import { getSpace, Size as SpaceSize } from '../space';
 import styled from 'styled-components';
@@ -11,6 +13,19 @@ export interface DropdownItemProps {
 	icon?: IconName;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
 }
+export interface StyledDropdownItemLinkProps {
+	color?: Color;
+}
+
+export interface DropdownItemEditableProps {
+	color?: Color;
+	editable?: boolean;
+	name: string;
+	icon?: IconName;
+	handleClick?: React.MouseEventHandler<HTMLElement>;
+	handleDoubleClick?: React.MouseEventHandler<HTMLElement>;
+}
+
 export interface StyledDropdownItemLinkProps {
 	color?: Color;
 }
@@ -91,3 +106,18 @@ export class DropdownItemLinkAttributeItem extends React.Component {
 		);
 	}
 }
+
+export const DropdownItemEditableLink: React.StatelessComponent<DropdownItemEditableProps> = (
+	props
+): JSX.Element => (
+	<StyledDropdownItem onDoubleClick={props.handleDoubleClick}>
+		{!props.editable ? (
+			<StyledDropdownItemLink onClick={props.handleClick}>
+				{props.icon && <StyledDropdownItemIcon size={IconSize.S} name={props.icon} />}
+				{props.name}
+			</StyledDropdownItemLink>
+		) : (
+			<Input type={InputTypes.string} placeholder="Edit Page name" />
+		)}
+	</StyledDropdownItem>
+);

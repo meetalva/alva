@@ -56,6 +56,10 @@ export class PageRef {
 		return this.id;
 	}
 
+	public setId(id: string): void {
+		this.id = id;
+	}
+
 	/**
 	 * Returns the human-friendly name of the page.
 	 * In the frontend, to be displayed instead of the ID.

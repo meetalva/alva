@@ -65,6 +65,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 
 	protected handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
 		this.props.pageRef.setName(e.target.value);
+		this.props.pageRef.setId(Store.guessId(e.target.value));
 	}
 }
 

@@ -66,6 +66,14 @@ export class PageRef {
 	}
 
 	/**
+	 * Sets the name of the page.
+	 * In the frontend, to be displayed instead of the ID.
+	 */
+	public setName(name: string): void {
+		this.name = name;
+	}
+
+	/**
 	 * Returns the project this page belongs to. May be undefined.
 	 * @return The project this page belongs to or undefined.
 	 */

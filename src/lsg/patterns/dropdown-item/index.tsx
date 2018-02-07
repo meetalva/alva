@@ -22,6 +22,7 @@ export interface DropdownItemEditableProps {
 	editable: boolean;
 	name: string;
 	icon?: IconName;
+	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 	handleClick: React.MouseEventHandler<HTMLElement>;
 	handleDoubleClick: React.MouseEventHandler<HTMLElement>;
 	handleKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
@@ -127,6 +128,7 @@ export const DropdownItemEditableLink: React.StatelessComponent<DropdownItemEdit
 		) : (
 			<StyledDropdownItemInput
 				isFocused={true}
+				handleChange={props.handleChange}
 				handleKeyDown={props.handleKeyDown}
 				placeholder="enter new name"
 				type={InputTypes.string}

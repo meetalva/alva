@@ -15,17 +15,20 @@ export interface PageListProps {
 export interface PageListItemProps {
 	id: string;
 	name: string;
+	pageRef: PageRef;
 	store: Store;
 }
 
 @observer
 export class PageListItem extends React.Component<PageListItemProps> {
 	@MobX.observable protected pageElementEditable: boolean = false;
+	@MobX.observable protected name: string = '';
 
 	public constructor(props: PageListItemProps) {
 		super(props);
 
-		this.handleKeyDown = this.handleKeyDown.bind(this);
+		this.handleInputChange = this.handleInputChange.bind(this);
+		this.handlePageKeyDown = this.handlePageKeyDown.bind(this);
 		this.handlePageClick = this.handlePageClick.bind(this);
 		this.handlePageDoubleClick = this.handlePageDoubleClick.bind(this);
 	}
@@ -34,12 +37,13 @@ export class PageListItem extends React.Component<PageListItemProps> {
 			<DropdownItemEditableLink
 				editable={this.pageElementEditable}
 				name={this.props.name}
+				handleChange={this.handleInputChange}
 				handleClick={(e: React.MouseEvent<HTMLElement>) => {
 					e.preventDefault();
 					this.handlePageClick(this.props.id);
 				}}
 				handleDoubleClick={this.handlePageDoubleClick}
-				handleKeyDown={this.handleKeyDown}
+				handleKeyDown={this.handlePageKeyDown}
 			/>
 		);
 	}
@@ -52,12 +56,15 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		this.pageElementEditable = !this.pageElementEditable;
 	}
 
-	protected handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
+	protected handlePageKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
 		if (e.key !== 'Enter') {
 			return;
 		}
 		this.pageElementEditable = false;
-		console.log(e.key, 'enter key was pressed!!!');
+	}
+
+	protected handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
+		this.props.pageRef.setName(e.target.value);
 	}
 }
 
@@ -87,6 +94,7 @@ export class PageList extends React.Component<PageListProps> {
 						id={page.getId()}
 						key={index}
 						name={page.getName()}
+						pageRef={page}
 						store={this.props.store}
 					/>
 				))}

@@ -19,11 +19,11 @@ export interface StyledDropdownItemLinkProps {
 
 export interface DropdownItemEditableProps {
 	color?: Color;
-	editable?: boolean;
+	editable: boolean;
 	name: string;
 	icon?: IconName;
-	handleClick?: React.MouseEventHandler<HTMLElement>;
-	handleDoubleClick?: React.MouseEventHandler<HTMLElement>;
+	handleClick: React.MouseEventHandler<HTMLElement>;
+	handleDoubleClick: React.MouseEventHandler<HTMLElement>;
 	handleKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
 }
 
@@ -74,6 +74,13 @@ const StyledDropdownItemLinkAttributeItem = styled.a`
 	}
 `;
 
+const StyledDropdownItemInput = styled(Input)`
+	padding-bottom: ${getSpace(SpaceSize.S)}px;
+	margin-left: 0;
+	font-weight: normal;
+	font-size: 12px;
+`;
+
 export default class DropdownItem extends React.Component<DropdownItemProps> {
 	public render(): JSX.Element {
 		return (
@@ -118,9 +125,10 @@ export const DropdownItemEditableLink: React.StatelessComponent<DropdownItemEdit
 				{props.name}
 			</StyledDropdownItemLink>
 		) : (
-			<Input
+			<StyledDropdownItemInput
+				isFocused={true}
 				handleKeyDown={props.handleKeyDown}
-				placeholder="rename page"
+				placeholder="enter new name"
 				type={InputTypes.string}
 			/>
 		)}

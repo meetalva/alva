@@ -4,6 +4,7 @@ import { getSpace, Size } from '../space';
 import styled from 'styled-components';
 
 export interface InputProps {
+	isFocused?: boolean;
 	className?: string;
 	disabled?: boolean;
 	type?: InputTypes;
@@ -55,6 +56,7 @@ const StyledInput = styled.input`
 
 const Input: React.StatelessComponent<InputProps> = props => (
 	<StyledInput
+		autoFocus={props.isFocused}
 		className={props.className}
 		disabled={props.disabled}
 		type={props.type}

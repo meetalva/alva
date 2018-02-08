@@ -4,13 +4,14 @@ import { getSpace, Size } from '../space';
 import styled from 'styled-components';
 
 export interface InputProps {
-	isFocused?: boolean;
+	focused?: boolean;
 	className?: string;
 	disabled?: boolean;
 	type?: InputTypes;
 	value?: string | number;
 	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 	handleKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
 	placeholder?: string;
 }
 
@@ -56,11 +57,12 @@ const StyledInput = styled.input`
 
 const Input: React.StatelessComponent<InputProps> = props => (
 	<StyledInput
-		autoFocus={props.isFocused}
+		autoFocus={props.focused}
 		className={props.className}
 		disabled={props.disabled}
 		type={props.type}
 		value={props.value}
+		onBlur={props.handleBlur}
 		onChange={props.handleChange}
 		onKeyDown={props.handleKeyDown}
 		placeholder={props.placeholder}

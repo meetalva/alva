@@ -27,6 +27,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		super(props);
 
 		this.handleInputChange = this.handleInputChange.bind(this);
+		this.handleBlur = this.handleBlur.bind(this);
 		this.handlePageKeyDown = this.handlePageKeyDown.bind(this);
 		this.handlePageClick = this.handlePageClick.bind(this);
 		this.handlePageDoubleClick = this.handlePageDoubleClick.bind(this);
@@ -36,7 +37,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		return (
 			<DropdownItemEditableLink
 				editable={this.pageElementEditable}
-				isFocused={this.pageElementEditable}
+				focused={this.pageElementEditable}
 				handleChange={this.handleInputChange}
 				handleClick={(e: React.MouseEvent<HTMLElement>) => {
 					e.preventDefault();
@@ -45,6 +46,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 				handleDoubleClick={this.handlePageDoubleClick}
 				handleKeyDown={this.handlePageKeyDown}
 				name={this.props.name}
+				handleBlur={this.handleBlur}
 				placeholder={this.props.name}
 				value={this.pageName ? this.pageName : this.props.name}
 			/>
@@ -53,6 +55,11 @@ export class PageListItem extends React.Component<PageListItemProps> {
 
 	protected handlePageClick(id: string): void {
 		this.props.store.openPage(id);
+	}
+
+	@MobX.action
+	protected handleBlur(): void {
+		this.pageElementEditable = false;
 	}
 
 	@MobX.action

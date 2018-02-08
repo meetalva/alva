@@ -109,7 +109,7 @@
     "react-router": "^4.2.0",
     "readts": "^0.1.0",
     "styled-components": "^3.0.2",
-    "systemjs": "^0.20.19",
+    "systemjs": "^0.21.0",
     "tslib": "^1.8.0",
     "typescript": "2.6.2"
   },

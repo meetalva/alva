@@ -22,10 +22,13 @@ export interface DropdownItemEditableProps {
 	editable: boolean;
 	name: string;
 	icon?: IconName;
+	isFocused: boolean;
 	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 	handleClick: React.MouseEventHandler<HTMLElement>;
 	handleDoubleClick: React.MouseEventHandler<HTMLElement>;
 	handleKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
+	placeholder: string;
+	value?: string;
 }
 
 export interface StyledDropdownItemLinkProps {
@@ -80,6 +83,15 @@ const StyledDropdownItemInput = styled(Input)`
 	margin-left: 0;
 	font-weight: normal;
 	font-size: 12px;
+
+	::placeholder {
+		color: ${colors.grey60.toString()};
+	}
+	:hover {
+		::placeholder {
+			color: ${colors.grey60.toString()};
+		}
+	}
 `;
 
 export default class DropdownItem extends React.Component<DropdownItemProps> {
@@ -127,11 +139,12 @@ export const DropdownItemEditableLink: React.StatelessComponent<DropdownItemEdit
 			</StyledDropdownItemLink>
 		) : (
 			<StyledDropdownItemInput
-				isFocused={true}
+				isFocused={props.isFocused}
 				handleChange={props.handleChange}
 				handleKeyDown={props.handleKeyDown}
-				placeholder="enter new name"
+				placeholder={props.placeholder}
 				type={InputTypes.string}
+				value={props.value}
 			/>
 		)}
 	</StyledDropdownItem>

@@ -430,8 +430,7 @@ export class Store {
 
 	/**
 	 * Renames the name of the pages files and update the names
-	 * @param project The project with the pages need.
-	 * @param name The new name of the page.
+	 * @param id The new ID of the page.
 	 */
 
 	public renameYaml(id: string): void {
@@ -443,12 +442,6 @@ export class Store {
 			const newPath = PathUtils.join(this.styleGuidePath, `/alva/page-${id}.yaml`);
 			FileUtils.renameSync(oldPath, newPath);
 		}
-
-		// Json store
-		// change name of the file
-		// loadYamlOrJsons change the name of the name from generated jsons
-		// saveYaml with the path of the new file and user the returned object of
-		// loadyamlorjson method.
 	}
 
 	/**

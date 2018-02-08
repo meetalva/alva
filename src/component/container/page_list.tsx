@@ -36,7 +36,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		return (
 			<DropdownItemEditableLink
 				editable={this.pageElementEditable}
-				name={this.props.name}
+				isFocused={this.pageElementEditable}
 				handleChange={this.handleInputChange}
 				handleClick={(e: React.MouseEvent<HTMLElement>) => {
 					e.preventDefault();
@@ -44,6 +44,9 @@ export class PageListItem extends React.Component<PageListItemProps> {
 				}}
 				handleDoubleClick={this.handlePageDoubleClick}
 				handleKeyDown={this.handlePageKeyDown}
+				name={this.props.name}
+				placeholder={this.props.name}
+				// value={this.props.name}
 			/>
 		);
 	}
@@ -59,17 +62,24 @@ export class PageListItem extends React.Component<PageListItemProps> {
 
 	@MobX.action
 	protected handlePageKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
-		if (e.key !== 'Enter') {
-			return;
-		}
+		switch (e.key.toString()) {
+			case 'Escape':
+				this.pageElementEditable = false;
+				break;
 
-		if (!this.pageName) {
-			this.pageElementEditable = false;
-			return;
-		}
+			case 'Enter':
+				if (!this.pageName) {
+					this.pageElementEditable = false;
+					return;
+				}
 
-		this.renamePage(this.pageName);
-		this.pageElementEditable = false;
+				this.renamePage(this.pageName);
+				this.pageElementEditable = false;
+				break;
+
+			default:
+				return;
+		}
 	}
 
 	protected handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {

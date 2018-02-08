@@ -2,6 +2,7 @@ import { PatternFolder } from './pattern/folder';
 import { JsonArray, JsonObject, Persister } from './json';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
+// import * as FileUtils from 'fs';
 import * as OsUtils from 'os';
 import { Page } from './page/page';
 import { PageElement } from './page/page-element';
@@ -132,7 +133,7 @@ export class Store {
 	 * @param name The human-friendly name.
 	 * @return The guessed technical (internal) ID.
 	 */
-	public static guessId(name: string): string {
+	public static convertToId(name: string): string {
 		const guessedId = name
 			.replace(/([' '])/, '-')
 			.replace(/([_])/, '-')
@@ -425,6 +426,27 @@ export class Store {
 		}
 
 		(this.projects as IObservableArray<Project>).remove(project);
+	}
+
+	public renamePage(project: Project): void {
+		if (!project) {
+			return;
+		}
+		const pages = project.getPages();
+		pages.forEach(pageRef => {
+			const pagePath: string = PathUtils.join(
+				this.getPagesPath(),
+				`page-${pageRef.getId()}.yaml`
+			);
+			Persister.saveYaml(pagePath, {});
+			console.log(pages);
+		});
+
+		// Json store
+		// change name of the file
+		// loadYamlOrJsons change the name of the name from generated jsons
+		// saveYaml with the path of the new file and user the returned object of
+		// loadyamlorjson method.
 	}
 
 	/**

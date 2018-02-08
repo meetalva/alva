@@ -56,10 +56,6 @@ export class PageRef {
 		return this.id;
 	}
 
-	public setId(id: string): void {
-		this.id = id;
-	}
-
 	/**
 	 * Returns the human-friendly name of the page.
 	 * In the frontend, to be displayed instead of the ID.
@@ -67,14 +63,6 @@ export class PageRef {
 	 */
 	public getName(): string {
 		return this.name;
-	}
-
-	/**
-	 * Sets the name of the page.
-	 * In the frontend, to be displayed instead of the ID.
-	 */
-	public setName(name: string): void {
-		this.name = name;
 	}
 
 	/**
@@ -90,6 +78,20 @@ export class PageRef {
 	 */
 	public remove(): void {
 		this.setProject(undefined);
+	}
+
+	/*
+	* Sets the technical (internal) ID of the page.
+	*/
+	public setId(id: string): void {
+		this.id = id;
+	}
+
+	/**
+	 * Sets the human-friendly name of the page.
+	 */
+	public setName(name: string): void {
+		this.name = name;
 	}
 
 	/**

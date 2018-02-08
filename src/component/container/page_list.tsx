@@ -1,6 +1,5 @@
 import Dropdown from '../../lsg/patterns/dropdown';
 import { DropdownItemEditableLink } from '../../lsg/patterns/dropdown-item';
-// import Input from '../../lsg/patterns/input';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import { PageRef } from '../../store/project/page-ref';
@@ -22,7 +21,7 @@ export interface PageListItemProps {
 @observer
 export class PageListItem extends React.Component<PageListItemProps> {
 	@MobX.observable protected pageElementEditable: boolean = false;
-	@MobX.observable protected name: string = '';
+	@MobX.observable protected pageName: string;
 
 	public constructor(props: PageListItemProps) {
 		super(props);
@@ -52,20 +51,31 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		this.props.store.openPage(id);
 	}
 
+	@MobX.action
 	protected handlePageDoubleClick(): void {
 		this.pageElementEditable = !this.pageElementEditable;
 	}
 
+	@MobX.action
 	protected handlePageKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
 		if (e.key !== 'Enter') {
 			return;
 		}
+		if (!this.pageName) {
+			this.pageElementEditable = false;
+			return;
+		}
+		this.props.pageRef.setName(this.pageName);
+		this.props.pageRef.setId(Store.convertToId(this.pageName));
 		this.pageElementEditable = false;
+		// when the page name is empty not change the name
+		// set page name editable to false
 	}
 
 	protected handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
-		this.props.pageRef.setName(e.target.value);
-		this.props.pageRef.setId(Store.guessId(e.target.value));
+		this.pageName = e.target.value;
+		// const foo = this.props.pageRef.getProject();
+		// this.props.store.renamePage(foo);
 	}
 }
 

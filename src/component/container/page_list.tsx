@@ -46,7 +46,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 				handleKeyDown={this.handlePageKeyDown}
 				name={this.props.name}
 				placeholder={this.props.name}
-				// value={this.props.name}
+				value={this.pageName ? this.pageName : this.props.name}
 			/>
 		);
 	}

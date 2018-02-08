@@ -77,7 +77,6 @@ export class PageListItem extends React.Component<PageListItemProps> {
 	}
 
 	protected renamePage(name: string): void {
-		const project = this.props.pageRef.getProject();
 		const currentPage = this.props.store.getCurrentPage();
 
 		this.props.pageRef.setName(name);
@@ -85,11 +84,8 @@ export class PageListItem extends React.Component<PageListItemProps> {
 
 		if (currentPage) {
 			currentPage.setName(name);
+			this.props.store.renameYaml(Store.convertToId(name));
 			currentPage.setId(Store.convertToId(name));
-		}
-
-		if (project) {
-			this.props.store.renamePage(project);
 		}
 	}
 }

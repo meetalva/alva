@@ -1,8 +1,8 @@
 import { PatternFolder } from './pattern/folder';
+import * as FileUtils from 'fs';
 import { JsonArray, JsonObject, Persister } from './json';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
-// import * as FileUtils from 'fs';
 import * as OsUtils from 'os';
 import { Page } from './page/page';
 import { PageElement } from './page/page-element';
@@ -129,7 +129,7 @@ export class Store {
 
 	/**
 	 * Tries to guess a technical (internal) ID from the name by removing,
-	 * empty spaces, periods and minuses.
+	 * empty spaces, periods and dashes.
 	 * @param name The human-friendly name.
 	 * @return The guessed technical (internal) ID.
 	 */
@@ -431,20 +431,18 @@ export class Store {
 	/**
 	 * Renames the name of the pages files and update the names
 	 * @param project The project with the pages need.
+	 * @param name The new name of the page.
 	 */
 
-	public renamePage(project: Project): void {
-		if (!project) {
-			return;
-		}
-		const pages = project.getPages();
-		pages.forEach(pageRef => {
-			const pagePath: string = PathUtils.join(
-				this.getPagesPath(),
-				`page-${pageRef.getId()}.yaml`
+	public renameYaml(id: string): void {
+		if (this.currentPage) {
+			const oldPath = PathUtils.join(
+				this.styleGuidePath,
+				`/alva/page-${this.currentPage.getId()}.yaml`
 			);
-			console.log(pagePath, '!!!!path');
-		});
+			const newPath = PathUtils.join(this.styleGuidePath, `/alva/page-${id}.yaml`);
+			FileUtils.renameSync(oldPath, newPath);
+		}
 
 		// Json store
 		// change name of the file

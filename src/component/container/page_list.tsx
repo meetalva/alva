@@ -30,6 +30,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		this.handlePageKeyDown = this.handlePageKeyDown.bind(this);
 		this.handlePageClick = this.handlePageClick.bind(this);
 		this.handlePageDoubleClick = this.handlePageDoubleClick.bind(this);
+		this.renamePage = this.renamePage.bind(this);
 	}
 	public render(): JSX.Element {
 		return (
@@ -61,21 +62,35 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		if (e.key !== 'Enter') {
 			return;
 		}
+
 		if (!this.pageName) {
 			this.pageElementEditable = false;
 			return;
 		}
-		this.props.pageRef.setName(this.pageName);
-		this.props.pageRef.setId(Store.convertToId(this.pageName));
+
+		this.renamePage(this.pageName);
 		this.pageElementEditable = false;
-		// when the page name is empty not change the name
-		// set page name editable to false
 	}
 
 	protected handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
 		this.pageName = e.target.value;
-		// const foo = this.props.pageRef.getProject();
-		// this.props.store.renamePage(foo);
+	}
+
+	protected renamePage(name: string): void {
+		const project = this.props.pageRef.getProject();
+		const currentPage = this.props.store.getCurrentPage();
+
+		this.props.pageRef.setName(name);
+		this.props.pageRef.setId(Store.convertToId(name));
+
+		if (currentPage) {
+			currentPage.setName(name);
+			currentPage.setId(Store.convertToId(name));
+		}
+
+		if (project) {
+			this.props.store.renamePage(project);
+		}
 	}
 }
 

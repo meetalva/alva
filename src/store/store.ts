@@ -428,6 +428,11 @@ export class Store {
 		(this.projects as IObservableArray<Project>).remove(project);
 	}
 
+	/**
+	 * Renames the name of the pages files and update the names
+	 * @param project The project with the pages need.
+	 */
+
 	public renamePage(project: Project): void {
 		if (!project) {
 			return;
@@ -438,8 +443,7 @@ export class Store {
 				this.getPagesPath(),
 				`page-${pageRef.getId()}.yaml`
 			);
-			Persister.saveYaml(pagePath, {});
-			console.log(pages);
+			console.log(pagePath, '!!!!path');
 		});
 
 		// Json store

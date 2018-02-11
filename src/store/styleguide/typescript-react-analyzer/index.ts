@@ -17,7 +17,7 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer<ReactPattern> {
 	public analyze(path: string): ReactPattern[] {
 		const patterns: ReactPattern[] = [];
 
-		const fileInfos = walkDirectoriesAndCollectPatterns(path);
+		const fileInfos = walkDirectoriesAndCollectPatterns(path, path);
 
 		const declarationFiles = fileInfos.map(patternInfo => patternInfo.declarationFilePath);
 
@@ -50,26 +50,29 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer<ReactPattern> {
 function getPatternName(fileInfo: PatternFileInfo, exportInfo: ReactComponentExport): string {
 	const baseName = PathUtils.basename(fileInfo.jsFilePath, '.js');
 	const directoryName = PathUtils.basename(fileInfo.directory);
-	const name = exportInfo.name || baseName !== 'index' ? baseName : directoryName;
+	const name = exportInfo.name || (baseName !== 'index' ? baseName : directoryName);
 
 	return name;
 }
 
-function walkDirectoriesAndCollectPatterns(directory: string): PatternFileInfo[] {
-	let patterns = detectPatternsInDirectory(directory);
+function walkDirectoriesAndCollectPatterns(
+	rootDirectory: string,
+	directory: string
+): PatternFileInfo[] {
+	let patterns = detectPatternsInDirectory(rootDirectory, directory);
 
 	FileUtils.readdirSync(directory).forEach(childName => {
 		const childPath = PathUtils.join(directory, childName);
 
 		if (FileUtils.lstatSync(childPath).isDirectory()) {
-			patterns = patterns.concat(walkDirectoriesAndCollectPatterns(childPath));
+			patterns = patterns.concat(walkDirectoriesAndCollectPatterns(rootDirectory, childPath));
 		}
 	});
 
 	return patterns;
 }
 
-function detectPatternsInDirectory(directory: string): PatternFileInfo[] {
+function detectPatternsInDirectory(rootDirectory: string, directory: string): PatternFileInfo[] {
 	const patterns: PatternFileInfo[] = [];
 
 	FileUtils.readdirSync(directory).forEach(childName => {
@@ -83,11 +86,21 @@ function detectPatternsInDirectory(directory: string): PatternFileInfo[] {
 		const name = PathUtils.basename(declarationFilePath, '.d.ts');
 		const jsFilePath = PathUtils.join(directory, `${name}.js`);
 
+		let iconPath: string | undefined = PathUtils.join(directory, 'icon.svg');
+		iconPath = PathUtils.relative(rootDirectory, iconPath);
+		iconPath = iconPath
+			.split('/')
+			.slice(1)
+			.join('/');
+		iconPath = PathUtils.resolve(rootDirectory, iconPath);
+		iconPath = FileUtils.existsSync(iconPath) ? iconPath : undefined;
+
 		if (FileUtils.existsSync(jsFilePath)) {
 			const patternFileInfo: PatternFileInfo = {
 				directory,
 				declarationFilePath,
-				jsFilePath
+				jsFilePath,
+				iconPath
 			};
 
 			patterns.push(patternFileInfo);

@@ -6,6 +6,7 @@ import { ReactComponentExport } from './typescript/react';
 export interface PatternFileInfo {
 	directory: string;
 	jsFilePath: string;
+	iconPath?: string;
 	declarationFilePath: string;
 }
 
@@ -28,6 +29,7 @@ export class ReactPattern extends Pattern {
 		this.fileInfo = init.fileInfo;
 		this.exportInfo = init.exportInfo;
 
+		this.iconPath = this.fileInfo.iconPath;
 		this.properties = this.generateProperties();
 	}
 

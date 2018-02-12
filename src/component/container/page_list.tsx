@@ -21,7 +21,7 @@ export interface PageListItemProps {
 @observer
 export class PageListItem extends React.Component<PageListItemProps> {
 	@MobX.observable protected pageElementEditable: boolean = false;
-	@MobX.observable protected pageName: string;
+	@MobX.observable protected pageName: string = this.pageName || this.props.name;
 
 	public constructor(props: PageListItemProps) {
 		super(props);
@@ -47,8 +47,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 				handleKeyDown={this.handlePageKeyDown}
 				name={this.props.name}
 				handleBlur={this.handleBlur}
-				placeholder={this.props.name}
-				value={this.pageName ? this.pageName : this.props.name}
+				value={this.pageName}
 			/>
 		);
 	}

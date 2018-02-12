@@ -28,7 +28,6 @@ export interface DropdownItemEditableProps {
 	handleDoubleClick: React.MouseEventHandler<HTMLElement>;
 	handleKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
 	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
-	placeholder: string;
 	value?: string;
 }
 
@@ -144,7 +143,6 @@ export const DropdownItemEditableLink: React.StatelessComponent<DropdownItemEdit
 				handleChange={props.handleChange}
 				handleKeyDown={props.handleKeyDown}
 				handleBlur={props.handleBlur}
-				placeholder={props.placeholder}
 				type={InputTypes.string}
 				value={props.value}
 			/>

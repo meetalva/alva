@@ -433,7 +433,7 @@ export class Store {
 	 * @param id The new ID of the page.
 	 */
 
-	public renameYaml(id: string): void {
+	public renamePage(id: string): void {
 		if (this.currentPage) {
 			const oldPath = PathUtils.join(
 				this.styleGuidePath,

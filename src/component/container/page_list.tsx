@@ -100,7 +100,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 
 		if (currentPage) {
 			currentPage.setName(name);
-			this.props.store.renameYaml(Store.convertToId(name));
+			this.props.store.renamePage(Store.convertToId(name));
 			currentPage.setId(Store.convertToId(name));
 		}
 	}

@@ -39,10 +39,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 				editable={this.pageElementEditable}
 				focused={this.pageElementEditable}
 				handleChange={this.handleInputChange}
-				handleClick={(e: React.MouseEvent<HTMLElement>) => {
-					e.preventDefault();
-					this.handlePageClick(this.props.pageID);
-				}}
+				handleClick={this.handlePageClick}
 				handleDoubleClick={this.handlePageDoubleClick}
 				handleKeyDown={this.handlePageKeyDown}
 				name={this.props.name}
@@ -52,8 +49,9 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		);
 	}
 
-	protected handlePageClick(id: string): void {
-		this.props.store.openPage(id);
+	protected handlePageClick(e: React.MouseEvent<HTMLElement>): void {
+		e.preventDefault();
+		this.props.store.openPage(this.props.pageID);
 	}
 
 	@MobX.action

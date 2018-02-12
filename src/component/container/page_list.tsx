@@ -21,7 +21,8 @@ export interface PageListItemProps {
 @observer
 export class PageListItem extends React.Component<PageListItemProps> {
 	@MobX.observable protected pageElementEditable: boolean = false;
-	@MobX.observable protected pageName: string = this.pageName || this.props.name;
+	@MobX.observable
+	protected pageNameInputValue: string = this.pageNameInputValue || this.props.name;
 
 	public constructor(props: PageListItemProps) {
 		super(props);
@@ -44,7 +45,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 				handleKeyDown={this.handlePageKeyDown}
 				name={this.props.name}
 				handleBlur={this.handleBlur}
-				value={this.pageName}
+				value={this.pageNameInputValue}
 			/>
 		);
 	}
@@ -72,12 +73,12 @@ export class PageListItem extends React.Component<PageListItemProps> {
 				break;
 
 			case 'Enter':
-				if (!this.pageName) {
+				if (!this.pageNameInputValue) {
 					this.pageElementEditable = false;
 					return;
 				}
 
-				this.renamePage(this.pageName);
+				this.renamePage(this.pageNameInputValue);
 				this.pageElementEditable = false;
 				break;
 
@@ -87,7 +88,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 	}
 
 	protected handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
-		this.pageName = e.target.value;
+		this.pageNameInputValue = e.target.value;
 	}
 
 	protected renamePage(name: string): void {

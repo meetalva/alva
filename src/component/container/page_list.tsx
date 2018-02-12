@@ -12,7 +12,7 @@ export interface PageListProps {
 }
 
 export interface PageListItemProps {
-	id: string;
+	pageID: string;
 	name: string;
 	pageRef: PageRef;
 	store: Store;
@@ -41,7 +41,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 				handleChange={this.handleInputChange}
 				handleClick={(e: React.MouseEvent<HTMLElement>) => {
 					e.preventDefault();
-					this.handlePageClick(this.props.id);
+					this.handlePageClick(this.props.pageID);
 				}}
 				handleDoubleClick={this.handlePageDoubleClick}
 				handleKeyDown={this.handlePageKeyDown}
@@ -129,9 +129,9 @@ export class PageList extends React.Component<PageListProps> {
 			>
 				{this.getProjectPages().map((page: PageRef, index) => (
 					<PageListItem
-						id={page.getId()}
 						key={index}
 						name={page.getName()}
+						pageID={page.getId()}
 						pageRef={page}
 						store={this.props.store}
 					/>

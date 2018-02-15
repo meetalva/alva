@@ -127,6 +127,21 @@ export class Store {
 	}
 
 	/**
+	 * Tries to guess a technical (internal) ID from the name by removing,
+	 * empty spaces, periods and dashes.
+	 * @param name The human-friendly name.
+	 * @return The guessed technical (internal) ID.
+	 */
+	public static convertToId(name: string): string {
+		const guessedId = name
+			.replace(/([' '])/, '-')
+			.replace(/([_])/, '-')
+			.replace(/([.])/, '')
+			.toLowerCase();
+		return guessedId;
+	}
+
+	/**
 	 * Add a new project definition to the list of projects.
 	 * Note: Changes to the projects and page references are saved only when calling save().
 	 * @param project The new project.

@@ -58,6 +58,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 	@MobX.action
 	protected handleBlur(): void {
 		this.pageElementEditable = false;
+		this.pageNameInputValue = this.props.name;
 	}
 
 	@MobX.action
@@ -82,6 +83,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 
 				this.renamePage(this.pageNameInputValue);
 				this.pageElementEditable = false;
+				this.pageNameInputValue = this.props.name;
 				break;
 
 			default:

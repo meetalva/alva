@@ -80,6 +80,20 @@ export class PageRef {
 		this.setProject(undefined);
 	}
 
+	/*
+	* Sets the technical (internal) ID of the page.
+	*/
+	public setId(id: string): void {
+		this.id = id;
+	}
+
+	/**
+	 * Sets the human-friendly name of the page.
+	 */
+	public setName(name: string): void {
+		this.name = name;
+	}
+
 	/**
 	 * Sets the project this page belongs to.
 	 * If it belonged to a project before, it is removed from that project.

@@ -1,4 +1,5 @@
 import { PatternFolder } from './pattern/folder';
+import * as FileUtils from 'fs';
 import { JsonArray, JsonObject, Persister } from './json';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
@@ -425,6 +426,22 @@ export class Store {
 		}
 
 		(this.projects as IObservableArray<Project>).remove(project);
+	}
+
+	/**
+	 * Renames the name of the pages files and update the names
+	 * @param id The new ID of the page.
+	 */
+
+	public renamePage(id: string): void {
+		if (this.currentPage) {
+			const oldPath = PathUtils.join(
+				this.styleGuidePath,
+				`/alva/page-${this.currentPage.getId()}.yaml`
+			);
+			const newPath = PathUtils.join(this.styleGuidePath, `/alva/page-${id}.yaml`);
+			FileUtils.renameSync(oldPath, newPath);
+		}
 	}
 
 	/**

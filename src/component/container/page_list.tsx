@@ -69,6 +69,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 	protected handlePageKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
 		switch (e.key.toString()) {
 			case 'Escape':
+				this.pageNameInputValue = this.props.name;
 				this.pageElementEditable = false;
 				break;
 

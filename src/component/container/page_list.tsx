@@ -75,6 +75,7 @@ export class PageListItem extends React.Component<PageListItemProps> {
 
 			case 'Enter':
 				if (!this.pageNameInputValue) {
+					this.pageNameInputValue = this.props.name;
 					this.pageElementEditable = false;
 					return;
 				}

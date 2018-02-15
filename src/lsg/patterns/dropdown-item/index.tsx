@@ -1,5 +1,6 @@
 import { Color, colors } from '../colors';
 import { Icon, IconName, Size as IconSize } from '../icons';
+import Input, { InputTypes } from '../input';
 import * as React from 'react';
 import { getSpace, Size as SpaceSize } from '../space';
 import styled from 'styled-components';
@@ -11,6 +12,24 @@ export interface DropdownItemProps {
 	icon?: IconName;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
 }
+export interface StyledDropdownItemLinkProps {
+	color?: Color;
+}
+
+export interface DropdownItemEditableProps {
+	color?: Color;
+	editable: boolean;
+	name: string;
+	icon?: IconName;
+	focused: boolean;
+	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
+	handleClick: React.MouseEventHandler<HTMLElement>;
+	handleDoubleClick: React.MouseEventHandler<HTMLElement>;
+	handleKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
+	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
+	value?: string;
+}
+
 export interface StyledDropdownItemLinkProps {
 	color?: Color;
 }
@@ -58,6 +77,22 @@ const StyledDropdownItemLinkAttributeItem = styled.a`
 	}
 `;
 
+const StyledDropdownItemInput = styled(Input)`
+	padding-bottom: ${getSpace(SpaceSize.S)}px;
+	margin-left: 0;
+	font-weight: normal;
+	font-size: 12px;
+
+	::placeholder {
+		color: ${colors.grey60.toString()};
+	}
+	:hover {
+		::placeholder {
+			color: ${colors.grey60.toString()};
+		}
+	}
+`;
+
 export default class DropdownItem extends React.Component<DropdownItemProps> {
 	public render(): JSX.Element {
 		return (
@@ -91,3 +126,25 @@ export class DropdownItemLinkAttributeItem extends React.Component {
 		);
 	}
 }
+
+export const DropdownItemEditableLink: React.StatelessComponent<DropdownItemEditableProps> = (
+	props
+): JSX.Element => (
+	<StyledDropdownItem onDoubleClick={props.handleDoubleClick}>
+		{!props.editable ? (
+			<StyledDropdownItemLink onClick={props.handleClick}>
+				{props.icon && <StyledDropdownItemIcon size={IconSize.S} name={props.icon} />}
+				{props.name}
+			</StyledDropdownItemLink>
+		) : (
+			<StyledDropdownItemInput
+				focused={props.focused}
+				handleChange={props.handleChange}
+				handleKeyDown={props.handleKeyDown}
+				handleBlur={props.handleBlur}
+				type={InputTypes.string}
+				value={props.value}
+			/>
+		)}
+	</StyledDropdownItem>
+);

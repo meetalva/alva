@@ -4,11 +4,14 @@ import { getSpace, Size } from '../space';
 import styled from 'styled-components';
 
 export interface InputProps {
+	focused?: boolean;
 	className?: string;
 	disabled?: boolean;
 	type?: InputTypes;
 	value?: string | number;
 	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
+	handleKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
 	placeholder?: string;
 }
 
@@ -20,7 +23,7 @@ export enum InputTypes {
 
 const StyledInput = styled.input`
 	/* reset Styles */
-	-webkit-appearance:textfield;
+	-webkit-appearance: textfield;
 	outline: none;
 	border: none;
 	background: transparent;
@@ -48,17 +51,20 @@ const StyledInput = styled.input`
 	}
 
 	::-webkit-search-decoration {
-			display:none;
+		display: none;
 	}
 `;
 
 const Input: React.StatelessComponent<InputProps> = props => (
 	<StyledInput
+		autoFocus={props.focused}
 		className={props.className}
 		disabled={props.disabled}
 		type={props.type}
 		value={props.value}
+		onBlur={props.handleBlur}
 		onChange={props.handleChange}
+		onKeyDown={props.handleKeyDown}
 		placeholder={props.placeholder}
 	/>
 );

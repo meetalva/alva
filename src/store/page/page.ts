@@ -73,6 +73,20 @@ export class Page {
 		return this.root as PageElement;
 	}
 
+	/*
+	* Sets the technical (internal) ID of the page.
+	*/
+	public setId(id: string): void {
+		this.id = id;
+	}
+
+	/**
+	 * Sets the human-friendly name of the page.
+	 */
+	public setName(name: string): void {
+		this.name = name;
+	}
+
 	/**
 	 * Serializes the page into a JSON object for persistence.
 	 * @return The JSON object to be persisted.

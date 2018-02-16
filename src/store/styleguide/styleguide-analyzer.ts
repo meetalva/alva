@@ -1,3 +1,4 @@
+import { Folder } from './utils/folder';
 import { Pattern } from '../pattern/pattern';
 import { PatternType } from '../pattern/pattern-type';
 
@@ -14,5 +15,5 @@ export abstract class StyleguideAnalyzer<T extends Pattern = Pattern> {
 
 	public abstract getPatternType(): PatternType;
 
-	public abstract analyze(path: string): T[];
+	public abstract analyze(path: string): Folder<T>;
 }

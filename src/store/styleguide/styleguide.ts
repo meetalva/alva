@@ -1,11 +1,12 @@
+import { Folder } from './utils/folder';
 import { Pattern } from '../pattern/pattern';
 import { StyleguideAnalyzer } from './styleguide-analyzer';
 
 export class Styleguide {
 	private readonly analyzers: StyleguideAnalyzer[];
 	private readonly path: string;
-
 	private patterns: Map<string, Pattern> = new Map();
+	private folders: Folder<Pattern>[] = [];
 
 	public constructor(path: string, analyzers?: StyleguideAnalyzer[]) {
 		this.analyzers = analyzers || [];
@@ -24,11 +25,19 @@ export class Styleguide {
 		return this.patterns;
 	}
 
+	public getFolders(): Folder<Pattern>[] {
+		return this.folders;
+	}
+
 	public load(): void {
 		this.patterns = new Map();
+		this.folders = [];
 
 		this.analyzers.forEach(analyzer => {
-			const patterns = analyzer.analyze(this.path);
+			const groupedPatterns = analyzer.analyze(this.path);
+			const patterns = groupedPatterns.flatten();
+
+			this.folders.push(groupedPatterns);
 
 			patterns.forEach(pattern => {
 				const localId = getStyleguideLocalPatternId(analyzer.getId(), pattern.getId());
@@ -41,34 +50,6 @@ export class Styleguide {
 		const localId = getStyleguideLocalPatternId(analyzerId, id);
 		return this.patterns.get(localId);
 	}
-
-	/**
-	 * Returns all pattern of this folder and its sub-folders matching a given search string.
-	 * @param term The search string as provided by the user.
-	 * @return The list of matching patterns.
-	 */
-	public searchPatterns(term: string): Pattern[] {
-		const result: Pattern[] = [];
-		this.patterns.forEach(pattern => {
-			if (patternMatchesSearch(pattern, term)) {
-				result.push(pattern);
-			}
-		});
-
-		return result;
-	}
-}
-
-function patternMatchesSearch(pattern: Pattern, term: string): boolean {
-	if (!term || !pattern.getName) {
-		return false;
-	}
-	return (
-		pattern
-			.getName()
-			.toLowerCase()
-			.indexOf(term.toLowerCase()) >= 0
-	);
 }
 
 function getStyleguideLocalPatternId(analyzerId: string, patternId: string): string {

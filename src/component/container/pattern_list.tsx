@@ -1,4 +1,5 @@
 import Input from '../../lsg/patterns/input/';
+import { Folder } from '../../store/styleguide/utils/folder';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { PageElement } from '../../store/page/page-element';
@@ -11,7 +12,6 @@ import PatternList, {
 import * as React from 'react';
 import Space, { Size } from '../../lsg/patterns/space';
 import { Store } from '../../store/store';
-import { Styleguide } from '../../store/styleguide/styleguide';
 
 export interface PatternListContainerProps {
 	store: Store;
@@ -51,7 +51,16 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	}
 
 	public render(): JSX.Element {
-		this.items = this.createItemsFromStyleguide(this.props.store.getStyleguide());
+		let items: PatternListContainerItemProps[] = [];
+
+		this.props.store
+			.getStyleguide()
+			.getFolders()
+			.forEach(folder => {
+				items = items.concat(this.createItemsFromFolder(folder));
+			});
+
+		this.items = items;
 
 		if (this.props.store.getPatternSearchTerm() !== '') {
 			this.items = this.search(this.items, this.props.store.getPatternSearchTerm());
@@ -67,20 +76,33 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 		);
 	}
 
-	public createItemsFromStyleguide(styleguide: Styleguide): PatternListContainerItemProps[] {
+	public createItemsFromFolder(folder: Folder<Pattern>): PatternListContainerItemProps[] {
 		const result: PatternListContainerItemProps[] = [];
 
-		styleguide.getPatterns().forEach((pattern: Pattern) => {
+		folder.getItems().forEach(pattern => {
+			const icon = pattern.getIconPath();
+
 			result.push({
 				value: pattern.getName(),
 				draggable: true,
-				icon: pattern.getIconPath(),
+				icon,
 				handleDragStart: (e: React.DragEvent<HTMLElement>) => {
 					this.handleDragStart(e, pattern);
 				},
 				onClick: () => {
 					this.handlePatternClick(pattern);
 				}
+			});
+		});
+
+		folder.getSubFolders().forEach(subFolder => {
+			if (subFolder.totalItems() === 0) {
+				return;
+			}
+
+			result.push({
+				value: subFolder.getName(),
+				children: this.createItemsFromFolder(subFolder)
 			});
 		});
 

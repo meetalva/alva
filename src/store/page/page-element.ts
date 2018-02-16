@@ -65,14 +65,10 @@ export class PageElement {
 	 * @return A new page element object containing the loaded data.
 	 */
 	public static fromJsonObject(
-		json: JsonObject | undefined,
+		json: JsonObject,
 		store: Store,
 		parent?: PageElement
 	): PageElement | undefined {
-		if (!json) {
-			return;
-		}
-
 		let patternId = json['pattern'] as string;
 		let analyzerId = json['analyzer'] as string | undefined;
 
@@ -83,7 +79,7 @@ export class PageElement {
 			if (patternId === 'text') {
 				analyzerId = 'synthetic';
 			} else {
-				patternId = `lib/patterns/${patternId}/index`;
+				patternId = `${patternId}/index`;
 				analyzerId = 'react';
 			}
 		}

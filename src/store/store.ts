@@ -9,7 +9,6 @@ import { Page } from './page/page';
 import { PageElement } from './page/page-element';
 import { PageRef } from './project/page-ref';
 import * as PathUtils from 'path';
-import { Pattern } from './pattern/pattern';
 import { Preferences } from './preferences';
 import { Project } from './project//project';
 import { Styleguide } from './styleguide/styleguide';
@@ -365,7 +364,7 @@ export class Store {
 			const typescriptReactAnalyzer = new TypescriptReactAnalyzer('react');
 			const syntheticAnalyzer = new SyntheticAnalyzer('synthetic');
 
-			const styleguide = new Styleguide(styleguidePath, [
+			const styleguide = new Styleguide(`${styleguidePath}/lib/patterns`, [
 				typescriptReactAnalyzer,
 				syntheticAnalyzer
 			]);
@@ -505,15 +504,6 @@ export class Store {
 	 */
 	private savePreferences(): void {
 		Persister.saveYaml(this.getPreferencesPath(), this.preferences.toJsonObject());
-	}
-
-	/**
-	 * Searches the current styleguide's pattern for a given search term.
-	 * @param term The case insensitive search term.
-	 * @return All patterns that match.
-	 */
-	public searchPatterns(term: string): Pattern[] {
-		return this.styleguide.searchPatterns(term);
 	}
 
 	/**

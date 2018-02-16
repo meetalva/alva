@@ -110,6 +110,10 @@ export function getExportInfos(program: ts.Program, statement: ts.Statement): Ex
 export function findDeclaration(expression: ts.Expression): ts.Declaration | undefined {
 	const sourceFile = expression.getSourceFile();
 
+	if (!sourceFile) {
+		return;
+	}
+
 	for (const statement of sourceFile.statements) {
 		if (ts.isVariableStatement(statement)) {
 			for (const variableDeclaration of statement.declarationList.declarations) {

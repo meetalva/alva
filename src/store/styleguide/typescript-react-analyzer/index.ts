@@ -1,8 +1,10 @@
+import { Directory } from '../utils/directory';
 import { getReactComponentExports, ReactComponentExport } from './typescript/react';
 import { PatternFileInfo, ReactPattern } from './react-pattern';
 import { StyleguideAnalyzer } from '../styleguide-analyzer';
 import * as ts from 'typescript';
 
+import { Folder } from '../utils/folder';
 import * as FileUtils from 'fs';
 import * as PathUtils from 'path';
 import { PatternType } from '../../pattern/pattern-type';
@@ -14,21 +16,32 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer<ReactPattern> {
 		return PatternType.react;
 	}
 
-	public analyze(path: string): ReactPattern[] {
-		const patterns: ReactPattern[] = [];
+	public analyze(path: string, program?: ts.Program, rootPath?: string): Folder<ReactPattern> {
+		const directory = new Directory(path);
+		const rootDirectory = rootPath ? new Directory(rootPath) : directory;
+		const folder = new Folder<ReactPattern>(directory.getName());
 
-		const fileInfos = walkDirectoriesAndCollectPatterns(path, path);
+		if (!program) {
+			const fileInfoFolder = createFileInfoFolder(path);
+			const declarationFiles = fileInfoFolder
+				.flatten()
+				.map(fileInfo => fileInfo.declarationFilePath);
+			program = ts.createProgram(declarationFiles, {}, undefined, this.program);
+		}
 
-		const declarationFiles = fileInfos.map(patternInfo => patternInfo.declarationFilePath);
+		const fileInfos = detectPatternsInDirectory(rootDirectory, directory);
 
-		this.program = ts.createProgram(declarationFiles, {}, undefined, this.program);
+		for (const fileInfo of fileInfos) {
+			const sourceFile = program.getSourceFile(fileInfo.declarationFilePath);
 
-		fileInfos.forEach(fileInfo => {
-			const sourceFile = this.program.getSourceFile(fileInfo.declarationFilePath);
-			const exports = getReactComponentExports(sourceFile, this.program);
+			if (!sourceFile) {
+				continue;
+			}
+
+			const exports = getReactComponentExports(sourceFile, program);
 
 			exports.forEach(exportInfo => {
-				const id = generatePatternId(path, fileInfo, exportInfo);
+				const id = generatePatternId(rootDirectory.getPath(), fileInfo, exportInfo);
 				const name = getPatternName(fileInfo, exportInfo);
 
 				const pattern = new ReactPattern({
@@ -39,11 +52,24 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer<ReactPattern> {
 					exportInfo
 				});
 
-				patterns.push(pattern);
+				folder.getItems().push(pattern);
 			});
-		});
+		}
 
-		return patterns;
+		for (const subDirectory of directory.getDirectories()) {
+			if (subDirectory.getName().toLowerCase() === 'node_modules') {
+				continue;
+			}
+
+			const patternSubFolder = this.analyze(
+				subDirectory.getPath(),
+				program,
+				rootDirectory.getPath()
+			);
+			folder.getSubFolders().push(patternSubFolder);
+		}
+
+		return folder;
 	}
 }
 
@@ -55,49 +81,57 @@ function getPatternName(fileInfo: PatternFileInfo, exportInfo: ReactComponentExp
 	return name;
 }
 
-function walkDirectoriesAndCollectPatterns(
-	rootDirectory: string,
-	directory: string
-): PatternFileInfo[] {
-	let patterns = detectPatternsInDirectory(rootDirectory, directory);
+function createFileInfoFolder(path: string, rootPath?: string): Folder<PatternFileInfo> {
+	const directory = new Directory(path);
+	const rootDirectory = rootPath ? new Directory(rootPath) : directory;
 
-	FileUtils.readdirSync(directory).forEach(childName => {
-		const childPath = PathUtils.join(directory, childName);
+	const folder: Folder<PatternFileInfo> = new Folder<PatternFileInfo>(
+		directory.getName(),
+		directory.getPath()
+	);
 
-		if (FileUtils.lstatSync(childPath).isDirectory()) {
-			patterns = patterns.concat(walkDirectoriesAndCollectPatterns(rootDirectory, childPath));
+	const patternInfos = detectPatternsInDirectory(rootDirectory, directory);
+	folder.setItems(patternInfos);
+
+	for (const subDirectory of directory.getDirectories()) {
+		if (subDirectory.getName().toLowerCase() === 'node_modules') {
+			continue;
 		}
-	});
 
-	return patterns;
+		const subFolder = createFileInfoFolder(subDirectory.getPath(), rootDirectory.getPath());
+		folder.getSubFolders().push(subFolder);
+	}
+
+	return folder;
 }
 
-function detectPatternsInDirectory(rootDirectory: string, directory: string): PatternFileInfo[] {
+function detectPatternsInDirectory(
+	rootDirectory: Directory,
+	directory: Directory
+): PatternFileInfo[] {
 	const patterns: PatternFileInfo[] = [];
 
-	FileUtils.readdirSync(directory).forEach(childName => {
-		const childPath = PathUtils.join(directory, childName);
-
-		if (!childPath.endsWith('.d.ts')) {
-			return;
+	for (const filePath of directory.getFiles()) {
+		if (!filePath.endsWith('.d.ts')) {
+			continue;
 		}
 
-		const declarationFilePath = childPath;
+		const declarationFilePath = filePath;
 		const name = PathUtils.basename(declarationFilePath, '.d.ts');
-		const jsFilePath = PathUtils.join(directory, `${name}.js`);
+		const jsFilePath = PathUtils.join(directory.getPath(), `${name}.js`);
 
-		let iconPath: string | undefined = PathUtils.join(directory, 'icon.svg');
-		iconPath = PathUtils.relative(rootDirectory, iconPath);
+		let iconPath: string | undefined = PathUtils.join(directory.getPath(), 'icon.svg');
+		iconPath = PathUtils.relative(rootDirectory.getPath(), iconPath);
 		iconPath = iconPath
 			.split('/')
 			.slice(1)
 			.join('/');
-		iconPath = PathUtils.resolve(rootDirectory, iconPath);
+		iconPath = PathUtils.resolve(rootDirectory.getPath(), iconPath);
 		iconPath = FileUtils.existsSync(iconPath) ? iconPath : undefined;
 
 		if (FileUtils.existsSync(jsFilePath)) {
 			const patternFileInfo: PatternFileInfo = {
-				directory,
+				directory: directory.getPath(),
 				declarationFilePath,
 				jsFilePath,
 				iconPath
@@ -105,7 +139,7 @@ function detectPatternsInDirectory(rootDirectory: string, directory: string): Pa
 
 			patterns.push(patternFileInfo);
 		}
-	});
+	}
 
 	return patterns;
 }

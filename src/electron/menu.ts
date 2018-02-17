@@ -14,6 +14,7 @@ import { Store } from '../store/store';
 const { screen, Menu, shell, app, dialog } = remote;
 
 export function createMenu(store: Store): void {
+	const isSplashscreen: boolean = !Boolean(store.getCurrentProject());
 	const template: MenuItemConstructorOptions[] = [
 		{
 			label: '&File',
@@ -60,10 +61,12 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: 'New &Page',
+					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+N'
 				},
 				{
 					label: 'New P&roject',
+					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+Shift+N'
 				},
 				{
@@ -71,6 +74,7 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: '&Save',
+					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+S',
 					role: 'save',
 					click: () => {
@@ -79,6 +83,7 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: '&Rename',
+					enabled: !isSplashscreen,
 					role: 'rename'
 				},
 				{
@@ -94,6 +99,7 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: 'Export page as PNG',
+					enabled: !isSplashscreen,
 					click: () => {
 						const webview = document.getElementById('preview') as WebviewTag;
 
@@ -175,6 +181,7 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: '&Cut',
+					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+X',
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
@@ -187,6 +194,7 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: 'C&opy',
+					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+C',
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
@@ -198,6 +206,7 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: '&Paste',
+					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+V',
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
@@ -215,6 +224,7 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: '&Duplicate',
+					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+D',
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
@@ -238,6 +248,7 @@ export function createMenu(store: Store): void {
 				},
 				{
 					label: '&Delete',
+					enabled: !isSplashscreen,
 					accelerator: (() => {
 						if (process.platform === 'darwin') {
 							return 'Backspace';

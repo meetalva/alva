@@ -1,3 +1,4 @@
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
@@ -36,48 +37,30 @@ export interface PreviewProps {
 	selectedElementId?: number[];
 }
 
-export interface PreviewState {
-	highlightArea: HighlightAreaProps;
-}
-
 @observer
-export class Preview extends React.Component<PreviewProps, PreviewState> {
+export class Preview extends React.Component<PreviewProps> {
 	private patternFactories: { [folder: string]: React.StatelessComponent };
+	@observable private highlightArea: HighlightAreaProps;
 
 	public constructor(props: PreviewProps) {
 		super(props);
 		this.patternFactories = {};
 
-		this.state = {
-			highlightArea: {
-				bottom: 0,
-				height: 0,
-				left: 0,
-				opacity: 0,
-				right: 0,
-				top: 0,
-				width: 0
-			}
+		this.highlightArea = {
+			bottom: 0,
+			height: 0,
+			left: 0,
+			opacity: 0,
+			right: 0,
+			top: 0,
+			width: 0
 		};
-	}
-
-	public componentDidUpdate(prevProps: PreviewProps, prevState: PreviewState): void {
-		if (this.state.highlightArea.opacity !== 0) {
-			setTimeout(() => {
-				this.setState({
-					highlightArea: {
-						...this.state.highlightArea,
-						opacity: 0
-					}
-				});
-			}, 500);
-		}
 	}
 
 	public render(): JSX.Element | null {
 		SmoothscrollPolyfill.polyfill();
 		if (this.props.page) {
-			const highlightArea: HighlightAreaProps = this.state.highlightArea;
+			const highlightArea: HighlightAreaProps = this.highlightArea;
 			return (
 				<>
 					{this.createComponent(this.props.page.getRoot()) as JSX.Element}
@@ -170,35 +153,7 @@ export class Preview extends React.Component<PreviewProps, PreviewState> {
 								return;
 							}
 
-							const highlightArea: HighlightAreaProps = this.state.highlightArea;
-							const clientRect: ClientRect = domNode.getBoundingClientRect();
-							const newHighlightArea: HighlightAreaProps = {
-								bottom: clientRect.bottom,
-								height: clientRect.height,
-								left: clientRect.left + window.scrollX,
-								opacity: 1,
-								right: clientRect.right,
-								top: clientRect.top + window.scrollY,
-								width: clientRect.width
-							};
-
-							if (
-								newHighlightArea.top === highlightArea.top &&
-								newHighlightArea.right === highlightArea.right &&
-								newHighlightArea.bottom === highlightArea.bottom &&
-								newHighlightArea.left === highlightArea.left &&
-								newHighlightArea.height === highlightArea.height &&
-								newHighlightArea.width === highlightArea.width
-							) {
-								return;
-							}
-
-							domNode.scrollIntoView({
-								behavior: 'smooth',
-								block: 'center',
-								inline: 'nearest'
-							});
-							this.setState({ highlightArea: newHighlightArea });
+							this.highlightElement(domNode);
 						}}
 					>
 						{reactComponent}
@@ -218,6 +173,47 @@ export class Preview extends React.Component<PreviewProps, PreviewState> {
 			});
 			return result;
 		}
+	}
+
+	@action
+	private highlightElement(element: Element): void {
+		const highlightArea: HighlightAreaProps = this.highlightArea;
+		const clientRect: ClientRect = element.getBoundingClientRect();
+		const newHighlightArea: HighlightAreaProps = {
+			bottom: clientRect.bottom,
+			height: clientRect.height,
+			left: clientRect.left + window.scrollX,
+			opacity: 1,
+			right: clientRect.right,
+			top: clientRect.top + window.scrollY,
+			width: clientRect.width
+		};
+
+		if (
+			newHighlightArea.top === highlightArea.top &&
+			newHighlightArea.right === highlightArea.right &&
+			newHighlightArea.bottom === highlightArea.bottom &&
+			newHighlightArea.left === highlightArea.left &&
+			newHighlightArea.height === highlightArea.height &&
+			newHighlightArea.width === highlightArea.width
+		) {
+			return;
+		}
+
+		element.scrollIntoView({
+			behavior: 'smooth',
+			block: 'center',
+			inline: 'nearest'
+		});
+
+		this.highlightArea = newHighlightArea;
+
+		setTimeout(() => this.hideHighlightArea(), 500);
+	}
+
+	@action
+	private hideHighlightArea(): void {
+		this.highlightArea.opacity = 0;
 	}
 }
 

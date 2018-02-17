@@ -1,6 +1,6 @@
 const { execSync } = require('child_process');
 
-shelljs.execSync('standard-version --no-verify');
+execSync('standard-version --no-verify');
 console.info('Clean build enviroment.');
 execSync('npm run clean-build');
 

@@ -90,7 +90,7 @@
     "@types/react-dom": "^16.0.3",
     "concurrently": "^3.5.1",
     "electron": "^1.7.10",
-    "electron-builder": "20.0.4",
+    "electron-builder": "20.0.5",
     "electron-devtools-installer": "^2.2.1",
     "husky": "^0.14.3",
     "lint-staged": "^6.0.0",

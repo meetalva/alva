@@ -69,6 +69,10 @@ export class PageElement {
 		store: Store,
 		parent?: PageElement
 	): PageElement | undefined {
+		if (!json) {
+			return;
+		}
+
 		let patternId = json['pattern'] as string;
 		let analyzerId = json['analyzer'] as string | undefined;
 

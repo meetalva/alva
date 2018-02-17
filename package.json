@@ -11,7 +11,8 @@
     "clean": "rm -rf build && rm -rf dist",
     "clean-build": "npm run clean && npm run build",
     "docs": "typedoc src",
-    "dist": "standard-version --no-verify && npm run clean-build && cd build && mkdir designkit && cp -r ../../designkit/patterns ../../designkit/alva ../../designkit/*.* designkit/ && cd designkit && npm i && npm run build && rm -rf node_modules && npm i --production && cd ../.. && electron-builder -mwl",
+    "dist": "node ./scripts/dist-preprocess.js",
+    "electron-build": "electron-builder -mwl && node ./scripts/dist-postprocess.js",
     "commit": "commit",
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "precommit": "lint-staged",
@@ -43,9 +44,6 @@
     "appId": "io.github.meetalva",
     "productName": "Alva",
     "copyright": "Copyright (c) 2017 SinnerSchrader Deutschland GmbH",
-    "mac": {
-      "category": "public.app-category.graphics-design"
-    },
     "files": [
       "build/**/*",
       "package.json"
@@ -57,12 +55,19 @@
     "asarUnpack": [
       "build/designkit/**"
     ],
+    "mac": {
+      "category": "public.app-category.graphics-design"
+    },
     "nsis": {
       "artifactName": "${productName}-${version}.${ext}",
       "oneClick": false,
       "perMachine": true,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "artifactName": "${productName}-${version}.${ext}",
+      "executableName": "Alva"
     }
   },
   "standard-version": {

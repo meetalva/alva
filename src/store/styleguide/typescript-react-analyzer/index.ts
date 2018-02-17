@@ -85,10 +85,7 @@ function createFileInfoFolder(path: string, rootPath?: string): Folder<PatternFi
 	const directory = new Directory(path);
 	const rootDirectory = rootPath ? new Directory(rootPath) : directory;
 
-	const folder: Folder<PatternFileInfo> = new Folder<PatternFileInfo>(
-		directory.getName(),
-		directory.getPath()
-	);
+	const folder: Folder<PatternFileInfo> = new Folder<PatternFileInfo>(directory.getName());
 
 	const patternInfos = detectPatternsInDirectory(rootDirectory, directory);
 	folder.setItems(patternInfos);
@@ -122,10 +119,8 @@ function detectPatternsInDirectory(
 
 		let iconPath: string | undefined = PathUtils.join(directory.getPath(), 'icon.svg');
 		iconPath = PathUtils.relative(rootDirectory.getPath(), iconPath);
-		iconPath = iconPath
-			.split('/')
-			.slice(1)
-			.join('/');
+		iconPath = PathUtils.join(rootDirectory.getPath(), '../../patterns', iconPath);
+
 		iconPath = PathUtils.resolve(rootDirectory.getPath(), iconPath);
 		iconPath = FileUtils.existsSync(iconPath) ? iconPath : undefined;
 

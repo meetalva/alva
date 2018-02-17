@@ -111,8 +111,11 @@ export class Preview extends React.Component<PreviewProps> {
 				return null;
 			}
 
-			if (pattern.getType() === PatternType.synthetic) {
-				switch (pattern.getId()) {
+			const patternId: string = pattern.getId();
+			const patternType: PatternType = pattern.getType();
+
+			if (patternType === PatternType.synthetic) {
+				switch (patternId) {
 					case 'text':
 						return pageElement.getPropertyValue('text');
 				}
@@ -121,9 +124,11 @@ export class Preview extends React.Component<PreviewProps> {
 			// tslint:disable-next-line:no-any
 			const componentProps: any = {};
 			pattern.getProperties().forEach(property => {
-				componentProps[property.getId()] = this.createComponent(
-					property.convertToRender(pageElement.getPropertyValue(property.getId())),
-					property.getId()
+				const propertyId = property.getId();
+
+				componentProps[propertyId] = this.createComponent(
+					property.convertToRender(pageElement.getPropertyValue(propertyId)),
+					propertyId
 				);
 			});
 
@@ -131,7 +136,7 @@ export class Preview extends React.Component<PreviewProps> {
 				.getChildren()
 				.map((child, index) => this.createComponent(child, String(index)));
 
-			if (pattern.getType() !== PatternType.react) {
+			if (patternType !== PatternType.react) {
 				return null;
 			}
 
@@ -140,13 +145,13 @@ export class Preview extends React.Component<PreviewProps> {
 			// Then, load the pattern factory
 			const patternPath: string = reactPattern.fileInfo.jsFilePath;
 			let patternFactory: React.StatelessComponent | ObjectConstructor = this.patternFactories[
-				pattern.getId()
+				patternId
 			];
 			if (patternFactory == null) {
 				const exportName = reactPattern.exportInfo.name || 'default';
 				const module = require(patternPath);
 				patternFactory = module[exportName];
-				this.patternFactories[pattern.getId()] = patternFactory;
+				this.patternFactories[patternId] = patternFactory;
 			}
 
 			const reactComponent = React.createElement(patternFactory, componentProps);

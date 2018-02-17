@@ -233,6 +233,10 @@ export class Store {
 			id.splice(0, 1);
 		}
 
+		if (!startElement) {
+			return;
+		}
+
 		const foundElement: PageElement = startElement.getChildren()[id[0]];
 
 		if (id.length === 1) {

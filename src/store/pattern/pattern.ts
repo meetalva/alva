@@ -15,14 +15,35 @@ export interface PatternInit {
  * of various types, like strings, numbers, page elements, etc.
  * The designer then creates page elements within a page using these patterns as a basis.
  * Patterns may be structured into folders (like 'atoms', 'modules', etc.).
- * Depending on the pattern parser used, various styleguide formats are supported,
+ * Depending on the StyleguideAnalyzer used, various styleguide formats are supported,
  * e.g. Patternplate.
  */
 export class Pattern {
+	/**
+	 * The ID of the pattern. It's local to the StyleguideAnalyzer that detected the pattern.
+	 * How this is generated is completely up to the StyleguideAnalyzer that creates the pattern.
+	 */
 	protected id: string;
+
+	/**
+	 * The StyleguideAnalyzer that detected the pattern.
+	 */
 	protected analyzer: StyleguideAnalyzer;
+
+	/**
+	 * The human-readable name of the pattern.
+	 * In the frontend, to be displayed instead of the ID.
+	 */
 	protected name: string;
+
+	/**
+	 * The properties this pattern supports.
+	 */
 	protected properties: Map<string, Property> = new Map();
+
+	/**
+	 * The absolute path to the icon of the pattern, if provided by the implementation.
+	 */
 	protected iconPath: string | undefined;
 
 	public constructor(init: PatternInit) {
@@ -32,26 +53,33 @@ export class Pattern {
 	}
 
 	/**
-	 * The ID of the pattern (also the folder name within the parent folder).
+	 * Returns the ID of the pattern. It's local to the StyleguideAnalyzer that detected the pattern.
+	 * How this is generated is completely up to the StyleguideAnalyzer that creates the pattern.
+	 * @return The ID of the pattern.
 	 */
 	public getId(): string {
 		return this.id;
 	}
 
-	/** The StylguideAnalyzer the pattern emerged from. */
+	/**
+	 * Returns the StyleguideAnalyzer that detected the pattern.
+	 * @return The StyleguideAnalyzer that detected the pattern.
+	 */
 	public getAnalyzer(): StyleguideAnalyzer {
 		return this.analyzer;
 	}
 
 	/**
-	 * The type of the pattern (eg.: react, vue...)
+	 * Returns the type of the pattern (eg.: react, vue...)
+	 * @return The type of the pattern (eg.: react, vue...)
 	 */
 	public getType(): PatternType {
 		return this.analyzer.getPatternType();
 	}
 
 	/**
-	 * The absolute path to the icon of the pattern, if provided by the implementation.
+	 * Returns the absolute path to the icon of the pattern, if provided by the implementation.
+	 * @return The absolute path to the icon of the pattern.
 	 */
 	public getIconPath(): string | undefined {
 		return this.iconPath;
@@ -62,8 +90,9 @@ export class Pattern {
 	}
 
 	/**
-	 * The human-readable name of the pattern.
+	 * Returns the human-readable name of the pattern.
 	 * In the frontend, to be displayed instead of the ID.
+	 * @return The human-readable name of the pattern.
 	 */
 	public getName(): string {
 		return this.name;
@@ -74,7 +103,8 @@ export class Pattern {
 	}
 
 	/**
-	 * The properties this pattern supports.
+	 * Returns the properties this pattern supports.
+	 * @return The properties this pattern supports.
 	 */
 	public getProperties(): Map<string, Property> {
 		return this.properties;

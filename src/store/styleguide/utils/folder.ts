@@ -1,12 +1,10 @@
 export class Folder<T> {
 	private name: string;
-	private path: string | undefined;
 	private items: T[] = [];
 	private subFolders: Folder<T>[] = [];
 
-	public constructor(name: string, path?: string) {
+	public constructor(name: string) {
 		this.name = name;
-		this.path = path;
 	}
 
 	public getName(): string {
@@ -15,14 +13,6 @@ export class Folder<T> {
 
 	public setName(name: string): void {
 		this.name = name;
-	}
-
-	public getPath(): string | undefined {
-		return this.path;
-	}
-
-	public setPath(path: string | undefined): void {
-		this.path = path;
 	}
 
 	public getItems(): T[] {
@@ -69,13 +59,16 @@ export class Folder<T> {
 		return result;
 	}
 
-	public totalItems(): number {
-		let totalItems = this.items.length;
+	public flattenFolders(): Folder<T>[] {
+		const flatFolder = new Folder<T>(this.name);
+		flatFolder.setItems(this.items);
+
+		let result: Folder<T>[] = [flatFolder];
 
 		for (const subFolder of this.subFolders) {
-			totalItems += subFolder.totalItems();
+			result = result.concat(subFolder.flattenFolders());
 		}
 
-		return totalItems;
+		return result;
 	}
 }

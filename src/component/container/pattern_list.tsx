@@ -17,9 +17,13 @@ export interface PatternListContainerProps {
 	store: Store;
 }
 
-export interface PatternListContainerItemProps extends PatternListItemProps {
-	children?: PatternListContainerItemProps[];
-	value: string;
+export interface PatternListContainerItemProps {
+	items: NamedPatternListItemProps[];
+	name: string;
+}
+
+export interface NamedPatternListItemProps extends PatternListItemProps {
+	name: string;
 }
 
 @observer
@@ -34,19 +38,25 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	}
 
 	public search(
-		listItem: PatternListContainerItemProps[],
+		containers: PatternListContainerItemProps[],
 		term: string
 	): PatternListContainerItemProps[] {
 		const result: PatternListContainerItemProps[] = [];
 
-		listItem.map(item => {
-			if (item.value.toLowerCase().indexOf(term.toLowerCase()) !== -1 && !item.children) {
-				result.push(item);
-			} else if (item.children) {
-				const folder = { value: item.value, children: [] };
-				result.push(folder, ...this.search(item.children, term));
+		for (const container of containers) {
+			if (!container.items.length) {
+				continue;
 			}
-		});
+
+			const matchingItems = container.items.filter(
+				item => item.name.toLowerCase().indexOf(term.toLowerCase()) !== -1
+			);
+			result.push({
+				name: container.name,
+				items: matchingItems
+			});
+		}
+
 		return result;
 	}
 
@@ -79,59 +89,58 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	public createItemsFromFolder(folder: Folder<Pattern>): PatternListContainerItemProps[] {
 		const result: PatternListContainerItemProps[] = [];
 
-		folder.getItems().forEach(pattern => {
-			const icon = pattern.getIconPath();
+		for (const flatFolder of folder.flattenFolders()) {
+			const containerItem: PatternListContainerItemProps = {
+				name: flatFolder.getName(),
+				items: []
+			};
 
-			result.push({
-				value: pattern.getName(),
-				draggable: true,
-				icon,
-				handleDragStart: (e: React.DragEvent<HTMLElement>) => {
-					this.handleDragStart(e, pattern);
-				},
-				onClick: () => {
-					this.handlePatternClick(pattern);
-				}
-			});
-		});
+			for (const pattern of flatFolder.getItems()) {
+				const icon = pattern.getIconPath();
 
-		folder.getSubFolders().forEach(subFolder => {
-			if (subFolder.totalItems() === 0) {
-				return;
+				containerItem.items.push({
+					name: pattern.getName(),
+					draggable: true,
+					icon,
+					handleDragStart: (e: React.DragEvent<HTMLElement>) => {
+						this.handleDragStart(e, pattern);
+					},
+					onClick: () => {
+						this.handlePatternClick(pattern);
+					}
+				});
 			}
 
-			result.push({
-				value: subFolder.getName(),
-				children: this.createItemsFromFolder(subFolder)
-			});
-		});
+			result.push(containerItem);
+		}
 
 		return result;
 	}
 
-	public createList(items: PatternListContainerItemProps[]): JSX.Element {
+	public createList(containers: PatternListContainerItemProps[]): JSX.Element {
 		return (
 			<PatternList>
-				{items.map((props: PatternListContainerItemProps, index: number) => {
-					if (props.children) {
+				{containers.map((container: PatternListContainerItemProps, index: number) => {
+					if (container.items.length) {
 						return (
 							<PatternList key={index}>
-								<PatternLabel>{props.value}</PatternLabel>
-								{this.createList(props.children)}
+								<PatternLabel>{container.name}</PatternLabel>
+								{container.items.map((item, itemIndex) => (
+									<PatternListItem
+										draggable={item.draggable}
+										handleDragStart={item.handleDragStart}
+										key={itemIndex}
+										icon={item.icon}
+										onClick={item.onClick}
+									>
+										{item.name}
+									</PatternListItem>
+								))}
 							</PatternList>
 						);
 					}
-					return (
-						<PatternListItem
-							draggable={props.draggable}
-							handleDragStart={props.handleDragStart}
-							key={index}
-							icon={props.icon}
-							onClick={props.onClick}
-						>
-							{props.value}
-						</PatternListItem>
-					);
+
+					return;
 				})}
 			</PatternList>
 		);

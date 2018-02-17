@@ -213,6 +213,32 @@ export class Store {
 	}
 
 	/**
+	 * Returns the page element for a given ID
+	 * @return The page element.
+	 */
+	public getElementById(id: number[], startElement?: PageElement): PageElement | undefined {
+		if (!id) {
+			return;
+		}
+		if (!startElement) {
+			const currentPage: Page | undefined = this.getCurrentPage();
+			if (!currentPage) {
+				return;
+			}
+			startElement = currentPage.getRoot();
+			id.splice(0, 1);
+		}
+
+		const foundElement: PageElement = startElement.getChildren()[id[0]];
+
+		if (id.length === 1) {
+			return foundElement;
+		}
+
+		return this.getElementById(id.slice(1), foundElement);
+	}
+
+	/**
 	 * Returns the path of the root folder of the designs (projects, pages)
 	 * in the currently opened styleguide.
 	 * @return The page root path.
@@ -548,5 +574,17 @@ export class Store {
 	 */
 	public setSelectedElement(selectedElement: PageElement | undefined): void {
 		this.selectedElement = selectedElement;
+	}
+
+	/**
+	 * Sets the currently selected element ID in the element list.
+	 * The properties pane shows the properties of this element,
+	 * and keyboard commands like cut, copy, or delete operate on this element.
+	 * May be empty if no element is selected.
+	 * @param selectedElementId The selected element or undefined.
+	 * @see setElementFocussed
+	 */
+	public setSelectedElementById(selectedElementId: number[]): void {
+		this.selectedElement = this.getElementById(selectedElementId);
 	}
 }

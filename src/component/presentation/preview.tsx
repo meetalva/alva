@@ -4,6 +4,8 @@ import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/pattern/pattern';
 import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
 import { TextPattern } from '../../store/pattern/text-pattern';
 
 class PatternWrapper extends React.Component<{}, PatternWrapperState> {
@@ -25,22 +27,79 @@ class PatternWrapper extends React.Component<{}, PatternWrapperState> {
 	}
 }
 
+export interface HighlightAreaProps extends ClientRect {
+	opacity?: number;
+}
+
 export interface PreviewProps {
 	page?: Page;
+	selectedElementId?: number[];
+}
+
+export interface PreviewState {
+	highlightArea: HighlightAreaProps;
 }
 
 @observer
-export class Preview extends React.Component<PreviewProps> {
+export class Preview extends React.Component<PreviewProps, PreviewState> {
 	private patternFactories: { [folder: string]: React.StatelessComponent };
 
 	public constructor(props: PreviewProps) {
 		super(props);
 		this.patternFactories = {};
+
+		this.state = {
+			highlightArea: {
+				bottom: 0,
+				height: 0,
+				left: 0,
+				opacity: 0,
+				right: 0,
+				top: 0,
+				width: 0
+			}
+		};
+	}
+
+	public componentDidUpdate(prevProps: PreviewProps, prevState: PreviewState): void {
+		if (this.state.highlightArea.opacity !== 0) {
+			setTimeout(() => {
+				this.setState({
+					highlightArea: {
+						...this.state.highlightArea,
+						opacity: 0
+					}
+				});
+			}, 500);
+		}
 	}
 
 	public render(): JSX.Element | null {
+		SmoothscrollPolyfill.polyfill();
 		if (this.props.page) {
-			return this.createComponent(this.props.page.getRoot()) as JSX.Element;
+			const highlightArea: HighlightAreaProps = this.state.highlightArea;
+			return (
+				<>
+					{this.createComponent(this.props.page.getRoot()) as JSX.Element}
+					<div
+						style={{
+							position: 'absolute',
+							boxSizing: 'border-box',
+							border: '1px dashed rgba(55, 55, 55, .5)',
+							background: 'rgba(102,169,230, .5)',
+							mixBlendMode: 'multiply',
+							transition: 'all .25s ease-in-out',
+							bottom: highlightArea.bottom,
+							height: highlightArea.height,
+							left: highlightArea.left,
+							opacity: highlightArea.opacity,
+							right: highlightArea.right,
+							top: highlightArea.top,
+							width: highlightArea.width
+						}}
+					/>
+				</>
+			);
 		}
 		return null;
 	}
@@ -98,6 +157,54 @@ export class Preview extends React.Component<PreviewProps> {
 			const reactComponent = patternFactory(componentProps);
 
 			// Finally, build the component
+			if (
+				pageElement.getId().toString() ===
+				(this.props.selectedElementId && this.props.selectedElementId.toString())
+			) {
+				return (
+					<PatternWrapper
+						key={key}
+						ref={(el: PatternWrapper) => {
+							const domNode = ReactDOM.findDOMNode(el);
+							if (!domNode) {
+								return;
+							}
+
+							const highlightArea: HighlightAreaProps = this.state.highlightArea;
+							const clientRect: ClientRect = domNode.getBoundingClientRect();
+							const newHighlightArea: HighlightAreaProps = {
+								bottom: clientRect.bottom,
+								height: clientRect.height,
+								left: clientRect.left + window.scrollX,
+								opacity: 1,
+								right: clientRect.right,
+								top: clientRect.top + window.scrollY,
+								width: clientRect.width
+							};
+
+							if (
+								newHighlightArea.top === highlightArea.top &&
+								newHighlightArea.right === highlightArea.right &&
+								newHighlightArea.bottom === highlightArea.bottom &&
+								newHighlightArea.left === highlightArea.left &&
+								newHighlightArea.height === highlightArea.height &&
+								newHighlightArea.width === highlightArea.width
+							) {
+								return;
+							}
+
+							domNode.scrollIntoView({
+								behavior: 'smooth',
+								block: 'center',
+								inline: 'nearest'
+							});
+							this.setState({ highlightArea: newHighlightArea });
+						}}
+					>
+						{reactComponent}
+					</PatternWrapper>
+				);
+			}
 			return <PatternWrapper key={key}>{reactComponent}</PatternWrapper>;
 		} else {
 			// The model is an object, but not a pattern declaration.

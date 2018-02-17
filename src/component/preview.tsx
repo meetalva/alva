@@ -2,6 +2,7 @@ import { ipcRenderer } from 'electron';
 import { JsonObject } from '../store/json';
 import { observer } from 'mobx-react';
 import { Page } from '../store/page/page';
+import { PageElement } from '../store/page/page-element';
 import { Preview } from './presentation/preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
@@ -30,9 +31,13 @@ class PreviewApp extends React.Component<PreviewAppProps, PreviewAppState> {
 			// Ignored
 		}
 
+		const selectedElement: PageElement | undefined = this.props.store.getSelectedElement();
 		return (
 			<div>
-				<Preview page={this.props.store.getCurrentPage()} />
+				<Preview
+					page={this.props.store.getCurrentPage()}
+					selectedElementId={selectedElement && selectedElement.getId()}
+				/>
 				{DevTools ? <DevTools /> : ''}
 			</div>
 		);
@@ -47,6 +52,10 @@ ipcRenderer.on('page-change', (event: {}, message: JsonObject) => {
 
 ipcRenderer.on('open-styleguide', (event: {}, message: JsonObject) => {
 	store.openStyleguide(message.styleGuidePath as string);
+});
+
+ipcRenderer.on('selectedElement-change', (event: {}, message: JsonObject) => {
+	store.setSelectedElementById(message.selectedElementId as number[]);
 });
 
 window.onload = () => {

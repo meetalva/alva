@@ -88,6 +88,7 @@
     "@types/node": "^9.4.0",
     "@types/react": "^16.0.0",
     "@types/react-dom": "^16.0.3",
+    "@types/smoothscroll-polyfill": "^0.3.0",
     "concurrently": "^3.5.1",
     "electron": "^1.7.10",
     "electron-builder": "20.0.5",
@@ -113,6 +114,7 @@
     "react-dom": "16.2.0",
     "react-router": "4.2.0",
     "readts": "0.1.0",
+    "smoothscroll-polyfill": "0.4.0",
     "styled-components": "3.1.6",
     "tslib": "1.9.0",
     "typescript": "2.6.2"

@@ -72,6 +72,10 @@ class App extends React.Component<AppProps> {
 		createMenu(this.props.store);
 	}
 
+	public componentDidMount(): void {
+		createMenu(this.props.store);
+	}
+
 	public render(): JSX.Element {
 		// Todo: project and page don't update on page change
 		const project = this.props.store.getCurrentProject();

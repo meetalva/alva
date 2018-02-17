@@ -190,6 +190,23 @@ export class PageElement {
 	}
 
 	/**
+	 * Returns the unique ID of this element
+	 * @return an array of numbers which represents the unique ID
+	 */
+	public getId(): number[] {
+		if (!this.parent) {
+			return [0];
+		}
+
+		if (!this.parent.parent) {
+			return [0, this.getIndex()];
+		}
+
+		const parentID = this.parent.getId();
+		return [...parentID, this.getIndex()];
+	}
+
+	/**
 	 * Returns the parent page element if this is not the root element.
 	 * @return The parent page element or undefined.
 	 */

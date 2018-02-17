@@ -193,6 +193,13 @@ function getDevTools(): React.StatelessComponent | null {
 
 const store = new Store();
 
+function sendWebViewMessage(message: JsonObject, channel: string): void {
+	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
+	if (webviewTag && webviewTag.send) {
+		webviewTag.send(channel, message);
+	}
+}
+
 MobX.autorun(() => {
 	const page: Page | undefined = store.getCurrentPage();
 	const message: JsonObject = {
@@ -200,19 +207,25 @@ MobX.autorun(() => {
 		pageId: page ? page.getId() : undefined
 	};
 
-	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
-	if (webviewTag && webviewTag.send) {
-		webviewTag.send('page-change', message);
-	}
+	sendWebViewMessage(message, 'page-change');
 });
 
 MobX.autorun(() => {
 	const message: JsonObject = { styleGuidePath: store.getStyleGuidePath() };
 
-	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
-	if (webviewTag && webviewTag.send) {
-		webviewTag.send('open-styleguide', message);
+	sendWebViewMessage(message, 'open-styleguide');
+});
+
+MobX.autorun(() => {
+	const selectedElement = store.getSelectedElement();
+
+	if (!selectedElement) {
+		return;
 	}
+
+	const message: JsonObject = { selectedElementId: selectedElement.getId() };
+
+	sendWebViewMessage(message, 'selectedElement-change');
 });
 
 ReactDom.render(<App store={store} />, document.getElementById('app'));

@@ -223,6 +223,12 @@ export class Store {
 				return;
 			}
 			startElement = currentPage.getRoot();
+
+			// if selected element is root element return immediately
+			if (id.length === 1) {
+				return startElement;
+			}
+
 			id.splice(0, 1);
 		}
 

@@ -1,9 +1,11 @@
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/pattern/pattern';
 import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { TextPattern } from '../../store/pattern/text-pattern';
 
 class PatternWrapper extends React.Component<{}, PatternWrapperState> {
@@ -25,22 +27,60 @@ class PatternWrapper extends React.Component<{}, PatternWrapperState> {
 	}
 }
 
+export interface HighlightAreaProps extends ClientRect {
+	opacity?: number;
+}
+
 export interface PreviewProps {
 	page?: Page;
+	selectedElementId?: number[];
 }
 
 @observer
 export class Preview extends React.Component<PreviewProps> {
 	private patternFactories: { [folder: string]: React.StatelessComponent };
+	@observable private highlightArea: HighlightAreaProps;
 
 	public constructor(props: PreviewProps) {
 		super(props);
 		this.patternFactories = {};
+
+		this.highlightArea = {
+			bottom: 0,
+			height: 0,
+			left: 0,
+			opacity: 0,
+			right: 0,
+			top: 0,
+			width: 0
+		};
 	}
 
 	public render(): JSX.Element | null {
 		if (this.props.page) {
-			return this.createComponent(this.props.page.getRoot()) as JSX.Element;
+			const highlightArea: HighlightAreaProps = this.highlightArea;
+			return (
+				<>
+					{this.createComponent(this.props.page.getRoot()) as JSX.Element}
+					<div
+						style={{
+							position: 'absolute',
+							boxSizing: 'border-box',
+							border: '1px dashed rgba(55, 55, 55, .5)',
+							background:
+								'repeating-linear-gradient(135deg,transparent,transparent 2.5px,rgba(51,141,222, .5) 2.5px,rgba(51,141,222, .5) 5px), rgba(102,169,230, .5)',
+							transition: 'all .25s ease-in-out',
+							bottom: highlightArea.bottom,
+							height: highlightArea.height,
+							left: highlightArea.left,
+							opacity: highlightArea.opacity,
+							right: highlightArea.right,
+							top: highlightArea.top,
+							width: highlightArea.width
+						}}
+					/>
+				</>
+			);
 		}
 		return null;
 	}
@@ -98,6 +138,26 @@ export class Preview extends React.Component<PreviewProps> {
 			const reactComponent = patternFactory(componentProps);
 
 			// Finally, build the component
+			if (
+				pageElement.getId().toString() ===
+				(this.props.selectedElementId && this.props.selectedElementId.toString())
+			) {
+				return (
+					<PatternWrapper
+						key={key}
+						ref={(el: PatternWrapper) => {
+							const domNode = ReactDOM.findDOMNode(el);
+							if (!domNode) {
+								return;
+							}
+
+							this.highlightElement(domNode);
+						}}
+					>
+						{reactComponent}
+					</PatternWrapper>
+				);
+			}
 			return <PatternWrapper key={key}>{reactComponent}</PatternWrapper>;
 		} else {
 			// The model is an object, but not a pattern declaration.
@@ -111,6 +171,47 @@ export class Preview extends React.Component<PreviewProps> {
 			});
 			return result;
 		}
+	}
+
+	@action
+	private highlightElement(element: Element): void {
+		const highlightArea: HighlightAreaProps = this.highlightArea;
+		const clientRect: ClientRect = element.getBoundingClientRect();
+		const newHighlightArea: HighlightAreaProps = {
+			bottom: clientRect.bottom,
+			height: clientRect.height,
+			left: clientRect.left + window.scrollX,
+			opacity: 1,
+			right: clientRect.right,
+			top: clientRect.top + window.scrollY,
+			width: clientRect.width
+		};
+
+		if (
+			newHighlightArea.top === highlightArea.top &&
+			newHighlightArea.right === highlightArea.right &&
+			newHighlightArea.bottom === highlightArea.bottom &&
+			newHighlightArea.left === highlightArea.left &&
+			newHighlightArea.height === highlightArea.height &&
+			newHighlightArea.width === highlightArea.width
+		) {
+			return;
+		}
+
+		element.scrollIntoView({
+			behavior: 'smooth',
+			block: 'center',
+			inline: 'nearest'
+		});
+
+		this.highlightArea = newHighlightArea;
+
+		setTimeout(() => this.hideHighlightArea(), 500);
+	}
+
+	@action
+	private hideHighlightArea(): void {
+		this.highlightArea.opacity = 0;
 	}
 }
 

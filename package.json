@@ -94,7 +94,7 @@
     "electron-builder": "20.0.5",
     "electron-devtools-installer": "^2.2.1",
     "husky": "^0.14.3",
-    "lint-staged": "^6.0.0",
+    "lint-staged": "^7.0.0",
     "mobx-react-devtools": "^4.2.15",
     "prettier": "^1.9.2",
     "standard-version": "^4.2.0",

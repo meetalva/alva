@@ -1,5 +1,5 @@
 import { checkForUpdates } from './auto-updater';
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import * as PathUtils from 'path';
 import * as url from 'url';
 
@@ -8,10 +8,14 @@ import * as url from 'url';
 let win: BrowserWindow | undefined;
 
 function createWindow(): void {
+	const { width = 1280, height = 800 } = screen.getPrimaryDisplay().workAreaSize;
+
 	// Create the browser window.
 	win = new BrowserWindow({
-		width: 1280,
-		height: 800,
+		width,
+		height,
+		minWidth: 780,
+		minHeight: 380,
 		titleBarStyle: 'hiddenInset',
 		title: 'Alva'
 	});

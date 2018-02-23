@@ -15,7 +15,8 @@ execSync(`
 	npm i &&
 	npm run build &&
 	rm -rf node_modules &&
-	npm i --production
+	npm i --production &&
+	npm i @types/react
 `, {
 		cwd: 'build/designkit'
 	}

@@ -119,36 +119,41 @@ export function createMenu(store: Store): void {
 							// outside the webview area (https://github.com/electron/electron/issues/9845)
 							webview.style.height = webviewSize.pageHeight;
 
-							dialog.showSaveDialog(
-								{
-									filters: [{ name: 'Untitled', extensions: ['png'] }]
-								},
-								filename => {
-									if (!filename) {
-										// reset the webview height
-										webview.style.height = '100%';
-										return;
-									}
+							// Delay the page capture to make sure that the style height changes are done.
+							// This is only needed because of the change in height in the above line
+							setTimeout(() => {
+								const scaleFactor = screen.getPrimaryDisplay().scaleFactor;
+								webview.capturePage(
+									{
+										x: 0,
+										y: 0,
+										// round the numbers to remove possible floating numbers
+										// also multiply by scaleFactor for devices with higher pixel ratio:
+										// https://github.com/electron/electron/issues/8314
+										width: Math.round(webviewSize.pageWidth * scaleFactor),
+										height: Math.round(webviewSize.pageHeight * scaleFactor)
+									},
+									capture => {
+										const pngBuffer: Buffer = capture.toPNG();
 
-									const scaleFactor = screen.getPrimaryDisplay().scaleFactor;
-									webview.capturePage(
-										{
-											x: 0,
-											y: 0,
-											// round the numbers to remove possible floating numbers
-											// also multiply by scaleFactor for devices with higher pixel ratio:
-											// https://github.com/electron/electron/issues/8314
-											width: Math.round(webviewSize.pageWidth * scaleFactor),
-											height: Math.round(webviewSize.pageHeight * scaleFactor)
-										},
-										capture => {
-											FileExtraUtils.writeFileSync(filename, capture.toPNG());
-											// reset the webview height
-											webview.style.height = '100%';
-										}
-									);
-								}
-							);
+										dialog.showSaveDialog(
+											{
+												filters: [{ name: 'Untitled', extensions: ['png'] }]
+											},
+											filename => {
+												// reset the webview height
+												webview.style.height = '100%';
+
+												if (!filename) {
+													return;
+												}
+
+												FileExtraUtils.writeFileSync(filename, pngBuffer);
+											}
+										);
+									}
+								);
+							}, 10);
 						});
 					}
 				},

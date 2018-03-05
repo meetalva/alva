@@ -107,7 +107,7 @@
     "electron-log": "2.2.14",
     "electron-updater": "2.20.1",
     "fs-extra": "5.0.0",
-    "js-yaml": "3.10.0",
+    "js-yaml": "3.11.0",
     "mobx": "3.4.1",
     "mobx-react": "4.3.5",
     "react": "16.2.0",

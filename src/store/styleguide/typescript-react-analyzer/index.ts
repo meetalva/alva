@@ -148,9 +148,10 @@ function generatePatternId(
 	const relativeDirectoryPath = PathUtils.relative(basePath, fileInfo.directory);
 
 	const baseIdentifier = PathUtils.join(relativeDirectoryPath, baseName);
+	const baseIdentifierNormalized = baseIdentifier.split(PathUtils.sep).join('/');
 	const exportIdentifier = exportInfo.name ? `@${exportInfo.name}` : '';
 
-	const id = `${baseIdentifier}${exportIdentifier}`;
+	const id = `${baseIdentifierNormalized}${exportIdentifier}`;
 
 	return id;
 }

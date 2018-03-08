@@ -44,6 +44,7 @@
     "appId": "io.github.meetalva",
     "productName": "Alva",
     "copyright": "Copyright (c) 2017 SinnerSchrader Deutschland GmbH",
+    "npmArgs": "npm i @types/react",
     "files": [
       "build/**/*",
       "package.json",

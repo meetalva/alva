@@ -115,7 +115,7 @@
     "react-router": "4.2.0",
     "readts": "0.1.0",
     "smoothscroll-polyfill": "0.4.0",
-    "styled-components": "3.1.6",
+    "styled-components": "3.2.1",
     "tslib": "1.9.0",
     "typescript": "2.6.2"
   },

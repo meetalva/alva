@@ -1,10 +1,33 @@
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { Page } from '../../store/page/page';
-import { PageElement } from '../../store/page/page-element';
-import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+
+import { Page } from '../../../store/page/page';
+import { PageElement } from '../../../store/page/page-element';
+import { PropertyValue } from '../../../store/page/property-value';
+import { Store } from '../../../store/store';
+
+import { HighlightAreaProps, HighlightElementFunction } from '../../preview';
+
+export interface PreviewAppProps {
+	store: Store;
+	highlightElement: HighlightElementFunction;
+}
+
+export interface PreviewAppState {
+	page?: Page;
+}
+
+interface PreviewProps {
+	page?: Page;
+	selectedElementId?: number[];
+	highlightElement: HighlightElementFunction;
+}
+
+interface PatternWrapperState {
+	errorMessage?: string;
+}
 
 class PatternWrapper extends React.Component<{}, PatternWrapperState> {
 	public constructor(props: {}) {
@@ -25,18 +48,10 @@ class PatternWrapper extends React.Component<{}, PatternWrapperState> {
 	}
 }
 
-export interface HighlightAreaProps extends ClientRect {
-	opacity?: number;
-}
-
-export interface PreviewProps {
-	page?: Page;
-	selectedElementId?: number[];
-}
-
 @observer
-export class Preview extends React.Component<PreviewProps> {
+class Preview extends React.Component<PreviewProps> {
 	private patternFactories: { [id: string]: React.StatelessComponent | ObjectConstructor };
+	private patternWrapperRef: PatternWrapper;
 	@observable private highlightArea: HighlightAreaProps;
 
 	public constructor(props: PreviewProps) {
@@ -52,6 +67,23 @@ export class Preview extends React.Component<PreviewProps> {
 			top: 0,
 			width: 0
 		};
+
+		this.highlightElementCallback = this.highlightElementCallback.bind(this);
+	}
+
+	public componentDidMount(): void {
+		this.triggerHighlight();
+	}
+
+	public componentDidUpdate(): void {
+		this.triggerHighlight();
+	}
+
+	private triggerHighlight(): void {
+		const domNode = this.patternWrapperRef && ReactDOM.findDOMNode(this.patternWrapperRef);
+		if (domNode) {
+			this.props.highlightElement(domNode, this.highlightArea, this.highlightElementCallback);
+		}
 	}
 
 	public render(): JSX.Element | null {
@@ -162,14 +194,7 @@ export class Preview extends React.Component<PreviewProps> {
 				return (
 					<PatternWrapper
 						key={key}
-						ref={(el: PatternWrapper) => {
-							const domNode = ReactDOM.findDOMNode(el);
-							if (!domNode) {
-								return;
-							}
-
-							this.highlightElement(domNode);
-						}}
+						ref={(ref: PatternWrapper) => (this.patternWrapperRef = ref)}
 					>
 						{reactComponent}
 					</PatternWrapper>
@@ -191,47 +216,38 @@ export class Preview extends React.Component<PreviewProps> {
 	}
 
 	@action
-	private highlightElement(element: Element): void {
-		const highlightArea: HighlightAreaProps = this.highlightArea;
-		const clientRect: ClientRect = element.getBoundingClientRect();
-		const newHighlightArea: HighlightAreaProps = {
-			bottom: clientRect.bottom,
-			height: clientRect.height,
-			left: clientRect.left + window.scrollX,
-			opacity: 1,
-			right: clientRect.right,
-			top: clientRect.top + window.scrollY,
-			width: clientRect.width
-		};
-
-		if (
-			newHighlightArea.top === highlightArea.top &&
-			newHighlightArea.right === highlightArea.right &&
-			newHighlightArea.bottom === highlightArea.bottom &&
-			newHighlightArea.left === highlightArea.left &&
-			newHighlightArea.height === highlightArea.height &&
-			newHighlightArea.width === highlightArea.width
-		) {
-			return;
+	private highlightElementCallback(newHighlightArea: HighlightAreaProps): void {
+		if (newHighlightArea) {
+			this.highlightArea = newHighlightArea;
 		}
-
-		element.scrollIntoView({
-			behavior: 'smooth',
-			block: 'center',
-			inline: 'nearest'
-		});
-
-		this.highlightArea = newHighlightArea;
-
-		setTimeout(() => this.hideHighlightArea(), 500);
-	}
-
-	@action
-	private hideHighlightArea(): void {
-		this.highlightArea.opacity = 0;
 	}
 }
 
-interface PatternWrapperState {
-	errorMessage?: string;
+@observer
+export class PreviewApp extends React.Component<PreviewAppProps, PreviewAppState> {
+	public constructor(props: PreviewAppProps) {
+		super(props);
+	}
+
+	public render(): JSX.Element {
+		let DevTools;
+		try {
+			const DevToolsExports = require('mobx-react-devtools');
+			DevTools = DevToolsExports ? DevToolsExports.default : undefined;
+		} catch (error) {
+			// Ignored
+		}
+
+		const selectedElement: PageElement | undefined = this.props.store.getSelectedElement();
+		return (
+			<div>
+				<Preview
+					page={this.props.store.getCurrentPage()}
+					selectedElementId={selectedElement && selectedElement.getId()}
+					highlightElement={this.props.highlightElement}
+				/>
+				{DevTools ? <DevTools /> : ''}
+			</div>
+		);
+	}
 }

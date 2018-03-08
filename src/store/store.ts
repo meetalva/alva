@@ -1,6 +1,5 @@
 import * as FileUtils from 'fs';
 import { TypescriptReactAnalyzer } from './styleguide/typescript-react-analyzer/index';
-import { SyntheticAnalyzer } from './styleguide/synthetic-analyzer/index';
 import { JsonArray, JsonObject, Persister } from './json';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
@@ -366,12 +365,11 @@ export class Store {
 			this.currentPage = undefined;
 
 			const typescriptReactAnalyzer = new TypescriptReactAnalyzer('react');
-			const syntheticAnalyzer = new SyntheticAnalyzer('synthetic');
 
-			const styleguide = new Styleguide(`${styleguidePath}/lib/patterns`, [
-				typescriptReactAnalyzer,
-				syntheticAnalyzer
-			]);
+			const styleguide = new Styleguide(
+				`${styleguidePath}/lib/patterns`,
+				typescriptReactAnalyzer
+			);
 
 			this.styleguide = styleguide;
 			this.styleguide.load();

@@ -1,15 +1,26 @@
 import { Folder } from './utils/folder';
 import { Pattern } from '../pattern/pattern';
 import { StyleguideAnalyzer } from './styleguide-analyzer';
+import { SyntheticAnalyzer } from './synthetic-analyzer';
+
+export interface Analyzers {
+	default?: StyleguideAnalyzer;
+	synthetic: StyleguideAnalyzer;
+	[id: string]: StyleguideAnalyzer | undefined;
+}
 
 export class Styleguide {
-	private readonly analyzers: StyleguideAnalyzer[];
+	private readonly analyzers: Analyzers;
 	private readonly path: string;
 	private patterns: Map<string, Pattern> = new Map();
 	private folders: Folder<Pattern>[] = [];
 
-	public constructor(path: string, analyzers?: StyleguideAnalyzer[]) {
-		this.analyzers = analyzers || [];
+	public constructor(path: string, analyzer?: StyleguideAnalyzer) {
+		this.analyzers = {
+			default: analyzer,
+			synthetic: new SyntheticAnalyzer('synthetic')
+		};
+
 		this.path = path;
 	}
 
@@ -17,8 +28,8 @@ export class Styleguide {
 		return this.path;
 	}
 
-	public getAnalyzers(): ReadonlyArray<StyleguideAnalyzer> {
-		return this.analyzers;
+	public getDefaultAnalyzer(): StyleguideAnalyzer | undefined {
+		return this.analyzers.default;
 	}
 
 	public getPatterns(): ReadonlyMap<string, Pattern> {
@@ -33,7 +44,13 @@ export class Styleguide {
 		this.patterns = new Map();
 		this.folders = [];
 
-		this.analyzers.forEach(analyzer => {
+		Object.keys(this.analyzers).forEach(analyzerId => {
+			const analyzer = this.analyzers[analyzerId];
+
+			if (analyzer === undefined) {
+				return;
+			}
+
 			const groupedPatterns = analyzer.analyze(this.path);
 			const patterns = groupedPatterns.flatten();
 

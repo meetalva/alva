@@ -5,7 +5,7 @@ import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
-import { Pattern } from '../../store/pattern/pattern';
+import { Pattern } from '../../store/styleguide/pattern';
 import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
 import { Store } from '../../store/store';
@@ -107,22 +107,20 @@ export class ElementList extends React.Component<ElementListProps> {
 				this.props.store.setRearrangeElement(element);
 			},
 			handleDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
-				const analyzerId = e.dataTransfer.getData('analyzerId');
 				const patternId = e.dataTransfer.getData('patternId');
 
 				const parentElement = element.getParent();
 				let pageElement: PageElement | undefined;
 
-				if (!(analyzerId && patternId)) {
+				if (!patternId) {
 					pageElement = this.props.store.getRearrangeElement();
 				} else {
 					const styleguide = this.props.store.getStyleguide();
-
 					if (!styleguide) {
 						return;
 					}
 
-					pageElement = new PageElement(styleguide.findPattern(analyzerId, patternId), true);
+					pageElement = new PageElement(styleguide.getPattern(patternId), true);
 				}
 
 				if (!parentElement || !pageElement || pageElement.isAncestorOf(parentElement)) {
@@ -133,12 +131,11 @@ export class ElementList extends React.Component<ElementListProps> {
 				this.props.store.setSelectedElement(pageElement);
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
-				const analyzerId = e.dataTransfer.getData('analyzerId');
 				const patternId = e.dataTransfer.getData('patternId');
 
 				let pageElement: PageElement | undefined;
 
-				if (!(analyzerId && patternId)) {
+				if (!patternId) {
 					pageElement = this.props.store.getRearrangeElement();
 				} else {
 					const styleguide = this.props.store.getStyleguide();
@@ -147,7 +144,7 @@ export class ElementList extends React.Component<ElementListProps> {
 						return;
 					}
 
-					pageElement = new PageElement(styleguide.findPattern(analyzerId, patternId), true);
+					pageElement = new PageElement(styleguide.getPattern(patternId), true);
 				}
 
 				if (!pageElement || pageElement.isAncestorOf(element)) {

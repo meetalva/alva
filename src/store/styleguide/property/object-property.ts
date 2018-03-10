@@ -63,8 +63,11 @@ export class ObjectProperty extends Property {
 	 * <b>Note:</b> This method should only be called from the pattern parsers.
 	 * @param properties The nested properties this property supports.
 	 */
-	public setProperties(properties: Map<string, Property>): void {
-		this.properties = properties;
+	public setProperties(properties: Property[]): void {
+		this.properties = new Map();
+		for (const property of properties) {
+			this.properties.set(property.getId(), property);
+		}
 	}
 
 	/**

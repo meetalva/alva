@@ -1,5 +1,4 @@
 import * as FileUtils from 'fs';
-import { TypescriptReactAnalyzer } from './styleguide/typescript-react-analyzer/index';
 import { JsonArray, JsonObject, Persister } from './json';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
@@ -11,6 +10,7 @@ import * as PathUtils from 'path';
 import { Preferences } from './preferences';
 import { Project } from './project//project';
 import { Styleguide } from './styleguide/styleguide';
+import { TypescriptReactAnalyzer } from '../styleguide-analyzer/typescript-react-analyzer/typescript-react-analyzer';
 
 /**
  * The central entry-point for all application state, managed by MobX.
@@ -364,11 +364,9 @@ export class Store {
 			this.styleGuidePath = styleguidePath;
 			this.currentPage = undefined;
 
-			const typescriptReactAnalyzer = new TypescriptReactAnalyzer('react');
-
 			const styleguide = new Styleguide(
 				`${styleguidePath}/lib/patterns`,
-				typescriptReactAnalyzer
+				new TypescriptReactAnalyzer()
 			);
 
 			this.styleguide = styleguide;

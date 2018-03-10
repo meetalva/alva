@@ -8,14 +8,6 @@ export class Directory {
 		this.path = path;
 	}
 
-	public getName(): string {
-		return PathUtils.basename(this.path);
-	}
-
-	public getPath(): string {
-		return this.path;
-	}
-
 	public *getDirectories(): IterableIterator<Directory> {
 		for (const childName of FileUtils.readdirSync(this.path)) {
 			const childPath = PathUtils.join(this.path, childName);
@@ -34,5 +26,13 @@ export class Directory {
 				yield childPath;
 			}
 		}
+	}
+
+	public getName(): string {
+		return PathUtils.basename(this.path);
+	}
+
+	public getPath(): string {
+		return this.path;
 	}
 }

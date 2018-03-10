@@ -1,14 +1,15 @@
 import Input from '../../lsg/patterns/input/';
-import { Folder } from '../../store/styleguide/utils/folder';
+import { PatternFolder } from '../../store/styleguide/folder';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { PageElement } from '../../store/page/page-element';
-import { Pattern } from '../../store/pattern/pattern';
+import { Pattern } from '../../store/styleguide/pattern';
 import PatternList, {
 	PatternLabel,
 	PatternListItem,
 	PatternListItemProps
 } from '../../lsg/patterns/pattern-list';
+import { PatternType } from '../../store/styleguide/pattern-type';
 import * as React from 'react';
 import Space, { Size } from '../../lsg/patterns/space';
 import { Store } from '../../store/store';
@@ -61,16 +62,8 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	}
 
 	public render(): JSX.Element {
-		let items: PatternListContainerItemProps[] = [];
-
-		this.props.store
-			.getStyleguide()
-			.getFolders()
-			.forEach(folder => {
-				items = items.concat(this.createItemsFromFolder(folder));
-			});
-
-		this.items = items;
+		const patternRoot = this.props.store.getStyleguide().getPatternRoot() as PatternFolder;
+		this.items = this.createItemsFromFolder(patternRoot);
 
 		if (this.props.store.getPatternSearchTerm() !== '') {
 			this.items = this.search(this.items, this.props.store.getPatternSearchTerm());
@@ -86,17 +79,19 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 		);
 	}
 
-	public createItemsFromFolder(folder: Folder<Pattern>): PatternListContainerItemProps[] {
+	public createItemsFromFolder(parent: PatternFolder): PatternListContainerItemProps[] {
 		const result: PatternListContainerItemProps[] = [];
 
-		for (const flatFolder of folder.flattenFolders()) {
+		for (const folder of parent.getDescendants()) {
 			const containerItem: PatternListContainerItemProps = {
-				name: flatFolder.getName(),
+				name: folder.getName(),
 				items: []
 			};
 
-			for (const pattern of flatFolder.getItems()) {
-				const icon = pattern.getIconPath();
+			for (const pattern of folder.getPatterns()) {
+				// a synthetic pattern can not have a icon
+				const icon =
+					pattern.getType() === PatternType.SYNTHETIC ? undefined : pattern.getIconPath();
 
 				containerItem.items.push({
 					name: pattern.getName(),
@@ -170,7 +165,6 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 			12
 		);
 
-		e.dataTransfer.setData('analyzerId', pattern.getAnalyzer().getId());
 		e.dataTransfer.setData('patternId', pattern.getId());
 	}
 }

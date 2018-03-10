@@ -1,7 +1,7 @@
 import { JsonArray, JsonObject, JsonValue } from '../json';
 import * as MobX from 'mobx';
-import { Pattern } from '../pattern/pattern';
-import { Property } from '../pattern/property/property';
+import { Pattern } from '../styleguide/pattern';
+import { Property } from '../styleguide/property/property';
 import { PropertyValue } from './property-value';
 import { Store } from '../store';
 
@@ -73,34 +73,19 @@ export class PageElement {
 			return;
 		}
 
-		let patternId = json['pattern'] as string;
-		let analyzerId = json['analyzer'] as string | undefined;
-
-		// Map patterns without styleguide and analyzer id to default ones.
-		// Convert old react pattern ids to the new schema as used by the TypescriptReactAnalyzer.
-		// TODO: Implement upgrade path for page files of older versions
-		if (!analyzerId) {
-			if (patternId === 'text') {
-				analyzerId = 'synthetic';
-			} else {
-				patternId = `${patternId}/index`;
-				analyzerId = 'react';
-			}
-		}
-
 		const styleguide = store.getStyleguide();
-
 		if (!styleguide) {
 			return;
 		}
 
-		const pattern: Pattern | undefined = styleguide.findPattern(analyzerId, patternId);
-		const element = new PageElement(pattern, false, parent);
-
+		const patternId = json['pattern'] as string;
+		const pattern: Pattern | undefined = styleguide.getPattern(patternId);
 		if (!pattern) {
 			console.warn(`Ignoring unknown pattern "${patternId}"`);
-			return element;
+			return new PageElement(undefined, false, parent);
 		}
+
+		const element = new PageElement(pattern, false, parent);
 
 		if (json.properties) {
 			Object.keys(json.properties as JsonObject).forEach((propertyId: string) => {
@@ -169,7 +154,7 @@ export class PageElement {
 			const styleguide = store.getStyleguide();
 
 			const element: PageElement = new PageElement(
-				styleguide.findPattern('synthetic', 'text'),
+				styleguide.getPattern('synthetic/text'),
 				false,
 				this
 			);
@@ -384,8 +369,7 @@ export class PageElement {
 	public toJsonObject(): JsonObject {
 		const json: JsonObject = {
 			_type: 'pattern',
-			pattern: this.pattern && this.pattern.getId(),
-			analyzer: this.pattern && this.pattern.getAnalyzer().getId()
+			pattern: this.pattern && this.pattern.getId()
 		};
 
 		json.children = this.children.map(

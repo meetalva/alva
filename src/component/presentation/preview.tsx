@@ -2,11 +2,9 @@ import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
-import { PatternType } from '../../store/pattern/pattern-type';
 import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { ReactPattern } from '../../store/styleguide/typescript-react-analyzer/react-pattern';
 
 class PatternWrapper extends React.Component<{}, PatternWrapperState> {
 	public constructor(props: {}) {
@@ -112,12 +110,14 @@ export class Preview extends React.Component<PreviewProps> {
 			}
 
 			const patternId: string = pattern.getId();
-			const patternType: PatternType = pattern.getType();
+			const patternType: string = pattern.getType();
 
-			if (patternType === PatternType.synthetic) {
+			if (patternType === 'synthetic') {
 				switch (patternId) {
 					case 'text':
 						return pageElement.getPropertyValue('text');
+					default:
+						throw new Error(`Unsupported synthetic pattern '${patternId}'`);
 				}
 			}
 
@@ -136,19 +136,17 @@ export class Preview extends React.Component<PreviewProps> {
 				.getChildren()
 				.map((child, index) => this.createComponent(child, String(index)));
 
-			if (patternType !== PatternType.react) {
-				return null;
+			if (patternType !== 'react') {
+				throw new Error(`Unsupported pattern type '${patternType}'`);
 			}
 
-			const reactPattern = pattern as ReactPattern;
-
 			// Then, load the pattern factory
-			const patternPath: string = reactPattern.fileInfo.jsFilePath;
+			const patternPath: string = pattern.getImplementationPath();
 			let patternFactory: React.StatelessComponent | ObjectConstructor = this.patternFactories[
 				patternId
 			];
 			if (patternFactory == null) {
-				const exportName = reactPattern.exportInfo.name || 'default';
+				const exportName = pattern.getExportName();
 				const module = require(patternPath);
 				patternFactory = module[exportName];
 				this.patternFactories[patternId] = patternFactory;

@@ -1,12 +1,12 @@
-import { EnumProperty, Option } from '../../store/pattern/property/enum-property';
-import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item/index';
-import { StringItem } from '../../lsg/patterns/property-items/string-item/index';
-import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item/index';
+import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item';
+import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item';
+import { EnumProperty, Option } from '../../store/styleguide/property/enum-property';
 import { observer } from 'mobx-react';
-import { ObjectProperty } from '../../store/pattern/property/object-property';
-import { Property } from '../../store/pattern/property/property';
+import { ObjectProperty } from '../../store/styleguide/property/object-property';
+import { Property } from '../../store/styleguide/property/property';
 import * as React from 'react';
 import { Store } from '../../store/store';
+import { StringItem } from '../../lsg/patterns/property-items/string-item';
 
 export interface PropertyListProps {
 	store: Store;
@@ -33,10 +33,7 @@ export class PropertyList extends React.Component<PropertyListProps> {
 		}
 
 		const pattern = selectedElement.getPattern();
-
-		const properties: Property[] | undefined =
-			pattern && Array.from(pattern.getProperties().values());
-
+		const properties: Property[] | undefined = pattern && pattern.getProperties();
 		if (!properties) {
 			return <div>This element has no properties</div>;
 		}

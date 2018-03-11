@@ -46,7 +46,12 @@
     "copyright": "Copyright (c) 2017 SinnerSchrader Deutschland GmbH",
     "files": [
       "build/**/*",
-      "package.json"
+      "package.json",
+      {
+        "from": "build/designkit/node_modules/@types",
+        "to": "build/designkit/node_modules/@types",
+        "filter": ["**/*.d.ts"]
+      }
     ],
     "directories": {
       "buildResources": "src/resources",

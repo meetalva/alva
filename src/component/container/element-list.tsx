@@ -1,5 +1,5 @@
 import { elementMenu } from '../../electron/context-menus';
-import { ElementWrapper } from './element_wrapper';
+import { ElementWrapper } from './element-wrapper';
 import { ListItemProps } from '../../lsg/patterns/list';
 import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';

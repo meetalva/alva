@@ -54,6 +54,11 @@ export const colors = {
 		displayName: 'Black',
 		rgb: [1, 12, 22]
 	}),
+	blackAlpha13: new Color({
+		alpha: 0.13,
+		displayName: 'Black Alpha 13',
+		rgb: [0, 0, 0]
+	}),
 	blue: new Color({
 		displayName: 'Blue',
 		rgb: [0, 112, 214]

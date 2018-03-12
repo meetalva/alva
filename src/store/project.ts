@@ -82,6 +82,16 @@ export class Project {
 		return this.id;
 	}
 
+	// TODO
+	public getLastChangedAuthor(): string {
+		return 'Max Mustermann';
+	}
+
+	// TODO
+	public getLastChangedDate(): Date {
+		return new Date();
+	}
+
 	/**
 	 * Returns the human-friendly name of the project.
 	 * In the frontend, to be displayed instead of the ID.

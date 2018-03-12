@@ -115,7 +115,7 @@
     "fs-extra": "5.0.0",
     "js-yaml": "3.11.0",
     "mobx": "3.4.1",
-    "mobx-react": "4.4.3",
+    "mobx-react": "5.0.0",
     "react": "16.2.0",
     "react-dom": "16.2.0",
     "react-router": "4.2.0",

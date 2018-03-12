@@ -5,18 +5,18 @@
   "main": "./build/electron/electron.js",
   "scripts": {
     "build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/*.html build/electron/",
-    "build-lsg": "tsc --project src/lsg --outDir build/lsg/patterns",
-    "start": "npm run build && concurrently \"electron build/electron/electron.js --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\"",
-    "start-lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
+    "build:electron": "electron-builder -mwl && node ./scripts/dist-postprocess.js",
+    "build:lsg": "tsc --project src/lsg --outDir build/lsg/patterns",
     "clean": "rm -rf build && rm -rf dist",
-    "clean-build": "npm run clean && npm run build",
-    "docs": "typedoc src",
-    "dist": "node ./scripts/dist-preprocess.js",
-    "electron-build": "electron-builder -mwl && node ./scripts/dist-postprocess.js",
+    "clean:build": "npm run clean && npm run build",
     "commit": "commit",
     "commitmsg": "commitlint -e $GIT_PARAMS",
-    "precommit": "lint-staged",
-    "lint": "tslint --project ."
+    "dist": "node ./scripts/dist-preprocess.js",
+    "docs": "typedoc src",
+    "lint": "tslint --project .",
+    "start": "npm run build && concurrently \"electron build/electron/electron.js --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\"",
+    "start:lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
+    "precommit": "lint-staged"
   },
   "repository": {
     "type": "git",
@@ -50,7 +50,9 @@
       {
         "from": "build/designkit/node_modules/@types",
         "to": "build/designkit/node_modules/@types",
-        "filter": ["**/*.d.ts"]
+        "filter": [
+          "**/*.d.ts"
+        ]
       }
     ],
     "directories": {
@@ -85,7 +87,8 @@
     "@commitlint/config-conventional": "^6.0.2",
     "@commitlint/prompt-cli": "^6.0.2",
     "@commitlint/travis-cli": "^6.0.2",
-    "@patternplate/cli": "^2.0.0-4",
+    "@patternplate/cli": "2.0.0-54",
+    "@patternplate/render-react": "^2.0.0-54",
     "@patternplate/render-styled-components": "^2.0.0-3",
     "@types/electron-devtools-installer": "^2.0.2",
     "@types/fs-extra": "^5.0.0",

@@ -1,22 +1,18 @@
 import { Directory } from '../directory';
+import { Export } from '../typescript/export';
 import { PatternFolder } from '../../store/styleguide/folder';
 import * as FileUtils from 'fs';
 import * as PathUtils from 'path';
 import { Pattern } from '../../store/styleguide/pattern';
+import { PatternType } from '../../store/styleguide/pattern-type';
 import { Property } from '../../store/styleguide/property/property';
 import { PropertyAnalyzer } from './property-analyzer';
+import { ReactUtils } from '../typescript/react-utils';
 import { Styleguide } from '../../store/styleguide/styleguide';
 import { StyleguideAnalyzer } from '../styleguide-analyzer';
 import { Type } from '../typescript/type';
 import * as ts from 'typescript';
-import { Export, TypescriptUtils } from '../typescript/typescript-utils';
-
-const REACT_COMPONENT_TYPES = [
-	'Component',
-	'ComponentClass',
-	'PureComponent',
-	'StatelessComponent'
-];
+import { TypescriptUtils } from '../typescript/typescript-utils';
 
 export interface PatternInfo {
 	declarationPath: string;
@@ -25,7 +21,13 @@ export interface PatternInfo {
 	implementationPath: string;
 }
 
+/**
+ * A styleguide analyzer for TypeScript React patterns.
+ */
 export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
+	/**
+	 * @inheritdoc
+	 */
 	public analyze(styleguide: Styleguide): void {
 		const directory = new Directory(styleguide.getPath());
 		const allPatternInfos: PatternInfo[] = this.findPatterns(directory, directory, true);
@@ -40,6 +42,15 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 		);
 	}
 
+	/**
+	 * Analyzes a folder of the styleguide and its subfolders. Called from the root analysis, and
+	 * then recursively from its children.
+	 * @param styleguide The styleguide to add patterns to.
+	 * @param path The path of the folder to analyze.
+	 * @param folder The parent pattern folder to add subfolders and patterns to.
+	 * @param program The TypeScript program containing all pattern declarations.
+	 * @param rootPath The root path of the styleguide pattern implementations.
+	 */
 	private analyzeFolder(
 		styleguide: Styleguide,
 		path: string,
@@ -58,7 +69,7 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 
 			const exports: Export[] = TypescriptUtils.getExports(sourceFile, program);
 			exports.forEach(exportInfo => {
-				const reactType: Type | undefined = this.findWellKnownReactType(
+				const reactType: Type | undefined = ReactUtils.findReactComponentType(
 					program,
 					exportInfo.type
 				);
@@ -67,12 +78,12 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 					return;
 				}
 
-				const id = this.generatePatternId(rootDirectory.getPath(), patternInfo, exportInfo);
+				const id = this.getPatternId(rootDirectory.getPath(), patternInfo, exportInfo);
 				const name = this.getPatternName(patternInfo, exportInfo);
 				const pattern = new Pattern(
 					id,
 					name,
-					this.getPatternType(),
+					PatternType.REACT,
 					patternInfo.implementationPath,
 					exportInfo.name
 				);
@@ -106,6 +117,14 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 		}
 	}
 
+	/**
+	 * Analyzes one directory of the styleguide (optionally recursively), returning information about
+	 * found pattern.
+	 * @param rootDirectory A directory of the styleguide pattern implementations root path.
+	 * @param directory The directory to analyze.
+	 * @param recurse The directory to analyze.
+	 * @return Information about the patterns found.
+	 */
 	private findPatterns(
 		rootDirectory: Directory,
 		directory: Directory,
@@ -150,64 +169,32 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 		return patterns;
 	}
 
-	private findWellKnownReactType(program: ts.Program, type: Type): Type | undefined {
-		if (this.isReactType(program, type.type)) {
-			return type;
-		}
-
-		for (const baseType of type.getBaseTypes()) {
-			const wellKnownReactType = this.findWellKnownReactType(program, baseType);
-
-			if (wellKnownReactType) {
-				return wellKnownReactType;
-			}
-		}
-
-		return undefined;
-	}
-
-	private generatePatternId(basePath: string, fileInfo: PatternInfo, exportInfo: Export): string {
+	/**
+	 * Generate the TypeScript React analyzer specific pattern ID from the pattern's file and export
+	 * info.
+	 * @param rootPath The root path of the styleguide pattern implementations.
+	 * @param fileInfo The pattern file info (implementation/declaration reference).
+	 * @param exportInfo Information about the pattern export.
+	 * @return The pattern ID to use.
+	 */
+	private getPatternId(rootPath: string, fileInfo: PatternInfo, exportInfo: Export): string {
 		const baseName = PathUtils.basename(fileInfo.implementationPath, '.js');
-		const relativePath = PathUtils.relative(basePath, fileInfo.directory);
+		const relativePath = PathUtils.relative(rootPath, fileInfo.directory);
 		const absolutePath = PathUtils.join(relativePath, baseName);
-
 		const baseIdentifier = absolutePath.split(PathUtils.sep).join('/');
-
 		const exportIdentifier = exportInfo.name ? `@${exportInfo.name}` : '';
 		return `${baseIdentifier}${exportIdentifier}`;
 	}
 
+	/**
+	 * Generate the pattern name from its file and export info.
+	 * @param fileInfo The pattern file info (implementation/declaration reference).
+	 * @param exportInfo Information about the pattern export.
+	 * @return The pattern name.
+	 */
 	private getPatternName(fileInfo: PatternInfo, exportInfo: Export): string {
 		const baseName = PathUtils.basename(fileInfo.implementationPath, '.js');
 		const directoryName = PathUtils.basename(fileInfo.directory);
 		return exportInfo.name || (baseName !== 'index' ? baseName : directoryName);
-	}
-
-	public getPatternType(): string {
-		return 'react';
-	}
-
-	private isReactType(program: ts.Program, type: ts.Type): boolean {
-		if (!(type.symbol && type.symbol.declarations)) {
-			return false;
-		}
-
-		const symbol = type.symbol;
-		const declarations = type.symbol.declarations;
-
-		const isWellKnownType = REACT_COMPONENT_TYPES.some(
-			wellKnownReactComponentType => symbol.name === wellKnownReactComponentType
-		);
-
-		if (!isWellKnownType) {
-			return false;
-		}
-
-		for (const declaration of declarations) {
-			const sourceFile = declaration.getSourceFile();
-			return sourceFile.fileName.includes('react/index.d.ts');
-		}
-
-		return false;
 	}
 }

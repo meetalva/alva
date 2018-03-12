@@ -36,10 +36,18 @@ export class PatternFolder {
 		}
 	}
 
+	/**
+	 * Adds a new pattern to this pattern folder. Note that you also have to add it to the styleguide (to have it in the global pattern registry).
+	 * @param pattern The pattern to add.
+	 */
 	public addPattern(pattern: Pattern): void {
 		this.patterns.set(pattern.getId(), pattern);
 	}
 
+	/**
+	 * Writes information about this folder to the console (subfolders, patterns).
+	 * @param indentation The current indentation level, if invoked from a parent pattern folder.
+	 */
 	public dump(indentation: number = 0): void {
 		console.log(`${'  '.repeat(indentation)}Folder '${this.name}'`);
 		for (const child of this.children.values()) {

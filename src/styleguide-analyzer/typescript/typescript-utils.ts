@@ -1,13 +1,8 @@
 // tslint:disable:no-bitwise
 
+import { Export } from './export';
 import { Type } from './type';
 import * as ts from 'typescript';
-
-export interface Export {
-	type: Type;
-	statement: ts.Statement;
-	name?: string;
-}
 
 export class TypescriptUtils {
 	public static getExports(sourceFile: ts.SourceFile, program: ts.Program): Export[] {
@@ -47,7 +42,7 @@ export class TypescriptUtils {
 				const exportName = isDefault ? undefined : declaration.name.getText();
 
 				const type = typechecker.getTypeAtLocation(declaration);
-				const exportType = new Type(type, typechecker, declaration);
+				const exportType = new Type(type, typechecker);
 
 				return [
 					{
@@ -67,7 +62,7 @@ export class TypescriptUtils {
 			const exportName = isDefault ? undefined : statement.name.text;
 
 			const type = typechecker.getTypeAtLocation(statement);
-			const exportType = new Type(type, typechecker, statement);
+			const exportType = new Type(type, typechecker);
 
 			return [
 				{
@@ -84,7 +79,7 @@ export class TypescriptUtils {
 
 			if (declaration) {
 				const type = typechecker.getTypeAtLocation(declaration);
-				const exportType = new Type(type, typechecker, declaration);
+				const exportType = new Type(type, typechecker);
 
 				return [
 					{
@@ -104,7 +99,7 @@ export class TypescriptUtils {
 				const exportName = isDefault ? undefined : exportSpecifier.name.getText();
 
 				const type = typechecker.getTypeAtLocation(exportSpecifier);
-				const exportType = new Type(type, typechecker, exportSpecifier);
+				const exportType = new Type(type, typechecker);
 
 				return {
 					name: exportName,

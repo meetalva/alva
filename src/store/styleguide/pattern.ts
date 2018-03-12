@@ -29,8 +29,8 @@ export class Pattern {
 	protected iconPath?: string;
 
 	/**
-	 * The ID of the pattern. It's local to the styleguide analyzer that detected the pattern.
-	 * How this is generated is completely up to the styleguide analyzer that creates the pattern.
+	 * The ID of the pattern. How this is generated is completely up to the styleguide analyzer
+	 * that creates the pattern (and does not necessarily represent the file path).
 	 */
 	protected id: string;
 
@@ -56,6 +56,17 @@ export class Pattern {
 	 */
 	protected type: string;
 
+	/**
+	 * Creates a new pattern.
+	 * @param id The ID of the pattern. How this is generated is completely up to the styleguide analyzer
+	 * that creates the pattern (and does not necessarily represent the file path).
+	 * @param name The human-readable name of the pattern.
+	 * @param type The type of the pattern (e.g. react, angular, vue). Use PatternType constants.
+	 * @param implementationPath The absolute path to the JavaScript implementation of the pattern,
+	 * used to preview page elements.
+	 * @param exportName The name of the export in the JavaScript implementation of the pattern.
+	 * For default export, the value is 'default'.
+	 */
 	public constructor(
 		id: string,
 		name: string,
@@ -78,7 +89,11 @@ export class Pattern {
 		this.properties.set(property.getId(), property);
 	}
 
-	public dump(indentation: number): void {
+	/**
+	 * Writes information about this pattern to the console.
+	 * @param indentation The current indentation level, if invoked from a pattern folder.
+	 */
+	public dump(indentation: number = 0): void {
 		console.log(
 			`${'  '.repeat(indentation)}Pattern '${this.id}', path '${this.implementationPath}'`
 		);
@@ -102,8 +117,9 @@ export class Pattern {
 	}
 
 	/**
-	 * Returns the ID of the pattern. How this is generated
-	 * is completely up to the styleguide analyzer that creates the pattern.
+	 * Returns the ID of the pattern. How this is generated is completely up to the
+	 * styleguide analyzer that creates the pattern (and does not necessarily represent
+	 * the file path).
 	 * @return The ID of the pattern.
 	 */
 	public getId(): string {

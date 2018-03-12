@@ -75,8 +75,10 @@ class Preview extends React.Component<PreviewProps> {
 		this.triggerHighlight();
 	}
 
-	public componentDidUpdate(): void {
-		this.triggerHighlight();
+	public componentDidUpdate(prevProps: PreviewProps): void {
+		if (this.props.selectedElementId) {
+			this.triggerHighlight();
+		}
 	}
 
 	private triggerHighlight(): void {

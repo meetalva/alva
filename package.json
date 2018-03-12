@@ -15,7 +15,7 @@
     "docs": "typedoc src",
     "lint": "tslint --project .",
     "start": "npm run build && concurrently \"electron build/electron/electron.js --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\"",
-    "start:lsg": "npm run build-lsg && concurrently \"npm run build-lsg -- -w\" \"patternplate start\"",
+    "start:lsg": "npm run build:lsg && concurrently \"npm run build:lsg -- -w\" \"patternplate start\"",
     "precommit": "lint-staged"
   },
   "repository": {
@@ -88,8 +88,7 @@
     "@commitlint/prompt-cli": "^6.0.2",
     "@commitlint/travis-cli": "^6.0.2",
     "@patternplate/cli": "2.0.0-54",
-    "@patternplate/render-react": "^2.0.0-54",
-    "@patternplate/render-styled-components": "^2.0.0-3",
+    "@patternplate/render-styled-components": "2.0.0-54",
     "@types/electron-devtools-installer": "^2.0.2",
     "@types/fs-extra": "^5.0.0",
     "@types/js-yaml": "^3.10.1",

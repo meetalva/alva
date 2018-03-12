@@ -1,4 +1,5 @@
 import { PatternFolder } from './folder';
+import { PatternType } from './pattern-type';
 import { Property } from './property/property';
 import { Store } from '../store';
 
@@ -54,7 +55,7 @@ export class Pattern {
 	/**
 	 * The type of the pattern (e.g. react, angular, vue).
 	 */
-	protected type: string;
+	protected type: PatternType;
 
 	/**
 	 * Creates a new pattern.
@@ -70,7 +71,7 @@ export class Pattern {
 	public constructor(
 		id: string,
 		name: string,
-		type: string,
+		type: PatternType,
 		implementationPath: string,
 		exportName?: string
 	) {
@@ -165,7 +166,7 @@ export class Pattern {
 	 * Returns the type of the pattern (e.g. react, angular, vue).
 	 * @return The type of the pattern (e.g. react, angular, vue).
 	 */
-	public getType(): string {
+	public getType(): PatternType {
 		return this.type;
 	}
 

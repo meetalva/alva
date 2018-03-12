@@ -78,8 +78,14 @@ export class PageElement {
 			return;
 		}
 
-		const patternId = json['pattern'] as string;
-		const pattern: Pattern | undefined = styleguide.getPattern(patternId);
+		let patternId = json['pattern'] as string;
+		let pattern: Pattern | undefined = styleguide.getPattern(patternId);
+
+		if (!pattern) {
+			patternId = `${patternId}/index`;
+			pattern = styleguide.getPattern(patternId);
+		}
+
 		if (!pattern) {
 			console.warn(`Ignoring unknown pattern "${patternId}"`);
 			return new PageElement(undefined, false, parent);

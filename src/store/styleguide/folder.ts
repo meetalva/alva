@@ -1,5 +1,4 @@
 import * as MobX from 'mobx';
-import * as PathUtils from 'path';
 import { Pattern } from './pattern';
 
 /**
@@ -52,29 +51,6 @@ export class PatternFolder {
 	}
 
 	/**
-	 * Returns the child folder matching a name or path, relative to this folder.
-	 * @param path The name of the child inside this folder, or a path (separated by forward slash
-	 * or OS-specific separator), where each element is a folder name.
-	 * @return The child folder if such name or path resolves to one.
-	 */
-	public getChild(path: string): PatternFolder | undefined {
-		path = path.replace('/', PathUtils.sep);
-		const slashPos: number = path.indexOf(PathUtils.sep);
-		if (slashPos < 0) {
-			return this.children.get(path);
-		}
-
-		const folderName: string = path.substring(0, slashPos);
-		const folder: PatternFolder | undefined = this.children.get(folderName);
-		if (!folder) {
-			return undefined;
-		}
-
-		const remainingPath: string = path.substring(slashPos + PathUtils.sep.length);
-		return folder.getChild(remainingPath);
-	}
-
-	/**
 	 * Returns the child folders of this folder.
 	 * @return The child folders of this folder.
 	 */
@@ -119,18 +95,5 @@ export class PatternFolder {
 	 */
 	public getPatterns(): Pattern[] {
 		return Array.from(this.patterns.values());
-	}
-
-	/**
-	 * Returns the OS-dependent path of the files of this pattern folder relative to their
-	 * styleguide patterns root.
-	 * @return The relative pattern folder path.
-	 */
-	public getRelativePath(): string {
-		if (this.parent) {
-			return PathUtils.join(this.parent.getRelativePath(), this.name);
-		} else {
-			return '';
-		}
 	}
 }

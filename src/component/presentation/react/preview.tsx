@@ -1,11 +1,11 @@
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-
 import { Page } from '../../../store/page/page';
 import { PageElement } from '../../../store/page/page-element';
+import { PatternType } from '../../../store/styleguide/pattern-type';
 import { PropertyValue } from '../../../store/page/property-value';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { Store } from '../../../store/store';
 
 import { HighlightAreaProps, HighlightElementFunction } from '../../preview';
@@ -142,9 +142,9 @@ class Preview extends React.Component<PreviewProps> {
 			}
 
 			const patternId: string = pattern.getId();
-			const patternType: string = pattern.getType();
+			const patternType: PatternType = pattern.getType();
 
-			if (patternType === 'synthetic') {
+			if (patternType === PatternType.Synthetic) {
 				switch (patternId) {
 					case 'text':
 						return pageElement.getPropertyValue('text');

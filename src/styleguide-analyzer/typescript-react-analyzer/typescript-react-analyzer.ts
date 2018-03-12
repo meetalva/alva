@@ -83,7 +83,7 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 				const pattern = new Pattern(
 					id,
 					name,
-					PatternType.REACT,
+					PatternType.React,
 					patternInfo.implementationPath,
 					exportInfo.name
 				);
@@ -196,5 +196,12 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 		const baseName = PathUtils.basename(fileInfo.implementationPath, '.js');
 		const directoryName = PathUtils.basename(fileInfo.directory);
 		return exportInfo.name || (baseName !== 'index' ? baseName : directoryName);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public getPatternType(): PatternType {
+		return PatternType.React;
 	}
 }

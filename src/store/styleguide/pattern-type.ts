@@ -1,6 +1,4 @@
-const patternType: { [name: string]: string } = {
-	SYNTHETIC: 'synthetic',
-	REACT: 'react'
-};
-
-export { patternType as PatternType };
+export enum PatternType {
+	Synthetic = 'synthetic',
+	React = 'react'
+}

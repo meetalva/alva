@@ -1,3 +1,4 @@
+import { PatternType } from '../store/styleguide/pattern-type';
 import { Styleguide } from '../store/styleguide/styleguide';
 
 /**
@@ -12,4 +13,10 @@ export abstract class StyleguideAnalyzer {
 	 * @param styleGuide The styleguide to analyze its implementations.
 	 */
 	public abstract analyze(styleGuide: Styleguide): void;
+
+	/**
+	 * Returns the pattern type this analyzer creates.
+	 * @return The pattern type this analyzer creates.
+	 */
+	public abstract getPatternType(): PatternType;
 }

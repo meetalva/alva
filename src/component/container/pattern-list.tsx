@@ -91,7 +91,7 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 			for (const pattern of folder.getPatterns()) {
 				// a synthetic pattern can not have a icon
 				const icon =
-					pattern.getType() === PatternType.SYNTHETIC ? undefined : pattern.getIconPath();
+					pattern.getType() === PatternType.Synthetic ? undefined : pattern.getIconPath();
 
 				containerItem.items.push({
 					name: pattern.getName(),

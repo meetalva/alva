@@ -20,7 +20,11 @@ export class Color {
 	}
 
 	public toString(format: 'rgb' | 'hex' = 'rgb', options?: { alpha?: number }): string {
-		const hasAlpha = options && typeof options === 'object' && 'alpha' in options && typeof options.alpha === 'number';
+		const hasAlpha =
+			options &&
+			typeof options === 'object' &&
+			'alpha' in options &&
+			typeof options.alpha === 'number';
 		const alpha = options && hasAlpha ? options.alpha : undefined;
 		return !hasAlpha && format === 'hex' ? this.toHexString() : this.toRGBString(alpha);
 	}
@@ -49,6 +53,11 @@ export const colors = {
 	black: new Color({
 		displayName: 'Black',
 		rgb: [1, 12, 22]
+	}),
+	blackAlpha13: new Color({
+		alpha: 0.13,
+		displayName: 'Black Alpha 13',
+		rgb: [0, 0, 0]
 	}),
 	blue: new Color({
 		displayName: 'Blue',

@@ -63,9 +63,8 @@ export class PatternFolder {
 	 * @return The child folders of this folder.
 	 */
 	public getDescendants(): PatternFolder[] {
-		let result: PatternFolder[] = [];
+		let result: PatternFolder[] = [this];
 		for (const child of this.children.values()) {
-			result.push(child);
 			result = result.concat(child.getDescendants());
 		}
 

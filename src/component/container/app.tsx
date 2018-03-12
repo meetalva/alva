@@ -14,14 +14,13 @@ import Link from '../../lsg/patterns/link';
 import { createMenu } from '../../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
-import { PageList } from '../../component/container/page-list';
 import * as PathUtils from 'path';
 import { PatternListContainer } from '../../component/container/pattern-list';
 import PatternsPane from '../../lsg/patterns/panes/patterns-pane';
 import { PreviewPaneWrapper } from '../../component/container/preview-pane-wrapper';
 import * as ProcessUtils from 'process';
-import { ProjectList } from '../../component/container/project-list';
-import { PropertyList } from '../../component/container/property-list';
+import { ProjectList } from './project-list';
+import { PropertyList } from './property-list';
 import PropertyPane from '../../lsg/patterns/panes/property-pane';
 import * as React from 'react';
 import Space, { Size as SpaceSize } from '../../lsg/patterns/space';
@@ -65,6 +64,7 @@ export class App extends React.Component {
 		}
 	}
 
+	@MobX.action
 	protected handleChromeToggle(evt: React.MouseEvent<HTMLElement>): void {
 		this.projectListVisible = !this.projectListVisible;
 	}
@@ -144,7 +144,6 @@ export class App extends React.Component {
 	}
 
 	public render(): JSX.Element {
-		// Todo: project and page don't update on page change
 		const project = store.getCurrentProject();
 		const title = `${project && project.getName()}`;
 		const styleguide = store.getStyleguide();
@@ -167,9 +166,6 @@ export class App extends React.Component {
 					{project && [
 						<SideBar key="left" directionVertical hasPaddings>
 							<ElementPane>
-								<Space sizeBottom={SpaceSize.L}>
-									<PageList />
-								</Space>
 								<ElementList />
 							</ElementPane>
 							<PatternsPane>

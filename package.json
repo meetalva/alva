@@ -5,10 +5,10 @@
   "main": "./build/electron/electron.js",
   "scripts": {
     "build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/*.html build/electron/",
+    "build:clean": "npm run clean && npm run build",
     "build:electron": "electron-builder -mwl && node ./scripts/dist-postprocess.js",
     "build:lsg": "tsc --project src/lsg --outDir build/lsg/patterns",
     "clean": "rm -rf build && rm -rf dist",
-    "clean:build": "npm run clean && npm run build",
     "commit": "commit",
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "dist": "node ./scripts/dist-preprocess.js",

@@ -1,3 +1,4 @@
+import { Directory } from '../../styleguide-analyzer/directory';
 import { PatternFolder } from './folder';
 import { Pattern } from './pattern';
 import { PatternType } from './pattern-type';
@@ -81,7 +82,8 @@ export class Styleguide {
 	}
 
 	public load(): void {
-		this.patternRoot = new PatternFolder('root');
+		const rootDir = new Directory(this.path);
+		this.patternRoot = new PatternFolder(rootDir.getName());
 
 		this.addSyntheticPatterns();
 

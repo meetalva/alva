@@ -73,7 +73,20 @@ function hideHighlightArea(
 
 window.onload = () => {
 	SmoothscrollPolyfill.polyfill();
-	renderReact(store, highlightElement);
+	const analyzer = store.getStyleguide().getAnalyzer();
+
+	if (!analyzer) {
+		return;
+	}
+
+	switch (analyzer.getPatternType()) {
+		case 'react':
+			renderReact(store, highlightElement);
+			break;
+
+		default:
+			console.log('No matching rederer found');
+	}
 };
 
 // Disable drag and drop from outside the application

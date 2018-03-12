@@ -1,0 +1,7 @@
+{
+	"name": "preview-tile",
+	"displayName": "Preview Tile",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": ["atom"]
+ }

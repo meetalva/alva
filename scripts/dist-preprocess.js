@@ -2,7 +2,7 @@ const { execSync } = require('child_process');
 
 execSync('standard-version --no-verify');
 console.info('Clean build enviroment.');
-execSync('npm run clean-build');
+execSync('npm run build:clean');
 
 console.info('Starting to copy designkit to build folder.');
 execSync(`
@@ -23,4 +23,4 @@ execSync(`
 
 console.info('Distrubution preperation finished.');
 console.info('Starting Alva application build.');
-execSync('npm run electron-build');
+execSync('npm run build:electron');

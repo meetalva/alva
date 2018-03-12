@@ -50,50 +50,50 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 		const directory = new Directory(path);
 		const rootDirectory = rootPath ? new Directory(rootPath) : directory;
 
-		for (const subdirectory of directory.getDirectories()) {
-			if (subdirectory.getName().toLowerCase() === 'node_modules') {
+		for (const patternInfo of this.findPatterns(rootDirectory, directory, false)) {
+			const sourceFile = program.getSourceFile(patternInfo.declarationPath);
+			if (!sourceFile) {
 				continue;
 			}
 
-			for (const patternInfo of this.findPatterns(rootDirectory, subdirectory, false)) {
-				const sourceFile = program.getSourceFile(patternInfo.declarationPath);
-				if (!sourceFile) {
-					continue;
+			const exports: Export[] = TypescriptUtils.getExports(sourceFile, program);
+			exports.forEach(exportInfo => {
+				const reactType: Type | undefined = this.findWellKnownReactType(
+					program,
+					exportInfo.type
+				);
+				const propType = reactType ? reactType.getTypeArguments()[0] : undefined;
+				if (!propType) {
+					return;
 				}
 
-				const exports: Export[] = TypescriptUtils.getExports(sourceFile, program);
-				exports.forEach(exportInfo => {
-					const reactType: Type | undefined = this.findWellKnownReactType(
-						program,
-						exportInfo.type
-					);
-					const propType = reactType ? reactType.getTypeArguments()[0] : undefined;
-					if (!propType) {
-						return;
-					}
+				const id = this.generatePatternId(rootDirectory.getPath(), patternInfo, exportInfo);
+				const name = this.getPatternName(patternInfo, exportInfo);
+				const pattern = new Pattern(
+					id,
+					name,
+					this.getPatternType(),
+					patternInfo.implementationPath,
+					exportInfo.name
+				);
+				pattern.setIconPath(patternInfo.iconPath);
 
-					const id = this.generatePatternId(rootDirectory.getPath(), patternInfo, exportInfo);
-					const name = this.getPatternName(patternInfo, exportInfo);
-					const pattern = new Pattern(
-						id,
-						name,
-						this.getPatternType(),
-						patternInfo.implementationPath,
-						exportInfo.name
-					);
-					pattern.setIconPath(patternInfo.iconPath);
+				const properties: Property[] = PropertyAnalyzer.analyze(
+					propType.type,
+					propType.typeChecker
+				);
+				for (const property of properties) {
+					pattern.addProperty(property);
+				}
 
-					const properties: Property[] = PropertyAnalyzer.analyze(
-						propType.type,
-						propType.typeChecker
-					);
-					for (const property of properties) {
-						pattern.addProperty(property);
-					}
+				folder.addPattern(pattern);
+				styleguide.addPattern(pattern);
+			});
+		}
 
-					folder.addPattern(pattern);
-					styleguide.addPattern(pattern);
-				});
+		for (const subdirectory of directory.getDirectories()) {
+			if (subdirectory.getName().toLowerCase() === 'node_modules') {
+				continue;
 			}
 
 			this.analyzeFolder(
@@ -171,8 +171,7 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 		const relativePath = PathUtils.relative(basePath, fileInfo.directory);
 		const absolutePath = PathUtils.join(relativePath, baseName);
 
-		let baseIdentifier = absolutePath.split(PathUtils.sep).join('/');
-		baseIdentifier = baseIdentifier.replace(/\/index$/, '');
+		const baseIdentifier = absolutePath.split(PathUtils.sep).join('/');
 
 		const exportIdentifier = exportInfo.name ? `@${exportInfo.name}` : '';
 		return `${baseIdentifier}${exportIdentifier}`;

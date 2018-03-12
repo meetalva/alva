@@ -80,9 +80,11 @@ export class PageRef {
 		this.setProject(undefined);
 	}
 
-	/*
-	* Sets the technical (internal) ID of the page.
-	*/
+	/**
+	 * Sets the human-friendly name of the page.
+	 * In the frontend, to be displayed instead of the ID.
+	 * @param id The human-friendly name of the page.
+	 */
 	public setId(id: string): void {
 		this.id = id;
 	}

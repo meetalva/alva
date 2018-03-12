@@ -8,14 +8,24 @@ const REACT_COMPONENT_TYPES = [
 	'StatelessComponent'
 ];
 
+/**
+ * Tools to inspect typescript React implementations.
+ */
 export class ReactUtils {
-	public findWellKnownReactType(program: ts.Program, type: Type): Type | undefined {
-		if (this.isReactType(program, type.type)) {
+	/**
+	 * Takes a type and tries to resolve it to a well-known (Alva supported) React component type,
+	 * walking through all of its base types and checking against a list of known types.
+	 * @param program The TypeScript program containing all styleguide declarations.
+	 * @param type The type to resolve to a React component type.
+	 * @return The well-known (Alva supported) React component type, or undefined if the given type cannot be resolved to one.
+	 */
+	public static findReactComponentType(program: ts.Program, type: Type): Type | undefined {
+		if (this.isReactComponentType(program, type.type)) {
 			return type;
 		}
 
 		for (const baseType of type.getBaseTypes()) {
-			const wellKnownReactType = this.findWellKnownReactType(program, baseType);
+			const wellKnownReactType = this.findReactComponentType(program, baseType);
 
 			if (wellKnownReactType) {
 				return wellKnownReactType;
@@ -25,22 +35,29 @@ export class ReactUtils {
 		return undefined;
 	}
 
-	public isReactType(program: ts.Program, type: ts.Type): boolean {
-		if (!type.symbol || !type.symbol.declarations) {
+	/**
+	 * Returns whether a given type is a well-known (Alva supported) React component type,
+	 * without traversing through the base types.
+	 * @param program The TypeScript program containing all styleguide declarations.
+	 * @param type The type to analyze.
+	 * @return Whether a given type is a well-known (Alva supported) React component type,
+	 */
+	private static isReactComponentType(program: ts.Program, type: ts.Type): boolean {
+		const symbol = type.symbol;
+		if (!symbol || !symbol.declarations) {
 			return false;
 		}
 
-		const symbol = type.symbol;
-		const isWellKnownType: boolean = REACT_COMPONENT_TYPES.some(
-			wellKnownReactComponentType => symbol.name === wellKnownReactComponentType
-		);
+		const isWellKnownType: boolean = REACT_COMPONENT_TYPES.indexOf(symbol.name) >= 0;
 		if (!isWellKnownType) {
 			return false;
 		}
 
-		for (const declaration of type.symbol.declarations) {
+		for (const declaration of symbol.declarations) {
 			const sourceFile = declaration.getSourceFile();
-			return sourceFile.fileName.includes('react/index.d.ts');
+			if (sourceFile && sourceFile.fileName.includes('react/index.d.ts')) {
+				return true;
+			}
 		}
 
 		return false;

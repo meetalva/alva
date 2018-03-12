@@ -345,47 +345,6 @@ export class Store {
 	}
 
 	/**
-	 * Closes any open page or styleguide, and opens and parses the given styleguide instead.
-	 * This triggers parsing of all contained patterns, and loading all projects and page refs
-	 * from the styleguide's alva folder.
-	 * @param styleguidePath The absolute and OS-dependent file-system path to the styleguide.
-	 */
-	public openStyleguide(styleguidePath: string): void {
-		// TODO: Replace workaround by proper dirty-check handling
-		if (this.currentPage) {
-			this.save();
-		}
-
-		MobX.transaction(() => {
-			if (!PathUtils.isAbsolute(styleguidePath)) {
-				// Currently, store is two levels below alva, so go two up
-				styleguidePath = PathUtils.join(styleguidePath);
-			}
-			this.styleGuidePath = styleguidePath;
-			this.currentPage = undefined;
-
-			const styleguide = new Styleguide(
-				`${styleguidePath}/lib/patterns`,
-				new TypescriptReactAnalyzer()
-			);
-
-			this.styleguide = styleguide;
-			this.styleguide.load();
-
-			(this.projects as IObservableArray<Project>).clear();
-			const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.yaml');
-			const projectsJsonObject: JsonObject = Persister.loadYamlOrJson(projectsPath);
-			(projectsJsonObject.projects as JsonArray).forEach((projectJson: JsonObject) => {
-				const project: Project = Project.fromJsonObject(projectJson, this);
-				this.addProject(project);
-			});
-		});
-
-		this.preferences.setLastStyleguidePath(styleguidePath);
-		this.savePreferences();
-	}
-
-	/**
 	 * Opens the first page of a given project for preview and editing.
 	 * @param projectId The ID of the project to open the first page of.
 	 * May be undefined, in this case, the first project of the styleguide is used.
@@ -429,6 +388,46 @@ export class Store {
 		});
 
 		this.preferences.setLastPageId(this.currentPage ? this.currentPage.getId() : undefined);
+		this.savePreferences();
+	}
+
+	/**
+	 * Closes any open page or styleguide, and opens and parses the given styleguide instead.
+	 * This triggers parsing of all contained patterns, and loading all projects and page refs
+	 * from the styleguide's alva folder.
+	 * @param styleguidePath The absolute and OS-dependent file-system path to the styleguide.
+	 */
+	public openStyleguide(styleguidePath: string): void {
+		// TODO: Replace workaround by proper dirty-check handling
+		if (this.currentPage) {
+			this.save();
+		}
+
+		MobX.transaction(() => {
+			if (!PathUtils.isAbsolute(styleguidePath)) {
+				// Currently, store is two levels below alva, so go two up
+				styleguidePath = PathUtils.join(styleguidePath);
+			}
+			this.styleGuidePath = styleguidePath;
+			this.currentPage = undefined;
+
+			const styleguide = new Styleguide(
+				`${styleguidePath}/lib/patterns`,
+				new TypescriptReactAnalyzer()
+			);
+
+			this.styleguide = styleguide;
+
+			(this.projects as IObservableArray<Project>).clear();
+			const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.yaml');
+			const projectsJsonObject: JsonObject = Persister.loadYamlOrJson(projectsPath);
+			(projectsJsonObject.projects as JsonArray).forEach((projectJson: JsonObject) => {
+				const project: Project = Project.fromJsonObject(projectJson, this);
+				this.addProject(project);
+			});
+		});
+
+		this.preferences.setLastStyleguidePath(styleguidePath);
 		this.savePreferences();
 	}
 

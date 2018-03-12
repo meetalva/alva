@@ -73,15 +73,18 @@ export class Page {
 		return this.root;
 	}
 
-	/*
-	* Sets the technical (internal) ID of the page.
-	*/
+	/**
+	 * Sets the technical (internal) ID of the page.
+	 * @param id The technical (internal) ID of the page.
+	 */
 	public setId(id: string): void {
 		this.id = id;
 	}
 
 	/**
 	 * Sets the human-friendly name of the page.
+	 * In the frontend, to be displayed instead of the ID.
+	 * @param name The human-friendly name of the page.
 	 */
 	public setName(name: string): void {
 		this.name = name;

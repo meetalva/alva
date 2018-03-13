@@ -123,7 +123,7 @@
     "react-router": "4.2.0",
     "readts": "0.2.0",
     "smoothscroll-polyfill": "0.4.3",
-    "styled-components": "3.2.0",
+    "styled-components": "3.2.2",
     "tslib": "1.9.0",
     "typescript": "2.6.2"
   },

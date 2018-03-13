@@ -10,7 +10,6 @@ export interface PreviewTileProps {
 
 const StyledPreview = styled.section`
 	width: 245px;
-	padding-bottom: ${getSpace(Size.XS)}px;
 	text-align: center;
 `;
 
@@ -20,6 +19,7 @@ const StyledPreviewTile = styled.div`
 	height: 340px;
 	border-radius: 5px;
 	box-shadow: 0 3px 12px ${colors.blackAlpha13.toString()};
+	margin-top: ${getSpace(Size.S)}px;
 	background-color: ${colors.white.toString()};
 `;
 

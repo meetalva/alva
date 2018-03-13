@@ -12,6 +12,11 @@ import { Store } from '../store';
  */
 export class Page {
 	/**
+	 * A lookup of all page elements by their ID.
+	 */
+	@MobX.observable private elementsById: Map<string, PageElement> = new Map();
+
+	/**
 	 * The page reference, containing the technical ID and the human-friendly name of this page.
 	 */
 	@MobX.observable private pageRef: PageRef;
@@ -42,9 +47,17 @@ export class Page {
 		}
 
 		const page = new Page(store.getPageRefById(id) as PageRef);
-		page.root = PageElement.fromJsonObject(json.root as JsonObject, store);
+		page.root = PageElement.fromJsonObject(json.root as JsonObject, store, page);
 
 		return page;
+	}
+
+	/**
+	 * Returns the page element for a given Id or undefined, if no such ID exists.
+	 * @return The page element or undefined.
+	 */
+	public getElementById(id: string): PageElement | undefined {
+		return this.elementsById.get(id);
 	}
 
 	/**
@@ -90,6 +103,15 @@ export class Page {
 	}
 
 	/**
+	 * Adds a given element and all its descendents to the lookup of elements by ID.
+	 * @param element The element to start with.
+	 */
+	public registerElementAndChildren(element: PageElement): void {
+		this.elementsById.set(element.getId(), element);
+		element.getChildren().forEach(child => this.registerElementAndChildren(child));
+	}
+
+	/**
 	 * Sets the human-friendly name of the page.
 	 * In the frontend, to be displayed instead of the ID.
 	 * @param name The human-friendly name of the page.
@@ -104,5 +126,14 @@ export class Page {
 	 */
 	public toJsonObject(): JsonObject {
 		return { root: this.root ? this.root.toJsonObject() : undefined };
+	}
+
+	/**
+	 * Removes a given element and all its descendents from the lookup of elements by ID.
+	 * @param element The element to start with.
+	 */
+	public unregisterElementAndChildren(element: PageElement): void {
+		this.elementsById.delete(element.getId());
+		element.getChildren().forEach(child => this.unregisterElementAndChildren(child));
 	}
 }

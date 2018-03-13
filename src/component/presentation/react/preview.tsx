@@ -21,7 +21,7 @@ export interface PreviewAppState {
 
 interface PreviewProps {
 	page?: Page;
-	selectedElementId?: number[];
+	selectedElementId?: string;
 	highlightElement: HighlightElementFunction;
 }
 
@@ -189,10 +189,7 @@ class Preview extends React.Component<PreviewProps> {
 			const reactComponent = React.createElement(patternFactory, componentProps);
 
 			// Finally, build the component
-			if (
-				pageElement.getId().toString() ===
-				(this.props.selectedElementId && this.props.selectedElementId.toString())
-			) {
+			if (pageElement.getId() === this.props.selectedElementId) {
 				return (
 					<PatternWrapper
 						key={key}

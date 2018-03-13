@@ -16,7 +16,7 @@ import { createMenu } from '../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import { Page } from '../store/page/page';
-import { PageList } from './container/page-list';
+import { PageListOld } from './container/page-list-dropdown_old';
 import * as PathUtils from 'path';
 import { PatternListContainer } from './container/pattern-list';
 import PatternsPane from '../lsg/patterns/panes/patterns-pane';
@@ -31,6 +31,8 @@ import * as ReactDom from 'react-dom';
 import Space, { Size as SpaceSize } from '../lsg/patterns/space';
 import SplashScreen from '../lsg/patterns/splash-screen';
 import { Store } from '../store/store';
+
+import PageListContainer from './container/page-list-container';
 
 // prevent app zooming
 webFrame.setVisualZoomLevelLimits(1, 1);
@@ -88,6 +90,7 @@ class App extends React.Component<AppProps> {
 
 		return (
 			<Layout directionVertical handleClick={this.handleMainWindowClick}>
+				<PageListContainer store={this.props.store} />
 				<Chrome
 					title={title}
 					handleClick={this.handleChromeToggle}
@@ -100,7 +103,7 @@ class App extends React.Component<AppProps> {
 						<SideBar key="left" directionVertical hasPaddings>
 							<ElementPane>
 								<Space sizeBottom={SpaceSize.L}>
-									<PageList store={this.props.store} />
+									<PageListOld store={this.props.store} />
 								</Space>
 								<ElementList store={this.props.store} />
 							</ElementPane>

@@ -31,6 +31,7 @@ import * as ReactDom from 'react-dom';
 import Space, { Size as SpaceSize } from '../lsg/patterns/space';
 import SplashScreen from '../lsg/patterns/splash-screen';
 import { Store } from '../store/store';
+import { Styleguide } from '../store/styleguide/styleguide';
 
 // prevent app zooming
 webFrame.setVisualZoomLevelLimits(1, 1);
@@ -80,9 +81,10 @@ class App extends React.Component<AppProps> {
 		// Todo: project and page don't update on page change
 		const project = this.props.store.getCurrentProject();
 		const title = `${project && project.getName()}`;
+		const styleguide = this.props.store.getStyleguide() as Styleguide;
 		const previewFrame = project && project.getPreviewFrame();
 		const previewFramePath =
-			previewFrame && PathUtils.join(this.props.store.getStyleGuidePath(), 'alva', previewFrame);
+			previewFrame && PathUtils.join(styleguide.getPagesPath(), 'alva', previewFrame);
 
 		const DevTools = getDevTools();
 
@@ -211,8 +213,8 @@ MobX.autorun(() => {
 });
 
 MobX.autorun(() => {
-	const message: JsonObject = { styleGuidePath: store.getStyleGuidePath() };
-
+	const styleguide = store.getStyleguide();
+	const message: JsonObject = { styleguidePath: styleguide ? styleguide.getPath() : undefined };
 	sendWebViewMessage(message, 'open-styleguide');
 });
 

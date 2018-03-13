@@ -1,6 +1,8 @@
 import { JsonObject } from '../json';
 import * as MobX from 'mobx';
 import { PageElement } from './page-element';
+import { PageRef } from '../project/page-ref';
+import { Project } from '../project/project';
 import { Store } from '../store';
 
 /**
@@ -10,15 +12,9 @@ import { Store } from '../store';
  */
 export class Page {
 	/**
-	 * The technical (internal) ID of the page.
+	 * The page reference, containing the technical ID and the human-friendly name of this page.
 	 */
-	@MobX.observable private id: string;
-
-	/**
-	 * The human-friendly name of the page.
-	 * In the frontend, to be displayed instead of the ID.
-	 */
-	@MobX.observable private name: string;
+	@MobX.observable private pageRef: PageRef;
 
 	/**
 	 * The root element of the page, the first pattern element of the content tree.
@@ -30,9 +26,8 @@ export class Page {
 	 * @param id The technical (internal) ID of the page.
 	 * @param store The global application store.
 	 */
-	public constructor(id: string, store: Store) {
-		this.id = id;
-		this.name = 'New Page';
+	public constructor(pageRef: PageRef) {
+		this.pageRef = pageRef;
 	}
 
 	/**
@@ -41,8 +36,12 @@ export class Page {
 	 * @return A new page object containing the loaded data.
 	 */
 	public static fromJsonObject(json: JsonObject, id: string, store: Store): Page {
-		const page = new Page(id, store);
-		page.name = json.name as string;
+		const pageRef = store.getPageRefById(id);
+		if (!pageRef) {
+			throw new Error(`Unknown page ID '${id}'`);
+		}
+
+		const page = new Page(store.getPageRefById(id) as PageRef);
 		page.root = PageElement.fromJsonObject(json.root as JsonObject, store);
 
 		return page;
@@ -53,7 +52,7 @@ export class Page {
 	 * @return The technical (internal) ID of the page.
 	 */
 	public getId(): string {
-		return this.id;
+		return this.pageRef.getId();
 	}
 
 	/**
@@ -62,7 +61,24 @@ export class Page {
 	 * @return The human-friendly name of the page.
 	 */
 	public getName(): string {
-		return this.name;
+		return this.pageRef.getName();
+	}
+
+	/**
+	 * Returns the page reference, containing the technical ID and the human-friendly name of this
+	 * page.
+	 * @return The page reference.
+	 */
+	public getPageRef(): PageRef {
+		return this.pageRef;
+	}
+
+	/**
+	 * Returns the project of this page.
+	 * @return The project of this page.
+	 */
+	public getProject(): Project {
+		return this.pageRef.getProject();
 	}
 
 	/**
@@ -74,20 +90,12 @@ export class Page {
 	}
 
 	/**
-	 * Sets the technical (internal) ID of the page.
-	 * @param id The technical (internal) ID of the page.
-	 */
-	public setId(id: string): void {
-		this.id = id;
-	}
-
-	/**
 	 * Sets the human-friendly name of the page.
 	 * In the frontend, to be displayed instead of the ID.
 	 * @param name The human-friendly name of the page.
 	 */
 	public setName(name: string): void {
-		this.name = name;
+		this.pageRef.setName(name);
 	}
 
 	/**
@@ -95,6 +103,6 @@ export class Page {
 	 * @return The JSON object to be persisted.
 	 */
 	public toJsonObject(): JsonObject {
-		return { name: this.name, root: this.root ? this.root.toJsonObject() : undefined };
+		return { root: this.root ? this.root.toJsonObject() : undefined };
 	}
 }

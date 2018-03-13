@@ -17,6 +17,11 @@ export class Preferences {
 	@MobX.observable private lastPageId?: string;
 
 	/**
+	 * The last selected project's ID.
+	 */
+	@MobX.observable private lastProjectId?: string;
+
+	/**
 	 * Loads and returns preferences from a given JSON object.
 	 * @param jsonObject The JSON object to load from.
 	 * @return A new preferences object containing the loaded data.
@@ -45,6 +50,14 @@ export class Preferences {
 	}
 
 	/**
+	 * Returns the last selected project's ID.
+	 * @return The last selected project's ID.
+	 */
+	public getLastProjectId(): string | undefined {
+		return this.lastProjectId;
+	}
+
+	/**
 	 * Sets the last opened styleguide's absolute path.
 	 * @param lastStyleguidePath The last opened styleguide's absolute path.
 	 */
@@ -58,6 +71,14 @@ export class Preferences {
 	 */
 	public setLastPageId(lastPageId?: string): void {
 		this.lastPageId = lastPageId;
+	}
+
+	/**
+	 * Sets the last selected project's ID.
+	 * @param lastProjectId The last selected project's ID.
+	 */
+	public setLastProjectId(lastProjectId?: string): void {
+		this.lastProjectId = lastProjectId;
 	}
 
 	/**

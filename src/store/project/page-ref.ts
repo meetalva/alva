@@ -1,6 +1,16 @@
 import { JsonObject } from '../json';
 import * as MobX from 'mobx';
 import { Project } from './project';
+import { Store } from '../store';
+import * as Uuid from 'uuid';
+
+export interface PageRefProperties {
+	id?: string;
+	name?: string;
+	path?: string;
+	project: Project;
+	store: Store;
+}
 
 /**
  * A page reference consists of the ID and name of a page,
@@ -17,35 +27,81 @@ export class PageRef {
 	@MobX.observable private id: string;
 
 	/**
+	 * The last path reference persisted in the projects.xml for this page. Used:
+	 * 1) to save the page elements file before saving the projects.yaml.
+	 * 2) to rename existing page elements files when saving the projects.yaml.
+	 */
+	@MobX.observable private lastPersistedPath?: string;
+
+	/**
 	 * The human-friendly name of the page.
 	 * In the frontend, to be displayed instead of the ID.
 	 */
 	@MobX.observable private name: string;
 
 	/**
-	 * The project this page belongs to. May be undefined.
+	 * The path of the page file, relative to the projects.yaml.
 	 */
-	@MobX.observable private project?: Project;
+	@MobX.observable private path: string;
+
+	/**
+	 * The project this page belongs to.
+	 */
+	@MobX.observable private project: Project;
+
+	/**
+	 * The store this page belongs to.
+	 */
+	private store: Store;
 
 	/**
 	 * Creates a new page.
-	 * @param id The technical (internal) ID of the page.
+	 * @param path The path of the page file, relative to the projects.yaml.
 	 * @param name The human-friendly name of the page.
-	 * @param project TThe project this page belongs to. May be undefined.
+	 * @param project The project this page belongs to.
+	 * @param store The store this page belongs to.
 	 */
-	public constructor(id: string, name: string, project?: Project) {
-		this.id = id;
-		this.name = name;
-		this.setProject(project);
+	public constructor(properties: PageRefProperties) {
+		this.store = properties.store;
+		this.id = properties.id ? properties.id : Uuid.v4();
+		this.setProject(properties.project);
+
+		if (properties.path) {
+			this.path = properties.path;
+			this.lastPersistedPath = this.path;
+		} else {
+			this.updatePathFromNames();
+		}
+
+		this.name = Store.guessName(this.id, properties.name);
 	}
 
 	/**
 	 * Loads and returns a page reference from a given JSON object.
 	 * @param jsonObject The JSON object to load from.
+	 * @param store The store this page belongs to.
 	 * @return A new page reference object containing the loaded data.
 	 */
-	public static fromJsonObject(json: JsonObject, project: Project): PageRef {
-		return new PageRef(json.id as string, json.name as string, project);
+	public static fromJsonObject(json: JsonObject, project: Project, store: Store): PageRef {
+		if (json.uuid) {
+			return new PageRef({
+				id: json.uuid as string,
+				path: json.path as string,
+				name: json.name as string,
+				project,
+				store
+			});
+		} else if (json.id) {
+			// Migrate from previous projects.yaml version
+			const path = `./page-${json.id}.yaml`;
+			const pageRef = new PageRef({ path, name: json.name as string, project, store });
+			pageRef.updatePathFromNames();
+			return pageRef;
+		} else {
+			throw new Error(
+				"Invalid page file reference in projects.yaml: Either 'id' or 'uuid' are required"
+			);
+		}
 	}
 
 	/**
@@ -54,6 +110,16 @@ export class PageRef {
 	 */
 	public getId(): string {
 		return this.id;
+	}
+
+	/**
+	 * Returns the last path reference persisted in the projects.xml for this page. Used:
+	 * 1) to save the page elements file before saving the projects.yaml.
+	 * 2) to rename existing page elements files when saving the projects.yaml.
+	 * @return The last path reference persisted in the projects.xml.
+	 */
+	public getLastPersistedPath(): string | undefined {
+		return this.lastPersistedPath;
 	}
 
 	/**
@@ -66,43 +132,43 @@ export class PageRef {
 	}
 
 	/**
-	 * Returns the project this page belongs to. May be undefined.
-	 * @return The project this page belongs to or undefined.
+	 * Returns the path of the page file, relative to the projects.yaml.
+	 * @return the path of the page file.
 	 */
-	public getProject(): Project | undefined {
+	public getPath(): string {
+		return this.path;
+	}
+
+	/**
+	 * Returns the project this page belongs to.
+	 * @return The project this page belongs to.
+	 */
+	public getProject(): Project {
 		return this.project;
 	}
 
 	/**
-	 * Removes this page from its project.
-	 */
-	public remove(): void {
-		this.setProject(undefined);
-	}
-
-	/**
 	 * Sets the human-friendly name of the page.
-	 * In the frontend, to be displayed instead of the ID.
-	 * @param id The human-friendly name of the page.
-	 */
-	public setId(id: string): void {
-		this.id = id;
-	}
-
-	/**
-	 * Sets the human-friendly name of the page.
+	 * @param name The human-friendly name of the page.
 	 */
 	public setName(name: string): void {
 		this.name = name;
 	}
 
 	/**
+	 * Sets the path of the page file, relative to the projects.yaml.
+	 * @param path The path of the page file.
+	 */
+	public setPath(path: string): void {
+		this.path = path;
+	}
+
+	/**
 	 * Sets the project this page belongs to.
 	 * If it belonged to a project before, it is removed from that project.
 	 * @param project The new project for this page.
-	 * May be undefined, in that case the page does not belong to any project anymore.
 	 */
-	public setProject(project?: Project): void {
+	public setProject(project: Project): void {
 		if (this.project) {
 			this.project.getPagesInternal().remove(this);
 		}
@@ -120,8 +186,25 @@ export class PageRef {
 	 */
 	public toJsonObject(): JsonObject {
 		return {
-			id: this.id,
-			name: this.name
+			uuid: this.id,
+			name: this.name,
+			path: this.path
 		};
+	}
+
+	/**
+	 * Updates the last persisted path from the path properties.
+	 * Call this method after saving the projects.yaml.
+	 */
+	public updateLastPersistedPath(): void {
+		this.lastPersistedPath = this.path;
+	}
+
+	/**
+	 * Updates the path of the page file from the project and page names, trying to use normalized
+	 * versions of those names, and then finding the next unused file name.
+	 */
+	public updatePathFromNames(): void {
+		this.path = this.store.findAvailablePagePath(this);
 	}
 }

@@ -2,6 +2,14 @@ import { JsonArray, JsonObject } from '../json';
 import * as MobX from 'mobx';
 import { PageRef } from './page-ref';
 import { Store } from '../store';
+import * as Uuid from 'uuid';
+
+export interface ProjectProperties {
+	id?: string;
+	name: string;
+	previewFrame: string;
+	store: Store;
+}
 
 /**
  * A project is the grouping unit for pages, and directly located below the styleguide designs
@@ -36,15 +44,20 @@ export class Project {
 	@MobX.observable private previewFrame: string;
 
 	/**
+	 * The store this page belongs to.
+	 */
+	private store: Store;
+
+	/**
 	 * Creates a new project.
 	 * @param id The technical (internal) ID of the project.
 	 * @param name The human-friendly name of the project.
 	 * @param previewFrame Path to the preview frame, relative to the projects.yaml file.
 	 */
-	public constructor(id: string, name: string, previewFrame: string) {
-		this.id = id;
-		this.name = name;
-		this.previewFrame = previewFrame;
+	public constructor(properties: ProjectProperties) {
+		this.id = properties.id ? properties.id : Uuid.v4();
+		this.name = properties.name;
+		this.previewFrame = properties.previewFrame;
 	}
 
 	/**
@@ -53,15 +66,16 @@ export class Project {
 	 * @return A new project object containing the loaded data.
 	 */
 	public static fromJsonObject(json: JsonObject, store: Store): Project {
-		const project: Project = new Project(
-			json.id as string,
-			json.name as string,
-			json.previewFrame as string
-		);
+		const project: Project = new Project({
+			id: json.uuid as string,
+			name: json.name as string,
+			previewFrame: json.previewFrame as string,
+			store
+		});
 
 		const pages: PageRef[] = [];
 		(json.pages as JsonArray).forEach((pageJson: JsonObject) => {
-			pages.push(PageRef.fromJsonObject(pageJson, project));
+			pages.push(PageRef.fromJsonObject(pageJson, project, store));
 		});
 
 		return project;
@@ -111,6 +125,15 @@ export class Project {
 	}
 
 	/**
+	 * Sets the human-friendly name of the project.
+	 * In the frontend, to be displayed instead of the ID.
+	 * @param name The human-friendly name of the project.
+	 */
+	public setName(name: string): void {
+		this.name = name;
+	}
+
+	/**
 	 * Serializes the project into a JSON object for persistence.
 	 * @return The JSON object to be persisted.
 	 */
@@ -121,10 +144,18 @@ export class Project {
 		});
 
 		return {
-			id: this.id,
+			uuid: this.id,
 			name: this.name,
 			previewFrame: this.previewFrame,
 			pages: pagesJsonObject
 		};
+	}
+
+	/**
+	 * Updates the path of each project's page file from the project and page names, trying to use
+	 * normalized versions of those names, and then finding the next unused file name.
+	 */
+	public updatePathFromNames(): void {
+		this.pages.forEach(project => this.store.findAvailablePagePath(project));
 	}
 }

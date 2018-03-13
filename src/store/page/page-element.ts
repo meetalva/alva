@@ -1,10 +1,20 @@
 import { JsonArray, JsonObject, JsonValue } from '../json';
 import * as MobX from 'mobx';
+import { Page } from './page';
 import { Pattern } from '../styleguide/pattern';
 import { Property } from '../styleguide/property/property';
 import { PropertyValue } from './property-value';
 import { Store } from '../store';
 import { Styleguide } from '../styleguide/styleguide';
+import * as Uuid from 'uuid';
+
+export interface PageElementProperties {
+	page: Page;
+	pattern?: Pattern;
+	id?: string;
+	setDefaults?: boolean;
+	parent?: PageElement;
+}
 
 /**
  * A page element provides the properties data of a pattern.
@@ -16,6 +26,16 @@ export class PageElement {
 	 * The child page elements of this element.
 	 */
 	@MobX.observable private children: PageElement[] = [];
+
+	/**
+	 * The technical (internal) ID of the page element.
+	 */
+	@MobX.observable private id: string;
+
+	/**
+	 * The page this element belongs to.
+	 */
+	private page: Page;
 
 	/**
 	 * The parent page element if this is not the root element.
@@ -43,10 +63,12 @@ export class PageElement {
 	 * @param parent The (optional) parent for this element. When set, the element is
 	 * automatically added to this parent (and thus maybe to the entire page).
 	 */
-	public constructor(pattern?: Pattern, setDefaults?: boolean, parent?: PageElement) {
-		this.pattern = pattern;
+	public constructor(properties: PageElementProperties) {
+		this.id = properties.id ? properties.id : Uuid.v4();
+		this.page = properties.page;
+		this.pattern = properties.pattern;
 
-		if (setDefaults && this.pattern) {
+		if (properties.setDefaults && this.pattern) {
 			this.pattern.getProperties().forEach(property => {
 				this.setPropertyValue(property.getId(), property.getDefaultValue());
 				console.log(
@@ -57,7 +79,7 @@ export class PageElement {
 			});
 		}
 
-		this.setParent(parent);
+		this.setParent(properties.parent);
 	}
 
 	/**
@@ -68,6 +90,7 @@ export class PageElement {
 	public static fromJsonObject(
 		json: JsonObject,
 		store: Store,
+		page: Page,
 		parent?: PageElement
 	): PageElement | undefined {
 		if (!json) {
@@ -89,10 +112,10 @@ export class PageElement {
 
 		if (!pattern) {
 			console.warn(`Ignoring unknown pattern "${patternId}"`);
-			return new PageElement(undefined, false, parent);
+			return new PageElement({ page, parent });
 		}
 
-		const element = new PageElement(pattern, false, parent);
+		const element = new PageElement({ id: json.uuid as string, page, pattern, parent });
 
 		if (json.properties) {
 			Object.keys(json.properties as JsonObject).forEach((propertyId: string) => {
@@ -138,7 +161,7 @@ export class PageElement {
 	 * @return The new clone.
 	 */
 	public clone(): PageElement {
-		const clone = new PageElement(this.pattern);
+		const clone = new PageElement({ page: this.page, pattern: this.pattern });
 		this.children.forEach(child => {
 			clone.addChild(child.clone());
 		});
@@ -156,15 +179,17 @@ export class PageElement {
 	 */
 	protected createChildElement(json: JsonValue, store: Store): PageElement | PropertyValue {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
-			return PageElement.fromJsonObject(json as JsonObject, store, this);
+			return PageElement.fromJsonObject(json as JsonObject, store, this.page, this);
 		} else {
 			const styleguide = store.getStyleguide() as Styleguide;
 
-			const element: PageElement = new PageElement(
-				styleguide.getPattern('synthetic/text'),
-				false,
-				this
-			);
+			const element: PageElement = new PageElement({
+				id: 'synthetic/text',
+				page: this.page,
+				pattern: styleguide.getPattern('synthetic/text'),
+				setDefaults: false,
+				parent: this
+			});
 			element.setPropertyValue('text', String(json));
 			return element;
 		}
@@ -178,7 +203,7 @@ export class PageElement {
 	 */
 	protected createPropertyValue(json: JsonValue, store: Store): PageElement | PropertyValue {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
-			return PageElement.fromJsonObject(json as JsonObject, store, this);
+			return PageElement.fromJsonObject(json as JsonObject, store, this.page, this);
 		} else {
 			return json as PropertyValue;
 		}
@@ -204,20 +229,19 @@ export class PageElement {
 	}
 
 	/**
-	 * Returns the unique ID of this element
-	 * @return an array of numbers which represents the unique ID
+	 * Returns the technical (internal) ID of the page.
+	 * @return The technical (internal) ID of the page.
 	 */
-	public getId(): number[] {
-		if (!this.parent) {
-			return [0];
-		}
+	public getId(): string {
+		return this.id;
+	}
 
-		if (!this.parent.parent) {
-			return [0, this.getIndex()];
-		}
-
-		const parentID = this.parent.getId();
-		return [...parentID, this.getIndex()];
+	/**
+	 * Returns the page this element belongs to.
+	 * @return The page this element belongs to.
+	 */
+	public getPage(): Page {
+		return this.page;
 	}
 
 	/**
@@ -337,6 +361,7 @@ export class PageElement {
 
 		if (this.parent) {
 			(this.parent.children as MobX.IObservableArray<PageElement>).remove(this);
+			this.parent.getPage().unregisterElementAndChildren(this);
 		}
 
 		this.parent = parent;
@@ -347,6 +372,8 @@ export class PageElement {
 			} else {
 				parent.children.splice(index < 0 ? 0 : index, 0, this);
 			}
+
+			parent.getPage().registerElementAndChildren(this);
 		}
 	}
 
@@ -376,6 +403,7 @@ export class PageElement {
 	public toJsonObject(): JsonObject {
 		const json: JsonObject = {
 			_type: 'pattern',
+			uuid: this.id,
 			pattern: this.pattern && this.pattern.getId()
 		};
 

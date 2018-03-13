@@ -120,7 +120,11 @@ export class ElementList extends React.Component<ElementListProps> {
 						return;
 					}
 
-					pageElement = new PageElement(styleguide.getPattern(patternId), true);
+					pageElement = new PageElement({
+						pattern: styleguide.getPattern(patternId),
+						page: this.props.store.getCurrentPage() as Page,
+						setDefaults: true
+					});
 				}
 
 				if (!parentElement || !pageElement || pageElement.isAncestorOf(parentElement)) {
@@ -144,7 +148,11 @@ export class ElementList extends React.Component<ElementListProps> {
 						return;
 					}
 
-					pageElement = new PageElement(styleguide.getPattern(patternId), true);
+					pageElement = new PageElement({
+						pattern: styleguide.getPattern(patternId),
+						page: this.props.store.getCurrentPage() as Page,
+						setDefaults: true
+					});
 				}
 
 				if (!pageElement || pageElement.isAncestorOf(element)) {

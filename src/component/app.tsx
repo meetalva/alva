@@ -221,13 +221,9 @@ MobX.autorun(() => {
 
 MobX.autorun(() => {
 	const selectedElement = store.getSelectedElement();
-
-	if (!selectedElement) {
-		return;
-	}
-
-	const message: JsonObject = { selectedElementId: selectedElement.getId() };
-
+	const message: JsonObject = {
+		selectedElementId: selectedElement ? selectedElement.getId() : undefined
+	};
 	sendWebViewMessage(message, 'selectedElement-change');
 });
 

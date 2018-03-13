@@ -2,6 +2,7 @@ import Input from '../../lsg/patterns/input/';
 import { PatternFolder } from '../../store/styleguide/folder';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
+import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/styleguide/pattern';
 import PatternList, {
@@ -152,7 +153,11 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	protected handlePatternClick(pattern: Pattern): void {
 		const selectedElement: PageElement | undefined = this.props.store.getSelectedElement();
 		if (selectedElement) {
-			const newPageElement = new PageElement(pattern, true);
+			const newPageElement = new PageElement({
+				pattern,
+				page: this.props.store.getCurrentPage() as Page,
+				setDefaults: true
+			});
 			selectedElement.addSibling(newPageElement);
 			this.props.store.setSelectedElement(newPageElement);
 		}

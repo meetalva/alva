@@ -5,9 +5,12 @@ import * as FileUtils from 'fs';
 import * as PathUtils from 'path';
 import { Pattern } from '../../store/styleguide/pattern';
 import { PatternType } from '../../store/styleguide/pattern-type';
+import { HighlightElementFunction } from '../../component/preview';
 import { Property } from '../../store/styleguide/property/property';
 import { PropertyAnalyzer } from './property-analyzer';
 import { ReactUtils } from '../typescript/react-utils';
+import { renderReact } from '../../component/presentation/react/render';
+import { Store } from '../../store/store';
 import { Styleguide } from '../../store/styleguide/styleguide';
 import { StyleguideAnalyzer } from '../styleguide-analyzer';
 import { Type } from '../typescript/type';
@@ -203,5 +206,12 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 	 */
 	public getPatternType(): PatternType {
 		return PatternType.React;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public render(store: Store, highlightElement: HighlightElementFunction): void {
+		renderReact(store, highlightElement);
 	}
 }

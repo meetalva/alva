@@ -1,4 +1,6 @@
 import { PatternType } from '../store/styleguide/pattern-type';
+import { HighlightElementFunction } from '../component/preview';
+import { Store } from '../store/store';
 import { Styleguide } from '../store/styleguide/styleguide';
 
 /**
@@ -19,4 +21,11 @@ export abstract class StyleguideAnalyzer {
 	 * @return The pattern type this analyzer creates.
 	 */
 	public abstract getPatternType(): PatternType;
+
+	/**
+	 * Renders the preview application based on the store.
+	 * @param store The store that the render should be based on.
+	 * @param highlightElement The function that should be called inside the renderer when a element need to be highlighted.
+	 */
+	public abstract render(store: Store, highlightElement: HighlightElementFunction): void;
 }

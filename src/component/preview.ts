@@ -1,7 +1,5 @@
 import { ipcRenderer } from 'electron';
 import { JsonObject } from '../store/json';
-import { PatternType } from '../store/styleguide/pattern-type';
-import { renderReact } from './presentation/react/render';
 import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
 import { Store } from '../store/store';
 
@@ -80,14 +78,7 @@ window.onload = () => {
 		return;
 	}
 
-	switch (analyzer.getPatternType()) {
-		case PatternType.React:
-			renderReact(store, highlightElement);
-			break;
-
-		default:
-			console.log('No matching renderer found');
-	}
+	analyzer.render(store, highlightElement);
 };
 
 // Disable drag and drop from outside the application

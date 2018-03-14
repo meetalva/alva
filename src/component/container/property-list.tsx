@@ -1,50 +1,72 @@
 import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item';
+import Element from '../../lsg/patterns/element';
 import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item';
 import { EnumProperty, Option } from '../../store/styleguide/property/enum-property';
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { ObjectProperty } from '../../store/styleguide/property/object-property';
-import { Property } from '../../store/styleguide/property/property';
+import { PageElement } from '../../store/page/page-element';
+import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
 import { Store } from '../../store/store';
 import { StringItem } from '../../lsg/patterns/property-items/string-item';
 
-export interface PropertyListProps {
-	store: Store;
+interface ObjectContext {
+	path: string;
+	property: ObjectProperty;
+}
+
+interface PropertyTreeProps {
+	context?: ObjectContext;
+	element: PageElement;
 }
 
 @observer
-export class PropertyList extends React.Component<PropertyListProps> {
-	public constructor(props: PropertyListProps) {
+class PropertyTree extends React.Component<PropertyTreeProps> {
+	@observable protected isOpen = false;
+
+	public constructor(props: PropertyTreeProps) {
 		super(props);
+
+		this.handleClick = this.handleClick.bind(this);
+		this.handleChange = this.handleChange.bind(this);
 	}
 
-	public convertOptionsToValues(options: Option[]): Values[] {
-		return options.map(option => ({
-			id: option.getId(),
-			name: option.getName()
-		}));
-	}
+	public render(): React.ReactNode {
+		const { context } = this.props;
 
-	public render(): JSX.Element {
-		const selectedElement = this.props.store.getSelectedElement();
-
-		if (!selectedElement) {
-			return <div>No Element selected</div>;
+		if (!context) {
+			return this.renderItems();
 		}
 
-		const pattern = selectedElement.getPattern();
-		const properties: Property[] | undefined = pattern && pattern.getProperties();
+		const { property } = context;
+
+		return (
+			<Element title={property.getName()} open={this.isOpen} handleClick={this.handleClick}>
+				{this.renderItems()}
+			</Element>
+		);
+	}
+
+	protected renderItems(): React.ReactNode {
+		const { context, element } = this.props;
+		const pattern = element.getPattern();
+
+		const properties = context
+			? context.property.getProperties()
+			: pattern && pattern.getProperties();
+
 		if (!properties) {
 			return <div>This element has no properties</div>;
 		}
 
 		return (
-			<div>
+			<>
 				{properties.map(property => {
 					const id = property.getId();
 					const name = property.getName();
 					const type = property.getType();
-					const value = selectedElement.getPropertyValue(id);
+					const value = this.getValue(id, context && context.path);
 
 					switch (type) {
 						case 'boolean':
@@ -53,9 +75,7 @@ export class PropertyList extends React.Component<PropertyListProps> {
 									key={id}
 									label={name}
 									checked={value as boolean}
-									handleChange={event => {
-										selectedElement.setPropertyValue(id, !value);
-									}}
+									handleChange={event => this.handleChange(id, !value, context)}
 								/>
 							);
 
@@ -65,9 +85,9 @@ export class PropertyList extends React.Component<PropertyListProps> {
 									key={id}
 									label={name}
 									value={value as string}
-									handleChange={event => {
-										selectedElement.setPropertyValue(id, event.currentTarget.value);
-									}}
+									handleChange={event =>
+										this.handleChange(id, event.currentTarget.value, context)
+									}
 								/>
 							);
 
@@ -83,27 +103,85 @@ export class PropertyList extends React.Component<PropertyListProps> {
 									label={name}
 									selectedValue={option && option.getId()}
 									values={this.convertOptionsToValues(options)}
-									handleChange={event => {
-										selectedElement.setPropertyValue(id, event.currentTarget.value);
-									}}
+									handleChange={event =>
+										this.handleChange(id, event.currentTarget.value, context)
+									}
 								/>
 							);
 
 						case 'object':
-							const members = (property as ObjectProperty).getProperties();
+							const objectProperty = property as ObjectProperty;
+							const newPath = (context && `${context.path}.${id}`) || id;
 
-							return (
-								<details>
-									<summary>{name}</summary>
-									<div>{members.map(member => <div>{member.getName()}</div>)}</div>
-								</details>
-							);
+							const newContext: ObjectContext = {
+								path: newPath,
+								property: objectProperty
+							};
+
+							return <PropertyTree key={id} context={newContext} element={element} />;
 
 						default:
 							return <div key={id}>Unknown type: {type}</div>;
 					}
 				})}
-			</div>
+			</>
 		);
+	}
+
+	// tslint:disable-next-line:no-any
+	protected handleChange(id: string, value: any, context?: ObjectContext): void {
+		if (context) {
+			const parts = `${context.path}.${id}`.split('.');
+			const [rootId, ...path] = parts;
+
+			this.props.element.setPropertyValue(rootId, value, path.join('.'));
+			return;
+		}
+
+		this.props.element.setPropertyValue(id, value);
+	}
+
+	protected getValue(id: string, path?: string): PropertyValue {
+		if (path) {
+			const parts = `${path}.${id}`.split('.');
+			const [rootId, ...propertyPath] = parts;
+
+			return this.props.element.getPropertyValue(rootId, propertyPath.join('.'));
+		}
+
+		return this.props.element.getPropertyValue(id);
+	}
+
+	@action
+	protected handleClick(): void {
+		this.isOpen = !this.isOpen;
+	}
+
+	protected convertOptionsToValues(options: Option[]): Values[] {
+		return options.map(option => ({
+			id: option.getId(),
+			name: option.getName()
+		}));
+	}
+}
+
+export interface PropertyListProps {
+	store: Store;
+}
+
+@observer
+export class PropertyList extends React.Component<PropertyListProps> {
+	public constructor(props: PropertyListProps) {
+		super(props);
+	}
+
+	public render(): React.ReactNode {
+		const selectedElement = this.props.store.getSelectedElement();
+
+		if (!selectedElement) {
+			return <div>No Element selected</div>;
+		}
+
+		return <PropertyTree element={selectedElement} />;
 	}
 }

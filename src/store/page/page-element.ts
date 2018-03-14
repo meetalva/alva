@@ -1,5 +1,7 @@
+import * as deepAssign from 'deep-assign';
 import { JsonArray, JsonObject, JsonValue } from '../json';
 import * as MobX from 'mobx';
+import * as ObjectPath from 'object-path';
 import { Page } from './page';
 import { Pattern } from '../styleguide/pattern';
 import { Property } from '../styleguide/property/property';
@@ -268,12 +270,18 @@ export class PageElement {
 	/**
 	 * The content of a property of this page element.
 	 * @param id The ID of the property to return the value of.
+	 * @param path If the property value you are trying to access is buried inside an object property use the path paremeter to access it.
+	 * eg: `getPropertyValue('image', 'src.srcSet')`.
 	 * @return The content value (as provided by the designer).
 	 */
-	public getPropertyValue(id: string): PropertyValue {
+	public getPropertyValue(id: string, path?: string): PropertyValue {
 		const value: PropertyValue = this.propertyValues.get(id);
 
-		return value;
+		if (!path) {
+			return value;
+		}
+
+		return ObjectPath.get(value as {}, path);
 	}
 
 	/**
@@ -385,18 +393,32 @@ export class PageElement {
 	 * Any given value is automatically converted to be compatible to the property type.
 	 * For instance, the string "true" is converted to true if the property is boolean.
 	 * @param id The ID of the property to set the value for.
+	 * @param path If want to set a property inside an object property use the path paremeter to access it.
+	 * eg: `setPropertyValue('image', 'http://someimageurl.jpeg', src.srcSet.XS')`.
 	 * @param value The value to set (which is automatically converted, see above).
 	 */
 	// tslint:disable-next-line:no-any
-	public setPropertyValue(id: string, value: any): void {
-		if (this.pattern) {
-			const property: Property | undefined = this.pattern.getProperty(id);
-			if (property) {
-				value = property.coerceValue(value);
-			}
+	public setPropertyValue(id: string, value: any, path?: string): void {
+		if (!this.pattern) {
+			return;
 		}
 
-		this.propertyValues.set(id, value);
+		const property: Property | undefined = this.pattern.getProperty(id, path);
+
+		if (!property) {
+			return;
+		}
+
+		value = property.coerceValue(value);
+
+		if (!path) {
+			this.propertyValues.set(id, value);
+			return;
+		}
+
+		const rootPropertyValue = this.propertyValues.get(id) || {};
+		ObjectPath.set<{}, PropertyValue>(rootPropertyValue, path, value);
+		this.propertyValues.set(id, deepAssign({}, rootPropertyValue));
 	}
 
 	/**

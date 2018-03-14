@@ -20,7 +20,7 @@ ipcRenderer.on('page-change', (event: {}, message: JsonObject) => {
 });
 
 ipcRenderer.on('open-styleguide', (event: {}, message: JsonObject) => {
-	store.openStyleguide(message.styleGuidePath as string);
+	store.openStyleguide(message.styleguidePath as string);
 });
 
 ipcRenderer.on('selectedElement-change', (event: {}, message: JsonObject) => {
@@ -72,8 +72,9 @@ function hideHighlightArea(
 
 window.onload = () => {
 	SmoothscrollPolyfill.polyfill();
-	const analyzer = store.getStyleguide().getAnalyzer();
 
+	const styleguide = store.getStyleguide();
+	const analyzer = styleguide ? styleguide.getAnalyzer() : undefined;
 	if (!analyzer) {
 		return;
 	}

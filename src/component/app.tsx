@@ -80,9 +80,12 @@ class App extends React.Component<AppProps> {
 		// Todo: project and page don't update on page change
 		const project = this.props.store.getCurrentProject();
 		const title = `${project && project.getName()}`;
+		const styleguide = this.props.store.getStyleguide();
 		const previewFrame = project && project.getPreviewFrame();
 		const previewFramePath =
-			previewFrame && PathUtils.join(this.props.store.getStyleGuidePath(), 'alva', previewFrame);
+			styleguide &&
+			previewFrame &&
+			PathUtils.join(styleguide.getPagesPath(), 'alva', previewFrame);
 
 		const DevTools = getDevTools();
 
@@ -211,8 +214,8 @@ MobX.autorun(() => {
 });
 
 MobX.autorun(() => {
-	const message: JsonObject = { styleGuidePath: store.getStyleGuidePath() };
-
+	const styleguide = store.getStyleguide();
+	const message: JsonObject = { styleguidePath: styleguide ? styleguide.getPath() : undefined };
 	sendWebViewMessage(message, 'open-styleguide');
 });
 

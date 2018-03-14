@@ -12,9 +12,9 @@ export abstract class StyleguideAnalyzer {
 	/**
 	 * Analyzes the pattern implementation directories starting the configured root path, and puts all pattern folders and patterns into the styleguide registry.
 	 * Note: Implementations should call the styleguide's addPattern method, and optionally create new pattern folders based on the styleguide's patternRoot, and also add the pattern to these folders (also addPattern).
-	 * @param styleGuide The styleguide to analyze its implementations.
+	 * @param styleguide The styleguide to analyze its implementations.
 	 */
-	public abstract analyze(styleGuide: Styleguide): void;
+	public abstract analyze(styleguide: Styleguide): void;
 
 	/**
 	 * Returns the pattern type this analyzer creates.

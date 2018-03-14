@@ -32,15 +32,15 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 	 * @inheritdoc
 	 */
 	public analyze(styleguide: Styleguide): void {
-		const directory = new Directory(styleguide.getPath());
+		const directory = new Directory(styleguide.getPatternsPath());
 		const allPatternInfos: PatternInfo[] = this.findPatterns(directory, directory, true);
 		const declarationPaths: string[] = allPatternInfos.map(info => info.declarationPath);
 		const program: ts.Program = ts.createProgram(declarationPaths, {});
 
 		this.analyzeFolder(
 			styleguide,
-			styleguide.getPath(),
-			styleguide.getPatternRoot() as PatternFolder,
+			styleguide.getPatternsPath(),
+			styleguide.getPatternRoot(),
 			program
 		);
 	}

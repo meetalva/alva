@@ -91,12 +91,14 @@
     "@patternplate/cli": "2.0.0-54",
     "@patternplate/render-styled-components": "2.0.0-54",
     "@types/electron-devtools-installer": "^2.0.2",
-    "@types/fs-extra": "^5.0.0",
+    "@types/fs-extra": "^5.0.1",
     "@types/js-yaml": "^3.10.1",
+    "@types/lodash": "^4.14.104",
     "@types/node": "^9.4.0",
     "@types/react": "^16.0.0",
     "@types/react-dom": "^16.0.3",
     "@types/smoothscroll-polyfill": "^0.3.0",
+    "@types/uuid": "^3.4.3",
     "concurrently": "^3.5.1",
     "electron": "^1.7.10",
     "electron-builder": "20.0.5",
@@ -114,8 +116,9 @@
     "cli": "1.0.1",
     "electron-log": "2.2.14",
     "electron-updater": "2.21.0",
-    "fs-extra": "5.0.0",
+    "fs-extra": "^5.0.0",
     "js-yaml": "3.11.0",
+    "lodash": "^4.17.5",
     "mobx": "3.4.1",
     "mobx-react": "4.4.3",
     "react": "16.2.0",
@@ -125,7 +128,8 @@
     "smoothscroll-polyfill": "0.4.3",
     "styled-components": "3.2.0",
     "tslib": "1.9.0",
-    "typescript": "2.6.2"
+    "typescript": "2.6.2",
+    "uuid": "^3.2.1"
   },
   "homepage": "https://meetalva.github.io/"
 }

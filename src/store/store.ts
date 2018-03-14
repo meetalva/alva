@@ -1,5 +1,7 @@
 import * as FileUtils from 'fs';
+import * as FileExtraUtils from 'fs-extra';
 import { JsonArray, JsonObject, Persister } from './json';
+import * as Lodash from 'lodash';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
 import * as OsUtils from 'os';
@@ -32,6 +34,13 @@ export class Store {
 	@MobX.observable private currentPage?: Page;
 
 	/**
+	 * The project that is currently being selected to add, edit, or remove pages of. May be
+	 * undefined if none is selected is none. Opening a page automatically changes the selected
+	 * project.
+	 */
+	@MobX.observable private currentProject?: Project;
+
+	/**
 	 * Whether the currently selected element also has focus.
 	 * In this case, keyboard operations such as copy, cut, or delete
 	 * should operate on that element.
@@ -45,21 +54,16 @@ export class Store {
 	@MobX.observable private patternSearchTerm: string = '';
 
 	/**
-	 * All projects (references) of this styleguide. Projects point to page references,
-	 * and both do not contain the actual page data (element), but only their IDs.
-	 */
-	@MobX.observable private projects: Project[] = [];
-
-	/**
-	 * The root folder of the patterns of the currently opened styleguide.
-	 */
-	@MobX.observable private styleguide: Styleguide = new Styleguide('');
-
-	/**
 	 * The internal data storage for preferences, i.e. personal settings
 	 * saved in the user's home directory (.alva-prefs.yaml).
 	 */
 	@MobX.observable private preferences: Preferences;
+
+	/**
+	 * All projects (references) of this styleguide. Projects point to page references,
+	 * and both do not contain the actual page data (element), but only their IDs.
+	 */
+	@MobX.observable private projects: Project[] = [];
 
 	/**
 	 * The element that is currently being dragged, or undefined if there is none.
@@ -76,10 +80,9 @@ export class Store {
 	@MobX.observable private selectedElement?: PageElement;
 
 	/**
-	 * The absolute and OS-dependent file-system path to the currently opened styleguide.
-	 * May be undefined if no styleguide is open.
+	 * The currently opened styleguide or undefined, if no styleguide is open.
 	 */
-	@MobX.observable private styleGuidePath: string;
+	@MobX.observable private styleguide?: Styleguide;
 
 	/**
 	 * Creates a new store.
@@ -98,10 +101,23 @@ export class Store {
 			if (lastStyleguidePath) {
 				this.openStyleguide(lastStyleguidePath);
 
+				const lastProjectId = this.preferences.getLastProjectId();
+				if (lastProjectId) {
+					this.openProject(lastProjectId);
+				}
+
 				const lastPageId = this.preferences.getLastPageId();
 				if (lastPageId) {
-					this.openPage(lastPageId);
+					try {
+						this.openPage(lastPageId);
+					} catch (error) {
+						// Ignored: The page does not exist anymore
+					}
 				}
+			}
+
+			if (!this.currentPage) {
+				this.openFirstPage();
 			}
 		} catch (error) {
 			console.error(`Failed to open last styleguide or page: ${error}`);
@@ -128,21 +144,6 @@ export class Store {
 	}
 
 	/**
-	 * Tries to guess a technical (internal) ID from the name by removing,
-	 * empty spaces, periods and dashes.
-	 * @param name The human-friendly name.
-	 * @return The guessed technical (internal) ID.
-	 */
-	public static convertToId(name: string): string {
-		const guessedId = name
-			.replace(/([' '])/, '-')
-			.replace(/([_])/, '-')
-			.replace(/([.])/, '')
-			.toLowerCase();
-		return guessedId;
-	}
-
-	/**
 	 * Add a new project definition to the list of projects.
 	 * Note: Changes to the projects and page references are saved only when calling save().
 	 * @param project The new project.
@@ -158,6 +159,44 @@ export class Store {
 	 */
 	public closePage(): void {
 		this.currentPage = undefined;
+	}
+
+	/**
+	 * Closes the current project in edit, also closing any open close.
+	 * @see getCurrentProject()
+	 */
+	public closeProject(): void {
+		MobX.transaction(() => {
+			this.currentProject = undefined;
+			this.closePage();
+		});
+	}
+
+	/**
+	 * Tries to find an available path for the page file, starting with a normalized version of
+	 * the project and page names.
+	 * @param projectName The human-friendly project name.
+	 * @param pageName The human-friendly page name.
+	 * @return An available page file path.
+	 */
+	public findAvailablePagePath(pageRef: PageRef): string {
+		const projectPart: string = Lodash.kebabCase(pageRef.getProject().getName());
+		const pagePart: string = Lodash.kebabCase(pageRef.getName());
+
+		for (let no = 1; no <= 1000; no++) {
+			const suffix = no > 1 ? `-${no}` : '';
+			const candidate = `./${projectPart}/${pagePart}${suffix}.yaml`;
+			const collision = this.getPageRefByPath(candidate);
+			if (!collision || collision === pageRef) {
+				return candidate;
+			}
+		}
+
+		throw new Error(
+			`Tried 1000 page file paths for project '${pageRef
+				.getProject()
+				.getName()}', page '${pageRef.getName()}', giving up`
+		);
 	}
 
 	/**
@@ -202,14 +241,13 @@ export class Store {
 	}
 
 	/**
-	 * Returns the project definition that belongs to the page that is currently
-	 * being displayed in the preview, and edited in the elements and properties panes.
-	 * May be undefined if there is none.
-	 * @return The project of the edited page, or undefined.
+	 * Returns the project that is currently being selected to add, edit, or remove pages of. May be
+	 * undefined if none is selected is none. Opening a page automatically changes the selected
+	 * project.
+	 * @return The currently selected project or undefined.
 	 */
 	public getCurrentProject(): Project | undefined {
-		const pageRef: PageRef | undefined = this.getCurrentPageRef();
-		return pageRef ? pageRef.getProject() : undefined;
+		return this.currentProject;
 	}
 
 	/**
@@ -246,19 +284,37 @@ export class Store {
 	}
 
 	/**
-	 * Returns the path of the root folder of the designs (projects, pages)
-	 * in the currently opened styleguide.
-	 * @return The page root path.
+	 * Returns a page reference (containing ID and name) object by its ID.
+	 * @param id The page ID.
+	 * @return The page reference or undefined, if no such ID exists.
 	 */
-	public getPagesPath(): string {
-		return PathUtils.join(this.styleGuidePath, 'alva');
+	public getPageRefById(id: string): PageRef | undefined {
+		for (const project of this.projects) {
+			for (const pageRef of project.getPages()) {
+				if (pageRef.getId() === id) {
+					return pageRef;
+				}
+			}
+		}
+
+		return undefined;
 	}
 
 	/**
-	 * Returns the specified styleguide by id.
+	 * Returns a page reference (containing ID and name) object by its page file path.
+	 * @param path The page file path.
+	 * @return The page reference or undefined, if no such page exists.
 	 */
-	public getStyleguide(): Styleguide {
-		return this.styleguide;
+	public getPageRefByPath(path: string): PageRef | undefined {
+		for (const project of this.projects) {
+			for (const pageRef of project.getPages()) {
+				if (pageRef.getPath() === path) {
+					return pageRef;
+				}
+			}
+		}
+
+		return undefined;
 	}
 
 	/**
@@ -270,29 +326,26 @@ export class Store {
 	}
 
 	/**
-	 * Returns the path of the root folder of the built patterns (like atoms, modules etc.)
-	 * in the currently opened styleguide.
-	 * @return The patterns root path.
-	 */
-	public getPatternsPath(): string {
-		return PathUtils.join(this.styleGuidePath, 'lib', 'patterns');
-	}
-
-	/**
-	 * Returns the path of the root folder of the patterns source code in the currently opened
-	 * styleguide.
-	 * @return The patterns source root path.
-	 */
-	public getPatternsSourcePath(): string {
-		return PathUtils.join(this.styleGuidePath, 'patterns');
-	}
-
-	/**
 	 * Returns the path to the user preferences YAML file.
 	 * @return The path to the user preferences YAML file.
 	 */
 	public getPreferencesPath(): string {
 		return PathUtils.join(OsUtils.homedir(), '.alva-prefs.yaml');
+	}
+
+	/**
+	 * Returns a project by its ID.
+	 * @param id The project ID.
+	 * @return The project or undefined, if no such ID exists.
+	 */
+	public getProjectById(id: string): Project | undefined {
+		for (const project of this.projects) {
+			if (project.getId() === id) {
+				return project;
+			}
+		}
+
+		return undefined;
 	}
 
 	/**
@@ -325,12 +378,10 @@ export class Store {
 	}
 
 	/**
-	 * Returns the absolute and OS-dependent file-system path to the currently opened styleguide.
-	 * May be undefined if no styleguide is open.
-	 * @return The styleguide path.
+	 * Returns the specified styleguide by id.
 	 */
-	public getStyleGuidePath(): string {
-		return this.styleGuidePath;
+	public getStyleguide(): Styleguide | undefined {
+		return this.styleguide;
 	}
 
 	/**
@@ -354,12 +405,7 @@ export class Store {
 			return;
 		}
 
-		let project: Project = this.projects[0];
-		this.projects.forEach(candidate => {
-			if (candidate.getId() === projectId) {
-				project = candidate;
-			}
-		});
+		const project: Project = this.projects[0];
 
 		const pages: PageRef[] = project.getPages();
 		if (!pages.length) {
@@ -372,23 +418,51 @@ export class Store {
 	/**
 	 * Opens a given page for preview and editing (elements and properties panes).
 	 * Any previously edited page is discarded (not saved), so call save() first.
-	 * @param id The ID of the project to open.
+	 * @param id The ID of the page to open.
 	 * @see save
 	 */
 	public openPage(id: string): void {
+		const styleguide = this.styleguide;
+		if (!styleguide) {
+			throw new Error('Cannot open page: No styleguide open');
+		}
+
 		// TODO: Replace workaround by proper dirty-check handling
 		this.save();
 
 		MobX.transaction(() => {
-			const pagePath: string = PathUtils.join(this.getPagesPath(), `page-${id}.yaml`);
-			const json: JsonObject = Persister.loadYamlOrJson(pagePath);
-			this.currentPage = Page.fromJsonObject(json, id, this);
+			const pageRef = this.getPageRefById(id);
+			if (pageRef) {
+				const pagePath: string = PathUtils.join(styleguide.getPagesPath(), pageRef.getPath());
+				const json: JsonObject = Persister.loadYamlOrJson(pagePath);
+				this.currentPage = Page.fromJsonObject(json, id, this);
+				this.currentProject = this.currentPage.getProject();
+			} else {
+				this.currentPage = undefined;
+			}
 
 			this.selectedElement = undefined;
 		});
 
 		this.preferences.setLastPageId(this.currentPage ? this.currentPage.getId() : undefined);
 		this.savePreferences();
+	}
+
+	/**
+	 * Opens the project that is currently being selected to add, edit, or remove pages of. May be
+	 * undefined if none is selected is none. Opening a page automatically changes the selected
+	 * project.
+	 * @param project The ID of the project to open.
+	 */
+	public openProject(id: string): void {
+		MobX.transaction(() => {
+			const project: Project | undefined = this.getProjectById(id);
+			this.currentProject = project;
+
+			if (this.currentPage && this.currentPage.getProject() === project) {
+				this.closePage();
+			}
+		});
 	}
 
 	/**
@@ -408,18 +482,12 @@ export class Store {
 				// Currently, store is two levels below alva, so go two up
 				styleguidePath = PathUtils.join(styleguidePath);
 			}
-			this.styleGuidePath = styleguidePath;
 			this.currentPage = undefined;
 
-			const styleguide = new Styleguide(
-				`${styleguidePath}/lib/patterns`,
-				new TypescriptReactAnalyzer()
-			);
-
-			this.styleguide = styleguide;
+			this.styleguide = new Styleguide(styleguidePath, new TypescriptReactAnalyzer());
 
 			(this.projects as IObservableArray<Project>).clear();
-			const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.yaml');
+			const projectsPath = PathUtils.join(this.styleguide.getPagesPath(), 'projects.yaml');
 			const projectsJsonObject: JsonObject = Persister.loadYamlOrJson(projectsPath);
 			(projectsJsonObject.projects as JsonArray).forEach((projectJson: JsonObject) => {
 				const project: Project = Project.fromJsonObject(projectJson, this);
@@ -432,9 +500,32 @@ export class Store {
 	}
 
 	/**
+	 * Removes a given page from the styleguide designs.
+	 * If the page is currently open, it is closed first.
+	 * Note: Changes to the page are saved only when calling save() first.
+	 * @param page The page to be removed.
+	 * @see save
+	 */
+	public removePage(page: PageRef): void {
+		if (!page) {
+			return;
+		}
+
+		const currentPage: Page | undefined = this.getCurrentPage();
+		if (currentPage && currentPage.getPageRef() === page) {
+			this.closePage();
+		}
+
+		page
+			.getProject()
+			.getPagesInternal()
+			.remove(page);
+	}
+
+	/**
 	 * Removes a given project and its child pages from the styleguide designs.
 	 * If one of these pages is currently open, it is closed first.
-	 * Note: Changes to the projects and page references are saved only when calling save().
+	 * Note: Changes to the projects and pages are saved only when calling save() first.
 	 * @param project The project to be removed.
 	 * @see save
 	 */
@@ -446,28 +537,16 @@ export class Store {
 		const currentPage: Page | undefined = this.getCurrentPage();
 		if (currentPage) {
 			project.getPages().forEach(pageRef => {
-				if (pageRef.getId() === currentPage.getId()) {
+				if (currentPage.getPageRef() === pageRef) {
 					this.closePage();
 				}
 			});
 		}
 
 		(this.projects as IObservableArray<Project>).remove(project);
-	}
 
-	/**
-	 * Renames the name of the pages files and update the names
-	 * @param id The new ID of the page.
-	 */
-
-	public renamePage(id: string): void {
-		if (this.currentPage) {
-			const oldPath = PathUtils.join(
-				this.styleGuidePath,
-				`/alva/page-${this.currentPage.getId()}.yaml`
-			);
-			const newPath = PathUtils.join(this.styleGuidePath, `/alva/page-${id}.yaml`);
-			FileUtils.renameSync(oldPath, newPath);
+		if (this.currentProject === project) {
+			this.closeProject();
 		}
 	}
 
@@ -477,25 +556,56 @@ export class Store {
 	 * Call this method when the user click Save in the File menu.
 	 */
 	public save(): void {
-		if (!this.getStyleGuidePath()) {
+		const styleguide = this.styleguide;
+		if (!styleguide) {
+			throw new Error('Cannot save: No styleguide open');
+		}
+
+		if (!this.styleguide) {
 			return;
 		}
 
-		const currentPage: Page | undefined = this.getCurrentPage();
-		if (currentPage) {
-			const pagePath: string = PathUtils.join(
-				this.getPagesPath(),
-				`page-${currentPage.getId()}.yaml`
-			);
-			Persister.saveYaml(pagePath, currentPage.toJsonObject());
-		}
+		MobX.transaction(() => {
+			// Move all page file to their new locations, if the path has changed
 
-		const projectsJsonObject: JsonObject = { projects: [] };
-		this.projects.forEach(project => {
-			(projectsJsonObject.projects as JsonArray).push(project.toJsonObject());
+			this.projects.forEach(project => {
+				project.getPages().forEach(page => {
+					const lastPath = page.getLastPersistedPath();
+					if (lastPath && page.getPath() !== lastPath) {
+						try {
+							const lastFullPath = PathUtils.join(styleguide.getPagesPath(), lastPath);
+							const newFullPath = PathUtils.join(styleguide.getPagesPath(), page.getPath());
+							FileExtraUtils.mkdirpSync(PathUtils.dirname(newFullPath));
+							FileUtils.renameSync(lastFullPath, newFullPath);
+							page.updateLastPersistedPath();
+						} catch (error) {
+							// Fall back to original path to continue saving
+							page.setPath(lastPath);
+						}
+					}
+				});
+			});
+
+			// Then update the currently open page's file
+
+			const currentPage: Page | undefined = this.getCurrentPage();
+			if (currentPage) {
+				const pagePath: string = PathUtils.join(
+					styleguide.getPagesPath(),
+					currentPage.getPageRef().getPath()
+				);
+				Persister.saveYaml(pagePath, currentPage.toJsonObject());
+			}
+
+			// Finally, update the projects.yaml
+
+			const projectsJsonObject: JsonObject = { projects: [] };
+			this.projects.forEach(project => {
+				(projectsJsonObject.projects as JsonArray).push(project.toJsonObject());
+			});
+			const projectsPath = PathUtils.join(styleguide.getPagesPath(), 'projects.yaml');
+			Persister.saveYaml(projectsPath, projectsJsonObject);
 		});
-		const projectsPath = PathUtils.join(this.getPagesPath(), 'projects.yaml');
-		Persister.saveYaml(projectsPath, projectsJsonObject);
 	}
 
 	/**

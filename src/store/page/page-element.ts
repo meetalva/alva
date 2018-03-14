@@ -4,6 +4,7 @@ import { Pattern } from '../styleguide/pattern';
 import { Property } from '../styleguide/property/property';
 import { PropertyValue } from './property-value';
 import { Store } from '../store';
+import { Styleguide } from '../styleguide/styleguide';
 
 /**
  * A page element provides the properties data of a pattern.
@@ -157,7 +158,7 @@ export class PageElement {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
 			return PageElement.fromJsonObject(json as JsonObject, store, this);
 		} else {
-			const styleguide = store.getStyleguide();
+			const styleguide = store.getStyleguide() as Styleguide;
 
 			const element: PageElement = new PageElement(
 				styleguide.getPattern('synthetic/text'),

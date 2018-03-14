@@ -23,8 +23,8 @@ export class ProjectList extends React.Component<ProjectListProps> {
 			<Dropdown chrome open={this.props.open}>
 				{this.props.store.getProjects().map((project: Project, index) => (
 					<DropdownItem
+						key={project.getId()}
 						name={project.getName()}
-						key={index}
 						handleClick={(e: React.MouseEvent<HTMLElement>) => {
 							e.preventDefault();
 							this.handleProjectClick(project.getId());

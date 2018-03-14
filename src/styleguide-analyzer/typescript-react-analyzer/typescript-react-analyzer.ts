@@ -27,7 +27,7 @@ export interface PatternInfo {
 /**
  * A styleguide analyzer for TypeScript React patterns.
  */
-export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
+export class Analyzer extends StyleguideAnalyzer {
 	/**
 	 * @inheritdoc
 	 */

@@ -1,18 +1,18 @@
 import * as FileUtils from 'fs';
 import * as FileExtraUtils from 'fs-extra';
-import { JsonArray, JsonObject, Persister } from './json';
 import * as Lodash from 'lodash';
 import * as MobX from 'mobx';
-import { IObservableArray } from 'mobx/lib/types/observablearray';
 import * as OsUtils from 'os';
+import * as PathUtils from 'path';
+
+import { JsonArray, JsonObject, Persister } from './json';
+import { IObservableArray } from 'mobx/lib/types/observablearray';
 import { Page } from './page/page';
 import { PageElement } from './page/page-element';
 import { PageRef } from './project/page-ref';
-import * as PathUtils from 'path';
 import { Preferences } from './preferences';
 import { Project } from './project//project';
 import { Styleguide } from './styleguide/styleguide';
-import { TypescriptReactAnalyzer } from '../styleguide-analyzer/typescript-react-analyzer/typescript-react-analyzer';
 
 /**
  * The central entry-point for all application state, managed by MobX.
@@ -20,6 +20,11 @@ import { TypescriptReactAnalyzer } from '../styleguide-analyzer/typescript-react
  * and call the respective business methods to perform operations.
  */
 export class Store {
+	/**
+	 * The name of the analyzer that should be used for the open styleguide.
+	 */
+	@MobX.observable private analyzerName: string;
+
 	/**
 	 * The element currently in the clipboard, or undefined if there is none.
 	 * Note: The element is cloned lazily, so it may represent a still active element.
@@ -197,6 +202,14 @@ export class Store {
 				.getProject()
 				.getName()}', page '${pageRef.getName()}', giving up`
 		);
+	}
+
+	/**
+	 * Returns the name of the analyzer that should be used for the open styleguide.
+	 * @return The name of the analyzer that should be used for the open styleguide.
+	 */
+	public getAnalyserName(): string {
+		return this.analyzerName;
 	}
 
 	/**
@@ -484,12 +497,38 @@ export class Store {
 			}
 			this.currentPage = undefined;
 
-			this.styleguide = new Styleguide(styleguidePath, new TypescriptReactAnalyzer());
-
 			(this.projects as IObservableArray<Project>).clear();
-			const projectsPath = PathUtils.join(this.styleguide.getPagesPath(), 'projects.yaml');
-			const projectsJsonObject: JsonObject = Persister.loadYamlOrJson(projectsPath);
-			(projectsJsonObject.projects as JsonArray).forEach((projectJson: JsonObject) => {
+			const configPath = PathUtils.join(styleguidePath, 'alva/alva.yaml');
+
+			// Todo: Converts old config structure to new one. This should be removed after the next version
+			const projectsPath = PathUtils.join(styleguidePath, 'alva/projects.yaml');
+			try {
+				const oldFileStructure = Boolean(FileUtils.statSync(projectsPath));
+				if (oldFileStructure) {
+					const oldConfig = Persister.loadYamlOrJson(projectsPath);
+					const newConfig = {
+						config: { analyzerName: 'typescript-react-analyzer', ...oldConfig }
+					};
+					console.log('newConfig', newConfig);
+					FileUtils.writeFileSync(configPath, {});
+					Persister.saveYaml(configPath, newConfig);
+					FileUtils.unlinkSync(projectsPath);
+				}
+			} catch (error) {
+				// ignore the correct setup with missing projects.yaml
+			}
+
+			const configJsonObject: JsonObject = Persister.loadYamlOrJson(configPath)
+				.config as JsonObject;
+			console.log(configJsonObject);
+			this.analyzerName = configJsonObject.analyzerName as string;
+
+			const Analyzer = require(`../styleguide-analyzer/${this.analyzerName}/${
+				this.analyzerName
+			}`).Analyzer;
+			this.styleguide = new Styleguide(styleguidePath, new Analyzer());
+
+			(configJsonObject.projects as JsonArray).forEach((projectJson: JsonObject) => {
 				const project: Project = Project.fromJsonObject(projectJson, this);
 				this.addProject(project);
 			});
@@ -597,14 +636,14 @@ export class Store {
 				Persister.saveYaml(pagePath, currentPage.toJsonObject());
 			}
 
-			// Finally, update the projects.yaml
+			// Finally, update the alva.yaml
 
-			const projectsJsonObject: JsonObject = { projects: [] };
+			const configJsonObject: JsonObject = { analyzerName: this.analyzerName, projects: [] };
 			this.projects.forEach(project => {
-				(projectsJsonObject.projects as JsonArray).push(project.toJsonObject());
+				(configJsonObject.projects as JsonArray).push(project.toJsonObject());
 			});
-			const projectsPath = PathUtils.join(styleguide.getPagesPath(), 'projects.yaml');
-			Persister.saveYaml(projectsPath, projectsJsonObject);
+			const configPath = PathUtils.join(styleguide.getPagesPath(), 'alva.yaml');
+			Persister.saveYaml(configPath, { config: configJsonObject });
 		});
 	}
 

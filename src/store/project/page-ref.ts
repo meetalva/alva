@@ -28,8 +28,8 @@ export class PageRef {
 
 	/**
 	 * The last path reference persisted in the projects.xml for this page. Used:
-	 * 1) to save the page elements file before saving the projects.yaml.
-	 * 2) to rename existing page elements files when saving the projects.yaml.
+	 * 1) to save the page elements file before saving the alva.yaml.
+	 * 2) to rename existing page elements files when saving the alva.yaml.
 	 */
 	@MobX.observable private lastPersistedPath?: string;
 
@@ -40,7 +40,7 @@ export class PageRef {
 	@MobX.observable private name: string;
 
 	/**
-	 * The path of the page file, relative to the projects.yaml.
+	 * The path of the page file, relative to the alva.yaml.
 	 */
 	@MobX.observable private path: string;
 
@@ -56,7 +56,7 @@ export class PageRef {
 
 	/**
 	 * Creates a new page.
-	 * @param path The path of the page file, relative to the projects.yaml.
+	 * @param path The path of the page file, relative to the alva.yaml.
 	 * @param name The human-friendly name of the page.
 	 * @param project The project this page belongs to.
 	 * @param store The store this page belongs to.
@@ -92,14 +92,14 @@ export class PageRef {
 				store
 			});
 		} else if (json.id) {
-			// Migrate from previous projects.yaml version
+			// Migrate from previous alva.yaml version
 			const path = `./page-${json.id}.yaml`;
 			const pageRef = new PageRef({ path, name: json.name as string, project, store });
 			pageRef.updatePathFromNames();
 			return pageRef;
 		} else {
 			throw new Error(
-				"Invalid page file reference in projects.yaml: Either 'id' or 'uuid' are required"
+				"Invalid page file reference in alva.yaml: Either 'id' or 'uuid' are required"
 			);
 		}
 	}
@@ -114,8 +114,8 @@ export class PageRef {
 
 	/**
 	 * Returns the last path reference persisted in the projects.xml for this page. Used:
-	 * 1) to save the page elements file before saving the projects.yaml.
-	 * 2) to rename existing page elements files when saving the projects.yaml.
+	 * 1) to save the page elements file before saving the alva.yaml.
+	 * 2) to rename existing page elements files when saving the alva.yaml.
 	 * @return The last path reference persisted in the projects.xml.
 	 */
 	public getLastPersistedPath(): string | undefined {
@@ -132,7 +132,7 @@ export class PageRef {
 	}
 
 	/**
-	 * Returns the path of the page file, relative to the projects.yaml.
+	 * Returns the path of the page file, relative to the alva.yaml.
 	 * @return the path of the page file.
 	 */
 	public getPath(): string {
@@ -156,7 +156,7 @@ export class PageRef {
 	}
 
 	/**
-	 * Sets the path of the page file, relative to the projects.yaml.
+	 * Sets the path of the page file, relative to the alva.yaml.
 	 * @param path The path of the page file.
 	 */
 	public setPath(path: string): void {
@@ -194,7 +194,7 @@ export class PageRef {
 
 	/**
 	 * Updates the last persisted path from the path properties.
-	 * Call this method after saving the projects.yaml.
+	 * Call this method after saving the alva.yaml.
 	 */
 	public updateLastPersistedPath(): void {
 		this.lastPersistedPath = this.path;

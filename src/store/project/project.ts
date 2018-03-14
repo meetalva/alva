@@ -39,7 +39,7 @@ export class Project {
 	@MobX.observable private pages: PageRef[] = [];
 
 	/**
-	 * Path to the preview frame, relative to the projects.yaml file.
+	 * Path to the preview frame, relative to the alva.yaml file.
 	 */
 	@MobX.observable private previewFrame: string;
 
@@ -52,7 +52,7 @@ export class Project {
 	 * Creates a new project.
 	 * @param id The technical (internal) ID of the project.
 	 * @param name The human-friendly name of the project.
-	 * @param previewFrame Path to the preview frame, relative to the projects.yaml file.
+	 * @param previewFrame Path to the preview frame, relative to the alva.yaml file.
 	 */
 	public constructor(properties: ProjectProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
@@ -117,7 +117,7 @@ export class Project {
 	}
 
 	/**
-	 * Returns the configured path to the preview frame, relative to the projects.yaml file.
+	 * Returns the configured path to the preview frame, relative to the alva.yaml file.
 	 * @return Path to the configured preview frame
 	 */
 	public getPreviewFrame(): string {

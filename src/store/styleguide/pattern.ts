@@ -1,4 +1,5 @@
 import { PatternFolder } from './folder';
+import { ObjectProperty } from './property/object-property';
 import { Property } from './property/property';
 import { Store } from '../store';
 
@@ -147,10 +148,26 @@ export class Pattern {
 	/**
 	 * Returns a property this pattern supports, by its ID.
 	 * @param id The ID of the property.
+	 * @param path If the property you are trying to find is buried inside an object property use the path paremeter to find it.
+	 * eg: `getProperty('image', 'src.srcSet')`.
 	 * @return The property for the given ID, if it exists.
 	 */
-	public getProperty(id: string): Property | undefined {
-		return this.properties.get(id);
+	public getProperty(id: string, path?: string): Property | undefined {
+		let property = this.properties.get(id);
+
+		if (!property || !path) {
+			return property;
+		}
+
+		for (const part of path.split('.')) {
+			if (property && property.getType() === 'object') {
+				property = (property as ObjectProperty).getProperty(part);
+			} else {
+				return undefined;
+			}
+		}
+
+		return property;
 	}
 
 	/**

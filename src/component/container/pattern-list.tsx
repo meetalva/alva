@@ -13,7 +13,6 @@ import { PatternType } from '../../store/styleguide/pattern-type';
 import * as React from 'react';
 import Space, { Size } from '../../lsg/patterns/space';
 import { Store } from '../../store/store';
-import { Styleguide } from '../../store/styleguide/styleguide';
 
 export interface PatternListContainerProps {
 	store: Store;
@@ -63,13 +62,14 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	}
 
 	public render(): JSX.Element {
-		const styleguide = this.props.store.getStyleguide() as Styleguide;
-		const patternRoot = styleguide.getPatternRoot() as PatternFolder;
-		this.items = this.createItemsFromFolder(patternRoot);
+		const styleguide = this.props.store.getStyleguide();
+		const patternRoot = styleguide && styleguide.getPatternRoot();
+		this.items = patternRoot ? this.createItemsFromFolder(patternRoot) : [];
 
 		if (this.props.store.getPatternSearchTerm() !== '') {
 			this.items = this.search(this.items, this.props.store.getPatternSearchTerm());
 		}
+
 		const list = this.createList(this.items);
 		return (
 			<div>

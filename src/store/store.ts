@@ -82,7 +82,7 @@ export class Store {
 	/**
 	 * The currently opened styleguide or undefined, if no styleguide is open.
 	 */
-	@MobX.observable private styleguide: Styleguide;
+	@MobX.observable private styleguide?: Styleguide;
 
 	/**
 	 * Creates a new store.
@@ -422,16 +422,18 @@ export class Store {
 	 * @see save
 	 */
 	public openPage(id: string): void {
+		const styleguide = this.styleguide;
+		if (!styleguide) {
+			throw new Error('Cannot open page: No styleguide open');
+		}
+
 		// TODO: Replace workaround by proper dirty-check handling
 		this.save();
 
 		MobX.transaction(() => {
 			const pageRef = this.getPageRefById(id);
 			if (pageRef) {
-				const pagePath: string = PathUtils.join(
-					this.styleguide.getPagesPath(),
-					pageRef.getPath()
-				);
+				const pagePath: string = PathUtils.join(styleguide.getPagesPath(), pageRef.getPath());
 				const json: JsonObject = Persister.loadYamlOrJson(pagePath);
 				this.currentPage = Page.fromJsonObject(json, id, this);
 				this.currentProject = this.currentPage.getProject();
@@ -554,6 +556,11 @@ export class Store {
 	 * Call this method when the user click Save in the File menu.
 	 */
 	public save(): void {
+		const styleguide = this.styleguide;
+		if (!styleguide) {
+			throw new Error('Cannot save: No styleguide open');
+		}
+
 		if (!this.styleguide) {
 			return;
 		}
@@ -566,11 +573,8 @@ export class Store {
 					const lastPath = page.getLastPersistedPath();
 					if (lastPath && page.getPath() !== lastPath) {
 						try {
-							const lastFullPath = PathUtils.join(this.styleguide.getPagesPath(), lastPath);
-							const newFullPath = PathUtils.join(
-								this.styleguide.getPagesPath(),
-								page.getPath()
-							);
+							const lastFullPath = PathUtils.join(styleguide.getPagesPath(), lastPath);
+							const newFullPath = PathUtils.join(styleguide.getPagesPath(), page.getPath());
 							FileExtraUtils.mkdirpSync(PathUtils.dirname(newFullPath));
 							FileUtils.renameSync(lastFullPath, newFullPath);
 							page.updateLastPersistedPath();
@@ -587,7 +591,7 @@ export class Store {
 			const currentPage: Page | undefined = this.getCurrentPage();
 			if (currentPage) {
 				const pagePath: string = PathUtils.join(
-					this.styleguide.getPagesPath(),
+					styleguide.getPagesPath(),
 					currentPage.getPageRef().getPath()
 				);
 				Persister.saveYaml(pagePath, currentPage.toJsonObject());
@@ -599,7 +603,7 @@ export class Store {
 			this.projects.forEach(project => {
 				(projectsJsonObject.projects as JsonArray).push(project.toJsonObject());
 			});
-			const projectsPath = PathUtils.join(this.styleguide.getPagesPath(), 'projects.yaml');
+			const projectsPath = PathUtils.join(styleguide.getPagesPath(), 'projects.yaml');
 			Persister.saveYaml(projectsPath, projectsJsonObject);
 		});
 	}

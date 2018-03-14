@@ -136,7 +136,7 @@ export class Styleguide {
 	 * Returns the root folder of the patterns of the currently opened styleguide.
 	 * @return The root folder object.
 	 */
-	public getPatternRoot(): PatternFolder | undefined {
+	public getPatternRoot(): PatternFolder {
 		return this.patternRoot;
 	}
 }

@@ -37,7 +37,7 @@ export class TypescriptReactAnalyzer extends StyleguideAnalyzer {
 		this.analyzeFolder(
 			styleguide,
 			styleguide.getPatternsPath(),
-			styleguide.getPatternRoot() as PatternFolder,
+			styleguide.getPatternRoot(),
 			program
 		);
 	}

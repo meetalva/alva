@@ -44,12 +44,15 @@ export class Styleguide {
 	 * Creates a new styleguide. Then loads the styleguide's patterns using the configured styleguide analyzer.
 	 * @param path The absolute and OS-specific path to the styleguide top-level folders.
 	 * This is where all pattern implementations are located.
-	 * @param analyzer The analyzer active in this styleguide. The actual one depends on the type of styleguide.
+	 * @param analyzerName The name of the analyzer active in this styleguide. The actual one depends on the type of styleguide.
 	 * The analyzers detects patterns (and pattern folders) it finds to the list of styleguide patterns.
 	 */
-	public constructor(path?: string, analyzer?: StyleguideAnalyzer) {
+	public constructor(path: string, analyzerName: string) {
 		this.path = path || '';
-		this.analyzer = analyzer;
+
+		const Analyzer = require(`../../styleguide-analyzer/${analyzerName}/${analyzerName}`)
+			.Analyzer;
+		this.analyzer = new Analyzer();
 
 		const patternsDir = new Directory(this.getPatternsPath());
 		this.patternRoot = new PatternFolder(patternsDir.getName());

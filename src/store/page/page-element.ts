@@ -106,8 +106,11 @@ export class PageElement {
 		let pattern: Pattern | undefined = styleguide.getPattern(patternId);
 
 		if (!pattern) {
-			patternId = `${patternId}/index`;
-			pattern = styleguide.getPattern(patternId);
+			const indexPatternId = `${patternId}/index`;
+			pattern = styleguide.getPattern(indexPatternId);
+			if (pattern) {
+				patternId = indexPatternId;
+			}
 		}
 
 		if (!pattern) {

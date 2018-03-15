@@ -1,15 +1,14 @@
 import * as FileUtils from 'fs';
 import * as FileExtraUtils from 'fs-extra';
+import { JsonArray, JsonObject, Persister } from './json';
 import * as Lodash from 'lodash';
 import * as MobX from 'mobx';
-import * as OsUtils from 'os';
-import * as PathUtils from 'path';
-
-import { JsonArray, JsonObject, Persister } from './json';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
+import * as OsUtils from 'os';
 import { Page } from './page/page';
 import { PageElement } from './page/page-element';
 import { PageRef } from './project/page-ref';
+import * as PathUtils from 'path';
 import { Preferences } from './preferences';
 import { Project } from './project//project';
 import { Styleguide } from './styleguide/styleguide';
@@ -100,33 +99,6 @@ export class Store {
 		} catch (error) {
 			this.preferences = new Preferences();
 		}
-
-		try {
-			const lastStyleguidePath = this.preferences.getLastStyleguidePath();
-			if (lastStyleguidePath) {
-				this.openStyleguide(lastStyleguidePath);
-
-				const lastProjectId = this.preferences.getLastProjectId();
-				if (lastProjectId) {
-					this.openProject(lastProjectId);
-				}
-
-				const lastPageId = this.preferences.getLastPageId();
-				if (lastPageId) {
-					try {
-						this.openPage(lastPageId);
-					} catch (error) {
-						// Ignored: The page does not exist anymore
-					}
-				}
-			}
-
-			if (!this.currentPage) {
-				this.openFirstPage();
-			}
-		} catch (error) {
-			console.error(`Failed to open last styleguide or page: ${error}`);
-		}
 	}
 
 	/**
@@ -208,7 +180,7 @@ export class Store {
 	 * Returns the name of the analyzer that should be used for the open styleguide.
 	 * @return The name of the analyzer that should be used for the open styleguide.
 	 */
-	public getAnalyserName(): string {
+	public getAnalyzerName(): string {
 		return this.analyzerName;
 	}
 
@@ -396,6 +368,38 @@ export class Store {
 	}
 
 	/**
+	 * Opens the last used styleguide, project, and page from the user's preferences.
+	 */
+	public openFromPreferences(): void {
+		try {
+			const lastStyleguidePath = this.preferences.getLastStyleguidePath();
+			if (lastStyleguidePath) {
+				this.openStyleguide(lastStyleguidePath);
+
+				const lastProjectId = this.preferences.getLastProjectId();
+				if (lastProjectId) {
+					this.openProject(lastProjectId);
+				}
+
+				const lastPageId = this.preferences.getLastPageId();
+				if (lastPageId) {
+					try {
+						this.openPage(lastPageId);
+					} catch (error) {
+						// Ignored: The page does not exist anymore
+					}
+				}
+
+				if (!this.currentPage) {
+					this.openFirstPage();
+				}
+			}
+		} catch (error) {
+			console.error(`Failed to open last styleguide or page: ${error}`);
+		}
+	}
+
+	/**
 	 * Opens a given page for preview and editing (elements and properties panes).
 	 * Any previously edited page is discarded (not saved), so call save() first.
 	 * @param id The ID of the page to open.
@@ -412,8 +416,11 @@ export class Store {
 
 		MobX.transaction(() => {
 			const pageRef = this.getPageRefById(id);
-			if (pageRef) {
-				const pagePath: string = PathUtils.join(styleguide.getPagesPath(), pageRef.getPath());
+			if (pageRef && pageRef.getLastPersistedPath()) {
+				const pagePath: string = PathUtils.join(
+					styleguide.getPagesPath(),
+					pageRef.getLastPersistedPath() as string
+				);
 				const json: JsonObject = Persister.loadYamlOrJson(pagePath);
 				this.currentPage = Page.fromJsonObject(json, id, this);
 				this.currentProject = this.currentPage.getProject();
@@ -465,37 +472,39 @@ export class Store {
 			this.currentPage = undefined;
 
 			(this.projects as IObservableArray<Project>).clear();
-			const configPath = PathUtils.join(styleguidePath, 'alva/alva.yaml');
+			const alvaYamlPath = PathUtils.join(styleguidePath, 'alva/alva.yaml');
 
-			// Todo: Converts old config structure to new one. This should be removed after the next version
+			// Todo: Converts old alva.yaml structure to new one.
+			// This should be removed after the next version.
 			const projectsPath = PathUtils.join(styleguidePath, 'alva/projects.yaml');
 			try {
 				const oldFileStructure = Boolean(FileUtils.statSync(projectsPath));
 				if (oldFileStructure) {
-					const oldConfig = Persister.loadYamlOrJson(projectsPath);
-					const newConfig = {
-						config: { analyzerName: 'typescript-react-analyzer', ...oldConfig }
+					const oldAlvaYaml = Persister.loadYamlOrJson(projectsPath);
+					const newAlvaYaml = {
+						analyzerName: 'typescript-react-analyzer',
+						...oldAlvaYaml
 					};
-					console.log('newConfig', newConfig);
-					FileUtils.writeFileSync(configPath, {});
-					Persister.saveYaml(configPath, newConfig);
+					FileUtils.writeFileSync(alvaYamlPath, {});
+					Persister.saveYaml(alvaYamlPath, newAlvaYaml);
 					FileUtils.unlinkSync(projectsPath);
 				}
 			} catch (error) {
 				// ignore the correct setup with missing projects.yaml
 			}
 
-			const configJsonObject: JsonObject = Persister.loadYamlOrJson(configPath)
-				.config as JsonObject;
-			console.log(configJsonObject);
-			this.analyzerName = configJsonObject.analyzerName as string;
+			let json: JsonObject = Persister.loadYamlOrJson(alvaYamlPath);
 
-			const Analyzer = require(`../styleguide-analyzer/${this.analyzerName}/${
-				this.analyzerName
-			}`).Analyzer;
-			this.styleguide = new Styleguide(styleguidePath, new Analyzer());
+			// Todo: Converts old alva.yaml structure to new one.
+			// This should be removed after the next version.
+			if (json.config) {
+				json = json.config as JsonObject;
+			}
 
-			(configJsonObject.projects as JsonArray).forEach((projectJson: JsonObject) => {
+			this.analyzerName = json.analyzerName as string;
+			this.styleguide = new Styleguide(styleguidePath, this.analyzerName);
+
+			(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
 				const project: Project = Project.fromJsonObject(projectJson, this);
 				this.addProject(project);
 			});
@@ -605,12 +614,13 @@ export class Store {
 
 			// Finally, update the alva.yaml
 
-			const configJsonObject: JsonObject = { analyzerName: this.analyzerName, projects: [] };
-			this.projects.forEach(project => {
-				(configJsonObject.projects as JsonArray).push(project.toJsonObject());
-			});
+			const json: JsonObject = {
+				analyzerName: this.analyzerName,
+				projects: this.projects.map(project => project.toJsonObject())
+			};
+
 			const configPath = PathUtils.join(styleguide.getPagesPath(), 'alva.yaml');
-			Persister.saveYaml(configPath, { config: configJsonObject });
+			Persister.saveYaml(configPath, json);
 		});
 	}
 
@@ -646,12 +656,13 @@ export class Store {
 	 * Loads a given JSON object into the store as current page.
 	 * Used internally within the store, do not use from UI components.
 	 * Also unselects any selected element.
-	 * @param json The JSON object to set
-	 * @param id The project's ID.
+	 * @param json The JSON object to set.
 	 */
-	public setPageFromJsonInternal(json: JsonObject, id: string): void {
+	public setPageFromJsonInternal(json: JsonObject): void {
 		MobX.transaction(() => {
-			this.currentPage = json ? Page.fromJsonObject(json, id, this) : undefined;
+			this.currentPage = json.page
+				? Page.fromJsonObject(json.page as JsonObject, json.pageId as string, this)
+				: undefined;
 			this.selectedElement = undefined;
 		});
 	}
@@ -682,5 +693,28 @@ export class Store {
 	 */
 	public setSelectedElement(selectedElement: PageElement | undefined): void {
 		this.selectedElement = selectedElement;
+	}
+
+	/**
+	 * Loads a styleguide from a JSON object into the store.
+	 * Used internally within the store, do not use from UI components.
+	 * @param json The JSON object to load from.
+	 */
+	public setStyleguideFromJsonInternal(json: JsonObject): void {
+		MobX.transaction(() => {
+			this.analyzerName = json.analyzerName as string;
+
+			this.projects = [];
+			(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
+				const project: Project = Project.fromJsonObject(projectJson, this);
+				this.addProject(project);
+			});
+
+			if (json.styleguidePath && this.analyzerName) {
+				this.styleguide = new Styleguide(json.styleguidePath as string, this.analyzerName);
+			} else {
+				this.styleguide = undefined;
+			}
+		});
 	}
 }

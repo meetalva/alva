@@ -2,7 +2,7 @@ import Button, { Order } from '../lsg/patterns/button';
 import { Chrome } from './container/chrome';
 import { colors } from '../lsg/patterns/colors';
 import Copy, { Size as CopySize } from '../lsg/patterns/copy';
-import { remote, webFrame, WebviewTag } from 'electron';
+import { ipcRenderer, remote, webFrame, WebviewTag } from 'electron';
 import { ElementList } from './container/element-list';
 import ElementPane from '../lsg/patterns/panes/element-pane';
 import * as FileExtraUtils from 'fs-extra';
@@ -76,6 +76,15 @@ class App extends React.Component<AppProps> {
 		createMenu(this.props.store);
 	}
 
+	private getDevTools(): React.StatelessComponent | null {
+		try {
+			const DevToolsExports = require('mobx-react-devtools');
+			return DevToolsExports ? DevToolsExports.default : undefined;
+		} catch (error) {
+			return null;
+		}
+	}
+
 	public render(): JSX.Element {
 		// Todo: project and page don't update on page change
 		const project = this.props.store.getCurrentProject();
@@ -87,7 +96,7 @@ class App extends React.Component<AppProps> {
 			previewFrame &&
 			PathUtils.join(styleguide.getPagesPath(), 'alva', previewFrame);
 
-		const DevTools = getDevTools();
+		const DevTools = this.getDevTools();
 
 		return (
 			<Layout directionVertical handleClick={this.handleMainWindowClick}>
@@ -185,46 +194,46 @@ class App extends React.Component<AppProps> {
 	}
 }
 
-function getDevTools(): React.StatelessComponent | null {
-	try {
-		const DevToolsExports = require('mobx-react-devtools');
-		return DevToolsExports ? DevToolsExports.default : undefined;
-	} catch (error) {
-		return null;
-	}
-}
-
 const store = new Store();
+store.openFromPreferences();
 
-function sendWebViewMessage(message: JsonObject, channel: string): void {
-	const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
-	if (webviewTag && webviewTag.send) {
-		webviewTag.send(channel, message);
+ipcRenderer.on('preview-ready', (readyEvent: {}, readyMessage: JsonObject) => {
+	function sendWebViewMessage(message: JsonObject, channel: string): void {
+		const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
+		if (webviewTag && webviewTag.send) {
+			webviewTag.send(channel, message);
+		}
 	}
-}
 
-MobX.autorun(() => {
-	const page: Page | undefined = store.getCurrentPage();
-	const message: JsonObject = {
-		page: page ? page.toJsonObject() : undefined,
-		pageId: page ? page.getId() : undefined
-	};
+	global.setTimeout(() => {
+		MobX.autorun(() => {
+			const styleguide = store.getStyleguide();
+			const message: JsonObject = {
+				analyzerName: store.getAnalyzerName(),
+				projects: store.getProjects().map(project => project.toJsonObject()),
+				styleguidePath: styleguide ? styleguide.getPath() : undefined
+			};
+			sendWebViewMessage(message, 'styleguide-change');
+		});
 
-	sendWebViewMessage(message, 'page-change');
-});
+		MobX.autorun(() => {
+			const page: Page | undefined = store.getCurrentPage();
+			const message: JsonObject = {
+				page: page ? page.toJsonObject() : undefined,
+				pageId: page ? page.getId() : undefined
+			};
 
-MobX.autorun(() => {
-	const styleguide = store.getStyleguide();
-	const message: JsonObject = { styleguidePath: styleguide ? styleguide.getPath() : undefined };
-	sendWebViewMessage(message, 'open-styleguide');
-});
+			sendWebViewMessage(message, 'page-change');
+		});
 
-MobX.autorun(() => {
-	const selectedElement = store.getSelectedElement();
-	const message: JsonObject = {
-		selectedElementId: selectedElement ? selectedElement.getId() : undefined
-	};
-	sendWebViewMessage(message, 'selectedElement-change');
+		MobX.autorun(() => {
+			const selectedElement = store.getSelectedElement();
+			const message: JsonObject = {
+				selectedElementId: selectedElement ? selectedElement.getId() : undefined
+			};
+			sendWebViewMessage(message, 'selectedElement-change');
+		});
+	}, 3000);
 });
 
 ReactDom.render(<App store={store} />, document.getElementById('app'));

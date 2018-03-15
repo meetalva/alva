@@ -1,7 +1,7 @@
 import Dropdown from '../../lsg/patterns/dropdown';
 import DropdownItem from '../../lsg/patterns/dropdown-item';
 import { observer } from 'mobx-react';
-import { Project } from '../../store/project/project';
+import { Project } from '../../store/project';
 import * as React from 'react';
 import { Store } from '../../store/store';
 

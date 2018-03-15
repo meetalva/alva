@@ -1,7 +1,7 @@
-import { JsonArray, JsonObject } from '../json';
+import { JsonArray, JsonObject } from './json';
 import * as MobX from 'mobx';
-import { PageRef } from './page-ref';
-import { Store } from '../store';
+import { PageRef } from './page/page-ref';
+import { Store } from './store';
 import * as Uuid from 'uuid';
 
 export interface ProjectProperties {

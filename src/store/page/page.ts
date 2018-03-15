@@ -1,8 +1,8 @@
 import { JsonObject } from '../json';
 import * as MobX from 'mobx';
 import { PageElement } from './page-element';
-import { PageRef } from '../project/page-ref';
-import { Project } from '../project/project';
+import { PageRef } from '../page/page-ref';
+import { Project } from '../project';
 import { Store } from '../store';
 
 /**
@@ -109,15 +109,6 @@ export class Page {
 	public registerElementAndChildren(element: PageElement): void {
 		this.elementsById.set(element.getId(), element);
 		element.getChildren().forEach(child => this.registerElementAndChildren(child));
-	}
-
-	/**
-	 * Sets the human-friendly name of the page.
-	 * In the frontend, to be displayed instead of the ID.
-	 * @param name The human-friendly name of the page.
-	 */
-	public setName(name: string): void {
-		this.pageRef.setName(name);
 	}
 
 	/**

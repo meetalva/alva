@@ -1,6 +1,6 @@
 import { JsonObject } from '../json';
 import * as MobX from 'mobx';
-import { Project } from './project';
+import { Project } from '../project';
 import { Store } from '../store';
 import * as Uuid from 'uuid';
 

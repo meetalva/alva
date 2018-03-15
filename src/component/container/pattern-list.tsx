@@ -1,4 +1,5 @@
 import Input from '../../lsg/patterns/input/';
+import { ElementCommand } from '../../store/page/command/element-command';
 import { PatternFolder } from '../../store/styleguide/folder';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
@@ -118,7 +119,7 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 				page: this.props.store.getCurrentPage() as Page,
 				setDefaults: true
 			});
-			selectedElement.addSibling(newPageElement);
+			this.props.store.execute(ElementCommand.addSibling(selectedElement, newPageElement));
 			this.props.store.setSelectedElement(newPageElement);
 		}
 	}

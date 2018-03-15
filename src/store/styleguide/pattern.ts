@@ -87,7 +87,7 @@ export class Pattern {
 	 * @param indentation The current indentation level, if invoked from a pattern folder.
 	 */
 	public dump(indentation: number = 0): void {
-		console.log(
+		console.info(
 			`${'  '.repeat(indentation)}Pattern '${this.id}', path '${this.implementationPath}'`
 		);
 	}

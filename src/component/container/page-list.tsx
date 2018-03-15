@@ -2,8 +2,8 @@ import Dropdown from '../../lsg/patterns/dropdown';
 import { DropdownItemEditableLink } from '../../lsg/patterns/dropdown-item';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
-import { PageRef } from '../../store/project/page-ref';
-import { Project } from '../../store/project/project';
+import { PageRef } from '../../store/page/page-ref';
+import { Project } from '../../store/project';
 import * as React from 'react';
 import { Store } from '../../store/store';
 

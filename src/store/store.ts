@@ -1,3 +1,4 @@
+import { Command } from './command/command';
 import * as FileUtils from 'fs';
 import * as FileExtraUtils from 'fs-extra';
 import { JsonArray, JsonObject, Persister } from './json';
@@ -7,10 +8,10 @@ import { IObservableArray } from 'mobx/lib/types/observablearray';
 import * as OsUtils from 'os';
 import { Page } from './page/page';
 import { PageElement } from './page/page-element';
-import { PageRef } from './project/page-ref';
+import { PageRef } from './page/page-ref';
 import * as PathUtils from 'path';
 import { Preferences } from './preferences';
-import { Project } from './project//project';
+import { Project } from './project';
 import { Styleguide } from './styleguide/styleguide';
 
 /**
@@ -19,6 +20,11 @@ import { Styleguide } from './styleguide/styleguide';
  * and call the respective business methods to perform operations.
  */
 export class Store {
+	/**
+	 * The store singleton instance.
+	 */
+	private static INSTANCE: Store;
+
 	/**
 	 * The name of the analyzer that should be used for the open styleguide.
 	 */
@@ -45,12 +51,26 @@ export class Store {
 	@MobX.observable private currentProject?: Project;
 
 	/**
+	 * The element that is currently being dragged, or undefined if there is none.
+	 */
+	@MobX.observable private draggedElement?: PageElement;
+
+	/**
 	 * Whether the currently selected element also has focus.
 	 * In this case, keyboard operations such as copy, cut, or delete
 	 * should operate on that element.
 	 * @see selectedElement
 	 */
 	@MobX.observable private elementFocussed?: boolean = false;
+
+	/**
+	 * Whether  the last executed user operation is now complete, so that similar operations do
+	 * not merge with the last one. For instance, if you edit the text of a page element property,
+	 * all subsequent edits on this property automatically merge. After leaving the input, setting
+	 * this property to true will cause the next text editing on this property to stay a separate
+	 * undo command.
+	 */
+	private lastCommandComplete: boolean;
 
 	/**
 	 * The current search term in the patterns list, or an empty string if there is none.
@@ -70,9 +90,11 @@ export class Store {
 	@MobX.observable private projects: Project[] = [];
 
 	/**
-	 * The element that is currently being dragged, or undefined if there is none.
+	 * The most recent undone user commands (user operations) to provide a redo feature.
+	 * Note that operations that close or open a page clear this buffer.
+	 * The last command in the list is the most recent undone.
 	 */
-	@MobX.observable private rearrangeElement?: PageElement;
+	@MobX.observable private redoBuffer: Command[] = [];
 
 	/**
 	 * The currently selected element in the element list.
@@ -89,9 +111,16 @@ export class Store {
 	@MobX.observable private styleguide?: Styleguide;
 
 	/**
+	 * The most recent user commands (user operations) to provide an undo feature.
+	 * Note that operations that close or open a page clear this buffer.
+	 * The last command in the list is the most recent executed one.
+	 */
+	@MobX.observable private undoBuffer: Command[] = [];
+
+	/**
 	 * Creates a new store.
 	 */
-	public constructor() {
+	private constructor() {
 		try {
 			this.preferences = Preferences.fromJsonObject(
 				Persister.loadYamlOrJson(this.getPreferencesPath())
@@ -99,6 +128,11 @@ export class Store {
 		} catch (error) {
 			this.preferences = new Preferences();
 		}
+	}
+
+	public static getInstance(): Store {
+		// TODO: Alles auf getInstance umbauen
+		return Store.INSTANCE;
 	}
 
 	/**
@@ -131,6 +165,15 @@ export class Store {
 	}
 
 	/**
+	 * Clears the undo and redo buffers (e.g. if a page is loaded or the page state get
+	 * incompatible with the buffers).
+	 */
+	public clearUndoRedoBuffers(): void {
+		this.undoBuffer = [];
+		this.redoBuffer = [];
+	}
+
+	/**
 	 * Closes the current page in edit and preview, setting it to undefined.
 	 * @see getCurrentPage()
 	 */
@@ -147,6 +190,29 @@ export class Store {
 			this.currentProject = undefined;
 			this.closePage();
 		});
+	}
+
+	/**
+	 * Executes a user command (user operation) and registers it as undoable command.
+	 * @param command The command to execute and register.
+	 */
+	public execute(command: Command): void {
+		if (command.execute()) {
+			const previousCommand = this.undoBuffer[this.undoBuffer.length - 1];
+			if (
+				!previousCommand ||
+				this.lastCommandComplete ||
+				!command.maybeMergeWith(previousCommand)
+			) {
+				this.undoBuffer.push(command);
+			}
+
+			this.redoBuffer = [];
+		} else {
+			this.clearUndoRedoBuffers();
+		}
+
+		this.lastCommandComplete = false;
 	}
 
 	/**
@@ -236,6 +302,14 @@ export class Store {
 	}
 
 	/**
+	 * Returns the element that is currently being dragged, or undefined if there is none.
+	 * @return The dragged element or undefined.
+	 */
+	public getDraggedElement(): PageElement | undefined {
+		return this.draggedElement;
+	}
+
+	/**
 	 * Returns a page reference (containing ID and name) object by its ID.
 	 * @param id The page ID.
 	 * @return The page reference or undefined, if no such ID exists.
@@ -310,14 +384,6 @@ export class Store {
 	}
 
 	/**
-	 * Returns the element that is currently being dragged, or undefined if there is none.
-	 * @return The rearrange element or undefined.
-	 */
-	public getRearrangeElement(): PageElement | undefined {
-		return this.rearrangeElement;
-	}
-
-	/**
 	 * Returns the currently selected element in the element list.
 	 * The properties pane shows the properties of this element,
 	 * and keyboard commands like cut, copy, or delete operate on this element.
@@ -334,6 +400,24 @@ export class Store {
 	 */
 	public getStyleguide(): Styleguide | undefined {
 		return this.styleguide;
+	}
+
+	/**
+	 * Returns whether there is a user comment (user operation) to redo.
+	 * @return Whether there is a user comment (user operation) to redo.
+	 * @see redo
+	 */
+	public hasRedoCommand(): boolean {
+		return this.redoBuffer.length > 0;
+	}
+
+	/**
+	 * Returns whether there is a user comment (user operation) to undo.
+	 * @return Whether there is a user comment (user operation) to undo.
+	 * @see undo
+	 */
+	public hasUndoCommand(): boolean {
+		return this.undoBuffer.length > 0;
 	}
 
 	/**
@@ -411,7 +495,6 @@ export class Store {
 			throw new Error('Cannot open page: No styleguide open');
 		}
 
-		// TODO: Replace workaround by proper dirty-check handling
 		this.save();
 
 		MobX.transaction(() => {
@@ -459,7 +542,6 @@ export class Store {
 	 * @param styleguidePath The absolute and OS-dependent file-system path to the styleguide.
 	 */
 	public openStyleguide(styleguidePath: string): void {
-		// TODO: Replace workaround by proper dirty-check handling
 		if (this.currentPage) {
 			this.save();
 		}
@@ -474,7 +556,7 @@ export class Store {
 			(this.projects as IObservableArray<Project>).clear();
 			const alvaYamlPath = PathUtils.join(styleguidePath, 'alva/alva.yaml');
 
-			// Todo: Converts old alva.yaml structure to new one.
+			// TODO: Converts old alva.yaml structure to new one.
 			// This should be removed after the next version.
 			const projectsPath = PathUtils.join(styleguidePath, 'alva/projects.yaml');
 			try {
@@ -495,7 +577,7 @@ export class Store {
 
 			let json: JsonObject = Persister.loadYamlOrJson(alvaYamlPath);
 
-			// Todo: Converts old alva.yaml structure to new one.
+			// TODO: Converts old alva.yaml structure to new one.
 			// This should be removed after the next version.
 			if (json.config) {
 				json = json.config as JsonObject;
@@ -510,8 +592,28 @@ export class Store {
 			});
 		});
 
+		this.clearUndoRedoBuffers();
+
 		this.preferences.setLastStyleguidePath(styleguidePath);
 		this.savePreferences();
+	}
+
+	/**
+	 * Redoes the last undone user operation, if available.
+	 * @return Whether the redo was successful.
+	 * @see hasRedoCommand
+	 */
+	public redo(): boolean {
+		const command: Command | undefined = this.redoBuffer.pop();
+		if (!command) {
+			return false;
+		} else if (command.execute()) {
+			this.undoBuffer.push(command);
+			return true;
+		} else {
+			this.clearUndoRedoBuffers();
+			return false;
+		}
 	}
 
 	/**
@@ -642,6 +744,14 @@ export class Store {
 	}
 
 	/**
+	 * Sets the element that is currently being dragged, or undefined if there is none.
+	 * @param draggedElement The dragged element or undefined.
+	 */
+	public setDraggedElement(draggedElement: PageElement): void {
+		this.draggedElement = draggedElement;
+	}
+
+	/**
 	 * Sets whether the currently selected element also has focus.
 	 * In this case, keyboard operations such as copy, cut, or delete
 	 * should operate on that element.
@@ -650,6 +760,16 @@ export class Store {
 	 */
 	public setElementFocussed(elementFocussed: boolean): void {
 		this.elementFocussed = elementFocussed;
+	}
+
+	/**
+	 * Marks that the last executed user operation is now complete, so that similar operations do
+	 * not merge with the last one. For instance, if you edit the text of a page element property,
+	 * all subsequent edits on this property automatically merge. After leaving the input, call this
+	 * method, and the next text editing on this property stays a separate undo command.
+	 */
+	public setLastCommandComplete(): void {
+		this.lastCommandComplete = true;
 	}
 
 	/**
@@ -673,14 +793,6 @@ export class Store {
 	 */
 	public setPatternSearchTerm(patternSearchTerm: string): void {
 		this.patternSearchTerm = patternSearchTerm;
-	}
-
-	/**
-	 * Sets the element that is currently being dragged, or undefined if there is none.
-	 * @param rearrangeElement The rearrange element or undefined.
-	 */
-	public setRearrangeElement(rearrangeElement: PageElement): void {
-		this.rearrangeElement = rearrangeElement;
 	}
 
 	/**
@@ -715,6 +827,26 @@ export class Store {
 			} else {
 				this.styleguide = undefined;
 			}
+
+			this.clearUndoRedoBuffers();
 		});
+	}
+
+	/**
+	 * Undoes the last user operation, if available.
+	 * @return Whether the undo was successful.
+	 * @see hasUndoCommand
+	 */
+	public undo(): boolean {
+		const command: Command | undefined = this.undoBuffer.pop();
+		if (!command) {
+			return false;
+		} else if (command.undo()) {
+			this.redoBuffer.push(command);
+			return true;
+		} else {
+			this.clearUndoRedoBuffers();
+			return false;
+		}
 	}
 }

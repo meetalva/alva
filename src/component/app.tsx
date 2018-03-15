@@ -44,19 +44,13 @@ interface AppProps {
 
 @observer
 class App extends React.Component<AppProps> {
-	private static PatternListID = 'patternlist';
-	private static PropertiesListID = 'propertieslist';
+	private static PATTERN_LIST_ID = 'patternlist';
+	private static PROPERTIES_LIST_ID = 'propertieslist';
 
-	@MobX.observable protected activeTab: string = App.PatternListID;
+	@MobX.observable protected activeTab: string = App.PATTERN_LIST_ID;
+	private ctrlDown: boolean = false;
 	@MobX.observable protected projectListVisible: boolean = false;
-	@MobX.computed
-	protected get isPatternListVisible(): boolean {
-		return Boolean(this.activeTab === App.PatternListID);
-	}
-	@MobX.computed
-	protected get isPropertiesListVisible(): boolean {
-		return Boolean(this.activeTab === App.PropertiesListID);
-	}
+	private shiftDown: boolean = false;
 
 	public constructor(props: AppProps) {
 		super(props);
@@ -69,6 +63,7 @@ class App extends React.Component<AppProps> {
 
 	public componentDidMount(): void {
 		createMenu(this.props.store);
+		this.redirectUndoRedo();
 	}
 
 	private getDevTools(): React.StatelessComponent | null {
@@ -92,7 +87,6 @@ class App extends React.Component<AppProps> {
 		}
 
 		const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
-		console.log(`Design kit path is: ${designkitPath}`);
 		dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] }, filePaths => {
 			if (filePaths.length <= 0) {
 				return;
@@ -119,6 +113,45 @@ class App extends React.Component<AppProps> {
 	@MobX.action
 	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
 		this.activeTab = id;
+	}
+
+	@MobX.computed
+	protected get isPatternListVisible(): boolean {
+		return Boolean(this.activeTab === App.PATTERN_LIST_ID);
+	}
+
+	@MobX.computed
+	protected get isPropertiesListVisible(): boolean {
+		return Boolean(this.activeTab === App.PROPERTIES_LIST_ID);
+	}
+
+	private redirectUndoRedo(): void {
+		document.body.onkeydown = event => {
+			if (event.keyCode === 16) {
+				this.shiftDown = true;
+			} else if (event.keyCode === 17 || event.keyCode === 91) {
+				this.ctrlDown = true;
+			} else if (this.ctrlDown && event.keyCode === 90) {
+				event.preventDefault();
+				if (this.shiftDown) {
+					this.props.store.redo();
+				} else {
+					this.props.store.undo();
+				}
+
+				return false;
+			}
+
+			return true;
+		};
+
+		document.body.onkeyup = event => {
+			if (event.keyCode === 16) {
+				this.shiftDown = false;
+			} else if (event.keyCode === 17 || event.keyCode === 91) {
+				this.ctrlDown = false;
+			}
+		};
 	}
 
 	public render(): JSX.Element {
@@ -194,7 +227,7 @@ class App extends React.Component<AppProps> {
 	}
 }
 
-const store = new Store();
+const store: Store = Store.getInstance();
 store.openFromPreferences();
 
 ipcRenderer.on('preview-ready', (readyEvent: {}, readyMessage: JsonObject) => {

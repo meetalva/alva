@@ -1,4 +1,5 @@
 import { elementMenu } from '../../electron/context-menus';
+import { ElementCommand } from '../../store/page/command/element-command';
 import { ElementWrapper } from './element-wrapper';
 import { ListItemProps } from '../../lsg/patterns/list';
 import { createMenu } from '../../electron/menu';
@@ -68,43 +69,54 @@ export class ElementList extends React.Component<ElementListProps> {
 				elementMenu(this.props.store, element);
 			},
 			handleDragStart: (e: React.DragEvent<HTMLElement>) => {
-				this.props.store.setRearrangeElement(element);
+				this.props.store.setDraggedElement(element);
 			},
 			handleDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');
 
-				const parentElement = element.getParent();
-				let pageElement: PageElement | undefined;
+				const newParent = element.getParent();
+				let draggedElement: PageElement | undefined;
 
 				if (!patternId) {
-					pageElement = this.props.store.getRearrangeElement();
+					draggedElement = this.props.store.getDraggedElement();
 				} else {
 					const styleguide = this.props.store.getStyleguide();
 					if (!styleguide) {
 						return;
 					}
 
-					pageElement = new PageElement({
+					draggedElement = new PageElement({
 						pattern: styleguide.getPattern(patternId),
 						page: this.props.store.getCurrentPage() as Page,
 						setDefaults: true
 					});
 				}
 
-				if (!parentElement || !pageElement || pageElement.isAncestorOf(parentElement)) {
+				if (!newParent || !draggedElement || draggedElement.isAncestorOf(newParent)) {
 					return;
 				}
 
-				parentElement.addChild(pageElement, element.getIndex());
-				this.props.store.setSelectedElement(pageElement);
+				let newIndex = element.getIndex();
+				if (draggedElement.getParent() === newParent) {
+					const currentIndex = draggedElement.getIndex();
+					if (newIndex > currentIndex) {
+						newIndex--;
+					}
+					if (newIndex === currentIndex) {
+						return;
+					}
+				}
+
+				this.props.store.execute(ElementCommand.addChild(newParent, draggedElement, newIndex));
+				this.props.store.setSelectedElement(draggedElement);
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');
 
-				let pageElement: PageElement | undefined;
+				let draggedElement: PageElement | undefined;
 
 				if (!patternId) {
-					pageElement = this.props.store.getRearrangeElement();
+					draggedElement = this.props.store.getDraggedElement();
 				} else {
 					const styleguide = this.props.store.getStyleguide();
 
@@ -112,19 +124,19 @@ export class ElementList extends React.Component<ElementListProps> {
 						return;
 					}
 
-					pageElement = new PageElement({
+					draggedElement = new PageElement({
 						pattern: styleguide.getPattern(patternId),
 						page: this.props.store.getCurrentPage() as Page,
 						setDefaults: true
 					});
 				}
 
-				if (!pageElement || pageElement.isAncestorOf(element)) {
+				if (!draggedElement || draggedElement.isAncestorOf(element)) {
 					return;
 				}
 
-				element.addChild(pageElement);
-				this.props.store.setSelectedElement(pageElement);
+				this.props.store.execute(ElementCommand.addChild(element, draggedElement));
+				this.props.store.setSelectedElement(draggedElement);
 			},
 			children: items,
 			active: element === selectedElement

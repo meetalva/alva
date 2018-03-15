@@ -49,7 +49,7 @@ export class PatternFolder {
 	 * @param indentation The current indentation level, if invoked from a parent pattern folder.
 	 */
 	public dump(indentation: number = 0): void {
-		console.log(`${'  '.repeat(indentation)}Folder '${this.name}'`);
+		console.info(`${'  '.repeat(indentation)}Folder '${this.name}'`);
 		for (const child of this.children.values()) {
 			child.dump(indentation + 1);
 		}

@@ -95,3 +95,9 @@ ipcMain.on('request-check-for-updates', () => {
 		checkForUpdates(win, true);
 	}
 });
+
+ipcMain.on('preview-ready', () => {
+	BrowserWindow.getAllWindows().forEach(window => {
+		window.webContents.send('preview-ready');
+	});
+});

@@ -34,6 +34,7 @@ export class ProjectList extends React.Component<ProjectListProps> {
 			</Dropdown>
 		);
 	}
+
 	protected handleProjectClick(id: string): void {
 		this.props.store.openFirstPage(id);
 	}

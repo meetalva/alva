@@ -16,18 +16,21 @@ export type HighlightElementFunction = (
 
 const store = new Store();
 
-ipcRenderer.on('page-change', (event: {}, message: JsonObject) => {
-	store.setPageFromJsonInternal(message.page as JsonObject, message.pageId as string);
+ipcRenderer.on('styleguide-change', (event: {}, message: JsonObject) => {
+	store.setStyleguideFromJsonInternal(message);
 });
 
-ipcRenderer.on('open-styleguide', (event: {}, message: JsonObject) => {
-	store.openStyleguide(message.styleguidePath as string);
+ipcRenderer.on('page-change', (event: {}, message: JsonObject) => {
+	store.setPageFromJsonInternal(message);
+	render();
 });
 
 ipcRenderer.on('selectedElement-change', (event: {}, message: JsonObject) => {
 	const page = store.getCurrentPage() as Page;
 	store.setSelectedElement(page.getElementById(message.selectedElementId as string));
 });
+
+ipcRenderer.send('preview-ready');
 
 const highlightElement: HighlightElementFunction = (element, currentHighlightArea, callback) => {
 	const clientRect: ClientRect = element.getBoundingClientRect();
@@ -62,6 +65,14 @@ const highlightElement: HighlightElementFunction = (element, currentHighlightAre
 	callback(newHighlightArea);
 };
 
+function render(): void {
+	const styleguide = store.getStyleguide();
+	const analyzer = styleguide ? styleguide.getAnalyzer() : undefined;
+	if (analyzer) {
+		analyzer.render(store, highlightElement);
+	}
+}
+
 function hideHighlightArea(
 	highlightArea: HighlightAreaProps,
 	callback: (highlightArea: HighlightAreaProps) => void
@@ -74,14 +85,6 @@ function hideHighlightArea(
 
 window.onload = () => {
 	SmoothscrollPolyfill.polyfill();
-
-	const styleguide = store.getStyleguide();
-	const analyzer = styleguide ? styleguide.getAnalyzer() : undefined;
-	if (!analyzer) {
-		return;
-	}
-
-	analyzer.render(store, highlightElement);
 };
 
 // Disable drag and drop from outside the application

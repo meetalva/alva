@@ -74,11 +74,6 @@ export class PageElement {
 		if (properties.setDefaults && this.pattern) {
 			this.pattern.getProperties().forEach(property => {
 				this.setPropertyValue(property.getId(), property.getDefaultValue());
-				console.log(
-					`Property ${property.getId()}: Set default ${JSON.stringify(
-						this.getPropertyValue(property.getId())
-					)}`
-				);
 			});
 		}
 
@@ -147,18 +142,6 @@ export class PageElement {
 	 */
 	public addChild(child: PageElement, index?: number): void {
 		child.setParent(this, index);
-	}
-
-	/**
-	 * Adds a page element as another child of this element's parent, directly after this element.
-	 * Also removes the element from any previous parent.
-	 * @param child The child element to add.
-	 */
-	public addSibling(child: PageElement): void {
-		const parentElement: PageElement | undefined = this.getParent();
-		if (parentElement) {
-			child.setParent(parentElement, this.getIndex() + 1);
-		}
 	}
 
 	/**
@@ -270,8 +253,9 @@ export class PageElement {
 	/**
 	 * The content of a property of this page element.
 	 * @param id The ID of the property to return the value of.
-	 * @param path If the property value you are trying to access is buried inside an object property use the path paremeter to access it.
-	 * eg: `getPropertyValue('image', 'src.srcSet')`.
+	 * @param path A dot ('.') separated optional path within an object property to point to a deep
+	 * property. E.g., setting propertyId to 'image' and path to 'src.srcSet.xs',
+	 * the operation edits 'image.src.srcSet.xs' on the element.
 	 * @return The content value (as provided by the designer).
 	 */
 	public getPropertyValue(id: string, path?: string): PropertyValue {
@@ -393,8 +377,9 @@ export class PageElement {
 	 * Any given value is automatically converted to be compatible to the property type.
 	 * For instance, the string "true" is converted to true if the property is boolean.
 	 * @param id The ID of the property to set the value for.
-	 * @param path If want to set a property inside an object property use the path paremeter to access it.
-	 * eg: `setPropertyValue('image', 'http://someimageurl.jpeg', src.srcSet.XS')`.
+	 * @param path A dot ('.') separated optional path within an object property to point to a deep
+	 * property. E.g., setting propertyId to 'image' and path to 'src.srcSet.xs',
+	 * the operation edits 'image.src.srcSet.xs' on the element.
 	 * @param value The value to set (which is automatically converted, see above).
 	 */
 	// tslint:disable-next-line:no-any

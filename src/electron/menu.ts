@@ -6,6 +6,7 @@ import {
 	remote,
 	WebviewTag
 } from 'electron';
+import { ElementCommand } from '../store/page/command/element-command';
 import * as FileExtraUtils from 'fs-extra';
 import { PageElement } from '../store/page/page-element';
 import * as PathUtils from 'path';
@@ -28,7 +29,6 @@ export function createMenu(store: Store): void {
 						}
 
 						const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
-						console.log(`Design kit path is: ${designkitPath}`);
 						dialog.showOpenDialog(
 							{ properties: ['openDirectory', 'createDirectory'] },
 							filePaths => {
@@ -174,12 +174,16 @@ export function createMenu(store: Store): void {
 				{
 					label: '&Undo',
 					accelerator: 'CmdOrCtrl+Z',
-					role: 'undo'
+					click: () => {
+						store.undo();
+					}
 				},
 				{
 					label: '&Redo',
 					accelerator: 'Shift+CmdOrCtrl+Z',
-					role: 'redo'
+					click: () => {
+						store.redo();
+					}
 				},
 				{
 					type: 'separator'
@@ -192,7 +196,7 @@ export function createMenu(store: Store): void {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						if (selectedElement && store.isElementFocussed()) {
 							store.setClipboardElement(selectedElement);
-							selectedElement.remove();
+							store.execute(ElementCommand.remove(selectedElement));
 						}
 						Menu.sendActionToFirstResponder('cut:');
 					}
@@ -218,7 +222,7 @@ export function createMenu(store: Store): void {
 						const clipboardElement: PageElement | undefined = store.getClipboardElement();
 						if (selectedElement && clipboardElement && store.isElementFocussed()) {
 							const newPageElement = clipboardElement.clone();
-							selectedElement.addSibling(newPageElement);
+							store.execute(ElementCommand.addSibling(selectedElement, newPageElement));
 							store.setSelectedElement(newPageElement);
 						}
 						Menu.sendActionToFirstResponder('paste:');
@@ -235,7 +239,7 @@ export function createMenu(store: Store): void {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						if (selectedElement && store.isElementFocussed()) {
 							const newPageElement = selectedElement.clone();
-							selectedElement.addSibling(newPageElement);
+							store.execute(ElementCommand.addSibling(selectedElement, newPageElement));
 							store.setSelectedElement(newPageElement);
 						}
 					}
@@ -264,7 +268,7 @@ export function createMenu(store: Store): void {
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						if (selectedElement) {
-							selectedElement.remove();
+							store.execute(ElementCommand.remove(selectedElement));
 							store.setSelectedElement(undefined);
 						} else {
 							if (process.platform === 'darwin') {

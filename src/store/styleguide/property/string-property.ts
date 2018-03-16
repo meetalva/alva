@@ -9,6 +9,11 @@ import { Property } from './property';
  */
 export class StringProperty extends Property {
 	/**
+	 * The ID of the synthetic string property in the synthetic text content pattern.
+	 */
+	public static SYNTHETIC_TEXT_ID: string = 'text';
+
+	/**
 	 * Creates a new string property.
 	 * @param id The technical ID of this property (e.g. the property name
 	 * in the TypeScript props interface).

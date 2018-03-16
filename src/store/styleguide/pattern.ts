@@ -1,5 +1,4 @@
 import { PatternFolder } from './folder';
-import { PatternType } from './pattern-type';
 import { Property } from './property/property';
 import { Store } from '../store';
 
@@ -13,6 +12,11 @@ import { Store } from '../store';
  * e.g. Patternplate.
  */
 export class Pattern {
+	/**
+	 * The ID of the synthetic text content pattern.
+	 */
+	public static SYNTHETIC_TEXT_ID: string = 'synthetic:text';
+
 	/**
 	 * The name of the export in the JavaScript implementation of the pattern.
 	 * For default export, the value is 'default'.
@@ -53,31 +57,18 @@ export class Pattern {
 	protected properties: Map<string, Property> = new Map();
 
 	/**
-	 * The type of the pattern (e.g. react, angular, vue).
-	 */
-	protected type: PatternType;
-
-	/**
 	 * Creates a new pattern.
 	 * @param id The ID of the pattern. How this is generated is completely up to the styleguide analyzer
 	 * that creates the pattern (and does not necessarily represent the file path).
 	 * @param name The human-readable name of the pattern.
-	 * @param type The type of the pattern (e.g. react, angular, vue). Use PatternType constants.
 	 * @param implementationPath The absolute path to the JavaScript implementation of the pattern,
 	 * used to preview page elements.
 	 * @param exportName The name of the export in the JavaScript implementation of the pattern.
 	 * For default export, the value is 'default'.
 	 */
-	public constructor(
-		id: string,
-		name: string,
-		type: PatternType,
-		implementationPath: string,
-		exportName?: string
-	) {
+	public constructor(id: string, name: string, implementationPath: string, exportName?: string) {
 		this.id = id;
 		this.name = Store.guessName(name);
-		this.type = type;
 		this.implementationPath = implementationPath || '';
 		this.exportName = exportName || 'default';
 	}
@@ -160,14 +151,6 @@ export class Pattern {
 	 */
 	public getProperty(id: string): Property | undefined {
 		return this.properties.get(id);
-	}
-
-	/**
-	 * Returns the type of the pattern (e.g. react, angular, vue).
-	 * @return The type of the pattern (e.g. react, angular, vue).
-	 */
-	public getType(): PatternType {
-		return this.type;
 	}
 
 	/**

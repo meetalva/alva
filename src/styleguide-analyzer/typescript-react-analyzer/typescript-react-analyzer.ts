@@ -4,7 +4,6 @@ import { PatternFolder } from '../../store/styleguide/folder';
 import * as FileUtils from 'fs';
 import * as PathUtils from 'path';
 import { Pattern } from '../../store/styleguide/pattern';
-import { PatternType } from '../../store/styleguide/pattern-type';
 import { HighlightElementFunction } from '../../component/preview';
 import { Property } from '../../store/styleguide/property/property';
 import { PropertyAnalyzer } from './property-analyzer';
@@ -83,13 +82,7 @@ export class Analyzer extends StyleguideAnalyzer {
 
 				const id = this.getPatternId(rootDirectory.getPath(), patternInfo, exportInfo);
 				const name = this.getPatternName(patternInfo, exportInfo);
-				const pattern = new Pattern(
-					id,
-					name,
-					PatternType.React,
-					patternInfo.implementationPath,
-					exportInfo.name
-				);
+				const pattern = new Pattern(id, name, patternInfo.implementationPath, exportInfo.name);
 				pattern.setIconPath(patternInfo.iconPath);
 
 				const properties: Property[] = PropertyAnalyzer.analyze(
@@ -199,13 +192,6 @@ export class Analyzer extends StyleguideAnalyzer {
 		const baseName = PathUtils.basename(fileInfo.implementationPath, '.js');
 		const directoryName = PathUtils.basename(fileInfo.directory);
 		return exportInfo.name || (baseName !== 'index' ? baseName : directoryName);
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public getPatternType(): PatternType {
-		return PatternType.React;
 	}
 
 	/**

@@ -2,11 +2,12 @@ import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { Page } from '../../../store/page/page';
 import { PageElement } from '../../../store/page/page-element';
-import { PatternType } from '../../../store/styleguide/pattern-type';
+import { Pattern } from '../../../store/styleguide/pattern';
 import { PropertyValue } from '../../../store/page/property-value';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Store } from '../../../store/store';
+import { StringProperty } from '../../../store/styleguide/property/string-property';
 
 import { HighlightAreaProps, HighlightElementFunction } from '../../preview';
 
@@ -144,15 +145,8 @@ class Preview extends React.Component<PreviewProps> {
 			}
 
 			const patternId: string = pattern.getId();
-			const patternType: PatternType = pattern.getType();
-
-			if (patternType === PatternType.Synthetic) {
-				switch (patternId) {
-					case 'text':
-						return pageElement.getPropertyValue('text');
-					default:
-						throw new Error(`Unsupported synthetic pattern '${patternId}'`);
-				}
+			if (patternId === Pattern.SYNTHETIC_TEXT_ID) {
+				return pageElement.getPropertyValue(StringProperty.SYNTHETIC_TEXT_ID);
 			}
 
 			// tslint:disable-next-line:no-any
@@ -169,10 +163,6 @@ class Preview extends React.Component<PreviewProps> {
 			componentProps.children = pageElement
 				.getChildren()
 				.map((child, index) => this.createComponent(child, String(index)));
-
-			if (patternType !== 'react') {
-				throw new Error(`Unsupported pattern type '${patternType}'`);
-			}
 
 			// Then, load the pattern factory
 			const patternPath: string = pattern.getImplementationPath();

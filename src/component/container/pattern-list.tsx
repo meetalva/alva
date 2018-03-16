@@ -10,7 +10,6 @@ import PatternList, {
 	PatternListItem,
 	PatternListItemProps
 } from '../../lsg/patterns/pattern-list';
-import { PatternType } from '../../store/styleguide/pattern-type';
 import * as React from 'react';
 import Space, { Size } from '../../lsg/patterns/space';
 import { Store } from '../../store/store';
@@ -92,14 +91,10 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 			};
 
 			for (const pattern of folder.getPatterns()) {
-				// a synthetic pattern can not have a icon
-				const icon =
-					pattern.getType() === PatternType.Synthetic ? undefined : pattern.getIconPath();
-
 				containerItem.items.push({
 					name: pattern.getName(),
 					draggable: true,
-					icon,
+					icon: pattern.getIconPath(),
 					handleDragStart: (e: React.DragEvent<HTMLElement>) => {
 						this.handleDragStart(e, pattern);
 					},

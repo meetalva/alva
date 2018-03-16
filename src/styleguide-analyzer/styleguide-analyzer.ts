@@ -1,4 +1,3 @@
-import { PatternType } from '../store/styleguide/pattern-type';
 import { HighlightElementFunction } from '../component/preview';
 import { Store } from '../store/store';
 import { Styleguide } from '../store/styleguide/styleguide';
@@ -7,6 +6,7 @@ import { Styleguide } from '../store/styleguide/styleguide';
  * A styleguide analyzer walks through the pattern implementations of a styleguide.
  * It finds folders and patterns, including multiple files within a folder, and multiple exports within a file.
  * It then creates pattern folder and pattern instances representing the implementations, and puts them into the styleguide registry.
+ * @see README.md for more details on analyzers and how to write your own.
  */
 export abstract class StyleguideAnalyzer {
 	/**
@@ -15,12 +15,6 @@ export abstract class StyleguideAnalyzer {
 	 * @param styleguide The styleguide to analyze its implementations.
 	 */
 	public abstract analyze(styleguide: Styleguide): void;
-
-	/**
-	 * Returns the pattern type this analyzer creates.
-	 * @return The pattern type this analyzer creates.
-	 */
-	public abstract getPatternType(): PatternType;
 
 	/**
 	 * Renders the preview application based on the store.

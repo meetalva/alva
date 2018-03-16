@@ -5,6 +5,7 @@ import { Pattern } from '../styleguide/pattern';
 import { Property } from '../styleguide/property/property';
 import { PropertyValue } from './property-value';
 import { Store } from '../store';
+import { StringProperty } from '../styleguide/property/string-property';
 import { Styleguide } from '../styleguide/styleguide';
 import * as Uuid from 'uuid';
 
@@ -187,13 +188,12 @@ export class PageElement {
 			const styleguide = store.getStyleguide() as Styleguide;
 
 			const element: PageElement = new PageElement({
-				id: 'synthetic/text',
 				page: this.page,
-				pattern: styleguide.getPattern('synthetic/text'),
+				pattern: styleguide.getPattern(Pattern.SYNTHETIC_TEXT_ID),
 				setDefaults: false,
 				parent: this
 			});
-			element.setPropertyValue('text', String(json));
+			element.setPropertyValue(StringProperty.SYNTHETIC_TEXT_ID, String(json));
 			return element;
 		}
 	}

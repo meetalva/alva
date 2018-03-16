@@ -2,7 +2,6 @@ import { Directory } from '../../styleguide-analyzer/directory';
 import { PatternFolder } from './folder';
 import * as PathUtils from 'path';
 import { Pattern } from './pattern';
-import { PatternType } from './pattern-type';
 import { StringProperty } from './property/string-property';
 import { StyleguideAnalyzer } from '../../styleguide-analyzer/styleguide-analyzer';
 
@@ -77,10 +76,8 @@ export class Styleguide {
 	 * Adds Alva's synthetic patterns to this styleguide. Synthetic patterns do not have a physical implementation. They are required to create page elements that represent values only, such as child text nodes.
 	 */
 	private addSyntheticPatterns(): void {
-		// TODO: Maybe move this method to the typescript-react-analyzer when
-		// moving the preview code to a renderer concept (e.g. pattern.getRenderer().render()).
-		const textPattern = new Pattern('text', 'text', PatternType.Synthetic, 'synthetic');
-		const textProperty = new StringProperty('text');
+		const textPattern = new Pattern(Pattern.SYNTHETIC_TEXT_ID, 'text', '');
+		const textProperty = new StringProperty(StringProperty.SYNTHETIC_TEXT_ID);
 		textPattern.addProperty(textProperty);
 
 		const folder = new PatternFolder('synthetic', this.patternRoot);

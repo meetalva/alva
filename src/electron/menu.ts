@@ -153,7 +153,7 @@ export function createMenu(store: Store): void {
 										);
 									}
 								);
-							}, 10);
+							}, 100);
 						});
 					}
 				},

@@ -67,7 +67,7 @@ Alva tries hard to understand the structure of your styleguide, including the pa
 
 However, currently, only TypeScript React pattern components are supported.
 
-The pattern parser expects directories in the following structure:
+The pattern analyzer expects directories in the following structure:
 
 * A directory named `lib` at styleguide top-level, and inside, a directory `patterns`.
 * Inside that, optionally, a directory per pattern folder (maybe even nested)
@@ -115,19 +115,92 @@ className?: string;
 
 You can also specify the @name annotation on enum members, and you can add it to the props interface to rename the entire pattern.
 
-### Source-code structure and architecture
+### Styleguide analyzers ###
 
-Alva is a React application using MobX as state management and Electron to provide a stand-alone application.
+Alva tries to understand the structure of your styleguide, including the pattern folders, patterns, and properties, by delegating to so-called styleguide analyzers.
 
-Additionally, it ships with a living styleguide project, which consists of Patternplate React components.
+In the future, there will be several analyzers for all types of
+* frontend technologies like [React](https://reactjs.org/), [Angular](https://angular.io/), and [Vue](https://vuejs.org/),
+* pattern systems like [Patternplate](https://github.com/patternplate) and [Storybook](https://storybook.js.org/), and
+* languages like [TypeScript](https://www.typescriptlang.org/) and plain JavaScript.
 
-All the sources of Alva are located in `src`, divided into the following folders:
+The analyzer is also responsible for rendering page elements into the preview, as it is the type of object that knows the frontend technology.
 
-* **components**: All React components for the project, page, page-element, and property panes, as well as the design preview in the middle of the page. Components may be smart (they may contain their own state), but only as long as the state is nothing global, related to multiple components, or fundamental enough. In this case, the state is maintained by the store (see below).
-* **electron**: The bootstrap code to start the Electron App, including the container HTML, and the main menu.
-* **lsg**: The styled components Alva uses, as a living styleguide. Do not mixup this styleguide with the designkit (which also is a styleguide). The LSG contains the styled, logic-less components which are used by the Alva UI. The designkit contains the patterns the designer uses to create a basic design (wireframes).
-* **resources**: Resources are files related to the build, like the icons.
-* **store**: The store is the data-center and business logic of Alva. The model. The store is a collection of MobX observables and does not contain any UI elements like React components. Instead, all components bind their props to this store by decorating with `@observer`.
+Currently we only have a [TypeScript React analyzer](./src/styleguide-analyzer/typescript-react-analyzer/typescript-react-analyzer.ts) with no extra intelligence for pattern systems.
+
+If you want to build your own, you have to implement a class similar to that analyzer, implementing an `analyze` and a `render` method. You have to create a new directory inside `src/styleguide-analyzer` with the kebab-case name of your analyzer. Then, put a `.ts` file into that folder, with the same name. The file must export a class named `Analyzer`, extending `StyleguideAnalyzer` (or one of its subclasses).
+
+If you create an analyzer named 'my-analyzer', there whould be a file `src/styleguide-analyzer/my-analyzer/my-analyzer.ts` with the following content:
+
+```javascript
+import { HighlightElementFunction } from '../../component/preview';
+import { Store } from '../../store/store';
+import { Styleguide } from '../../store/styleguide/styleguide';
+import { StyleguideAnalyzer } from '../styleguide-analyzer';
+
+export class Analyzer extends StyleguideAnalyzer {
+	/**
+	 * @inheritdoc
+	 */
+	public analyze(styleguide: Styleguide): void {
+		// TODO: Implement me.
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public render(store: Store, highlightElement: HighlightElementFunction): void {
+		// TODO: Implement me.
+	}
+}
+```
+
+#### Pattern analysis
+
+The implementation of `analyze` should use the provided path as a starting point to find pattern folders and patterns. For each folder, instantiate a `PatternFolder` object like this:
+
+```javascript
+new PatternFolder(name, parent)
+```
+
+where `name` is the human friendly name of that folder, and `parent` is the styleguide's `getPatternRoot()` (for top-level folders), or a previously created parent folder (or nested folders). Maybe implement a folder recursion if you want to support nesting.
+
+For each pattern, locate the implementation (to be `require`d when rendering), its export name if it is not the default, and maybe an icon file. Also generate a stable ID for the pattern, e.g. by using the pattern system's ID metadata (or the file path, if not available). Then create a `Pattern` object like this:
+
+```javascript
+const pattern = new Pattern(id, name, implementationPath, exportName);
+pattern.setIconPath(iconPath);
+```
+
+Next, add properties to the pattern by scanning the TypeScript types, reading pattern system metadata, etc. For each property, instantiate one of the `Property` subclasses, and add the property to the pattern, e.g.:
+
+```javascript
+const property = new StringProperty(id);
+property.setRequired(required);
+pattern.addProperty(property);
+```
+
+Finally, add the pattern to the styleguide, and optionally to one or more pattern folders:
+
+```javascript
+folder.addPattern(pattern);
+styleguide.addPattern(pattern);
+```
+#### Rendering
+
+In the render method of the styleguide analyzer, your task is to output a component that displays the preview of the currently edited page (see `store.getCurrentPage()`).
+
+You have to iterate recursively over the page elements, and build property data objects for each element. See the TypeScript React analyzer's `createComponent` method for an example.
+
+Then `require` the implementation path and run the exported function with that data.
+
+#### Select your new analyzer
+
+After having created a new styleguide analyzer, put its name into your styleguide's `alva.yaml` as top-level `analyzerName` property:
+
+```javascript
+analyzerName: my-analyzer
+```
 
 ## Next features
 

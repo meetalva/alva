@@ -2,6 +2,77 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.7.0"></a>
+# [0.7.0](https://github.com/meetalva/alva/compare/v0.6.0...v0.7.0) (2018-03-16)
+
+
+### Bug Fixes
+
+* **auto-updater:** correct value for progress bar and reset progress bar ([153806c](https://github.com/meetalva/alva/commit/153806c))
+* **component:** Fix PatternListContainer unique key error ([26750dd](https://github.com/meetalva/alva/commit/26750dd))
+* **component:** prevent app zooming ([bbf7e89](https://github.com/meetalva/alva/commit/bbf7e89))
+* **component:** restore old pattern_list rendering behavior ([33bcb9f](https://github.com/meetalva/alva/commit/33bcb9f))
+* **dist:** package react typings for distributed design-kit ([#289](https://github.com/meetalva/alva/issues/289)) ([3f4ec49](https://github.com/meetalva/alva/commit/3f4ec49))
+* **electron:** use right url for "learn more" menu entry ([#172](https://github.com/meetalva/alva/issues/172)) ([75edbb1](https://github.com/meetalva/alva/commit/75edbb1))
+* **lsg:** adjust property item label colors ([#159](https://github.com/meetalva/alva/issues/159)) ([7d7c83e](https://github.com/meetalva/alva/commit/7d7c83e)), closes [#147](https://github.com/meetalva/alva/issues/147)
+* **lsg:** apply preview styling on webview element ([e74debf](https://github.com/meetalva/alva/commit/e74debf)), closes [#122](https://github.com/meetalva/alva/issues/122)
+* **menu:** also close alva when all windows are hidden ([ee8b5c4](https://github.com/meetalva/alva/commit/ee8b5c4)), closes [#187](https://github.com/meetalva/alva/issues/187)
+* **menu:** it is not possible to call toggleDevTools on browserWindow ([928e01c](https://github.com/meetalva/alva/commit/928e01c))
+* **menu:** make sure that the page is done resizing before capture ([6bd6acf](https://github.com/meetalva/alva/commit/6bd6acf))
+* **menu:** move update check execution in to the main process ([7f8ce94](https://github.com/meetalva/alva/commit/7f8ce94))
+* **package:** update electron-updater to version 2.21.0 ([dae637b](https://github.com/meetalva/alva/commit/dae637b))
+* **package:** update js-yaml to version 3.11.0 ([#266](https://github.com/meetalva/alva/issues/266)) ([122e071](https://github.com/meetalva/alva/commit/122e071))
+* **package:** update mobx-react to version 4.4.3 ([#268](https://github.com/meetalva/alva/issues/268)) ([13c6937](https://github.com/meetalva/alva/commit/13c6937))
+* **package:** update readts to version 0.2.0 ([#262](https://github.com/meetalva/alva/issues/262)) ([540ad9e](https://github.com/meetalva/alva/commit/540ad9e))
+* **package:** update smoothscroll-polyfill to version 0.4.3 ([cc1d2af](https://github.com/meetalva/alva/commit/cc1d2af)), closes [#259](https://github.com/meetalva/alva/issues/259)
+* **package:** update styled-components to version 3.2.0 ([#267](https://github.com/meetalva/alva/issues/267)) ([79a9aea](https://github.com/meetalva/alva/commit/79a9aea))
+* **png-export:** longer wait time before screenshot ([dc27989](https://github.com/meetalva/alva/commit/dc27989))
+* **preview:** make preview wrapper not absolute to enable page capturing ([79c59a5](https://github.com/meetalva/alva/commit/79c59a5))
+* **preview:** stop component from highlighting when only props change ([37b778f](https://github.com/meetalva/alva/commit/37b778f))
+* **release:** remove use of unknown dependency ([aa01853](https://github.com/meetalva/alva/commit/aa01853))
+* **store:** don't ignore patterns in pattern root folder ([d9ace1a](https://github.com/meetalva/alva/commit/d9ace1a))
+* **store:** don't try to save when there is no styleguide ([f9ef1dd](https://github.com/meetalva/alva/commit/f9ef1dd)), closes [#101](https://github.com/meetalva/alva/issues/101)
+* **store:** name pattern root after folder on fs ([1b4cb1e](https://github.com/meetalva/alva/commit/1b4cb1e))
+* **store:** naming of string-property file in imports ([#211](https://github.com/meetalva/alva/issues/211)) ([5652072](https://github.com/meetalva/alva/commit/5652072))
+* **store:** normalize pattern ids across platforms ([#287](https://github.com/meetalva/alva/issues/287)) ([25b939d](https://github.com/meetalva/alva/commit/25b939d))
+* **store:** page elements have stable IDs now, fixing UI lists ([55053d3](https://github.com/meetalva/alva/commit/55053d3))
+* disable unhandled dragging interaction on main window ([0a0c45b](https://github.com/meetalva/alva/commit/0a0c45b)), closes [#177](https://github.com/meetalva/alva/issues/177)
+* **store:** patternId migration path ([c67d58f](https://github.com/meetalva/alva/commit/c67d58f))
+* **store:** preview/app race condition when loading a styleguide ([a0786b0](https://github.com/meetalva/alva/commit/a0786b0))
+* **store:** re-implement pattern grouping / folders ([49f6bf8](https://github.com/meetalva/alva/commit/49f6bf8))
+* **store:** restore pattern icon detection ([037dcc4](https://github.com/meetalva/alva/commit/037dcc4))
+* **store:** typescript-react-analyzer respect fs folder structure ([dfd2fde](https://github.com/meetalva/alva/commit/dfd2fde))
+* disable svg image dragging in <PatternList> ([44b85ef](https://github.com/meetalva/alva/commit/44b85ef)), closes [#177](https://github.com/meetalva/alva/issues/177)
+* disabled drag-and-drop from outside the application ([cf1fe2f](https://github.com/meetalva/alva/commit/cf1fe2f))
+* set default linebreak for ts files ([8f83c72](https://github.com/meetalva/alva/commit/8f83c72))
+
+
+### Features
+
+* **analyzer:** move decision for the renderer in to the analyzers ([1442f51](https://github.com/meetalva/alva/commit/1442f51))
+* **auto-updater:** ask user before updating alva ([38c7766](https://github.com/meetalva/alva/commit/38c7766)), closes [#168](https://github.com/meetalva/alva/issues/168)
+* **auto-updater:** set progress bar and add to menu ([e024cc4](https://github.com/meetalva/alva/commit/e024cc4)), closes [#84](https://github.com/meetalva/alva/issues/84)
+* **config:** add styleguide option for choosing a specific analyzer ([a988121](https://github.com/meetalva/alva/commit/a988121))
+* **logo:** new alva logo ([0903f24](https://github.com/meetalva/alva/commit/0903f24))
+* **menu:** add context menu for page elements ([a8cd86e](https://github.com/meetalva/alva/commit/a8cd86e)), closes [#111](https://github.com/meetalva/alva/issues/111)
+* **menu:** add option to export current page as png ([1c423b6](https://github.com/meetalva/alva/commit/1c423b6)), closes [#71](https://github.com/meetalva/alva/issues/71)
+* **menu:** disable specific menu items for splashscreen ([c009cd2](https://github.com/meetalva/alva/commit/c009cd2))
+* **menu:** new menuitem that opens settings file in default application ([f8676a7](https://github.com/meetalva/alva/commit/f8676a7)), closes [#195](https://github.com/meetalva/alva/issues/195)
+* **page-element:** unique id for each page-element ([79bbb1a](https://github.com/meetalva/alva/commit/79bbb1a))
+* **page-list:** page editable w doubleclick on page-item in dropdown ([1736b0b](https://github.com/meetalva/alva/commit/1736b0b))
+* **preview:** highlight element on select ([2423a5d](https://github.com/meetalva/alva/commit/2423a5d))
+* **preview-pane:** implement resizing of the preview-pane ([5f6e133](https://github.com/meetalva/alva/commit/5f6e133))
+* **renderer:** switch between renderers based on analyser type ([a4008df](https://github.com/meetalva/alva/commit/a4008df))
+* **splashscreen:** display OS menu ([bd21b62](https://github.com/meetalva/alva/commit/bd21b62))
+* **store:** function for selecting element by it’s id ([d2ee04a](https://github.com/meetalva/alva/commit/d2ee04a))
+* **store:** new function for converting page names to ids ([cad182b](https://github.com/meetalva/alva/commit/cad182b))
+* **store:** new function for renaming pages ([73413d2](https://github.com/meetalva/alva/commit/73413d2))
+* add ability to define a custom preview frame html wrapper ([47e1f4d](https://github.com/meetalva/alva/commit/47e1f4d))
+* **webview:** disable node-integration for webview ([2d7d75e](https://github.com/meetalva/alva/commit/2d7d75e))
+* **window:** minimum app window size ([239d788](https://github.com/meetalva/alva/commit/239d788)), closes [#107](https://github.com/meetalva/alva/issues/107)
+
+
+
 <a name="0.6.0"></a>
 # [0.6.0](https://github.com/meetalva/alva/compare/v0.5.0...v0.6.0) (2017-12-20)
 

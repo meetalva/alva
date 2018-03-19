@@ -37,14 +37,19 @@ const StyledPreviewResizer = styled.div`
 	}
 `;
 
-const StyledPreviewPane = styled.div`
-	max-width: ${(props: PreviewPaneProps) => `${props.width}px` || 'none'};
+const BaseStyledPreviewPane = styled.div`
 	flex-grow: 1;
 	overflow: hidden;
 	background: ${colors.white.toString()};
 	border-radius: 6px 6px 0 0;
 	box-shadow: 0 3px 9px 0 ${colors.black.toRGBString(0.15)};
 `;
+
+const StyledPreviewPane = BaseStyledPreviewPane.extend.attrs({
+	style: (props: PreviewPaneProps) => ({
+		maxWidth: `${props.width}px` || 'none'
+	})
+}) `${(props: PreviewPaneProps) => ({})}`;
 
 export default class PreviewPane extends React.Component<PreviewPaneProps> {
 	private previewPane: HTMLElement;

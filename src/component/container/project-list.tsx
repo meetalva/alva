@@ -7,7 +7,6 @@ import { Store } from '../../store/store';
 
 export interface ProjectListProps {
 	open?: boolean;
-	store: Store;
 }
 
 @observer
@@ -19,22 +18,24 @@ export class ProjectList extends React.Component<ProjectListProps> {
 	}
 
 	protected handleProjectClick(id: string): void {
-		this.props.store.openFirstPage(id);
+		Store.getInstance().openFirstPage(id);
 	}
 
 	public render(): JSX.Element {
 		return (
 			<Dropdown chrome open={this.props.open}>
-				{this.props.store.getProjects().map((project: Project, index) => (
-					<DropdownItem
-						key={project.getId()}
-						name={project.getName()}
-						handleClick={(e: React.MouseEvent<HTMLElement>) => {
-							e.preventDefault();
-							this.handleProjectClick(project.getId());
-						}}
-					/>
-				))}
+				{Store.getInstance()
+					.getProjects()
+					.map((project: Project, index) => (
+						<DropdownItem
+							key={project.getId()}
+							name={project.getName()}
+							handleClick={(e: React.MouseEvent<HTMLElement>) => {
+								e.preventDefault();
+								this.handleProjectClick(project.getId());
+							}}
+						/>
+					))}
 			</Dropdown>
 		);
 	}

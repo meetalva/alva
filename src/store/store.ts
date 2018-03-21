@@ -496,7 +496,7 @@ export class Store {
 	 * @param id The ID of the page to open.
 	 * @see save
 	 */
-	public openPage(id: string): void {
+	public openPage(id: string): boolean {
 		const styleguide = this.styleguide;
 		if (!styleguide) {
 			throw new Error('Cannot open page: No styleguide open');
@@ -512,7 +512,7 @@ export class Store {
 					pageRef.getLastPersistedPath() as string
 				);
 				const json: JsonObject = Persister.loadYamlOrJson(pagePath);
-				this.currentPage = Page.fromJsonObject(json, id, this);
+				this.currentPage = Page.fromJsonObject(json, id);
 				this.currentProject = this.currentPage.getProject();
 			} else {
 				this.currentPage = undefined;
@@ -523,6 +523,8 @@ export class Store {
 
 		this.preferences.setLastPageId(this.currentPage ? this.currentPage.getId() : undefined);
 		this.savePreferences();
+
+		return this.currentPage !== undefined;
 	}
 
 	/**
@@ -594,7 +596,7 @@ export class Store {
 			this.styleguide = new Styleguide(styleguidePath, this.analyzerName);
 
 			(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
-				const project: Project = Project.fromJsonObject(projectJson, this);
+				const project: Project = Project.fromJsonObject(projectJson);
 				this.addProject(project);
 			});
 		});
@@ -788,7 +790,7 @@ export class Store {
 	public setPageFromJsonInternal(json: JsonObject): void {
 		MobX.transaction(() => {
 			this.currentPage = json.page
-				? Page.fromJsonObject(json.page as JsonObject, json.pageId as string, this)
+				? Page.fromJsonObject(json.page as JsonObject, json.pageId as string)
 				: undefined;
 			this.selectedElement = undefined;
 		});
@@ -825,7 +827,7 @@ export class Store {
 
 			this.projects = [];
 			(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
-				const project: Project = Project.fromJsonObject(projectJson, this);
+				const project: Project = Project.fromJsonObject(projectJson);
 				this.addProject(project);
 			});
 

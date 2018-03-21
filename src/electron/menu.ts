@@ -6,7 +6,7 @@ import {
 	remote,
 	WebviewTag
 } from 'electron';
-import { ElementCommand } from '../store/page/command/element-command';
+import { ElementCommand } from '../store/command/element-command';
 import * as FileExtraUtils from 'fs-extra';
 import { PageElement } from '../store/page/page-element';
 import * as PathUtils from 'path';
@@ -14,7 +14,8 @@ import * as ProcessUtils from 'process';
 import { Store } from '../store/store';
 const { screen, Menu, shell, app, dialog } = remote;
 
-export function createMenu(store: Store): void {
+export function createMenu(): void {
+	const store = Store.getInstance();
 	const isSplashscreen: boolean = !Boolean(store.getCurrentProject());
 	const template: MenuItemConstructorOptions[] = [
 		{

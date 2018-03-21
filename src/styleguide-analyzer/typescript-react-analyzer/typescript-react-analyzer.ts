@@ -9,7 +9,6 @@ import { Property } from '../../store/styleguide/property/property';
 import { PropertyAnalyzer } from './property-analyzer';
 import { ReactUtils } from '../typescript/react-utils';
 import { renderReact } from '../../component/presentation/react/render';
-import { Store } from '../../store/store';
 import { Styleguide } from '../../store/styleguide/styleguide';
 import { StyleguideAnalyzer } from '../styleguide-analyzer';
 import { Type } from '../typescript/type';
@@ -197,7 +196,7 @@ export class Analyzer extends StyleguideAnalyzer {
 	/**
 	 * @inheritdoc
 	 */
-	public render(store: Store, highlightElement: HighlightElementFunction): void {
-		renderReact(store, highlightElement);
+	public render(highlightElement: HighlightElementFunction): void {
+		renderReact(highlightElement);
 	}
 }

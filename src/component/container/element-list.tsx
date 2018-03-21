@@ -1,5 +1,5 @@
 import { elementMenu } from '../../electron/context-menus';
-import { ElementCommand } from '../../store/page/command/element-command';
+import { ElementCommand } from '../../store/command/element-command';
 import { ElementWrapper } from './element-wrapper';
 import { ListItemProps } from '../../lsg/patterns/list';
 import { createMenu } from '../../electron/menu';
@@ -11,22 +11,18 @@ import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
 import { Store } from '../../store/store';
 
-export interface ElementListProps {
-	store: Store;
-}
-
 @observer
-export class ElementList extends React.Component<ElementListProps> {
-	public constructor(props: ElementListProps) {
+export class ElementList extends React.Component {
+	public constructor(props: {}) {
 		super(props);
 	}
 
 	public componentDidMount(): void {
-		createMenu(this.props.store);
+		createMenu();
 	}
 
-	public componentWillUpdate(newProps: ElementListProps): void {
-		createMenu(newProps.store);
+	public componentWillUpdate(newProps: {}): void {
+		createMenu();
 	}
 
 	public createItemFromElement(
@@ -57,19 +53,17 @@ export class ElementList extends React.Component<ElementListProps> {
 
 		const updatePageElement: React.MouseEventHandler<HTMLElement> = event => {
 			event.stopPropagation();
-			this.props.store.setSelectedElement(element);
-			this.props.store.setElementFocussed(true);
+			Store.getInstance().setSelectedElement(element);
+			Store.getInstance().setElementFocussed(true);
 		};
 
 		return {
 			label: key,
 			value: pattern.getName(),
 			onClick: updatePageElement,
-			onContextMenu: () => {
-				elementMenu(this.props.store, element);
-			},
+			onContextMenu: () => elementMenu(element),
 			handleDragStart: (e: React.DragEvent<HTMLElement>) => {
-				this.props.store.setDraggedElement(element);
+				Store.getInstance().setDraggedElement(element);
 			},
 			handleDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');
@@ -77,17 +71,17 @@ export class ElementList extends React.Component<ElementListProps> {
 				const newParent = element.getParent();
 				let draggedElement: PageElement | undefined;
 
+				const store = Store.getInstance();
 				if (!patternId) {
-					draggedElement = this.props.store.getDraggedElement();
+					draggedElement = store.getDraggedElement();
 				} else {
-					const styleguide = this.props.store.getStyleguide();
+					const styleguide = store.getStyleguide();
 					if (!styleguide) {
 						return;
 					}
 
 					draggedElement = new PageElement({
 						pattern: styleguide.getPattern(patternId),
-						page: this.props.store.getCurrentPage() as Page,
 						setDefaults: true
 					});
 				}
@@ -107,18 +101,19 @@ export class ElementList extends React.Component<ElementListProps> {
 					}
 				}
 
-				this.props.store.execute(ElementCommand.addChild(newParent, draggedElement, newIndex));
-				this.props.store.setSelectedElement(draggedElement);
+				store.execute(ElementCommand.addChild(newParent, draggedElement, newIndex));
+				store.setSelectedElement(draggedElement);
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');
 
 				let draggedElement: PageElement | undefined;
 
+				const store = Store.getInstance();
 				if (!patternId) {
-					draggedElement = this.props.store.getDraggedElement();
+					draggedElement = store.getDraggedElement();
 				} else {
-					const styleguide = this.props.store.getStyleguide();
+					const styleguide = store.getStyleguide();
 
 					if (!styleguide) {
 						return;
@@ -126,7 +121,6 @@ export class ElementList extends React.Component<ElementListProps> {
 
 					draggedElement = new PageElement({
 						pattern: styleguide.getPattern(patternId),
-						page: this.props.store.getCurrentPage() as Page,
 						setDefaults: true
 					});
 				}
@@ -135,8 +129,8 @@ export class ElementList extends React.Component<ElementListProps> {
 					return;
 				}
 
-				this.props.store.execute(ElementCommand.addChild(element, draggedElement));
-				this.props.store.setSelectedElement(draggedElement);
+				store.execute(ElementCommand.addChild(element, draggedElement));
+				store.setSelectedElement(draggedElement);
 			},
 			children: items,
 			active: element === selectedElement
@@ -173,7 +167,8 @@ export class ElementList extends React.Component<ElementListProps> {
 	}
 
 	public render(): JSX.Element | null {
-		const page: Page | undefined = this.props.store.getCurrentPage();
+		const store = Store.getInstance();
+		const page: Page | undefined = store.getCurrentPage();
 		if (page) {
 			const rootElement = page.getRoot();
 
@@ -181,7 +176,7 @@ export class ElementList extends React.Component<ElementListProps> {
 				return null;
 			}
 
-			const selectedElement = this.props.store.getSelectedElement();
+			const selectedElement = store.getSelectedElement();
 
 			return this.renderList(this.createItemFromElement('Root', rootElement, selectedElement));
 		} else {

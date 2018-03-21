@@ -38,12 +38,11 @@ webFrame.setLayoutZoomLevelLimits(0, 0);
 
 globalStyles();
 
-interface AppProps {
-	store: Store;
-}
+const store: Store = Store.getInstance();
+store.openFromPreferences();
 
 @observer
-class App extends React.Component<AppProps> {
+class App extends React.Component {
 	private static PATTERN_LIST_ID = 'patternlist';
 	private static PROPERTIES_LIST_ID = 'propertieslist';
 
@@ -52,7 +51,7 @@ class App extends React.Component<AppProps> {
 	@MobX.observable protected projectListVisible: boolean = false;
 	private shiftDown: boolean = false;
 
-	public constructor(props: AppProps) {
+	public constructor(props: {}) {
 		super(props);
 		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
 		this.handleMainWindowClick = this.handleMainWindowClick.bind(this);
@@ -62,7 +61,7 @@ class App extends React.Component<AppProps> {
 	}
 
 	public componentDidMount(): void {
-		createMenu(this.props.store);
+		createMenu();
 		this.redirectUndoRedo();
 	}
 
@@ -93,20 +92,20 @@ class App extends React.Component<AppProps> {
 			}
 
 			FileExtraUtils.copySync(designkitPath, PathUtils.join(filePaths[0], 'designkit'));
-			this.props.store.openStyleguide(`${filePaths[0]}/designkit`);
-			this.props.store.openFirstPage();
+			store.openStyleguide(`${filePaths[0]}/designkit`);
+			store.openFirstPage();
 		});
 	}
 
 	private handleMainWindowClick(): void {
-		this.props.store.setElementFocussed(false);
-		createMenu(this.props.store);
+		Store.getInstance().setElementFocussed(false);
+		createMenu();
 	}
 
 	protected handleOpenSpaceClick(): void {
 		dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
-			this.props.store.openStyleguide(filePaths[0]);
-			this.props.store.openFirstPage();
+			store.openStyleguide(filePaths[0]);
+			store.openFirstPage();
 		});
 	}
 
@@ -134,9 +133,9 @@ class App extends React.Component<AppProps> {
 			} else if (this.ctrlDown && event.keyCode === 90) {
 				event.preventDefault();
 				if (this.shiftDown) {
-					this.props.store.redo();
+					Store.getInstance().redo();
 				} else {
-					this.props.store.undo();
+					Store.getInstance().undo();
 				}
 
 				return false;
@@ -156,9 +155,9 @@ class App extends React.Component<AppProps> {
 
 	public render(): JSX.Element {
 		// Todo: project and page don't update on page change
-		const project = this.props.store.getCurrentProject();
+		const project = store.getCurrentProject();
 		const title = `${project && project.getName()}`;
-		const styleguide = this.props.store.getStyleguide();
+		const styleguide = store.getStyleguide();
 		const previewFrame = project && project.getPreviewFrame();
 		const previewFramePath =
 			styleguide &&
@@ -174,25 +173,25 @@ class App extends React.Component<AppProps> {
 					handleClick={this.handleChromeToggle}
 					open={this.projectListVisible}
 				>
-					{project && <ProjectList store={this.props.store} open={this.projectListVisible} />}
+					{project && <ProjectList open={this.projectListVisible} />}
 				</Chrome>
 				<MainArea>
 					{project && [
 						<SideBar key="left" directionVertical hasPaddings>
 							<ElementPane>
 								<Space sizeBottom={SpaceSize.L}>
-									<PageList store={this.props.store} />
+									<PageList />
 								</Space>
-								<ElementList store={this.props.store} />
+								<ElementList />
 							</ElementPane>
 							<PatternsPane>
-								<PatternListContainer store={this.props.store} />
+								<PatternListContainer />
 							</PatternsPane>
 						</SideBar>,
 						<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />,
 						<SideBar key="right" directionVertical hasPaddings>
 							<PropertyPane>
-								<PropertyList store={this.props.store} />
+								<PropertyList />
 							</PropertyPane>
 						</SideBar>
 					]}
@@ -226,9 +225,6 @@ class App extends React.Component<AppProps> {
 		);
 	}
 }
-
-const store: Store = Store.getInstance();
-store.openFromPreferences();
 
 ipcRenderer.on('preview-ready', (readyEvent: {}, readyMessage: JsonObject) => {
 	function sendWebViewMessage(message: JsonObject, channel: string): void {
@@ -269,7 +265,7 @@ ipcRenderer.on('preview-ready', (readyEvent: {}, readyMessage: JsonObject) => {
 	}, 3000);
 });
 
-ReactDom.render(<App store={store} />, document.getElementById('app'));
+ReactDom.render(<App />, document.getElementById('app'));
 
 // Disable drag and drop from outside the application
 document.addEventListener(

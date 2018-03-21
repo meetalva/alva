@@ -13,7 +13,6 @@ import { StringProperty } from '../../../store/styleguide/property/string-proper
 
 export interface PreviewAppProps {
 	highlightElement: HighlightElementFunction;
-	store: Store;
 }
 
 export interface PreviewAppState {
@@ -240,11 +239,11 @@ export class PreviewApp extends React.Component<PreviewAppProps, PreviewAppState
 			// Ignored
 		}
 
-		const selectedElement: PageElement | undefined = this.props.store.getSelectedElement();
+		const selectedElement: PageElement | undefined = Store.getInstance().getSelectedElement();
 		return (
 			<div>
 				<Preview
-					page={this.props.store.getCurrentPage()}
+					page={Store.getInstance().getCurrentPage()}
 					selectedElementId={selectedElement && selectedElement.getId()}
 					highlightElement={this.props.highlightElement}
 				/>

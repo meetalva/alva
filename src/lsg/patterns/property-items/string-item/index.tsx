@@ -5,10 +5,10 @@ import { getSpace, Size } from '../../space';
 import styled from 'styled-components';
 
 export interface StringItemProps {
-	label: string;
-	value?: string;
 	className?: string;
 	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
+	label: string;
+	value?: string;
 }
 
 const StyledStringItem = styled.div`

@@ -12,8 +12,8 @@ export interface PageListProps {
 }
 
 export interface PageListItemProps {
-	pageID: string;
 	name: string;
+	pageID: string;
 	pageRef: PageRef;
 	store: Store;
 }
@@ -34,31 +34,20 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		this.handlePageDoubleClick = this.handlePageDoubleClick.bind(this);
 		this.renamePage = this.renamePage.bind(this);
 	}
-	public render(): JSX.Element {
-		return (
-			<DropdownItemEditableLink
-				editable={this.pageElementEditable}
-				focused={this.pageElementEditable}
-				handleChange={this.handleInputChange}
-				handleClick={this.handlePageClick}
-				handleDoubleClick={this.handlePageDoubleClick}
-				handleKeyDown={this.handlePageKeyDown}
-				name={this.props.name}
-				handleBlur={this.handleBlur}
-				value={this.pageNameInputValue}
-			/>
-		);
-	}
-
-	protected handlePageClick(e: React.MouseEvent<HTMLElement>): void {
-		e.preventDefault();
-		this.props.store.openPage(this.props.pageID);
-	}
 
 	@MobX.action
 	protected handleBlur(): void {
 		this.pageElementEditable = false;
 		this.pageNameInputValue = this.props.name;
+	}
+
+	protected handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
+		this.pageNameInputValue = e.target.value;
+	}
+
+	protected handlePageClick(e: React.MouseEvent<HTMLElement>): void {
+		e.preventDefault();
+		this.props.store.openPage(this.props.pageID);
 	}
 
 	@MobX.action
@@ -90,14 +79,26 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		}
 	}
 
-	protected handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
-		this.pageNameInputValue = e.target.value;
-	}
-
 	protected renamePage(name: string): void {
 		const pageRef = this.props.pageRef;
 		pageRef.setName(name);
 		pageRef.updatePathFromNames();
+	}
+
+	public render(): JSX.Element {
+		return (
+			<DropdownItemEditableLink
+				editable={this.pageElementEditable}
+				focused={this.pageElementEditable}
+				handleChange={this.handleInputChange}
+				handleClick={this.handlePageClick}
+				handleDoubleClick={this.handlePageDoubleClick}
+				handleKeyDown={this.handlePageKeyDown}
+				name={this.props.name}
+				handleBlur={this.handleBlur}
+				value={this.pageNameInputValue}
+			/>
+		);
 	}
 }
 
@@ -108,6 +109,20 @@ export class PageList extends React.Component<PageListProps> {
 		super(props);
 
 		this.handleDropdownToggle = this.handleDropdownToggle.bind(this);
+	}
+
+	public getProjectPages(): PageRef[] {
+		const project: Project | undefined = this.props.store.getCurrentProject();
+		let projectPages: PageRef[] = [];
+		if (project) {
+			projectPages = project.getPages();
+		}
+		return projectPages;
+	}
+
+	@MobX.action
+	protected handleDropdownToggle(): void {
+		this.pageListVisible = !this.pageListVisible;
 	}
 
 	public render(): JSX.Element {
@@ -133,19 +148,5 @@ export class PageList extends React.Component<PageListProps> {
 				))}
 			</Dropdown>
 		);
-	}
-
-	public getProjectPages(): PageRef[] {
-		const project: Project | undefined = this.props.store.getCurrentProject();
-		let projectPages: PageRef[] = [];
-		if (project) {
-			projectPages = project.getPages();
-		}
-		return projectPages;
-	}
-
-	@MobX.action
-	protected handleDropdownToggle(): void {
-		this.pageListVisible = !this.pageListVisible;
 	}
 }

@@ -10,12 +10,12 @@ export interface Values {
 }
 
 export interface EnumItemProps {
-	label: string;
-	selectedValue?: string;
-	values: Values[];
-	required?: boolean;
 	className?: string;
 	handleChange?: React.ChangeEventHandler<HTMLSelectElement>;
+	label: string;
+	required?: boolean;
+	selectedValue?: string;
+	values: Values[];
 }
 
 const StyledEnumItem = styled.div`

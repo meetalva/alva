@@ -5,8 +5,8 @@ import styled from 'styled-components';
 export interface LayoutProps {
 	className?: string;
 	directionVertical?: boolean;
-	hasPaddings?: boolean;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
+	hasPaddings?: boolean;
 }
 
 const StyledLayout = styled.div`

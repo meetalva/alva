@@ -2,11 +2,11 @@ import PreviewPane, { PreviewPaneProps } from '../../lsg/patterns/panes/preview-
 import * as React from 'react';
 
 export interface ElementWrapperState {
-	isResizing: boolean;
 	direction: number;
-	width: number;
+	isResizing: boolean;
 	maxWidth: number;
 	mousePosition?: number;
+	width: number;
 }
 
 export class PreviewPaneWrapper extends React.Component<PreviewPaneProps, ElementWrapperState> {
@@ -27,14 +27,6 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps, Elemen
 		this.handlePreviewWidthUpdate = this.handlePreviewWidthUpdate.bind(this);
 	}
 
-	private handleMouseDownRight(e: React.MouseEvent<HTMLElement>): void {
-		this.setState({
-			isResizing: true,
-			mousePosition: e.pageX,
-			direction: 1
-		});
-	}
-
 	private handleMouseDownLeft(e: React.MouseEvent<HTMLElement>): void {
 		this.setState({
 			isResizing: true,
@@ -43,10 +35,11 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps, Elemen
 		});
 	}
 
-	private handleMouseUp(): void {
+	private handleMouseDownRight(e: React.MouseEvent<HTMLElement>): void {
 		this.setState({
-			isResizing: false,
-			mousePosition: undefined
+			isResizing: true,
+			mousePosition: e.pageX,
+			direction: 1
 		});
 	}
 
@@ -72,6 +65,13 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps, Elemen
 			// only set new width if it is not smaller than 300 and also not bigger than the maxWidth
 			width: newWidth >= maxWidth ? maxWidth : newWidth >= 300 ? newWidth : 300,
 			mousePosition: e.pageX
+		});
+	}
+
+	private handleMouseUp(): void {
+		this.setState({
+			isResizing: false,
+			mousePosition: undefined
 		});
 	}
 

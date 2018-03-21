@@ -30,55 +30,13 @@ export interface NamedPatternListItemProps extends PatternListItemProps {
 @observer
 export class PatternListContainer extends React.Component<PatternListContainerProps> {
 	public items: PatternListContainerItemProps[] = [];
+
 	public constructor(props: PatternListContainerProps) {
 		super(props);
 
 		this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
 		this.handlePatternClick = this.handlePatternClick.bind(this);
 		this.handleDragStart = this.handleDragStart.bind(this);
-	}
-
-	public search(
-		containers: PatternListContainerItemProps[],
-		term: string
-	): PatternListContainerItemProps[] {
-		const result: PatternListContainerItemProps[] = [];
-
-		for (const container of containers) {
-			if (!container.items.length) {
-				continue;
-			}
-
-			const matchingItems = container.items.filter(
-				item => item.name.toLowerCase().indexOf(term.toLowerCase()) !== -1
-			);
-			result.push({
-				name: container.name,
-				items: matchingItems
-			});
-		}
-
-		return result;
-	}
-
-	public render(): JSX.Element {
-		const styleguide = this.props.store.getStyleguide();
-		const patternRoot = styleguide && styleguide.getPatternRoot();
-		this.items = patternRoot ? this.createItemsFromFolder(patternRoot) : [];
-
-		if (this.props.store.getPatternSearchTerm() !== '') {
-			this.items = this.search(this.items, this.props.store.getPatternSearchTerm());
-		}
-
-		const list = this.createList(this.items);
-		return (
-			<div>
-				<Space sizeBottom={Size.XXS}>
-					<Input handleChange={this.handleSearchInputChange} placeholder="Search patterns" />
-				</Space>
-				<Space size={[0, Size.L]}>{list}</Space>
-			</div>
-		);
 	}
 
 	public createItemsFromFolder(parent: PatternFolder): PatternListContainerItemProps[] {
@@ -140,8 +98,15 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	}
 
 	@action
-	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
-		this.props.store.setPatternSearchTerm(evt.target.value);
+	protected handleDragStart(e: React.DragEvent<HTMLElement>, pattern: Pattern): void {
+		e.dataTransfer.dropEffect = 'copy';
+		e.dataTransfer.setDragImage(
+			e.currentTarget.querySelector('.pattern__icon') as Element,
+			12,
+			12
+		);
+
+		e.dataTransfer.setData('patternId', pattern.getId());
 	}
 
 	@action
@@ -159,14 +124,50 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	}
 
 	@action
-	protected handleDragStart(e: React.DragEvent<HTMLElement>, pattern: Pattern): void {
-		e.dataTransfer.dropEffect = 'copy';
-		e.dataTransfer.setDragImage(
-			e.currentTarget.querySelector('.pattern__icon') as Element,
-			12,
-			12
-		);
+	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
+		this.props.store.setPatternSearchTerm(evt.target.value);
+	}
 
-		e.dataTransfer.setData('patternId', pattern.getId());
+	public render(): JSX.Element {
+		const styleguide = this.props.store.getStyleguide();
+		const patternRoot = styleguide && styleguide.getPatternRoot();
+		this.items = patternRoot ? this.createItemsFromFolder(patternRoot) : [];
+
+		if (this.props.store.getPatternSearchTerm() !== '') {
+			this.items = this.search(this.items, this.props.store.getPatternSearchTerm());
+		}
+
+		const list = this.createList(this.items);
+		return (
+			<div>
+				<Space sizeBottom={Size.XXS}>
+					<Input handleChange={this.handleSearchInputChange} placeholder="Search patterns" />
+				</Space>
+				<Space size={[0, Size.L]}>{list}</Space>
+			</div>
+		);
+	}
+
+	public search(
+		containers: PatternListContainerItemProps[],
+		term: string
+	): PatternListContainerItemProps[] {
+		const result: PatternListContainerItemProps[] = [];
+
+		for (const container of containers) {
+			if (!container.items.length) {
+				continue;
+			}
+
+			const matchingItems = container.items.filter(
+				item => item.name.toLowerCase().indexOf(term.toLowerCase()) !== -1
+			);
+			result.push({
+				name: container.name,
+				items: matchingItems
+			});
+		}
+
+		return result;
 	}
 }

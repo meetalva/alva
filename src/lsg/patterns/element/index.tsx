@@ -6,22 +6,21 @@ import styled from 'styled-components';
 
 export interface ElementProps {
 	active?: boolean;
-	open?: boolean;
-	highlight?: boolean;
-	highlightPlaceholder?: boolean;
-	title: string;
-
 	draggable?: boolean;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
 	handleContextMenu?: React.MouseEventHandler<HTMLElement>;
-	handleIconClick?: React.MouseEventHandler<SVGSVGElement>;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
-	handleDragEnter?: React.DragEventHandler<HTMLElement>;
-	handleDragLeave?: React.DragEventHandler<HTMLElement>;
 	handleDragDrop?: React.DragEventHandler<HTMLElement>;
-	handleDragEnterForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
 	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
+	handleDragEnter?: React.DragEventHandler<HTMLElement>;
+	handleDragEnterForChild?: React.DragEventHandler<HTMLElement>;
+	handleDragLeave?: React.DragEventHandler<HTMLElement>;
+	handleDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
+	handleDragStart?: React.DragEventHandler<HTMLElement>;
+	handleIconClick?: React.MouseEventHandler<SVGSVGElement>;
+	highlight?: boolean;
+	highlightPlaceholder?: boolean;
+	open?: boolean;
+	title: string;
 }
 
 interface StyledElementLabelProps {
@@ -39,10 +38,10 @@ export interface StyledElementChildProps {
 }
 
 export interface StyledPlaceholder {
-	highlightPlaceholder?: boolean;
+	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
 	handleDragEnterForChild?: React.DragEventHandler<HTMLElement>;
 	handleDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
+	highlightPlaceholder?: boolean;
 }
 
 const StyledElement = styled.div`

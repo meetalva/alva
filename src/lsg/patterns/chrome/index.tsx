@@ -6,15 +6,15 @@ import { getSpace, Size as SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface ChromeProps {
-	title?: string;
-	open?: boolean;
-	handleClick?: React.MouseEventHandler<HTMLElement>;
 	active?: boolean;
+	handleClick?: React.MouseEventHandler<HTMLElement>;
+	open?: boolean;
+	title?: string;
 }
 
 export interface ChromeTitleProps {
-	open?: boolean;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
+	open?: boolean;
 }
 
 interface StyledChromeIconProps {

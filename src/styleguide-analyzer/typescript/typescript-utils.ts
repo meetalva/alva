@@ -5,22 +5,24 @@ import { Type } from './type';
 import * as ts from 'typescript';
 
 export class TypescriptUtils {
-	public static getExports(sourceFile: ts.SourceFile, program: ts.Program): Export[] {
-		let exports: Export[] = [];
+	public static findDeclaration(expression: ts.Expression): ts.Declaration | undefined {
+		const sourceFile = expression.getSourceFile();
 
-		const exportStatements = this.getExportStatements(sourceFile);
+		if (!sourceFile) {
+			return;
+		}
 
-		exportStatements.forEach(statement => {
-			const exportInfos = this.getExportInfos(program, statement);
-
-			if (!exportInfos) {
-				return;
+		for (const statement of sourceFile.statements) {
+			if (ts.isVariableStatement(statement)) {
+				for (const variableDeclaration of statement.declarationList.declarations) {
+					if (variableDeclaration.name.getText() === expression.getText()) {
+						return variableDeclaration;
+					}
+				}
 			}
+		}
 
-			exports = exports.concat(exportInfos);
-		});
-
-		return exports;
+		return;
 	}
 
 	public static getExportInfos(
@@ -112,24 +114,22 @@ export class TypescriptUtils {
 		return;
 	}
 
-	public static findDeclaration(expression: ts.Expression): ts.Declaration | undefined {
-		const sourceFile = expression.getSourceFile();
+	public static getExports(sourceFile: ts.SourceFile, program: ts.Program): Export[] {
+		let exports: Export[] = [];
 
-		if (!sourceFile) {
-			return;
-		}
+		const exportStatements = this.getExportStatements(sourceFile);
 
-		for (const statement of sourceFile.statements) {
-			if (ts.isVariableStatement(statement)) {
-				for (const variableDeclaration of statement.declarationList.declarations) {
-					if (variableDeclaration.name.getText() === expression.getText()) {
-						return variableDeclaration;
-					}
-				}
+		exportStatements.forEach(statement => {
+			const exportInfos = this.getExportInfos(program, statement);
+
+			if (!exportInfos) {
+				return;
 			}
-		}
 
-		return;
+			exports = exports.concat(exportInfos);
+		});
+
+		return exports;
 	}
 
 	public static getExportStatements(sourceFile: ts.SourceFile): ts.Statement[] {

@@ -6,8 +6,8 @@ import * as React from 'react';
 import { Store } from '../../store/store';
 
 export interface ProjectListProps {
-	store: Store;
 	open?: boolean;
+	store: Store;
 }
 
 @observer
@@ -16,6 +16,10 @@ export class ProjectList extends React.Component<ProjectListProps> {
 		super(props);
 
 		this.handleProjectClick = this.handleProjectClick.bind(this);
+	}
+
+	protected handleProjectClick(id: string): void {
+		this.props.store.openFirstPage(id);
 	}
 
 	public render(): JSX.Element {
@@ -33,9 +37,5 @@ export class ProjectList extends React.Component<ProjectListProps> {
 				))}
 			</Dropdown>
 		);
-	}
-
-	protected handleProjectClick(id: string): void {
-		this.props.store.openFirstPage(id);
 	}
 }

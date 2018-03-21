@@ -43,7 +43,8 @@
 					"constructor",
 					"static-method",
 					"instance-method"
-				]
+				],
+				"alphabetize": true
 			}
 		],
 		"no-any": true,

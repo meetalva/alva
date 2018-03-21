@@ -4,11 +4,11 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export interface PreviewPaneProps {
-	previewFrame?: string;
 	handleMouseDownLeft?: React.MouseEventHandler<HTMLElement>;
 	handleMouseDownRight?: React.MouseEventHandler<HTMLElement>;
 	handleMouseMove?: React.MouseEventHandler<HTMLElement>;
 	handleMouseUp?: React.MouseEventHandler<HTMLElement>;
+	previewFrame?: string;
 	width?: number;
 	handlePreviewWidthUpdate?(previewWidth: number): void;
 }
@@ -53,15 +53,6 @@ export default class PreviewPane extends React.Component<PreviewPaneProps> {
 		super(props);
 	}
 
-	private updatePreviewWidth(): void {
-		if (!this.props.handlePreviewWidthUpdate) {
-			return;
-		}
-
-		const previewWidth = this.previewPane.offsetWidth;
-		this.props.handlePreviewWidthUpdate(previewWidth);
-	}
-
 	public componentDidMount(): void {
 		this.updatePreviewWidth();
 
@@ -95,5 +86,14 @@ export default class PreviewPane extends React.Component<PreviewPaneProps> {
 				<StyledPreviewResizer onMouseDown={handleMouseDownRight} />
 			</StyledPreviewWrapper>
 		);
+	}
+
+	private updatePreviewWidth(): void {
+		if (!this.props.handlePreviewWidthUpdate) {
+			return;
+		}
+
+		const previewWidth = this.previewPane.offsetWidth;
+		this.props.handlePreviewWidthUpdate(previewWidth);
 	}
 }

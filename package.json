@@ -1,139 +1,139 @@
 {
-  "name": "meetalva",
-  "version": "0.7.0",
-  "description": "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
-  "main": "./build/electron/electron.js",
-  "scripts": {
-    "build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/*.html build/electron/",
-    "build:clean": "npm run clean && npm run build",
-    "build:electron": "electron-builder -mwl && node ./scripts/dist-postprocess.js",
-    "build:lsg": "tsc --project src/lsg --outDir build/lsg/patterns",
-    "clean": "rm -rf build && rm -rf dist",
-    "commit": "commit",
-    "commitmsg": "commitlint -e $GIT_PARAMS",
-    "dist": "node ./scripts/dist-preprocess.js",
-    "docs": "typedoc src",
-    "lint": "tslint --project .",
-    "start": "npm run build && concurrently \"electron build/electron/electron.js --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\"",
-    "start:lsg": "npm run build:lsg && concurrently \"npm run build:lsg -- -w\" \"patternplate start\"",
-    "precommit": "lint-staged"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/meetalva/alva.git"
-  },
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/meetalva/alva/issues"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "prettier --write",
-      "tslint -c tsconfig.json --fix",
-      "git add"
-    ]
-  },
-  "prettier": {
-    "printWidth": 100,
-    "useTabs": true,
-    "tabWidth": 3,
-    "singleQuote": true
-  },
-  "build": {
-    "appId": "io.github.meetalva",
-    "productName": "Alva",
-    "copyright": "Copyright (c) 2017 SinnerSchrader Deutschland GmbH",
-    "npmArgs": "npm i @types/react",
-    "files": [
-      "build/**/*",
-      "package.json",
-      {
-        "from": "build/designkit/node_modules/@types",
-        "to": "build/designkit/node_modules/@types",
-        "filter": [
-          "**/*.d.ts"
-        ]
-      }
-    ],
-    "directories": {
-      "buildResources": "src/resources",
-      "output": "dist"
-    },
-    "asarUnpack": [
-      "build/designkit/**"
-    ],
-    "mac": {
-      "category": "public.app-category.graphics-design"
-    },
-    "nsis": {
-      "artifactName": "${productName}-${version}.${ext}",
-      "oneClick": false,
-      "perMachine": true,
-      "allowElevation": true,
-      "allowToChangeInstallationDirectory": true
-    },
-    "linux": {
-      "artifactName": "${productName}-${version}.${ext}",
-      "executableName": "Alva"
-    }
-  },
-  "standard-version": {
-    "scripts": {
-      "prebump": "rm -f package-lock.json"
-    }
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^6.0.2",
-    "@commitlint/config-conventional": "^6.0.2",
-    "@commitlint/prompt-cli": "^6.0.2",
-    "@commitlint/travis-cli": "^6.0.2",
-    "@patternplate/cli": "2.0.0-54",
-    "@patternplate/render-styled-components": "2.0.0-54",
-    "@types/deep-assign": "^0.1.1",
-    "@types/electron-devtools-installer": "^2.0.2",
-    "@types/fs-extra": "^5.0.1",
-    "@types/js-yaml": "^3.10.1",
-    "@types/lodash": "^4.14.104",
-    "@types/node": "^9.4.0",
-    "@types/object-path": "^0.9.29",
-    "@types/react": "^16.0.0",
-    "@types/react-dom": "^16.0.3",
-    "@types/smoothscroll-polyfill": "^0.3.0",
-    "@types/uuid": "^3.4.3",
-    "concurrently": "^3.5.1",
-    "electron": "^1.7.10",
-    "electron-builder": "20.0.5",
-    "electron-devtools-installer": "^2.2.1",
-    "husky": "^0.14.3",
-    "lint-staged": "^7.0.0",
-    "mobx-react-devtools": "^4.2.15",
-    "prettier": "^1.9.2",
-    "standard-version": "^4.2.0",
-    "ts-config": "^17.0.0",
-    "tslint": "^5.8.0",
-    "typedoc": "^0.11.0"
-  },
-  "dependencies": {
-    "cli": "1.0.1",
-    "deep-assign": "^2.0.0",
-    "electron-log": "2.2.14",
-    "electron-updater": "2.21.0",
-    "fs-extra": "^5.0.0",
-    "js-yaml": "3.11.0",
-    "lodash": "^4.17.5",
-    "mobx": "3.4.1",
-    "mobx-react": "4.4.3",
-    "object-path": "^0.11.4",
-    "react": "16.2.0",
-    "react-dom": "16.2.0",
-    "react-router": "4.2.0",
-    "readts": "0.2.0",
-    "smoothscroll-polyfill": "0.4.3",
-    "styled-components": "3.2.0",
-    "tslib": "1.9.0",
-    "typescript": "2.6.2",
-    "uuid": "^3.2.1"
-  },
-  "homepage": "https://meetalva.github.io/"
+	"name": "meetalva",
+	"version": "0.7.0",
+	"description": "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
+	"main": "./build/electron/electron.js",
+	"scripts": {
+		"build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/*.html build/electron/",
+		"build:clean": "npm run clean && npm run build",
+		"build:electron": "electron-builder -mwl && node ./scripts/dist-postprocess.js",
+		"build:lsg": "tsc --project src/lsg --outDir build/lsg/patterns",
+		"clean": "rm -rf build && rm -rf dist",
+		"commit": "commit",
+		"commitmsg": "commitlint -e $GIT_PARAMS",
+		"dist": "node ./scripts/dist-preprocess.js",
+		"docs": "typedoc src",
+		"lint": "tslint --project .",
+		"start": "npm run build && concurrently \"electron build/electron/electron.js --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\"",
+		"start:lsg": "npm run build:lsg && concurrently \"npm run build:lsg -- -w\" \"patternplate start\"",
+		"precommit": "lint-staged"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/meetalva/alva.git"
+	},
+	"author": "",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/meetalva/alva/issues"
+	},
+	"lint-staged": {
+		"*.{ts,tsx}": [
+			"prettier --write",
+			"tslint -c tsconfig.json --fix",
+			"git add"
+		]
+	},
+	"prettier": {
+		"printWidth": 100,
+		"useTabs": true,
+		"tabWidth": 3,
+		"singleQuote": true
+	},
+	"build": {
+		"appId": "io.github.meetalva",
+		"productName": "Alva",
+		"copyright": "Copyright (c) 2017 SinnerSchrader Deutschland GmbH",
+		"npmArgs": "npm i @types/react",
+		"files": [
+			"build/**/*",
+			"package.json",
+			{
+				"from": "build/designkit/node_modules/@types",
+				"to": "build/designkit/node_modules/@types",
+				"filter": [
+					"**/*.d.ts"
+				]
+			}
+		],
+		"directories": {
+			"buildResources": "src/resources",
+			"output": "dist"
+		},
+		"asarUnpack": [
+			"build/designkit/**"
+		],
+		"mac": {
+			"category": "public.app-category.graphics-design"
+		},
+		"nsis": {
+			"artifactName": "${productName}-${version}.${ext}",
+			"oneClick": false,
+			"perMachine": true,
+			"allowElevation": true,
+			"allowToChangeInstallationDirectory": true
+		},
+		"linux": {
+			"artifactName": "${productName}-${version}.${ext}",
+			"executableName": "Alva"
+		}
+	},
+	"standard-version": {
+		"scripts": {
+			"prebump": "rm -f package-lock.json"
+		}
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^6.0.2",
+		"@commitlint/config-conventional": "^6.0.2",
+		"@commitlint/prompt-cli": "^6.0.2",
+		"@commitlint/travis-cli": "^6.0.2",
+		"@patternplate/cli": "^2.0.0-54",
+		"@patternplate/render-styled-components": "^2.0.0-54",
+		"@types/deep-assign": "^0.1.1",
+		"@types/electron-devtools-installer": "^2.0.2",
+		"@types/fs-extra": "^5.0.1",
+		"@types/js-yaml": "^3.10.1",
+		"@types/lodash": "^4.14.104",
+		"@types/node": "^9.4.0",
+		"@types/object-path": "^0.9.29",
+		"@types/react": "^16.0.0",
+		"@types/react-dom": "^16.0.3",
+		"@types/smoothscroll-polyfill": "^0.3.0",
+		"@types/uuid": "^3.4.3",
+		"concurrently": "^3.5.1",
+		"electron": "^1.7.10",
+		"electron-builder": "^20.0.5",
+		"electron-devtools-installer": "^2.2.1",
+		"husky": "^0.14.3",
+		"lint-staged": "^7.0.0",
+		"mobx-react-devtools": "^4.2.15",
+		"prettier": "^1.9.2",
+		"standard-version": "^4.2.0",
+		"ts-config": "^17.0.0",
+		"tslint": "^5.8.0",
+		"typedoc": "^0.11.0"
+	},
+	"dependencies": {
+		"cli": "^1.0.1",
+		"deep-assign": "^2.0.0",
+		"electron-log": "^2.2.14",
+		"electron-updater": "^2.21.0",
+		"fs-extra": "^5.0.0",
+		"js-yaml": "^3.11.0",
+		"lodash": "^4.17.5",
+		"mobx": "^3.4.1",
+		"mobx-react": "^4.4.3",
+		"object-path": "^0.11.4",
+		"react": "^16.2.0",
+		"react-dom": "^16.2.0",
+		"react-router": "^4.2.0",
+		"readts": "^0.2.0",
+		"smoothscroll-polyfill": "^0.4.3",
+		"styled-components": "^3.2.0",
+		"tslib": "^1.9.0",
+		"typescript": "^2.6.2",
+		"uuid": "^3.2.1"
+	},
+	"homepage": "https://meetalva.github.io/"
 }

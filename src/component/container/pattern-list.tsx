@@ -106,12 +106,15 @@ export class PatternListContainer extends React.Component {
 	protected handlePatternClick(pattern: Pattern): void {
 		const store: Store = Store.getInstance();
 		const selectedElement: PageElement | undefined = store.getSelectedElement();
+		const selectedSlot = store.getSelectedSlotId();
 		if (selectedElement) {
 			const newPageElement = new PageElement({
 				pattern,
 				setDefaults: true
 			});
-			store.execute(ElementLocationCommand.addSibling(selectedElement, newPageElement));
+			store.execute(
+				ElementLocationCommand.addChild(selectedElement, newPageElement, selectedSlot)
+			);
 			store.setSelectedElement(newPageElement);
 		}
 	}

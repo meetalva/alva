@@ -2,7 +2,12 @@ root:
   _type: pattern
   uuid: 9ee029be-81f7-43bc-a3e8-e2e90f70f48a
   pattern: image/index
-  children:
-    - _type: pattern
-      uuid: 32b59be-81f7-43bc-a3e8-e2e90f70f438
-      pattern: image/index
+  contents:
+    default:
+      - _type: pattern
+        uuid: 32b59be-81f7-43bc-a3e8-e2e90f70f438
+        pattern: image/index
+    header:
+      - _type: pattern
+        uuid: 88b59be-81f7-43bc-a3e8-e2e90f70f543
+        pattern: image/index

@@ -1,6 +1,7 @@
 import { PatternFolder } from './folder';
 import { ObjectProperty } from './property/object-property';
 import { Property } from './property/property';
+import { Slot } from './slot';
 import { Store } from '../store';
 
 /**
@@ -13,6 +14,11 @@ import { Store } from '../store';
  * e.g. Patternplate.
  */
 export class Pattern {
+	/**
+	 * The ID of the default slot.
+	 */
+	public static DEFAULT_SLOT_ID: string = 'default';
+
 	/**
 	 * The ID of the synthetic asset content pattern.
 	 */
@@ -63,6 +69,13 @@ export class Pattern {
 	protected properties: Map<string, Property> = new Map();
 
 	/**
+	 * The slots this pattern supports
+	 */
+	protected slots: Map<string, Slot> = new Map([
+		[Pattern.DEFAULT_SLOT_ID, new Slot(Pattern.DEFAULT_SLOT_ID)]
+	]);
+
+	/**
 	 * Creates a new pattern.
 	 * @param id The ID of the pattern. How this is generated is completely up to the styleguide analyzer
 	 * that creates the pattern (and does not necessarily represent the file path).
@@ -85,6 +98,14 @@ export class Pattern {
 	 */
 	public addProperty(property: Property): void {
 		this.properties.set(property.getId(), property);
+	}
+
+	/**
+	 * Adds a slot to this pattern. This method is called by the analyzer only.
+	 * @param name The slot to add.
+	 */
+	public addSlot(slot: Slot): void {
+		this.slots.set(slot.getId(), slot);
 	}
 
 	/**
@@ -173,6 +194,14 @@ export class Pattern {
 		}
 
 		return property;
+	}
+
+	/**
+	 * Returns the slots this pattern supports.
+	 * @return The slots this pattern supports.
+	 */
+	public getSlots(): Slot[] {
+		return Array.from(this.slots.values());
 	}
 
 	/**

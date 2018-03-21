@@ -103,6 +103,11 @@ export class Store {
 	@MobX.observable private selectedElement?: PageElement;
 
 	/**
+	 * The currently selected slot of the currently selected element.
+	 */
+	@MobX.observable private selectedSlotId?: string;
+
+	/**
 	 * The currently opened styleguide or undefined, if no styleguide is open.
 	 */
 	@MobX.observable private styleguide?: Styleguide;
@@ -421,6 +426,14 @@ export class Store {
 	 */
 	public getSelectedElement(): PageElement | undefined {
 		return this.selectedElement;
+	}
+
+	/**
+	 * Returns the id of the currently selected slot of the currently selected element if any.
+	 * @return The id of the currently selected slot of the currently selected element if any.
+	 */
+	public getSelectedSlotId(): string | undefined {
+		return this.selectedSlotId;
 	}
 
 	/**
@@ -815,6 +828,15 @@ export class Store {
 	 */
 	public setSelectedElement(selectedElement: PageElement | undefined): void {
 		this.selectedElement = selectedElement;
+		this.selectedSlotId = undefined;
+	}
+
+	/**
+	 * Sets the currently selected slot of the currently selected element.
+	 * @param slotId The id of the slot to select.
+	 */
+	public setSelectedSlot(slotId?: string): void {
+		this.selectedSlotId = slotId;
 	}
 
 	/**

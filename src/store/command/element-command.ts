@@ -65,11 +65,17 @@ export class ElementCommand extends Command {
 		super();
 
 		this.child = child;
+		this.parent = parent;
+		this.index = index;
+
+		this.previousParent = child.getParent();
+		this.previousIndex = this.previousParent ? child.getIndex() : undefined;
+
+		// Memorize the page IDs.
+		// This way, closing and opening a page does not break the command.
+
 		const page = child.getPage();
 		if (page) {
-			// If the element is already known to the page, memorize the element and page IDs.
-			// This way, closing and opening a page does not break the command.
-			this.childId = child.getId();
 			this.pageId = page.getId();
 		} else if (parent) {
 			const parentPage = parent.getPage();
@@ -84,16 +90,6 @@ export class ElementCommand extends Command {
 				'Element commands require either a child already added to a page, or a target parent for a new child'
 			);
 		}
-
-		this.parent = parent;
-		this.index = index;
-
-		this.previousParent = child.getParent();
-		this.previousIndex = this.previousParent ? child.getIndex() : undefined;
-
-		// Same here: If the elements are already known to the page, memorize their IDs.
-		this.parentId = this.getElementIdIfPartOfPage(this.parent);
-		this.previousParentId = this.getElementIdIfPartOfPage(this.previousParent);
 	}
 
 	/**
@@ -206,6 +202,8 @@ export class ElementCommand extends Command {
 		}
 
 		this.child.setParent(this.parent, this.index);
+		this.memorizeElementIds();
+
 		return true;
 	}
 
@@ -217,6 +215,16 @@ export class ElementCommand extends Command {
 	}
 
 	/**
+	 * Stores the ID of the page elements if they are currently added to the page,
+	 * to prevent issues with undo/redo when pages are closed and reopened.
+	 */
+	private memorizeElementIds(): void {
+		this.childId = this.getElementIdIfPartOfPage(this.child);
+		this.parentId = this.getElementIdIfPartOfPage(this.parent);
+		this.previousParentId = this.getElementIdIfPartOfPage(this.previousParent);
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	public undo(): boolean {
@@ -225,6 +233,8 @@ export class ElementCommand extends Command {
 		}
 
 		this.child.setParent(this.previousParent, this.previousIndex);
+		this.memorizeElementIds();
+
 		return true;
 	}
 }

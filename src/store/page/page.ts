@@ -1,7 +1,7 @@
 import { JsonObject } from '../json';
 import * as MobX from 'mobx';
 import { PageElement } from './page-element';
-import { PageRef } from '../page/page-ref';
+import { PageRef } from './page-ref';
 import { Project } from '../project';
 import { Store } from '../store';
 
@@ -40,14 +40,15 @@ export class Page {
 	 * @param jsonObject The JSON object to load from.
 	 * @return A new page object containing the loaded data.
 	 */
-	public static fromJsonObject(json: JsonObject, id: string, store: Store): Page {
+	public static fromJsonObject(json: JsonObject, id: string): Page {
+		const store = Store.getInstance();
 		const pageRef = store.getPageRefById(id);
 		if (!pageRef) {
 			throw new Error(`Unknown page ID '${id}'`);
 		}
 
 		const page = new Page(store.getPageRefById(id) as PageRef);
-		page.root = PageElement.fromJsonObject(json.root as JsonObject, store, page);
+		page.setRoot(PageElement.fromJsonObject(json.root as JsonObject));
 
 		return page;
 	}
@@ -109,6 +110,22 @@ export class Page {
 	public registerElementAndChildren(element: PageElement): void {
 		this.elementsById.set(element.getId(), element);
 		element.getChildren().forEach(child => this.registerElementAndChildren(child));
+	}
+
+	/**
+	 * Sets the root element of the page, the first pattern element of the content tree.
+	 * @param root The new root element of the page.
+	 */
+	public setRoot(root?: PageElement | undefined): void {
+		if (this.root) {
+			this.root.setParentInternal(undefined, undefined, undefined);
+		}
+
+		this.root = root;
+
+		if (root) {
+			root.setParentInternal(undefined, undefined, this);
+		}
 	}
 
 	/**

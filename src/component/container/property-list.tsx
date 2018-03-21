@@ -20,7 +20,6 @@ interface ObjectContext {
 interface PropertyTreeProps {
 	context?: ObjectContext;
 	element: PageElement;
-	store: Store;
 }
 
 @observer
@@ -51,7 +50,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 	protected handleChange(id: string, value: any, context?: ObjectContext): void {
 		const fullPath: string = context ? `${context.path}.${id}` : id;
 		const [rootId, ...propertyPath] = fullPath.split('.');
-		this.props.store.execute(
+		Store.getInstance().execute(
 			new PropertyValueCommand(this.props.element, rootId, value, propertyPath.join('.'))
 		);
 	}
@@ -147,14 +146,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 								property: objectProperty
 							};
 
-							return (
-								<PropertyTree
-									key={id}
-									context={newContext}
-									element={element}
-									store={this.props.store}
-								/>
-							);
+							return <PropertyTree key={id} context={newContext} element={element} />;
 
 						default:
 							return <div key={id}>Unknown type: {type}</div>;
@@ -165,23 +157,19 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 	}
 }
 
-export interface PropertyListProps {
-	store: Store;
-}
-
 @observer
-export class PropertyList extends React.Component<PropertyListProps> {
-	public constructor(props: PropertyListProps) {
+export class PropertyList extends React.Component<{}> {
+	public constructor(props: {}) {
 		super(props);
 	}
 
 	public render(): React.ReactNode {
-		const selectedElement = this.props.store.getSelectedElement();
+		const selectedElement = Store.getInstance().getSelectedElement();
 
 		if (!selectedElement) {
 			return <div>No Element selected</div>;
 		}
 
-		return <PropertyTree element={selectedElement} store={this.props.store} />;
+		return <PropertyTree element={selectedElement} />;
 	}
 }

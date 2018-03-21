@@ -149,7 +149,7 @@ export class Analyzer extends StyleguideAnalyzer {
 	/**
 	 * @inheritdoc
 	 */
-	public render(store: Store, highlightElement: HighlightElementFunction): void {
+	public render(highlightElement: HighlightElementFunction): void {
 		// TODO: Implement me.
 	}
 }

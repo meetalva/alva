@@ -14,7 +14,7 @@ export type HighlightElementFunction = (
 	callback: (newHighlightArea: HighlightAreaProps) => void
 ) => void;
 
-const store = new Store();
+const store = Store.getInstance();
 
 ipcRenderer.on('styleguide-change', (event: {}, message: JsonObject) => {
 	store.setStyleguideFromJsonInternal(message);
@@ -69,7 +69,7 @@ function render(): void {
 	const styleguide = store.getStyleguide();
 	const analyzer = styleguide ? styleguide.getAnalyzer() : undefined;
 	if (analyzer) {
-		analyzer.render(store, highlightElement);
+		analyzer.render(highlightElement);
 	}
 }
 

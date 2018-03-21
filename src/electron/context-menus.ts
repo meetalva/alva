@@ -1,9 +1,10 @@
 import { MenuItemConstructorOptions, remote } from 'electron';
-import { ElementCommand } from '../store/page/command/element-command';
+import { ElementCommand } from '../store/command/element-command';
 import { PageElement } from '../store/page/page-element';
 import { Store } from '../store/store';
 
-export function elementMenu(store: Store, element: PageElement): void {
+const store = Store.getInstance();
+export function elementMenu(element: PageElement): void {
 	const clipboardElement: PageElement | undefined = store.getClipboardElement();
 
 	const template: MenuItemConstructorOptions[] = [

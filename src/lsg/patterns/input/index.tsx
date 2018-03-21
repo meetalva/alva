@@ -4,15 +4,15 @@ import { getSpace, Size } from '../space';
 import styled from 'styled-components';
 
 export interface InputProps {
-	focused?: boolean;
 	className?: string;
 	disabled?: boolean;
-	type?: InputTypes;
-	value?: string | number;
+	focused?: boolean;
+	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
 	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 	handleKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
-	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
 	placeholder?: string;
+	type?: InputTypes;
+	value?: string | number;
 }
 
 export enum InputTypes {

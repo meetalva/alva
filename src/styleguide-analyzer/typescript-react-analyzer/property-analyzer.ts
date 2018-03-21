@@ -268,26 +268,6 @@ export class PropertyAnalyzer {
 	}
 
 	/**
-	 * Updates a created property from the meta-data found in the declaration file, such as required
-	 * flag, name-override, and default value.
-	 * @param property The property to enrich
-	 * @param symbol The TypeScript symbol of the Props property.
-	 */
-	private static setPropertyMetaData(property: Property, symbol: ts.Symbol): void {
-		property.setRequired((symbol.flags & ts.SymbolFlags.Optional) !== ts.SymbolFlags.Optional);
-
-		const nameOverride = PropertyAnalyzer.getJsDocValueFromSymbol(symbol, 'name');
-		if (nameOverride) {
-			property.setName(nameOverride);
-		}
-
-		const defaultValue = PropertyAnalyzer.getJsDocValueFromSymbol(symbol, 'default');
-		if (defaultValue) {
-			property.setDefaultValue(defaultValue);
-		}
-	}
-
-	/**
 	 * Searches a TypeScript AST (syntactic) node for a named JSDoc tag, and returns its value if
 	 * found. This is used to read Alva declaration annotations.
 	 * @param node The node to scan.
@@ -331,5 +311,25 @@ export class PropertyAnalyzer {
 		}
 
 		return result !== undefined ? result.trim() : undefined;
+	}
+
+	/**
+	 * Updates a created property from the meta-data found in the declaration file, such as required
+	 * flag, name-override, and default value.
+	 * @param property The property to enrich
+	 * @param symbol The TypeScript symbol of the Props property.
+	 */
+	private static setPropertyMetaData(property: Property, symbol: ts.Symbol): void {
+		property.setRequired((symbol.flags & ts.SymbolFlags.Optional) !== ts.SymbolFlags.Optional);
+
+		const nameOverride = PropertyAnalyzer.getJsDocValueFromSymbol(symbol, 'name');
+		if (nameOverride) {
+			property.setName(nameOverride);
+		}
+
+		const defaultValue = PropertyAnalyzer.getJsDocValueFromSymbol(symbol, 'default');
+		if (defaultValue) {
+			property.setDefaultValue(defaultValue);
+		}
 	}
 }

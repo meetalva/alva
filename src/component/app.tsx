@@ -67,11 +67,6 @@ class App extends React.Component<AppProps> {
 		this.handleOpenSpaceClick = this.handleOpenSpaceClick.bind(this);
 	}
 
-	private handleMainWindowClick(): void {
-		this.props.store.setElementFocussed(false);
-		createMenu(this.props.store);
-	}
-
 	public componentDidMount(): void {
 		createMenu(this.props.store);
 	}
@@ -83,6 +78,47 @@ class App extends React.Component<AppProps> {
 		} catch (error) {
 			return null;
 		}
+	}
+
+	@MobX.action
+	protected handleChromeToggle(evt: React.MouseEvent<HTMLElement>): void {
+		this.projectListVisible = !this.projectListVisible;
+	}
+
+	protected handleCreateNewSpaceClick(): void {
+		let appPath: string = app.getAppPath().replace('.asar', '.asar.unpacked');
+		if (appPath.indexOf('node_modules') >= 0) {
+			appPath = ProcessUtils.cwd();
+		}
+
+		const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
+		console.log(`Design kit path is: ${designkitPath}`);
+		dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] }, filePaths => {
+			if (filePaths.length <= 0) {
+				return;
+			}
+
+			FileExtraUtils.copySync(designkitPath, PathUtils.join(filePaths[0], 'designkit'));
+			this.props.store.openStyleguide(`${filePaths[0]}/designkit`);
+			this.props.store.openFirstPage();
+		});
+	}
+
+	private handleMainWindowClick(): void {
+		this.props.store.setElementFocussed(false);
+		createMenu(this.props.store);
+	}
+
+	protected handleOpenSpaceClick(): void {
+		dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
+			this.props.store.openStyleguide(filePaths[0]);
+			this.props.store.openFirstPage();
+		});
+	}
+
+	@MobX.action
+	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
+		this.activeTab = id;
 	}
 
 	public render(): JSX.Element {
@@ -155,42 +191,6 @@ class App extends React.Component<AppProps> {
 				{DevTools ? <DevTools /> : null}
 			</Layout>
 		);
-	}
-
-	@MobX.action
-	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
-		this.activeTab = id;
-	}
-
-	@MobX.action
-	protected handleChromeToggle(evt: React.MouseEvent<HTMLElement>): void {
-		this.projectListVisible = !this.projectListVisible;
-	}
-
-	protected handleCreateNewSpaceClick(): void {
-		let appPath: string = app.getAppPath().replace('.asar', '.asar.unpacked');
-		if (appPath.indexOf('node_modules') >= 0) {
-			appPath = ProcessUtils.cwd();
-		}
-
-		const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
-		console.log(`Design kit path is: ${designkitPath}`);
-		dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] }, filePaths => {
-			if (filePaths.length <= 0) {
-				return;
-			}
-
-			FileExtraUtils.copySync(designkitPath, PathUtils.join(filePaths[0], 'designkit'));
-			this.props.store.openStyleguide(`${filePaths[0]}/designkit`);
-			this.props.store.openFirstPage();
-		});
-	}
-
-	protected handleOpenSpaceClick(): void {
-		dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
-			this.props.store.openStyleguide(filePaths[0]);
-			this.props.store.openFirstPage();
-		});
 	}
 }
 

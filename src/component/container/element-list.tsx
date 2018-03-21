@@ -20,48 +20,12 @@ export class ElementList extends React.Component<ElementListProps> {
 		super(props);
 	}
 
-	public render(): JSX.Element | null {
-		const page: Page | undefined = this.props.store.getCurrentPage();
-		if (page) {
-			const rootElement = page.getRoot();
-
-			if (!rootElement) {
-				return null;
-			}
-
-			const selectedElement = this.props.store.getSelectedElement();
-
-			return this.renderList(this.createItemFromElement('Root', rootElement, selectedElement));
-		} else {
-			return null;
-		}
-	}
-
 	public componentDidMount(): void {
 		createMenu(this.props.store);
 	}
 
 	public componentWillUpdate(newProps: ElementListProps): void {
 		createMenu(newProps.store);
-	}
-
-	public renderList(item: ListItemProps, key?: number): JSX.Element {
-		return (
-			<ElementWrapper
-				title={item.value}
-				key={key}
-				handleClick={item.onClick}
-				handleContextMenu={item.onContextMenu}
-				active={item.active}
-				handleDragStart={item.handleDragStart}
-				handleDragDropForChild={item.handleDragDropForChild}
-				handleDragDrop={item.handleDragDrop}
-			>
-				{item.children &&
-					item.children.length > 0 &&
-					item.children.map((child, index) => this.renderList(child, index))}
-			</ElementWrapper>
-		);
 	}
 
 	public createItemFromElement(
@@ -194,5 +158,41 @@ export class ElementList extends React.Component<ElementListProps> {
 			});
 			return { value: key, children: items };
 		}
+	}
+
+	public render(): JSX.Element | null {
+		const page: Page | undefined = this.props.store.getCurrentPage();
+		if (page) {
+			const rootElement = page.getRoot();
+
+			if (!rootElement) {
+				return null;
+			}
+
+			const selectedElement = this.props.store.getSelectedElement();
+
+			return this.renderList(this.createItemFromElement('Root', rootElement, selectedElement));
+		} else {
+			return null;
+		}
+	}
+
+	public renderList(item: ListItemProps, key?: number): JSX.Element {
+		return (
+			<ElementWrapper
+				title={item.value}
+				key={key}
+				handleClick={item.onClick}
+				handleContextMenu={item.onContextMenu}
+				active={item.active}
+				handleDragStart={item.handleDragStart}
+				handleDragDropForChild={item.handleDragDropForChild}
+				handleDragDrop={item.handleDragDrop}
+			>
+				{item.children &&
+					item.children.length > 0 &&
+					item.children.map((child, index) => this.renderList(child, index))}
+			</ElementWrapper>
+		);
 	}
 }

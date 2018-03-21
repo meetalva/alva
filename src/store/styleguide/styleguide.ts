@@ -24,6 +24,12 @@ export class Styleguide {
 	private readonly analyzer?: StyleguideAnalyzer;
 
 	/**
+	 * The absolute and OS-specific path to the styleguide top-level folders.
+	 * This is where all pattern implementations are located.
+	 */
+	private readonly path: string;
+
+	/**
 	 * The root folder of the patterns of the currently opened styleguide.
 	 */
 	private patternRoot: PatternFolder;
@@ -32,12 +38,6 @@ export class Styleguide {
 	 * The global pattern registry, a lookup of all pattern by their IDs.
 	 */
 	private patterns: Map<string, Pattern> = new Map();
-
-	/**
-	 * The absolute and OS-specific path to the styleguide top-level folders.
-	 * This is where all pattern implementations are located.
-	 */
-	private readonly path: string;
 
 	/**
 	 * Creates a new styleguide. Then loads the styleguide's patterns using the configured styleguide analyzer.
@@ -114,15 +114,6 @@ export class Styleguide {
 	}
 
 	/**
-	 * Returns the path of the root folder of the built patterns (like atoms, modules etc.)
-	 * in the currently opened styleguide.
-	 * @return The patterns root path.
-	 */
-	public getPatternsPath(): string {
-		return PathUtils.join(this.path, 'lib', 'patterns');
-	}
-
-	/**
 	 * Returns a parsed pattern information object for a given pattern ID.
 	 * @param id The ID of the pattern. It's local to the styleguide analyzer that detected the pattern.
 	 * How this is generated is completely up to the styleguide analyzer that creates the pattern.
@@ -138,5 +129,14 @@ export class Styleguide {
 	 */
 	public getPatternRoot(): PatternFolder {
 		return this.patternRoot;
+	}
+
+	/**
+	 * Returns the path of the root folder of the built patterns (like atoms, modules etc.)
+	 * in the currently opened styleguide.
+	 * @return The patterns root path.
+	 */
+	public getPatternsPath(): string {
+		return PathUtils.join(this.path, 'lib', 'patterns');
 	}
 }

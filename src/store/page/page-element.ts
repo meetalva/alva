@@ -12,11 +12,11 @@ import { Styleguide } from '../styleguide/styleguide';
 import * as Uuid from 'uuid';
 
 export interface PageElementProperties {
-	page: Page;
-	pattern?: Pattern;
 	id?: string;
-	setDefaults?: boolean;
+	page: Page;
 	parent?: PageElement;
+	pattern?: Pattern;
+	setDefaults?: boolean;
 }
 
 /**
@@ -223,6 +223,14 @@ export class PageElement {
 	}
 
 	/**
+	 * Returns the technical (internal) ID of the page.
+	 * @return The technical (internal) ID of the page.
+	 */
+	public getId(): string {
+		return this.id;
+	}
+
+	/**
 	 * Returns the 0-based position of this element within its parent.
 	 * @return The 0-based position of this element.
 	 */
@@ -231,14 +239,6 @@ export class PageElement {
 			throw new Error('This element has no parent');
 		}
 		return this.parent.children.indexOf(this);
-	}
-
-	/**
-	 * Returns the technical (internal) ID of the page.
-	 * @return The technical (internal) ID of the page.
-	 */
-	public getId(): string {
-		return this.id;
 	}
 
 	/**

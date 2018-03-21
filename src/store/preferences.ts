@@ -7,11 +7,6 @@ import * as MobX from 'mobx';
  */
 export class Preferences {
 	/**
-	 * The last opened styleguide's absolute path.
-	 */
-	@MobX.observable private lastStyleguidePath?: string;
-
-	/**
 	 * The last opened page's ID.
 	 */
 	@MobX.observable private lastPageId?: string;
@@ -20,6 +15,11 @@ export class Preferences {
 	 * The last selected project's ID.
 	 */
 	@MobX.observable private lastProjectId?: string;
+
+	/**
+	 * The last opened styleguide's absolute path.
+	 */
+	@MobX.observable private lastStyleguidePath?: string;
 
 	/**
 	 * Loads and returns preferences from a given JSON object.
@@ -31,14 +31,6 @@ export class Preferences {
 		preferences.lastStyleguidePath = jsonObject.lastStyleguidePath as string;
 		preferences.lastPageId = jsonObject.lastPageId as string;
 		return preferences;
-	}
-
-	/**
-	 * Returns the last opened styleguide's absolute path.
-	 * @return The last opened styleguide's absolute path.
-	 */
-	public getLastStyleguidePath(): string | undefined {
-		return this.lastStyleguidePath;
 	}
 
 	/**
@@ -58,11 +50,11 @@ export class Preferences {
 	}
 
 	/**
-	 * Sets the last opened styleguide's absolute path.
-	 * @param lastStyleguidePath The last opened styleguide's absolute path.
+	 * Returns the last opened styleguide's absolute path.
+	 * @return The last opened styleguide's absolute path.
 	 */
-	public setLastStyleguidePath(lastStyleguidePath?: string): void {
-		this.lastStyleguidePath = lastStyleguidePath;
+	public getLastStyleguidePath(): string | undefined {
+		return this.lastStyleguidePath;
 	}
 
 	/**
@@ -79,6 +71,14 @@ export class Preferences {
 	 */
 	public setLastProjectId(lastProjectId?: string): void {
 		this.lastProjectId = lastProjectId;
+	}
+
+	/**
+	 * Sets the last opened styleguide's absolute path.
+	 * @param lastStyleguidePath The last opened styleguide's absolute path.
+	 */
+	public setLastStyleguidePath(lastStyleguidePath?: string): void {
+		this.lastStyleguidePath = lastStyleguidePath;
 	}
 
 	/**

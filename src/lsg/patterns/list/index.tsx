@@ -10,30 +10,28 @@ export interface ListProps {
 export interface ListItemProps {
 	active?: boolean;
 	children?: ListItemProps[];
-	label?: string;
-	value: string;
-
-	onClick?: React.MouseEventHandler<HTMLElement>;
-	onContextMenu?: React.MouseEventHandler<HTMLElement>;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
+	draggable?: boolean;
 	handleDragDrop?: React.DragEventHandler<HTMLElement>;
 	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
-	draggable?: boolean;
+	handleDragStart?: React.DragEventHandler<HTMLElement>;
+	label?: string;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+	onContextMenu?: React.MouseEventHandler<HTMLElement>;
+	value: string;
 }
 
 interface StyledListItemProps {
 	active?: boolean;
-	onClick?: React.MouseEventHandler<HTMLElement>;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	draggable?: boolean;
+	handleDragStart?: React.DragEventHandler<HTMLElement>;
+	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 export interface LiProps {
 	active?: boolean;
 	draggable?: boolean;
-
-	onClick?: React.MouseEventHandler<HTMLElement>;
 	handleDragStart?: React.DragEventHandler<HTMLElement>;
+	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 const StyledUl = styled.ul`
@@ -47,8 +45,8 @@ const StyledLi = styled.li`
 	line-height: 25px;
 	list-style: none;
 	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')} ${(
-			props: StyledListItemProps
-		) => (props.active ? 'background: #def' : '')};
+		props: StyledListItemProps
+	) => (props.active ? 'background: #def' : '')};
 `;
 
 const StyledLabel = styled.span`

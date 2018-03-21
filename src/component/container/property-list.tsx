@@ -32,6 +32,42 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 		this.handleChange = this.handleChange.bind(this);
 	}
 
+	protected convertOptionsToValues(options: Option[]): Values[] {
+		return options.map(option => ({
+			id: option.getId(),
+			name: option.getName()
+		}));
+	}
+
+	protected getValue(id: string, path?: string): PropertyValue {
+		if (path) {
+			const parts = `${path}.${id}`.split('.');
+			const [rootId, ...propertyPath] = parts;
+
+			return this.props.element.getPropertyValue(rootId, propertyPath.join('.'));
+		}
+
+		return this.props.element.getPropertyValue(id);
+	}
+
+	// tslint:disable-next-line:no-any
+	protected handleChange(id: string, value: any, context?: ObjectContext): void {
+		if (context) {
+			const parts = `${context.path}.${id}`.split('.');
+			const [rootId, ...path] = parts;
+
+			this.props.element.setPropertyValue(rootId, value, path.join('.'));
+			return;
+		}
+
+		this.props.element.setPropertyValue(id, value);
+	}
+
+	@action
+	protected handleClick(): void {
+		this.isOpen = !this.isOpen;
+	}
+
 	public render(): React.ReactNode {
 		const { context } = this.props;
 
@@ -126,42 +162,6 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 				})}
 			</>
 		);
-	}
-
-	// tslint:disable-next-line:no-any
-	protected handleChange(id: string, value: any, context?: ObjectContext): void {
-		if (context) {
-			const parts = `${context.path}.${id}`.split('.');
-			const [rootId, ...path] = parts;
-
-			this.props.element.setPropertyValue(rootId, value, path.join('.'));
-			return;
-		}
-
-		this.props.element.setPropertyValue(id, value);
-	}
-
-	protected getValue(id: string, path?: string): PropertyValue {
-		if (path) {
-			const parts = `${path}.${id}`.split('.');
-			const [rootId, ...propertyPath] = parts;
-
-			return this.props.element.getPropertyValue(rootId, propertyPath.join('.'));
-		}
-
-		return this.props.element.getPropertyValue(id);
-	}
-
-	@action
-	protected handleClick(): void {
-		this.isOpen = !this.isOpen;
-	}
-
-	protected convertOptionsToValues(options: Option[]): Values[] {
-		return options.map(option => ({
-			id: option.getId(),
-			name: option.getName()
-		}));
 	}
 }
 

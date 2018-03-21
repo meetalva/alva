@@ -8,9 +8,9 @@ import * as ts from 'typescript';
  */
 export interface Export {
 	/**
-	 * The type of the object exported.
+	 * The name of the export, or undefined if this is the default export.
 	 */
-	type: Type;
+	name?: string;
 
 	/**
 	 * The TypeScript export statement.
@@ -18,7 +18,7 @@ export interface Export {
 	statement: ts.Statement;
 
 	/**
-	 * The name of the export, or undefined if this is the default export.
+	 * The type of the object exported.
 	 */
-	name?: string;
+	type: Type;
 }

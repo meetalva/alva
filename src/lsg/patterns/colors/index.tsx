@@ -19,15 +19,12 @@ export class Color {
 		}
 	}
 
-	public toString(format: 'rgb' | 'hex' = 'rgb', options?: { alpha?: number }): string {
-		const hasAlpha = options && typeof options === 'object' && 'alpha' in options && typeof options.alpha === 'number';
-		const alpha = options && hasAlpha ? options.alpha : undefined;
-		return !hasAlpha && format === 'hex' ? this.toHexString() : this.toRGBString(alpha);
-	}
+	protected hexDigit(d: number): string {
+		const digit = Math.floor(d)
+			.toString(16)
+			.slice(-2);
 
-	public toRGBString(alpha?: number): string {
-		const a = typeof alpha === 'number' ? alpha : this.alpha;
-		return a === 1 ? `rgb(${this.rgb.join(', ')})` : `rgba(${this.rgb.join(', ')}, ${a})`;
+		return digit.length === 2 ? digit : `0${digit}`;
 	}
 
 	public toHexString(): string {
@@ -36,12 +33,19 @@ export class Color {
 		return this.alpha === 1 ? `#${r}${g}${b}` : `#${r}${g}${b}${this.hexDigit(this.alpha * 255)}`;
 	}
 
-	protected hexDigit(d: number): string {
-		const digit = Math.floor(d)
-			.toString(16)
-			.slice(-2);
+	public toRGBString(alpha?: number): string {
+		const a = typeof alpha === 'number' ? alpha : this.alpha;
+		return a === 1 ? `rgb(${this.rgb.join(', ')})` : `rgba(${this.rgb.join(', ')}, ${a})`;
+	}
 
-		return digit.length === 2 ? digit : `0${digit}`;
+	public toString(format: 'rgb' | 'hex' = 'rgb', options?: { alpha?: number }): string {
+		const hasAlpha =
+			options &&
+			typeof options === 'object' &&
+			'alpha' in options &&
+			typeof options.alpha === 'number';
+		const alpha = options && hasAlpha ? options.alpha : undefined;
+		return !hasAlpha && format === 'hex' ? this.toHexString() : this.toRGBString(alpha);
 	}
 }
 

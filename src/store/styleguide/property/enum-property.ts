@@ -33,14 +33,6 @@ export class EnumProperty extends Property {
 	 * @inheritdoc
 	 */
 	// tslint:disable-next-line:no-any
-	public convertToRender(value: any): any {
-		return this.ordinalById[value as string];
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	// tslint:disable-next-line:no-any
 	public coerceValue(value: any): any {
 		if (value === null || value === undefined || value === '') {
 			return undefined;
@@ -69,6 +61,14 @@ export class EnumProperty extends Property {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	// tslint:disable-next-line:no-any
+	public convertToRender(value: any): any {
+		return this.ordinalById[value as string];
+	}
+
+	/**
 	 * Returns the option ordinal (assigned number value) for a given option ID.
 	 * @param id The option ID.
 	 * @return The ordinal if an option with this ID exists.
@@ -91,6 +91,13 @@ export class EnumProperty extends Property {
 		return this.options;
 	}
 
+	// tslint:disable-next-line:no-any
+	protected getToStringProperties(): [string, any][] {
+		const result = super.getToStringProperties();
+		result.push(['options', this.options]);
+		return result;
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -108,13 +115,6 @@ export class EnumProperty extends Property {
 		this.options.forEach((option: Option) => {
 			this.ordinalById[option.getId()] = option.getOrdinal();
 		});
-	}
-
-	// tslint:disable-next-line:no-any
-	protected getToStringProperties(): [string, any][] {
-		const result = super.getToStringProperties();
-		result.push(['options', this.options]);
-		return result;
 	}
 
 	/**

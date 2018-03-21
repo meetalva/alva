@@ -6,22 +6,23 @@ import styled from 'styled-components';
 
 export interface DropdownProps {
 	chrome?: boolean;
-	visible?: boolean;
+	handleClick?: React.MouseEventHandler<HTMLElement>;
 	label?: string;
 	open?: boolean;
-
-	handleClick?: React.MouseEventHandler<HTMLElement>;
+	visible?: boolean;
 }
+
 export interface StyledChromeDropdownProps {
 	open?: boolean;
 }
+
 export interface StyledDropdownProps {
 	open?: boolean;
 }
 
 export interface StyledLabelProps {
-	open?: boolean;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
+	open?: boolean;
 }
 
 export interface StyledIconProps {

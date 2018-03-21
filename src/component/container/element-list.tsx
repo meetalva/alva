@@ -1,4 +1,5 @@
 import { elementMenu } from '../../electron/context-menus';
+import { ElementCommand } from '../../store/command/element-command';
 import { ElementWrapper } from './element-wrapper';
 import { ListItemProps } from '../../lsg/patterns/list';
 import { createMenu } from '../../electron/menu';
@@ -10,58 +11,18 @@ import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
 import { Store } from '../../store/store';
 
-export interface ElementListProps {
-	store: Store;
-}
-
 @observer
-export class ElementList extends React.Component<ElementListProps> {
-	public constructor(props: ElementListProps) {
+export class ElementList extends React.Component<{}> {
+	public constructor(props: {}) {
 		super(props);
 	}
 
-	public render(): JSX.Element | null {
-		const page: Page | undefined = this.props.store.getCurrentPage();
-		if (page) {
-			const rootElement = page.getRoot();
-
-			if (!rootElement) {
-				return null;
-			}
-
-			const selectedElement = this.props.store.getSelectedElement();
-
-			return this.renderList(this.createItemFromElement('Root', rootElement, selectedElement));
-		} else {
-			return null;
-		}
-	}
-
 	public componentDidMount(): void {
-		createMenu(this.props.store);
+		createMenu();
 	}
 
-	public componentWillUpdate(newProps: ElementListProps): void {
-		createMenu(newProps.store);
-	}
-
-	public renderList(item: ListItemProps, key?: number): JSX.Element {
-		return (
-			<ElementWrapper
-				title={item.value}
-				key={key}
-				handleClick={item.onClick}
-				handleContextMenu={item.onContextMenu}
-				active={item.active}
-				handleDragStart={item.handleDragStart}
-				handleDragDropForChild={item.handleDragDropForChild}
-				handleDragDrop={item.handleDragDrop}
-			>
-				{item.children &&
-					item.children.length > 0 &&
-					item.children.map((child, index) => this.renderList(child, index))}
-			</ElementWrapper>
-		);
+	public componentWillUpdate(newProps: {}): void {
+		createMenu();
 	}
 
 	public createItemFromElement(
@@ -92,75 +53,84 @@ export class ElementList extends React.Component<ElementListProps> {
 
 		const updatePageElement: React.MouseEventHandler<HTMLElement> = event => {
 			event.stopPropagation();
-			this.props.store.setSelectedElement(element);
-			this.props.store.setElementFocussed(true);
+			Store.getInstance().setSelectedElement(element);
+			Store.getInstance().setElementFocussed(true);
 		};
 
 		return {
 			label: key,
 			value: pattern.getName(),
 			onClick: updatePageElement,
-			onContextMenu: () => {
-				elementMenu(this.props.store, element);
-			},
+			onContextMenu: () => elementMenu(element),
 			handleDragStart: (e: React.DragEvent<HTMLElement>) => {
-				this.props.store.setRearrangeElement(element);
+				Store.getInstance().setDraggedElement(element);
 			},
 			handleDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');
 
-				const parentElement = element.getParent();
-				let pageElement: PageElement | undefined;
+				const newParent = element.getParent();
+				let draggedElement: PageElement | undefined;
 
+				const store = Store.getInstance();
 				if (!patternId) {
-					pageElement = this.props.store.getRearrangeElement();
+					draggedElement = store.getDraggedElement();
 				} else {
-					const styleguide = this.props.store.getStyleguide();
+					const styleguide = store.getStyleguide();
 					if (!styleguide) {
 						return;
 					}
 
-					pageElement = new PageElement({
+					draggedElement = new PageElement({
 						pattern: styleguide.getPattern(patternId),
-						page: this.props.store.getCurrentPage() as Page,
 						setDefaults: true
 					});
 				}
 
-				if (!parentElement || !pageElement || pageElement.isAncestorOf(parentElement)) {
+				if (!newParent || !draggedElement || draggedElement.isAncestorOf(newParent)) {
 					return;
 				}
 
-				parentElement.addChild(pageElement, element.getIndex());
-				this.props.store.setSelectedElement(pageElement);
+				let newIndex = element.getIndex();
+				if (draggedElement.getParent() === newParent) {
+					const currentIndex = draggedElement.getIndex();
+					if (newIndex > currentIndex) {
+						newIndex--;
+					}
+					if (newIndex === currentIndex) {
+						return;
+					}
+				}
+
+				store.execute(ElementCommand.addChild(newParent, draggedElement, newIndex));
+				store.setSelectedElement(draggedElement);
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');
 
-				let pageElement: PageElement | undefined;
+				let draggedElement: PageElement | undefined;
 
+				const store = Store.getInstance();
 				if (!patternId) {
-					pageElement = this.props.store.getRearrangeElement();
+					draggedElement = store.getDraggedElement();
 				} else {
-					const styleguide = this.props.store.getStyleguide();
+					const styleguide = store.getStyleguide();
 
 					if (!styleguide) {
 						return;
 					}
 
-					pageElement = new PageElement({
+					draggedElement = new PageElement({
 						pattern: styleguide.getPattern(patternId),
-						page: this.props.store.getCurrentPage() as Page,
 						setDefaults: true
 					});
 				}
 
-				if (!pageElement || pageElement.isAncestorOf(element)) {
+				if (!draggedElement || draggedElement.isAncestorOf(element)) {
 					return;
 				}
 
-				element.addChild(pageElement);
-				this.props.store.setSelectedElement(pageElement);
+				store.execute(ElementCommand.addChild(element, draggedElement));
+				store.setSelectedElement(draggedElement);
 			},
 			children: items,
 			active: element === selectedElement
@@ -194,5 +164,42 @@ export class ElementList extends React.Component<ElementListProps> {
 			});
 			return { value: key, children: items };
 		}
+	}
+
+	public render(): JSX.Element | null {
+		const store = Store.getInstance();
+		const page: Page | undefined = store.getCurrentPage();
+		if (page) {
+			const rootElement = page.getRoot();
+
+			if (!rootElement) {
+				return null;
+			}
+
+			const selectedElement = store.getSelectedElement();
+
+			return this.renderList(this.createItemFromElement('Root', rootElement, selectedElement));
+		} else {
+			return null;
+		}
+	}
+
+	public renderList(item: ListItemProps, key?: number): JSX.Element {
+		return (
+			<ElementWrapper
+				title={item.value}
+				key={key}
+				handleClick={item.onClick}
+				handleContextMenu={item.onContextMenu}
+				active={item.active}
+				handleDragStart={item.handleDragStart}
+				handleDragDropForChild={item.handleDragDropForChild}
+				handleDragDrop={item.handleDragDrop}
+			>
+				{item.children &&
+					item.children.length > 0 &&
+					item.children.map((child, index) => this.renderList(child, index))}
+			</ElementWrapper>
+		);
 	}
 }

@@ -5,10 +5,10 @@ import { getSpace, Size } from '../../space';
 import styled from 'styled-components';
 
 export interface BooleanItemProps {
-	label: string;
 	checked?: boolean;
 	className?: string;
 	handleChange?: React.ChangeEventHandler<HTMLElement>;
+	label: string;
 }
 
 interface IndicatorProps {

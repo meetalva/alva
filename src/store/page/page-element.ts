@@ -12,11 +12,10 @@ import { Styleguide } from '../styleguide/styleguide';
 import * as Uuid from 'uuid';
 
 export interface PageElementProperties {
-	page: Page;
-	pattern?: Pattern;
 	id?: string;
-	setDefaults?: boolean;
 	parent?: PageElement;
+	pattern?: Pattern;
+	setDefaults?: boolean;
 }
 
 /**
@@ -38,7 +37,7 @@ export class PageElement {
 	/**
 	 * The page this element belongs to.
 	 */
-	private page: Page;
+	private page?: Page;
 
 	/**
 	 * The parent page element if this is not the root element.
@@ -68,17 +67,11 @@ export class PageElement {
 	 */
 	public constructor(properties: PageElementProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
-		this.page = properties.page;
 		this.pattern = properties.pattern;
 
 		if (properties.setDefaults && this.pattern) {
 			this.pattern.getProperties().forEach(property => {
 				this.setPropertyValue(property.getId(), property.getDefaultValue());
-				console.log(
-					`Property ${property.getId()}: Set default ${JSON.stringify(
-						this.getPropertyValue(property.getId())
-					)}`
-				);
 			});
 		}
 
@@ -92,17 +85,17 @@ export class PageElement {
 	 */
 	public static fromJsonObject(
 		json: JsonObject,
-		store: Store,
-		page: Page,
-		parent?: PageElement
+		parent?: PageElement,
+		page?: Page
 	): PageElement | undefined {
 		if (!json) {
-			return;
+			return undefined;
 		}
 
+		const store: Store = Store.getInstance();
 		const styleguide = store.getStyleguide();
 		if (!styleguide) {
-			return;
+			return undefined;
 		}
 
 		let patternId = json['pattern'] as string;
@@ -118,21 +111,21 @@ export class PageElement {
 
 		if (!pattern) {
 			console.warn(`Ignoring unknown pattern "${patternId}"`);
-			return new PageElement({ page, parent });
+			return new PageElement({ parent });
 		}
 
-		const element = new PageElement({ id: json.uuid as string, page, pattern, parent });
+		const element = new PageElement({ id: json.uuid as string, pattern, parent });
 
 		if (json.properties) {
 			Object.keys(json.properties as JsonObject).forEach((propertyId: string) => {
 				const value: JsonValue = (json.properties as JsonObject)[propertyId];
-				element.setPropertyValue(propertyId, element.createPropertyValue(value, store));
+				element.setPropertyValue(propertyId, element.createPropertyValue(value));
 			});
 		}
 
 		if (json.children) {
 			element.children = (json.children as JsonArray).map(
-				(childJson: JsonObject) => element.createChildElement(childJson, store) as PageElement
+				(childJson: JsonObject) => element.createChildElement(childJson) as PageElement
 			);
 		}
 
@@ -150,24 +143,12 @@ export class PageElement {
 	}
 
 	/**
-	 * Adds a page element as another child of this element's parent, directly after this element.
-	 * Also removes the element from any previous parent.
-	 * @param child The child element to add.
-	 */
-	public addSibling(child: PageElement): void {
-		const parentElement: PageElement | undefined = this.getParent();
-		if (parentElement) {
-			child.setParent(parentElement, this.getIndex() + 1);
-		}
-	}
-
-	/**
 	 * Returns a deep clone of this page element (i.e. cloning all values and children as well).
 	 * The new clone does not have any parent.
 	 * @return The new clone.
 	 */
 	public clone(): PageElement {
-		const clone = new PageElement({ page: this.page, pattern: this.pattern });
+		const clone = new PageElement({ pattern: this.pattern });
 		this.children.forEach(child => {
 			clone.addChild(child.clone());
 		});
@@ -180,17 +161,16 @@ export class PageElement {
 	/**
 	 * Creates a child element (pattern or text) for a given serialization JSON.
 	 * @param json The JSON to read from.
-	 * @param store The application's store.
 	 * @return The new child element.
 	 */
-	protected createChildElement(json: JsonValue, store: Store): PageElement | PropertyValue {
+	protected createChildElement(json: JsonValue): PageElement | PropertyValue {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
-			return PageElement.fromJsonObject(json as JsonObject, store, this.page, this);
+			return PageElement.fromJsonObject(json as JsonObject, this);
 		} else {
+			const store: Store = Store.getInstance();
 			const styleguide = store.getStyleguide() as Styleguide;
 
 			const element: PageElement = new PageElement({
-				page: this.page,
 				pattern: styleguide.getPattern(Pattern.SYNTHETIC_TEXT_ID),
 				setDefaults: false,
 				parent: this
@@ -203,12 +183,11 @@ export class PageElement {
 	/**
 	 * Creates a property value or element for a given serialization JSON.
 	 * @param json The JSON to read from.
-	 * @param store The application's store.
 	 * @return The new property value or element.
 	 */
-	protected createPropertyValue(json: JsonValue, store: Store): PageElement | PropertyValue {
+	protected createPropertyValue(json: JsonValue): PageElement | PropertyValue {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
-			return PageElement.fromJsonObject(json as JsonObject, store, this.page, this);
+			return PageElement.fromJsonObject(json as JsonObject, this);
 		} else {
 			return json as PropertyValue;
 		}
@@ -223,6 +202,14 @@ export class PageElement {
 	}
 
 	/**
+	 * Returns the technical (internal) ID of the page.
+	 * @return The technical (internal) ID of the page.
+	 */
+	public getId(): string {
+		return this.id;
+	}
+
+	/**
 	 * Returns the 0-based position of this element within its parent.
 	 * @return The 0-based position of this element.
 	 */
@@ -234,18 +221,10 @@ export class PageElement {
 	}
 
 	/**
-	 * Returns the technical (internal) ID of the page.
-	 * @return The technical (internal) ID of the page.
-	 */
-	public getId(): string {
-		return this.id;
-	}
-
-	/**
 	 * Returns the page this element belongs to.
 	 * @return The page this element belongs to.
 	 */
-	public getPage(): Page {
+	public getPage(): Page | undefined {
 		return this.page;
 	}
 
@@ -270,8 +249,9 @@ export class PageElement {
 	/**
 	 * The content of a property of this page element.
 	 * @param id The ID of the property to return the value of.
-	 * @param path If the property value you are trying to access is buried inside an object property use the path paremeter to access it.
-	 * eg: `getPropertyValue('image', 'src.srcSet')`.
+	 * @param path A dot ('.') separated optional path within an object property to point to a deep
+	 * property. E.g., setting propertyId to 'image' and path to 'src.srcSet.xs',
+	 * the operation edits 'image.src.srcSet.xs' on the element.
 	 * @return The content value (as provided by the designer).
 	 */
 	public getPropertyValue(id: string, path?: string): PropertyValue {
@@ -366,16 +346,32 @@ export class PageElement {
 	 * Leaving out the position adds it at the end of the list.
 	 */
 	public setParent(parent?: PageElement, index?: number): void {
+		this.setParentInternal(parent, index, parent ? parent.getPage() : undefined);
+	}
+
+	/**
+	 * Internal method to set the parent, index, and page the root belongs to.
+	 * Do not call from components code.
+	 * @param parent The (optional) new parent for this element.
+	 * @param index The 0-based new position within the children of the new parent.
+	 * Leaving out the position adds it at the end of the list.
+	 * @param page The page of this element.
+	 */
+	public setParentInternal(parent?: PageElement, index?: number, page?: Page): void {
 		if (index !== undefined && this.parent === parent && this.children.indexOf(this) === index) {
 			return;
 		}
 
 		if (this.parent) {
 			(this.parent.children as MobX.IObservableArray<PageElement>).remove(this);
-			this.parent.getPage().unregisterElementAndChildren(this);
+		}
+
+		if (this.page) {
+			this.page.unregisterElementAndChildren(this);
 		}
 
 		this.parent = parent;
+		this.updatePageInDescendants(page);
 
 		if (parent) {
 			if (index === undefined || index >= parent.children.length) {
@@ -383,8 +379,10 @@ export class PageElement {
 			} else {
 				parent.children.splice(index < 0 ? 0 : index, 0, this);
 			}
+		}
 
-			parent.getPage().registerElementAndChildren(this);
+		if (this.page) {
+			this.page.registerElementAndChildren(this);
 		}
 	}
 
@@ -393,8 +391,9 @@ export class PageElement {
 	 * Any given value is automatically converted to be compatible to the property type.
 	 * For instance, the string "true" is converted to true if the property is boolean.
 	 * @param id The ID of the property to set the value for.
-	 * @param path If want to set a property inside an object property use the path paremeter to access it.
-	 * eg: `setPropertyValue('image', 'http://someimageurl.jpeg', src.srcSet.XS')`.
+	 * @param path A dot ('.') separated optional path within an object property to point to a deep
+	 * property. E.g., setting propertyId to 'image' and path to 'src.srcSet.xs',
+	 * the operation edits 'image.src.srcSet.xs' on the element.
 	 * @param value The value to set (which is automatically converted, see above).
 	 */
 	// tslint:disable-next-line:no-any
@@ -445,5 +444,14 @@ export class PageElement {
 		});
 
 		return json;
+	}
+
+	/**
+	 * Updates the page property in this element and all its descendants
+	 * @param page The new page.
+	 */
+	private updatePageInDescendants(page?: Page): void {
+		this.page = page;
+		this.children.forEach(child => child.updatePageInDescendants(page));
 	}
 }

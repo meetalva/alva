@@ -1,6 +1,6 @@
 import { JsonObject } from '../json';
 import * as MobX from 'mobx';
-import { Project } from './project';
+import { Project } from '../project';
 import { Store } from '../store';
 import * as Uuid from 'uuid';
 
@@ -9,7 +9,6 @@ export interface PageRefProperties {
 	name?: string;
 	path?: string;
 	project: Project;
-	store: Store;
 }
 
 /**
@@ -50,19 +49,12 @@ export class PageRef {
 	@MobX.observable private project: Project;
 
 	/**
-	 * The store this page belongs to.
-	 */
-	private store: Store;
-
-	/**
 	 * Creates a new page.
 	 * @param path The path of the page file, relative to the alva.yaml.
 	 * @param name The human-friendly name of the page.
 	 * @param project The project this page belongs to.
-	 * @param store The store this page belongs to.
 	 */
 	public constructor(properties: PageRefProperties) {
-		this.store = properties.store;
 		this.id = properties.id ? properties.id : Uuid.v4();
 		this.setProject(properties.project);
 
@@ -79,22 +71,20 @@ export class PageRef {
 	/**
 	 * Loads and returns a page reference from a given JSON object.
 	 * @param jsonObject The JSON object to load from.
-	 * @param store The store this page belongs to.
 	 * @return A new page reference object containing the loaded data.
 	 */
-	public static fromJsonObject(json: JsonObject, project: Project, store: Store): PageRef {
+	public static fromJsonObject(json: JsonObject, project: Project): PageRef {
 		if (json.uuid) {
 			return new PageRef({
 				id: json.uuid as string,
 				path: json.path as string,
 				name: json.name as string,
-				project,
-				store
+				project
 			});
 		} else if (json.id) {
 			// Migrate from previous alva.yaml version
 			const path = `./page-${json.id}.yaml`;
-			const pageRef = new PageRef({ path, name: json.name as string, project, store });
+			const pageRef = new PageRef({ path, name: json.name as string, project });
 			pageRef.updatePathFromNames();
 			return pageRef;
 		} else {
@@ -205,6 +195,6 @@ export class PageRef {
 	 * versions of those names, and then finding the next unused file name.
 	 */
 	public updatePathFromNames(): void {
-		this.path = this.store.findAvailablePagePath(this);
+		this.path = Store.getInstance().findAvailablePagePath(this);
 	}
 }

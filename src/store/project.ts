@@ -1,14 +1,13 @@
-import { JsonArray, JsonObject } from '../json';
+import { JsonArray, JsonObject } from './json';
 import * as MobX from 'mobx';
-import { PageRef } from './page-ref';
-import { Store } from '../store';
+import { PageRef } from './page/page-ref';
+import { Store } from './store';
 import * as Uuid from 'uuid';
 
 export interface ProjectProperties {
 	id?: string;
 	name: string;
 	previewFrame: string;
-	store: Store;
 }
 
 /**
@@ -44,11 +43,6 @@ export class Project {
 	@MobX.observable private previewFrame: string;
 
 	/**
-	 * The store this page belongs to.
-	 */
-	private store: Store;
-
-	/**
 	 * Creates a new project.
 	 * @param id The technical (internal) ID of the project.
 	 * @param name The human-friendly name of the project.
@@ -65,17 +59,16 @@ export class Project {
 	 * @param jsonObject The JSON object to load from.
 	 * @return A new project object containing the loaded data.
 	 */
-	public static fromJsonObject(json: JsonObject, store: Store): Project {
+	public static fromJsonObject(json: JsonObject): Project {
 		const project: Project = new Project({
 			id: json.uuid as string,
 			name: json.name as string,
-			previewFrame: json.previewFrame as string,
-			store
+			previewFrame: json.previewFrame as string
 		});
 
 		const pages: PageRef[] = [];
 		(json.pages as JsonArray).forEach((pageJson: JsonObject) => {
-			pages.push(PageRef.fromJsonObject(pageJson, project, store));
+			pages.push(PageRef.fromJsonObject(pageJson, project));
 		});
 
 		return project;
@@ -156,6 +149,6 @@ export class Project {
 	 * normalized versions of those names, and then finding the next unused file name.
 	 */
 	public updatePathFromNames(): void {
-		this.pages.forEach(project => this.store.findAvailablePagePath(project));
+		this.pages.forEach(project => Store.getInstance().findAvailablePagePath(project));
 	}
 }

@@ -2,20 +2,20 @@ import Element from '../../lsg/patterns/element';
 import * as React from 'react';
 
 export interface ElementWrapperState {
-	open?: boolean;
 	highlight?: boolean;
 	highlightPlaceholder?: boolean;
+	open?: boolean;
 }
 
 export interface ElementWrapperProps {
 	active?: boolean;
-	open?: boolean;
-	title: string;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
 	handleContextMenu?: React.MouseEventHandler<HTMLElement>;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	handleDragDrop?: React.DragEventHandler<HTMLElement>;
 	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
+	handleDragStart?: React.DragEventHandler<HTMLElement>;
+	open?: boolean;
+	title: string;
 }
 
 export class ElementWrapper extends React.Component<ElementWrapperProps, ElementWrapperState> {
@@ -37,9 +37,45 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 		this.handleDragDropForChild = this.handleDragDropForChild.bind(this);
 	}
 
-	private handleIconClick(): void {
+	private handleDragDrop(e: React.DragEvent<HTMLElement>): void {
 		this.setState({
-			open: !this.state.open
+			highlight: false
+		});
+		if (typeof this.props.handleDragDrop === 'function') {
+			this.props.handleDragDrop(e);
+		}
+	}
+
+	private handleDragDropForChild(e: React.DragEvent<HTMLElement>): void {
+		this.setState({
+			highlightPlaceholder: false
+		});
+		if (typeof this.props.handleDragDropForChild === 'function') {
+			this.props.handleDragDropForChild(e);
+		}
+	}
+
+	private handleDragEnter(e: React.DragEvent<HTMLElement>): void {
+		this.setState({
+			highlight: true
+		});
+	}
+
+	private handleDragEnterForChild(e: React.DragEvent<HTMLElement>): void {
+		this.setState({
+			highlightPlaceholder: true
+		});
+	}
+
+	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
+		this.setState({
+			highlight: false
+		});
+	}
+
+	private handleDragLeaveForChild(e: React.DragEvent<HTMLElement>): void {
+		this.setState({
+			highlightPlaceholder: false
 		});
 	}
 
@@ -52,46 +88,10 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 		}
 	}
 
-	private handleDragEnter(e: React.DragEvent<HTMLElement>): void {
+	private handleIconClick(): void {
 		this.setState({
-			highlight: true
+			open: !this.state.open
 		});
-	}
-
-	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
-		this.setState({
-			highlight: false
-		});
-	}
-
-	private handleDragDrop(e: React.DragEvent<HTMLElement>): void {
-		this.setState({
-			highlight: false
-		});
-		if (typeof this.props.handleDragDrop === 'function') {
-			this.props.handleDragDrop(e);
-		}
-	}
-
-	private handleDragEnterForChild(e: React.DragEvent<HTMLElement>): void {
-		this.setState({
-			highlightPlaceholder: true
-		});
-	}
-
-	private handleDragLeaveForChild(e: React.DragEvent<HTMLElement>): void {
-		this.setState({
-			highlightPlaceholder: false
-		});
-	}
-
-	private handleDragDropForChild(e: React.DragEvent<HTMLElement>): void {
-		this.setState({
-			highlightPlaceholder: false
-		});
-		if (typeof this.props.handleDragDropForChild === 'function') {
-			this.props.handleDragDropForChild(e);
-		}
 	}
 
 	public render(): JSX.Element {

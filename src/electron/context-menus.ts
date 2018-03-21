@@ -1,9 +1,10 @@
 import { MenuItemConstructorOptions, remote } from 'electron';
+import { ElementCommand } from '../store/command/element-command';
 import { PageElement } from '../store/page/page-element';
 import { Store } from '../store/store';
-const { Menu } = remote;
 
-export function elementMenu(store: Store, element: PageElement): void {
+const store = Store.getInstance();
+export function elementMenu(element: PageElement): void {
 	const clipboardElement: PageElement | undefined = store.getClipboardElement();
 
 	const template: MenuItemConstructorOptions[] = [
@@ -11,7 +12,7 @@ export function elementMenu(store: Store, element: PageElement): void {
 			label: 'Cut Element',
 			click: () => {
 				store.setClipboardElement(element);
-				element.remove();
+				store.execute(ElementCommand.remove(element));
 			}
 		},
 		{
@@ -23,7 +24,7 @@ export function elementMenu(store: Store, element: PageElement): void {
 		{
 			label: 'Delete element',
 			click: () => {
-				element.remove();
+				store.execute(ElementCommand.remove(element));
 			}
 		},
 		{
@@ -36,7 +37,7 @@ export function elementMenu(store: Store, element: PageElement): void {
 				const newPageElement = clipboardElement && clipboardElement.clone();
 
 				if (newPageElement) {
-					element.addSibling(newPageElement);
+					store.execute(ElementCommand.addSibling(element, newPageElement));
 				}
 			}
 		},
@@ -47,12 +48,12 @@ export function elementMenu(store: Store, element: PageElement): void {
 				const newPageElement = clipboardElement && clipboardElement.clone();
 
 				if (newPageElement) {
-					element.addChild(newPageElement);
+					store.execute(ElementCommand.addChild(element, newPageElement));
 				}
 			}
 		}
 	];
 
-	const menu = Menu.buildFromTemplate(template);
+	const menu = remote.Menu.buildFromTemplate(template);
 	menu.popup();
 }

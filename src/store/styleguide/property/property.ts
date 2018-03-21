@@ -18,15 +18,15 @@ export abstract class Property {
 	private defaultValue: any;
 
 	/**
-	 * The technical ID of this property (e.g. the property name in the TypeScript props interface).
-	 */
-	private id: string;
-
-	/**
 	 * Whether this property is marked as hidden in Alva (exists in the pattern, but the designer
 	 * should not provide content for it).
 	 */
 	private hidden: boolean = false;
+
+	/**
+	 * The technical ID of this property (e.g. the property name in the TypeScript props interface).
+	 */
+	private id: string;
 
 	/**
 	 * The human-friendly name of the property, usually provided by an annotation.

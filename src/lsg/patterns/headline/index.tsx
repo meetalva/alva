@@ -5,15 +5,15 @@ import styled, { css, StyledComponentClass } from 'styled-components';
 
 export interface HeadlineProps {
 	className?: string;
-	textColor?: Color;
 	order?: 1 | 2 | 3;
 	tagName?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div';
+	textColor?: Color;
 }
 
 interface StyledHeadlineProps {
 	className?: string;
-	textColor?: Color;
 	order?: 1 | 2 | 3;
+	textColor?: Color;
 }
 
 const StyledHeadline = styled.div`

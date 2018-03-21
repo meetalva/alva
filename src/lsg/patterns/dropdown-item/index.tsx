@@ -8,9 +8,9 @@ import styled from 'styled-components';
 export interface DropdownItemProps {
 	// active?: boolean;
 	color?: Color;
-	name: string;
-	icon?: IconName;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
+	icon?: IconName;
+	name: string;
 }
 export interface StyledDropdownItemLinkProps {
 	color?: Color;
@@ -19,14 +19,14 @@ export interface StyledDropdownItemLinkProps {
 export interface DropdownItemEditableProps {
 	color?: Color;
 	editable: boolean;
-	name: string;
-	icon?: IconName;
 	focused: boolean;
+	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
 	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 	handleClick: React.MouseEventHandler<HTMLElement>;
 	handleDoubleClick: React.MouseEventHandler<HTMLElement>;
 	handleKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
-	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
+	icon?: IconName;
+	name: string;
 	value?: string;
 }
 

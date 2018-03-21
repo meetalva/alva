@@ -1,8 +1,8 @@
 import Input from '../../lsg/patterns/input/';
+import { ElementCommand } from '../../store/command/element-command';
 import { PatternFolder } from '../../store/styleguide/folder';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
-import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/styleguide/pattern';
 import PatternList, {
@@ -14,10 +14,6 @@ import * as React from 'react';
 import Space, { Size } from '../../lsg/patterns/space';
 import { Store } from '../../store/store';
 
-export interface PatternListContainerProps {
-	store: Store;
-}
-
 export interface PatternListContainerItemProps {
 	items: NamedPatternListItemProps[];
 	name: string;
@@ -28,57 +24,15 @@ export interface NamedPatternListItemProps extends PatternListItemProps {
 }
 
 @observer
-export class PatternListContainer extends React.Component<PatternListContainerProps> {
+export class PatternListContainer extends React.Component<{}> {
 	public items: PatternListContainerItemProps[] = [];
-	public constructor(props: PatternListContainerProps) {
+
+	public constructor(props: {}) {
 		super(props);
 
 		this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
 		this.handlePatternClick = this.handlePatternClick.bind(this);
 		this.handleDragStart = this.handleDragStart.bind(this);
-	}
-
-	public search(
-		containers: PatternListContainerItemProps[],
-		term: string
-	): PatternListContainerItemProps[] {
-		const result: PatternListContainerItemProps[] = [];
-
-		for (const container of containers) {
-			if (!container.items.length) {
-				continue;
-			}
-
-			const matchingItems = container.items.filter(
-				item => item.name.toLowerCase().indexOf(term.toLowerCase()) !== -1
-			);
-			result.push({
-				name: container.name,
-				items: matchingItems
-			});
-		}
-
-		return result;
-	}
-
-	public render(): JSX.Element {
-		const styleguide = this.props.store.getStyleguide();
-		const patternRoot = styleguide && styleguide.getPatternRoot();
-		this.items = patternRoot ? this.createItemsFromFolder(patternRoot) : [];
-
-		if (this.props.store.getPatternSearchTerm() !== '') {
-			this.items = this.search(this.items, this.props.store.getPatternSearchTerm());
-		}
-
-		const list = this.createList(this.items);
-		return (
-			<div>
-				<Space sizeBottom={Size.XXS}>
-					<Input handleChange={this.handleSearchInputChange} placeholder="Search patterns" />
-				</Space>
-				<Space size={[0, Size.L]}>{list}</Space>
-			</div>
-		);
 	}
 
 	public createItemsFromFolder(parent: PatternFolder): PatternListContainerItemProps[] {
@@ -140,25 +94,6 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 	}
 
 	@action
-	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
-		this.props.store.setPatternSearchTerm(evt.target.value);
-	}
-
-	@action
-	protected handlePatternClick(pattern: Pattern): void {
-		const selectedElement: PageElement | undefined = this.props.store.getSelectedElement();
-		if (selectedElement) {
-			const newPageElement = new PageElement({
-				pattern,
-				page: this.props.store.getCurrentPage() as Page,
-				setDefaults: true
-			});
-			selectedElement.addSibling(newPageElement);
-			this.props.store.setSelectedElement(newPageElement);
-		}
-	}
-
-	@action
 	protected handleDragStart(e: React.DragEvent<HTMLElement>, pattern: Pattern): void {
 		e.dataTransfer.dropEffect = 'copy';
 		e.dataTransfer.setDragImage(
@@ -168,5 +103,68 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 		);
 
 		e.dataTransfer.setData('patternId', pattern.getId());
+	}
+
+	@action
+	protected handlePatternClick(pattern: Pattern): void {
+		const store: Store = Store.getInstance();
+		const selectedElement: PageElement | undefined = store.getSelectedElement();
+		if (selectedElement) {
+			const newPageElement = new PageElement({
+				pattern,
+				setDefaults: true
+			});
+			store.execute(ElementCommand.addSibling(selectedElement, newPageElement));
+			store.setSelectedElement(newPageElement);
+		}
+	}
+
+	@action
+	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
+		Store.getInstance().setPatternSearchTerm(evt.target.value);
+	}
+
+	public render(): JSX.Element {
+		const store: Store = Store.getInstance();
+		const styleguide = store.getStyleguide();
+		const patternRoot = styleguide && styleguide.getPatternRoot();
+		this.items = patternRoot ? this.createItemsFromFolder(patternRoot) : [];
+
+		if (store.getPatternSearchTerm() !== '') {
+			this.items = this.search(this.items, store.getPatternSearchTerm());
+		}
+
+		const list = this.createList(this.items);
+		return (
+			<div>
+				<Space sizeBottom={Size.XXS}>
+					<Input handleChange={this.handleSearchInputChange} placeholder="Search patterns" />
+				</Space>
+				<Space size={[0, Size.L]}>{list}</Space>
+			</div>
+		);
+	}
+
+	public search(
+		containers: PatternListContainerItemProps[],
+		term: string
+	): PatternListContainerItemProps[] {
+		const result: PatternListContainerItemProps[] = [];
+
+		for (const container of containers) {
+			if (!container.items.length) {
+				continue;
+			}
+
+			const matchingItems = container.items.filter(
+				item => item.name.toLowerCase().indexOf(term.toLowerCase()) !== -1
+			);
+			result.push({
+				name: container.name,
+				items: matchingItems
+			});
+		}
+
+		return result;
 	}
 }

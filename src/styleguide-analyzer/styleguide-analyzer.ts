@@ -1,5 +1,4 @@
 import { HighlightElementFunction } from '../component/preview';
-import { Store } from '../store/store';
 import { Styleguide } from '../store/styleguide/styleguide';
 
 /**
@@ -18,8 +17,7 @@ export abstract class StyleguideAnalyzer {
 
 	/**
 	 * Renders the preview application based on the store.
-	 * @param store The store that the render should be based on.
 	 * @param highlightElement The function that should be called inside the renderer when a element need to be highlighted.
 	 */
-	public abstract render(store: Store, highlightElement: HighlightElementFunction): void;
+	public abstract render(highlightElement: HighlightElementFunction): void;
 }

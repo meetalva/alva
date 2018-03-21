@@ -4,8 +4,8 @@ import styled, { css } from 'styled-components';
 
 export interface ButtonProps {
 	color?: Color;
-	order?: Order;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
+	order?: Order;
 }
 
 export interface StyledButtonProps {

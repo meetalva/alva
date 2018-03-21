@@ -12,7 +12,6 @@ import { StringProperty } from '../../../store/styleguide/property/string-proper
 import { HighlightAreaProps, HighlightElementFunction } from '../../preview';
 
 export interface PreviewAppProps {
-	store: Store;
 	highlightElement: HighlightElementFunction;
 }
 
@@ -21,9 +20,9 @@ export interface PreviewAppState {
 }
 
 interface PreviewProps {
+	highlightElement: HighlightElementFunction;
 	page?: Page;
 	selectedElementId?: string;
-	highlightElement: HighlightElementFunction;
 }
 
 interface PatternWrapperState {
@@ -51,9 +50,9 @@ class PatternWrapper extends React.Component<{}, PatternWrapperState> {
 
 @observer
 class Preview extends React.Component<PreviewProps> {
+	@observable private highlightArea: HighlightAreaProps;
 	private patternFactories: { [id: string]: React.StatelessComponent | ObjectConstructor };
 	private patternWrapperRef: PatternWrapper;
-	@observable private highlightArea: HighlightAreaProps;
 
 	public constructor(props: PreviewProps) {
 		super(props);
@@ -80,42 +79,6 @@ class Preview extends React.Component<PreviewProps> {
 		if (this.props.selectedElementId) {
 			this.triggerHighlight();
 		}
-	}
-
-	private triggerHighlight(): void {
-		const domNode = this.patternWrapperRef && ReactDOM.findDOMNode(this.patternWrapperRef);
-		if (domNode) {
-			this.props.highlightElement(domNode, this.highlightArea, this.highlightElementCallback);
-		}
-	}
-
-	public render(): JSX.Element | null {
-		if (this.props.page) {
-			const highlightArea: HighlightAreaProps = this.highlightArea;
-			return (
-				<>
-					{this.createComponent(this.props.page.getRoot()) as JSX.Element}
-					<div
-						style={{
-							position: 'absolute',
-							boxSizing: 'border-box',
-							border: '1px dashed rgba(55, 55, 55, .5)',
-							background:
-								'repeating-linear-gradient(135deg,transparent,transparent 2.5px,rgba(51,141,222, .5) 2.5px,rgba(51,141,222, .5) 5px), rgba(102,169,230, .5)',
-							transition: 'all .25s ease-in-out',
-							bottom: highlightArea.bottom,
-							height: highlightArea.height,
-							left: highlightArea.left,
-							opacity: highlightArea.opacity,
-							right: highlightArea.right,
-							top: highlightArea.top,
-							width: highlightArea.width
-						}}
-					/>
-				</>
-			);
-		}
-		return null;
 	}
 
 	/**
@@ -210,6 +173,42 @@ class Preview extends React.Component<PreviewProps> {
 			this.highlightArea = newHighlightArea;
 		}
 	}
+
+	public render(): JSX.Element | null {
+		if (this.props.page) {
+			const highlightArea: HighlightAreaProps = this.highlightArea;
+			return (
+				<>
+					{this.createComponent(this.props.page.getRoot()) as JSX.Element}
+					<div
+						style={{
+							position: 'absolute',
+							boxSizing: 'border-box',
+							border: '1px dashed rgba(55, 55, 55, .5)',
+							background:
+								'repeating-linear-gradient(135deg,transparent,transparent 2.5px,rgba(51,141,222, .5) 2.5px,rgba(51,141,222, .5) 5px), rgba(102,169,230, .5)',
+							transition: 'all .25s ease-in-out',
+							bottom: highlightArea.bottom,
+							height: highlightArea.height,
+							left: highlightArea.left,
+							opacity: highlightArea.opacity,
+							right: highlightArea.right,
+							top: highlightArea.top,
+							width: highlightArea.width
+						}}
+					/>
+				</>
+			);
+		}
+		return null;
+	}
+
+	private triggerHighlight(): void {
+		const domNode = this.patternWrapperRef && ReactDOM.findDOMNode(this.patternWrapperRef);
+		if (domNode) {
+			this.props.highlightElement(domNode, this.highlightArea, this.highlightElementCallback);
+		}
+	}
 }
 
 @observer
@@ -227,11 +226,11 @@ export class PreviewApp extends React.Component<PreviewAppProps, PreviewAppState
 			// Ignored
 		}
 
-		const selectedElement: PageElement | undefined = this.props.store.getSelectedElement();
+		const selectedElement: PageElement | undefined = Store.getInstance().getSelectedElement();
 		return (
 			<div>
 				<Preview
-					page={this.props.store.getCurrentPage()}
+					page={Store.getInstance().getCurrentPage()}
 					selectedElementId={selectedElement && selectedElement.getId()}
 					highlightElement={this.props.highlightElement}
 				/>

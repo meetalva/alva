@@ -2,20 +2,15 @@ import Dropdown from '../../lsg/patterns/dropdown';
 import { DropdownItemEditableLink } from '../../lsg/patterns/dropdown-item';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
-import { PageRef } from '../../store/project/page-ref';
-import { Project } from '../../store/project/project';
+import { PageRef } from '../../store/page/page-ref';
+import { Project } from '../../store/project';
 import * as React from 'react';
 import { Store } from '../../store/store';
 
-export interface PageListProps {
-	store: Store;
-}
-
 export interface PageListItemProps {
-	pageID: string;
 	name: string;
+	pageID: string;
 	pageRef: PageRef;
-	store: Store;
 }
 
 @observer
@@ -34,31 +29,20 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		this.handlePageDoubleClick = this.handlePageDoubleClick.bind(this);
 		this.renamePage = this.renamePage.bind(this);
 	}
-	public render(): JSX.Element {
-		return (
-			<DropdownItemEditableLink
-				editable={this.pageElementEditable}
-				focused={this.pageElementEditable}
-				handleChange={this.handleInputChange}
-				handleClick={this.handlePageClick}
-				handleDoubleClick={this.handlePageDoubleClick}
-				handleKeyDown={this.handlePageKeyDown}
-				name={this.props.name}
-				handleBlur={this.handleBlur}
-				value={this.pageNameInputValue}
-			/>
-		);
-	}
-
-	protected handlePageClick(e: React.MouseEvent<HTMLElement>): void {
-		e.preventDefault();
-		this.props.store.openPage(this.props.pageID);
-	}
 
 	@MobX.action
 	protected handleBlur(): void {
 		this.pageElementEditable = false;
 		this.pageNameInputValue = this.props.name;
+	}
+
+	protected handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
+		this.pageNameInputValue = e.target.value;
+	}
+
+	protected handlePageClick(e: React.MouseEvent<HTMLElement>): void {
+		e.preventDefault();
+		Store.getInstance().openPage(this.props.pageID);
 	}
 
 	@MobX.action
@@ -90,28 +74,54 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		}
 	}
 
-	protected handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
-		this.pageNameInputValue = e.target.value;
-	}
-
 	protected renamePage(name: string): void {
 		const pageRef = this.props.pageRef;
 		pageRef.setName(name);
 		pageRef.updatePathFromNames();
 	}
+
+	public render(): JSX.Element {
+		return (
+			<DropdownItemEditableLink
+				editable={this.pageElementEditable}
+				focused={this.pageElementEditable}
+				handleChange={this.handleInputChange}
+				handleClick={this.handlePageClick}
+				handleDoubleClick={this.handlePageDoubleClick}
+				handleKeyDown={this.handlePageKeyDown}
+				name={this.props.name}
+				handleBlur={this.handleBlur}
+				value={this.pageNameInputValue}
+			/>
+		);
+	}
 }
 
 @observer
-export class PageList extends React.Component<PageListProps> {
+export class PageList extends React.Component<{}> {
 	@MobX.observable protected pageListVisible: boolean = false;
-	public constructor(props: PageListProps) {
+	public constructor(props: {}) {
 		super(props);
 
 		this.handleDropdownToggle = this.handleDropdownToggle.bind(this);
 	}
 
+	public getProjectPages(): PageRef[] {
+		const project: Project | undefined = Store.getInstance().getCurrentProject();
+		let projectPages: PageRef[] = [];
+		if (project) {
+			projectPages = project.getPages();
+		}
+		return projectPages;
+	}
+
+	@MobX.action
+	protected handleDropdownToggle(): void {
+		this.pageListVisible = !this.pageListVisible;
+	}
+
 	public render(): JSX.Element {
-		const currentPage = this.props.store.getCurrentPage();
+		const currentPage = Store.getInstance().getCurrentPage();
 		let currentPageName = '';
 		if (currentPage) {
 			currentPageName = currentPage.getName();
@@ -128,24 +138,9 @@ export class PageList extends React.Component<PageListProps> {
 						name={page.getName()}
 						pageID={page.getId()}
 						pageRef={page}
-						store={this.props.store}
 					/>
 				))}
 			</Dropdown>
 		);
-	}
-
-	public getProjectPages(): PageRef[] {
-		const project: Project | undefined = this.props.store.getCurrentProject();
-		let projectPages: PageRef[] = [];
-		if (project) {
-			projectPages = project.getPages();
-		}
-		return projectPages;
-	}
-
-	@MobX.action
-	protected handleDropdownToggle(): void {
-		this.pageListVisible = !this.pageListVisible;
 	}
 }

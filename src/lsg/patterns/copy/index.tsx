@@ -3,13 +3,13 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export interface CopyProps {
-	textColor?: Color;
 	size?: Size;
+	textColor?: Color;
 }
 
 export interface StyledCopyProps {
-	textColor?: Color;
 	size?: Size;
+	textColor?: Color;
 }
 
 export enum Size {
@@ -19,8 +19,10 @@ export enum Size {
 
 const StyledCopy = styled.p`
 	margin: 0;
-	${(props: StyledCopyProps) => (typeof props.size !== 'undefined' ? `font-size: ${props.size}px;` : '')};
-	${(props: StyledCopyProps) => (typeof props.textColor !== 'undefined' ? `color: ${props.textColor.toString()};` : '')};
+	${(props: StyledCopyProps) =>
+		typeof props.size !== 'undefined' ? `font-size: ${props.size}px;` : ''};
+	${(props: StyledCopyProps) =>
+		typeof props.textColor !== 'undefined' ? `color: ${props.textColor.toString()};` : ''};
 	line-height: 22px;
 `;
 

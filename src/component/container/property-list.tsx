@@ -7,6 +7,7 @@ import { observer } from 'mobx-react';
 import { ObjectProperty } from '../../store/styleguide/property/object-property';
 import { PageElement } from '../../store/page/page-element';
 import { PropertyValue } from '../../store/page/property-value';
+import { PropertyValueCommand } from '../../store/command/property-value-command';
 import * as React from 'react';
 import { Store } from '../../store/store';
 import { StringItem } from '../../lsg/patterns/property-items/string-item';
@@ -30,6 +31,33 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 
 		this.handleClick = this.handleClick.bind(this);
 		this.handleChange = this.handleChange.bind(this);
+	}
+
+	protected convertOptionsToValues(options: Option[]): Values[] {
+		return options.map(option => ({
+			id: option.getId(),
+			name: option.getName()
+		}));
+	}
+
+	protected getValue(id: string, path?: string): PropertyValue {
+		const fullPath = path ? `${path}.${id}` : id;
+		const [rootId, ...propertyPath] = fullPath.split('.');
+		return this.props.element.getPropertyValue(rootId, propertyPath.join('.'));
+	}
+
+	// tslint:disable-next-line:no-any
+	protected handleChange(id: string, value: any, context?: ObjectContext): void {
+		const fullPath: string = context ? `${context.path}.${id}` : id;
+		const [rootId, ...propertyPath] = fullPath.split('.');
+		Store.getInstance().execute(
+			new PropertyValueCommand(this.props.element, rootId, value, propertyPath.join('.'))
+		);
+	}
+
+	@action
+	protected handleClick(): void {
+		this.isOpen = !this.isOpen;
 	}
 
 	public render(): React.ReactNode {
@@ -127,56 +155,16 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 			</>
 		);
 	}
-
-	// tslint:disable-next-line:no-any
-	protected handleChange(id: string, value: any, context?: ObjectContext): void {
-		if (context) {
-			const parts = `${context.path}.${id}`.split('.');
-			const [rootId, ...path] = parts;
-
-			this.props.element.setPropertyValue(rootId, value, path.join('.'));
-			return;
-		}
-
-		this.props.element.setPropertyValue(id, value);
-	}
-
-	protected getValue(id: string, path?: string): PropertyValue {
-		if (path) {
-			const parts = `${path}.${id}`.split('.');
-			const [rootId, ...propertyPath] = parts;
-
-			return this.props.element.getPropertyValue(rootId, propertyPath.join('.'));
-		}
-
-		return this.props.element.getPropertyValue(id);
-	}
-
-	@action
-	protected handleClick(): void {
-		this.isOpen = !this.isOpen;
-	}
-
-	protected convertOptionsToValues(options: Option[]): Values[] {
-		return options.map(option => ({
-			id: option.getId(),
-			name: option.getName()
-		}));
-	}
-}
-
-export interface PropertyListProps {
-	store: Store;
 }
 
 @observer
-export class PropertyList extends React.Component<PropertyListProps> {
-	public constructor(props: PropertyListProps) {
+export class PropertyList extends React.Component<{}> {
+	public constructor(props: {}) {
 		super(props);
 	}
 
 	public render(): React.ReactNode {
-		const selectedElement = this.props.store.getSelectedElement();
+		const selectedElement = Store.getInstance().getSelectedElement();
 
 		if (!selectedElement) {
 			return <div>No Element selected</div>;

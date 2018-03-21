@@ -38,27 +38,20 @@ webFrame.setLayoutZoomLevelLimits(0, 0);
 
 globalStyles();
 
-interface AppProps {
-	store: Store;
-}
+const store: Store = Store.getInstance();
+store.openFromPreferences();
 
 @observer
-class App extends React.Component<AppProps> {
-	private static PatternListID = 'patternlist';
-	private static PropertiesListID = 'propertieslist';
+class App extends React.Component<{}> {
+	private static PATTERN_LIST_ID = 'patternlist';
+	private static PROPERTIES_LIST_ID = 'propertieslist';
 
-	@MobX.observable protected activeTab: string = App.PatternListID;
+	@MobX.observable protected activeTab: string = App.PATTERN_LIST_ID;
+	private ctrlDown: boolean = false;
 	@MobX.observable protected projectListVisible: boolean = false;
-	@MobX.computed
-	protected get isPatternListVisible(): boolean {
-		return Boolean(this.activeTab === App.PatternListID);
-	}
-	@MobX.computed
-	protected get isPropertiesListVisible(): boolean {
-		return Boolean(this.activeTab === App.PropertiesListID);
-	}
+	private shiftDown: boolean = false;
 
-	public constructor(props: AppProps) {
+	public constructor(props: {}) {
 		super(props);
 		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
 		this.handleMainWindowClick = this.handleMainWindowClick.bind(this);
@@ -67,13 +60,9 @@ class App extends React.Component<AppProps> {
 		this.handleOpenSpaceClick = this.handleOpenSpaceClick.bind(this);
 	}
 
-	private handleMainWindowClick(): void {
-		this.props.store.setElementFocussed(false);
-		createMenu(this.props.store);
-	}
-
 	public componentDidMount(): void {
-		createMenu(this.props.store);
+		createMenu();
+		this.redirectUndoRedo();
 	}
 
 	private getDevTools(): React.StatelessComponent | null {
@@ -85,11 +74,90 @@ class App extends React.Component<AppProps> {
 		}
 	}
 
+	@MobX.action
+	protected handleChromeToggle(evt: React.MouseEvent<HTMLElement>): void {
+		this.projectListVisible = !this.projectListVisible;
+	}
+
+	protected handleCreateNewSpaceClick(): void {
+		let appPath: string = app.getAppPath().replace('.asar', '.asar.unpacked');
+		if (appPath.indexOf('node_modules') >= 0) {
+			appPath = ProcessUtils.cwd();
+		}
+
+		const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
+		dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] }, filePaths => {
+			if (filePaths.length <= 0) {
+				return;
+			}
+
+			FileExtraUtils.copySync(designkitPath, PathUtils.join(filePaths[0], 'designkit'));
+			store.openStyleguide(`${filePaths[0]}/designkit`);
+			store.openFirstPage();
+		});
+	}
+
+	private handleMainWindowClick(): void {
+		Store.getInstance().setElementFocussed(false);
+		createMenu();
+	}
+
+	protected handleOpenSpaceClick(): void {
+		dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
+			store.openStyleguide(filePaths[0]);
+			store.openFirstPage();
+		});
+	}
+
+	@MobX.action
+	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
+		this.activeTab = id;
+	}
+
+	@MobX.computed
+	protected get isPatternListVisible(): boolean {
+		return Boolean(this.activeTab === App.PATTERN_LIST_ID);
+	}
+
+	@MobX.computed
+	protected get isPropertiesListVisible(): boolean {
+		return Boolean(this.activeTab === App.PROPERTIES_LIST_ID);
+	}
+
+	private redirectUndoRedo(): void {
+		document.body.onkeydown = event => {
+			if (event.keyCode === 16) {
+				this.shiftDown = true;
+			} else if (event.keyCode === 17 || event.keyCode === 91) {
+				this.ctrlDown = true;
+			} else if (this.ctrlDown && event.keyCode === 90) {
+				event.preventDefault();
+				if (this.shiftDown) {
+					Store.getInstance().redo();
+				} else {
+					Store.getInstance().undo();
+				}
+
+				return false;
+			}
+
+			return true;
+		};
+
+		document.body.onkeyup = event => {
+			if (event.keyCode === 16) {
+				this.shiftDown = false;
+			} else if (event.keyCode === 17 || event.keyCode === 91) {
+				this.ctrlDown = false;
+			}
+		};
+	}
+
 	public render(): JSX.Element {
 		// Todo: project and page don't update on page change
-		const project = this.props.store.getCurrentProject();
+		const project = store.getCurrentProject();
 		const title = `${project && project.getName()}`;
-		const styleguide = this.props.store.getStyleguide();
+		const styleguide = store.getStyleguide();
 		const previewFrame = project && project.getPreviewFrame();
 		const previewFramePath =
 			styleguide &&
@@ -105,25 +173,25 @@ class App extends React.Component<AppProps> {
 					handleClick={this.handleChromeToggle}
 					open={this.projectListVisible}
 				>
-					{project && <ProjectList store={this.props.store} open={this.projectListVisible} />}
+					{project && <ProjectList open={this.projectListVisible} />}
 				</Chrome>
 				<MainArea>
 					{project && [
 						<SideBar key="left" directionVertical hasPaddings>
 							<ElementPane>
 								<Space sizeBottom={SpaceSize.L}>
-									<PageList store={this.props.store} />
+									<PageList />
 								</Space>
-								<ElementList store={this.props.store} />
+								<ElementList />
 							</ElementPane>
 							<PatternsPane>
-								<PatternListContainer store={this.props.store} />
+								<PatternListContainer />
 							</PatternsPane>
 						</SideBar>,
 						<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />,
 						<SideBar key="right" directionVertical hasPaddings>
 							<PropertyPane>
-								<PropertyList store={this.props.store} />
+								<PropertyList />
 							</PropertyPane>
 						</SideBar>
 					]}
@@ -156,46 +224,7 @@ class App extends React.Component<AppProps> {
 			</Layout>
 		);
 	}
-
-	@MobX.action
-	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
-		this.activeTab = id;
-	}
-
-	@MobX.action
-	protected handleChromeToggle(evt: React.MouseEvent<HTMLElement>): void {
-		this.projectListVisible = !this.projectListVisible;
-	}
-
-	protected handleCreateNewSpaceClick(): void {
-		let appPath: string = app.getAppPath().replace('.asar', '.asar.unpacked');
-		if (appPath.indexOf('node_modules') >= 0) {
-			appPath = ProcessUtils.cwd();
-		}
-
-		const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
-		console.log(`Design kit path is: ${designkitPath}`);
-		dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] }, filePaths => {
-			if (filePaths.length <= 0) {
-				return;
-			}
-
-			FileExtraUtils.copySync(designkitPath, PathUtils.join(filePaths[0], 'designkit'));
-			this.props.store.openStyleguide(`${filePaths[0]}/designkit`);
-			this.props.store.openFirstPage();
-		});
-	}
-
-	protected handleOpenSpaceClick(): void {
-		dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
-			this.props.store.openStyleguide(filePaths[0]);
-			this.props.store.openFirstPage();
-		});
-	}
 }
-
-const store = new Store();
-store.openFromPreferences();
 
 ipcRenderer.on('preview-ready', (readyEvent: {}, readyMessage: JsonObject) => {
 	function sendWebViewMessage(message: JsonObject, channel: string): void {
@@ -236,7 +265,7 @@ ipcRenderer.on('preview-ready', (readyEvent: {}, readyMessage: JsonObject) => {
 	}, 3000);
 });
 
-ReactDom.render(<App store={store} />, document.getElementById('app'));
+ReactDom.render(<App />, document.getElementById('app'));
 
 // Disable drag and drop from outside the application
 document.addEventListener(

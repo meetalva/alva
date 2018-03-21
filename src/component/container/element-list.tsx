@@ -7,8 +7,8 @@ import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/styleguide/pattern';
-import { PropertyValue } from '../../store/page/property-value';
 import * as React from 'react';
+import { Slot } from '../../store/styleguide/slot';
 import { Store } from '../../store/store';
 
 @observer
@@ -26,7 +26,9 @@ export class ElementList extends React.Component {
 		element: PageElement,
 		selectedElement?: PageElement
 	): ListItemProps {
+		const store = Store.getInstance();
 		const pattern: Pattern | undefined = element.getPattern();
+
 		if (!pattern) {
 			return {
 				label: key,
@@ -35,22 +37,23 @@ export class ElementList extends React.Component {
 			};
 		}
 
-		const items: ListItemProps[] = [];
-		const children: PageElement[] = element.getChildren() || [];
-		children.forEach((value: PageElement, index: number) => {
-			items.push(
-				this.createItemFromProperty(
-					children.length > 1 ? `Child ${index + 1}` : 'Child',
-					value,
-					selectedElement
-				)
-			);
+		let defaultSlotItems: ListItemProps[] | undefined = [];
+		const slots: ListItemProps[] = [];
+
+		pattern.getSlots().forEach(slot => {
+			const listItem = this.createItemFromSlot(slot, element, selectedElement);
+
+			if (slot.getId() === Pattern.DEFAULT_SLOT_ID) {
+				defaultSlotItems = listItem.children;
+			} else {
+				slots.push(listItem);
+			}
 		});
 
 		const updatePageElement: React.MouseEventHandler<HTMLElement> = event => {
 			event.stopPropagation();
-			Store.getInstance().setSelectedElement(element);
-			Store.getInstance().setElementFocussed(true);
+			store.setSelectedElement(element);
+			store.setElementFocussed(true);
 		};
 
 		return {
@@ -67,7 +70,6 @@ export class ElementList extends React.Component {
 				const newParent = element.getParent();
 				let draggedElement: PageElement | undefined;
 
-				const store = Store.getInstance();
 				if (!patternId) {
 					draggedElement = store.getDraggedElement();
 				} else {
@@ -97,7 +99,14 @@ export class ElementList extends React.Component {
 					}
 				}
 
-				store.execute(ElementLocationCommand.addChild(newParent, draggedElement, newIndex));
+				store.execute(
+					ElementLocationCommand.addChild(
+						newParent,
+						draggedElement,
+						element.getParentSlotId(),
+						newIndex
+					)
+				);
 				store.setSelectedElement(draggedElement);
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
@@ -105,7 +114,6 @@ export class ElementList extends React.Component {
 
 				let draggedElement: PageElement | undefined;
 
-				const store = Store.getInstance();
 				if (!patternId) {
 					draggedElement = store.getDraggedElement();
 				} else {
@@ -128,38 +136,76 @@ export class ElementList extends React.Component {
 				store.execute(ElementLocationCommand.addChild(element, draggedElement));
 				store.setSelectedElement(draggedElement);
 			},
-			children: items,
-			active: element === selectedElement
+			children: [...slots, ...defaultSlotItems],
+			active: element === selectedElement && !store.getSelectedSlotId()
 		};
 	}
 
-	public createItemFromProperty(
-		key: string,
-		value: PropertyValue,
+	public createItemFromSlot(
+		slot: Slot,
+		element: PageElement,
 		selectedElement?: PageElement
 	): ListItemProps {
-		if (value instanceof Array) {
-			const items: ListItemProps[] = [];
-			(value as (string | number)[]).forEach((child, index: number) => {
-				items.push(this.createItemFromProperty(String(index + 1), child));
-			});
-			return { value: key, children: items };
-		}
+		const store = Store.getInstance();
+		const slotId = slot.getId();
+		const slotContents: PageElement[] = element.getSlotContents(slotId);
+		const childItems: ListItemProps[] = [];
+		const selectedSlot = store.getSelectedSlotId();
 
-		if (value === undefined || value === null || typeof value !== 'object') {
-			return { label: key, value: String(value) };
-		}
+		slotContents.forEach((value: PageElement, index: number) => {
+			childItems.push(
+				this.createItemFromElement(
+					slotContents.length > 1 ? `Child ${index + 1}` : 'Child',
+					value,
+					selectedElement
+				)
+			);
+		});
 
-		if (value instanceof PageElement) {
-			return this.createItemFromElement(key, value, selectedElement);
-		} else {
-			const items: ListItemProps[] = [];
-			Object.keys(value).forEach((childKey: string) => {
-				// tslint:disable-next-line:no-any
-				items.push(this.createItemFromProperty(childKey, (value as any)[childKey]));
-			});
-			return { value: key, children: items };
-		}
+		const updateSelectedSlot: React.MouseEventHandler<HTMLElement> = event => {
+			event.stopPropagation();
+			store.setSelectedElement(element);
+			store.setSelectedSlot(slotId);
+			store.setElementFocussed(false);
+		};
+
+		const slotListItem: ListItemProps = {
+			value: `\uD83D\uDD18 ${slot.getName()}`,
+			draggable: false,
+			children: childItems,
+			label: slotId,
+			onClick: updateSelectedSlot,
+			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
+				const patternId = e.dataTransfer.getData('patternId');
+
+				let draggedElement: PageElement | undefined;
+
+				if (!patternId) {
+					draggedElement = store.getDraggedElement();
+				} else {
+					const styleguide = store.getStyleguide();
+
+					if (!styleguide) {
+						return;
+					}
+
+					draggedElement = new PageElement({
+						pattern: styleguide.getPattern(patternId),
+						setDefaults: true
+					});
+				}
+
+				if (!draggedElement) {
+					return;
+				}
+
+				store.execute(ElementLocationCommand.addChild(element, draggedElement, slotId));
+				store.setSelectedElement(draggedElement);
+			},
+			active: element === selectedElement && selectedSlot === slotId
+		};
+
+		return slotListItem;
 	}
 
 	public render(): JSX.Element | null {

@@ -130,7 +130,7 @@ describe(`Test for backwards compatibility of config files`, () => {
 				// 	console.log('getProperties', rootElementPattern.getProperties());
 				// })
 
-				const rootElementChildren = rootElement.getChildren();
+				const rootElementChildren = rootElement.getContent();
 				test('children are defined', () => {
 					expect(rootElementChildren).toBeDefined();
 				});

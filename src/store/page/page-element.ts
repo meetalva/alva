@@ -13,7 +13,6 @@ import * as Uuid from 'uuid';
 
 export interface PageElementProperties {
 	id?: string;
-	page: Page;
 	parent?: PageElement;
 	pattern?: Pattern;
 	setDefaults?: boolean;
@@ -38,7 +37,7 @@ export class PageElement {
 	/**
 	 * The page this element belongs to.
 	 */
-	private page: Page;
+	private page?: Page;
 
 	/**
 	 * The parent page element if this is not the root element.
@@ -68,7 +67,6 @@ export class PageElement {
 	 */
 	public constructor(properties: PageElementProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
-		this.page = properties.page;
 		this.pattern = properties.pattern;
 
 		if (properties.setDefaults && this.pattern) {
@@ -87,17 +85,17 @@ export class PageElement {
 	 */
 	public static fromJsonObject(
 		json: JsonObject,
-		store: Store,
-		page: Page,
-		parent?: PageElement
+		parent?: PageElement,
+		page?: Page
 	): PageElement | undefined {
 		if (!json) {
-			return;
+			return undefined;
 		}
 
+		const store: Store = Store.getInstance();
 		const styleguide = store.getStyleguide();
 		if (!styleguide) {
-			return;
+			return undefined;
 		}
 
 		let patternId = json['pattern'] as string;
@@ -113,21 +111,21 @@ export class PageElement {
 
 		if (!pattern) {
 			console.warn(`Ignoring unknown pattern "${patternId}"`);
-			return new PageElement({ page, parent });
+			return new PageElement({ parent });
 		}
 
-		const element = new PageElement({ id: json.uuid as string, page, pattern, parent });
+		const element = new PageElement({ id: json.uuid as string, pattern, parent });
 
 		if (json.properties) {
 			Object.keys(json.properties as JsonObject).forEach((propertyId: string) => {
 				const value: JsonValue = (json.properties as JsonObject)[propertyId];
-				element.setPropertyValue(propertyId, element.createPropertyValue(value, store));
+				element.setPropertyValue(propertyId, element.createPropertyValue(value));
 			});
 		}
 
 		if (json.children) {
 			element.children = (json.children as JsonArray).map(
-				(childJson: JsonObject) => element.createChildElement(childJson, store) as PageElement
+				(childJson: JsonObject) => element.createChildElement(childJson) as PageElement
 			);
 		}
 
@@ -150,7 +148,7 @@ export class PageElement {
 	 * @return The new clone.
 	 */
 	public clone(): PageElement {
-		const clone = new PageElement({ page: this.page, pattern: this.pattern });
+		const clone = new PageElement({ pattern: this.pattern });
 		this.children.forEach(child => {
 			clone.addChild(child.clone());
 		});
@@ -163,17 +161,16 @@ export class PageElement {
 	/**
 	 * Creates a child element (pattern or text) for a given serialization JSON.
 	 * @param json The JSON to read from.
-	 * @param store The application's store.
 	 * @return The new child element.
 	 */
-	protected createChildElement(json: JsonValue, store: Store): PageElement | PropertyValue {
+	protected createChildElement(json: JsonValue): PageElement | PropertyValue {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
-			return PageElement.fromJsonObject(json as JsonObject, store, this.page, this);
+			return PageElement.fromJsonObject(json as JsonObject, this);
 		} else {
+			const store: Store = Store.getInstance();
 			const styleguide = store.getStyleguide() as Styleguide;
 
 			const element: PageElement = new PageElement({
-				page: this.page,
 				pattern: styleguide.getPattern(Pattern.SYNTHETIC_TEXT_ID),
 				setDefaults: false,
 				parent: this
@@ -186,12 +183,11 @@ export class PageElement {
 	/**
 	 * Creates a property value or element for a given serialization JSON.
 	 * @param json The JSON to read from.
-	 * @param store The application's store.
 	 * @return The new property value or element.
 	 */
-	protected createPropertyValue(json: JsonValue, store: Store): PageElement | PropertyValue {
+	protected createPropertyValue(json: JsonValue): PageElement | PropertyValue {
 		if (json && (json as JsonObject)['_type'] === 'pattern') {
-			return PageElement.fromJsonObject(json as JsonObject, store, this.page, this);
+			return PageElement.fromJsonObject(json as JsonObject, this);
 		} else {
 			return json as PropertyValue;
 		}
@@ -228,7 +224,7 @@ export class PageElement {
 	 * Returns the page this element belongs to.
 	 * @return The page this element belongs to.
 	 */
-	public getPage(): Page {
+	public getPage(): Page | undefined {
 		return this.page;
 	}
 
@@ -350,16 +346,32 @@ export class PageElement {
 	 * Leaving out the position adds it at the end of the list.
 	 */
 	public setParent(parent?: PageElement, index?: number): void {
+		this.setParentInternal(parent, index, parent ? parent.getPage() : undefined);
+	}
+
+	/**
+	 * Internal method to set the parent, index, and page the root belongs to.
+	 * Do not call from components code.
+	 * @param parent The (optional) new parent for this element.
+	 * @param index The 0-based new position within the children of the new parent.
+	 * Leaving out the position adds it at the end of the list.
+	 * @param page The page of this element.
+	 */
+	public setParentInternal(parent?: PageElement, index?: number, page?: Page): void {
 		if (index !== undefined && this.parent === parent && this.children.indexOf(this) === index) {
 			return;
 		}
 
 		if (this.parent) {
 			(this.parent.children as MobX.IObservableArray<PageElement>).remove(this);
-			this.parent.getPage().unregisterElementAndChildren(this);
+		}
+
+		if (this.page) {
+			this.page.unregisterElementAndChildren(this);
 		}
 
 		this.parent = parent;
+		this.updatePageInDescendants(page);
 
 		if (parent) {
 			if (index === undefined || index >= parent.children.length) {
@@ -367,8 +379,10 @@ export class PageElement {
 			} else {
 				parent.children.splice(index < 0 ? 0 : index, 0, this);
 			}
+		}
 
-			parent.getPage().registerElementAndChildren(this);
+		if (this.page) {
+			this.page.registerElementAndChildren(this);
 		}
 	}
 
@@ -430,5 +444,14 @@ export class PageElement {
 		});
 
 		return json;
+	}
+
+	/**
+	 * Updates the page property in this element and all its descendants
+	 * @param page The new page.
+	 */
+	private updatePageInDescendants(page?: Page): void {
+		this.page = page;
+		this.children.forEach(child => child.updatePageInDescendants(page));
 	}
 }

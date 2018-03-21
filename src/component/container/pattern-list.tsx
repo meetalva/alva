@@ -1,9 +1,8 @@
 import Input from '../../lsg/patterns/input/';
-import { ElementCommand } from '../../store/page/command/element-command';
+import { ElementCommand } from '../../store/command/element-command';
 import { PatternFolder } from '../../store/styleguide/folder';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
-import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/styleguide/pattern';
 import PatternList, {
@@ -15,10 +14,6 @@ import * as React from 'react';
 import Space, { Size } from '../../lsg/patterns/space';
 import { Store } from '../../store/store';
 
-export interface PatternListContainerProps {
-	store: Store;
-}
-
 export interface PatternListContainerItemProps {
 	items: NamedPatternListItemProps[];
 	name: string;
@@ -29,10 +24,10 @@ export interface NamedPatternListItemProps extends PatternListItemProps {
 }
 
 @observer
-export class PatternListContainer extends React.Component<PatternListContainerProps> {
+export class PatternListContainer extends React.Component {
 	public items: PatternListContainerItemProps[] = [];
 
-	public constructor(props: PatternListContainerProps) {
+	public constructor(props: {}) {
 		super(props);
 
 		this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
@@ -112,30 +107,31 @@ export class PatternListContainer extends React.Component<PatternListContainerPr
 
 	@action
 	protected handlePatternClick(pattern: Pattern): void {
-		const selectedElement: PageElement | undefined = this.props.store.getSelectedElement();
+		const store: Store = Store.getInstance();
+		const selectedElement: PageElement | undefined = store.getSelectedElement();
 		if (selectedElement) {
 			const newPageElement = new PageElement({
 				pattern,
-				page: this.props.store.getCurrentPage() as Page,
 				setDefaults: true
 			});
-			this.props.store.execute(ElementCommand.addSibling(selectedElement, newPageElement));
-			this.props.store.setSelectedElement(newPageElement);
+			store.execute(ElementCommand.addSibling(selectedElement, newPageElement));
+			store.setSelectedElement(newPageElement);
 		}
 	}
 
 	@action
 	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
-		this.props.store.setPatternSearchTerm(evt.target.value);
+		Store.getInstance().setPatternSearchTerm(evt.target.value);
 	}
 
 	public render(): JSX.Element {
-		const styleguide = this.props.store.getStyleguide();
+		const store: Store = Store.getInstance();
+		const styleguide = store.getStyleguide();
 		const patternRoot = styleguide && styleguide.getPatternRoot();
 		this.items = patternRoot ? this.createItemsFromFolder(patternRoot) : [];
 
-		if (this.props.store.getPatternSearchTerm() !== '') {
-			this.items = this.search(this.items, this.props.store.getPatternSearchTerm());
+		if (store.getPatternSearchTerm() !== '') {
+			this.items = this.search(this.items, store.getPatternSearchTerm());
 		}
 
 		const list = this.createList(this.items);

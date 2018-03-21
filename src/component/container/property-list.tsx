@@ -20,12 +20,12 @@ interface ObjectContext {
 interface PropertyTreeProps {
 	context?: ObjectContext;
 	element: PageElement;
-	store: Store;
 }
 
 @observer
 class PropertyTree extends React.Component<PropertyTreeProps> {
 	@observable protected isOpen = false;
+	protected lastCommand: PropertyValueCommand;
 
 	public constructor(props: PropertyTreeProps) {
 		super(props);
@@ -47,13 +47,23 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 		return this.props.element.getPropertyValue(rootId, propertyPath.join('.'));
 	}
 
+	protected handleBlur(): void {
+		if (this.lastCommand) {
+			this.lastCommand.seal();
+		}
+	}
+
 	// tslint:disable-next-line:no-any
 	protected handleChange(id: string, value: any, context?: ObjectContext): void {
 		const fullPath: string = context ? `${context.path}.${id}` : id;
 		const [rootId, ...propertyPath] = fullPath.split('.');
-		this.props.store.execute(
-			new PropertyValueCommand(this.props.element, rootId, value, propertyPath.join('.'))
+		this.lastCommand = new PropertyValueCommand(
+			this.props.element,
+			rootId,
+			value,
+			propertyPath.join('.')
 		);
+		Store.getInstance().execute(this.lastCommand);
 	}
 
 	@action
@@ -117,6 +127,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 									handleChange={event =>
 										this.handleChange(id, event.currentTarget.value, context)
 									}
+									handleBlur={event => this.handleBlur()}
 								/>
 							);
 
@@ -147,14 +158,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 								property: objectProperty
 							};
 
-							return (
-								<PropertyTree
-									key={id}
-									context={newContext}
-									element={element}
-									store={this.props.store}
-								/>
-							);
+							return <PropertyTree key={id} context={newContext} element={element} />;
 
 						default:
 							return <div key={id}>Unknown type: {type}</div>;
@@ -165,23 +169,15 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 	}
 }
 
-export interface PropertyListProps {
-	store: Store;
-}
-
 @observer
-export class PropertyList extends React.Component<PropertyListProps> {
-	public constructor(props: PropertyListProps) {
-		super(props);
-	}
-
+export class PropertyList extends React.Component {
 	public render(): React.ReactNode {
-		const selectedElement = this.props.store.getSelectedElement();
+		const selectedElement = Store.getInstance().getSelectedElement();
 
 		if (!selectedElement) {
 			return <div>No Element selected</div>;
 		}
 
-		return <PropertyTree element={selectedElement} store={this.props.store} />;
+		return <PropertyTree element={selectedElement} />;
 	}
 }

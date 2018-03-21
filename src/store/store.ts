@@ -64,15 +64,6 @@ export class Store {
 	@MobX.observable private elementFocussed?: boolean = false;
 
 	/**
-	 * Whether  the last executed user operation is now complete, so that similar operations do
-	 * not merge with the last one. For instance, if you edit the text of a page element property,
-	 * all subsequent edits on this property automatically merge. After leaving the input, setting
-	 * this property to true will cause the next text editing on this property to stay a separate
-	 * undo command.
-	 */
-	private lastCommandComplete: boolean;
-
-	/**
 	 * The current search term in the patterns list, or an empty string if there is none.
 	 */
 	@MobX.observable private patternSearchTerm: string = '';
@@ -204,22 +195,34 @@ export class Store {
 	 * @param command The command to execute and register.
 	 */
 	public execute(command: Command): void {
-		if (command.execute()) {
-			const previousCommand = this.undoBuffer[this.undoBuffer.length - 1];
-			if (
-				!previousCommand ||
-				this.lastCommandComplete ||
-				!command.maybeMergeWith(previousCommand)
-			) {
-				this.undoBuffer.push(command);
-			}
-
-			this.redoBuffer = [];
-		} else {
+		const successful: boolean = command.execute();
+		if (!successful) {
+			// The state and the undo/redo buffers are out of sync.
+			// This may be the case if not all store operations are proper command implementations.
+			// In that case, the store is correct and we drop the undo/redo buffers.
 			this.clearUndoRedoBuffers();
+			return;
 		}
 
-		this.lastCommandComplete = false;
+		// The command was processed successfully, now memorize it to provide an undo stack.
+
+		// But first, we give the command the chance to indicate that the previous undo command
+		// and the current one are too similar to keep both. If so, the newer command
+		// incorporates both commands' changes into itself, and we keep only that newer one
+		// on the undo stack.
+
+		const previousCommand = this.undoBuffer[this.undoBuffer.length - 1];
+		const wasMerged = previousCommand && command.maybeMergeWith(previousCommand);
+		if (wasMerged) {
+			// The newer command now contains both changes, so we drop the previous one
+			this.undoBuffer.pop();
+		}
+
+		// Now memorize the new command
+		this.undoBuffer.push(command);
+
+		// All previously undone commands (the redo stack) are invalid after a forward command
+		this.redoBuffer = [];
 	}
 
 	/**
@@ -496,7 +499,7 @@ export class Store {
 	 * @param id The ID of the page to open.
 	 * @see save
 	 */
-	public openPage(id: string): void {
+	public openPage(id: string): boolean {
 		const styleguide = this.styleguide;
 		if (!styleguide) {
 			throw new Error('Cannot open page: No styleguide open');
@@ -512,7 +515,7 @@ export class Store {
 					pageRef.getLastPersistedPath() as string
 				);
 				const json: JsonObject = Persister.loadYamlOrJson(pagePath);
-				this.currentPage = Page.fromJsonObject(json, id, this);
+				this.currentPage = Page.fromJsonObject(json, id);
 				this.currentProject = this.currentPage.getProject();
 			} else {
 				this.currentPage = undefined;
@@ -523,6 +526,8 @@ export class Store {
 
 		this.preferences.setLastPageId(this.currentPage ? this.currentPage.getId() : undefined);
 		this.savePreferences();
+
+		return this.currentPage !== undefined;
 	}
 
 	/**
@@ -594,7 +599,7 @@ export class Store {
 			this.styleguide = new Styleguide(styleguidePath, this.analyzerName);
 
 			(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
-				const project: Project = Project.fromJsonObject(projectJson, this);
+				const project: Project = Project.fromJsonObject(projectJson);
 				this.addProject(project);
 			});
 		});
@@ -614,13 +619,19 @@ export class Store {
 		const command: Command | undefined = this.redoBuffer.pop();
 		if (!command) {
 			return false;
-		} else if (command.execute()) {
-			this.undoBuffer.push(command);
-			return true;
-		} else {
+		}
+
+		const successful: boolean = command.execute();
+		if (!successful) {
+			// The state and the undo/redo buffers are out of sync.
+			// This may be the case if not all store operations are proper command implementations.
+			// In that case, the store is correct and we drop the undo/redo buffers.
 			this.clearUndoRedoBuffers();
 			return false;
 		}
+
+		this.undoBuffer.push(command);
+		return true;
 	}
 
 	/**
@@ -770,16 +781,6 @@ export class Store {
 	}
 
 	/**
-	 * Marks that the last executed user operation is now complete, so that similar operations do
-	 * not merge with the last one. For instance, if you edit the text of a page element property,
-	 * all subsequent edits on this property automatically merge. After leaving the input, call this
-	 * method, and the next text editing on this property stays a separate undo command.
-	 */
-	public setLastCommandComplete(): void {
-		this.lastCommandComplete = true;
-	}
-
-	/**
 	 * Loads a given JSON object into the store as current page.
 	 * Used internally within the store, do not use from UI components.
 	 * Also unselects any selected element.
@@ -788,7 +789,7 @@ export class Store {
 	public setPageFromJsonInternal(json: JsonObject): void {
 		MobX.transaction(() => {
 			this.currentPage = json.page
-				? Page.fromJsonObject(json.page as JsonObject, json.pageId as string, this)
+				? Page.fromJsonObject(json.page as JsonObject, json.pageId as string)
 				: undefined;
 			this.selectedElement = undefined;
 		});
@@ -825,7 +826,7 @@ export class Store {
 
 			this.projects = [];
 			(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
-				const project: Project = Project.fromJsonObject(projectJson, this);
+				const project: Project = Project.fromJsonObject(projectJson);
 				this.addProject(project);
 			});
 
@@ -848,12 +849,18 @@ export class Store {
 		const command: Command | undefined = this.undoBuffer.pop();
 		if (!command) {
 			return false;
-		} else if (command.undo()) {
-			this.redoBuffer.push(command);
-			return true;
-		} else {
+		}
+
+		const successful: boolean = command.undo();
+		if (!successful) {
+			// The state and the undo/redo buffers are out of sync.
+			// This may be the case if not all store operations are proper command implementations.
+			// In that case, the store is correct and we drop the undo/redo buffers.
 			this.clearUndoRedoBuffers();
 			return false;
 		}
+
+		this.redoBuffer.push(command);
+		return true;
 	}
 }

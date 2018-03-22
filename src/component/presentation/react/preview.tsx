@@ -1,15 +1,15 @@
+import { ErrorMessage } from './error-message';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { Page } from '../../../store/page/page';
 import { PageElement } from '../../../store/page/page-element';
 import { Pattern } from '../../../store/styleguide/pattern';
+import { HighlightAreaProps, HighlightElementFunction } from '../../preview';
 import { PropertyValue } from '../../../store/page/property-value';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Store } from '../../../store/store';
 import { StringProperty } from '../../../store/styleguide/property/string-property';
-
-import { HighlightAreaProps, HighlightElementFunction } from '../../preview';
 
 export interface PreviewAppProps {
 	highlightElement: HighlightElementFunction;
@@ -30,8 +30,12 @@ interface PatternWrapperState {
 	errorMessage?: string;
 }
 
-class PatternWrapper extends React.Component<{}, PatternWrapperState> {
-	public constructor(props: {}) {
+interface PatternWrapperProps {
+	pattern: Pattern;
+}
+
+class PatternWrapper extends React.Component<PatternWrapperProps, PatternWrapperState> {
+	public constructor(props: PatternWrapperProps) {
 		super(props);
 		this.state = {};
 	}
@@ -42,7 +46,12 @@ class PatternWrapper extends React.Component<{}, PatternWrapperState> {
 
 	public render(): React.ReactNode {
 		if (this.state.errorMessage) {
-			return <span>{this.state.errorMessage}</span>;
+			return (
+				<ErrorMessage
+					patternName={this.props.pattern.getName()}
+					error={this.state.errorMessage}
+				/>
+			);
 		} else {
 			return this.props.children;
 		}
@@ -103,57 +112,61 @@ class Preview extends React.Component<PreviewProps> {
 			// First, process the properties and children of the declaration recursively
 			const pageElement: PageElement = value;
 			const pattern = pageElement.getPattern();
-
 			if (!pattern) {
 				return null;
 			}
 
-			const patternId: string = pattern.getId();
-			if (patternId === Pattern.SYNTHETIC_TEXT_ID) {
-				return pageElement.getPropertyValue(StringProperty.SYNTHETIC_TEXT_ID);
-			}
+			try {
+				const patternId: string = pattern.getId();
+				if (patternId === Pattern.SYNTHETIC_TEXT_ID) {
+					return pageElement.getPropertyValue(StringProperty.SYNTHETIC_TEXT_ID);
+				}
 
-			// tslint:disable-next-line:no-any
-			const componentProps: any = {};
-			pattern.getProperties().forEach(property => {
-				const propertyId = property.getId();
+				// tslint:disable-next-line:no-any
+				const componentProps: any = {};
+				pattern.getProperties().forEach(property => {
+					const propertyId = property.getId();
 
-				componentProps[propertyId] = this.createComponent(
-					property.convertToRender(pageElement.getPropertyValue(propertyId)),
-					propertyId
-				);
-			});
+					componentProps[propertyId] = this.createComponent(
+						property.convertToRender(pageElement.getPropertyValue(propertyId)),
+						propertyId
+					);
+				});
 
-			componentProps.children = pageElement
-				.getChildren()
-				.map((child, index) => this.createComponent(child, String(index)));
+				componentProps.children = pageElement
+					.getChildren()
+					.map((child, index) => this.createComponent(child, String(index)));
 
-			// Then, load the pattern factory
-			const patternPath: string = pattern.getImplementationPath();
-			let patternFactory: React.StatelessComponent | ObjectConstructor = this.patternFactories[
-				patternId
-			];
-			if (patternFactory == null) {
-				const exportName = pattern.getExportName();
-				const module = require(patternPath);
-				patternFactory = module[exportName];
-				this.patternFactories[patternId] = patternFactory;
-			}
+				// Then, load the pattern factory
+				const patternPath: string = pattern.getImplementationPath();
+				let patternFactory: React.StatelessComponent | ObjectConstructor = this
+					.patternFactories[patternId];
+				if (patternFactory == null) {
+					const exportName = pattern.getExportName();
+					const module = require(patternPath);
+					patternFactory = module[exportName];
+					this.patternFactories[patternId] = patternFactory;
+				}
 
-			const reactComponent = React.createElement(patternFactory, componentProps);
+				const reactComponent = React.createElement(patternFactory, componentProps);
 
-			// Finally, build the component
-			if (pageElement.getId() === this.props.selectedElementId) {
+				// Finally, build the component
 				return (
 					<PatternWrapper
 						key={key}
-						ref={(ref: PatternWrapper) => (this.patternWrapperRef = ref)}
+						pattern={pattern}
+						ref={
+							pageElement.getId() === this.props.selectedElementId
+								? (ref: PatternWrapper) => (this.patternWrapperRef = ref)
+								: undefined
+						}
 					>
 						{reactComponent}
 					</PatternWrapper>
 				);
+			} catch (error) {
+				return <ErrorMessage patternName={pattern.getName()} error={error.toString()} />;
 			}
-			return <PatternWrapper key={key}>{reactComponent}</PatternWrapper>;
 		} else {
 			// The model is an object, but not a pattern declaration.
 			// Create a new object with recursively processed values.

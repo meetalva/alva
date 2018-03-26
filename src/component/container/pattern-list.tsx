@@ -27,8 +27,8 @@ export interface NamedPatternListItemProps extends PatternListItemProps {
 export class PatternListContainer extends React.Component {
 	public items: PatternListContainerItemProps[] = [];
 
-	public constructor() {
-		super({});
+	public constructor(props: {}) {
+		super(props);
 
 		this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
 		this.handlePatternClick = this.handlePatternClick.bind(this);

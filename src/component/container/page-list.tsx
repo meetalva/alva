@@ -100,8 +100,8 @@ export class PageListItem extends React.Component<PageListItemProps> {
 @observer
 export class PageList extends React.Component {
 	@MobX.observable protected pageListVisible: boolean = false;
-	public constructor() {
-		super({});
+	public constructor(props: {}) {
+		super(props);
 
 		this.handleDropdownToggle = this.handleDropdownToggle.bind(this);
 	}

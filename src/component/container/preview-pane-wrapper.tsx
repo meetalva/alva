@@ -10,8 +10,8 @@ export interface ElementWrapperState {
 }
 
 export class PreviewPaneWrapper extends React.Component<PreviewPaneProps, ElementWrapperState> {
-	public constructor() {
-		super({});
+	public constructor(props: {}) {
+		super(props);
 
 		this.state = {
 			isResizing: false,

@@ -51,8 +51,8 @@ class App extends React.Component {
 	@MobX.observable protected projectListVisible: boolean = false;
 	private shiftDown: boolean = false;
 
-	public constructor() {
-		super({});
+	public constructor(props: {}) {
+		super(props);
 		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
 		this.handleMainWindowClick = this.handleMainWindowClick.bind(this);
 		this.handleChromeToggle = this.handleChromeToggle.bind(this);

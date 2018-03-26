@@ -171,10 +171,6 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 
 @observer
 export class PropertyList extends React.Component {
-	public constructor() {
-		super({});
-	}
-
 	public render(): React.ReactNode {
 		const selectedElement = Store.getInstance().getSelectedElement();
 

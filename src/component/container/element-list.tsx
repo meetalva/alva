@@ -13,10 +13,6 @@ import { Store } from '../../store/store';
 
 @observer
 export class ElementList extends React.Component {
-	public constructor() {
-		super({});
-	}
-
 	public componentDidMount(): void {
 		createMenu();
 	}

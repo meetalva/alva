@@ -2,7 +2,6 @@ import { Command } from './command';
 import { Page } from '../page/page';
 import { PageElement } from '../page/page-element';
 import { Store } from '../store';
-import * as Uuid from 'uuid';
 
 /**
  * A user operation to set the value of a page element property.
@@ -19,7 +18,6 @@ export class PropertyValueCommand extends Command {
 	 */
 	private elementId: string;
 
-	private id: string;
 	/**
 	 * The ID of the page the operation is performed on.
 	 */
@@ -66,7 +64,6 @@ export class PropertyValueCommand extends Command {
 	// tslint:disable-next-line:no-any
 	public constructor(element: PageElement, propertyId: string, value: any, path?: string) {
 		super();
-		this.id = Uuid.v4();
 
 		this.element = element;
 		this.propertyId = propertyId;
@@ -146,7 +143,6 @@ export class PropertyValueCommand extends Command {
 		}
 
 		const previousPropertyCommand: PropertyValueCommand = previousCommand as PropertyValueCommand;
-		console.log(`Comparing new command ${this.id} against ${previousPropertyCommand.id}`);
 		if (
 			previousPropertyCommand.sealed ||
 			previousPropertyCommand.element.getId() !== this.element.getId() ||
@@ -168,7 +164,6 @@ export class PropertyValueCommand extends Command {
 	 */
 	public seal(): void {
 		this.sealed = true;
-		console.log(`Sealed ${this.id}`);
 	}
 
 	/**

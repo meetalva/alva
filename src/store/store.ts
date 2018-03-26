@@ -64,15 +64,6 @@ export class Store {
 	@MobX.observable private elementFocussed?: boolean = false;
 
 	/**
-	 * Whether  the last executed user operation is now complete, so that similar operations do
-	 * not merge with the last one. For instance, if you edit the text of a page element property,
-	 * all subsequent edits on this property automatically merge. After leaving the input, setting
-	 * this property to true will cause the next text editing on this property to stay a separate
-	 * undo command.
-	 */
-	private lastCommandComplete: boolean;
-
-	/**
 	 * The current search term in the patterns list, or an empty string if there is none.
 	 */
 	@MobX.observable private patternSearchTerm: string = '';
@@ -206,11 +197,7 @@ export class Store {
 	public execute(command: Command): void {
 		if (command.execute()) {
 			const previousCommand = this.undoBuffer[this.undoBuffer.length - 1];
-			if (
-				!previousCommand ||
-				this.lastCommandComplete ||
-				!command.maybeMergeWith(previousCommand)
-			) {
+			if (!previousCommand || !command.maybeMergeWith(previousCommand)) {
 				this.undoBuffer.push(command);
 			}
 
@@ -218,8 +205,6 @@ export class Store {
 		} else {
 			this.clearUndoRedoBuffers();
 		}
-
-		this.lastCommandComplete = false;
 	}
 
 	/**
@@ -769,16 +754,6 @@ export class Store {
 	 */
 	public setElementFocussed(elementFocussed: boolean): void {
 		this.elementFocussed = elementFocussed;
-	}
-
-	/**
-	 * Marks that the last executed user operation is now complete, so that similar operations do
-	 * not merge with the last one. For instance, if you edit the text of a page element property,
-	 * all subsequent edits on this property automatically merge. After leaving the input, call this
-	 * method, and the next text editing on this property stays a separate undo command.
-	 */
-	public setLastCommandComplete(): void {
-		this.lastCommandComplete = true;
 	}
 
 	/**

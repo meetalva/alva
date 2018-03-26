@@ -25,6 +25,7 @@ interface PropertyTreeProps {
 @observer
 class PropertyTree extends React.Component<PropertyTreeProps> {
 	@observable protected isOpen = false;
+	protected lastCommand: PropertyValueCommand;
 
 	public constructor(props: PropertyTreeProps) {
 		super(props);
@@ -46,13 +47,23 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 		return this.props.element.getPropertyValue(rootId, propertyPath.join('.'));
 	}
 
+	protected handleBlur(): void {
+		if (this.lastCommand) {
+			this.lastCommand.seal();
+		}
+	}
+
 	// tslint:disable-next-line:no-any
 	protected handleChange(id: string, value: any, context?: ObjectContext): void {
 		const fullPath: string = context ? `${context.path}.${id}` : id;
 		const [rootId, ...propertyPath] = fullPath.split('.');
-		Store.getInstance().execute(
-			new PropertyValueCommand(this.props.element, rootId, value, propertyPath.join('.'))
+		this.lastCommand = new PropertyValueCommand(
+			this.props.element,
+			rootId,
+			value,
+			propertyPath.join('.')
 		);
+		Store.getInstance().execute(this.lastCommand);
 	}
 
 	@action
@@ -116,6 +127,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 									handleChange={event =>
 										this.handleChange(id, event.currentTarget.value, context)
 									}
+									handleBlur={event => this.handleBlur()}
 								/>
 							);
 

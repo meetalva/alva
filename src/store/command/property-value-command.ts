@@ -41,6 +41,14 @@ export class PropertyValueCommand extends Command {
 	 */
 	private propertyId: string;
 
+	/**
+	 * Whether this property value editing is complete now, so that similar value changes do not
+	 * merge with this one. If you edit the text of a page element property, all subsequent edits
+	 * on this property automatically merge. After leaving the input, setting this property to true
+	 * will cause the next text editing on this property to stay a separate undo command.
+	 */
+	protected sealed: boolean = false;
+
 	// tslint:disable-next-line:no-any
 	private value: any;
 
@@ -136,6 +144,7 @@ export class PropertyValueCommand extends Command {
 
 		const previousPropertyCommand: PropertyValueCommand = previousCommand as PropertyValueCommand;
 		if (
+			previousPropertyCommand.sealed ||
 			previousPropertyCommand.element.getId() !== this.element.getId() ||
 			previousPropertyCommand.propertyId !== this.propertyId ||
 			previousPropertyCommand.path !== this.path
@@ -145,6 +154,16 @@ export class PropertyValueCommand extends Command {
 
 		previousPropertyCommand.value = this.value;
 		return true;
+	}
+
+	/**
+	 * Marks that this property value editing is complete now, so that similar value changes do not
+	 * merge with this one. If you edit the text of a page element property, all subsequent edits
+	 * on this property automatically merge. After leaving the input, sealing will cause the next
+	 * text editing on this property to stay a separate undo command.
+	 */
+	public seal(): void {
+		this.sealed = true;
 	}
 
 	/**

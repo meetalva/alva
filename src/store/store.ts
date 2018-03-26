@@ -195,16 +195,34 @@ export class Store {
 	 * @param command The command to execute and register.
 	 */
 	public execute(command: Command): void {
-		if (command.execute()) {
-			const previousCommand = this.undoBuffer[this.undoBuffer.length - 1];
-			if (!previousCommand || !command.maybeMergeWith(previousCommand)) {
-				this.undoBuffer.push(command);
-			}
-
-			this.redoBuffer = [];
-		} else {
+		const successful: boolean = command.execute();
+		if (!successful) {
+			// The state and the undo/redo buffers are out of sync.
+			// This may be the case if not all store operations are proper command implementations.
+			// In that case, the store is correct and we drop the undo/redo buffers.
 			this.clearUndoRedoBuffers();
+			return;
 		}
+
+		// The command was processed successfully, now memorize it to provide an undo stack.
+
+		// But first, we give the command the chance to indicate that the previous undo command
+		// and the current one are too similar to keep both. If so, the newer command
+		// incorporates both commands' changes into itself, and we keep only that newer one
+		// on the undo stack.
+
+		const previousCommand = this.undoBuffer[this.undoBuffer.length - 1];
+		const wasMerged = previousCommand && command.maybeMergeWith(previousCommand);
+		if (wasMerged) {
+			// The newer command now contains both changes, so we drop the previous one
+			this.undoBuffer.pop();
+		}
+
+		// Now memorize the new command
+		this.undoBuffer.push(command);
+
+		// All previously undone commands (the redo stack) are invalid after a forward command
+		this.redoBuffer = [];
 	}
 
 	/**
@@ -601,13 +619,19 @@ export class Store {
 		const command: Command | undefined = this.redoBuffer.pop();
 		if (!command) {
 			return false;
-		} else if (command.execute()) {
-			this.undoBuffer.push(command);
-			return true;
-		} else {
+		}
+
+		const successful: boolean = command.execute();
+		if (!successful) {
+			// The state and the undo/redo buffers are out of sync.
+			// This may be the case if not all store operations are proper command implementations.
+			// In that case, the store is correct and we drop the undo/redo buffers.
 			this.clearUndoRedoBuffers();
 			return false;
 		}
+
+		this.undoBuffer.push(command);
+		return true;
 	}
 
 	/**
@@ -825,12 +849,18 @@ export class Store {
 		const command: Command | undefined = this.undoBuffer.pop();
 		if (!command) {
 			return false;
-		} else if (command.undo()) {
-			this.redoBuffer.push(command);
-			return true;
-		} else {
+		}
+
+		const successful: boolean = command.undo();
+		if (!successful) {
+			// The state and the undo/redo buffers are out of sync.
+			// This may be the case if not all store operations are proper command implementations.
+			// In that case, the store is correct and we drop the undo/redo buffers.
 			this.clearUndoRedoBuffers();
 			return false;
 		}
+
+		this.redoBuffer.push(command);
+		return true;
 	}
 }

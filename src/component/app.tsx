@@ -51,8 +51,8 @@ class App extends React.Component {
 	@MobX.observable protected projectListVisible: boolean = false;
 	private shiftDown: boolean = false;
 
-	public constructor(props: {}) {
-		super(props);
+	public constructor() {
+		super({});
 		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
 		this.handleMainWindowClick = this.handleMainWindowClick.bind(this);
 		this.handleChromeToggle = this.handleChromeToggle.bind(this);
@@ -116,12 +116,12 @@ class App extends React.Component {
 
 	@MobX.computed
 	protected get isPatternListVisible(): boolean {
-		return Boolean(this.activeTab === App.PATTERN_LIST_ID);
+		return this.activeTab === App.PATTERN_LIST_ID;
 	}
 
 	@MobX.computed
 	protected get isPropertiesListVisible(): boolean {
-		return Boolean(this.activeTab === App.PROPERTIES_LIST_ID);
+		return this.activeTab === App.PROPERTIES_LIST_ID;
 	}
 
 	private redirectUndoRedo(): void {

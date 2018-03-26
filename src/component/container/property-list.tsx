@@ -171,8 +171,8 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 
 @observer
 export class PropertyList extends React.Component {
-	public constructor(props: {}) {
-		super(props);
+	public constructor() {
+		super({});
 	}
 
 	public render(): React.ReactNode {

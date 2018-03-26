@@ -34,8 +34,9 @@ export abstract class Command {
 
 	/**
 	 * Looks at a given previous command, checking whether the types are compatible
-	 * and the changes are too similar to keep both. If so, the method modifies the previous
-	 * command and returns true, indicating not to put this newer command into the undo buffer.
+	 * and the changes are too similar to keep both. If so, the method incorporates both changes
+	 * into this command and returns true, indicating to remove the older command from the stack
+	 * and only keep this one.
 	 * @param previousCommand The previous command.
 	 * @return Whether the method has merged itself into the previous command.
 	 * <code>false</code> keeps both methods separate.

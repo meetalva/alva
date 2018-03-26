@@ -13,15 +13,15 @@ import { Store } from '../../store/store';
 
 @observer
 export class ElementList extends React.Component {
-	public constructor(props: {}) {
-		super(props);
+	public constructor() {
+		super({});
 	}
 
 	public componentDidMount(): void {
 		createMenu();
 	}
 
-	public componentWillUpdate(newProps: {}): void {
+	public componentWillUpdate(): void {
 		createMenu();
 	}
 

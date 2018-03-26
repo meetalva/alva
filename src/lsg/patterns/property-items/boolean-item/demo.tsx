@@ -12,8 +12,8 @@ export interface BooleanItemDemoState {
 }
 
 export class BooleanItemDemo extends React.Component<{}, BooleanItemDemoState> {
-	public constructor(props: {}) {
-		super(props);
+	public constructor() {
+		super({});
 
 		this.state = {
 			checked: false

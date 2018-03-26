@@ -14,8 +14,8 @@ export interface EnumItemDemoState {
 }
 
 export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
-	public constructor(props: {}) {
-		super(props);
+	public constructor() {
+		super({});
 
 		const values = [
 			{ id: 'id1', name: 'Medium' },

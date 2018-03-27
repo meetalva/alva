@@ -21,7 +21,7 @@ export class NumberProperty extends Property {
 	 * @inheritdoc
 	 */
 	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
+	public async coerceValue(value: any): Promise<any> {
 		const result: number = parseFloat(value);
 		return isNaN(result) ? undefined : result;
 	}

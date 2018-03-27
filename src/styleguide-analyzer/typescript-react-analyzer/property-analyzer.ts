@@ -1,18 +1,17 @@
 // tslint:disable:no-bitwise
 
-import { Property } from '../../store/styleguide/property/property';
-import * as ts from 'typescript';
-
+import { AssetProperty } from '../../store/styleguide/property/asset-property';
 import { BooleanProperty } from '../../store/styleguide/property/boolean-property';
 import { EnumProperty, Option } from '../../store/styleguide/property/enum-property';
 import { NumberArrayProperty } from '../../store/styleguide/property/number-array-property';
 import { NumberProperty } from '../../store/styleguide/property/number-property';
 import { ObjectProperty } from '../../store/styleguide/property/object-property';
+import { Property } from '../../store/styleguide/property/property';
 import { StringArrayProperty } from '../../store/styleguide/property/string-array-property';
 import { StringProperty } from '../../store/styleguide/property/string-property';
+import * as ts from 'typescript';
 
 interface PropertyFactoryArgs {
-	id: string;
 	symbol: ts.Symbol;
 	type: ts.Type;
 	typechecker: ts.TypeChecker;
@@ -25,6 +24,15 @@ type PropertyFactory = (args: PropertyFactoryArgs) => Property | undefined;
  * Alva supported pattern properties.
  */
 export class PropertyAnalyzer {
+	private static PROPERTY_FACTORIES: PropertyFactory[] = [
+		PropertyAnalyzer.createBooleanProperty,
+		PropertyAnalyzer.createEnumProperty,
+		PropertyAnalyzer.createStringProperty,
+		PropertyAnalyzer.createNumberProperty,
+		PropertyAnalyzer.createArrayProperty,
+		PropertyAnalyzer.createObjectProperty
+	];
+
 	/**
 	 * Analyzes a given Props type and returns all Alva-supported properties found.
 	 * @param type The TypeScript Props type.
@@ -74,30 +82,15 @@ export class PropertyAnalyzer {
 			type = (type as ts.UnionType).types[0];
 		}
 
-		const PROPERTY_FACTORIES: PropertyFactory[] = [
-			this.createBooleanProperty,
-			this.createEnumProperty,
-			this.createStringProperty,
-			this.createNumberProperty,
-			this.createArrayProperty,
-			this.createObjectProperty
-		];
-
-		for (const propertyFactory of PROPERTY_FACTORIES) {
-			const property: Property | undefined = propertyFactory({
-				id: symbol.name,
-				symbol,
-				type,
-				typechecker
-			});
-
+		for (const propertyFactory of this.PROPERTY_FACTORIES) {
+			const property: Property | undefined = propertyFactory({ symbol, type, typechecker });
 			if (property) {
 				this.setPropertyMetaData(property, symbol);
 				return property;
 			}
 		}
 
-		return undefined;
+		return;
 	}
 
 	/**
@@ -118,12 +111,12 @@ export class PropertyAnalyzer {
 			const itemType = arrayType.typeArguments[0];
 
 			if ((itemType.flags & ts.TypeFlags.String) === ts.TypeFlags.String) {
-				const property = new StringArrayProperty(args.id);
+				const property = new StringArrayProperty(args.symbol.name);
 				return property;
 			}
 
 			if ((itemType.flags & ts.TypeFlags.Number) === ts.TypeFlags.Number) {
-				const property = new NumberArrayProperty(args.id);
+				const property = new NumberArrayProperty(args.symbol.name);
 				return property;
 			}
 		}
@@ -143,7 +136,7 @@ export class PropertyAnalyzer {
 			(args.type.flags & ts.TypeFlags.BooleanLiteral) === ts.TypeFlags.BooleanLiteral ||
 			(args.type.symbol && args.type.symbol.name === 'Boolean')
 		) {
-			return new BooleanProperty(args.id);
+			return new BooleanProperty(args.symbol.name);
 		}
 
 		return;
@@ -185,7 +178,7 @@ export class PropertyAnalyzer {
 				return new Option(enumMemberId, enumMemberName, enumMemberOrdinal);
 			});
 
-			const property = new EnumProperty(args.id);
+			const property = new EnumProperty(args.symbol.name);
 			property.setOptions(options);
 			return property;
 		}
@@ -202,8 +195,7 @@ export class PropertyAnalyzer {
 	 */
 	private static createNumberProperty(args: PropertyFactoryArgs): NumberProperty | undefined {
 		if ((args.type.flags & ts.TypeFlags.Number) === ts.TypeFlags.Number) {
-			const property = new NumberProperty(args.id);
-			return property;
+			return new NumberProperty(args.symbol.name);
 		}
 
 		return;
@@ -221,7 +213,7 @@ export class PropertyAnalyzer {
 			const objectType = args.type as ts.ObjectType;
 
 			if (objectType.objectFlags & ts.ObjectFlags.Interface) {
-				const property = new ObjectProperty(args.id);
+				const property = new ObjectProperty(args.symbol.name);
 				property.setProperties(PropertyAnalyzer.analyze(args.type, args.typechecker));
 				return property;
 			}
@@ -239,8 +231,11 @@ export class PropertyAnalyzer {
 	 */
 	private static createStringProperty(args: PropertyFactoryArgs): StringProperty | undefined {
 		if ((args.type.flags & ts.TypeFlags.String) === ts.TypeFlags.String) {
-			const property = new StringProperty(args.id);
-			return property;
+			if (PropertyAnalyzer.getJsDocValueFromSymbol(args.symbol, 'asset') !== undefined) {
+				return new AssetProperty(args.symbol.name);
+			} else {
+				return new StringProperty(args.symbol.name);
+			}
 		}
 
 		return;

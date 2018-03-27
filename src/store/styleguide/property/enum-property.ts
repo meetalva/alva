@@ -33,9 +33,9 @@ export class EnumProperty extends Property {
 	 * @inheritdoc
 	 */
 	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
+	public async coerceValue(value: any): Promise<any> {
 		if (value === null || value === undefined || value === '') {
-			return undefined;
+			return;
 		}
 
 		for (const option of this.options) {
@@ -80,7 +80,7 @@ export class EnumProperty extends Property {
 			}
 		}
 
-		return undefined;
+		return;
 	}
 
 	/**

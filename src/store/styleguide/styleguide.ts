@@ -1,9 +1,9 @@
-import { Directory } from '../../styleguide-analyzer/directory';
+import { Directory } from '../../styleguide/analyzer/directory';
 import { PatternFolder } from './folder';
 import * as PathUtils from 'path';
 import { Pattern } from './pattern';
 import { StringProperty } from './property/string-property';
-import { StyleguideAnalyzer } from '../../styleguide-analyzer/styleguide-analyzer';
+import { StyleguideAnalyzer } from '../../styleguide/analyzer/styleguide-analyzer';
 
 /**
  * The styleguide is the component library the current Alva space bases on.
@@ -49,7 +49,7 @@ export class Styleguide {
 	public constructor(path: string, analyzerName: string) {
 		this.path = path || '';
 
-		const Analyzer = require(`../../styleguide-analyzer/${analyzerName}/${analyzerName}`)
+		const Analyzer = require(`../../styleguide/analyzer/${analyzerName}/${analyzerName}`)
 			.Analyzer;
 		this.analyzer = new Analyzer();
 

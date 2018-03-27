@@ -1,14 +1,14 @@
 // tslint:disable:no-bitwise
 
-import { AssetProperty } from '../../store/styleguide/property/asset-property';
-import { BooleanProperty } from '../../store/styleguide/property/boolean-property';
-import { EnumProperty, Option } from '../../store/styleguide/property/enum-property';
-import { NumberArrayProperty } from '../../store/styleguide/property/number-array-property';
-import { NumberProperty } from '../../store/styleguide/property/number-property';
-import { ObjectProperty } from '../../store/styleguide/property/object-property';
-import { Property } from '../../store/styleguide/property/property';
-import { StringArrayProperty } from '../../store/styleguide/property/string-array-property';
-import { StringProperty } from '../../store/styleguide/property/string-property';
+import { AssetProperty } from '../../../store/styleguide/property/asset-property';
+import { BooleanProperty } from '../../../store/styleguide/property/boolean-property';
+import { EnumProperty, Option } from '../../../store/styleguide/property/enum-property';
+import { NumberArrayProperty } from '../../../store/styleguide/property/number-array-property';
+import { NumberProperty } from '../../../store/styleguide/property/number-property';
+import { ObjectProperty } from '../../../store/styleguide/property/object-property';
+import { Property } from '../../../store/styleguide/property/property';
+import { StringArrayProperty } from '../../../store/styleguide/property/string-array-property';
+import { StringProperty } from '../../../store/styleguide/property/string-property';
 import * as ts from 'typescript';
 
 interface PropertyFactoryArgs {

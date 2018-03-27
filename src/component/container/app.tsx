@@ -1,48 +1,39 @@
-import Button, { Order } from '../lsg/patterns/button';
-import { Chrome } from './container/chrome';
-import { colors } from '../lsg/patterns/colors';
-import Copy, { Size as CopySize } from '../lsg/patterns/copy';
-import { ipcRenderer, remote, webFrame, WebviewTag } from 'electron';
-import { ElementList } from './container/element-list';
-import ElementPane from '../lsg/patterns/panes/element-pane';
+import Button, { Order } from '../../lsg/patterns/button';
+import { Chrome } from '../../component/container/chrome';
+import { colors } from '../../lsg/patterns/colors';
+import Copy, { Size as CopySize } from '../../lsg/patterns/copy';
+import { remote } from 'electron';
+import { ElementList } from '../../component/container/element-list';
+import ElementPane from '../../lsg/patterns/panes/element-pane';
 import * as FileExtraUtils from 'fs-extra';
-import globalStyles from '../lsg/patterns/global-styles';
-import { Headline } from '../lsg/patterns/headline';
-import { IconName, IconRegistry } from '../lsg/patterns/icons';
-import { JsonObject } from '../store/json';
-import Layout, { MainArea, SideBar } from '../lsg/patterns/layout';
-import Link from '../lsg/patterns/link';
-import { createMenu } from '../electron/menu';
+import globalStyles from '../../lsg/patterns/global-styles';
+import { Headline } from '../../lsg/patterns/headline';
+import { IconName, IconRegistry } from '../../lsg/patterns/icons';
+import Layout, { MainArea, SideBar } from '../../lsg/patterns/layout';
+import Link from '../../lsg/patterns/link';
+import { createMenu } from '../../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
-import { Page } from '../store/page/page';
-import { PageList } from './container/page-list';
+import { PageList } from '../../component/container/page-list';
 import * as PathUtils from 'path';
-import { PatternListContainer } from './container/pattern-list';
-import PatternsPane from '../lsg/patterns/panes/patterns-pane';
-import { PreviewPaneWrapper } from '../component/container/preview-pane-wrapper';
+import { PatternListContainer } from '../../component/container/pattern-list';
+import PatternsPane from '../../lsg/patterns/panes/patterns-pane';
+import { PreviewPaneWrapper } from '../../component/container/preview-pane-wrapper';
 import * as ProcessUtils from 'process';
-import { ProjectList } from './container/project-list';
-import { PropertyList } from './container/property-list';
-import PropertyPane from '../lsg/patterns/panes/property-pane';
-const { app, dialog } = remote;
+import { ProjectList } from '../../component/container/project-list';
+import { PropertyList } from '../../component/container/property-list';
+import PropertyPane from '../../lsg/patterns/panes/property-pane';
 import * as React from 'react';
-import * as ReactDom from 'react-dom';
-import Space, { Size as SpaceSize } from '../lsg/patterns/space';
-import SplashScreen from '../lsg/patterns/splash-screen';
-import { Store } from '../store/store';
-
-// prevent app zooming
-webFrame.setVisualZoomLevelLimits(1, 1);
-webFrame.setLayoutZoomLevelLimits(0, 0);
+import Space, { Size as SpaceSize } from '../../lsg/patterns/space';
+import SplashScreen from '../../lsg/patterns/splash-screen';
+import { Store } from '../../store/store';
 
 globalStyles();
 
-const store: Store = Store.getInstance();
-store.openFromPreferences();
+const store = Store.getInstance();
 
 @observer
-class App extends React.Component {
+export class App extends React.Component {
 	private static PATTERN_LIST_ID = 'patternlist';
 	private static PROPERTIES_LIST_ID = 'propertieslist';
 
@@ -80,21 +71,24 @@ class App extends React.Component {
 	}
 
 	protected handleCreateNewSpaceClick(): void {
-		let appPath: string = app.getAppPath().replace('.asar', '.asar.unpacked');
+		let appPath: string = remote.app.getAppPath().replace('.asar', '.asar.unpacked');
 		if (appPath.indexOf('node_modules') >= 0) {
 			appPath = ProcessUtils.cwd();
 		}
 
 		const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
-		dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] }, filePaths => {
-			if (filePaths.length <= 0) {
-				return;
-			}
+		remote.dialog.showOpenDialog(
+			{ properties: ['openDirectory', 'createDirectory'] },
+			filePaths => {
+				if (filePaths.length <= 0) {
+					return;
+				}
 
-			FileExtraUtils.copySync(designkitPath, PathUtils.join(filePaths[0], 'designkit'));
-			store.openStyleguide(`${filePaths[0]}/designkit`);
-			store.openFirstPage();
-		});
+				FileExtraUtils.copySync(designkitPath, PathUtils.join(filePaths[0], 'designkit'));
+				store.openStyleguide(`${filePaths[0]}/designkit`);
+				store.openFirstPage();
+			}
+		);
 	}
 
 	private handleMainWindowClick(): void {
@@ -103,7 +97,7 @@ class App extends React.Component {
 	}
 
 	protected handleOpenSpaceClick(): void {
-		dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
+		remote.dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
 			store.openStyleguide(filePaths[0]);
 			store.openFirstPage();
 		});
@@ -225,60 +219,3 @@ class App extends React.Component {
 		);
 	}
 }
-
-ipcRenderer.on('preview-ready', (readyEvent: {}, readyMessage: JsonObject) => {
-	function sendWebViewMessage(message: JsonObject, channel: string): void {
-		const webviewTag: WebviewTag = document.getElementById('preview') as WebviewTag;
-		if (webviewTag && webviewTag.send) {
-			webviewTag.send(channel, message);
-		}
-	}
-
-	global.setTimeout(() => {
-		MobX.autorun(() => {
-			const styleguide = store.getStyleguide();
-			const message: JsonObject = {
-				analyzerName: store.getAnalyzerName(),
-				projects: store.getProjects().map(project => project.toJsonObject()),
-				styleguidePath: styleguide ? styleguide.getPath() : undefined
-			};
-			sendWebViewMessage(message, 'styleguide-change');
-		});
-
-		MobX.autorun(() => {
-			const page: Page | undefined = store.getCurrentPage();
-			const message: JsonObject = {
-				page: page ? page.toJsonObject() : undefined,
-				pageId: page ? page.getId() : undefined
-			};
-
-			sendWebViewMessage(message, 'page-change');
-		});
-
-		MobX.autorun(() => {
-			const selectedElement = store.getSelectedElement();
-			const message: JsonObject = {
-				selectedElementId: selectedElement ? selectedElement.getId() : undefined
-			};
-			sendWebViewMessage(message, 'selectedElement-change');
-		});
-	}, 3000);
-});
-
-ReactDom.render(<App />, document.getElementById('app'));
-
-// Disable drag and drop from outside the application
-document.addEventListener(
-	'dragover',
-	event => {
-		event.preventDefault();
-	},
-	false
-);
-document.addEventListener(
-	'drop',
-	event => {
-		event.preventDefault();
-	},
-	false
-);

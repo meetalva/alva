@@ -1,26 +1,21 @@
 import { ErrorMessage } from './error-message';
-import { action, observable } from 'mobx';
+import { HighlightArea } from '../highlight-area';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { Page } from '../../../store/page/page';
 import { PageElement } from '../../../store/page/page-element';
 import { Pattern } from '../../../store/styleguide/pattern';
-import { HighlightAreaProps, HighlightElementFunction } from '../../preview';
 import { PropertyValue } from '../../../store/page/property-value';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Store } from '../../../store/store';
 import { StringProperty } from '../../../store/styleguide/property/string-property';
 
-export interface PreviewAppProps {
-	highlightElement: HighlightElementFunction;
-}
-
 export interface PreviewAppState {
 	page?: Page;
 }
 
 interface PreviewProps {
-	highlightElement: HighlightElementFunction;
 	page?: Page;
 	selectedElementId?: string;
 }
@@ -59,7 +54,7 @@ class PatternWrapper extends React.Component<PatternWrapperProps, PatternWrapper
 
 @observer
 class Preview extends React.Component<PreviewProps> {
-	@observable private highlightArea: HighlightAreaProps;
+	@observable private highlightArea: HighlightArea;
 	private patternFactories: { [id: string]: React.StatelessComponent | ObjectConstructor };
 	private patternWrapperRef: PatternWrapper;
 
@@ -67,17 +62,7 @@ class Preview extends React.Component<PreviewProps> {
 		super(props);
 		this.patternFactories = {};
 
-		this.highlightArea = {
-			bottom: 0,
-			height: 0,
-			left: 0,
-			opacity: 0,
-			right: 0,
-			top: 0,
-			width: 0
-		};
-
-		this.highlightElementCallback = this.highlightElementCallback.bind(this);
+		this.highlightArea = new HighlightArea();
 	}
 
 	public componentDidMount(): void {
@@ -180,16 +165,9 @@ class Preview extends React.Component<PreviewProps> {
 		}
 	}
 
-	@action
-	private highlightElementCallback(newHighlightArea: HighlightAreaProps): void {
-		if (newHighlightArea) {
-			this.highlightArea = newHighlightArea;
-		}
-	}
-
 	public render(): JSX.Element | null {
 		if (this.props.page) {
-			const highlightArea: HighlightAreaProps = this.highlightArea;
+			const highlightAreaProps = this.highlightArea.getProps();
 			return (
 				<>
 					{this.createComponent(this.props.page.getRoot()) as JSX.Element}
@@ -201,13 +179,13 @@ class Preview extends React.Component<PreviewProps> {
 							background:
 								'repeating-linear-gradient(135deg,transparent,transparent 2.5px,rgba(51,141,222, .5) 2.5px,rgba(51,141,222, .5) 5px), rgba(102,169,230, .5)',
 							transition: 'all .25s ease-in-out',
-							bottom: highlightArea.bottom,
-							height: highlightArea.height,
-							left: highlightArea.left,
-							opacity: highlightArea.opacity,
-							right: highlightArea.right,
-							top: highlightArea.top,
-							width: highlightArea.width
+							bottom: highlightAreaProps.bottom,
+							height: highlightAreaProps.height,
+							left: highlightAreaProps.left,
+							opacity: highlightAreaProps.opacity,
+							right: highlightAreaProps.right,
+							top: highlightAreaProps.top,
+							width: highlightAreaProps.width
 						}}
 					/>
 				</>
@@ -219,14 +197,14 @@ class Preview extends React.Component<PreviewProps> {
 	private triggerHighlight(): void {
 		const domNode = this.patternWrapperRef && ReactDOM.findDOMNode(this.patternWrapperRef);
 		if (domNode) {
-			this.props.highlightElement(domNode, this.highlightArea, this.highlightElementCallback);
+			this.highlightArea.show(domNode);
 		}
 	}
 }
 
 @observer
-export class PreviewApp extends React.Component<PreviewAppProps, PreviewAppState> {
-	public constructor(props: PreviewAppProps) {
+export class PreviewApp extends React.Component<{}, PreviewAppState> {
+	public constructor(props: {}) {
 		super(props);
 	}
 
@@ -245,7 +223,6 @@ export class PreviewApp extends React.Component<PreviewAppProps, PreviewAppState
 				<Preview
 					page={Store.getInstance().getCurrentPage()}
 					selectedElementId={selectedElement && selectedElement.getId()}
-					highlightElement={this.props.highlightElement}
 				/>
 				{DevTools ? <DevTools /> : ''}
 			</div>

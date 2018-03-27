@@ -1,16 +1,16 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
 		{
 			"type": "chrome",
 			"request": "attach",
 			"name": "Attach to main browser instance",
 			"port": 9222,
 			"webRoot": "${workspaceFolder}",
-			"url": "${workspaceFolder}/build/electron/electron.html"
+			"url": "${workspaceFolder}/build/electron/renderer/app.html"
 		},
 		{
 			"type": "chrome",
@@ -18,7 +18,7 @@
 			"name": "Attach to preview browser instance",
 			"port": 9222,
 			"webRoot": "${workspaceFolder}",
-			"url": "${workspaceFolder}/build/electron/preview.html"
+			"url": "${workspaceFolder}/build/electron/renderer/preview.html"
 		},
 		{
 			"name": "Attach to electron host application",
@@ -27,5 +27,5 @@
 			"cwd": "${workspaceRoot}",
 			"port": 9223
 		}
-    ]
+	]
 }

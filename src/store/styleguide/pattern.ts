@@ -163,7 +163,7 @@ export class Pattern {
 			if (property && property.getType() === 'object') {
 				property = (property as ObjectProperty).getProperty(part);
 			} else {
-				return undefined;
+				return;
 			}
 		}
 

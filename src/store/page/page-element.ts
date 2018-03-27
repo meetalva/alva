@@ -408,16 +408,20 @@ export class PageElement {
 			return;
 		}
 
-		value = property.coerceValue(value);
-
-		if (!path) {
-			this.propertyValues.set(id, value);
-			return;
-		}
-
-		const rootPropertyValue = this.propertyValues.get(id) || {};
-		ObjectPath.set<{}, PropertyValue>(rootPropertyValue, path, value);
-		this.propertyValues.set(id, deepAssign({}, rootPropertyValue));
+		(async () => {
+			const coercedValue: string = await property.coerceValue(value);
+			if (path) {
+				const rootPropertyValue = this.propertyValues.get(id) || {};
+				ObjectPath.set<{}, PropertyValue>(rootPropertyValue, path, coercedValue);
+				this.propertyValues.set(id, deepAssign({}, rootPropertyValue));
+			} else {
+				this.propertyValues.set(id, coercedValue);
+			}
+		})().catch(reason => {
+			console.log(
+				`Failed to coerce property value of property ${this.getId()} of pattern ${this.getPattern()}: ${reason}`
+			);
+		});
 	}
 
 	/**

@@ -28,7 +28,7 @@ export class PatternProperty extends Property {
 	 * @inheritdoc
 	 */
 	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
+	public async coerceValue(value: any): Promise<any> {
 		// Page elements coerce their properties themselves
 		return value;
 	}

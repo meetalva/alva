@@ -1,15 +1,16 @@
 import { Directory } from '../directory';
 import { Export } from '../typescript/export';
-import { PatternFolder } from '../../store/styleguide/folder';
+import { PatternFolder } from '../../../store/styleguide/folder';
 import * as FileUtils from 'fs';
 import * as PathUtils from 'path';
-import { Pattern } from '../../store/styleguide/pattern';
-import { HighlightElementFunction } from '../../component/preview';
-import { Property } from '../../store/styleguide/property/property';
+import { Pattern } from '../../../store/styleguide/pattern';
+import { PreviewApp } from '../../renderer/react/preview';
+import { Property } from '../../../store/styleguide/property/property';
 import { PropertyAnalyzer } from './property-analyzer';
+import * as React from 'react';
+import * as ReactDom from 'react-dom';
 import { ReactUtils } from '../typescript/react-utils';
-import { renderReact } from '../../component/presentation/react/render';
-import { Styleguide } from '../../store/styleguide/styleguide';
+import { Styleguide } from '../../../store/styleguide/styleguide';
 import { StyleguideAnalyzer } from '../styleguide-analyzer';
 import { Type } from '../typescript/type';
 import * as ts from 'typescript';
@@ -196,7 +197,7 @@ export class Analyzer extends StyleguideAnalyzer {
 	/**
 	 * @inheritdoc
 	 */
-	public render(highlightElement: HighlightElementFunction): void {
-		renderReact(highlightElement);
+	public render(): void {
+		ReactDom.render(React.createElement(PreviewApp), document.getElementById('app'));
 	}
 }

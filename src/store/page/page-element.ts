@@ -35,6 +35,11 @@ export class PageElement {
 	@MobX.observable private id: string;
 
 	/**
+	 * The assigned name of the page element, initially the pattern's human-friendly name.
+	 */
+	@MobX.observable private name: string;
+
+	/**
 	 * The page this element belongs to.
 	 */
 	private page?: Page;
@@ -68,6 +73,10 @@ export class PageElement {
 	public constructor(properties: PageElementProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
 		this.pattern = properties.pattern;
+
+		if (this.name === undefined && this.pattern) {
+			this.name = this.pattern.getName();
+		}
 
 		if (properties.setDefaults && this.pattern) {
 			this.pattern.getProperties().forEach(property => {
@@ -115,6 +124,10 @@ export class PageElement {
 		}
 
 		const element = new PageElement({ id: json.uuid as string, pattern, parent });
+
+		if (json.name !== undefined) {
+			element.name = json.name as string;
+		}
 
 		if (json.properties) {
 			Object.keys(json.properties as JsonObject).forEach((propertyId: string) => {
@@ -218,6 +231,14 @@ export class PageElement {
 			throw new Error('This element has no parent');
 		}
 		return this.parent.children.indexOf(this);
+	}
+
+	/**
+	 * Returns the assigned name of the page element, initially the pattern's human-friendly name.
+	 * @return The assigned name of the page element.
+	 */
+	public getName(): string {
+		return this.name;
 	}
 
 	/**
@@ -339,6 +360,14 @@ export class PageElement {
 	}
 
 	/**
+	 * Sets the assigned name of the page element, initially the pattern's human-friendly name.
+	 * @param name The assigned name of the page element.
+	 */
+	public setName(name: string): void {
+		this.name = name;
+	}
+
+	/**
 	 * Sets a new parent for this element (and removes it from its previous parent).
 	 * If no parent is provided, only removes it from its parent.
 	 * @param parent The (optional) new parent for this element.
@@ -432,6 +461,7 @@ export class PageElement {
 		const json: JsonObject = {
 			_type: 'pattern',
 			uuid: this.id,
+			name: this.name,
 			pattern: this.pattern && this.pattern.getId()
 		};
 

@@ -1,5 +1,5 @@
 import { MenuItemConstructorOptions, remote } from 'electron';
-import { ElementCommand } from '../store/command/element-command';
+import { ElementLocationCommand } from '../store/command/element-location-command';
 import { PageElement } from '../store/page/page-element';
 import { Store } from '../store/store';
 
@@ -12,7 +12,7 @@ export function elementMenu(element: PageElement): void {
 			label: 'Cut Element',
 			click: () => {
 				store.setClipboardElement(element);
-				store.execute(ElementCommand.remove(element));
+				store.execute(ElementLocationCommand.remove(element));
 			}
 		},
 		{
@@ -24,7 +24,7 @@ export function elementMenu(element: PageElement): void {
 		{
 			label: 'Delete element',
 			click: () => {
-				store.execute(ElementCommand.remove(element));
+				store.execute(ElementLocationCommand.remove(element));
 			}
 		},
 		{
@@ -37,7 +37,7 @@ export function elementMenu(element: PageElement): void {
 				const newPageElement = clipboardElement && clipboardElement.clone();
 
 				if (newPageElement) {
-					store.execute(ElementCommand.addSibling(element, newPageElement));
+					store.execute(ElementLocationCommand.addSibling(element, newPageElement));
 				}
 			}
 		},
@@ -48,7 +48,7 @@ export function elementMenu(element: PageElement): void {
 				const newPageElement = clipboardElement && clipboardElement.clone();
 
 				if (newPageElement) {
-					store.execute(ElementCommand.addChild(element, newPageElement));
+					store.execute(ElementLocationCommand.addChild(element, newPageElement));
 				}
 			}
 		}

@@ -42,8 +42,12 @@ class PatternWrapper extends React.Component<PatternWrapperProps, PatternWrapper
 
 	public render(): React.ReactNode {
 		if (this.state.errorMessage) {
-			const pattern = this.props.element.getPattern() as Pattern;
-			return <ErrorMessage patternName={pattern.getName()} error={this.state.errorMessage} />;
+			return (
+				<ErrorMessage
+					patternName={this.props.element.getName()}
+					error={this.state.errorMessage}
+				/>
+			);
 		} else {
 			return this.props.children;
 		}
@@ -143,7 +147,7 @@ class Preview extends React.Component<PreviewProps> {
 				const reactElement = React.createElement(patternFactory, componentProps);
 				return this.createWrapper(pageElement, reactElement);
 			} catch (error) {
-				return <ErrorMessage patternName={pattern.getName()} error={error.toString()} />;
+				return <ErrorMessage patternName={pageElement.getName()} error={error.toString()} />;
 			}
 		} else {
 			// The model is an object, but not a pattern declaration.

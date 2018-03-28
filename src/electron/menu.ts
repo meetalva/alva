@@ -6,7 +6,7 @@ import {
 	remote,
 	WebviewTag
 } from 'electron';
-import { ElementCommand } from '../store/command/element-command';
+import { ElementLocationCommand } from '../store/command/element-location-command';
 import * as FileExtraUtils from 'fs-extra';
 import { PageElement } from '../store/page/page-element';
 import * as PathUtils from 'path';
@@ -197,7 +197,7 @@ export function createMenu(): void {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						if (selectedElement && store.isElementFocussed()) {
 							store.setClipboardElement(selectedElement);
-							store.execute(ElementCommand.remove(selectedElement));
+							store.execute(ElementLocationCommand.remove(selectedElement));
 						}
 						Menu.sendActionToFirstResponder('cut:');
 					}
@@ -223,7 +223,9 @@ export function createMenu(): void {
 						const clipboardElement: PageElement | undefined = store.getClipboardElement();
 						if (selectedElement && clipboardElement && store.isElementFocussed()) {
 							const newPageElement = clipboardElement.clone();
-							store.execute(ElementCommand.addSibling(selectedElement, newPageElement));
+							store.execute(
+								ElementLocationCommand.addSibling(selectedElement, newPageElement)
+							);
 							store.setSelectedElement(newPageElement);
 						}
 						Menu.sendActionToFirstResponder('paste:');
@@ -240,7 +242,9 @@ export function createMenu(): void {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						if (selectedElement && store.isElementFocussed()) {
 							const newPageElement = selectedElement.clone();
-							store.execute(ElementCommand.addSibling(selectedElement, newPageElement));
+							store.execute(
+								ElementLocationCommand.addSibling(selectedElement, newPageElement)
+							);
 							store.setSelectedElement(newPageElement);
 						}
 					}
@@ -269,7 +273,7 @@ export function createMenu(): void {
 					click: () => {
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
 						if (selectedElement) {
-							store.execute(ElementCommand.remove(selectedElement));
+							store.execute(ElementLocationCommand.remove(selectedElement));
 							store.setSelectedElement(undefined);
 						} else {
 							if (process.platform === 'darwin') {

@@ -146,7 +146,8 @@ export abstract class Property {
 	}
 
 	/**
-	 * Returns the technical ID of this property (e.g. the property name in the TypeScript props interface).
+	 * Returns the technical ID of this property (e.g. the property name in the TypeScript props
+	 * interface).
 	 * @return The technical ID.
 	 */
 	public getId(): string {

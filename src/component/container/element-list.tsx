@@ -1,5 +1,5 @@
 import { elementMenu } from '../../electron/context-menus';
-import { ElementCommand } from '../../store/command/element-command';
+import { ElementLocationCommand } from '../../store/command/element-location-command';
 import { ElementWrapper } from './element-wrapper';
 import { ListItemProps } from '../../lsg/patterns/list';
 import { createMenu } from '../../electron/menu';
@@ -55,7 +55,7 @@ export class ElementList extends React.Component {
 
 		return {
 			label: key,
-			value: pattern.getName(),
+			value: element.getName(),
 			onClick: updatePageElement,
 			onContextMenu: () => elementMenu(element),
 			handleDragStart: (e: React.DragEvent<HTMLElement>) => {
@@ -97,7 +97,7 @@ export class ElementList extends React.Component {
 					}
 				}
 
-				store.execute(ElementCommand.addChild(newParent, draggedElement, newIndex));
+				store.execute(ElementLocationCommand.addChild(newParent, draggedElement, newIndex));
 				store.setSelectedElement(draggedElement);
 			},
 			handleDragDrop: (e: React.DragEvent<HTMLElement>) => {
@@ -125,7 +125,7 @@ export class ElementList extends React.Component {
 					return;
 				}
 
-				store.execute(ElementCommand.addChild(element, draggedElement));
+				store.execute(ElementLocationCommand.addChild(element, draggedElement));
 				store.setSelectedElement(draggedElement);
 			},
 			children: items,

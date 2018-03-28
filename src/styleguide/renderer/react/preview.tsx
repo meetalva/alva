@@ -1,3 +1,4 @@
+import { AssetProperty } from '../../../store/styleguide/property/asset-property';
 import { ErrorMessage } from './error-message';
 import { HighlightArea } from '../highlight-area';
 import { observable } from 'mobx';
@@ -5,6 +6,7 @@ import { observer } from 'mobx-react';
 import { Page } from '../../../store/page/page';
 import { PageElement } from '../../../store/page/page-element';
 import { Pattern } from '../../../store/styleguide/pattern';
+import { Placeholder } from './placeholder';
 import { PropertyValue } from '../../../store/page/property-value';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -25,7 +27,7 @@ interface PatternWrapperState {
 }
 
 interface PatternWrapperProps {
-	pattern: Pattern;
+	element: PageElement;
 }
 
 class PatternWrapper extends React.Component<PatternWrapperProps, PatternWrapperState> {
@@ -40,12 +42,8 @@ class PatternWrapper extends React.Component<PatternWrapperProps, PatternWrapper
 
 	public render(): React.ReactNode {
 		if (this.state.errorMessage) {
-			return (
-				<ErrorMessage
-					patternName={this.props.pattern.getName()}
-					error={this.state.errorMessage}
-				/>
-			);
+			const pattern = this.props.element.getPattern() as Pattern;
+			return <ErrorMessage patternName={pattern.getName()} error={this.state.errorMessage} />;
 		} else {
 			return this.props.children;
 		}
@@ -65,6 +63,24 @@ class Preview extends React.Component<PreviewProps> {
 		this.highlightArea = new HighlightArea();
 	}
 
+	// tslint:disable-next-line:no-any
+	private collectChildren(componentProps: any, pageElement: PageElement): void {
+		componentProps.children = pageElement
+			.getChildren()
+			.map((child, index) => this.createComponent(child));
+	}
+
+	// tslint:disable-next-line:no-any
+	private collectPropertyValues(componentProps: any, pageElement: PageElement): void {
+		const pattern = pageElement.getPattern() as Pattern;
+		pattern.getProperties().forEach(property => {
+			const propertyId = property.getId();
+			componentProps[propertyId] = this.createComponent(
+				property.convertToRender(pageElement.getPropertyValue(propertyId))
+			);
+		});
+	}
+
 	public componentDidMount(): void {
 		this.triggerHighlight();
 	}
@@ -73,6 +89,11 @@ class Preview extends React.Component<PreviewProps> {
 		if (this.props.selectedElementId) {
 			this.triggerHighlight();
 		}
+	}
+
+	private createAssetComponent(pageElement: PageElement): JSX.Element {
+		const src = pageElement.getPropertyValue(AssetProperty.SYNTHETIC_ASSET_ID) as string;
+		return this.createWrapper(pageElement, <Placeholder src={src} />);
 	}
 
 	/**
@@ -84,7 +105,7 @@ class Preview extends React.Component<PreviewProps> {
 	 * @returns A React component in case of a page element, the primitive in case of a primitive,
 	 * or an array or object with values converted in the same manner, if an array resp. object is provided.
 	 */
-	private createComponent(value: PropertyValue, key?: string): JSX.Element | PropertyValue {
+	private createComponent(value: PropertyValue): JSX.Element | PropertyValue {
 		if (value === undefined || value === null || typeof value !== 'object') {
 			// Primitives stay primitives.
 			return value;
@@ -103,51 +124,24 @@ class Preview extends React.Component<PreviewProps> {
 			try {
 				const patternId: string = pattern.getId();
 				if (patternId === Pattern.SYNTHETIC_TEXT_ID) {
-					return pageElement.getPropertyValue(StringProperty.SYNTHETIC_TEXT_ID);
+					return this.createStringComponent(pageElement);
+				} else if (patternId === Pattern.SYNTHETIC_ASSET_ID) {
+					return this.createAssetComponent(pageElement);
 				}
 
 				// tslint:disable-next-line:no-any
 				const componentProps: any = {};
-				pattern.getProperties().forEach(property => {
-					const propertyId = property.getId();
-
-					componentProps[propertyId] = this.createComponent(
-						property.convertToRender(pageElement.getPropertyValue(propertyId)),
-						propertyId
-					);
-				});
-
-				componentProps.children = pageElement
-					.getChildren()
-					.map((child, index) => this.createComponent(child, String(index)));
+				this.collectPropertyValues(componentProps, pageElement);
+				this.collectChildren(componentProps, pageElement);
 
 				// Then, load the pattern factory
-				const patternPath: string = pattern.getImplementationPath();
-				let patternFactory: React.StatelessComponent | ObjectConstructor = this
-					.patternFactories[patternId];
-				if (patternFactory == null) {
-					const exportName = pattern.getExportName();
-					const module = require(patternPath);
-					patternFactory = module[exportName];
-					this.patternFactories[patternId] = patternFactory;
-				}
+				const patternFactory:
+					| React.StatelessComponent
+					| ObjectConstructor = this.loadAndCachePatternFactory(pattern);
 
-				const reactComponent = React.createElement(patternFactory, componentProps);
-
-				// Finally, build the component
-				return (
-					<PatternWrapper
-						key={key}
-						pattern={pattern}
-						ref={
-							pageElement.getId() === this.props.selectedElementId
-								? (ref: PatternWrapper) => (this.patternWrapperRef = ref)
-								: undefined
-						}
-					>
-						{reactComponent}
-					</PatternWrapper>
-				);
+				// Finally, build the component and wrap it for selectability
+				const reactElement = React.createElement(patternFactory, componentProps);
+				return this.createWrapper(pageElement, reactElement);
 			} catch (error) {
 				return <ErrorMessage patternName={pattern.getName()} error={error.toString()} />;
 			}
@@ -163,6 +157,43 @@ class Preview extends React.Component<PreviewProps> {
 			});
 			return result;
 		}
+	}
+
+	private createStringComponent(pageElement: PageElement): string {
+		return String(pageElement.getPropertyValue(StringProperty.SYNTHETIC_TEXT_ID));
+	}
+
+	private createWrapper(pageElement: PageElement, reactElement: JSX.Element): JSX.Element {
+		return (
+			<PatternWrapper
+				key={pageElement.getId()}
+				element={pageElement}
+				ref={
+					pageElement.getId() === this.props.selectedElementId
+						? (ref: PatternWrapper) => (this.patternWrapperRef = ref)
+						: undefined
+				}
+			>
+				{reactElement}
+			</PatternWrapper>
+		);
+	}
+
+	private loadAndCachePatternFactory(
+		pattern: Pattern
+	): React.StatelessComponent | ObjectConstructor {
+		let patternFactory: React.StatelessComponent | ObjectConstructor = this.patternFactories[
+			pattern.getId()
+		];
+		if (patternFactory == null) {
+			const patternPath: string = pattern.getImplementationPath();
+			const exportName = pattern.getExportName();
+			const module = require(patternPath);
+			patternFactory = module[exportName];
+			this.patternFactories[pattern.getId()] = patternFactory;
+		}
+
+		return patternFactory;
 	}
 
 	public render(): JSX.Element | null {

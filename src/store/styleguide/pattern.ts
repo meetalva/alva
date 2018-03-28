@@ -14,6 +14,11 @@ import { Store } from '../store';
  */
 export class Pattern {
 	/**
+	 * The ID of the synthetic asset content pattern.
+	 */
+	public static SYNTHETIC_ASSET_ID: string = 'synthetic:asset';
+
+	/**
 	 * The ID of the synthetic text content pattern.
 	 */
 	public static SYNTHETIC_TEXT_ID: string = 'synthetic:text';

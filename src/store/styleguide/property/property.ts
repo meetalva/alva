@@ -117,10 +117,10 @@ export abstract class Property {
 	 * See Property sub-classes documentation for a description of allowed raw values
 	 * and their conversion.
 	 * @param value The raw value.
-	 * @return The resulting, property-compatible value.
+	 * @param callback A callback to be called with the resulting, property-compatible value.
 	 */
 	// tslint:disable-next-line:no-any
-	public abstract coerceValue(value: any): any;
+	public abstract coerceValue(value: any): Promise<any>;
 
 	/**
 	 * Converts a given value into the form required by the component's props' property.
@@ -146,7 +146,8 @@ export abstract class Property {
 	}
 
 	/**
-	 * Returns the technical ID of this property (e.g. the property name in the TypeScript props interface).
+	 * Returns the technical ID of this property (e.g. the property name in the TypeScript props
+	 * interface).
 	 * @return The technical ID.
 	 */
 	public getId(): string {

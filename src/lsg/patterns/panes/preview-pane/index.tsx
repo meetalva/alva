@@ -80,7 +80,7 @@ export default class PreviewPane extends React.Component<PreviewPaneProps> {
 					width={width}
 					dangerouslySetInnerHTML={{
 						__html: `<webview id="preview" style="height: 100%; border-radius: 6px 6px 0 0; overflow: hidden;" src="${previewFrame ||
-							'./preview.html'}" preload="../../build/component/preview.js" partition="electron" />`
+							'./preview.html'}" preload="./preview.js" partition="electron" />`
 					}}
 				/>
 				<StyledPreviewResizer onMouseDown={handleMouseDownRight} />

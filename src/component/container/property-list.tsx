@@ -1,4 +1,7 @@
+import { AssetItem } from '../../lsg/patterns/property-items/asset-item';
+import { AssetProperty } from '../../store/styleguide/property/asset-property';
 import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item';
+import { remote } from 'electron';
 import Element from '../../lsg/patterns/element';
 import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item';
 import { EnumProperty, Option } from '../../store/styleguide/property/enum-property';
@@ -64,6 +67,21 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 			propertyPath.join('.')
 		);
 		Store.getInstance().execute(this.lastCommand);
+	}
+
+	protected handleChooseAsset(id: string, context?: ObjectContext): void {
+		remote.dialog.showOpenDialog(
+			{
+				title: 'Select an image',
+				properties: ['openFile']
+			},
+			filePaths => {
+				if (filePaths && filePaths.length) {
+					const dataUrl = AssetProperty.getValueFromFile(filePaths[0]);
+					this.handleChange(id, dataUrl, context);
+				}
+			}
+		);
 	}
 
 	@action
@@ -146,6 +164,22 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 									handleChange={event =>
 										this.handleChange(id, event.currentTarget.value, context)
 									}
+								/>
+							);
+
+						case 'asset':
+							const src = value as string | undefined;
+							return (
+								<AssetItem
+									key={id}
+									label={name}
+									inputValue={src && !src.startsWith('data:') ? src : ''}
+									imageSrc={src}
+									handleInputChange={event =>
+										this.handleChange(id, event.currentTarget.value, context)
+									}
+									handleChooseClick={event => this.handleChooseAsset(id, context)}
+									handleClearClick={event => this.handleChange(id, undefined, context)}
 								/>
 							);
 

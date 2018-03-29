@@ -1,5 +1,4 @@
-import { HighlightElementFunction } from '../component/preview';
-import { Styleguide } from '../store/styleguide/styleguide';
+import { Styleguide } from '../../store/styleguide/styleguide';
 
 /**
  * A styleguide analyzer walks through the pattern implementations of a styleguide.
@@ -17,7 +16,6 @@ export abstract class StyleguideAnalyzer {
 
 	/**
 	 * Renders the preview application based on the store.
-	 * @param highlightElement The function that should be called inside the renderer when a element need to be highlighted.
 	 */
-	public abstract render(highlightElement: HighlightElementFunction): void;
+	public abstract render(): void;
 }

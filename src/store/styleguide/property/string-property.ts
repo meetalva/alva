@@ -26,12 +26,12 @@ export class StringProperty extends Property {
 	 * @inheritdoc
 	 */
 	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
+	public async coerceValue(value: any): Promise<any> {
 		if (value === null || value === undefined || value === '') {
 			return '';
+		} else {
+			return String(value);
 		}
-
-		return String(value);
 	}
 
 	/**

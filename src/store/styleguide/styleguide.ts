@@ -1,9 +1,10 @@
-import { Directory } from '../../styleguide-analyzer/directory';
+import { AssetProperty } from './property/asset-property';
+import { Directory } from '../../styleguide/analyzer/directory';
 import { PatternFolder } from './folder';
 import * as PathUtils from 'path';
 import { Pattern } from './pattern';
 import { StringProperty } from './property/string-property';
-import { StyleguideAnalyzer } from '../../styleguide-analyzer/styleguide-analyzer';
+import { StyleguideAnalyzer } from '../../styleguide/analyzer/styleguide-analyzer';
 
 /**
  * The styleguide is the component library the current Alva space bases on.
@@ -49,7 +50,7 @@ export class Styleguide {
 	public constructor(path: string, analyzerName: string) {
 		this.path = path || '';
 
-		const Analyzer = require(`../../styleguide-analyzer/${analyzerName}/${analyzerName}`)
+		const Analyzer = require(`../../styleguide/analyzer/${analyzerName}/${analyzerName}`)
 			.Analyzer;
 		this.analyzer = new Analyzer();
 
@@ -73,17 +74,25 @@ export class Styleguide {
 	}
 
 	/**
-	 * Adds Alva's synthetic patterns to this styleguide. Synthetic patterns do not have a physical implementation. They are required to create page elements that represent values only, such as child text nodes.
+	 * Adds Alva's synthetic patterns to this styleguide.
+	 * Synthetic patterns do not have a physical implementation.
+	 * They are required to create page elements that represent values only,
+	 * such as child text nodes.
 	 */
 	private addSyntheticPatterns(): void {
-		const textPattern = new Pattern(Pattern.SYNTHETIC_TEXT_ID, 'text', '');
+		const folder = new PatternFolder('synthetic', this.patternRoot);
+
+		const textPattern = new Pattern(Pattern.SYNTHETIC_TEXT_ID, 'Text', '');
 		const textProperty = new StringProperty(StringProperty.SYNTHETIC_TEXT_ID);
 		textPattern.addProperty(textProperty);
-
-		const folder = new PatternFolder('synthetic', this.patternRoot);
 		folder.addPattern(textPattern);
-
 		this.addPattern(textPattern);
+
+		const assetPattern = new Pattern(Pattern.SYNTHETIC_ASSET_ID, 'Placeholder', '');
+		const assetProperty = new AssetProperty(AssetProperty.SYNTHETIC_ASSET_ID);
+		assetPattern.addProperty(assetProperty);
+		folder.addPattern(assetPattern);
+		this.addPattern(assetPattern);
 	}
 
 	/**

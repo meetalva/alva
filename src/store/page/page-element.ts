@@ -35,6 +35,11 @@ export class PageElement {
 	@MobX.observable private id: string;
 
 	/**
+	 * The assigned name of the page element, initially the pattern's human-friendly name.
+	 */
+	@MobX.observable private name: string;
+
+	/**
 	 * The page this element belongs to.
 	 */
 	private page?: Page;
@@ -49,6 +54,13 @@ export class PageElement {
 	 * has disappeared or got invalid in the mean-time.
 	 */
 	private pattern?: Pattern;
+
+	/**
+	 * The ID of the pattern this page element reflects. This is a cached value equal to the ID of
+	 * the pattern property, for cases where the pattern could not be resolved on load, to not lose
+	 * the ID on save.
+	 */
+	private patternId?: string;
 
 	/**
 	 * The pattern property values of this element's component instance.
@@ -68,6 +80,11 @@ export class PageElement {
 	public constructor(properties: PageElementProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
 		this.pattern = properties.pattern;
+		this.patternId = this.pattern ? this.pattern.getId() : undefined;
+
+		if (this.name === undefined && this.pattern) {
+			this.name = this.pattern.getName();
+		}
 
 		if (properties.setDefaults && this.pattern) {
 			this.pattern.getProperties().forEach(property => {
@@ -109,12 +126,16 @@ export class PageElement {
 			}
 		}
 
-		if (!pattern) {
-			console.warn(`Ignoring unknown pattern "${patternId}"`);
-			return new PageElement({ parent });
+		if (!pattern && patternId) {
+			console.warn(`Unknown pattern '${patternId}', please check styleguide`);
 		}
 
 		const element = new PageElement({ id: json.uuid as string, pattern, parent });
+		element.patternId = patternId;
+
+		if (json.name !== undefined) {
+			element.name = json.name as string;
+		}
 
 		if (json.properties) {
 			Object.keys(json.properties as JsonObject).forEach((propertyId: string) => {
@@ -218,6 +239,14 @@ export class PageElement {
 			throw new Error('This element has no parent');
 		}
 		return this.parent.children.indexOf(this);
+	}
+
+	/**
+	 * Returns the assigned name of the page element, initially the pattern's human-friendly name.
+	 * @return The assigned name of the page element.
+	 */
+	public getName(): string {
+		return this.name;
 	}
 
 	/**
@@ -339,6 +368,14 @@ export class PageElement {
 	}
 
 	/**
+	 * Sets the assigned name of the page element, initially the pattern's human-friendly name.
+	 * @param name The assigned name of the page element.
+	 */
+	public setName(name: string): void {
+		this.name = name;
+	}
+
+	/**
 	 * Sets a new parent for this element (and removes it from its previous parent).
 	 * If no parent is provided, only removes it from its parent.
 	 * @param parent The (optional) new parent for this element.
@@ -398,26 +435,30 @@ export class PageElement {
 	 */
 	// tslint:disable-next-line:no-any
 	public setPropertyValue(id: string, value: any, path?: string): void {
-		if (!this.pattern) {
-			return;
+		let property: Property | undefined;
+		if (this.pattern) {
+			property = this.pattern.getProperty(id, path);
+			if (!property) {
+				console.warn(`Unknown property '${id}' in pattern '${this.patternId}'`);
+			}
 		}
 
-		const property: Property | undefined = this.pattern.getProperty(id, path);
-
-		if (!property) {
-			return;
-		}
-
-		value = property.coerceValue(value);
-
-		if (!path) {
-			this.propertyValues.set(id, value);
-			return;
-		}
-
-		const rootPropertyValue = this.propertyValues.get(id) || {};
-		ObjectPath.set<{}, PropertyValue>(rootPropertyValue, path, value);
-		this.propertyValues.set(id, deepAssign({}, rootPropertyValue));
+		(async () => {
+			const coercedValue = property ? await property.coerceValue(value) : value;
+			if (path) {
+				const rootPropertyValue = this.propertyValues.get(id) || {};
+				ObjectPath.set<{}, PropertyValue>(rootPropertyValue, path, coercedValue);
+				this.propertyValues.set(id, deepAssign({}, rootPropertyValue));
+			} else {
+				this.propertyValues.set(id, coercedValue);
+			}
+		})().catch(reason => {
+			console.log(
+				`Failed to coerce property value of property '${id}' of pattern '${
+					this.patternId
+				}': ${reason}`
+			);
+		});
 	}
 
 	/**
@@ -428,7 +469,8 @@ export class PageElement {
 		const json: JsonObject = {
 			_type: 'pattern',
 			uuid: this.id,
-			pattern: this.pattern && this.pattern.getId()
+			name: this.name,
+			pattern: this.patternId
 		};
 
 		json.children = this.children.map(

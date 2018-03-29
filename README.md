@@ -126,17 +126,17 @@ In the future, there will be several analyzers for all types of
 
 The analyzer is also responsible for rendering page elements into the preview, as it is the type of object that knows the frontend technology.
 
-Currently we only have a [TypeScript React analyzer](./src/styleguide-analyzer/typescript-react-analyzer/typescript-react-analyzer.ts) with no extra intelligence for pattern systems.
+Currently we only have a [TypeScript React analyzer](./src/styleguide/analyzer/typescript-react-analyzer/typescript-react-analyzer.ts) with no extra intelligence for pattern systems.
 
-If you want to build your own, you have to implement a class similar to that analyzer, implementing an `analyze` and a `render` method. You have to create a new directory inside `src/styleguide-analyzer` with the kebab-case name of your analyzer. Then, put a `.ts` file into that folder, with the same name. The file must export a class named `Analyzer`, extending `StyleguideAnalyzer` (or one of its subclasses).
+If you want to build your own, you have to implement a class similar to that analyzer, implementing an `analyze` and a `render` method. You have to create a new directory inside `src/styleguide/analyzer` with the kebab-case name of your analyzer. Then, put a `.ts` file into that folder, with the same name. The file must export a class named `Analyzer`, extending `StyleguideAnalyzer` (or one of its subclasses).
 
-If you create an analyzer named 'my-analyzer', there whould be a file `src/styleguide-analyzer/my-analyzer/my-analyzer.ts` with the following content:
+If you create an analyzer named 'my-analyzer', there whould be a file `src/styleguide/analyzer/my-analyzer/my-analyzer.ts` with the following content:
 
 ```javascript
 import { HighlightElementFunction } from '../../component/preview';
 import { Store } from '../../store/store';
 import { Styleguide } from '../../store/styleguide/styleguide';
-import { StyleguideAnalyzer } from '../styleguide-analyzer';
+import { StyleguideAnalyzer } from '../styleguide/analyzer';
 
 export class Analyzer extends StyleguideAnalyzer {
 	/**

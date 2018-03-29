@@ -60,12 +60,12 @@ export class Type {
 	private getOriginalType(): ts.Type | undefined {
 		const symbol = this.type.symbol;
 		if (!symbol) {
-			return undefined;
+			return;
 		}
 
 		const typeDeclaration = symbol.declarations && symbol.declarations[0];
 		if (!typeDeclaration) {
-			return undefined;
+			return;
 		}
 
 		return this.typeChecker.getTypeAtLocation(typeDeclaration);

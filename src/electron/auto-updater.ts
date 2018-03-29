@@ -1,7 +1,6 @@
 import { BrowserWindow, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 
-// autoUpdater.logger = log;
 let showUpdateNotAvailable = false;
 let window: BrowserWindow;
 

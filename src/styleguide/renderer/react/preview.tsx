@@ -90,9 +90,7 @@ class Preview extends React.Component<PreviewProps> {
 	}
 
 	public componentDidUpdate(prevProps: PreviewProps): void {
-		if (this.props.selectedElementId) {
-			this.triggerHighlight();
-		}
+		this.triggerHighlight();
 	}
 
 	private createAssetComponent(pageElement: PageElement): JSX.Element {
@@ -230,9 +228,13 @@ class Preview extends React.Component<PreviewProps> {
 	}
 
 	private triggerHighlight(): void {
-		const domNode = this.patternWrapperRef && ReactDOM.findDOMNode(this.patternWrapperRef);
-		if (domNode) {
-			this.highlightArea.show(domNode);
+		if (this.props.selectedElementId) {
+			const domNode = this.patternWrapperRef && ReactDOM.findDOMNode(this.patternWrapperRef);
+			if (domNode) {
+				this.highlightArea.show(domNode, this.props.selectedElementId);
+			}
+		} else {
+			this.highlightArea.hide();
 		}
 	}
 }

@@ -11,6 +11,8 @@ export interface HighlightAreaProps {
 }
 
 export class HighlightArea {
+	private pageElementId?: string;
+
 	@observable
 	private props: HighlightAreaProps = {
 		bottom: 0,
@@ -28,11 +30,17 @@ export class HighlightArea {
 
 	public hide(): void {
 		this.props.opacity = 0;
+		this.pageElementId = undefined;
 	}
 
-	public show(element: Element): void {
+	public show(element: Element, pageElementId: string): void {
+		if (this.pageElementId === pageElementId) {
+			return;
+		}
+		this.pageElementId = pageElementId;
+
 		const clientRect: ClientRect = element.getBoundingClientRect();
-		const newProps: HighlightAreaProps = {
+		this.props = {
 			bottom: clientRect.bottom,
 			height: clientRect.height,
 			left: clientRect.left + window.scrollX,
@@ -42,19 +50,7 @@ export class HighlightArea {
 			width: clientRect.width
 		};
 
-		if (
-			this.props.top === newProps.top &&
-			this.props.right === newProps.right &&
-			this.props.bottom === newProps.bottom &&
-			this.props.left === newProps.left &&
-			this.props.height === newProps.height &&
-			this.props.width === newProps.width
-		) {
-			return;
-		}
-
-		this.props = newProps;
-
+		console.log('Scrolled into view');
 		element.scrollIntoView({
 			behavior: 'smooth',
 			block: 'center',

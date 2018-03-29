@@ -56,6 +56,13 @@ export class PageElement {
 	private pattern?: Pattern;
 
 	/**
+	 * The ID of the pattern this page element reflects. This is a cached value equal to the ID of
+	 * the pattern property, for cases where the pattern could not be resolved on load, to not lose
+	 * the ID on save.
+	 */
+	private patternId?: string;
+
+	/**
 	 * The pattern property values of this element's component instance.
 	 * Each key represents the property ID of the pattern, while the value holds the content
 	 * as provided by the designer.
@@ -73,6 +80,7 @@ export class PageElement {
 	public constructor(properties: PageElementProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
 		this.pattern = properties.pattern;
+		this.patternId = this.pattern ? this.pattern.getId() : undefined;
 
 		if (this.name === undefined && this.pattern) {
 			this.name = this.pattern.getName();
@@ -118,12 +126,12 @@ export class PageElement {
 			}
 		}
 
-		if (!pattern) {
-			console.warn(`Ignoring unknown pattern "${patternId}"`);
-			return new PageElement({ parent });
+		if (!pattern && patternId) {
+			console.warn(`Unknown pattern '${patternId}', please check styleguide`);
 		}
 
 		const element = new PageElement({ id: json.uuid as string, pattern, parent });
+		element.patternId = patternId;
 
 		if (json.name !== undefined) {
 			element.name = json.name as string;
@@ -427,18 +435,16 @@ export class PageElement {
 	 */
 	// tslint:disable-next-line:no-any
 	public setPropertyValue(id: string, value: any, path?: string): void {
-		if (!this.pattern) {
-			return;
-		}
-
-		const property: Property | undefined = this.pattern.getProperty(id, path);
-
-		if (!property) {
-			return;
+		let property: Property | undefined;
+		if (this.pattern) {
+			property = this.pattern.getProperty(id, path);
+			if (!property) {
+				console.warn(`Unknown property '${id}' in pattern '${this.patternId}'`);
+			}
 		}
 
 		(async () => {
-			const coercedValue: string = await property.coerceValue(value);
+			const coercedValue = property ? await property.coerceValue(value) : value;
 			if (path) {
 				const rootPropertyValue = this.propertyValues.get(id) || {};
 				ObjectPath.set<{}, PropertyValue>(rootPropertyValue, path, coercedValue);
@@ -448,7 +454,9 @@ export class PageElement {
 			}
 		})().catch(reason => {
 			console.log(
-				`Failed to coerce property value of property ${this.getId()} of pattern ${this.getPattern()}: ${reason}`
+				`Failed to coerce property value of property '${id}' of pattern '${
+					this.patternId
+				}': ${reason}`
 			);
 		});
 	}
@@ -462,7 +470,7 @@ export class PageElement {
 			_type: 'pattern',
 			uuid: this.id,
 			name: this.name,
-			pattern: this.pattern && this.pattern.getId()
+			pattern: this.patternId
 		};
 
 		json.children = this.children.map(

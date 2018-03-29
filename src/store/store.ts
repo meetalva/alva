@@ -286,7 +286,7 @@ export class Store {
 	 */
 	public getCurrentPageRef(): PageRef | undefined {
 		if (!this.currentPage) {
-			return undefined;
+			return;
 		}
 
 		const currentPageId: string = this.currentPage.getId();
@@ -298,7 +298,7 @@ export class Store {
 			}
 		}
 
-		return undefined;
+		return;
 	}
 
 	/**
@@ -333,7 +333,7 @@ export class Store {
 			}
 		}
 
-		return undefined;
+		return;
 	}
 
 	/**
@@ -350,7 +350,7 @@ export class Store {
 			}
 		}
 
-		return undefined;
+		return;
 	}
 
 	/**
@@ -381,7 +381,7 @@ export class Store {
 			}
 		}
 
-		return undefined;
+		return;
 	}
 
 	/**

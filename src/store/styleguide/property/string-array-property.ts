@@ -22,7 +22,7 @@ export class StringArrayProperty extends Property {
 	 * @inheritdoc
 	 */
 	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
+	public async coerceValue(value: any): Promise<any> {
 		// tslint:disable-next-line:no-any
 		return this.coerceArrayValue(value, (element: any) => String(value));
 	}

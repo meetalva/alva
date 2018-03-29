@@ -32,7 +32,7 @@ export class ReactUtils {
 			}
 		}
 
-		return undefined;
+		return;
 	}
 
 	/**

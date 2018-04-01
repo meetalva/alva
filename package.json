@@ -88,7 +88,7 @@
     "@commitlint/config-conventional": "^6.0.2",
     "@commitlint/prompt-cli": "^6.0.2",
     "@commitlint/travis-cli": "^6.0.2",
-    "@patternplate/cli": "2.0.0-54",
+    "@patternplate/cli": "2.0.0",
     "@patternplate/render-styled-components": "2.0.0-54",
     "@types/deep-assign": "^0.1.1",
     "@types/electron-devtools-installer": "^2.0.2",

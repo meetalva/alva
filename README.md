@@ -55,7 +55,7 @@ Inside the styleguide, Alva creates a new folder name `alva`, putting projects a
 
 Instruct the designer team on how to add, commit, and push these files. The styleguide repository is your common base of interchange. You should both work on the same feature branches and integrate frequently. For example, let the designer add a place-holder element into a page, and then you replace it by an actual new pattern. This is a minimal and quick design-development roundtrip.
 
-You can find an example patterglate styleguide with Alva designs at https://github.com/meetalva/designkit.
+You can find an example patternplate styleguide with Alva designs at https://github.com/meetalva/designkit.
 
 ### As a contributor to Alva
 

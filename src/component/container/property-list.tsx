@@ -5,7 +5,7 @@ import { remote } from 'electron';
 import Element from '../../lsg/patterns/element';
 import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item';
 import { EnumProperty, Option } from '../../store/styleguide/property/enum-property';
-import { action, observable } from 'mobx';
+import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import { ObjectProperty } from '../../store/styleguide/property/object-property';
 import { PageElement } from '../../store/page/page-element';
@@ -27,7 +27,7 @@ interface PropertyTreeProps {
 
 @observer
 class PropertyTree extends React.Component<PropertyTreeProps> {
-	@observable protected isOpen = false;
+	@MobX.observable protected isOpen = false;
 	protected lastCommand: PropertyValueCommand;
 
 	public constructor(props: PropertyTreeProps) {
@@ -84,7 +84,6 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 		);
 	}
 
-	@action
 	protected handleClick(): void {
 		this.isOpen = !this.isOpen;
 	}

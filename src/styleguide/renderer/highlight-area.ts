@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import * as MobX from 'mobx';
 
 export interface HighlightAreaProps {
 	bottom?: number;
@@ -13,7 +13,7 @@ export interface HighlightAreaProps {
 export class HighlightArea {
 	private pageElementId?: string;
 
-	@observable
+	@MobX.observable
 	private props: HighlightAreaProps = {
 		bottom: 0,
 		height: 0,

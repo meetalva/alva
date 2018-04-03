@@ -16,12 +16,12 @@ export interface PageListItemProps {
 @observer
 export class PageListItem extends React.Component<PageListItemProps> {
 	@MobX.observable protected pageElementEditable: boolean = false;
-	@MobX.observable
-	protected pageNameInputValue: string = this.pageNameInputValue || this.props.name;
+	@MobX.observable protected pageNameInputValue: string;
 
 	public constructor(props: PageListItemProps) {
 		super(props);
 
+		this.pageNameInputValue = this.props.name;
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.handleBlur = this.handleBlur.bind(this);
 		this.handlePageKeyDown = this.handlePageKeyDown.bind(this);
@@ -45,7 +45,6 @@ export class PageListItem extends React.Component<PageListItemProps> {
 		Store.getInstance().openPage(this.props.pageID);
 	}
 
-	@MobX.action
 	protected handlePageDoubleClick(): void {
 		this.pageElementEditable = !this.pageElementEditable;
 	}
@@ -115,7 +114,6 @@ export class PageList extends React.Component {
 		return projectPages;
 	}
 
-	@MobX.action
 	protected handleDropdownToggle(): void {
 		this.pageListVisible = !this.pageListVisible;
 	}

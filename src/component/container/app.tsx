@@ -65,7 +65,6 @@ export class App extends React.Component {
 		}
 	}
 
-	@MobX.action
 	protected handleChromeToggle(evt: React.MouseEvent<HTMLElement>): void {
 		this.projectListVisible = !this.projectListVisible;
 	}
@@ -103,17 +102,14 @@ export class App extends React.Component {
 		});
 	}
 
-	@MobX.action
 	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
 		this.activeTab = id;
 	}
 
-	@MobX.computed
 	protected get isPatternListVisible(): boolean {
 		return this.activeTab === App.PATTERN_LIST_ID;
 	}
 
-	@MobX.computed
 	protected get isPropertiesListVisible(): boolean {
 		return this.activeTab === App.PROPERTIES_LIST_ID;
 	}

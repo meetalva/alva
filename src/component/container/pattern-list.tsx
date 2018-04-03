@@ -1,7 +1,6 @@
 import Input from '../../lsg/patterns/input/';
 import { ElementLocationCommand } from '../../store/command/element-location-command';
 import { PatternFolder } from '../../store/styleguide/folder';
-import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/styleguide/pattern';
@@ -93,7 +92,6 @@ export class PatternListContainer extends React.Component {
 		);
 	}
 
-	@action
 	protected handleDragStart(e: React.DragEvent<HTMLElement>, pattern: Pattern): void {
 		e.dataTransfer.dropEffect = 'copy';
 		e.dataTransfer.setDragImage(
@@ -105,7 +103,6 @@ export class PatternListContainer extends React.Component {
 		e.dataTransfer.setData('patternId', pattern.getId());
 	}
 
-	@action
 	protected handlePatternClick(pattern: Pattern): void {
 		const store: Store = Store.getInstance();
 		const selectedElement: PageElement | undefined = store.getSelectedElement();
@@ -119,7 +116,6 @@ export class PatternListContainer extends React.Component {
 		}
 	}
 
-	@action
 	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
 		Store.getInstance().setPatternSearchTerm(evt.target.value);
 	}

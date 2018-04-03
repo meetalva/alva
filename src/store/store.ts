@@ -183,11 +183,10 @@ export class Store {
 	 * Closes the current project in edit, also closing any open close.
 	 * @see getCurrentProject()
 	 */
+	@MobX.action
 	public closeProject(): void {
-		MobX.transaction(() => {
-			this.currentProject = undefined;
-			this.closePage();
-		});
+		this.currentProject = undefined;
+		this.closePage();
 	}
 
 	/**
@@ -499,6 +498,7 @@ export class Store {
 	 * @param id The ID of the page to open.
 	 * @see save
 	 */
+	@MobX.action
 	public openPage(id: string): boolean {
 		const styleguide = this.styleguide;
 		if (!styleguide) {
@@ -507,22 +507,20 @@ export class Store {
 
 		this.save();
 
-		MobX.transaction(() => {
-			const pageRef = this.getPageRefById(id);
-			if (pageRef && pageRef.getLastPersistedPath()) {
-				const pagePath: string = PathUtils.join(
-					styleguide.getPagesPath(),
-					pageRef.getLastPersistedPath() as string
-				);
-				const json: JsonObject = Persister.loadYamlOrJson(pagePath);
-				this.currentPage = Page.fromJsonObject(json, id);
-				this.currentProject = this.currentPage.getProject();
-			} else {
-				this.currentPage = undefined;
-			}
+		const pageRef = this.getPageRefById(id);
+		if (pageRef && pageRef.getLastPersistedPath()) {
+			const pagePath: string = PathUtils.join(
+				styleguide.getPagesPath(),
+				pageRef.getLastPersistedPath() as string
+			);
+			const json: JsonObject = Persister.loadYamlOrJson(pagePath);
+			this.currentPage = Page.fromJsonObject(json, id);
+			this.currentProject = this.currentPage.getProject();
+		} else {
+			this.currentPage = undefined;
+		}
 
-			this.selectedElement = undefined;
-		});
+		this.selectedElement = undefined;
 
 		this.preferences.setLastPageId(this.currentPage ? this.currentPage.getId() : undefined);
 		this.savePreferences();
@@ -536,15 +534,14 @@ export class Store {
 	 * project.
 	 * @param project The ID of the project to open.
 	 */
+	@MobX.action
 	public openProject(id: string): void {
-		MobX.transaction(() => {
-			const project: Project | undefined = this.getProjectById(id);
-			this.currentProject = project;
+		const project: Project | undefined = this.getProjectById(id);
+		this.currentProject = project;
 
-			if (this.currentPage && this.currentPage.getProject() === project) {
-				this.closePage();
-			}
-		});
+		if (this.currentPage && this.currentPage.getProject() === project) {
+			this.closePage();
+		}
 	}
 
 	/**
@@ -553,55 +550,54 @@ export class Store {
 	 * from the styleguide's alva folder.
 	 * @param styleguidePath The absolute and OS-dependent file-system path to the styleguide.
 	 */
+	@MobX.action
 	public openStyleguide(styleguidePath: string): void {
 		if (this.currentPage) {
 			this.save();
 		}
 
-		MobX.transaction(() => {
-			if (!PathUtils.isAbsolute(styleguidePath)) {
-				// Currently, store is two levels below alva, so go two up
-				styleguidePath = PathUtils.join(styleguidePath);
+		if (!PathUtils.isAbsolute(styleguidePath)) {
+			// Currently, store is two levels below alva, so go two up
+			styleguidePath = PathUtils.join(styleguidePath);
+		}
+		this.currentPage = undefined;
+
+		(this.projects as IObservableArray<Project>).clear();
+		const alvaYamlPath = PathUtils.join(styleguidePath, 'alva/alva.yaml');
+
+		// TODO: Converts old alva.yaml structure to new one.
+		// This should be removed after the next version.
+		const projectsPath = PathUtils.join(styleguidePath, 'alva/projects.yaml');
+		try {
+			const oldFileStructure = Boolean(FileUtils.statSync(projectsPath));
+			if (oldFileStructure) {
+				const oldAlvaYaml = Persister.loadYamlOrJson(projectsPath);
+				const newAlvaYaml = {
+					analyzerName: 'typescript-react-analyzer',
+					...oldAlvaYaml
+				};
+				FileUtils.writeFileSync(alvaYamlPath, {});
+				Persister.saveYaml(alvaYamlPath, newAlvaYaml);
+				FileUtils.unlinkSync(projectsPath);
 			}
-			this.currentPage = undefined;
+		} catch (error) {
+			// ignore the correct setup with missing projects.yaml
+		}
 
-			(this.projects as IObservableArray<Project>).clear();
-			const alvaYamlPath = PathUtils.join(styleguidePath, 'alva/alva.yaml');
+		let json: JsonObject = Persister.loadYamlOrJson(alvaYamlPath);
 
-			// TODO: Converts old alva.yaml structure to new one.
-			// This should be removed after the next version.
-			const projectsPath = PathUtils.join(styleguidePath, 'alva/projects.yaml');
-			try {
-				const oldFileStructure = Boolean(FileUtils.statSync(projectsPath));
-				if (oldFileStructure) {
-					const oldAlvaYaml = Persister.loadYamlOrJson(projectsPath);
-					const newAlvaYaml = {
-						analyzerName: 'typescript-react-analyzer',
-						...oldAlvaYaml
-					};
-					FileUtils.writeFileSync(alvaYamlPath, {});
-					Persister.saveYaml(alvaYamlPath, newAlvaYaml);
-					FileUtils.unlinkSync(projectsPath);
-				}
-			} catch (error) {
-				// ignore the correct setup with missing projects.yaml
-			}
+		// TODO: Converts old alva.yaml structure to new one.
+		// This should be removed after the next version.
+		if (json.config) {
+			json = json.config as JsonObject;
+		}
 
-			let json: JsonObject = Persister.loadYamlOrJson(alvaYamlPath);
+		this.analyzerName = json.analyzerName as string;
+		this.styleguide = new Styleguide(styleguidePath, this.analyzerName);
 
-			// TODO: Converts old alva.yaml structure to new one.
-			// This should be removed after the next version.
-			if (json.config) {
-				json = json.config as JsonObject;
-			}
-
-			this.analyzerName = json.analyzerName as string;
-			this.styleguide = new Styleguide(styleguidePath, this.analyzerName);
-
-			(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
-				const project: Project = Project.fromJsonObject(projectJson);
-				this.addProject(project);
-			});
+		(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
+			const project: Project = Project.fromJsonObject(projectJson);
+			this.addProject(project);
 		});
 
 		this.clearUndoRedoBuffers();
@@ -690,6 +686,7 @@ export class Store {
 	 * the currently opened page and its elements.
 	 * Call this method when the user click Save in the File menu.
 	 */
+	@MobX.action
 	public save(): void {
 		const styleguide = this.styleguide;
 		if (!styleguide) {
@@ -700,48 +697,46 @@ export class Store {
 			return;
 		}
 
-		MobX.transaction(() => {
-			// Move all page file to their new locations, if the path has changed
+		// Move all page file to their new locations, if the path has changed
 
-			this.projects.forEach(project => {
-				project.getPages().forEach(page => {
-					const lastPath = page.getLastPersistedPath();
-					if (lastPath && page.getPath() !== lastPath) {
-						try {
-							const lastFullPath = PathUtils.join(styleguide.getPagesPath(), lastPath);
-							const newFullPath = PathUtils.join(styleguide.getPagesPath(), page.getPath());
-							FileExtraUtils.mkdirpSync(PathUtils.dirname(newFullPath));
-							FileUtils.renameSync(lastFullPath, newFullPath);
-							page.updateLastPersistedPath();
-						} catch (error) {
-							// Fall back to original path to continue saving
-							page.setPath(lastPath);
-						}
+		this.projects.forEach(project => {
+			project.getPages().forEach(page => {
+				const lastPath = page.getLastPersistedPath();
+				if (lastPath && page.getPath() !== lastPath) {
+					try {
+						const lastFullPath = PathUtils.join(styleguide.getPagesPath(), lastPath);
+						const newFullPath = PathUtils.join(styleguide.getPagesPath(), page.getPath());
+						FileExtraUtils.mkdirpSync(PathUtils.dirname(newFullPath));
+						FileUtils.renameSync(lastFullPath, newFullPath);
+						page.updateLastPersistedPath();
+					} catch (error) {
+						// Fall back to original path to continue saving
+						page.setPath(lastPath);
 					}
-				});
+				}
 			});
-
-			// Then update the currently open page's file
-
-			const currentPage: Page | undefined = this.getCurrentPage();
-			if (currentPage) {
-				const pagePath: string = PathUtils.join(
-					styleguide.getPagesPath(),
-					currentPage.getPageRef().getPath()
-				);
-				Persister.saveYaml(pagePath, currentPage.toJsonObject());
-			}
-
-			// Finally, update the alva.yaml
-
-			const json: JsonObject = {
-				analyzerName: this.analyzerName,
-				projects: this.projects.map(project => project.toJsonObject())
-			};
-
-			const configPath = PathUtils.join(styleguide.getPagesPath(), 'alva.yaml');
-			Persister.saveYaml(configPath, json);
 		});
+
+		// Then update the currently open page's file
+
+		const currentPage: Page | undefined = this.getCurrentPage();
+		if (currentPage) {
+			const pagePath: string = PathUtils.join(
+				styleguide.getPagesPath(),
+				currentPage.getPageRef().getPath()
+			);
+			Persister.saveYaml(pagePath, currentPage.toJsonObject());
+		}
+
+		// Finally, update the alva.yaml
+
+		const json: JsonObject = {
+			analyzerName: this.analyzerName,
+			projects: this.projects.map(project => project.toJsonObject())
+		};
+
+		const configPath = PathUtils.join(styleguide.getPagesPath(), 'alva.yaml');
+		Persister.saveYaml(configPath, json);
 	}
 
 	/**
@@ -786,13 +781,12 @@ export class Store {
 	 * Also unselects any selected element.
 	 * @param json The JSON object to set.
 	 */
+	@MobX.action
 	public setPageFromJsonInternal(json: JsonObject): void {
-		MobX.transaction(() => {
-			this.currentPage = json.page
-				? Page.fromJsonObject(json.page as JsonObject, json.pageId as string)
-				: undefined;
-			this.selectedElement = undefined;
-		});
+		this.currentPage = json.page
+			? Page.fromJsonObject(json.page as JsonObject, json.pageId as string)
+			: undefined;
+		this.selectedElement = undefined;
 	}
 
 	/**
@@ -820,24 +814,23 @@ export class Store {
 	 * Used internally within the store, do not use from UI components.
 	 * @param json The JSON object to load from.
 	 */
+	@MobX.action
 	public setStyleguideFromJsonInternal(json: JsonObject): void {
-		MobX.transaction(() => {
-			this.analyzerName = json.analyzerName as string;
+		this.analyzerName = json.analyzerName as string;
 
-			this.projects = [];
-			(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
-				const project: Project = Project.fromJsonObject(projectJson);
-				this.addProject(project);
-			});
-
-			if (json.styleguidePath && this.analyzerName) {
-				this.styleguide = new Styleguide(json.styleguidePath as string, this.analyzerName);
-			} else {
-				this.styleguide = undefined;
-			}
-
-			this.clearUndoRedoBuffers();
+		this.projects = [];
+		(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
+			const project: Project = Project.fromJsonObject(projectJson);
+			this.addProject(project);
 		});
+
+		if (json.styleguidePath && this.analyzerName) {
+			this.styleguide = new Styleguide(json.styleguidePath as string, this.analyzerName);
+		} else {
+			this.styleguide = undefined;
+		}
+
+		this.clearUndoRedoBuffers();
 	}
 
 	/**

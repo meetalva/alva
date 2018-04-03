@@ -83,7 +83,7 @@ export class AssetProperty extends Property {
 	 * @inheritdoc
 	 */
 	// tslint:disable-next-line:no-any
-	public async coerceValue(value: any): Promise<any> {
+	public coerceValue(value: any): any {
 		if (typeof value === 'string') {
 			return value;
 		}

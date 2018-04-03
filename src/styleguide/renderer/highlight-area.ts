@@ -50,7 +50,6 @@ export class HighlightArea {
 			width: clientRect.width
 		};
 
-		console.log('Scrolled into view');
 		element.scrollIntoView({
 			behavior: 'smooth',
 			block: 'center',

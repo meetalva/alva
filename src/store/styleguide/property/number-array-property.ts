@@ -21,7 +21,7 @@ export class NumberArrayProperty extends Property {
 	 * @inheritdoc
 	 */
 	// tslint:disable-next-line:no-any
-	public async coerceValue(value: any): Promise<any> {
+	public coerceValue(value: any): any {
 		// tslint:disable-next-line:no-any
 		return this.coerceArrayValue(value, (element: any) => parseFloat(value));
 	}

@@ -120,7 +120,7 @@ export abstract class Property {
 	 * @param callback A callback to be called with the resulting, property-compatible value.
 	 */
 	// tslint:disable-next-line:no-any
-	public abstract coerceValue(value: any): Promise<any>;
+	public abstract coerceValue(value: any): any;
 
 	/**
 	 * Converts a given value into the form required by the component's props' property.

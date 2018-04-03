@@ -443,22 +443,14 @@ export class PageElement {
 			}
 		}
 
-		(async () => {
-			const coercedValue = property ? await property.coerceValue(value) : value;
-			if (path) {
-				const rootPropertyValue = this.propertyValues.get(id) || {};
-				ObjectPath.set<{}, PropertyValue>(rootPropertyValue, path, coercedValue);
-				this.propertyValues.set(id, deepAssign({}, rootPropertyValue));
-			} else {
-				this.propertyValues.set(id, coercedValue);
-			}
-		})().catch(reason => {
-			console.log(
-				`Failed to coerce property value of property '${id}' of pattern '${
-					this.patternId
-				}': ${reason}`
-			);
-		});
+		const coercedValue = property ? property.coerceValue(value) : value;
+		if (path) {
+			const rootPropertyValue = this.propertyValues.get(id) || {};
+			ObjectPath.set<{}, PropertyValue>(rootPropertyValue, path, coercedValue);
+			this.propertyValues.set(id, deepAssign({}, rootPropertyValue));
+		} else {
+			this.propertyValues.set(id, coercedValue);
+		}
 	}
 
 	/**

@@ -26,7 +26,7 @@ export class ObjectProperty extends Property {
 	 * @inheritdoc
 	 */
 	// tslint:disable-next-line:no-any
-	public async coerceValue(value: any): Promise<any> {
+	public coerceValue(value: any): any {
 		if (value === null || value === undefined || value === '') {
 			return undefined;
 		}

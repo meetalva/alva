@@ -103,7 +103,7 @@ export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 				/>
 			</StyledPreview>
 		</label>
-		<StyledButton onClick={props.handleChooseClick}>Open</StyledButton>
+		<StyledButton onClick={props.handleChooseClick}>Choose...</StyledButton>
 		<StyledButton onClick={props.handleClearClick}>Clear</StyledButton>
 	</StyledAssetItem>
 );

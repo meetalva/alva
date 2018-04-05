@@ -1,8 +1,16 @@
+import { Store } from '../../../store/store';
+
 export type RGB = [number, number, number];
 export interface ColorOptions {
 	alpha?: number;
 	displayName: string;
 	rgb: RGB;
+}
+
+export function getColor(colorId: string): string {
+	return Store.getInstance()
+		.getTheme()
+		.getColor(colorId);
 }
 
 export class Color {

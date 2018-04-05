@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { colors, getColor } from '../colors';
 import { Icon, IconName, Size as IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, Size as SpaceSize } from '../space';
@@ -35,7 +35,7 @@ export interface StyledFlyoutProps {
 
 const StyledDropdown = styled.div`
 	border: 1px solid ${colors.grey90.toString()};
-	background: ${colors.white.toString()};
+	background: ${getColor('blue')};
 	border-radius: 3px;
 `;
 

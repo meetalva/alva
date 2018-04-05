@@ -22,6 +22,11 @@ export class Preferences {
 	@MobX.observable private lastStyleguidePath?: string;
 
 	/**
+	 * The name of the configured theme.
+	 */
+	@MobX.observable private theme?: string;
+
+	/**
 	 * Loads and returns preferences from a given JSON object.
 	 * @param jsonObject The JSON object to load from.
 	 * @return A new preferences object containing the loaded data.
@@ -30,6 +35,7 @@ export class Preferences {
 		const preferences: Preferences = new Preferences();
 		preferences.lastStyleguidePath = jsonObject.lastStyleguidePath as string;
 		preferences.lastPageId = jsonObject.lastPageId as string;
+		preferences.theme = jsonObject.theme as string;
 		return preferences;
 	}
 
@@ -58,6 +64,14 @@ export class Preferences {
 	}
 
 	/**
+	 * Returns the name of the configured theme.
+	 * @return The name of the configured theme.
+	 */
+	public getThemeName(): string | undefined {
+		return this.theme;
+	}
+
+	/**
 	 * Sets the last opened page's ID.
 	 * @param lastPageId The last opened page's ID.
 	 */
@@ -82,13 +96,22 @@ export class Preferences {
 	}
 
 	/**
+	 * Sets the name of the theme.
+	 * @param theme The name of the theme that should be used.
+	 */
+	public setThemeName(theme: string): void {
+		this.theme = theme;
+	}
+
+	/**
 	 * Serializes the preferences into a JSON object for persistence.
 	 * @return The JSON object to be persisted.
 	 */
 	public toJsonObject(): JsonObject {
 		return {
 			lastStyleguidePath: this.getLastStyleguidePath(),
-			lastPageId: this.getLastPageId()
+			lastPageId: this.getLastPageId(),
+			theme: this.getThemeName()
 		};
 	}
 }

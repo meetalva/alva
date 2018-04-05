@@ -1,0 +1,11 @@
+{
+	"baseColors": {
+		"blue": "rgb(0, 112, 214)",
+		"grey36": "rgba(92, 92, 92, 1)"
+	},
+	"input": {
+		"background": {
+			"$ref": "#/baseColors/grey36"
+		}
+	}
+}

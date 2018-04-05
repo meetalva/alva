@@ -13,6 +13,7 @@ import * as PathUtils from 'path';
 import { Preferences } from './preferences';
 import { Project } from './project';
 import { Styleguide } from './styleguide/styleguide';
+import { Theme } from './theme';
 
 /**
  * The central entry-point for all application state, managed by MobX.
@@ -102,6 +103,11 @@ export class Store {
 	@MobX.observable private styleguide?: Styleguide;
 
 	/**
+	 * The combined theme configs.
+	 */
+	@MobX.observable private theme: Theme;
+
+	/**
 	 * The most recent user commands (user operations) to provide an undo feature.
 	 * Note that operations that close or open a page clear this buffer.
 	 * The last command in the list is the most recent executed one.
@@ -119,6 +125,8 @@ export class Store {
 		} catch (error) {
 			this.preferences = new Preferences();
 		}
+
+		this.theme = Store.initTheme(this.preferences.getThemeName());
 	}
 
 	/**
@@ -150,6 +158,10 @@ export class Store {
 			.replace(/([a-z])([A-Z])/g, '$1 $2')
 			.toLowerCase();
 		return guessedName.substring(0, 1).toUpperCase() + guessedName.substring(1);
+	}
+
+	private static initTheme(themeName?: string): Theme {
+		return new Theme(themeName);
 	}
 
 	/**
@@ -409,6 +421,13 @@ export class Store {
 	 */
 	public getStyleguide(): Styleguide | undefined {
 		return this.styleguide;
+	}
+
+	/**
+	 * Returns the specified theme.
+	 */
+	public getTheme(): Theme {
+		return this.theme;
 	}
 
 	/**

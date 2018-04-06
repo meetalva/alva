@@ -30,6 +30,7 @@ ipcRenderer.on('preview-ready', (readyEvent: {}, readyMessage: JsonObject) => {
 				projects: store.getProjects().map(project => project.toJsonObject()),
 				styleguidePath: styleguide ? styleguide.getPath() : undefined
 			};
+
 			sendWebViewMessage(message, 'styleguide-change');
 		});
 

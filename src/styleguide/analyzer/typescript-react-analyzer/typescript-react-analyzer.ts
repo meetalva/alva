@@ -198,6 +198,6 @@ export class Analyzer extends StyleguideAnalyzer {
 	 * @inheritdoc
 	 */
 	public render(): void {
-		ReactDom.render(React.createElement(PreviewApp), document.getElementById('app'));
+		ReactDom.render(React.createElement(PreviewApp), document.getElementById('preview'));
 	}
 }

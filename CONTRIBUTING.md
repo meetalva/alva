@@ -117,7 +117,10 @@ You'll find more information, extensions for editors and IDEs at the [editorconf
 
 ## Commit message conventions
 
-For commit messages we use the [angular commit guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits).
+For commit messages we use the [angular commit guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits) with one exception: Please put the GitHub issue reference into the header, e.g.
+```
+feat(store): patterns path configurable (fixes #214)
+```
 
 As tools, we use [commitlint](https://github.com/marionebl/commitlint) and [commitizen](https://github.com/commitizen/cz-cli).
 

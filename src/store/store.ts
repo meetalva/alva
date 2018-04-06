@@ -88,6 +88,12 @@ export class Store {
 	@MobX.observable private redoBuffer: Command[] = [];
 
 	/**
+	 * The path of the built pattern implementation's root folder, e.g. 'lib/patterns',
+	 * relative to the styleguide root, always using forward slashes.
+	 */
+	@MobX.observable private relativePatternsPath: string;
+
+	/**
 	 * The currently selected element in the element list.
 	 * The properties pane shows the properties of this element,
 	 * and keyboard commands like cut, copy, or delete operate on this element.
@@ -353,6 +359,19 @@ export class Store {
 	}
 
 	/**
+	 * Returns the absolute and OS-specific path of the root folder of the designs (projects, pages)
+	 * in the currently opened styleguide.
+	 * @return The absolute and OS-specific page root path.
+	 */
+	public getPagesPath(): string {
+		if (!this.styleguide) {
+			throw new Error('Cannot open page: No styleguide open');
+		}
+
+		return PathUtils.join(this.styleguide.getPath(), 'alva');
+	}
+
+	/**
 	 * Returns the current search term in the patterns list, or an empty string if there is none.
 	 * @return The current pattern search term or an empty string.
 	 */
@@ -510,7 +529,7 @@ export class Store {
 		const pageRef = this.getPageRefById(id);
 		if (pageRef && pageRef.getLastPersistedPath()) {
 			const pagePath: string = PathUtils.join(
-				styleguide.getPagesPath(),
+				this.getPagesPath(),
 				pageRef.getLastPersistedPath() as string
 			);
 			const json: JsonObject = Persister.loadYamlOrJson(pagePath);
@@ -556,13 +575,8 @@ export class Store {
 			this.save();
 		}
 
-		if (!PathUtils.isAbsolute(styleguidePath)) {
-			// Currently, store is two levels below alva, so go two up
-			styleguidePath = PathUtils.join(styleguidePath);
-		}
 		this.currentPage = undefined;
 
-		(this.projects as IObservableArray<Project>).clear();
 		const alvaYamlPath = PathUtils.join(styleguidePath, 'alva/alva.yaml');
 
 		// TODO: Converts old alva.yaml structure to new one.
@@ -592,15 +606,8 @@ export class Store {
 			json = json.config as JsonObject;
 		}
 
-		this.analyzerName = json.analyzerName as string;
-		this.styleguide = new Styleguide(styleguidePath, this.analyzerName);
-
-		(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
-			const project: Project = Project.fromJsonObject(projectJson);
-			this.addProject(project);
-		});
-
-		this.clearUndoRedoBuffers();
+		json.styleguidePath = styleguidePath;
+		this.setStyleguideFromJsonInternal(json);
 
 		this.preferences.setLastStyleguidePath(styleguidePath);
 		this.savePreferences();
@@ -704,8 +711,8 @@ export class Store {
 				const lastPath = page.getLastPersistedPath();
 				if (lastPath && page.getPath() !== lastPath) {
 					try {
-						const lastFullPath = PathUtils.join(styleguide.getPagesPath(), lastPath);
-						const newFullPath = PathUtils.join(styleguide.getPagesPath(), page.getPath());
+						const lastFullPath = PathUtils.join(this.getPagesPath(), lastPath);
+						const newFullPath = PathUtils.join(this.getPagesPath(), page.getPath());
 						FileExtraUtils.mkdirpSync(PathUtils.dirname(newFullPath));
 						FileUtils.renameSync(lastFullPath, newFullPath);
 						page.updateLastPersistedPath();
@@ -722,7 +729,7 @@ export class Store {
 		const currentPage: Page | undefined = this.getCurrentPage();
 		if (currentPage) {
 			const pagePath: string = PathUtils.join(
-				styleguide.getPagesPath(),
+				this.getPagesPath(),
 				currentPage.getPageRef().getPath()
 			);
 			Persister.saveYaml(pagePath, currentPage.toJsonObject());
@@ -732,10 +739,11 @@ export class Store {
 
 		const json: JsonObject = {
 			analyzerName: this.analyzerName,
+			patternsPath: this.relativePatternsPath,
 			projects: this.projects.map(project => project.toJsonObject())
 		};
 
-		const configPath = PathUtils.join(styleguide.getPagesPath(), 'alva.yaml');
+		const configPath = PathUtils.join(this.getPagesPath(), 'alva.yaml');
 		Persister.saveYaml(configPath, json);
 	}
 
@@ -817,15 +825,22 @@ export class Store {
 	@MobX.action
 	public setStyleguideFromJsonInternal(json: JsonObject): void {
 		this.analyzerName = json.analyzerName as string;
+		this.relativePatternsPath = (json.patternsPath as string) || 'lib/patterns';
 
-		this.projects = [];
+		(this.projects as IObservableArray<Project>).clear();
 		(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
 			const project: Project = Project.fromJsonObject(projectJson);
 			this.addProject(project);
 		});
 
 		if (json.styleguidePath && this.analyzerName) {
-			this.styleguide = new Styleguide(json.styleguidePath as string, this.analyzerName);
+			const styleguidePath = json.styleguidePath as string;
+			const patternsPath = PathUtils.join(
+				styleguidePath,
+				this.relativePatternsPath.split('/').join(PathUtils.sep)
+			);
+
+			this.styleguide = new Styleguide(styleguidePath, patternsPath, this.analyzerName);
 		} else {
 			this.styleguide = undefined;
 		}

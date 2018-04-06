@@ -6,23 +6,11 @@ import { getSpace, Size as SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface ChromeProps {
-	active?: boolean;
-	handleClick?: React.MouseEventHandler<HTMLElement>;
-	open?: boolean;
+	leftVisible?: boolean;
+	onLeftClick?: React.MouseEventHandler<HTMLElement>;
+	onRightClick?: React.MouseEventHandler<HTMLElement>;
+	rightVisible?: boolean;
 	title?: string;
-}
-
-export interface ChromeTitleProps {
-	handleClick?: React.MouseEventHandler<HTMLElement>;
-	open?: boolean;
-}
-
-interface StyledChromeIconProps {
-	open?: boolean;
-}
-
-export interface StyledChromeDropDownItemProps {
-	active?: boolean;
 }
 
 const StyledChrome = styled.div`
@@ -48,23 +36,58 @@ const StyledChromeTitle = styled.div`
 	font-size: 15px;
 `;
 
-const StyledChromeIcon = styled(Icon)`
-	margin-left: ${getSpace(SpaceSize.XS)}px;
-	fill: ${colors.grey36.toString()};
-	transition: transform 0.2s;
-
-	${(props: StyledChromeIconProps) =>
-		props.open ? 'transform: rotate(-90deg)' : 'transform: rotate(90deg)'};
+const StyledTitleWrapper = styled.div`
+	position: relative;
+	margin: 0 ${getSpace(SpaceSize.XS)}px;
+	white-space: nowrap;
+  text-overflow: ellipsis;
+	overflow: hidden;
+	text-align: center;
+	width: 130px;
+	}
 `;
 
-const ChromeComponent: React.StatelessComponent<ChromeProps> = props => (
+interface StyledIconWrapperProps {
+	visible: boolean;
+}
+
+const StyledIconWrapper = styled.div`
+	margin: ${getSpace(SpaceSize.XS)}px;
+	padding: ${getSpace(SpaceSize.XS)}px;
+	border-radius: ${getSpace(SpaceSize.XXS)}px;
+
+	&:hover {
+		background: ${colors.grey90.toString()};
+	}
+
+	${(props: StyledIconWrapperProps) =>
+		props.visible ? 'visibility: visible' : 'visibility: hidden'};
+`;
+
+const StyledLeftIcon = styled(Icon)`
+	fill: ${colors.grey60.toString()};
+	transform: rotate(180deg);
+`;
+
+const StyledRightIcon = styled(Icon)`
+	fill: ${colors.grey60.toString()};
+`;
+
+const Chrome: React.StatelessComponent<ChromeProps> = props => (
 	<StyledChrome>
-		<StyledChromeTitle onClick={props.handleClick}>
-			{props.title}
-			<StyledChromeIcon size={IconSize.XXS} name={IconName.ArrowFill} open={props.open} />
+		<StyledChromeTitle>
+			<StyledIconWrapper visible={props.leftVisible !== false} onClick={props.onLeftClick}>
+				<StyledLeftIcon size={IconSize.XS} name={IconName.ArrowFill} />
+			</StyledIconWrapper>
+
+			<StyledTitleWrapper>{props.title}</StyledTitleWrapper>
+
+			<StyledIconWrapper visible={props.rightVisible !== false} onClick={props.onRightClick}>
+				<StyledRightIcon size={IconSize.XS} name={IconName.ArrowFill} />
+			</StyledIconWrapper>
 		</StyledChromeTitle>
 		{props.children}
 	</StyledChrome>
 );
 
-export default ChromeComponent;
+export default Chrome;

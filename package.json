@@ -90,6 +90,7 @@
     "@commitlint/travis-cli": "^6.0.2",
     "@patternplate/cli": "2",
     "@patternplate/render-styled-components": "2",
+    "@types/chokidar": "^1.7.5",
     "@types/deep-assign": "^0.1.1",
     "@types/electron-devtools-installer": "^2.0.2",
     "@types/fs-extra": "^5.0.1",
@@ -118,6 +119,7 @@
     "typedoc": "^0.11.0"
   },
   "dependencies": {
+    "chokidar": "^2.0.3",
     "cli": "1.0.1",
     "deep-assign": "^2.0.0",
     "electron-log": "2.2.14",

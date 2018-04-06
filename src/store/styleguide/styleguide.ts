@@ -105,9 +105,9 @@ export class Styleguide {
 	}
 
 	/**
-	 * Returns the path of the root folder of the designs (projects, pages)
+	 * Returns the absolute and OS-specific path of the root folder of the designs (projects, pages)
 	 * in the currently opened styleguide.
-	 * @return The page root path.
+	 * @return The absolute and OS-specific page root path.
 	 */
 	public getPagesPath(): string {
 		return PathUtils.join(this.path, 'alva');
@@ -116,7 +116,7 @@ export class Styleguide {
 	/**
 	 * Returns the absolute and OS-specific path to the styleguide top-level directories.
 	 * This is where the projects, pages, and the pattern implementations are located.
-	 * @return The root path of the styleguide.
+	 * @return The absolute and OS-specific root path of the styleguide.
 	 */
 	public getPath(): string {
 		return this.path;
@@ -141,9 +141,17 @@ export class Styleguide {
 	}
 
 	/**
-	 * Returns the path of the root folder of the built patterns (like atoms, modules etc.)
-	 * in the currently opened styleguide.
-	 * @return The patterns root path.
+	 * Returns all known (parsed) pattern informations.
+	 * @return All known (parsed) pattern informations.
+	 */
+	public getPatterns(): Pattern[] {
+		return Array.from(this.patterns.values());
+	}
+
+	/**
+	 * Returns the absolute and OS-specific path of the root folder of the built patterns
+	 * (like atoms, modules etc.) in the currently opened styleguide.
+	 * @return The absolute and OS-specific patterns root path.
 	 */
 	public getPatternsPath(): string {
 		return PathUtils.join(this.path, 'lib', 'patterns');

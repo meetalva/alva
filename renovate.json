@@ -1,0 +1,9 @@
+{
+	"extends": [
+		"schedule:weekly",
+		":maintainLockFilesWeekly"
+	],
+	"minor": {
+		"groupName": "all minor"
+	}
+}

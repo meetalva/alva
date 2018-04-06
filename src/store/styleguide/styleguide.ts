@@ -1,7 +1,6 @@
 import { AssetProperty } from './property/asset-property';
 import { Directory } from '../../styleguide/analyzer/directory';
 import { PatternFolder } from './folder';
-import * as PathUtils from 'path';
 import { Pattern } from './pattern';
 import { StringProperty } from './property/string-property';
 import { StyleguideAnalyzer } from '../../styleguide/analyzer/styleguide-analyzer';
@@ -20,7 +19,8 @@ import { StyleguideAnalyzer } from '../../styleguide/analyzer/styleguide-analyze
 export class Styleguide {
 	/**
 	 * The analyzer active in this styleguide. The actual one depends on the type of styleguide.
-	 * The analyzers detects patterns (and pattern folders) it finds to the list of styleguide patterns.
+	 * The analyzers detects patterns (and pattern folders) it finds to the list of styleguide
+	 * patterns.
 	 */
 	private readonly analyzer?: StyleguideAnalyzer;
 
@@ -41,14 +41,25 @@ export class Styleguide {
 	private patterns: Map<string, Pattern> = new Map();
 
 	/**
-	 * Creates a new styleguide. Then loads the styleguide's patterns using the configured styleguide analyzer.
+	 * The path of the root folder of the built patterns (like atoms, modules etc.)
+	 * in the currently opened styleguide.
+	 */
+	private patternsPath: string;
+
+	/**
+	 * Creates a new styleguide. Then loads the styleguide's patterns using the configured
+	 * styleguide analyzer.
 	 * @param path The absolute and OS-specific path to the styleguide top-level folders.
 	 * This is where all pattern implementations are located.
-	 * @param analyzerName The name of the analyzer active in this styleguide. The actual one depends on the type of styleguide.
-	 * The analyzers detects patterns (and pattern folders) it finds to the list of styleguide patterns.
+	 * @param patternsPath The path of the root folder of the built patterns (like atoms,
+	 * modules etc.) in the currently opened styleguide.
+	 * @param analyzerName The name of the analyzer active in this styleguide. The actual one
+	 * depends on the type of styleguide. The analyzers detects patterns (and pattern folders)
+	 * it finds to the list of styleguide patterns.
 	 */
-	public constructor(path: string, analyzerName: string) {
-		this.path = path || '';
+	public constructor(path: string, patternsPath: string, analyzerName: string) {
+		this.path = path;
+		this.patternsPath = patternsPath;
 
 		const Analyzer = require(`../../styleguide/analyzer/${analyzerName}/${analyzerName}`)
 			.Analyzer;
@@ -66,7 +77,8 @@ export class Styleguide {
 
 	/**
 	 * Adds a new pattern to the styleguide. Call this method from the styleguide analyzer.
-	 * Note that you can optionally also call addPattern on one or more pattern folders to organize patterns, but you always have to add it to the styleguide.
+	 * Note that you can optionally also call addPattern on one or more pattern folders to organize
+	 * patterns, but you always have to add it to the styleguide.
 	 * @param pattern The pattern to add.
 	 */
 	public addPattern(pattern: Pattern): void {
@@ -96,21 +108,13 @@ export class Styleguide {
 	}
 
 	/**
-	 * Returns the analyzer active in this styleguide. The actual one depends on the type of styleguide.
-	 * The analyzers detects patterns (and pattern folders) it finds to the list of styleguide patterns.
+	 * Returns the analyzer active in this styleguide. The actual one depends on the type of
+	 * styleguide. The analyzers detects patterns (and pattern folders) it finds to the list of
+	 * styleguide patterns.
 	 * @return The analyzer active in this styleguide.
 	 */
 	public getAnalyzer(): StyleguideAnalyzer | undefined {
 		return this.analyzer;
-	}
-
-	/**
-	 * Returns the absolute and OS-specific path of the root folder of the designs (projects, pages)
-	 * in the currently opened styleguide.
-	 * @return The absolute and OS-specific page root path.
-	 */
-	public getPagesPath(): string {
-		return PathUtils.join(this.path, 'alva');
 	}
 
 	/**
@@ -124,8 +128,9 @@ export class Styleguide {
 
 	/**
 	 * Returns a parsed pattern information object for a given pattern ID.
-	 * @param id The ID of the pattern. It's local to the styleguide analyzer that detected the pattern.
-	 * How this is generated is completely up to the styleguide analyzer that creates the pattern.
+	 * @param id The ID of the pattern. It's local to the styleguide analyzer that detected the
+	 * pattern. How this is generated is completely up to the styleguide analyzer that creates the
+	 * pattern.
 	 * @return The resolved pattern, or undefined, if no such ID exists.
 	 */
 	public getPattern(id: string): Pattern | undefined {
@@ -154,6 +159,6 @@ export class Styleguide {
 	 * @return The absolute and OS-specific patterns root path.
 	 */
 	public getPatternsPath(): string {
-		return PathUtils.join(this.path, 'lib', 'patterns');
+		return this.patternsPath;
 	}
 }

@@ -150,9 +150,7 @@ export class App extends React.Component {
 		const styleguide = store.getStyleguide();
 		const previewFrame = project && project.getPreviewFrame();
 		const previewFramePath =
-			styleguide &&
-			previewFrame &&
-			PathUtils.join(styleguide.getPagesPath(), 'alva', previewFrame);
+			styleguide && previewFrame && PathUtils.join(store.getPagesPath(), 'alva', previewFrame);
 
 		const DevTools = this.getDevTools();
 

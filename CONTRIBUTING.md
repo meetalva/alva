@@ -42,6 +42,8 @@ git clone git@github.com:meetalva/alva.git
 npm i && npm start
 ```
 
+(Note: Please use *npm* only. We dropped the support for Yarn for now, as we wired our release process to the package-lock.json file.)
+
 3. Now open a compatible styleguide.
 
 If you don't have a compatible styleguide, follow the next steps:

@@ -39,9 +39,12 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	@MobX.action
 	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
 		this.props.onClick(e);
-		if (this.props.focused) {
-			this.editable = true;
-		}
+
+		setTimeout(() => {
+			if (this.props.focused) {
+				this.editable = true;
+			}
+		}, 300);
 	}
 
 	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {

@@ -14,8 +14,6 @@ import Link from '../../lsg/patterns/link';
 import { createMenu } from '../../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
-import { PageListContainer } from '../page-list/page-list-container';
-import { PageListPreview } from '../page-list/page-list-preview';
 import * as PathUtils from 'path';
 import { PatternListContainer } from '../../component/container/pattern-list';
 import PatternsPane from '../../lsg/patterns/panes/patterns-pane';
@@ -178,12 +176,6 @@ export class App extends React.Component {
 				</Chrome>
 				<MainArea>
 					{project && [
-						<PageListPreview
-							lastChangedDate={this.getLastChangedDate().toString()}
-							headline={title}
-						>
-							<PageListContainer />
-						</PageListPreview>,
 						<SideBar key="left" directionVertical hasPaddings>
 							<ElementPane>
 								<ElementList />

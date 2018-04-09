@@ -31,7 +31,6 @@ export class PageListContainer extends React.Component<{}> {
 		}
 		this.focusStates.forEach((state, index) => {
 			this.focusStates[index] = false;
-			console.log('this are all the states', state);
 		});
 		this.focusStates[i] = !this.focusStates[i];
 	}

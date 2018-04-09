@@ -25,11 +25,15 @@ export class PageListContainer extends React.Component<{}> {
 	}
 
 	@MobX.action
-	protected handleClick(e: React.MouseEvent<HTMLElement>, index: number): void {
-		this.focusStates[index] = !this.focusStates[index];
-		this.focusStates.forEach((state, i) => {
-			// TODO
+	protected handleClick(e: React.MouseEvent<HTMLElement>, i: number): void {
+		if (this.focusStates[i]) {
+			return;
+		}
+		this.focusStates.forEach((state, index) => {
+			this.focusStates[index] = false;
+			console.log('this are all the states', state);
 		});
+		this.focusStates[i] = !this.focusStates[i];
 	}
 
 	public render(): JSX.Element {

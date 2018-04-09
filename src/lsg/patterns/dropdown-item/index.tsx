@@ -6,7 +6,6 @@ import { getSpace, Size as SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface DropdownItemProps {
-	// active?: boolean;
 	color?: Color;
 	handleClick?: React.MouseEventHandler<HTMLElement>;
 	icon?: IconName;

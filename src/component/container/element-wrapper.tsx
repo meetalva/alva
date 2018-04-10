@@ -9,40 +9,42 @@ export interface ElementWrapperState {
 
 export interface ElementWrapperProps {
 	active?: boolean;
-	handleClick?: React.MouseEventHandler<HTMLElement>;
-	handleContextMenu?: React.MouseEventHandler<HTMLElement>;
-	handleDragDrop?: React.DragEventHandler<HTMLElement>;
-	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
+	dragging: boolean;
+	id: string;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+	onContextMenu?: React.MouseEventHandler<HTMLElement>;
+	onDragDrop?: React.DragEventHandler<HTMLElement>;
+	onDragDropForChild?: React.DragEventHandler<HTMLElement>;
+	onDragStart?: React.DragEventHandler<HTMLElement>;
 	open?: boolean;
 	title: string;
 }
 
 export class ElementWrapper extends React.Component<ElementWrapperProps, ElementWrapperState> {
-	public constructor(props: ElementWrapperProps) {
-		super(props);
+	public state = {
+		open: this.props.open,
+		highlightPlaceholder: false,
+		highlight: false
+	};
 
-		this.state = {
-			open: this.props.open,
-			highlight: false
-		};
+	private handleClick(e: React.MouseEvent<HTMLElement>): void {
+		const target = e.target as HTMLElement;
+		const icon = above(target, 'svg[data-icon]');
 
-		this.handleIconClick = this.handleIconClick.bind(this);
-		this.handleDragStart = this.handleDragStart.bind(this);
-		this.handleDragEnter = this.handleDragEnter.bind(this);
-		this.handleDragLeave = this.handleDragLeave.bind(this);
-		this.handleDragDrop = this.handleDragDrop.bind(this);
-		this.handleDragEnterForChild = this.handleDragEnterForChild.bind(this);
-		this.handleDragLeaveForChild = this.handleDragLeaveForChild.bind(this);
-		this.handleDragDropForChild = this.handleDragDropForChild.bind(this);
+		if (icon) {
+			e.stopPropagation();
+			this.setState({
+				open: !this.state.open
+			});
+		}
 	}
 
 	private handleDragDrop(e: React.DragEvent<HTMLElement>): void {
 		this.setState({
 			highlight: false
 		});
-		if (typeof this.props.handleDragDrop === 'function') {
-			this.props.handleDragDrop(e);
+		if (typeof this.props.onDragDrop === 'function') {
+			this.props.onDragDrop(e);
 		}
 	}
 
@@ -50,8 +52,8 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 		this.setState({
 			highlightPlaceholder: false
 		});
-		if (typeof this.props.handleDragDropForChild === 'function') {
-			this.props.handleDragDropForChild(e);
+		if (typeof this.props.onDragDropForChild === 'function') {
+			this.props.onDragDropForChild(e);
 		}
 	}
 
@@ -83,40 +85,54 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 		this.setState({
 			highlight: true
 		});
-		if (typeof this.props.handleDragStart === 'function') {
-			this.props.handleDragStart(e);
+		if (typeof this.props.onDragStart === 'function') {
+			this.props.onDragStart(e);
 		}
 	}
 
-	private handleIconClick(): void {
-		this.setState({
-			open: !this.state.open
-		});
-	}
-
 	public render(): JSX.Element {
-		const { active, children, handleClick, handleContextMenu, title } = this.props;
+		const { active, children, title } = this.props;
 		return (
 			<Element
-				title={title}
-				open={!this.state.open}
 				active={active}
+				dragging={this.props.dragging}
+				draggable
+				onClick={e => this.handleClick(e)}
+				onDragDrop={e => this.handleDragDrop(e)}
+				onDragDropForChild={e => this.handleDragDropForChild(e)}
+				onDragEnter={e => this.handleDragEnter(e)}
+				onDragEnterForChild={e => this.handleDragEnterForChild(e)}
+				onDragLeave={e => this.handleDragLeave(e)}
+				onDragLeaveForChild={e => this.handleDragLeaveForChild(e)}
+				onDragStart={e => this.handleDragStart(e)}
 				highlight={this.state.highlight}
 				highlightPlaceholder={this.state.highlightPlaceholder}
-				handleClick={handleClick}
-				handleContextMenu={handleContextMenu}
-				draggable
-				handleIconClick={this.handleIconClick}
-				handleDragStart={this.handleDragStart}
-				handleDragEnter={this.handleDragEnter}
-				handleDragLeave={this.handleDragLeave}
-				handleDragDrop={this.handleDragDrop}
-				handleDragEnterForChild={this.handleDragEnterForChild}
-				handleDragLeaveForChild={this.handleDragLeaveForChild}
-				handleDragDropForChild={this.handleDragDropForChild}
+				id={this.props.id}
+				open={!this.state.open}
+				title={title}
 			>
 				{children}
 			</Element>
 		);
 	}
+}
+
+function above(node: EventTarget, selector: string): HTMLElement | null {
+	let el = node as HTMLElement;
+	let ended = false;
+
+	while (el && !ended) {
+		if (el.matches(selector)) {
+			break;
+		}
+
+		if (el.parentElement !== null) {
+			el = el.parentElement;
+		} else {
+			ended = true;
+			break;
+		}
+	}
+
+	return ended ? null : el;
 }

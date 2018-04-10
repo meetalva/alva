@@ -109,7 +109,9 @@ export class Page {
 	 */
 	public registerElementAndChildren(element: PageElement): void {
 		this.elementsById.set(element.getId(), element);
-		element.getChildren().forEach(child => this.registerElementAndChildren(child));
+		element.getContents().forEach((slotContents, slotId) => {
+			slotContents.forEach(child => this.registerElementAndChildren(child));
+		});
 	}
 
 	/**
@@ -118,22 +120,28 @@ export class Page {
 	 */
 	public setRoot(root?: PageElement | undefined): void {
 		if (this.root) {
-			this.root.setParentInternal(undefined, undefined, undefined);
+			this.root.setParentInternal(undefined, undefined, undefined, undefined);
 		}
 
 		this.root = root;
 
 		if (root) {
-			root.setParentInternal(undefined, undefined, this);
+			root.setParentInternal(undefined, undefined, undefined, this);
 		}
 	}
 
 	/**
 	 * Serializes the page into a JSON object for persistence.
+	 * @param forRendering Whether all property values should be converted using
+	 * Property.convertToRender (for the preview app instead of file persistence).
 	 * @return The JSON object to be persisted.
+	 * @see Property.convertToRender()
 	 */
-	public toJsonObject(): JsonObject {
-		return { root: this.root ? this.root.toJsonObject() : undefined };
+	public toJsonObject(props?: { forRendering?: boolean }): JsonObject {
+		return {
+			id: this.getId(),
+			root: this.root ? this.root.toJsonObject(props) : undefined
+		};
 	}
 
 	/**
@@ -142,6 +150,8 @@ export class Page {
 	 */
 	public unregisterElementAndChildren(element: PageElement): void {
 		this.elementsById.delete(element.getId());
-		element.getChildren().forEach(child => this.unregisterElementAndChildren(child));
+		element.getContents().forEach(slotContents => {
+			slotContents.forEach(child => this.unregisterElementAndChildren(child));
+		});
 	}
 }

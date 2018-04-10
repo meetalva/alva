@@ -2,3 +2,4 @@ build
 dist
 designkit
 node_modules
+*.log

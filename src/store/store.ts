@@ -1,18 +1,23 @@
 import { Command } from './command/command';
-import * as FileUtils from 'fs';
-import * as FileExtraUtils from 'fs-extra';
+import * as Fs from 'fs';
+import * as FsExtra from 'fs-extra';
 import { JsonArray, JsonObject, Persister } from './json';
 import * as Lodash from 'lodash';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
-import * as OsUtils from 'os';
+import * as Os from 'os';
 import { Page } from './page/page';
 import { PageElement } from './page/page-element';
 import { PageRef } from './page/page-ref';
-import * as PathUtils from 'path';
+import * as Path from 'path';
 import { Preferences } from './preferences';
 import { Project } from './project';
 import { Styleguide } from './styleguide/styleguide';
+
+export enum RightPane {
+	Patterns = 'Patterns',
+	Properties = 'Properties'
+}
 
 /**
  * The central entry-point for all application state, managed by MobX.
@@ -64,6 +69,11 @@ export class Store {
 	@MobX.observable private elementFocussed?: boolean = false;
 
 	/**
+	 * The current state of the Page Overview
+	 */
+	@MobX.observable public pageOverviewIsOpened: boolean = false;
+
+	/**
 	 * The current search term in the patterns list, or an empty string if there is none.
 	 */
 	@MobX.observable private patternSearchTerm: string = '';
@@ -94,6 +104,12 @@ export class Store {
 	@MobX.observable private relativePatternsPath: string;
 
 	/**
+	 * The well-known enum name of content that should be visible in
+	 * the right-hand sidebar/pane.
+	 */
+	@MobX.observable private rightPane: RightPane | null = null;
+
+	/**
 	 * The currently selected element in the element list.
 	 * The properties pane shows the properties of this element,
 	 * and keyboard commands like cut, copy, or delete operate on this element.
@@ -101,6 +117,16 @@ export class Store {
 	 * @see isElementFocussed
 	 */
 	@MobX.observable private selectedElement?: PageElement;
+
+	/**
+	 * The currently selected slot of the currently selected element.
+	 */
+	@MobX.observable private selectedSlotId?: string;
+
+	/**
+	 * http port the preview server is listening on
+	 */
+	@MobX.observable private serverPort: number = 1879;
 
 	/**
 	 * The currently opened styleguide or undefined, if no styleguide is open.
@@ -368,7 +394,7 @@ export class Store {
 			throw new Error('Cannot open page: No styleguide open');
 		}
 
-		return PathUtils.join(this.styleguide.getPath(), 'alva');
+		return Path.join(this.styleguide.getPath(), 'alva');
 	}
 
 	/**
@@ -384,7 +410,7 @@ export class Store {
 	 * @return The path to the user preferences YAML file.
 	 */
 	public getPreferencesPath(basePreferencePath?: string): string {
-		return PathUtils.join(basePreferencePath || OsUtils.homedir(), '.alva-prefs.yaml');
+		return Path.join(basePreferencePath || Os.homedir(), '.alva-prefs.yaml');
 	}
 
 	/**
@@ -412,6 +438,17 @@ export class Store {
 	}
 
 	/**
+	 * @return The content id to show in the right-hand sidebar
+	 * @see isElementFocussed
+	 */
+	public getRightPane(): RightPane {
+		if (this.rightPane === null) {
+			return this.selectedElement ? RightPane.Properties : RightPane.Patterns;
+		}
+		return this.rightPane;
+	}
+
+	/**
 	 * Returns the currently selected element in the element list.
 	 * The properties pane shows the properties of this element,
 	 * and keyboard commands like cut, copy, or delete operate on this element.
@@ -421,6 +458,18 @@ export class Store {
 	 */
 	public getSelectedElement(): PageElement | undefined {
 		return this.selectedElement;
+	}
+
+	/**
+	 * Returns the id of the currently selected slot of the currently selected element if any.
+	 * @return The id of the currently selected slot of the currently selected element if any.
+	 */
+	public getSelectedSlotId(): string | undefined {
+		return this.selectedSlotId;
+	}
+
+	public getServerPort(): number {
+		return this.serverPort;
 	}
 
 	/**
@@ -528,7 +577,7 @@ export class Store {
 
 		const pageRef = this.getPageRefById(id);
 		if (pageRef && pageRef.getLastPersistedPath()) {
-			const pagePath: string = PathUtils.join(
+			const pagePath: string = Path.join(
 				this.getPagesPath(),
 				pageRef.getLastPersistedPath() as string
 			);
@@ -577,22 +626,22 @@ export class Store {
 
 		this.currentPage = undefined;
 
-		const alvaYamlPath = PathUtils.join(styleguidePath, 'alva/alva.yaml');
+		const alvaYamlPath = Path.join(styleguidePath, 'alva/alva.yaml');
 
 		// TODO: Converts old alva.yaml structure to new one.
 		// This should be removed after the next version.
-		const projectsPath = PathUtils.join(styleguidePath, 'alva/projects.yaml');
+		const projectsPath = Path.join(styleguidePath, 'alva/projects.yaml');
 		try {
-			const oldFileStructure = Boolean(FileUtils.statSync(projectsPath));
+			const oldFileStructure = Boolean(Fs.statSync(projectsPath));
 			if (oldFileStructure) {
 				const oldAlvaYaml = Persister.loadYamlOrJson(projectsPath);
 				const newAlvaYaml = {
 					analyzerName: 'typescript-react-analyzer',
 					...oldAlvaYaml
 				};
-				FileUtils.writeFileSync(alvaYamlPath, {});
+				Fs.writeFileSync(alvaYamlPath, {});
 				Persister.saveYaml(alvaYamlPath, newAlvaYaml);
-				FileUtils.unlinkSync(projectsPath);
+				Fs.unlinkSync(projectsPath);
 			}
 		} catch (error) {
 			// ignore the correct setup with missing projects.yaml
@@ -711,10 +760,10 @@ export class Store {
 				const lastPath = page.getLastPersistedPath();
 				if (lastPath && page.getPath() !== lastPath) {
 					try {
-						const lastFullPath = PathUtils.join(this.getPagesPath(), lastPath);
-						const newFullPath = PathUtils.join(this.getPagesPath(), page.getPath());
-						FileExtraUtils.mkdirpSync(PathUtils.dirname(newFullPath));
-						FileUtils.renameSync(lastFullPath, newFullPath);
+						const lastFullPath = Path.join(this.getPagesPath(), lastPath);
+						const newFullPath = Path.join(this.getPagesPath(), page.getPath());
+						FsExtra.mkdirpSync(Path.dirname(newFullPath));
+						Fs.renameSync(lastFullPath, newFullPath);
 						page.updateLastPersistedPath();
 					} catch (error) {
 						// Fall back to original path to continue saving
@@ -728,7 +777,7 @@ export class Store {
 
 		const currentPage: Page | undefined = this.getCurrentPage();
 		if (currentPage) {
-			const pagePath: string = PathUtils.join(
+			const pagePath: string = Path.join(
 				this.getPagesPath(),
 				currentPage.getPageRef().getPath()
 			);
@@ -743,7 +792,7 @@ export class Store {
 			projects: this.projects.map(project => project.toJsonObject())
 		};
 
-		const configPath = PathUtils.join(this.getPagesPath(), 'alva.yaml');
+		const configPath = Path.join(this.getPagesPath(), 'alva.yaml');
 		Persister.saveYaml(configPath, json);
 	}
 
@@ -768,7 +817,7 @@ export class Store {
 	 * Sets the element that is currently being dragged, or undefined if there is none.
 	 * @param draggedElement The dragged element or undefined.
 	 */
-	public setDraggedElement(draggedElement: PageElement): void {
+	public setDraggedElement(draggedElement?: PageElement): void {
 		this.draggedElement = draggedElement;
 	}
 
@@ -806,6 +855,14 @@ export class Store {
 	}
 
 	/**
+	 * @return The content id to show in the right-hand sidebar
+	 * @see rightPane
+	 */
+	public setRightPane(pane: RightPane | null): void {
+		this.rightPane = pane;
+	}
+
+	/**
 	 * Sets the currently selected element in the element list.
 	 * The properties pane shows the properties of this element,
 	 * and keyboard commands like cut, copy, or delete operate on this element.
@@ -813,8 +870,26 @@ export class Store {
 	 * @param selectedElement The selected element or undefined.
 	 * @see setElementFocussed
 	 */
-	public setSelectedElement(selectedElement: PageElement | undefined): void {
+	public setSelectedElement(selectedElement?: PageElement): void {
+		this.rightPane = null;
 		this.selectedElement = selectedElement;
+		this.selectedSlotId = undefined;
+	}
+
+	/**
+	 * Sets the currently selected slot of the currently selected element.
+	 * @param slotId The id of the slot to select.
+	 */
+	public setSelectedSlot(slotId?: string): void {
+		this.selectedSlotId = slotId;
+	}
+
+	/**
+	 * Set the port the preview server is listening to
+	 * @param port
+	 */
+	public setServerPort(port: number): void {
+		this.serverPort = port;
 	}
 
 	/**
@@ -835,9 +910,9 @@ export class Store {
 
 		if (json.styleguidePath && this.analyzerName) {
 			const styleguidePath = json.styleguidePath as string;
-			const patternsPath = PathUtils.join(
+			const patternsPath = Path.join(
 				styleguidePath,
-				this.relativePatternsPath.split('/').join(PathUtils.sep)
+				this.relativePatternsPath.split('/').join(Path.sep)
 			);
 
 			this.styleguide = new Styleguide(styleguidePath, patternsPath, this.analyzerName);
@@ -846,6 +921,16 @@ export class Store {
 		}
 
 		this.clearUndoRedoBuffers();
+	}
+
+	/**
+	 * Toggles the Page Overview layer.
+	 * It toggles between true and false.
+	 * @return void
+	 */
+	@MobX.action
+	public togglePageOverview(): void {
+		this.pageOverviewIsOpened = !this.pageOverviewIsOpened;
 	}
 
 	/**

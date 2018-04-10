@@ -1,7 +1,7 @@
 import { colors } from '../colors';
 import Input, { InputTypes } from '../input';
 import * as React from 'react';
-import { getSpace, Size } from '../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface PreviewTileProps {
@@ -9,6 +9,7 @@ export interface PreviewTileProps {
 	focused: boolean;
 	id?: string;
 	name: string;
+	named: boolean;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
@@ -19,6 +20,10 @@ export interface PreviewTileProps {
 
 interface StyledPreviewTileProps {
 	focused: boolean;
+}
+
+interface StyledPreviewTitle {
+	named: boolean;
 }
 
 const StyledPreview = styled.section`
@@ -42,16 +47,18 @@ const StyledPreviewTile = styled.div`
 const StyledTitle = styled.strong`
 	display: inline-block;
 	width: 100%;
-	margin-bottom: ${getSpace(Size.S)}px;
+	margin-bottom: ${getSpace(SpaceSize.S)}px;
 	font-size: 12px;
 	font-weight: normal;
+	color: ${(props: StyledPreviewTitle) =>
+		props.named ? colors.black.toString() : colors.grey80.toString()}
 	cursor: pointer;
 `;
 
 const StyledEditableTitle = styled(Input)`
 	display: inline-block;
 	padding: 0;
-	margin: 0 0 ${getSpace(Size.S)}px 0;
+	margin: 0 0 ${getSpace(SpaceSize.S)}px 0;
 	font-size: 12px;
 	font-weight: normal;
 	text-align: center;
@@ -79,7 +86,7 @@ export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): 
 				{props.value}
 			</StyledEditableTitle>
 		) : (
-			<StyledTitle>{props.name}</StyledTitle>
+			<StyledTitle named={props.named}>{props.name}</StyledTitle>
 		)}
 		<StyledPreviewTile focused={props.focused} />
 	</StyledPreview>

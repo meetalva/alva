@@ -1,7 +1,7 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
 import * as React from 'react';
-import { getSpace, Size } from '../../space';
+import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
 
 export interface Values {
@@ -32,8 +32,8 @@ const StyledSelect = styled.select`
 	color: ${colors.grey36.toString()};
 	font-size: 15px;
 	border-bottom: 1px solid transparent;
-	padding-bottom: ${getSpace(Size.M) / 2}px;
-	margin-bottom: ${getSpace(Size.L)}px;
+	padding-bottom: ${getSpace(SpaceSize.M) / 2}px;
+	margin-bottom: ${getSpace(SpaceSize.L)}px;
 	transition: all 0.2s;
 
 	&:hover {
@@ -50,7 +50,7 @@ const StyledSelect = styled.select`
 
 const StyledLabel = styled.span`
 	display: block;
-	margin-bottom: ${getSpace(Size.XS)}px;
+	margin-bottom: ${getSpace(SpaceSize.XS)}px;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};

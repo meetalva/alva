@@ -1,5 +1,5 @@
-import * as FileUtils from 'fs';
-import * as PathUtils from 'path';
+import * as Fs from 'fs';
+import * as Path from 'path';
 
 export class Directory {
 	private readonly path: string;
@@ -9,27 +9,27 @@ export class Directory {
 	}
 
 	public *getDirectories(): IterableIterator<Directory> {
-		for (const childName of FileUtils.readdirSync(this.path)) {
-			const childPath = PathUtils.join(this.path, childName);
+		for (const childName of Fs.readdirSync(this.path)) {
+			const childPath = Path.join(this.path, childName);
 
-			if (FileUtils.lstatSync(childPath).isDirectory()) {
+			if (Fs.lstatSync(childPath).isDirectory()) {
 				yield new Directory(childPath);
 			}
 		}
 	}
 
 	public *getFiles(): IterableIterator<string> {
-		for (const childName of FileUtils.readdirSync(this.path)) {
-			const childPath = PathUtils.join(this.path, childName);
+		for (const childName of Fs.readdirSync(this.path)) {
+			const childPath = Path.join(this.path, childName);
 
-			if (FileUtils.lstatSync(childPath).isFile()) {
+			if (Fs.lstatSync(childPath).isFile()) {
 				yield childPath;
 			}
 		}
 	}
 
 	public getName(): string {
-		return PathUtils.basename(this.path);
+		return Path.basename(this.path);
 	}
 
 	public getPath(): string {

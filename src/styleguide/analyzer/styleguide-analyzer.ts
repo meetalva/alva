@@ -18,9 +18,4 @@ export abstract class StyleguideAnalyzer {
 	 * @param styleguide The styleguide to analyze its implementations.
 	 */
 	public abstract analyze(styleguide: Styleguide): void;
-
-	/**
-	 * Renders the preview application based on the store.
-	 */
-	public abstract render(): void;
 }

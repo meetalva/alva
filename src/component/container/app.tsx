@@ -14,6 +14,8 @@ import Link from '../../lsg/patterns/link';
 import { createMenu } from '../../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
+import { PageListContainer } from '../page-list/page-list-container';
+import { PageListPreview } from '../page-list/page-list-preview';
 import * as PathUtils from 'path';
 import { PatternListContainer } from '../../component/container/pattern-list';
 import PatternsPane from '../../lsg/patterns/panes/patterns-pane';
@@ -34,9 +36,9 @@ const store = Store.getInstance();
 export class App extends React.Component {
 	private static PATTERN_LIST_ID = 'patternlist';
 	private static PROPERTIES_LIST_ID = 'propertieslist';
-
 	@MobX.observable protected activeTab: string = App.PATTERN_LIST_ID;
 	private ctrlDown: boolean = false;
+
 	private shiftDown: boolean = false;
 
 	public constructor(props: {}) {
@@ -147,25 +149,29 @@ export class App extends React.Component {
 		return (
 			<Layout directionVertical handleClick={this.handleMainWindowClick}>
 				<ChromeContainer />
-
 				<MainArea>
-					{project && [
-						<SideBar key="left" directionVertical hasPaddings>
-							<ElementPane>
-								<ElementList />
-							</ElementPane>
-							<PatternsPane>
-								<PatternListContainer />
-							</PatternsPane>
-						</SideBar>,
-						<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />,
-						<SideBar key="right" directionVertical hasPaddings>
-							<PropertyPane>
-								<PropertyList />
-							</PropertyPane>
-						</SideBar>
-					]}
-
+					{project &&
+						!store.pageOverviewIsOpened && [
+							<SideBar key="left" directionVertical hasPaddings>
+								<ElementPane>
+									<ElementList />
+								</ElementPane>
+								<PatternsPane>
+									<PatternListContainer />
+								</PatternsPane>
+							</SideBar>,
+							<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />,
+							<SideBar key="right" directionVertical hasPaddings>
+								<PropertyPane>
+									<PropertyList />
+								</PropertyPane>
+							</SideBar>
+						]}
+					{store.pageOverviewIsOpened && (
+						<PageListPreview>
+							<PageListContainer />
+						</PageListPreview>
+					)}
 					{!project && (
 						<SplashScreen>
 							<Space sizeBottom={SpaceSize.L}>

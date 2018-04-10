@@ -10,22 +10,13 @@ export interface ElementWrapperState {
 }
 
 export class PreviewPaneWrapper extends React.Component<PreviewPaneProps, ElementWrapperState> {
-	public constructor(props: {}) {
-		super(props);
-
-		this.state = {
-			isResizing: false,
-			direction: 1,
-			width: 0,
-			maxWidth: 0
-		};
-
-		this.handleMouseDownRight = this.handleMouseDownRight.bind(this);
-		this.handleMouseDownLeft = this.handleMouseDownLeft.bind(this);
-		this.handleMouseUp = this.handleMouseUp.bind(this);
-		this.handleMouseMove = this.handleMouseMove.bind(this);
-		this.handlePreviewWidthUpdate = this.handlePreviewWidthUpdate.bind(this);
-	}
+	public state = {
+		isResizing: false,
+		direction: 1,
+		width: 0,
+		maxWidth: 0,
+		mousePosition: undefined
+	};
 
 	private handleMouseDownLeft(e: React.MouseEvent<HTMLElement>): void {
 		this.setState({
@@ -46,7 +37,7 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps, Elemen
 	private handleMouseMove(e: React.MouseEvent<HTMLElement>): void {
 		const { maxWidth, mousePosition, width, direction } = this.state;
 
-		if (!mousePosition) {
+		if (typeof mousePosition !== 'number' || Number.isNaN(mousePosition)) {
 			return;
 		}
 
@@ -83,15 +74,17 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps, Elemen
 	}
 
 	public render(): JSX.Element {
+		const { props } = this;
 		return (
 			<PreviewPane
-				handleMouseDownLeft={this.handleMouseDownLeft}
-				handleMouseDownRight={this.handleMouseDownRight}
-				handleMouseMove={this.handleMouseMove}
-				handleMouseUp={this.handleMouseUp}
-				handlePreviewWidthUpdate={this.handlePreviewWidthUpdate}
-				width={this.state.width}
+				id={props.id}
+				onMouseDownLeft={e => this.handleMouseDownLeft(e)}
+				onMouseDownRight={e => this.handleMouseDownRight(e)}
+				onMouseMove={e => this.handleMouseMove(e)}
+				onMouseUp={() => this.handleMouseUp()}
+				onPreviewWidthUpdate={e => this.handlePreviewWidthUpdate(e)}
 				previewFrame={this.props.previewFrame}
+				width={this.state.width}
 			/>
 		);
 	}

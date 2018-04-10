@@ -4,13 +4,14 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export interface PreviewPaneProps {
-	handleMouseDownLeft?: React.MouseEventHandler<HTMLElement>;
-	handleMouseDownRight?: React.MouseEventHandler<HTMLElement>;
-	handleMouseMove?: React.MouseEventHandler<HTMLElement>;
-	handleMouseUp?: React.MouseEventHandler<HTMLElement>;
+	id?: string;
+	onMouseDownLeft?: React.MouseEventHandler<HTMLElement>;
+	onMouseDownRight?: React.MouseEventHandler<HTMLElement>;
+	onMouseMove?: React.MouseEventHandler<HTMLElement>;
+	onMouseUp?: React.MouseEventHandler<HTMLElement>;
 	previewFrame?: string;
 	width?: number;
-	handlePreviewWidthUpdate?(previewWidth: number): void;
+	onPreviewWidthUpdate?(previewWidth: number): void;
 }
 
 const StyledPreviewWrapper = styled.div`
@@ -21,35 +22,58 @@ const StyledPreviewWrapper = styled.div`
 `;
 
 const StyledPreviewResizer = styled.div`
-	width: 12px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 11px;
 	height: 100%;
 	cursor: ew-resize;
+	background-color: ${colors.blackAlpha13.toString()};
+	opacity: 0;
+	transition: opacity 0.15s ease-in-out;
+
 	&::after {
 		content: '';
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
 		height: 36px;
-		width: 6px;
-		margin: 3px;
-		border-radius: 5px;
-		background: grey;
+		width: 3px;
+		margin: 4px;
+		border-radius: 2px;
+		background: ${colors.grey80.toString()};
+	}
+
+	&:hover {
+		opacity: 1;
+		&::after {
+			background: ${colors.grey60.toString()};
+		}
+	}
+	&:active {
+		opacity: 1;
+		&::after {
+			background: ${colors.white.toString()};
+		}
+	}
+	&:last-of-type {
+		right: 0;
+		left: auto;
 	}
 `;
 
 const BaseStyledPreviewPane = styled.div`
+	position: relative;
 	flex-grow: 1;
 	overflow: hidden;
 	background: ${colors.white.toString()};
-	border-radius: 6px 6px 0 0;
-	box-shadow: 0 3px 9px 0 ${colors.black.toRGBString(0.15)};
 `;
 
 const StyledPreviewPane = BaseStyledPreviewPane.extend.attrs({
 	style: (props: PreviewPaneProps) => ({
 		maxWidth: `${props.width}px` || 'none'
 	})
-}) `${(props: PreviewPaneProps) => ({})}`;
+})`${(props: PreviewPaneProps) => ({})}`;
 
 export default class PreviewPane extends React.Component<PreviewPaneProps> {
 	private previewPane: HTMLElement;
@@ -65,40 +89,37 @@ export default class PreviewPane extends React.Component<PreviewPaneProps> {
 	}
 
 	public render(): JSX.Element {
-		const {
-			handleMouseDownLeft,
-			handleMouseDownRight,
-			handleMouseMove,
-			handleMouseUp,
-			width,
-			previewFrame
-		} = this.props;
+		const props = this.props;
 
 		return (
 			<StyledPreviewWrapper
 				innerRef={(ref: HTMLElement) => (this.previewPane = ref)}
-				onMouseMove={handleMouseMove}
-				onMouseUp={handleMouseUp}
+				onMouseMove={props.onMouseMove}
+				onMouseUp={props.onMouseUp}
 			>
-				<StyledPreviewResizer onMouseDown={handleMouseDownLeft} />
-				<StyledPreviewPane
-					width={width}
-					dangerouslySetInnerHTML={{
-						__html: `<webview id="preview" style="height: 100%; border-radius: 6px 6px 0 0; overflow: hidden;" src="${previewFrame ||
-							'./preview.html'}" preload="./preview.js" partition="electron" />`
-					}}
-				/>
-				<StyledPreviewResizer onMouseDown={handleMouseDownRight} />
+				<StyledPreviewPane width={props.width}>
+					<StyledPreviewResizer onMouseDown={props.onMouseDownLeft} />
+					<StyledPreviewFrame src={props.previewFrame} />
+					<StyledPreviewResizer onMouseDown={props.onMouseDownRight} />
+				</StyledPreviewPane>
 			</StyledPreviewWrapper>
 		);
 	}
 
 	private updatePreviewWidth(): void {
-		if (!this.props.handlePreviewWidthUpdate) {
+		if (!this.props.onPreviewWidthUpdate) {
 			return;
 		}
 
 		const previewWidth = this.previewPane.offsetWidth;
-		this.props.handlePreviewWidthUpdate(previewWidth);
+		this.props.onPreviewWidthUpdate(previewWidth);
 	}
 }
+
+const StyledPreviewFrame = styled('iframe')`
+	width: 100%;
+	height: 100%;
+	border: none;
+	border-radius: 6px 6px 0 0;
+	overflow: hidden;
+`;

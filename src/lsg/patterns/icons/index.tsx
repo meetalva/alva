@@ -4,7 +4,8 @@ import styled from 'styled-components';
 
 export enum IconName {
 	Arrow,
-	ArrowFill,
+	ArrowFillRight,
+	ArrowFillLeft,
 	Robo,
 	Pattern
 }
@@ -15,12 +16,12 @@ export interface IconRegistryProps {
 export interface IconProps {
 	className?: string;
 	color?: Color;
-	handleClick?: React.MouseEventHandler<SVGSVGElement>;
+	handleClick?: React.MouseEventHandler<SVGElement>;
 	name: IconName | null;
-	size?: Size;
+	size?: IconSize;
 }
 
-export enum Size {
+export enum IconSize {
 	XXS = 12,
 	XS = 15,
 	S = 24
@@ -29,7 +30,7 @@ export enum Size {
 interface StyledIconProps {
 	className?: string;
 	iconColor?: Color;
-	size?: Size;
+	size?: IconSize;
 }
 
 interface IconRegistrySymbolProps {
@@ -40,7 +41,8 @@ const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
 	[IconName.Arrow]: [
 		[<path key="arrow" d="M17.5 12l-8.486 8.485L7.6 19.071 14.671 12 7.6 4.929l1.414-1.414z" />]
 	],
-	[IconName.ArrowFill]: [[<path key="arrowFill" d="M8 4l8 8-8 8z" />]],
+	[IconName.ArrowFillRight]: [[<path key="arrowFillRight" d="M8 4l8 8-8 8z" />]],
+	[IconName.ArrowFillLeft]: [[<path key="arrowFillLeft" d="M16 20l-8-8 8-8v16z" />]],
 	[IconName.Robo]: [
 		[<path key="robo" d="M0 0h24v24H0V0zm15 5v5h5V5h-5zM4 20h16v-1H4v1zM4 5v5h5V5H4z" />]
 	],
@@ -59,8 +61,8 @@ const StyledIconRegistry = styled.svg`
 `;
 
 const StyledIcon = styled.svg`
-	width: ${(props: StyledIconProps) => props.size || Size.S}px;
-	height: ${(props: StyledIconProps) => props.size || Size.S}px;
+	width: ${(props: StyledIconProps) => props.size || IconSize.S}px;
+	height: ${(props: StyledIconProps) => props.size || IconSize.S}px;
 
 	color: ${(props: StyledIconProps) => (props.iconColor ? props.iconColor.toString() : 'inherit')};
 	fill: currentColor;

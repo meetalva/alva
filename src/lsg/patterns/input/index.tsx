@@ -1,6 +1,6 @@
 import { colors } from '../colors';
 import * as React from 'react';
-import { getSpace, Size } from '../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface InputProps {
@@ -28,12 +28,12 @@ const StyledInput = styled.input`
 	border: none;
 	background: transparent;
 
-	margin: 0 ${getSpace(Size.L)}px;
+	margin: 0 ${getSpace(SpaceSize.L)}px;
 	font-size: 15px;
 
 	box-sizing: border-box;
 	display: block;
-	width: calc(100% - ${getSpace(Size.M) * 2}px);
+	width: calc(100% - ${getSpace(SpaceSize.M) * 2}px);
 	color: ${colors.black.toString()};
 
 	font-weight: 500;

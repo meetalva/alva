@@ -1,19 +1,12 @@
-import {
-	BrowserWindow,
-	ipcRenderer,
-	MenuItem,
-	MenuItemConstructorOptions,
-	remote,
-	WebviewTag
-} from 'electron';
+import { BrowserWindow, ipcRenderer, MenuItem, MenuItemConstructorOptions, remote } from 'electron';
 import { ElementLocationCommand } from '../store/command/element-location-command';
-import * as FileExtraUtils from 'fs-extra';
+import * as FsExtra from 'fs-extra';
 import { Page } from '../store/page/page';
 import { PageElement } from '../store/page/page-element';
-import * as PathUtils from 'path';
+import * as Path from 'path';
 import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
-import * as ProcessUtils from 'process';
+import * as Process from 'process';
 import { SketchExporter } from '../export/sketch-exporter';
 import { Store } from '../store/store';
 const { Menu, shell, app, dialog } = remote;
@@ -55,10 +48,10 @@ export function createMenu(): void {
 					click: () => {
 						let appPath: string = app.getAppPath().replace('.asar', '.asar.unpacked');
 						if (appPath.indexOf('node_modules') >= 0) {
-							appPath = ProcessUtils.cwd();
+							appPath = Process.cwd();
 						}
 
-						const designkitPath = PathUtils.join(appPath, 'build', 'designkit');
+						const designkitPath = Path.join(appPath, 'build', 'designkit');
 						dialog.showOpenDialog(
 							{ properties: ['openDirectory', 'createDirectory'] },
 							filePaths => {
@@ -66,10 +59,7 @@ export function createMenu(): void {
 									return;
 								}
 
-								FileExtraUtils.copySync(
-									designkitPath,
-									PathUtils.join(filePaths[0], 'designkit')
-								);
+								FsExtra.copySync(designkitPath, Path.join(filePaths[0], 'designkit'));
 								store.openStyleguide(`${filePaths[0]}/designkit`);
 								store.openFirstPage();
 							}
@@ -134,9 +124,8 @@ export function createMenu(): void {
 								});
 
 								if (path) {
-									const webview = document.getElementById('preview') as WebviewTag;
 									const sketchExporter = new SketchExporter();
-									await sketchExporter.createExport(webview);
+									await sketchExporter.createExport();
 									await sketchExporter.writeToDisk(path);
 								}
 							}
@@ -153,9 +142,8 @@ export function createMenu(): void {
 								});
 
 								if (path) {
-									const webview = document.getElementById('preview') as WebviewTag;
 									const pdfExporter = new PdfExporter();
-									await pdfExporter.createExport(webview);
+									await pdfExporter.createExport();
 									await pdfExporter.writeToDisk(path);
 								}
 							}
@@ -172,9 +160,8 @@ export function createMenu(): void {
 								});
 
 								if (path) {
-									const webview = document.getElementById('preview') as WebviewTag;
 									const pngExporter = new PngExporter();
-									await pngExporter.createExport(webview);
+									await pngExporter.createExport();
 									await pngExporter.writeToDisk(path);
 								}
 							}
@@ -278,7 +265,7 @@ export function createMenu(): void {
 						if (selectedElement && store.isElementFocussed()) {
 							const newPageElement = selectedElement.clone();
 							store.execute(
-								ElementLocationCommand.addSibling(selectedElement, newPageElement)
+								ElementLocationCommand.addSibling(newPageElement, selectedElement)
 							);
 							store.setSelectedElement(newPageElement);
 						}
@@ -306,7 +293,12 @@ export function createMenu(): void {
 						}
 					})(),
 					click: () => {
+						if (store.getSelectedSlotId()) {
+							return;
+						}
+
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
+
 						if (selectedElement) {
 							store.execute(ElementLocationCommand.remove(selectedElement));
 							store.setSelectedElement(undefined);

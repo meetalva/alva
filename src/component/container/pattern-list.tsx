@@ -10,7 +10,7 @@ import PatternList, {
 	PatternListItemProps
 } from '../../lsg/patterns/pattern-list';
 import * as React from 'react';
-import Space, { Size } from '../../lsg/patterns/space';
+import Space, { SpaceSize } from '../../lsg/patterns/space';
 import { Store } from '../../store/store';
 
 export interface PatternListContainerItemProps {
@@ -106,12 +106,15 @@ export class PatternListContainer extends React.Component {
 	protected handlePatternClick(pattern: Pattern): void {
 		const store: Store = Store.getInstance();
 		const selectedElement: PageElement | undefined = store.getSelectedElement();
+		const selectedSlot = store.getSelectedSlotId();
 		if (selectedElement) {
 			const newPageElement = new PageElement({
 				pattern,
 				setDefaults: true
 			});
-			store.execute(ElementLocationCommand.addSibling(selectedElement, newPageElement));
+			store.execute(
+				ElementLocationCommand.addChild(selectedElement, newPageElement, selectedSlot)
+			);
 			store.setSelectedElement(newPageElement);
 		}
 	}
@@ -133,10 +136,10 @@ export class PatternListContainer extends React.Component {
 		const list = this.createList(this.items);
 		return (
 			<div>
-				<Space sizeBottom={Size.XXS}>
+				<Space sizeBottom={SpaceSize.XXS}>
 					<Input handleChange={this.handleSearchInputChange} placeholder="Search patterns" />
 				</Space>
-				<Space size={[0, Size.L]}>{list}</Space>
+				<Space size={[0, SpaceSize.L]}>{list}</Space>
 			</div>
 		);
 	}

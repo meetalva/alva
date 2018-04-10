@@ -182,7 +182,7 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 				{children && (
 					<StyledIcon
 						handleClick={handleIconClick}
-						name={IconName.ArrowFill}
+						name={IconName.ArrowFillRight}
 						size={IconSize.XXS}
 						color={colors.grey60}
 						open={open}

@@ -1,7 +1,7 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
 import * as React from 'react';
-import { getSpace, Size } from '../../space';
+import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
 
 export interface BooleanItemProps {
@@ -21,7 +21,7 @@ const StyledBooleanItem = styled.div`
 
 const StyledLabelWrapper = styled.label`
 	display: block;
-	margin-bottom: ${getSpace(Size.L)}px;
+	margin-bottom: ${getSpace(SpaceSize.L)}px;
 `;
 
 const indicatorWidth = 42;
@@ -70,7 +70,7 @@ const StyledLabel = styled.span`
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
-	margin-bottom: ${getSpace(Size.XS)}px;
+	margin-bottom: ${getSpace(SpaceSize.XS)}px;
 `;
 
 const StyledInput = styled.input`

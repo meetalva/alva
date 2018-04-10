@@ -40,6 +40,10 @@ function setupVirtualFileSystem() {
 		mockFolderStructure[`/${mock}/projectfiles/lib/`] = createMockConfigFromFolder(
 			`${testBasePath}dummy-patterns/lib/`
 		);
+		mockFolderStructure[`/${mock}/projectfiles/node_modules/`] = createMockConfigFromFolder(
+			`${testBasePath}dummy-patterns/node_modules/`,
+			true
+		);
 		mockFolderStructure[`/${mock}/userfiles/`] = createMockConfigFromFolder(
 			`${testBasePath}mock-styleguides/${mock}/userfiles/`
 		);
@@ -125,12 +129,18 @@ describe(`Test for backwards compatibility of config files`, () => {
 					return;
 				}
 
-				// currently the typescript-react-analyzer does not find properties for our test file
-				// test('property values', () => {
-				// 	console.log('getProperties', rootElementPattern.getProperties());
-				// })
+				test('property values are defined', () => {
+					const altProperty = rootElement.getPropertyValue('alt');
+					expect(altProperty).toBe("Don't look");
 
-				const rootElementChildren = rootElement.getChildren();
+					const srcProperty = rootElement.getPropertyValue('src');
+					expect(srcProperty).toBe('www.google.com');
+
+					const sizeProperty = rootElement.getPropertyValue('size');
+					expect(sizeProperty).toBe('XL');
+				});
+
+				const rootElementChildren = rootElement.getSlotContents();
 				test('children are defined', () => {
 					expect(rootElementChildren).toBeDefined();
 				});

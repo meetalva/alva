@@ -1,8 +1,8 @@
 import { Color, colors } from '../colors';
-import { Icon, IconName, Size as IconSize } from '../icons';
+import { Icon, IconName, IconSize } from '../icons';
 import Input, { InputTypes } from '../input';
 import * as React from 'react';
-import { getSpace, Size as SpaceSize } from '../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface DropdownItemProps {

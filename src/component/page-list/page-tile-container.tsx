@@ -1,5 +1,5 @@
 import { PreviewTile } from '../../lsg/patterns/preview-tile/index';
-import Space, { Size } from '../../lsg/patterns/space/index';
+import Space, { SpaceSize } from '../../lsg/patterns/space/index';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import { PageRef } from '../../store/page/page-ref';
@@ -8,7 +8,6 @@ import { Store } from '../../store/store';
 
 export interface PageTileContainerProps {
 	focused: boolean;
-	onClick: React.MouseEventHandler<HTMLElement>;
 	page: PageRef;
 }
 
@@ -16,11 +15,11 @@ export interface PageTileContainerProps {
 export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	@MobX.observable public editable: boolean = false;
 	@MobX.observable public inputValue: string = '';
+	@MobX.observable public namedPage: boolean = Boolean(this.props.page.getName());
 
 	public constructor(props: PageTileContainerProps) {
 		super(props);
-		this.inputValue = this.inputValue || this.props.page.getName();
-
+		this.inputValue = this.inputValue || (this.props.page.getName() || 'Unnamed Page');
 		this.handleBlur = this.handleBlur.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 		this.handleClick = this.handleClick.bind(this);
@@ -41,14 +40,18 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 
 	@MobX.action
 	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
-		this.props.onClick(e);
+		const store = Store.getInstance();
+		store.openPage(this.props.page.getId());
+
 		if (this.props.focused) {
 			this.editable = true;
 		}
 	}
 
 	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
-		Store.getInstance().openPage(this.props.page.getId());
+		const store = Store.getInstance();
+		store.togglePageOverview();
+		store.openPage(this.props.page.getId());
 	}
 
 	@MobX.action
@@ -82,7 +85,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 
 	public render(): JSX.Element {
 		return (
-			<Space size={Size.S}>
+			<Space size={SpaceSize.S}>
 				<PreviewTile
 					editable={this.editable}
 					focused={this.props.focused}
@@ -93,6 +96,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 					onClick={this.handleClick}
 					onDoubleClick={this.handleDoubleClick}
 					onKeyDown={this.handleKeyDown}
+					named={this.namedPage}
 					value={this.inputValue}
 				/>
 			</Space>

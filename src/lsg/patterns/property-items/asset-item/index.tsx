@@ -1,7 +1,7 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
 import * as React from 'react';
-import { getSpace, Size } from '../../space';
+import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
 
 export interface AssetItemProps {
@@ -22,12 +22,12 @@ const StyledPreview = styled.div`
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	margin-bottom: ${getSpace(Size.XS)}px;
+	margin-bottom: ${getSpace(SpaceSize.XS)}px;
 `;
 
 const StyledLabel = styled.span`
 	display: block;
-	margin-bottom: ${getSpace(Size.XS)}px;
+	margin-bottom: ${getSpace(SpaceSize.XS)}px;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
@@ -84,7 +84,7 @@ const StyledButton = styled.button`
 	border: 0.5px solid ${colors.grey90.toString()};
 	border-radius: 3px;
 	background-color: ${colors.white.toString()};
-	padding: ${getSpace(Size.XS)}px ${getSpace(Size.S)}px;
+	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.S)}px;
 `;
 
 export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (

@@ -103,6 +103,7 @@
     "@types/react": "16.3.5",
     "@types/react-dom": "16.0.4",
     "@types/smoothscroll-polyfill": "0.3.0",
+    "@types/username": "3.0.0",
     "@types/uuid": "3.4.3",
     "concurrently": "3.5.1",
     "electron": "1.8.4",
@@ -139,6 +140,7 @@
     "styled-components": "3.2.5",
     "tslib": "1.9.0",
     "typescript": "2.8.1",
+    "username": "3.0.0",
     "uuid": "3.2.1"
   },
   "homepage": "https://meetalva.github.io/"

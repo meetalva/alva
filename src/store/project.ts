@@ -2,10 +2,13 @@ import { JsonArray, JsonObject } from './json';
 import * as MobX from 'mobx';
 import { PageRef } from './page/page-ref';
 import { Store } from './store';
+import * as username from 'username';
 import * as Uuid from 'uuid';
 
 export interface ProjectProperties {
 	id?: string;
+	lastChangedAuthor?: string;
+	lastChangedDate?: Date;
 	name: string;
 	previewFrame: string;
 }
@@ -23,6 +26,20 @@ export class Project {
 	 * The technical (internal) ID of the project.
 	 */
 	@MobX.observable private id: string;
+
+	/**
+	 * The last author who edited this project or one of its pages (including elements,
+	 * properties etc.). Updated when calling the touch method.
+	 * @see touch()
+	 */
+	@MobX.observable private lastChangedAuthor: string;
+
+	/**
+	 * The last change date when this project or one of its pages was edited (including elements,
+	 * properties etc.). Updated when calling the touch method.
+	 * @see touch()
+	 */
+	@MobX.observable private lastChangedDate: Date = new Date();
 
 	/**
 	 * The human-friendly name of the project.
@@ -51,6 +68,8 @@ export class Project {
 	public constructor(properties: ProjectProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
 		this.name = properties.name;
+		this.lastChangedAuthor = properties.lastChangedAuthor || 'unknown';
+		this.lastChangedDate = properties.lastChangedDate || new Date();
 		this.previewFrame = properties.previewFrame;
 	}
 
@@ -60,9 +79,13 @@ export class Project {
 	 * @return A new project object containing the loaded data.
 	 */
 	public static fromJsonObject(json: JsonObject): Project {
+		const lastChangedDate = new Date(json.lastChangedDate as string);
+
 		const project: Project = new Project({
 			id: json.uuid as string,
 			name: json.name as string,
+			lastChangedAuthor: json.lastChangedAuthor as string | undefined,
+			lastChangedDate: isNaN(lastChangedDate.getTime()) ? undefined : lastChangedDate,
 			previewFrame: json.previewFrame as string
 		});
 
@@ -82,14 +105,22 @@ export class Project {
 		return this.id;
 	}
 
-	// TODO
+	/**
+	 * The last author who edited this project or one of its pages (including elements,
+	 * properties etc.). Updated when calling the touch method.
+	 * @see touch()
+	 */
 	public getLastChangedAuthor(): string {
-		return 'Max Mustermann';
+		return this.lastChangedAuthor;
 	}
 
-	// TODO
+	/**
+	 * The last change date when this project or one of its pages was edited (including elements,
+	 * properties etc.). Updated when calling the touch method.
+	 * @see touch()
+	 */
 	public getLastChangedDate(): Date {
-		return new Date();
+		return this.lastChangedDate;
 	}
 
 	/**
@@ -149,9 +180,21 @@ export class Project {
 		return {
 			uuid: this.id,
 			name: this.name,
+			lastChangedAuthor: this.lastChangedAuthor,
+			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
 			previewFrame: this.previewFrame,
 			pages: pagesJsonObject
 		};
+	}
+
+	/**
+	 * Updates the last-changed date and author. Call this on any page or project user command.
+	 */
+	public touch(): void {
+		void (async () => {
+			this.lastChangedAuthor = await username();
+			this.lastChangedDate = new Date();
+		})();
 	}
 
 	/**

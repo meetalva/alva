@@ -9,6 +9,7 @@ export interface PreviewTileProps {
 	focused: boolean;
 	id?: string;
 	name: string;
+	named: boolean;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
@@ -19,6 +20,10 @@ export interface PreviewTileProps {
 
 interface StyledPreviewTileProps {
 	focused: boolean;
+}
+
+interface StyledPreviewTitle {
+	named: boolean;
 }
 
 const StyledPreview = styled.section`
@@ -45,6 +50,8 @@ const StyledTitle = styled.strong`
 	margin-bottom: ${getSpace(Size.S)}px;
 	font-size: 12px;
 	font-weight: normal;
+	color: ${(props: StyledPreviewTitle) =>
+		props.named ? colors.black.toString() : colors.grey80.toString()}
 	cursor: pointer;
 `;
 
@@ -79,7 +86,7 @@ export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): 
 				{props.value}
 			</StyledEditableTitle>
 		) : (
-			<StyledTitle>{props.name}</StyledTitle>
+			<StyledTitle named={props.named}>{props.name}</StyledTitle>
 		)}
 		<StyledPreviewTile focused={props.focused} />
 	</StyledPreview>

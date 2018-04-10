@@ -16,11 +16,12 @@ export interface PageTileContainerProps {
 export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	@MobX.observable public editable: boolean = false;
 	@MobX.observable public inputValue: string = '';
+	@MobX.observable public namedPage: boolean = Boolean(this.props.page.getName());
 
 	public constructor(props: PageTileContainerProps) {
 		super(props);
-		this.inputValue = this.inputValue || this.props.page.getName();
-
+		this.inputValue = this.inputValue || (this.props.page.getName() || 'Unnamed Page');
+		console.log(this.namedPage, '((((((');
 		this.handleBlur = this.handleBlur.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 		this.handleClick = this.handleClick.bind(this);
@@ -93,6 +94,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 					onClick={this.handleClick}
 					onDoubleClick={this.handleDoubleClick}
 					onKeyDown={this.handleKeyDown}
+					named={this.namedPage}
 					value={this.inputValue}
 				/>
 			</Space>

@@ -82,7 +82,9 @@ export abstract class ElementCommand extends Command {
 			return false;
 		}
 
-		if (this.element.getPage()) {
+		const page = this.element.getPage();
+		if (page) {
+			page.getProject().touch();
 			Store.getInstance().setSelectedElement(this.element);
 		}
 

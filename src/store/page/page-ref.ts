@@ -23,7 +23,7 @@ export class PageRef {
 	/**
 	 * The technical (internal) ID of the page.
 	 */
-	@MobX.observable private id: string;
+	@MobX.observable private id?: string;
 
 	/**
 	 * The last path reference persisted in the projects.xml for this page. Used:
@@ -36,7 +36,7 @@ export class PageRef {
 	 * The human-friendly name of the page.
 	 * In the frontend, to be displayed instead of the ID.
 	 */
-	@MobX.observable private name: string;
+	@MobX.observable private name?: string;
 
 	/**
 	 * The path of the page file, relative to the alva.yaml.
@@ -99,7 +99,7 @@ export class PageRef {
 	 * @return The technical (internal) ID of the page.
 	 */
 	public getId(): string {
-		return this.id;
+		return this.id || Uuid.v4();
 	}
 
 	/**
@@ -118,7 +118,7 @@ export class PageRef {
 	 * @return The human-friendly name of the page.
 	 */
 	public getName(): string {
-		return this.name;
+		return this.name || 'Unnamed Page';
 	}
 
 	/**

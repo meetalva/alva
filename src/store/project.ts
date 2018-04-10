@@ -6,7 +6,7 @@ import * as Uuid from 'uuid';
 
 export interface ProjectProperties {
 	id?: string;
-	name: string;
+	name?: string;
 	previewFrame: string;
 }
 
@@ -50,7 +50,7 @@ export class Project {
 	 */
 	public constructor(properties: ProjectProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
-		this.name = properties.name;
+		this.name = properties.name || 'Unnamed Project';
 		this.previewFrame = properties.previewFrame;
 	}
 

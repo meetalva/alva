@@ -21,7 +21,6 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	public constructor(props: PageTileContainerProps) {
 		super(props);
 		this.inputValue = this.inputValue || (this.props.page.getName() || 'Unnamed Page');
-		console.log(this.namedPage, '((((((');
 		this.handleBlur = this.handleBlur.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 		this.handleClick = this.handleClick.bind(this);

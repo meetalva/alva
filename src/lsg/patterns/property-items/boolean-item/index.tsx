@@ -36,14 +36,13 @@ const StyledIndicator = styled.span`
 	border-radius: ${indicatorHeight / 2}px;
 	background: ${colors.grey90.toString()};
 	box-sizing: border-box;
-	box-shadow: inset 0 0 0 ${indicatorBorderWidth}px ${colors.grey60.toString()};
 
 	&:after {
 		content: '';
 		display: block;
 		width: ${indicatorHeight}px;
 		height: ${indicatorHeight}px;
-		border: ${indicatorBorderWidth}px solid ${colors.grey60.toString()};
+		box-shadow: 0 0 1.5px ${indicatorBorderWidth}px ${colors.grey80.toString()};
 		transform: translateX(0px);
 		border-radius: 100%;
 		background: ${colors.white.toString()};

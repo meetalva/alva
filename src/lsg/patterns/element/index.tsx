@@ -52,15 +52,14 @@ const StyledElement = styled.div`
 const StyledElementLabel = styled.div`
 	position: relative;
 	display: flex;
-	padding: 9px ${getSpace(Size.L)}px 9px ${getSpace(Size.XL)}px;
-	border-radius: 3px;
+	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px ${getSpace(Size.XL)}px;
 	cursor: pointer;
 	align-items: center;
 	color: ${colors.black.toString()};
 	position: relative;
 
 	&:hover {
-		background: ${colors.grey90.toString()};
+		background ${colors.black.toString('rgb', { alpha: 0.05 })};
 	}
 
 	${(props: StyledElementLabelProps) =>

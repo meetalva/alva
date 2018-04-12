@@ -28,15 +28,19 @@ const StyledInput = styled.input`
 	display: block;
 	box-sizing: border-box;
 	width: 100%;
-	text-overflow: ellipsis;
-	border: none;
-	border-bottom: 1px solid transparent;
-	background: transparent;
-	font-family: ${fonts().NORMAL_FONT};
-	font-size: 15px;
-	padding-bottom: ${getSpace(Size.M) / 2}px;
-	color: ${colors.grey36.toString()};
+	padding: ${getSpace(Size.XS)}px;
 	margin-bottom: ${getSpace(Size.L)}px;
+
+	border: 0.5px solid ${colors.grey90.toString()};
+	border-radius: 1px;
+
+	background: ${colors.white.toString()};
+	color: ${colors.black.toString()};
+
+	font-family: ${fonts().NORMAL_FONT};
+	font-size: 12px;
+	text-overflow: ellipsis;
+
 	transition: all 0.2s;
 
 	::-webkit-input-placeholder {
@@ -50,7 +54,7 @@ const StyledInput = styled.input`
 
 	&:focus {
 		outline: none;
-		border-color: ${colors.blue40.toString()};
+		border-color: ${colors.blue.toString()};
 		color: ${colors.black.toString()};
 	}
 `;

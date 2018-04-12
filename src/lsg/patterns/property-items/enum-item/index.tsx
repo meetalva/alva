@@ -55,6 +55,7 @@ const StyledSelect = styled.select`
 		outline: none;
 		border-color: ${colors.blue40.toString()};
 		color: ${colors.black.toString()};
+		box-shadow: 0 0 3px ${colors.blue40.toString()};
 	}
 `;
 

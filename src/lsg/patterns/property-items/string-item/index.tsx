@@ -56,6 +56,7 @@ const StyledInput = styled.input`
 		outline: none;
 		border-color: ${colors.blue.toString()};
 		color: ${colors.black.toString()};
+		box-shadow: 0 0 3px ${colors.blue40.toString()};
 	}
 `;
 

@@ -18,22 +18,32 @@ export interface EnumItemProps {
 	values: Values[];
 }
 
+export interface StyledIconProps {
+	open?: boolean;
+}
+
 const StyledEnumItem = styled.div`
 	width: 100%;
 `;
 
 const StyledSelect = styled.select`
 	appearance: none;
-	border: none;
-	border-radius: 0;
-	font-size: 1em;
+	display: block;
+	box-sizing: border-box;
 	width: 100%;
-	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey36.toString()};
-	font-size: 15px;
-	border-bottom: 1px solid transparent;
-	padding-bottom: ${getSpace(Size.M) / 2}px;
+	padding: ${getSpace(Size.XS)}px;
 	margin-bottom: ${getSpace(Size.L)}px;
+
+	border: 0.5px solid ${colors.grey90.toString()};
+	border-radius: 3px;
+
+	background: ${colors.white.toString()};
+	color: ${colors.black.toString()};
+
+	font-family: ${fonts().NORMAL_FONT};
+	font-size: 12px;
+	text-overflow: ellipsis;
+
 	transition: all 0.2s;
 
 	&:hover {

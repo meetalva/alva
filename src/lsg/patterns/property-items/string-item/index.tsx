@@ -18,7 +18,7 @@ const StyledStringItem = styled.div`
 
 const StyledLabel = styled.span`
 	display: block;
-	margin-bottom: ${getSpace(Size.XS)}px;
+	margin-bottom: ${getSpace(Size.XXS)}px;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
@@ -29,7 +29,7 @@ const StyledInput = styled.input`
 	box-sizing: border-box;
 	width: 100%;
 	padding: ${getSpace(Size.XS)}px;
-	margin-bottom: ${getSpace(Size.L)}px;
+	margin-bottom: ${getSpace(Size.M)}px;
 
 	border: 0.5px solid ${colors.grey90.toString()};
 	border-radius: 1px;

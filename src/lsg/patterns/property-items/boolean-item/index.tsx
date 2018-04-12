@@ -21,7 +21,7 @@ const StyledBooleanItem = styled.div`
 
 const StyledLabelWrapper = styled.label`
 	display: block;
-	margin-bottom: ${getSpace(Size.L)}px;
+	margin-bottom: ${getSpace(Size.M)}px;
 `;
 
 const indicatorWidth = 42;
@@ -69,7 +69,7 @@ const StyledLabel = styled.span`
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
-	margin-bottom: ${getSpace(Size.XS)}px;
+	margin-bottom: ${getSpace(Size.XXS)}px;
 `;
 
 const StyledInput = styled.input`

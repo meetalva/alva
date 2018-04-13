@@ -1,0 +1,6 @@
+projects:
+ - id: meet-alva
+   name: Meet Alva
+   pages:
+      - id: testpage
+        name: Testpage

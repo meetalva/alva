@@ -122,6 +122,23 @@ export function createMenu(): void {
 					label: '&Export',
 					submenu: [
 						{
+							label: 'Export page as Sketch',
+							enabled: !isSplashscreen,
+							click: () => {
+								const pageFileName = getPageFileName();
+								querySaveFilePath(
+									'Export Sketch as',
+									'Almost Sketch JSON',
+									pageFileName,
+									'asketch.json',
+									(path: string) => {
+										const webview = document.getElementById('preview') as WebviewTag;
+										webview.send('export-as-sketch', path);
+									}
+								);
+							}
+						},
+						{
 							label: 'Export page as PDF',
 							enabled: !isSplashscreen,
 							click: () => {

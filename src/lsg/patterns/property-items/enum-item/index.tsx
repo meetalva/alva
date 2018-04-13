@@ -1,5 +1,6 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
+import { Icon, IconName, Size as IconSize } from '../../icons';
 import * as React from 'react';
 import { getSpace, Size } from '../../space';
 import styled from 'styled-components';
@@ -26,6 +27,8 @@ const StyledEnumItem = styled.div`
 	width: 100%;
 `;
 
+const StyledIcon = styled(Icon)``;
+
 const StyledSelect = styled.select`
 	appearance: none;
 	display: block;
@@ -37,7 +40,12 @@ const StyledSelect = styled.select`
 	border: 0.5px solid ${colors.grey90.toString()};
 	border-radius: 3px;
 
-	background: ${colors.white.toString()};
+	background-color: ${colors.white.toString()};
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${colors.grey60.toString()}'><path d='M8,4 l8,8 -8,8 z' /></svg>");
+	background-repeat: no-repeat;
+	background-size: 12px;
+	background-position: right 10px top 9px;
+
 	color: ${colors.black.toString()};
 
 	font-family: ${fonts().NORMAL_FONT};
@@ -84,6 +92,7 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 						{value.name}
 					</option>
 				))};
+				<StyledIcon size={IconSize.XS} name={IconName.ArrowFill} />
 			</StyledSelect>
 		</StyledEnumItem>
 	);

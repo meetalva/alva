@@ -8,11 +8,38 @@ import {
 } from 'electron';
 import { ElementLocationCommand } from '../store/command/element-location-command';
 import * as FileExtraUtils from 'fs-extra';
+import { Page } from '../store/page/page';
 import { PageElement } from '../store/page/page-element';
 import * as PathUtils from 'path';
+import { PngExporter } from '../export/png-exporter';
 import * as ProcessUtils from 'process';
 import { Store } from '../store/store';
-const { screen, Menu, shell, app, dialog } = remote;
+const { Menu, shell, app, dialog } = remote;
+
+function getPageFileName(): string {
+	return (Store.getInstance().getCurrentPage() as Page).getName();
+}
+
+function querySaveFilePath(
+	title: string,
+	typeName: string,
+	defaultName: string,
+	extension: string,
+	callback: (path: string) => void
+): void {
+	dialog.showSaveDialog(
+		{
+			title,
+			defaultPath: `${defaultName}.${extension}`,
+			filters: [{ name: typeName, extensions: [extension] }]
+		},
+		path => {
+			if (path) {
+				callback(path);
+			}
+		}
+	);
+}
 
 export function createMenu(): void {
 	const store = Store.getInstance();
@@ -91,71 +118,37 @@ export function createMenu(): void {
 					type: 'separator'
 				},
 				{
+					label: '&Export',
+					submenu: [
+						{
+							label: 'Export page as PNG',
+							enabled: !isSplashscreen,
+							click: () => {
+								const pageFileName = getPageFileName();
+								querySaveFilePath(
+									'Export PNG as',
+									'PNG Image',
+									pageFileName,
+									'png',
+									(path: string) => {
+										const webview = document.getElementById('preview') as WebviewTag;
+										PngExporter.exportToPng(path, webview);
+									}
+								);
+							}
+						}
+					]
+				},
+				{
+					type: 'separator',
+					visible: process.platform !== 'darwin'
+				},
+				{
 					label: 'Se&ttings',
 					visible: process.platform !== 'darwin',
 					accelerator: 'Cmd+,',
 					click: () => {
 						shell.openItem(store.getPreferencesPath());
-					}
-				},
-				{
-					label: 'Export page as PNG',
-					enabled: !isSplashscreen,
-					click: () => {
-						const webview = document.getElementById('preview') as WebviewTag;
-
-						// code that gets executed inside the webview to get
-						// the actual size of the preview body
-						const code = `
-							bodyTag = document.querySelector('body');
-							r = {};
-							r.pageHeight = bodyTag.getBoundingClientRect().height;
-							r.pageWidth = bodyTag.getBoundingClientRect().width;
-							r;
-						`;
-
-						webview.executeJavaScript(code, false, webviewSize => {
-							// set the height of the webview tag to the preview body height
-							// This is needed because capturePage can not capture anything that renders
-							// outside the webview area (https://github.com/electron/electron/issues/9845)
-							webview.style.height = webviewSize.pageHeight;
-
-							// Delay the page capture to make sure that the style height changes are done.
-							// This is only needed because of the change in height in the above line
-							setTimeout(() => {
-								const scaleFactor = screen.getPrimaryDisplay().scaleFactor;
-								webview.capturePage(
-									{
-										x: 0,
-										y: 0,
-										// round the numbers to remove possible floating numbers
-										// also multiply by scaleFactor for devices with higher pixel ratio:
-										// https://github.com/electron/electron/issues/8314
-										width: Math.round(webviewSize.pageWidth * scaleFactor),
-										height: Math.round(webviewSize.pageHeight * scaleFactor)
-									},
-									capture => {
-										const pngBuffer: Buffer = capture.toPNG();
-
-										dialog.showSaveDialog(
-											{
-												filters: [{ name: 'Untitled', extensions: ['png'] }]
-											},
-											filename => {
-												// reset the webview height
-												webview.style.height = '100%';
-
-												if (!filename) {
-													return;
-												}
-
-												FileExtraUtils.writeFileSync(filename, pngBuffer);
-											}
-										);
-									}
-								);
-							}, 100);
-						});
 					}
 				},
 				{

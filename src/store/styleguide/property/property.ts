@@ -47,7 +47,7 @@ export abstract class Property {
 	 */
 	public constructor(id: string) {
 		this.id = id;
-		this.name = Store.guessName(id, name);
+		this.name = Store.guessName(id);
 	}
 
 	/**

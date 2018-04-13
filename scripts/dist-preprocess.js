@@ -6,9 +6,9 @@ execSync('npm run build:clean');
 
 console.info('Starting to copy designkit to build folder.');
 execSync(`
-	mkdir build/designkit &&
-	cp -r ../designkit/patterns ../designkit/alva ../designkit/*.* build/designkit/
-`);
+	git clone git@github.com:meetalva/designkit.git --depth=1 build/designkit &&
+	rm -r build/designkit/.[^.]*
+`)
 
 console.info('Install node packages for designkit.');
 execSync(`

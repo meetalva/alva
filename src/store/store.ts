@@ -117,10 +117,10 @@ export class Store {
 	/**
 	 * Creates a new store.
 	 */
-	private constructor() {
+	private constructor(basePreferencePath?: string) {
 		try {
 			this.preferences = Preferences.fromJsonObject(
-				Persister.loadYamlOrJson(this.getPreferencesPath())
+				Persister.loadYamlOrJson(this.getPreferencesPath(basePreferencePath))
 			);
 		} catch (error) {
 			this.preferences = new Preferences();
@@ -131,9 +131,9 @@ export class Store {
 	 * Returns (or creates) the one global store instance.
 	 * @return The one global store instance.
 	 */
-	public static getInstance(): Store {
+	public static getInstance(basePreferencePath?: string): Store {
 		if (!Store.INSTANCE) {
-			Store.INSTANCE = new Store();
+			Store.INSTANCE = new Store(basePreferencePath);
 		}
 
 		return Store.INSTANCE;
@@ -383,8 +383,8 @@ export class Store {
 	 * Returns the path to the user preferences YAML file.
 	 * @return The path to the user preferences YAML file.
 	 */
-	public getPreferencesPath(): string {
-		return PathUtils.join(OsUtils.homedir(), '.alva-prefs.yaml');
+	public getPreferencesPath(basePreferencePath?: string): string {
+		return PathUtils.join(basePreferencePath || OsUtils.homedir(), '.alva-prefs.yaml');
 	}
 
 	/**

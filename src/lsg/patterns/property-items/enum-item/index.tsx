@@ -1,6 +1,5 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
-import { Icon, IconName, Size as IconSize } from '../../icons';
 import * as React from 'react';
 import { getSpace, Size } from '../../space';
 import styled from 'styled-components';
@@ -26,8 +25,6 @@ export interface StyledIconProps {
 const StyledEnumItem = styled.div`
 	width: 100%;
 `;
-
-const StyledIcon = styled(Icon)``;
 
 const StyledSelect = styled.select`
 	appearance: none;
@@ -91,8 +88,7 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 					<option key={value.id} value={value.id}>
 						{value.name}
 					</option>
-				))};
-				<StyledIcon size={IconSize.XS} name={IconName.ArrowFill} />
+				))}
 			</StyledSelect>
 		</StyledEnumItem>
 	);

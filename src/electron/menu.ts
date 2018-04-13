@@ -11,6 +11,7 @@ import * as FileExtraUtils from 'fs-extra';
 import { Page } from '../store/page/page';
 import { PageElement } from '../store/page/page-element';
 import * as PathUtils from 'path';
+import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
 import * as ProcessUtils from 'process';
 import { Store } from '../store/store';
@@ -120,6 +121,23 @@ export function createMenu(): void {
 				{
 					label: '&Export',
 					submenu: [
+						{
+							label: 'Export page as PDF',
+							enabled: !isSplashscreen,
+							click: () => {
+								const pageFileName = getPageFileName();
+								querySaveFilePath(
+									'Export PDF as',
+									'PDF Document',
+									pageFileName,
+									'pdf',
+									(path: string) => {
+										const webview = document.getElementById('preview') as WebviewTag;
+										PdfExporter.exportToPdf(path, webview);
+									}
+								);
+							}
+						},
 						{
 							label: 'Export page as PNG',
 							enabled: !isSplashscreen,

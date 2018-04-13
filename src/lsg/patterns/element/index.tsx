@@ -83,21 +83,36 @@ const StyledElementLabel = styled.div`
 
 const StyledPlaceholder = styled.div`
 	position: relative;
-	height: 10px;
+	height: 16px;
 	width: 100%;
-	margin-top: -5px;
-	margin-bottom: -5px;
+	margin-top: -6px;
+	margin-bottom: -10px;
 	border-radius: 3px;
+
+	&::before {
+		content: '';
+		display: block;
+		position: absolute;
+		height: 6px;
+		width: 6px;
+		left: 6px;
+		top: 3px;
+		border-radius: 3px;
+		background: ${colors.blue40.toString()};
+		transform: scale(0);
+		transition: transform 0.2s;
+		z-index: 100;
+	}
 
 	&::after {
 		content: '';
 		display: block;
 		position: absolute;
-		height: 100%;
+		height: 2px;
 		width: 100%;
-		left: 0;
-		top: 0;
-		background: ${colors.grey90.toString()};
+		left: 6px;
+		top: 5px;
+		background: ${colors.blue40.toString()};
 		transform: scaleY(0);
 		transition: transform 0.2s;
 		z-index: 50;
@@ -106,6 +121,9 @@ const StyledPlaceholder = styled.div`
 	${(props: StyledPlaceholder) =>
 		props.highlightPlaceholder
 			? `
+			&:before {
+				transform: scale(1);
+			}
 			&:after {
 				transform: scaleY(1);
 			}

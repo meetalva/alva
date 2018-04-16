@@ -224,7 +224,7 @@ class Preview extends React.Component<PreviewProps> {
 	private triggerHighlight(): void {
 		if (this.props.selectedElementId) {
 			const domNode = this.patternWrapperRef && ReactDOM.findDOMNode(this.patternWrapperRef);
-			if (domNode) {
+			if (domNode && domNode instanceof Element) {
 				this.highlightArea.show(domNode, this.props.selectedElementId);
 			}
 		} else {

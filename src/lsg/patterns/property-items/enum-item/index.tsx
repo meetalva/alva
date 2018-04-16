@@ -40,8 +40,9 @@ const StyledSelectWrapper = styled.div`
 const StyledSelect = styled.select`
 	appearance: none;
 	box-sizing: border-box;
-	width: calc(100% - ${getSpace(Size.XL)}px);
-	padding: ${getSpace(Size.XS)}px;
+	width: 100%;
+	padding: ${getSpace(Size.XS)}px ${getSpace(Size.XL)}px ${getSpace(Size.XS)}px
+		${getSpace(Size.XS)}px;
 
 	border: none;
 

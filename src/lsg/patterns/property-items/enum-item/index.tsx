@@ -1,5 +1,6 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
+import { Icon, IconName, Size as IconSize } from '../../icons';
 import * as React from 'react';
 import { getSpace, Size } from '../../space';
 import styled from 'styled-components';
@@ -26,22 +27,25 @@ const StyledEnumItem = styled.div`
 	width: 100%;
 `;
 
-const StyledSelect = styled.select`
-	appearance: none;
-	display: block;
-	box-sizing: border-box;
+const StyledSelectWrapper = styled.div`
 	width: 100%;
-	padding: ${getSpace(Size.XS)}px;
+	position: relative;
+	display: block;
 	margin-bottom: ${getSpace(Size.M)}px;
-
 	border: 0.5px solid ${colors.grey90.toString()};
 	border-radius: 3px;
-
 	background-color: ${colors.white.toString()};
-	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${colors.grey60.toString()}'><path d='M8,4 l8,8 -8,8 z' /></svg>");
-	background-repeat: no-repeat;
-	background-size: 12px;
-	background-position: right 10px top 9px;
+`;
+
+const StyledSelect = styled.select`
+	appearance: none;
+	box-sizing: border-box;
+	width: calc(100% - ${getSpace(Size.XL)}px);
+	padding: ${getSpace(Size.XS)}px;
+
+	border: none;
+
+	background: none;
 
 	color: ${colors.black.toString()};
 
@@ -64,6 +68,16 @@ const StyledSelect = styled.select`
 	}
 `;
 
+const StyledIcon = styled(Icon)`
+	position: absolute;
+	right: 0;
+	fill: ${colors.grey60.toString()};
+	width: 12px;
+	height: 12px;
+	padding: ${getSpace(Size.XS)}px;
+	transform: rotate(90deg);
+`;
+
 const StyledLabel = styled.span`
 	display: block;
 	margin-bottom: ${getSpace(Size.XXS)}px;
@@ -78,18 +92,21 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 	return (
 		<StyledEnumItem className={className}>
 			<StyledLabel>{label}</StyledLabel>
-			<StyledSelect
-				className={className}
-				onChange={handleChange}
-				value={selectedValue ? selectedValue : ''}
-			>
-				{!required && <option key="empty" value="" />}
-				{values.map(value => (
-					<option key={value.id} value={value.id}>
-						{value.name}
-					</option>
-				))}
-			</StyledSelect>
+			<StyledSelectWrapper>
+				<StyledSelect
+					className={className}
+					onChange={handleChange}
+					value={selectedValue ? selectedValue : ''}
+				>
+					{!required && <option key="empty" value="" />}
+					{values.map(value => (
+						<option key={value.id} value={value.id}>
+							{value.name}
+						</option>
+					))}
+				</StyledSelect>
+				<StyledIcon name={IconName.ArrowFill} size={IconSize.XXS} color={colors.grey60} />
+			</StyledSelectWrapper>
 		</StyledEnumItem>
 	);
 };

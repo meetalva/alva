@@ -3,6 +3,7 @@
 import { AssetProperty } from '../../../store/styleguide/property/asset-property';
 import { BooleanProperty } from '../../../store/styleguide/property/boolean-property';
 import { EnumProperty, Option } from '../../../store/styleguide/property/enum-property';
+import { EventProperty } from '../../../store/styleguide/property/event/event-property';
 import { NumberArrayProperty } from '../../../store/styleguide/property/number-array-property';
 import { NumberProperty } from '../../../store/styleguide/property/number-property';
 import { ObjectProperty } from '../../../store/styleguide/property/object-property';
@@ -26,6 +27,7 @@ type PropertyFactory = (args: PropertyFactoryArgs) => Property | undefined;
  */
 export class PropertyAnalyzer {
 	private static PROPERTY_FACTORIES: PropertyFactory[] = [
+		PropertyAnalyzer.createEventProperty,
 		PropertyAnalyzer.createBooleanProperty,
 		PropertyAnalyzer.createEnumProperty,
 		PropertyAnalyzer.createStringProperty,
@@ -182,6 +184,22 @@ export class PropertyAnalyzer {
 			const property = new EnumProperty(args.symbol.name);
 			property.setOptions(options);
 			return property;
+		}
+
+		return;
+	}
+
+	/**
+	 * Analyzes a TypeScript symbol and tries to interpret it as an event property.
+	 * On success, returns a new event property instance.
+	 * @param args The property ID to use, the TypeScript symbol, the TypeScript type, and the type
+	 * checker.
+	 * @return The Alva-supported property or undefined, if the symbol is not supported.
+	 */
+	private static createEventProperty(args: PropertyFactoryArgs): EventProperty | undefined {
+		const callSignatures: ts.Signature[] = args.type.getCallSignatures();
+		if (callSignatures.length) {
+			return new EventProperty(args.symbol.name);
 		}
 
 		return;

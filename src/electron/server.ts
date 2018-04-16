@@ -173,16 +173,19 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 				}
 				break;
 			}
+
 			case ServerMessageType.PageChange: {
 				state.payload.page = message.payload;
 				send(state);
 				break;
 			}
+
 			case ServerMessageType.ElementChange: {
 				state.payload.elementId = message.payload;
 				send(message);
 				break;
 			}
+
 			case ServerMessageType.BundleChange: {
 				send({
 					type: 'reload',
@@ -191,14 +194,17 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 				});
 				break;
 			}
+
 			case ServerMessageType.AppLoaded: {
 				break;
 			}
+
 			case ServerMessageType.SketchExportRequest:
 			case ServerMessageType.ContentRequest: {
 				send(message);
 				break;
 			}
+
 			default: {
 				console.warn(`Unknown message type: ${message.type}`);
 			}

@@ -1,4 +1,4 @@
-import { Store } from '../../store/store';
+import { Store } from '../store';
 
 /**
  * A Slot is the meta-information about one styleguide patterns supported composition points.

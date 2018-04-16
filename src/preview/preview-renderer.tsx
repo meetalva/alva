@@ -1,6 +1,7 @@
 import { ComponentGetter } from './get-component';
 import { HighlightArea } from './highlight-area';
 import { omit } from 'lodash';
+import { PreviewMessageType } from '../message';
 import * as MobX from 'mobx';
 import * as MobXReact from 'mobx-react';
 import { PreviewStore } from './preview';
@@ -11,7 +12,8 @@ import * as ReactDom from 'react-dom';
 // to dedupe MobX when upgrading to 4.x
 MobX.extras.shareGlobalState();
 
-export interface RenderInit {
+export interface RenderProps {
+	connection: WebSocket;
 	getComponent: ComponentGetter<React.Component | React.SFC>;
 	highlight: HighlightArea;
 	store: PreviewStore;
@@ -51,7 +53,7 @@ interface ErrorBoundaryState {
 	errorMessage?: string;
 }
 
-export function render(init: RenderInit): void {
+export function render(renderProps: RenderProps): void {
 	@MobXReact.inject('store', 'highlight')
 	@MobXReact.observer
 	class PreviewApplication extends React.Component {
@@ -137,7 +139,7 @@ export function render(init: RenderInit): void {
 			props.store.elementId;
 
 			// tslint:disable-next-line:no-any
-			const Component = init.getComponent(props, {
+			const Component = renderProps.getComponent(props, {
 				// tslint:disable-next-line:no-any
 				text: (p: any) => p.text,
 				// tslint:disable-next-line:no-any
@@ -154,9 +156,56 @@ export function render(init: RenderInit): void {
 				return null;
 			}
 
+			const properties = {};
+			Object.keys(props.properties).forEach((name: string) => {
+				let propertyValue = props.properties[name];
+
+				if (propertyValue['_type'] === 'set-variable-event-action') {
+					const action = propertyValue;
+					propertyValue = (event: Event) => {
+						let inputValue;
+
+						const target = event.currentTarget;
+						if (
+							target instanceof HTMLInputElement ||
+							target instanceof HTMLSelectElement ||
+							target instanceof HTMLTextAreaElement
+						) {
+							inputValue = target.value;
+						}
+
+						if (inputValue !== undefined && inputValue !== null) {
+							const type: string = typeof inputValue;
+							if (type !== 'string' && type !== 'number' && type !== 'boolean') {
+								inputValue = inputValue.toString();
+							}
+						}
+
+						renderProps.connection.send(
+							JSON.stringify({
+								type: PreviewMessageType.SetVariable,
+								payload: { variable: action.variable, inputValue }
+							})
+						);
+					};
+				} else if (propertyValue['_type'] === 'open-page-event-action') {
+					const action = propertyValue;
+					propertyValue = (event: Event) => {
+						renderProps.connection.send(
+							JSON.stringify({
+								type: PreviewMessageType.OpenPage,
+								payload: action.pageId
+							})
+						);
+					};
+				}
+
+				properties[name] = propertyValue;
+			});
+
 			return (
 				<ErrorBoundary name={props.name}>
-					<Component {...props.properties} {...renderedSlots} data-sketch-name={props.name}>
+					<Component {...properties} {...renderedSlots} data-sketch-name={props.name}>
 						{children.map(child => <PreviewComponent key={child.uuid} {...child} />)}
 					</Component>
 				</ErrorBoundary>
@@ -200,7 +249,7 @@ export function render(init: RenderInit): void {
 	}
 
 	ReactDom.render(
-		<MobXReact.Provider store={init.store} highlight={init.highlight}>
+		<MobXReact.Provider store={renderProps.store} highlight={renderProps.highlight}>
 			<PreviewApplication />
 		</MobXReact.Provider>,
 		document.getElementById('preview')

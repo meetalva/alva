@@ -19,9 +19,20 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 	if (!message) {
 		return;
 	}
+
 	switch (message.type) {
 		case 'start-app': {
 			store.setServerPort(message.payload);
+			break;
+		}
+
+		case 'open-page': {
+			store.openPage(message.payload);
+			break;
+		}
+
+		case 'set-variable': {
+			store.setVariableValue(message.payload.variable, message.payload.inputValue);
 		}
 	}
 });

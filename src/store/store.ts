@@ -12,6 +12,7 @@ import { PageRef } from './page/page-ref';
 import * as Path from 'path';
 import { Preferences } from './preferences';
 import { Project } from './project';
+import { PropertyValue } from './page/property-value';
 import { Styleguide } from './styleguide/styleguide';
 
 export enum RightPane {
@@ -134,6 +135,14 @@ export class Store {
 	 * The last command in the list is the most recent executed one.
 	 */
 	@MobX.observable private undoBuffer: Command[] = [];
+
+	/**
+	 * Variables are property values edited by the user while testing pages.
+	 * They receive their values from property event handlers, and can bind to other properties,
+	 * providing a way to transfer data e.g. from an input to a summary page.
+	 * Variables are not persisted in the styleguide.
+	 */
+	@MobX.observable private variableValues: Map<string, PropertyValue> = new Map();
 
 	/**
 	 * Creates a new store.
@@ -472,6 +481,27 @@ export class Store {
 	 */
 	public getStyleguide(): Styleguide | undefined {
 		return this.styleguide;
+	}
+
+	/**
+	 * Returns the names of all variables currently registered.
+	 * @return The names of all variables.
+	 */
+	public getVariableNames(): string[] {
+		return Array.from(this.variableValues.keys());
+	}
+
+	/**
+	 * Returns the current value of a variable.
+	 * Note: Variables are property values edited by the user while testing pages.
+	 * They receive their values from property event handlers, and can bind to other properties,
+	 * providing a way to transfer data e.g. from an input to a summary page.
+	 * Variables are not persisted in the styleguide.
+	 * @param id The ID of the variable (global to the styleguide).
+	 * @return The current property value.
+	 */
+	public getVariableValue(id: string): PropertyValue {
+		return this.variableValues.get(id);
 	}
 
 	/**
@@ -916,6 +946,19 @@ export class Store {
 		}
 
 		this.clearUndoRedoBuffers();
+	}
+
+	/**
+	 * Sets a variable value and updates all pattern properties that use variables.
+	 * Note: Variables are property values edited by the user while testing pages.
+	 * They receive their values from property event handlers, and can bind to other properties,
+	 * providing a way to transfer data e.g. from an input to a summary page.
+	 * Variables are not persisted in the styleguide.
+	 * @param id The ID of the variable (global to the styleguide).
+	 * @param value The new property value.
+	 */
+	public setVariableValue(id: string, value: PropertyValue): void {
+		this.variableValues.set(id, value);
 	}
 
 	/**

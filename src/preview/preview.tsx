@@ -45,6 +45,7 @@ function main(): void {
 	const render = () => {
 		// tslint:disable-next-line:no-any
 		(window as any).renderer.render({
+			connection,
 			getComponent,
 			highlight,
 			store
@@ -69,20 +70,24 @@ function main(): void {
 				window.location.reload();
 				break;
 			}
+
 			case PreviewMessageType.Update: {
 				Promise.all([refetch('renderer'), refetch('components')]).then(() => {
 					render();
 				});
 				break;
 			}
+
 			case PreviewMessageType.State: {
 				store.page = payload.page;
 				break;
 			}
+
 			case PreviewMessageType.ElementChange: {
 				store.elementId = payload;
 				break;
 			}
+
 			case PreviewMessageType.ContentRequest: {
 				const rec = document.documentElement.getBoundingClientRect();
 
@@ -101,6 +106,7 @@ function main(): void {
 
 				break;
 			}
+
 			case PreviewMessageType.SketchExportRequest: {
 				const sketchPage = HtmlSketchApp.nodeTreeToSketchPage(document.documentElement, {
 					pageName: payload.pageName,

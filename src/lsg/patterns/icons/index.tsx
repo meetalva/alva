@@ -114,7 +114,7 @@ export function reduce(
 	e: typeof IconName,
 	cb: (name: string, e: number) => JSX.Element[]
 ): JSX.Element[] {
-	const results = [];
+	const results: JSX.Element[] = [];
 	for (const name in e) {
 		if (isNaN(Number(name))) {
 			results.push(...cb(name, Number(e[name])));

@@ -204,7 +204,7 @@ analyzerName: my-analyzer
 
 ## Next features
 
-See [issues](https://github.com/meetalva/alva/issues?q=is%3Aopen+is%3Aissue) or our [backlog](https://github.com/meetalva/alva/projects/3).
+See [issues](https://github.com/meetalva/alva/issues?q=is%3Aopen+is%3Aissue) or our [backlog](https://github.com/meetalva/alva/projects/6).
 
 ---
 

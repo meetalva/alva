@@ -1,0 +1,11 @@
+analyzerName: typescript-react-analyzer
+patternsPath: lib/patterns
+projects:
+  - uuid: aa5fd2d3-f91e-413a-8e29-1a9ad16f5952
+    name: testproject
+    lastChangedAuthor: unknown
+    lastChangedDate: '2018-04-11T16:22:14.742Z'
+    pages:
+      - uuid: a6dd4b0f-5cf6-42d3-a5ba-f453199a44c2
+        name: Testpage
+        path: ./testproject/testpage.yaml

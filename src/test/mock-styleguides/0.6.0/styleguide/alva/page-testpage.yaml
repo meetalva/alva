@@ -1,0 +1,6 @@
+root:
+  _type: pattern
+  pattern: image
+  children:
+    - _type: pattern
+      pattern: image

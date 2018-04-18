@@ -47,7 +47,7 @@ export class Page {
 			throw new Error(`Unknown page ID '${id}'`);
 		}
 
-		const page = new Page(store.getPageRefById(id) as PageRef);
+		const page = new Page(pageRef);
 		page.setRoot(PageElement.fromJsonObject(json.root as JsonObject));
 
 		return page;

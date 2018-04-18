@@ -8,19 +8,19 @@ export interface ErrorMessageProps {
 export const ErrorMessage: React.StatelessComponent<ErrorMessageProps> = props => (
 	<div
 		style={{
-			'background-color': 'rgb(240, 40, 110)',
+			backgroundColor: 'rgb(240, 40, 110)',
 			color: 'white',
 			padding: '12px 15px',
-			'text-align': 'center'
+			textAlign: 'center'
 		}}
 	>
 		<p
 			style={{
 				margin: '0',
-				'font-family':
+				fontFamily:
 					'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"',
-				'font-size': '15px',
-				'line-height': '22px'
+				fontSize: '15px',
+				lineHeight: '22px'
 			}}
 		>
 			{props.patternName} failed to render: {props.error}

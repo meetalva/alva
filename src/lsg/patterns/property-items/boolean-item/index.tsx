@@ -16,11 +16,9 @@ interface IndicatorProps {
 }
 
 const StyledBooleanItem = styled.div`
+	display: flex;
+	align-content: center;
 	width: 100%;
-`;
-
-const StyledLabelWrapper = styled.label`
-	display: block;
 	margin-bottom: ${getSpace(Size.M)}px;
 `;
 
@@ -30,7 +28,7 @@ const indicatorBorderWidth = 1;
 
 const StyledIndicator = styled.span`
 	position: relative;
-	display: block;
+	display: inline-block;
 	width: ${indicatorWidth}px;
 	height: ${indicatorHeight}px;
 	border-radius: ${indicatorHeight / 2}px;
@@ -65,11 +63,12 @@ const StyledIndicator = styled.span`
 `;
 
 const StyledLabel = styled.span`
-	display: block;
+	display: inline-block;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
-	margin-bottom: ${getSpace(Size.XXS)}px;
+	padding: ${getSpace(Size.XS)}px 0;
+	width: 30%;
 `;
 
 const StyledInput = styled.input`
@@ -81,11 +80,9 @@ export const BooleanItem: React.StatelessComponent<BooleanItemProps> = props => 
 
 	return (
 		<StyledBooleanItem className={className}>
-			<StyledLabelWrapper>
-				<StyledLabel>{label}</StyledLabel>
-				<StyledInput onChange={handleChange} type="checkbox" />
-				<StyledIndicator checked={checked} />
-			</StyledLabelWrapper>
+			<StyledLabel>{label}</StyledLabel>
+			<StyledInput onChange={handleChange} type="checkbox" />
+			<StyledIndicator checked={checked} />
 			{children}
 		</StyledBooleanItem>
 	);

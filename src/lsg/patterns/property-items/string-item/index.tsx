@@ -14,22 +14,26 @@ export interface StringItemProps {
 
 const StyledStringItem = styled.div`
 	width: 100%;
+	display: flex;
+	align-content: center;
+	justify-content: space-between;
+	margin-bottom: ${getSpace(Size.M)}px;
 `;
 
 const StyledLabel = styled.span`
-	display: block;
-	margin-bottom: ${getSpace(Size.XXS)}px;
+	display: inline-block;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
+	width: 30%;
+	padding: ${getSpace(Size.XS)}px 0;
 `;
 
 const StyledInput = styled.input`
-	display: block;
+	display: inline-block;
 	box-sizing: border-box;
-	width: 100%;
+	width: 70%;
 	padding: ${getSpace(Size.XS)}px;
-	margin-bottom: ${getSpace(Size.M)}px;
 
 	border: 0.5px solid ${colors.grey90.toString()};
 	border-radius: 1px;
@@ -65,16 +69,14 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 
 	return (
 		<StyledStringItem className={className}>
-			<label>
-				<StyledLabel>{label}</StyledLabel>
-				<StyledInput
-					onChange={handleChange}
-					onBlur={handleBlur}
-					type="textarea"
-					value={value}
-					placeholder="Type in"
-				/>
-			</label>
+			<StyledLabel>{label}</StyledLabel>
+			<StyledInput
+				onChange={handleChange}
+				onBlur={handleBlur}
+				type="textarea"
+				value={value}
+				placeholder="Type in"
+			/>
 		</StyledStringItem>
 	);
 };

@@ -25,13 +25,15 @@ export interface StyledIconProps {
 
 const StyledEnumItem = styled.div`
 	width: 100%;
+	margin-bottom: ${getSpace(Size.M)}px;
+	display: flex;
+	justify-content: space-between;
 `;
 
 const StyledSelectWrapper = styled.div`
-	width: 100%;
+	width: 70%;
 	position: relative;
-	display: block;
-	margin-bottom: ${getSpace(Size.M)}px;
+	display: inline-block;
 	border: 0.5px solid ${colors.grey90.toString()};
 	border-radius: 3px;
 	background-color: ${colors.white.toString()};
@@ -80,11 +82,12 @@ const StyledIcon = styled(Icon)`
 `;
 
 const StyledLabel = styled.span`
-	display: block;
-	margin-bottom: ${getSpace(Size.XXS)}px;
+	display: inline-block;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
+	padding: ${getSpace(Size.XS)}px 0;
+	width: 30%;
 `;
 
 export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {

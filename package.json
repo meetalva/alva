@@ -15,6 +15,7 @@
     "docs": "typedoc src",
     "lint": "tslint --project .",
     "start": "npm run build && concurrently \"electron build/electron/main.js --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\"",
+    "start:clean": "npm run clean && npm run start",
     "start:lsg": "npm run build:lsg && concurrently \"npm run build:lsg -- -w\" \"patternplate start\"",
     "precommit": "lint-staged",
     "watch:tests": "jest --watch",
@@ -128,6 +129,7 @@
     "typedoc": "0.11.1"
   },
   "dependencies": {
+    "@thereincarnator/html-sketchapp": "2.1.0-11",
     "chokidar": "2.0.3",
     "cli": "1.0.1",
     "deep-assign": "2.0.0",

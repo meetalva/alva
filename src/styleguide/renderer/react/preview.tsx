@@ -53,7 +53,7 @@ class PatternWrapper extends React.Component<PatternWrapperProps, PatternWrapper
 				/>
 			);
 		} else {
-			return this.props.children;
+			return <div data-sketch-name={this.props.element.getName()}>{this.props.children}</div>;
 		}
 	}
 }

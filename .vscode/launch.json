@@ -26,6 +26,15 @@
 			"request": "attach",
 			"cwd": "${workspaceRoot}",
 			"port": 9223
-		}
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Jest All",
+			"program": "${workspaceFolder}/node_modules/jest/bin/jest",
+			"args": ["--runInBand"],
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen"
+		  }
 	]
 }

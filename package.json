@@ -7,7 +7,7 @@
     "build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/renderer/*.html build/electron/renderer",
     "build:clean": "npm run clean && npm run build",
     "build:electron": "electron-builder -mwl && node ./scripts/dist-postprocess.js",
-    "build:lsg": "tsc --project src/lsg --outDir build/lsg/patterns",
+    "build:lsg": "tsc --preserveWatchOutput --project src/lsg --outDir build/lsg/patterns",
     "clean": "rm -rf build && rm -rf dist",
     "commit": "commit",
     "commitmsg": "commitlint -e $GIT_PARAMS",

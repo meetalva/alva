@@ -1,11 +1,4 @@
-import {
-	BrowserWindow,
-	ipcRenderer,
-	MenuItem,
-	MenuItemConstructorOptions,
-	remote,
-	WebviewTag
-} from 'electron';
+import { BrowserWindow, ipcRenderer, MenuItem, MenuItemConstructorOptions, remote } from 'electron';
 import { ElementLocationCommand } from '../store/command/element-location-command';
 import * as FileExtraUtils from 'fs-extra';
 import { Page } from '../store/page/page';
@@ -134,9 +127,8 @@ export function createMenu(): void {
 								});
 
 								if (path) {
-									const webview = document.getElementById('preview') as WebviewTag;
 									const sketchExporter = new SketchExporter();
-									await sketchExporter.createExport(webview);
+									await sketchExporter.createExport();
 									await sketchExporter.writeToDisk(path);
 								}
 							}
@@ -153,9 +145,8 @@ export function createMenu(): void {
 								});
 
 								if (path) {
-									const webview = document.getElementById('preview') as WebviewTag;
 									const pdfExporter = new PdfExporter();
-									await pdfExporter.createExport(webview);
+									await pdfExporter.createExport();
 									await pdfExporter.writeToDisk(path);
 								}
 							}
@@ -172,9 +163,8 @@ export function createMenu(): void {
 								});
 
 								if (path) {
-									const webview = document.getElementById('preview') as WebviewTag;
 									const pngExporter = new PngExporter();
-									await pngExporter.createExport(webview);
+									await pngExporter.createExport();
 									await pngExporter.writeToDisk(path);
 								}
 							}

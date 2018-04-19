@@ -132,11 +132,6 @@ export class App extends React.Component {
 
 	public render(): JSX.Element {
 		const project = store.getCurrentProject();
-		const styleguide = store.getStyleguide();
-		const previewFrame = project && project.getPreviewFrame();
-		const previewFramePath =
-			styleguide && previewFrame && PathUtils.join(store.getPagesPath(), 'alva', previewFrame);
-
 		const DevTools = this.getDevTools();
 
 		return (
@@ -164,7 +159,11 @@ export class App extends React.Component {
 									}}
 								/>
 							</SideBar>
-							<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />
+							<PreviewPaneWrapper
+								key="center"
+								id="preview"
+								previewFrame={`http://localhost:${store.getServerPort()}/preview.html`}
+							/>,
 							<SideBar side="right" directionVertical hasBorder>
 								{store.getRightPane() === RightPane.Properties && (
 									<PropertyPane>

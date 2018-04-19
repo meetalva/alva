@@ -4,13 +4,14 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export interface PreviewPaneProps {
-	handleMouseDownLeft?: React.MouseEventHandler<HTMLElement>;
-	handleMouseDownRight?: React.MouseEventHandler<HTMLElement>;
-	handleMouseMove?: React.MouseEventHandler<HTMLElement>;
-	handleMouseUp?: React.MouseEventHandler<HTMLElement>;
+	id?: string;
+	onMouseDownLeft?: React.MouseEventHandler<HTMLElement>;
+	onMouseDownRight?: React.MouseEventHandler<HTMLElement>;
+	onMouseMove?: React.MouseEventHandler<HTMLElement>;
+	onMouseUp?: React.MouseEventHandler<HTMLElement>;
 	previewFrame?: string;
 	width?: number;
-	handlePreviewWidthUpdate?(previewWidth: number): void;
+	onPreviewWidthUpdate?(previewWidth: number): void;
 }
 
 const StyledPreviewWrapper = styled.div`
@@ -74,40 +75,37 @@ export default class PreviewPane extends React.Component<PreviewPaneProps> {
 	}
 
 	public render(): JSX.Element {
-		const {
-			handleMouseDownLeft,
-			handleMouseDownRight,
-			handleMouseMove,
-			handleMouseUp,
-			width,
-			previewFrame
-		} = this.props;
+		const props = this.props;
 
 		return (
 			<StyledPreviewWrapper
 				innerRef={(ref: HTMLElement) => (this.previewPane = ref)}
-				onMouseMove={handleMouseMove}
-				onMouseUp={handleMouseUp}
+				onMouseMove={props.onMouseMove}
+				onMouseUp={props.onMouseUp}
 			>
-				<StyledPreviewResizer onMouseDown={handleMouseDownLeft} />
-				<StyledPreviewPane
-					width={width}
-					dangerouslySetInnerHTML={{
-						__html: `<webview id="preview" style="height: 100%; overflow: hidden;" src="${previewFrame ||
-							'./preview.html'}" preload="./preview.js" partition="electron" />`
-					}}
-				/>
-				<StyledPreviewResizer onMouseDown={handleMouseDownRight} />
+				<StyledPreviewResizer onMouseDown={props.onMouseDownLeft} />
+				<StyledPreviewPane width={props.width}>
+					<StyledPreviewFrame src={props.previewFrame} />
+				</StyledPreviewPane>
+				<StyledPreviewResizer onMouseDown={props.onMouseDownRight} />
 			</StyledPreviewWrapper>
 		);
 	}
 
 	private updatePreviewWidth(): void {
-		if (!this.props.handlePreviewWidthUpdate) {
+		if (!this.props.onPreviewWidthUpdate) {
 			return;
 		}
 
 		const previewWidth = this.previewPane.offsetWidth;
-		this.props.handlePreviewWidthUpdate(previewWidth);
+		this.props.onPreviewWidthUpdate(previewWidth);
 	}
 }
+
+const StyledPreviewFrame = styled('iframe')`
+	width: 100%;
+	height: 100%;
+	border: none;
+	border-radius: 6px 6px 0 0;
+	overflow: hidden;
+`;

@@ -34,6 +34,9 @@ export class HighlightArea {
 	}
 
 	public show(element: Element, pageElementId: string): void {
+		if (typeof element.getBoundingClientRect !== 'function') {
+			return;
+		}
 		if (this.pageElementId === pageElementId) {
 			return;
 		}

@@ -1,14 +1,32 @@
 import { checkForUpdates } from './auto-updater';
 import { colors } from '../lsg/patterns/colors';
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
+import * as FsUtils from 'fs';
+import * as getPort from 'get-port';
+import * as stringEscape from 'js-string-escape';
+import { PreviewMessageType, ServerMessage, ServerMessageType } from '../message';
 import * as PathUtils from 'path';
-import * as url from 'url';
+import { createServer } from './server';
+import * as Url from 'url';
+import * as uuid from 'uuid';
+
+const APP_ENTRY = require.resolve('./renderer');
+
+const RENDERER_DOCUMENT = `<!doctype html>
+<html>
+<body>
+	<div id="app"></div>
+	<script>require('${stringEscape(APP_ENTRY)}')</script>
+</body>
+</html>`;
+
+FsUtils.writeFileSync(PathUtils.join(__dirname, 'app.html'), RENDERER_DOCUMENT);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win: BrowserWindow | undefined;
 
-function createWindow(): void {
+async function createWindow(): Promise<void> {
 	const { width = 1280, height = 800 } = screen.getPrimaryDisplay().workAreaSize;
 
 	// Create the browser window.
@@ -24,12 +42,70 @@ function createWindow(): void {
 
 	// and load the index.html of the app.
 	win.loadURL(
-		url.format({
-			pathname: PathUtils.join(__dirname, 'renderer', 'app.html'),
+		Url.format({
+			pathname: PathUtils.join(__dirname, 'app.html'),
 			protocol: 'file:',
 			slashes: true
 		})
 	);
+
+	// Cast getPort return type from PromiseLike<number> to Promise<number>
+	// to avoid async-promise tslint rule to produce errors here
+	const port = await (getPort({ port: 1879 }) as Promise<number>);
+	const server = await createServer({ port });
+
+	// tslint:disable-next-line:no-any
+	const send = (message: ServerMessage) => {
+		if (win) {
+			win.webContents.send('message', message);
+		}
+	};
+
+	// tslint:disable-next-line:no-any
+	ipcMain.on('message', (e: Electron.Event, payload: any) => {
+		if (!payload) {
+			return;
+		}
+
+		server.emit('message', payload);
+
+		switch (payload.type) {
+			case ServerMessageType.AppLoaded: {
+				send({
+					id: uuid.v4(),
+					type: ServerMessageType.StartApp,
+					payload: String(port)
+				});
+			}
+		}
+	});
+
+	server.on('client-message', (envelope: string) => {
+		try {
+			const message = JSON.parse(envelope);
+
+			switch (message.type) {
+				case PreviewMessageType.ContentResponse: {
+					send({
+						id: message.id,
+						payload: message.payload,
+						type: ServerMessageType.ContentResponse
+					});
+					break;
+				}
+				case PreviewMessageType.SketchExportResponse: {
+					send({
+						id: message.id,
+						payload: message.payload,
+						type: ServerMessageType.SketchExportResponse
+					});
+				}
+			}
+		} catch (err) {
+			console.error('Error while receiving client message');
+			console.error(err);
+		}
+	});
 
 	// Open the DevTools.
 	// win.webContents.openDevTools();
@@ -71,8 +147,8 @@ log.info('App starting...');
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', () => {
-	createWindow();
+app.on('ready', async () => {
+	await createWindow();
 });
 
 // Quit when all windows are closed.
@@ -84,11 +160,11 @@ app.on('window-all-closed', () => {
 	}
 });
 
-app.on('activate', () => {
+app.on('activate', async () => {
 	// On macOS it's common to re-create a window in the app when the
 	// dock icon is clicked and there are no other windows open.
 	if (!win) {
-		createWindow();
+		await createWindow();
 	}
 });
 
@@ -96,17 +172,4 @@ ipcMain.on('request-check-for-updates', () => {
 	if (win) {
 		checkForUpdates(win, true);
 	}
-});
-
-ipcMain.on('preview-ready', () => {
-	BrowserWindow.getAllWindows().forEach(window => {
-		window.webContents.send('preview-ready');
-	});
-});
-
-// tslint:disable-next-line:no-any
-ipcMain.on('export-as-sketch-done', (_: Event, payload: any) => {
-	BrowserWindow.getAllWindows().forEach(window => {
-		window.webContents.send('export-as-sketch-done', payload);
-	});
 });

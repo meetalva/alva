@@ -119,6 +119,11 @@ export class Store {
 	@MobX.observable private selectedSlotId?: string;
 
 	/**
+	 * http port the preview server is listening on
+	 */
+	@MobX.observable private serverPort: number = 1879;
+
+	/**
 	 * The currently opened styleguide or undefined, if no styleguide is open.
 	 */
 	@MobX.observable private styleguide?: Styleguide;
@@ -456,6 +461,10 @@ export class Store {
 	 */
 	public getSelectedSlotId(): string | undefined {
 		return this.selectedSlotId;
+	}
+
+	public getServerPort(): number {
+		return this.serverPort;
 	}
 
 	/**
@@ -868,6 +877,14 @@ export class Store {
 	 */
 	public setSelectedSlot(slotId?: string): void {
 		this.selectedSlotId = slotId;
+	}
+
+	/**
+	 * Set the port the preview server is listening to
+	 * @param port
+	 */
+	public setServerPort(port: number): void {
+		this.serverPort = port;
 	}
 
 	/**

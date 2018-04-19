@@ -69,6 +69,7 @@ export class PropertyValueCommand extends ElementCommand {
 		}
 
 		this.element.setPropertyValue(this.propertyId, this.value, this.path);
+
 		return true;
 	}
 
@@ -119,6 +120,7 @@ export class PropertyValueCommand extends ElementCommand {
 		}
 
 		this.element.setPropertyValue(this.propertyId, this.previousValue, this.path);
+
 		return true;
 	}
 }

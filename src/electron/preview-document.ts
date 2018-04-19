@@ -1,5 +1,5 @@
+export const previewDocument = `<!doctype html>
 <html>
-
 <head>
 	<title>alva&trade;</title>
 	<style>
@@ -8,12 +8,18 @@
 		}
 	</style>
 </head>
-
 <body>
 	<div id="preview">
 		<style>
+			html,
+			body,
+			preview,
 			.outer {
-				min-height: 100%;
+				min-height: 100vh;
+				min-width: 100vw;
+			}
+
+			.outer {
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -75,6 +81,10 @@
 			<div class="circle_blue"></div>
 		</div>
 	</div>
+	<script src="/scripts/vendor.js" data-script="vendor"></script>
+	<script src="/scripts/renderer.js" data-script="renderer"></script>
+	<script src="/scripts/components.js" data-script="components"></script>
+	<script src="/scripts/preview.js" data-script="preview"></script>
 </body>
-
 </html>
+`;

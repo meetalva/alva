@@ -4,11 +4,8 @@ import { PatternFolder } from '../../../store/styleguide/folder';
 import * as FileUtils from 'fs';
 import * as PathUtils from 'path';
 import { Pattern } from '../../../store/styleguide/pattern';
-import { PreviewApp } from '../../renderer/react/preview';
 import { Property } from '../../../store/styleguide/property/property';
 import { PropertyAnalyzer } from './property-analyzer';
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
 import { ReactUtils } from '../typescript/react-utils';
 import { Slot } from '../../../store/styleguide/slot';
 import { SlotAnalyzer } from './slot-analzyer';
@@ -209,12 +206,5 @@ export class Analyzer extends StyleguideAnalyzer {
 		const baseName = PathUtils.basename(fileInfo.implementationPath, '.js');
 		const directoryName = PathUtils.basename(fileInfo.directory);
 		return exportInfo.name || (baseName !== 'index' ? baseName : directoryName);
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public render(): void {
-		ReactDom.render(React.createElement(PreviewApp), document.getElementById('preview'));
 	}
 }

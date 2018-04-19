@@ -120,10 +120,10 @@ const StyledElementLabel = styled(div)`
 const placeholderDiv = tag('div').omit(['highlightPlaceholder']);
 const StyledPlaceholder = styled(placeholderDiv)`
 	position: relative;
-	height: ${getSpace(Size.S)};
+	height: ${getSpace(Size.S)}px;
 	width: 100%;
-	margin-top: -${getSpace(Size.XS)};
-	margin-bottom: -${getSpace(Size.XS)};
+	margin-top: -${getSpace(Size.XS)}px;
+	margin-bottom: -${getSpace(Size.XS)}px;
 	z-index: 10;
 
 	&::before {
@@ -132,7 +132,7 @@ const StyledPlaceholder = styled(placeholderDiv)`
 		position: absolute;
 		height: 6px;
 		width: 6px;
-		left: 6px;
+		left: 0;
 		top: 3px;
 		border-radius: 3px;
 		background: ${colors.blue40.toString()};
@@ -190,13 +190,7 @@ const StyledIcon = styled(Icon)`
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => (
-	<StyledElement
-		draggable={props.draggable}
-		data-id={props.id}
-		onClick={props.onClick}
-		onMouseOver={e => e.stopPropagation()}
-		onMouseLeave={e => e.stopPropagation()}
-	>
+	<StyledElement draggable={props.draggable} data-id={props.id} onClick={props.onClick}>
 		{props.dragging && (
 			<StyledPlaceholder
 				data-element-placeholder

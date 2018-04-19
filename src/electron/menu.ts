@@ -21,25 +21,25 @@ function getPageFileName(): string {
 	return (Store.getInstance().getCurrentPage() as Page).getName();
 }
 
-function querySaveFilePath(
-	title: string,
-	typeName: string,
-	defaultName: string,
-	extension: string,
-	callback: (path: string) => void
-): void {
-	dialog.showSaveDialog(
-		{
-			title,
-			defaultPath: `${defaultName}.${extension}`,
-			filters: [{ name: typeName, extensions: [extension] }]
-		},
-		path => {
-			if (path) {
-				callback(path);
-			}
-		}
-	);
+interface PathQuery {
+	defaultName: string;
+	extname: string;
+	title: string;
+	typeName: string;
+}
+
+// tslint:disable-next-line promise-function-async
+function queryPath(options: PathQuery): Promise<string> {
+	return new Promise((resolve, reject) => {
+		dialog.showSaveDialog(
+			{
+				title: options.title,
+				defaultPath: `${options.defaultName}.${options.extname}`,
+				filters: [{ name: options.typeName, extensions: [options.extname] }]
+			},
+			resolve
+		);
+	});
 }
 
 export function createMenu(): void {
@@ -124,52 +124,52 @@ export function createMenu(): void {
 						{
 							label: 'Export page as Sketch',
 							enabled: !isSplashscreen,
-							click: () => {
-								const pageFileName = getPageFileName();
-								querySaveFilePath(
-									'Export Sketch as',
-									'Almost Sketch JSON',
-									pageFileName,
-									'asketch.json',
-									(path: string) => {
-										const webview = document.getElementById('preview') as WebviewTag;
-										webview.send('export-as-sketch', path);
-									}
-								);
+							click: async () => {
+								const path = await queryPath({
+									title: 'Export Sketch as',
+									typeName: 'Almost Sketch JSON',
+									defaultName: `${getPageFileName()}.asketch`,
+									extname: 'json'
+								});
+
+								if (path) {
+									const webview = document.getElementById('preview') as WebviewTag;
+									webview.send('export-as-sketch', path);
+								}
 							}
 						},
 						{
 							label: 'Export page as PDF',
 							enabled: !isSplashscreen,
-							click: () => {
-								const pageFileName = getPageFileName();
-								querySaveFilePath(
-									'Export PDF as',
-									'PDF Document',
-									pageFileName,
-									'pdf',
-									(path: string) => {
-										const webview = document.getElementById('preview') as WebviewTag;
-										PdfExporter.exportToPdf(path, webview);
-									}
-								);
+							click: async () => {
+								const path = await queryPath({
+									title: 'Export PDF as',
+									typeName: 'PDF Document',
+									defaultName: getPageFileName(),
+									extname: 'pdf'
+								});
+
+								if (path) {
+									const webview = document.getElementById('preview') as WebviewTag;
+									PdfExporter.exportToPdf(path, webview);
+								}
 							}
 						},
 						{
 							label: 'Export page as PNG',
 							enabled: !isSplashscreen,
-							click: () => {
-								const pageFileName = getPageFileName();
-								querySaveFilePath(
-									'Export PNG as',
-									'PNG Image',
-									pageFileName,
-									'png',
-									(path: string) => {
-										const webview = document.getElementById('preview') as WebviewTag;
-										PngExporter.exportToPng(path, webview);
-									}
-								);
+							click: async () => {
+								const path = await queryPath({
+									title: 'Export PNG as',
+									typeName: 'PNG Image',
+									defaultName: getPageFileName(),
+									extname: 'png'
+								});
+
+								if (path) {
+									const webview = document.getElementById('preview') as WebviewTag;
+									PngExporter.exportToPng(path, webview);
+								}
 							}
 						}
 					]

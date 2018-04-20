@@ -77,28 +77,37 @@ export class Analyzer extends StyleguideAnalyzer {
 					program,
 					exportInfo.type
 				);
-				const propType = reactType ? reactType.getTypeArguments()[0] : undefined;
+
+				if (!reactType) {
+					return;
+				}
+
+				const reactTypeArguments = reactType.getTypeArguments();
+
+				if (reactTypeArguments.length === 0) {
+					return;
+				}
+
+				const propType = reactTypeArguments[0];
 
 				const id = this.getPatternId(rootDirectory.getPath(), patternInfo, exportInfo);
 				const name = this.getPatternName(patternInfo, exportInfo);
 				const pattern = new Pattern(id, name, patternInfo.implementationPath, exportInfo.name);
 				pattern.setIconPath(patternInfo.iconPath);
 
-				if (propType) {
-					const properties: Property[] = PropertyAnalyzer.analyze(
-						propType.type,
-						propType.typeChecker
-					);
+				const properties: Property[] = PropertyAnalyzer.analyze(
+					propType.type,
+					propType.typeChecker
+				);
 
-					for (const property of properties) {
-						pattern.addProperty(property);
-					}
+				for (const property of properties) {
+					pattern.addProperty(property);
+				}
 
-					const slots: Slot[] = SlotAnalyzer.analyzeSlots(propType.type, program);
+				const slots: Slot[] = SlotAnalyzer.analyzeSlots(propType.type, program);
 
-					for (const slot of slots) {
-						pattern.addSlot(slot);
-					}
+				for (const slot of slots) {
+					pattern.addSlot(slot);
 				}
 
 				folder.addPattern(pattern);

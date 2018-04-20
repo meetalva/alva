@@ -11,3 +11,7 @@ root:
       - _type: pattern
         uuid: 88b59be-81f7-43bc-a3e8-e2e90f70f543
         pattern: image/index
+  properties:
+    alt: Don't look
+    src: www.google.com
+    size: XL

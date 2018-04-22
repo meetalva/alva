@@ -2,6 +2,11 @@
 language: node_js
 node_js:
   - '8'
+
+before_install: npm i -g npm@latest
+
+install: npm ci
+
 script:
   - commitlint-travis
   - npm run lint

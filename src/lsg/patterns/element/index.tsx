@@ -52,14 +52,16 @@ const StyledElement = styled.div`
 const StyledElementLabel = styled.div`
 	position: relative;
 	display: flex;
-	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px ${getSpace(Size.XXL)}px;
+	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px ${getSpace(
+	Size.XXL
+)}px;
 	align-items: center;
 	color: ${colors.grey20.toString()};
 	position: relative;
 	font-size: 15px;
 	line-height: 21px;
 	z-index: 1;
-	
+
 	&::before {
 		content: '';
 		display: block;
@@ -73,7 +75,7 @@ const StyledElementLabel = styled.div`
 
 	&:hover {
 		background ${colors.black.toString('rgb', { alpha: 0.05 })};
-		
+
 		&::before {
 			background: ${colors.black.toString('rgb', { alpha: 0.05 })};
 		}

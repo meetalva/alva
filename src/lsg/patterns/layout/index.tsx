@@ -5,8 +5,8 @@ import styled from 'styled-components';
 export interface LayoutProps {
 	className?: string;
 	directionVertical?: boolean;
-	handleClick?: React.MouseEventHandler<HTMLElement>;
 	hasPaddings?: boolean;
+	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 const StyledLayout = styled.div`
@@ -42,6 +42,7 @@ export const SideBar: React.StatelessComponent<LayoutProps> = props => (
 		className={props.className}
 		directionVertical={props.directionVertical}
 		hasPaddings={props.hasPaddings}
+		onClick={props.onClick}
 	>
 		{props.children}
 	</StyledSideBar>
@@ -52,7 +53,7 @@ const Layout: React.StatelessComponent<LayoutProps> = props => (
 		className={props.className}
 		directionVertical={props.directionVertical}
 		hasPaddings={props.hasPaddings}
-		onClick={props.handleClick}
+		onClick={props.onClick}
 	>
 		{props.children}
 	</StyledLayout>

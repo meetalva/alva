@@ -813,7 +813,7 @@ export class Store {
 	 * @param selectedElement The selected element or undefined.
 	 * @see setElementFocussed
 	 */
-	public setSelectedElement(selectedElement: PageElement | undefined): void {
+	public setSelectedElement(selectedElement?: PageElement): void {
 		this.selectedElement = selectedElement;
 	}
 

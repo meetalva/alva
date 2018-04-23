@@ -1,7 +1,7 @@
-import * as React from 'react';
-import styled from 'styled-components';
 import { colors } from '../../colors';
+import * as React from 'react';
 import { getSpace, Size } from '../../space';
+import styled from 'styled-components';
 
 const StyledElementPane = styled.div`
 	position: relative;

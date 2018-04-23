@@ -4,6 +4,7 @@ import { colors } from '../../lsg/patterns/colors';
 import Copy, { Size as CopySize } from '../../lsg/patterns/copy';
 import { remote } from 'electron';
 import { ElementList } from '../../component/container/element-list';
+// import { ElementButton } from '../../component/container/element-button';
 import ElementPane from '../../lsg/patterns/panes/element-pane';
 import * as FileExtraUtils from 'fs-extra';
 import globalStyles from '../../lsg/patterns/global-styles';
@@ -42,7 +43,6 @@ export class App extends React.Component {
 	public constructor(props: {}) {
 		super(props);
 		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
-		this.handleMainWindowClick = this.handleMainWindowClick.bind(this);
 		this.handleCreateNewSpaceClick = this.handleCreateNewSpaceClick.bind(this);
 		this.handleOpenSpaceClick = this.handleOpenSpaceClick.bind(this);
 	}
@@ -145,12 +145,15 @@ export class App extends React.Component {
 		const DevTools = this.getDevTools();
 
 		return (
-			<Layout directionVertical handleClick={this.handleMainWindowClick}>
+			<Layout directionVertical onClick={this.handleMainWindowClick}>
 				<ChromeContainer />
-
 				<MainArea>
 					{project && [
-						<SideBar key="left" directionVertical>
+						<SideBar
+							key="left"
+							directionVertical
+							onClick={() => Store.getInstance().setSelectedElement()}
+						>
 							<ElementPane>
 								<ElementList />
 							</ElementPane>

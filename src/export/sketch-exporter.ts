@@ -9,7 +9,7 @@ export class SketchExporter {
 			element = document.querySelector('#preview > div > div:nth-child(1)') as HTMLElement;
 		}
 
-		const page = (Store.getInstance().getCurrentPage() as Page);
+		const page = Store.getInstance().getCurrentPage() as Page;
 		const pageName = page.getName();
 		const projectName = page.getName();
 
@@ -17,7 +17,8 @@ export class SketchExporter {
 			pageName: projectName,
 			addArtboard: true,
 			artboardName: pageName,
-			getGroupName: node => node.getAttribute && node.getAttribute('data-sketch-name'),
+			getGroupName: node =>
+				node.getAttribute('data-sketch-name') || `(${node.nodeName.toLowerCase()})`,
 			getRectangleName: () => 'background',
 			skipSystemFonts: true
 		});

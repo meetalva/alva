@@ -45,9 +45,8 @@ export class SketchExporter extends Exporter {
 		return JSON.stringify(sketchPage.toJSON(), null, '\t');
 	}
 
-	// tslint:disable-next-line promise-function-async
-	public createExport(webview: WebviewTag): Promise<ExportResult> {
-		return new Promise((resolve, reject) => {
+	public async createExport(webview: WebviewTag): Promise<ExportResult> {
+		return new Promise<ExportResult>((resolve, reject) => {
 			// tslint:disable-next-line no-any
 			const onMessage = (_: Event, payload: any) => {
 				if (!this.isMessage(payload)) {

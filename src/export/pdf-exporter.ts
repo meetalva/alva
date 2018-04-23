@@ -2,9 +2,8 @@ import { WebviewTag } from 'electron';
 import { Exporter, ExportResult } from './exporter';
 
 export class PdfExporter extends Exporter {
-	// tslint:disable-next-line promise-function-async
-	public createExport(webview: WebviewTag): Promise<ExportResult> {
-		return new Promise(resolve => {
+	public async createExport(webview: WebviewTag): Promise<ExportResult> {
+		return new Promise<ExportResult>(resolve => {
 			webview.printToPDF(
 				{
 					marginsType: 1,

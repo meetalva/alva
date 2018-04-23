@@ -66,10 +66,10 @@ export class ElementList extends React.Component {
 				var dragImg = e.currentTarget.querySelector('div').cloneNode(true);
 				dragImg.setAttribute(
 					'style',
-					'position: absolute; background-color: #fff; color: #000; padding: 1px 6px; border-radius: 3px; font-size: 12px; opacity: 1; top: 0; left: -500px;'
+					'position: absolute; background-color: #fff; color: #000; padding: 6px 18px; border-radius: 3px; font-size: 12px; opacity: 1; top: 0; left: -500px;'
 				);
 				document.body.appendChild(dragImg);
-				e.dataTransfer.setDragImage(dragImg, 75, 10);
+				e.dataTransfer.setDragImage(dragImg, 75, 15);
 			},
 			handleDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');

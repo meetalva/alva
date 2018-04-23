@@ -1,6 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { colors } from '../../colors';
+import { getSpace, Size } from '../../space';
 
 const StyledElementPane = styled.div`
 	position: relative;
@@ -8,6 +9,7 @@ const StyledElementPane = styled.div`
 	flex-shrink: 0;
 	flex-basis: 60%;
 	overflow: scroll;
+	padding-top: ${getSpace(Size.M)}px;
 
 	&::before {
 		content: '';

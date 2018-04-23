@@ -45,32 +45,56 @@ export interface StyledPlaceholder {
 }
 
 const StyledElement = styled.div`
-	cursor: default;
 	position: relative;
+	z-index: 1;
 `;
 
 const StyledElementLabel = styled.div`
 	position: relative;
 	display: flex;
-	padding: 9px ${getSpace(Size.L)}px 9px ${getSpace(Size.XL)}px;
-	border-radius: 3px;
-	cursor: pointer;
+	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px ${getSpace(Size.XXL)}px;
 	align-items: center;
-	color: ${colors.black.toString()};
+	color: ${colors.grey20.toString()};
 	position: relative;
+	font-size: 15px;
+	line-height: 21px;
+	z-index: 1;
+	
+	&::before {
+		content: '';
+		display: block;
+		position: absolute;
+		height: 100%;
+		width: 240px;
+		left: 0;
+		top: 0;
+		margin-left: -240px;
+	}
 
 	&:hover {
-		background: ${colors.grey90.toString()};
+		background ${colors.black.toString('rgb', { alpha: 0.05 })};
+		
+		&::before {
+			background: ${colors.black.toString('rgb', { alpha: 0.05 })};
+		}
 	}
 
 	${(props: StyledElementLabelProps) =>
 		props.active
 			? `
-				color: ${colors.white.toString()};
-				background: ${colors.blue40.toString()};
+				color: ${colors.blue.toString()};
+				background: ${colors.blue80.toString()};
+
+				&::before {
+					background: ${colors.blue80.toString()};
+				}
 
                 &:hover {
-                    background: ${colors.blue40.toString()};
+                    background: ${colors.blue80.toString()};
+
+					&::before {
+						background: ${colors.blue80.toString()};
+					}
                 }
 			`
 			: ''};
@@ -78,36 +102,59 @@ const StyledElementLabel = styled.div`
 		props.highlight
 			? `
 			background: ${colors.grey90.toString()};
+
+			&::before {
+				background: ${colors.grey90.toString()};
+			}
 		`
 			: ''};
 `;
 
 const StyledPlaceholder = styled.div`
 	position: relative;
-	height: 10px;
+	height: ${getSpace(Size.S)};
 	width: 100%;
-	margin-top: -5px;
-	margin-bottom: -5px;
-	border-radius: 3px;
+	margin-top: -${getSpace(Size.XS)};
+	margin-bottom: -${getSpace(Size.XS)};
+	z-index: 10;
+
+	&::before {
+		content: '';
+		display: block;
+		position: absolute;
+		height: 6px;
+		width: 6px;
+		left: 6px;
+		top: 3px;
+		border-radius: 3px;
+		background: ${colors.blue40.toString()};
+		transform: scale(0);
+		transition: transform 0.2s;
+		z-index: 20;
+	}
 
 	&::after {
 		content: '';
 		display: block;
 		position: absolute;
-		height: 100%;
-		width: 100%;
-		left: 0;
-		top: 0;
-		background: ${colors.grey90.toString()};
+		height: 2px;
+		width: calc(100% - 6px);
+		left: ${getSpace(Size.XS)};
+		top: 5px;
+		background: ${colors.blue40.toString()};
 		transform: scaleY(0);
 		transition: transform 0.2s;
-		z-index: 50;
+		z-index: 20;
 	}
 
 	${(props: StyledPlaceholder) =>
 		props.highlightPlaceholder
 			? `
-			&:after {
+			&::before {
+				transform: scale(1);
+			}
+
+			&::after {
 				transform: scaleY(1);
 			}
 		`
@@ -122,15 +169,15 @@ const StyledElementChild = styled.div`
 
 const StyledIcon = styled(Icon)`
 	position: absolute;
-	left: 0;
+	left: ${getSpace(Size.XS) + getSpace(Size.XXS)}px;
 	fill: ${colors.grey60.toString()};
-	width: 12px;
-	height: 12px;
+	width: ${getSpace(Size.S)}px;
+	height: ${getSpace(Size.S)}px;
 	padding: ${getSpace(Size.XS)}px;
 	transition: transform 0.2s;
 
 	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
-	${(props: StyledIconProps) => (props.active ? 'fill: white' : '')};
+	${(props: StyledIconProps) => (props.active ? 'fill: #0070D6' : '')};
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => {
@@ -155,7 +202,7 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 	} = props;
 
 	return (
-		<StyledElement title={title}>
+		<StyledElement>
 			<StyledPlaceholder
 				highlightPlaceholder={highlightPlaceholder}
 				onDragOver={(e: React.DragEvent<HTMLElement>) => {

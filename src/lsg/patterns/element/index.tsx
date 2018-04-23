@@ -91,13 +91,13 @@ const StyledElementLabel = styled.div`
 					background: ${colors.blue80.toString()};
 				}
 
-                &:hover {
-                    background: ${colors.blue80.toString()};
+				&:hover {
+					background: ${colors.blue80.toString()};
 
 					&::before {
 						background: ${colors.blue80.toString()};
 					}
-                }
+				}
 			`
 			: ''};
 	${(props: StyledElementLabelProps) =>

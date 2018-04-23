@@ -4,8 +4,6 @@ import Element from './index';
 import * as React from 'react';
 import styled from 'styled-components';
 
-const NOOP = () => {}; // tslint:disable-line no-empty
-
 const StyledTestDiv = styled.div`
 	flex-grow: 1;
 	max-width: 200px;
@@ -25,14 +23,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 
 		<StyledTestDiv>
 			With Child and handleIconClick
-			<Element
-				handleClick={e => {
-					e.stopPropagation();
-				}}
-				handleIconClick={NOOP}
-				title="Element"
-				dragging
-			>
+			<Element onClick={e => e.stopPropagation()} title="Element" dragging>
 				Child
 			</Element>
 		</StyledTestDiv>

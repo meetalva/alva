@@ -101,3 +101,10 @@ ipcMain.on('preview-ready', () => {
 		window.webContents.send('preview-ready');
 	});
 });
+
+// tslint:disable-next-line:no-any
+ipcMain.on('export-as-sketch-done', (_: Event, payload: any) => {
+	BrowserWindow.getAllWindows().forEach(window => {
+		window.webContents.send('export-as-sketch-done', payload);
+	});
+});

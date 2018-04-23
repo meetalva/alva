@@ -14,6 +14,7 @@ import * as PathUtils from 'path';
 import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
 import * as ProcessUtils from 'process';
+import { SketchExporter } from '../export/sketch-exporter';
 import { Store } from '../store/store';
 const { Menu, shell, app, dialog } = remote;
 
@@ -134,7 +135,9 @@ export function createMenu(): void {
 
 								if (path) {
 									const webview = document.getElementById('preview') as WebviewTag;
-									webview.send('export-as-sketch', path);
+									const sketchExporter = new SketchExporter();
+									await sketchExporter.createExport(webview);
+									await sketchExporter.writeToDisk(path);
 								}
 							}
 						},
@@ -151,7 +154,9 @@ export function createMenu(): void {
 
 								if (path) {
 									const webview = document.getElementById('preview') as WebviewTag;
-									PdfExporter.exportToPdf(path, webview);
+									const pdfExporter = new PdfExporter();
+									await pdfExporter.createExport(webview);
+									await pdfExporter.writeToDisk(path);
 								}
 							}
 						},
@@ -168,7 +173,9 @@ export function createMenu(): void {
 
 								if (path) {
 									const webview = document.getElementById('preview') as WebviewTag;
-									PngExporter.exportToPng(path, webview);
+									const pngExporter = new PngExporter();
+									await pngExporter.createExport(webview);
+									await pngExporter.writeToDisk(path);
 								}
 							}
 						}

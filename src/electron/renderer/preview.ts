@@ -30,8 +30,13 @@ ipcRenderer.on('selectedElement-change', (event: {}, message: JsonObject) => {
 	store.setSelectedElement(page.getElementById(message.selectedElementId as string));
 });
 
-ipcRenderer.on('export-as-sketch', (event: {}, path: string) => {
-	SketchExporter.exportToSketch(path);
+ipcRenderer.on('export-as-sketch', (event: Electron.Event, id: string) => {
+	try {
+		const contents = SketchExporter.createSketchExport();
+		ipcRenderer.send('export-as-sketch-done', { id, contents });
+	} catch (error) {
+		ipcRenderer.send('export-as-sketch-done', { id, error });
+	}
 });
 
 ipcRenderer.send('preview-ready');

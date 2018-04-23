@@ -62,14 +62,18 @@ export class ElementList extends React.Component {
 				Store.getInstance().setDraggedElement(element);
 				e.dataTransfer.effectAllowed = 'move';
 
+				let dragElement = e.currentTarget.querySelector('div');
+
 				// restyle the drag image and move it somewhere invisible
-				var dragImg = e.currentTarget.querySelector('div').cloneNode(true);
-				dragImg.setAttribute(
-					'style',
-					'position: absolute; background-color: #fff; color: #000; padding: 6px 18px; border-radius: 3px; font-size: 12px; opacity: 1; top: 0; left: -500px;'
-				);
-				document.body.appendChild(dragImg);
-				e.dataTransfer.setDragImage(dragImg, 75, 15);
+				if (dragElement) {
+					let dragImg = dragElement.cloneNode(true) as HTMLElement;
+					dragImg.setAttribute(
+						'style',
+						'position: absolute; background-color: #fff; color: #000; padding: 6px 18px; border-radius: 3px; font-size: 12px; opacity: 1; top: 0; left: -500px;'
+					);
+					document.body.appendChild(dragImg);
+					e.dataTransfer.setDragImage(dragImg, 75, 15);
+				}
 			},
 			handleDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');

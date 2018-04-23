@@ -184,60 +184,50 @@ const StyledIcon = styled(Icon)`
 	${(props: StyledIconProps) => (props.active ? 'fill: #0070D6' : '')};
 `;
 
-const Element: React.StatelessComponent<ElementProps> = props => {
-	const {
-		children,
-		title,
-		active,
-		open,
-		highlight,
-		draggable,
-		dragging,
-		onClick,
-		onContextMenu,
-		onDragEnterForChild,
-		onDragLeaveForChild,
-		onDragDropForChild,
-		highlightPlaceholder
-	} = props;
-
-	return (
-		<StyledElement data-id={props.id} onClick={onClick}>
-			{dragging && (
-				<StyledPlaceholder
-					data-element-placeholder
-					highlightPlaceholder={highlightPlaceholder}
-					onDragOver={(e: React.DragEvent<HTMLElement>) => {
-						e.preventDefault();
-					}}
-					onDragEnter={onDragEnterForChild}
-					onDragLeave={onDragLeaveForChild}
-					onDrop={onDragDropForChild}
-				/>
-			)}
-			<StyledElementLabel
-				data-element-label
-				draggable={draggable}
-				active={active}
-				highlight={highlight}
-				onContextMenu={onContextMenu}
-			>
-				{Array.isArray(children) &&
-					children.length > 0 && (
-						<StyledIcon
-							dataIcon={props.id}
-							name={IconName.ArrowFill}
-							size={IconSize.XXS}
-							color={colors.grey60}
-							open={open}
-							active={active}
-						/>
-					)}
-				<div>{title}</div>
-			</StyledElementLabel>
-			{children && <StyledElementChild open={open}>{children}</StyledElementChild>}
-		</StyledElement>
-	);
-};
+const Element: React.StatelessComponent<ElementProps> = props => (
+	<StyledElement data-id={props.id} onClick={props.onClick}>
+		{props.dragging && (
+			<StyledPlaceholder
+				data-element-placeholder
+				highlightPlaceholder={props.highlightPlaceholder}
+				onDragOver={(e: React.DragEvent<HTMLElement>) => {
+					e.preventDefault();
+				}}
+				onDragEnter={props.onDragEnterForChild}
+				onDragLeave={props.onDragLeaveForChild}
+				onDrop={props.onDragDropForChild}
+			/>
+		)}
+		<StyledElementLabel
+			data-element-label
+			draggable={props.draggable}
+			active={props.active}
+			highlight={props.highlight}
+			onContextMenu={props.onContextMenu}
+			onDragOver={(e: React.DragEvent<HTMLElement>) => {
+				e.preventDefault();
+			}}
+			onDragEnter={props.onDragEnter}
+			onDragLeave={props.onDragLeave}
+			onDrop={props.onDragDrop}
+		>
+			{Array.isArray(props.children) &&
+				props.children.length > 0 && (
+					<StyledIcon
+						dataIcon={props.id}
+						name={IconName.ArrowFill}
+						size={IconSize.XXS}
+						color={colors.grey60}
+						open={props.open}
+						active={props.active}
+					/>
+				)}
+			<div>{props.title}</div>
+		</StyledElementLabel>
+		{props.children && (
+			<StyledElementChild open={props.open}>{props.children}</StyledElementChild>
+		)}
+	</StyledElement>
+);
 
 export default Element;

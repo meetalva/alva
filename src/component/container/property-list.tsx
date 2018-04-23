@@ -99,7 +99,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 
 		return (
 			<Element title={property.getName()} open={this.isOpen} handleClick={this.handleClick}>
-				{this.renderItems()}
+				{this.isOpen ? this.renderItems() : 'hidden'}
 			</Element>
 		);
 	}

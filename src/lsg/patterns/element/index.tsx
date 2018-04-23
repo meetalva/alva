@@ -31,6 +31,7 @@ interface StyledElementLabelProps {
 
 interface StyledIconProps {
 	active?: boolean;
+	id?: string;
 	open?: boolean;
 }
 
@@ -224,7 +225,7 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 				{Array.isArray(children) &&
 					children.length > 0 && (
 						<StyledIcon
-							data-element-icon
+							dataIcon={props.id}
 							name={IconName.ArrowFill}
 							size={IconSize.XXS}
 							color={colors.grey60}

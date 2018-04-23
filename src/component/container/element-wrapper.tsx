@@ -29,8 +29,10 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const target = e.target as HTMLElement;
+		const icon = above(target, 'svg[data-icon]');
 
-		if (target.getAttribute('data-element-icon')) {
+		if (icon) {
+			e.stopPropagation();
 			this.setState({
 				open: !this.state.open
 			});
@@ -113,4 +115,24 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 			</Element>
 		);
 	}
+}
+
+function above(node: EventTarget, selector: string): HTMLElement | null {
+	let el = node as HTMLElement;
+	let ended = false;
+
+	while (el && !ended) {
+		if (el.matches(selector)) {
+			break;
+		}
+
+		if (el.parentElement !== null) {
+			el = el.parentElement;
+		} else {
+			ended = true;
+			break;
+		}
+	}
+
+	return ended ? null : el;
 }

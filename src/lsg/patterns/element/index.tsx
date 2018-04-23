@@ -7,18 +7,19 @@ import styled from 'styled-components';
 export interface ElementProps {
 	active?: boolean;
 	draggable?: boolean;
-	handleClick?: React.MouseEventHandler<HTMLElement>;
-	handleContextMenu?: React.MouseEventHandler<HTMLElement>;
-	handleDragDrop?: React.DragEventHandler<HTMLElement>;
-	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragEnter?: React.DragEventHandler<HTMLElement>;
-	handleDragEnterForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragLeave?: React.DragEventHandler<HTMLElement>;
-	handleDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
-	handleIconClick?: React.MouseEventHandler<SVGSVGElement>;
+	dragging: boolean;
 	highlight?: boolean;
 	highlightPlaceholder?: boolean;
+	id?: string;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+	onContextMenu?: React.MouseEventHandler<HTMLElement>;
+	onDragDrop?: React.DragEventHandler<HTMLElement>;
+	onDragDropForChild?: React.DragEventHandler<HTMLElement>;
+	onDragEnter?: React.DragEventHandler<HTMLElement>;
+	onDragEnterForChild?: React.DragEventHandler<HTMLElement>;
+	onDragLeave?: React.DragEventHandler<HTMLElement>;
+	onDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
+	onDragStart?: React.DragEventHandler<HTMLElement>;
 	open?: boolean;
 	title: string;
 }
@@ -190,55 +191,48 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 		open,
 		highlight,
 		draggable,
-		handleClick,
-		handleContextMenu,
-		handleIconClick,
-		handleDragStart,
-		handleDragEnter,
-		handleDragLeave,
-		handleDragDrop,
-		handleDragEnterForChild,
-		handleDragLeaveForChild,
-		handleDragDropForChild,
+		dragging,
+		onClick,
+		onContextMenu,
+		onDragEnterForChild,
+		onDragLeaveForChild,
+		onDragDropForChild,
 		highlightPlaceholder
 	} = props;
 
 	return (
-		<StyledElement>
-			<StyledPlaceholder
-				highlightPlaceholder={highlightPlaceholder}
-				onDragOver={(e: React.DragEvent<HTMLElement>) => {
-					e.preventDefault();
-				}}
-				onDragEnter={handleDragEnterForChild}
-				onDragLeave={handleDragLeaveForChild}
-				onDrop={handleDragDropForChild}
-			/>
+		<StyledElement data-id={props.id} onClick={onClick}>
+			{dragging && (
+				<StyledPlaceholder
+					data-element-placeholder
+					highlightPlaceholder={highlightPlaceholder}
+					onDragOver={(e: React.DragEvent<HTMLElement>) => {
+						e.preventDefault();
+					}}
+					onDragEnter={onDragEnterForChild}
+					onDragLeave={onDragLeaveForChild}
+					onDrop={onDragDropForChild}
+				/>
+			)}
 			<StyledElementLabel
-				onDragOver={(e: React.DragEvent<HTMLElement>) => {
-					e.preventDefault();
-				}}
+				data-element-label
 				draggable={draggable}
-				onDragStart={handleDragStart}
-				onDragEnter={handleDragEnter}
-				onDragLeave={handleDragLeave}
-				onDrop={handleDragDrop}
 				active={active}
 				highlight={highlight}
-				onClick={handleClick}
-				onContextMenu={handleContextMenu}
+				onContextMenu={onContextMenu}
 			>
-				{children && (
-					<StyledIcon
-						handleClick={handleIconClick}
-						name={IconName.ArrowFill}
-						size={IconSize.XXS}
-						color={colors.grey60}
-						open={open}
-						active={active}
-					/>
-				)}
-				<div>{title}</div>
+				{Array.isArray(children) &&
+					children.length > 0 && (
+						<StyledIcon
+							data-element-icon
+							name={IconName.ArrowFill}
+							size={IconSize.XXS}
+							color={colors.grey60}
+							open={open}
+							active={active}
+						/>
+					)}
+				{title}
 			</StyledElementLabel>
 			{children && <StyledElementChild open={open}>{children}</StyledElementChild>}
 		</StyledElement>

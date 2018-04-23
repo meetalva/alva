@@ -194,7 +194,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			Store.getInstance().setDraggedElement(element);
 		}
 
-		const dragElement = e.target.querySelector('div');
+		const target = e.target as HTMLElement;
+		const dragElement = target.querySelector('div');
 
 		// restyle the drag image and move it somewhere invisible
 		if (dragElement) {

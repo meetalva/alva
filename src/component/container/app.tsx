@@ -155,12 +155,15 @@ export class App extends React.Component {
 							</SideBar>
 							<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />
 							<SideBar key="right" directionVertical hasPaddings>
-								<PropertyPane>
-									<PropertyList />
-								</PropertyPane>
-								<PatternsPane>
-									<PatternListContainer />
-								</PatternsPane>
+								{store.getSelectedElement() ? (
+									<PropertyPane>
+										<PropertyList />
+									</PropertyPane>
+								) : (
+									<PatternsPane>
+										<PatternListContainer />
+									</PatternsPane>
+								)}
 							</SideBar>
 						</React.Fragment>
 					) : (

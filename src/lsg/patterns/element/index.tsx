@@ -238,7 +238,7 @@ const Element: React.StatelessComponent<ElementProps> = props => {
 						active={active}
 					/>
 				)}
-				{title}
+				<div>{title}</div>
 			</StyledElementLabel>
 			{children && <StyledElementChild open={open}>{children}</StyledElementChild>}
 		</StyledElement>

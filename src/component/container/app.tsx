@@ -1,17 +1,12 @@
-import Button, { Order } from '../../lsg/patterns/button';
 import { ChromeContainer } from '../chrome/chrome-container';
-import { colors } from '../../lsg/patterns/colors';
-import Copy, { Size as CopySize } from '../../lsg/patterns/copy';
 import { remote } from 'electron';
 import { ElementList } from '../../component/container/element-list';
 // import { ElementButton } from '../../component/container/element-button';
 import ElementPane from '../../lsg/patterns/panes/element-pane';
 import * as FileExtraUtils from 'fs-extra';
 import globalStyles from '../../lsg/patterns/global-styles';
-import { Headline } from '../../lsg/patterns/headline';
 import { IconName, IconRegistry } from '../../lsg/patterns/icons';
 import Layout, { MainArea, SideBar } from '../../lsg/patterns/layout';
-import Link from '../../lsg/patterns/link';
 import { createMenu } from '../../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
@@ -23,8 +18,7 @@ import * as ProcessUtils from 'process';
 import { PropertyList } from './property-list';
 import PropertyPane from '../../lsg/patterns/panes/property-pane';
 import * as React from 'react';
-import Space, { Size as SpaceSize } from '../../lsg/patterns/space';
-import SplashScreen from '../../lsg/patterns/splash-screen';
+import { SplashScreen } from './splash-screen';
 import { Store } from '../../store/store';
 
 globalStyles();
@@ -43,8 +37,6 @@ export class App extends React.Component {
 	public constructor(props: {}) {
 		super(props);
 		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
-		this.handleCreateNewSpaceClick = this.handleCreateNewSpaceClick.bind(this);
-		this.handleOpenSpaceClick = this.handleOpenSpaceClick.bind(this);
 	}
 
 	public componentDidMount(): void {
@@ -52,16 +44,8 @@ export class App extends React.Component {
 		this.redirectUndoRedo();
 	}
 
-	private getDevTools(): React.StatelessComponent | null {
-		try {
-			const DevToolsExports = require('mobx-react-devtools');
-			return DevToolsExports ? DevToolsExports.default : undefined;
-		} catch (error) {
-			return null;
-		}
-	}
-
-	protected handleCreateNewSpaceClick(): void {
+	// TODO: Should move to store
+	protected createNewSpace(): void {
 		let appPath: string = remote.app.getAppPath().replace('.asar', '.asar.unpacked');
 		if (appPath.indexOf('node_modules') >= 0) {
 			appPath = ProcessUtils.cwd();
@@ -82,16 +66,18 @@ export class App extends React.Component {
 		);
 	}
 
+	private getDevTools(): React.StatelessComponent | null {
+		try {
+			const DevToolsExports = require('mobx-react-devtools');
+			return DevToolsExports ? DevToolsExports.default : undefined;
+		} catch (error) {
+			return null;
+		}
+	}
+
 	private handleMainWindowClick(): void {
 		Store.getInstance().setElementFocussed(false);
 		createMenu();
-	}
-
-	protected handleOpenSpaceClick(): void {
-		remote.dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
-			store.openStyleguide(filePaths[0]);
-			store.openFirstPage();
-		});
 	}
 
 	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
@@ -104,6 +90,14 @@ export class App extends React.Component {
 
 	protected get isPropertiesListVisible(): boolean {
 		return this.activeTab === App.PROPERTIES_LIST_ID;
+	}
+
+	// TODO: Should move to store
+	protected openSpace(): void {
+		remote.dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
+			store.openStyleguide(filePaths[0]);
+			store.openFirstPage();
+		});
 	}
 
 	private redirectUndoRedo(): void {
@@ -148,54 +142,35 @@ export class App extends React.Component {
 			<Layout directionVertical onClick={this.handleMainWindowClick}>
 				<ChromeContainer />
 				<MainArea>
-					{project && [
-						<SideBar
-							key="left"
-							directionVertical
-							onClick={() => Store.getInstance().setSelectedElement()}
-						>
-							<ElementPane>
-								<ElementList />
-							</ElementPane>
-						</SideBar>,
-						<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />,
-						<SideBar key="right" directionVertical hasPaddings>
-							<PropertyPane>
-								<PropertyList />
-							</PropertyPane>
-							<PatternsPane>
-								<PatternListContainer />
-							</PatternsPane>
-						</SideBar>
-					]}
-
-					{!project && (
-						<SplashScreen>
-							<Space sizeBottom={SpaceSize.L}>
-								<Headline textColor={colors.grey20} order={2}>
-									Getting started with Alva
-								</Headline>
-							</Space>
-							<Space sizeBottom={SpaceSize.XXXL}>
-								<Copy size={CopySize.M} textColor={colors.grey20}>
-									You can open an existing Alva space or create a new one based on our
-									designkit including some basic components to kickstart your project.
-								</Copy>
-							</Space>
-							<Space sizeBottom={SpaceSize.S}>
-								<Button handleClick={this.handleCreateNewSpaceClick} order={Order.Primary}>
-									Create new Alva space
-								</Button>
-							</Space>
-							<Link color={colors.grey50} onClick={this.handleOpenSpaceClick}>
-								<Copy size={CopySize.S}>or open existing Alva space</Copy>
-							</Link>
-						</SplashScreen>
+					{project ? (
+						<React.Fragment>
+							<SideBar
+								key="left"
+								directionVertical
+								onClick={() => Store.getInstance().setSelectedElement()}
+							>
+								<ElementPane>
+									<ElementList />
+								</ElementPane>
+							</SideBar>
+							<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />
+							<SideBar key="right" directionVertical hasPaddings>
+								<PropertyPane>
+									<PropertyList />
+								</PropertyPane>
+								<PatternsPane>
+									<PatternListContainer />
+								</PatternsPane>
+							</SideBar>
+						</React.Fragment>
+					) : (
+						<SplashScreen
+							onPrimaryButtonClick={() => this.createNewSpace()}
+							onSecondaryButtonClick={() => this.openSpace()}
+						/>
 					)}
 				</MainArea>
-
 				<IconRegistry names={IconName} />
-
 				{DevTools ? <DevTools /> : null}
 			</Layout>
 		);

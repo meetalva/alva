@@ -150,19 +150,19 @@ export class App extends React.Component {
 
 				<MainArea>
 					{project && [
-						<SideBar key="left" directionVertical hasPaddings>
+						<SideBar key="left" directionVertical>
 							<ElementPane>
 								<ElementList />
 							</ElementPane>
-							<PatternsPane>
-								<PatternListContainer />
-							</PatternsPane>
 						</SideBar>,
 						<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />,
 						<SideBar key="right" directionVertical hasPaddings>
 							<PropertyPane>
 								<PropertyList />
 							</PropertyPane>
+							<PatternsPane>
+								<PatternListContainer />
+							</PatternsPane>
 						</SideBar>
 					]}
 

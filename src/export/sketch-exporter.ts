@@ -1,4 +1,4 @@
-import * as HtmlSketchApp from '@thereincarnator/html-sketchapp';
+import * as HtmlSketchApp from '@brainly/html-sketchapp';
 import { ipcRenderer, WebviewTag } from 'electron';
 import { Exporter, ExportResult } from './exporter';
 import { Page } from '../store/page/page';

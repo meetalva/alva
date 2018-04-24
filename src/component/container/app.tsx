@@ -1,7 +1,7 @@
 import { ChromeContainer } from '../chrome/chrome-container';
 import { remote } from 'electron';
+import { ElementButton } from './element-button';
 import { ElementList } from '../../component/container/element-list';
-// import { ElementButton } from '../../component/container/element-button';
 import ElementPane from '../../lsg/patterns/panes/element-pane';
 import * as FileExtraUtils from 'fs-extra';
 import globalStyles from '../../lsg/patterns/global-styles';
@@ -11,7 +11,7 @@ import { createMenu } from '../../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import * as PathUtils from 'path';
-import { PatternListContainer } from '../../component/container/pattern-list';
+import { PatternListContainer } from './pattern-list';
 import PatternsPane from '../../lsg/patterns/panes/patterns-pane';
 import { PreviewPaneWrapper } from '../../component/container/preview-pane-wrapper';
 import * as ProcessUtils from 'process';
@@ -19,7 +19,7 @@ import { PropertyList } from './property-list';
 import PropertyPane from '../../lsg/patterns/panes/property-pane';
 import * as React from 'react';
 import { SplashScreen } from './splash-screen';
-import { Store } from '../../store/store';
+import { RightPane, Store } from '../../store/store';
 
 globalStyles();
 
@@ -31,6 +31,7 @@ export class App extends React.Component {
 	private static PROPERTIES_LIST_ID = 'propertieslist';
 
 	@MobX.observable protected activeTab: string = App.PATTERN_LIST_ID;
+
 	private ctrlDown: boolean = false;
 	private shiftDown: boolean = false;
 
@@ -147,19 +148,28 @@ export class App extends React.Component {
 							<SideBar
 								key="left"
 								directionVertical
-								onClick={() => Store.getInstance().setSelectedElement()}
+								onClick={() => store.setSelectedElement()}
 							>
 								<ElementPane>
 									<ElementList />
 								</ElementPane>
+								{store.getRightPane() === RightPane.Properties && (
+									<ElementButton
+										onClick={e => {
+											e.stopPropagation();
+											store.setRightPane(RightPane.Patterns);
+										}}
+									/>
+								)}
 							</SideBar>
 							<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />
 							<SideBar key="right" directionVertical hasPaddings>
-								{store.getSelectedElement() ? (
+								{store.getRightPane() === RightPane.Properties && (
 									<PropertyPane>
 										<PropertyList />
 									</PropertyPane>
-								) : (
+								)}
+								{store.getRightPane() === RightPane.Patterns && (
 									<PatternsPane>
 										<PatternListContainer />
 									</PatternsPane>

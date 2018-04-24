@@ -13,7 +13,7 @@
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "dist": "node ./scripts/dist-preprocess.js",
     "docs": "typedoc src",
-    "lint": "tslint --project .",
+    "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
     "start": "npm run build && concurrently \"electron build/electron/main.js --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\"",
     "start:clean": "npm run clean && npm run start",
     "start:lsg": "npm run build:lsg && concurrently \"npm run build:lsg -- -w\" \"patternplate start\"",

@@ -16,10 +16,22 @@ export interface ElementListState {
 	dragging: boolean;
 }
 
+const DRAG_IMG_STYLE = `
+	position: absolute;
+	background-color: #fff;
+	color: #000;
+	padding: 6px 18px;
+	border-radius: 3px;
+	font-size: 12px;
+	opacity: 1;
+	top: 0;
+	left: -500px;
+`;
+
 @observer
 export class ElementList extends React.Component<{}, ElementListState> {
 	public state = {
-		dragging: false
+		dragging: true
 	};
 
 	public componentDidMount(): void {
@@ -200,10 +212,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		// restyle the drag image and move it somewhere invisible
 		if (dragElement) {
 			const dragImg = dragElement.cloneNode(true) as HTMLElement;
-			dragImg.setAttribute(
-				'style',
-				'position: absolute; background-color: #fff; color: #000; padding: 6px 18px; border-radius: 3px; font-size: 12px; opacity: 1; top: 0; left: -500px;'
-			);
+			dragImg.setAttribute('style', DRAG_IMG_STYLE);
 			document.body.appendChild(dragImg);
 			e.dataTransfer.setDragImage(dragImg, 75, 15);
 		}
@@ -228,10 +237,13 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		return (
 			<div
+				data-drag-root
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
 				onDragStart={e => this.handleDragStart(e)}
 				onDragEnd={e => this.handleDragEnd(e)}
+				onMouseOver={e => this.setState({ dragging: false })}
+				onMouseLeave={e => this.setState({ dragging: true })}
 			>
 				<ElementTree {...item} dragging={this.state.dragging} />
 			</div>

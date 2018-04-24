@@ -95,8 +95,8 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 		return (
 			<Element
 				active={active}
-				draggable
 				dragging={this.props.dragging}
+				draggable
 				onClick={e => this.handleClick(e)}
 				onDragDrop={e => this.handleDragDrop(e)}
 				onDragDropForChild={e => this.handleDragDropForChild(e)}

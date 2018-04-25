@@ -10,6 +10,9 @@
 			"name": "Attach to main browser instance",
 			"port": 9222,
 			"webRoot": "${workspaceFolder}",
+			"windows": {
+				"url": "${workspaceFolder}\\build\\electron\\renderer\\app.html"
+			},
 			"url": "${workspaceFolder}/build/electron/renderer/app.html"
 		},
 		{
@@ -18,6 +21,9 @@
 			"name": "Attach to preview browser instance",
 			"port": 9222,
 			"webRoot": "${workspaceFolder}",
+			"windows": {
+				"url": "${workspaceFolder}\\build\\electron\\renderer\\preview.html"
+			},
 			"url": "${workspaceFolder}/build/electron/renderer/preview.html"
 		},
 		{

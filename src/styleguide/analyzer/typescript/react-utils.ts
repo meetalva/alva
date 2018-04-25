@@ -1,3 +1,5 @@
+// tslint:disable:no-bitwise
+
 import { Type } from './type';
 import * as ts from 'typescript';
 
@@ -7,6 +9,8 @@ const REACT_COMPONENT_TYPES = [
 	'PureComponent',
 	'StatelessComponent'
 ];
+
+const REACT_SLOT_TYPES = ['Element', 'ReactNode', 'ReactChild'];
 
 /**
  * Tools to inspect typescript React implementations.
@@ -35,6 +39,17 @@ export class ReactUtils {
 		return;
 	}
 
+	protected static hasDeclarationInReactTypingsFile(declarations: ts.Declaration[]): boolean {
+		for (const declaration of declarations) {
+			const sourceFile = declaration.getSourceFile();
+			if (sourceFile && sourceFile.fileName.includes('react/index.d.ts')) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Returns whether a given type is a well-known (Alva supported) React component type,
 	 * without traversing through the base types.
@@ -53,9 +68,33 @@ export class ReactUtils {
 			return false;
 		}
 
-		for (const declaration of symbol.declarations) {
-			const sourceFile = declaration.getSourceFile();
-			if (sourceFile && sourceFile.fileName.includes('react/index.d.ts')) {
+		return this.hasDeclarationInReactTypingsFile(symbol.declarations);
+	}
+
+	/**
+	 * Test if the provided type is assignable to a react node.
+	 * @param program The TypeScript program.
+	 * @param type The type to test against react node type.
+	 */
+	public static isSlotType(program: ts.Program, type: ts.Type): boolean {
+		const typeSymbols: (ts.Symbol | undefined)[] =
+			type.symbol || type.aliasSymbol
+				? [type.symbol || type.aliasSymbol]
+				: type.flags & ts.TypeFlags.Union
+					? (type as ts.UnionType).types.map(value => value.aliasSymbol || value.symbol)
+					: [];
+
+		for (const typeSymbol of typeSymbols) {
+			if (!typeSymbol || !typeSymbol.declarations) {
+				continue;
+			}
+
+			const isWellKnownType: boolean = REACT_SLOT_TYPES.indexOf(typeSymbol.name) >= 0;
+			if (!isWellKnownType) {
+				continue;
+			}
+
+			if (this.hasDeclarationInReactTypingsFile(typeSymbol.declarations)) {
 				return true;
 			}
 		}

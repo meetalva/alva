@@ -37,7 +37,7 @@ export function elementMenu(element: PageElement): void {
 				const newPageElement = clipboardElement && clipboardElement.clone();
 
 				if (newPageElement) {
-					store.execute(ElementLocationCommand.addSibling(element, newPageElement));
+					store.execute(ElementLocationCommand.addSibling(newPageElement, element));
 				}
 			}
 		},

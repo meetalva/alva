@@ -278,7 +278,7 @@ export function createMenu(): void {
 						if (selectedElement && store.isElementFocussed()) {
 							const newPageElement = selectedElement.clone();
 							store.execute(
-								ElementLocationCommand.addSibling(selectedElement, newPageElement)
+								ElementLocationCommand.addSibling(newPageElement, selectedElement)
 							);
 							store.setSelectedElement(newPageElement);
 						}
@@ -306,7 +306,12 @@ export function createMenu(): void {
 						}
 					})(),
 					click: () => {
+						if (store.getSelectedSlotId()) {
+							return;
+						}
+
 						const selectedElement: PageElement | undefined = store.getSelectedElement();
+
 						if (selectedElement) {
 							store.execute(ElementLocationCommand.remove(selectedElement));
 							store.setSelectedElement(undefined);

@@ -10,7 +10,6 @@ import * as PathUtils from 'path';
 import { Pattern } from '../../../store/styleguide/pattern';
 import { PatternComponent } from './pattern-component';
 import { Placeholder } from './placeholder';
-import { PropertyValue } from '../../../store/page/property-value';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Store } from '../../../store/store';
@@ -89,9 +88,9 @@ class Preview extends React.Component<PreviewProps> {
 		const pattern = pageElement.getPattern() as Pattern;
 		pattern.getProperties().forEach(property => {
 			const propertyId = property.getId();
-			componentProps[propertyId] = this.createComponent(
-				property.convertToRender(pageElement.getPropertyValue(propertyId))
-			);
+			const value = pageElement.getPropertyValue(propertyId);
+
+			componentProps[propertyId] = property.convertToRender(value);
 		});
 	}
 
@@ -117,45 +116,23 @@ class Preview extends React.Component<PreviewProps> {
 	 * @returns A React component in case of a page element, the primitive in case of a primitive,
 	 * or an array or object with values converted in the same manner, if an array resp. object is provided.
 	 */
-	protected createComponent(value: PropertyValue): JSX.Element | PropertyValue {
-		if (value === undefined || value === null || typeof value !== 'object') {
-			// Primitives stay primitives.
-			return value;
+	protected createComponent(pageElement: PageElement): React.ReactNode {
+		const pattern = pageElement.getPattern();
+		if (!pattern) {
+			return null;
 		}
 
-		if (value instanceof PageElement) {
-			// The model is a page element, create a React pattern component
-
-			// First, process the properties and children of the declaration recursively
-			const pageElement: PageElement = value;
-			const pattern = pageElement.getPattern();
-			if (!pattern) {
-				return null;
+		try {
+			const patternId: string = pattern.getId();
+			if (patternId === Pattern.SYNTHETIC_TEXT_ID) {
+				return this.createStringComponent(pageElement);
+			} else if (patternId === Pattern.SYNTHETIC_ASSET_ID) {
+				return this.createAssetComponent(pageElement);
+			} else {
+				return this.createPatternComponent(pageElement, patternId);
 			}
-
-			try {
-				const patternId: string = pattern.getId();
-				if (patternId === Pattern.SYNTHETIC_TEXT_ID) {
-					return this.createStringComponent(pageElement);
-				} else if (patternId === Pattern.SYNTHETIC_ASSET_ID) {
-					return this.createAssetComponent(pageElement);
-				} else {
-					return this.createPatternComponent(pageElement, patternId);
-				}
-			} catch (error) {
-				return <ErrorMessage patternName={pageElement.getName()} error={error.toString()} />;
-			}
-		} else {
-			// The model is an object, but not a pattern declaration.
-			// Create a new object with recursively processed values.
-
-			// tslint:disable-next-line:no-any
-			const result: any = {};
-			Object.keys(value).forEach(objectKey => {
-				// tslint:disable-next-line:no-any
-				result[objectKey] = this.createComponent((value as any)[objectKey]);
-			});
-			return result;
+		} catch (error) {
+			return <ErrorMessage patternName={pageElement.getName()} error={error.toString()} />;
 		}
 	}
 
@@ -204,9 +181,11 @@ class Preview extends React.Component<PreviewProps> {
 	public render(): JSX.Element | null {
 		if (this.props.page) {
 			const highlightAreaProps = this.highlightArea.getProps();
+			const root = this.props.page.getRoot();
+
 			return (
 				<>
-					{this.createComponent(this.props.page.getRoot()) as JSX.Element}
+					{root && this.createComponent(root)}
 					<div
 						style={{
 							position: 'absolute',

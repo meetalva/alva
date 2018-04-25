@@ -1,5 +1,3 @@
-import { PageElement } from './page-element';
-
 /**
  * The valid types for each property value, mainly primitives, objects of primitives,
  * page elements, and some arrays.
@@ -11,7 +9,5 @@ export type PropertyValue =
 	| number
 	| number[]
 	| boolean
-	| PageElement
-	| PageElement[]
 	| undefined
 	| null;

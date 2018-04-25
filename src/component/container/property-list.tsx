@@ -104,7 +104,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 				open={this.isOpen}
 				onClick={this.handleClick}
 			>
-				{this.renderItems()}
+				{this.isOpen ? this.renderItems() : 'hidden'}
 			</Element>
 		);
 	}

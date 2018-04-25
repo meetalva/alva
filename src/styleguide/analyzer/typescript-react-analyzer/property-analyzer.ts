@@ -214,7 +214,9 @@ export class PropertyAnalyzer {
 
 			if (objectType.objectFlags & ts.ObjectFlags.Interface) {
 				const property = new ObjectProperty(args.symbol.name);
-				property.setProperties(PropertyAnalyzer.analyze(args.type, args.typechecker));
+				property.setPropertyResolver(() =>
+					PropertyAnalyzer.analyze(args.type, args.typechecker)
+				);
 				return property;
 			}
 		}

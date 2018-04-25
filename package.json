@@ -4,7 +4,7 @@
   "description": "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
   "main": "./build/electron/main.js",
   "scripts": {
-    "build": "tslint --project . -c tslint.json 'src/**/*.ts' && tsc --project . && cp src/electron/renderer/*.html build/electron/renderer",
+    "build": "npm run lint && tsc --project . && cp src/electron/renderer/*.html build/electron/renderer",
     "build:clean": "npm run clean && npm run build",
     "build:electron": "electron-builder -mwl && node ./scripts/dist-postprocess.js",
     "build:lsg": "tsc --preserveWatchOutput --project src/lsg --outDir build/lsg/patterns",
@@ -13,7 +13,7 @@
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "dist": "node ./scripts/dist-preprocess.js",
     "docs": "typedoc src",
-    "lint": "tslint --project .",
+    "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
     "start": "npm run build && concurrently \"electron build/electron/main.js --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\"",
     "start:clean": "npm run clean && npm run start",
     "start:lsg": "npm run build:lsg && concurrently \"npm run build:lsg -- -w\" \"patternplate start\"",
@@ -129,7 +129,7 @@
     "typedoc": "0.11.1"
   },
   "dependencies": {
-    "@thereincarnator/html-sketchapp": "2.1.0-11",
+    "@brainly/html-sketchapp": "3.0.2",
     "chokidar": "2.0.3",
     "cli": "1.0.1",
     "deep-assign": "2.0.0",

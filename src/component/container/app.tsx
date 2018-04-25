@@ -1,6 +1,6 @@
+import AddButton from '../../lsg/patterns/add-button';
 import { ChromeContainer } from '../chrome/chrome-container';
 import { remote } from 'electron';
-import { ElementButton } from './element-button';
 import { ElementList } from '../../component/container/element-list';
 import ElementPane from '../../lsg/patterns/panes/element-pane';
 import * as FileExtraUtils from 'fs-extra';
@@ -152,15 +152,16 @@ export class App extends React.Component {
 							>
 								<ElementPane>
 									<ElementList />
-								</ElementPane>
-								{store.getRightPane() === RightPane.Properties && (
-									<ElementButton
+									<AddButton
+										active={store.getRightPane() === RightPane.Patterns}
+										label="Add Elements"
 										onClick={e => {
 											e.stopPropagation();
 											store.setRightPane(RightPane.Patterns);
+											store.setSelectedElement();
 										}}
 									/>
-								)}
+								</ElementPane>
 							</SideBar>
 							<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />
 							<SideBar key="right" directionVertical hasPaddings>

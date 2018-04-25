@@ -23,22 +23,6 @@ const StyledElementPane = styled.div`
 		box-sizing: border-box;
 		z-index: 10;
 	}
-
-	/*FadeOut*/
-	&::after {
-		content: '';
-		position: sticky;
-		bottom: 0;
-		display: block;
-		width: 100%;
-		height: 40px;
-		background: linear-gradient(
-			to bottom,
-			rgba(247, 247, 247, 0) 0%,
-			rgba(247, 247, 247, 0.5) 15%,
-			rgba(247, 247, 247, 1) 100%
-		);
-	}
 `;
 
 const ElementPane: React.StatelessComponent = props => (

@@ -45,7 +45,8 @@ const StyledLi = styled.li`
 	line-height: 25px;
 	list-style: none;
 	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')};
-	${(props: StyledListItemProps) => (props.active ? 'background: #def' : '')};
+	${(props: StyledListItemProps) =>
+		props.active ? `background: ${colors.blue80.toString()}` : ''};
 `;
 
 const StyledLabel = styled.span`

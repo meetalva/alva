@@ -1,3 +1,4 @@
+import { colors } from '../../lsg/patterns/colors';
 import { elementMenu } from '../../electron/context-menus';
 import { ElementLocationCommand } from '../../store/command/element-location-command';
 import { ElementWrapper } from './element-wrapper';
@@ -19,8 +20,8 @@ export interface ElementListState {
 const DRAG_IMG_STYLE = `
 	position: fixed;
 	top: 100vh;
-	background-color: #fff;
-	color: #000;
+	background-color: ${colors.white.toString()};
+	color: ${colors.black.toString()};
 	padding: 6px 18px;
 	border-radius: 3px;
 	font-size: 12px;

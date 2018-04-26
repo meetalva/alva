@@ -18,7 +18,7 @@ function createWindow(): void {
 		minWidth: 780,
 		minHeight: 380,
 		titleBarStyle: 'hiddenInset',
-		backgroundColor: colors.grey97.toString(),
+		backgroundColor: colors.grey97.toString('hex'),
 		title: 'Alva'
 	});
 

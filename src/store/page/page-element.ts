@@ -369,9 +369,7 @@ export class PageElement {
 	 * @return The JSON value.
 	 */
 	protected propertyToJsonValue(value: PropertyValue): JsonValue {
-		if (value instanceof PageElement) {
-			return value.toJsonObject();
-		} else if (value instanceof Object) {
+		if (value instanceof Object) {
 			const jsonObject: JsonObject = {};
 			Object.keys(value).forEach((propertyId: string) => {
 				// tslint:disable-next-line:no-any

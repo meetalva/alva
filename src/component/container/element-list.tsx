@@ -29,6 +29,8 @@ const DRAG_IMG_STYLE = `
 
 @observer
 export class ElementList extends React.Component<{}, ElementListState> {
+	private dragImg?: HTMLElement;
+
 	public state = {
 		dragging: true
 	};
@@ -241,6 +243,10 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 	private handleDragEnd(e: React.DragEvent<HTMLElement>): void {
 		this.setState({ dragging: false });
+
+		if (this.dragImg && this.dragImg.parentNode) {
+			this.dragImg.parentNode.removeChild(this.dragImg);
+		}
 	}
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
@@ -260,6 +266,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			dragImg.setAttribute('style', DRAG_IMG_STYLE);
 			document.body.appendChild(dragImg);
 			e.dataTransfer.setDragImage(dragImg, 75, 15);
+			this.dragImg = dragImg;
 		}
 	}
 

@@ -17,15 +17,14 @@ export interface ElementListState {
 }
 
 const DRAG_IMG_STYLE = `
-	position: absolute;
+	position: fixed;
+	top: 100vh;
 	background-color: #fff;
 	color: #000;
 	padding: 6px 18px;
 	border-radius: 3px;
 	font-size: 12px;
 	opacity: 1;
-	top: 0;
-	left: -500px;
 `;
 
 @observer

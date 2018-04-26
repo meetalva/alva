@@ -24,17 +24,16 @@ const StyledPreviewResizer = styled.div`
 	width: 12px;
 	height: 100%;
 	cursor: ew-resize;
-	display: none;
 	&::after {
 		content: '';
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
 		height: 36px;
-		width: 6px;
+		width: 3px;
 		margin: 3px;
 		border-radius: 5px;
-		background: grey;
+		background: ${colors.grey80.toString()};
 	}
 `;
 
@@ -42,7 +41,6 @@ const BaseStyledPreviewPane = styled.div`
 	flex-grow: 1;
 	overflow: hidden;
 	background: ${colors.white.toString()};
-	border-right: 0.5px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
 `;
 
 const StyledPreviewPane = BaseStyledPreviewPane.extend.attrs({

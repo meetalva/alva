@@ -22,8 +22,12 @@ const StyledAddButton = styled.div`
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	border-top: 0.5px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
+	border-top: 1px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-top-width: 0.5px;
+	}
 	cursor: default;
+	user-select: none;
 	display: flex;
 	height: 40px;
 	box-sizing: border-box;
@@ -39,7 +43,10 @@ const StyledAddButton = styled.div`
 	${(props: StyledAddButtonProps) =>
 		props.active
 			? `
-		border-top: 0.5px solid ${colors.blue.toString('rgb', { alpha: 0.1 })};
+		border-top: 1px solid ${colors.blue.toString('rgb', { alpha: 0.1 })};
+		@media screen and (-webkit-min-device-pixel-ratio: 2) {
+			border-top-width: 0.5px;
+		}
 		background: ${colors.blue80.toString()};
 		color: ${colors.blue.toString()};
 

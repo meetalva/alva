@@ -22,7 +22,10 @@ const StyledChrome = styled.div`
 	width: 100%;
 	height: 40px;
 	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXL) * 3}px;
-	border-bottom: 0.5px solid ${colors.grey90.toString()};
+	border-bottom: 1px solid ${colors.grey90.toString()};
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-bottom-width: 0.5px;
+	}
 	background: ${colors.white.toString()};
 	font-family: ${fonts().NORMAL_FONT};
 	-webkit-app-region: drag;

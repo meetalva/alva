@@ -19,7 +19,10 @@ const StyledElementPane = styled.div`
 		display: block;
 		width: 1px;
 		height: 100%;
-		border-right: 0.5px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
+		border-right: 1px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
+		@media screen and (-webkit-min-device-pixel-ratio: 2) {
+			border-right-width: 0.5px;
+		}
 		box-sizing: border-box;
 		z-index: 10;
 	}

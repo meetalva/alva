@@ -180,8 +180,8 @@ const StyledIcon = styled(Icon)`
 	padding: ${getSpace(Size.XS)}px;
 	transition: transform 0.2s;
 
-	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
-	${(props: StyledIconProps) => (props.active ? 'fill: #0070D6' : '')};
+	${(props: StyledIconProps) => (props.open ? `transform: rotate(90deg)` : '')};
+	${(props: StyledIconProps) => (props.active ? `fill: ${colors.blue20.toString()}` : '')};
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => (

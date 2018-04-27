@@ -15,7 +15,7 @@ interface IndicatorProps {
 	checked?: boolean;
 }
 
-const StyledBooleanItem = styled.div`
+const StyledBooleanItem = styled.label`
 	display: flex;
 	align-content: center;
 	width: 100%;

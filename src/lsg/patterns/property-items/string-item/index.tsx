@@ -24,25 +24,31 @@ const StyledLabel = styled.span`
 	display: inline-block;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey36.toString()};
+	color: ${colors.grey60.toString()};
 	width: 30%;
-	padding: ${getSpace(Size.XS)}px 0;
+	padding: ${getSpace(Size.XS) + getSpace(Size.XXS)}px 0 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis
+	user-select: none;
+	cursor: default;
 `;
 
 const StyledInput = styled.input`
 	display: inline-block;
 	box-sizing: border-box;
 	width: 70%;
-	padding: ${getSpace(Size.XS)}px;
+	height: 30px;
+	padding: ${getSpace(Size.XS)}px ${getSpace(Size.S)}px;
 
 	border: 0.5px solid ${colors.grey90.toString()};
-	border-radius: 1px;
+	border-radius: 3px;
 
 	background: ${colors.white.toString()};
-	color: ${colors.black.toString()};
+	color: ${colors.grey20.toString()};
 
 	font-family: ${fonts().NORMAL_FONT};
-	font-size: 12px;
+	font-size: 15px;
 	text-overflow: ellipsis;
 
 	transition: all 0.2s;
@@ -58,9 +64,8 @@ const StyledInput = styled.input`
 
 	&:focus {
 		outline: none;
-		border-color: ${colors.blue.toString()};
+		border-color: ${colors.blue20.toString()};
 		color: ${colors.black.toString()};
-		box-shadow: 0 0 3px ${colors.blue40.toString()};
 	}
 `;
 
@@ -69,13 +74,13 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 
 	return (
 		<StyledStringItem className={className}>
-			<StyledLabel>{label}</StyledLabel>
+			<StyledLabel title={label}>{label}</StyledLabel>
 			<StyledInput
 				onChange={handleChange}
 				onBlur={handleBlur}
 				type="textarea"
 				value={value}
-				placeholder="Type in"
+				placeholder="…"
 			/>
 		</StyledStringItem>
 	);

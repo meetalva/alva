@@ -32,11 +32,18 @@ const StyledEnumItem = styled.div`
 
 const StyledSelectWrapper = styled.div`
 	width: 70%;
+	height: 30px;
 	position: relative;
 	display: inline-block;
+	box-sizing: border-box;
 	border: 0.5px solid ${colors.grey90.toString()};
 	border-radius: 3px;
 	background-color: ${colors.white.toString()};
+	transition: all 0.2s;
+
+	&:hover {
+		border-color: ${colors.grey60.toString()};
+	}
 `;
 
 const StyledSelect = styled.select`
@@ -44,23 +51,22 @@ const StyledSelect = styled.select`
 	box-sizing: border-box;
 	width: 100%;
 	padding: ${getSpace(Size.XS)}px ${getSpace(Size.XL)}px ${getSpace(Size.XS)}px
-		${getSpace(Size.XS)}px;
+		${getSpace(Size.S)}px;
+	margin-top: -1px;
 
 	border: none;
-
 	background: none;
 
-	color: ${colors.black.toString()};
+	color: ${colors.grey20.toString()};
 
 	font-family: ${fonts().NORMAL_FONT};
-	font-size: 12px;
-	text-overflow: ellipsis;
+	font-size: 15px;
 
+	text-overflow: ellipsis;
 	transition: all 0.2s;
 
 	&:hover {
 		color: ${colors.black.toString()};
-		border-color: ${colors.grey60.toString()};
 	}
 
 	&:focus {
@@ -77,17 +83,23 @@ const StyledIcon = styled(Icon)`
 	fill: ${colors.grey60.toString()};
 	width: 12px;
 	height: 12px;
-	padding: ${getSpace(Size.XS)}px;
+	padding: ${getSpace(Size.XS) + getSpace(Size.XXS)}px;
 	transform: rotate(90deg);
+	pointer-events: none;
 `;
 
 const StyledLabel = styled.span`
 	display: inline-block;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey36.toString()};
-	padding: ${getSpace(Size.XS)}px 0;
+	color: ${colors.grey60.toString()};
+	padding: ${getSpace(Size.XS) + getSpace(Size.XXS)}px 0 0;
 	width: 30%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis
+	user-select: none;
+	cursor: default;
 `;
 
 export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
@@ -95,7 +107,7 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 
 	return (
 		<StyledEnumItem className={className}>
-			<StyledLabel>{label}</StyledLabel>
+			<StyledLabel title={label}>{label}</StyledLabel>
 			<StyledSelectWrapper>
 				<StyledSelect
 					className={className}

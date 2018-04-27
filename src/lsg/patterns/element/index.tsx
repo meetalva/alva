@@ -3,22 +3,24 @@ import { Icon, IconName, Size as IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, Size } from '../space';
 import styled from 'styled-components';
+import { tag } from '../tag';
 
 export interface ElementProps {
 	active?: boolean;
 	draggable?: boolean;
-	handleClick?: React.MouseEventHandler<HTMLElement>;
-	handleContextMenu?: React.MouseEventHandler<HTMLElement>;
-	handleDragDrop?: React.DragEventHandler<HTMLElement>;
-	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragEnter?: React.DragEventHandler<HTMLElement>;
-	handleDragEnterForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragLeave?: React.DragEventHandler<HTMLElement>;
-	handleDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
-	handleIconClick?: React.MouseEventHandler<SVGSVGElement>;
+	dragging: boolean;
 	highlight?: boolean;
 	highlightPlaceholder?: boolean;
+	id?: string;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+	onContextMenu?: React.MouseEventHandler<HTMLElement>;
+	onDragDrop?: React.DragEventHandler<HTMLElement>;
+	onDragDropForChild?: React.DragEventHandler<HTMLElement>;
+	onDragEnter?: React.DragEventHandler<HTMLElement>;
+	onDragEnterForChild?: React.DragEventHandler<HTMLElement>;
+	onDragLeave?: React.DragEventHandler<HTMLElement>;
+	onDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
+	onDragStart?: React.DragEventHandler<HTMLElement>;
 	open?: boolean;
 	title: string;
 }
@@ -30,6 +32,7 @@ interface StyledElementLabelProps {
 
 interface StyledIconProps {
 	active?: boolean;
+	id?: string;
 	open?: boolean;
 }
 
@@ -45,76 +48,129 @@ export interface StyledPlaceholder {
 }
 
 const StyledElement = styled.div`
-	cursor: default;
 	position: relative;
+	z-index: 1;
 `;
 
-const StyledElementLabel = styled.div`
+const div = tag('div').omit(['active', 'highlight']);
+
+const StyledElementLabel = styled(div)`
 	position: relative;
 	display: flex;
-	padding: 9px ${getSpace(Size.L)}px 9px ${getSpace(Size.XL)}px;
-	border-radius: 3px;
-	cursor: pointer;
+	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px ${getSpace(
+	Size.XXL
+)}px;
 	align-items: center;
-	color: ${colors.black.toString()};
+	color: ${colors.grey20.toString()};
 	position: relative;
+	font-size: 15px;
+	line-height: 21px;
+	z-index: 1;
+
+	&::before {
+		content: '';
+		display: block;
+		position: absolute;
+		height: 100%;
+		width: 240px;
+		left: 0;
+		top: 0;
+		margin-left: -240px;
+	}
 
 	&:hover {
-		background: ${colors.grey90.toString()};
+		background ${colors.black.toString('rgb', { alpha: 0.05 })};
+
+		&::before {
+			background: ${colors.black.toString('rgb', { alpha: 0.05 })};
+		}
 	}
 
 	${(props: StyledElementLabelProps) =>
 		props.active
 			? `
-				color: ${colors.white.toString()};
-				background: ${colors.blue40.toString()};
+				color: ${colors.blue.toString()};
+				background: ${colors.blue80.toString()};
 
-                &:hover {
-                    background: ${colors.blue40.toString()};
-                }
+				&::before {
+					background: ${colors.blue80.toString()};
+				}
+
+				&:hover {
+					background: ${colors.blue80.toString()};
+
+					&::before {
+						background: ${colors.blue80.toString()};
+					}
+				}
 			`
 			: ''};
 	${(props: StyledElementLabelProps) =>
 		props.highlight
 			? `
 			background: ${colors.grey90.toString()};
+
+			&::before {
+				background: ${colors.grey90.toString()};
+			}
 		`
 			: ''};
 `;
 
-const StyledPlaceholder = styled.div`
+const placeholderDiv = tag('div').omit(['highlightPlaceholder']);
+const StyledPlaceholder = styled(placeholderDiv)`
 	position: relative;
-	height: 10px;
+	height: ${getSpace(Size.S)};
 	width: 100%;
-	margin-top: -5px;
-	margin-bottom: -5px;
-	border-radius: 3px;
+	margin-top: -${getSpace(Size.XS)};
+	margin-bottom: -${getSpace(Size.XS)};
+	z-index: 10;
+
+	&::before {
+		content: '';
+		display: block;
+		position: absolute;
+		height: 6px;
+		width: 6px;
+		left: 6px;
+		top: 3px;
+		border-radius: 3px;
+		background: ${colors.blue40.toString()};
+		transform: scale(0);
+		transition: transform 0.2s;
+		z-index: 20;
+	}
 
 	&::after {
 		content: '';
 		display: block;
 		position: absolute;
-		height: 100%;
-		width: 100%;
-		left: 0;
-		top: 0;
-		background: ${colors.grey90.toString()};
+		height: 2px;
+		width: calc(100% - 6px);
+		left: ${getSpace(Size.XS)};
+		top: 5px;
+		background: ${colors.blue40.toString()};
 		transform: scaleY(0);
 		transition: transform 0.2s;
-		z-index: 50;
+		z-index: 20;
 	}
 
 	${(props: StyledPlaceholder) =>
 		props.highlightPlaceholder
 			? `
-			&:after {
+			&::before {
+				transform: scale(1);
+			}
+
+			&::after {
 				transform: scaleY(1);
 			}
 		`
 			: ''};
 `;
 
-const StyledElementChild = styled.div`
+const elementDiv = tag('div').omit(['open']);
+const StyledElementChild = styled(elementDiv)`
 	flex-basis: 100%;
 	padding-left: ${getSpace(Size.L)}px;
 	${(props: StyledElementChildProps) => (props.open ? 'display: block;' : 'display: none;')};
@@ -122,78 +178,66 @@ const StyledElementChild = styled.div`
 
 const StyledIcon = styled(Icon)`
 	position: absolute;
-	left: 0;
+	left: ${getSpace(Size.XS) + getSpace(Size.XXS)}px;
 	fill: ${colors.grey60.toString()};
-	width: 12px;
-	height: 12px;
+	width: ${getSpace(Size.S)}px;
+	height: ${getSpace(Size.S)}px;
 	padding: ${getSpace(Size.XS)}px;
 	transition: transform 0.2s;
 
 	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
-	${(props: StyledIconProps) => (props.active ? 'fill: white' : '')};
+	${(props: StyledIconProps) => (props.active ? `fill: ${colors.blue20.toString()}` : '')};
 `;
 
-const Element: React.StatelessComponent<ElementProps> = props => {
-	const {
-		children,
-		title,
-		active,
-		open,
-		highlight,
-		draggable,
-		handleClick,
-		handleContextMenu,
-		handleIconClick,
-		handleDragStart,
-		handleDragEnter,
-		handleDragLeave,
-		handleDragDrop,
-		handleDragEnterForChild,
-		handleDragLeaveForChild,
-		handleDragDropForChild,
-		highlightPlaceholder
-	} = props;
-
-	return (
-		<StyledElement title={title}>
+const Element: React.StatelessComponent<ElementProps> = props => (
+	<StyledElement
+		draggable={props.draggable}
+		data-id={props.id}
+		onClick={props.onClick}
+		onMouseOver={e => e.stopPropagation()}
+		onMouseLeave={e => e.stopPropagation()}
+	>
+		{props.dragging && (
 			<StyledPlaceholder
-				highlightPlaceholder={highlightPlaceholder}
+				data-element-placeholder
+				highlightPlaceholder={props.highlightPlaceholder}
 				onDragOver={(e: React.DragEvent<HTMLElement>) => {
 					e.preventDefault();
 				}}
-				onDragEnter={handleDragEnterForChild}
-				onDragLeave={handleDragLeaveForChild}
-				onDrop={handleDragDropForChild}
+				onDragEnter={props.onDragEnterForChild}
+				onDragLeave={props.onDragLeaveForChild}
+				onDrop={props.onDragDropForChild}
 			/>
-			<StyledElementLabel
-				onDragOver={(e: React.DragEvent<HTMLElement>) => {
-					e.preventDefault();
-				}}
-				draggable={draggable}
-				onDragStart={handleDragStart}
-				onDragEnter={handleDragEnter}
-				onDragLeave={handleDragLeave}
-				onDrop={handleDragDrop}
-				active={active}
-				highlight={highlight}
-				onClick={handleClick}
-				onContextMenu={handleContextMenu}
-			>
-				{children && (
+		)}
+		<StyledElementLabel
+			data-element-label
+			active={props.active}
+			highlight={props.highlight}
+			onContextMenu={props.onContextMenu}
+			onDragOver={(e: React.DragEvent<HTMLElement>) => {
+				e.preventDefault();
+			}}
+			onDragEnter={props.onDragEnter}
+			onDragLeave={props.onDragLeave}
+			onDrop={props.onDragDrop}
+		>
+			{Array.isArray(props.children) &&
+				props.children.length > 0 && (
 					<StyledIcon
-						handleClick={handleIconClick}
+						dataIcon={props.id}
 						name={IconName.ArrowFill}
 						size={IconSize.XXS}
 						color={colors.grey60}
-						open={open}
-						active={active}
+						open={props.open}
+						active={props.active}
 					/>
 				)}
-				{title}
-			</StyledElementLabel>
-			{children && <StyledElementChild open={open}>{children}</StyledElementChild>}
-		</StyledElement>
-	);
-};
+			<div>{props.title}</div>
+		</StyledElementLabel>
+		{props.children && (
+			<StyledElementChild open={props.open}>{props.children}</StyledElementChild>
+		)}
+	</StyledElement>
+);
 
 export default Element;

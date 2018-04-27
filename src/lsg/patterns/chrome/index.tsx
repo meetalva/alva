@@ -20,12 +20,18 @@ const StyledChrome = styled.div`
 	display: flex;
 	align-items: center;
 	width: 100%;
-	height: 54px;
+	height: 40px;
 	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXL) * 3}px;
+	border-bottom: 1px solid ${colors.grey90.toString()};
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-bottom-width: 0.5px;
+	}
+	background: ${colors.white.toString()};
 	font-family: ${fonts().NORMAL_FONT};
 	-webkit-app-region: drag;
 	-webkit-user-select: none;
 	user-select: none;
+	-webkit-font-smoothing: antialiased;
 `;
 
 const StyledChromeTitle = styled.div`
@@ -38,13 +44,12 @@ const StyledChromeTitle = styled.div`
 
 const StyledTitleWrapper = styled.div`
 	position: relative;
-	margin: 0 ${getSpace(SpaceSize.XS)}px;
+	margin: -${getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.XS)}px 0;
 	white-space: nowrap;
-  text-overflow: ellipsis;
+	text-overflow: ellipsis;
 	overflow: hidden;
 	text-align: center;
 	width: 130px;
-	}
 `;
 
 interface StyledIconWrapperProps {
@@ -53,7 +58,7 @@ interface StyledIconWrapperProps {
 
 const StyledIconWrapper = styled.div`
 	margin: ${getSpace(SpaceSize.XS)}px;
-	padding: ${getSpace(SpaceSize.XS)}px;
+	padding: ${getSpace(SpaceSize.XXS)}px;
 	border-radius: ${getSpace(SpaceSize.XXS)}px;
 
 	&:hover {
@@ -77,13 +82,13 @@ const Chrome: React.StatelessComponent<ChromeProps> = props => (
 	<StyledChrome>
 		<StyledChromeTitle>
 			<StyledIconWrapper visible={props.leftVisible !== false} onClick={props.onLeftClick}>
-				<StyledLeftIcon size={IconSize.XS} name={IconName.ArrowFill} />
+				<StyledLeftIcon size={IconSize.XS} name={IconName.Arrow} />
 			</StyledIconWrapper>
 
 			<StyledTitleWrapper>{props.title}</StyledTitleWrapper>
 
 			<StyledIconWrapper visible={props.rightVisible !== false} onClick={props.onRightClick}>
-				<StyledRightIcon size={IconSize.XS} name={IconName.ArrowFill} />
+				<StyledRightIcon size={IconSize.XS} name={IconName.Arrow} />
 			</StyledIconWrapper>
 		</StyledChromeTitle>
 		{props.children}

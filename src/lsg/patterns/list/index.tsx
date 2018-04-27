@@ -11,13 +11,13 @@ export interface ListItemProps {
 	active?: boolean;
 	children?: ListItemProps[];
 	draggable?: boolean;
-	handleDragDrop?: React.DragEventHandler<HTMLElement>;
-	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	label?: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onContextMenu?: React.MouseEventHandler<HTMLElement>;
-	value: string;
+	onDragDrop?: React.DragEventHandler<HTMLElement>;
+	onDragDropForChild?: React.DragEventHandler<HTMLElement>;
+	onDragStart?: React.DragEventHandler<HTMLElement>;
+	title: string;
 }
 
 interface StyledListItemProps {
@@ -44,9 +44,9 @@ const StyledUl = styled.ul`
 const StyledLi = styled.li`
 	line-height: 25px;
 	list-style: none;
-	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')} ${(
-		props: StyledListItemProps
-	) => (props.active ? 'background: #def' : '')};
+	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')};
+	${(props: StyledListItemProps) =>
+		props.active ? `background: ${colors.blue80.toString()}` : ''};
 `;
 
 const StyledLabel = styled.span`

@@ -14,6 +14,11 @@ import { Preferences } from './preferences';
 import { Project } from './project';
 import { Styleguide } from './styleguide/styleguide';
 
+export enum RightPane {
+	Patterns = 'Patterns',
+	Properties = 'Properties'
+}
+
 /**
  * The central entry-point for all application state, managed by MobX.
  * Use this object and its properties in your React components,
@@ -92,6 +97,12 @@ export class Store {
 	 * relative to the styleguide root, always using forward slashes.
 	 */
 	@MobX.observable private relativePatternsPath: string;
+
+	/**
+	 * The well-known enum name of content that should be visible in
+	 * the right-hand sidebar/pane.
+	 */
+	@MobX.observable private rightPane: RightPane | null = null;
 
 	/**
 	 * The currently selected element in the element list.
@@ -414,6 +425,17 @@ export class Store {
 	 */
 	public getProjects(): Project[] {
 		return this.projects;
+	}
+
+	/**
+	 * @return The content id to show in the right-hand sidebar
+	 * @see isElementFocussed
+	 */
+	public getRightPane(): RightPane {
+		if (this.rightPane === null) {
+			return this.selectedElement ? RightPane.Properties : RightPane.Patterns;
+		}
+		return this.rightPane;
 	}
 
 	/**
@@ -781,7 +803,7 @@ export class Store {
 	 * Sets the element that is currently being dragged, or undefined if there is none.
 	 * @param draggedElement The dragged element or undefined.
 	 */
-	public setDraggedElement(draggedElement: PageElement): void {
+	public setDraggedElement(draggedElement?: PageElement): void {
 		this.draggedElement = draggedElement;
 	}
 
@@ -819,6 +841,14 @@ export class Store {
 	}
 
 	/**
+	 * @return The content id to show in the right-hand sidebar
+	 * @see rightPane
+	 */
+	public setRightPane(pane: RightPane | null): void {
+		this.rightPane = pane;
+	}
+
+	/**
 	 * Sets the currently selected element in the element list.
 	 * The properties pane shows the properties of this element,
 	 * and keyboard commands like cut, copy, or delete operate on this element.
@@ -826,7 +856,8 @@ export class Store {
 	 * @param selectedElement The selected element or undefined.
 	 * @see setElementFocussed
 	 */
-	public setSelectedElement(selectedElement: PageElement | undefined): void {
+	public setSelectedElement(selectedElement?: PageElement): void {
+		this.rightPane = null;
 		this.selectedElement = selectedElement;
 		this.selectedSlotId = undefined;
 	}

@@ -71,6 +71,10 @@ export const colors = {
 		displayName: 'Blue 40',
 		rgb: [102, 169, 230]
 	}),
+	blue80: new Color({
+		displayName: 'Blue 80',
+		rgb: [212, 226, 242]
+	}),
 	grey20: new Color({
 		displayName: 'Grey 20',
 		rgb: [52, 61, 69]
@@ -94,6 +98,10 @@ export const colors = {
 	grey90: new Color({
 		displayName: 'Grey 90',
 		rgb: [229, 230, 231]
+	}),
+	grey97: new Color({
+		displayName: 'Grey 97',
+		rgb: [247, 247, 247]
 	}),
 	white: new Color({
 		displayName: 'White',

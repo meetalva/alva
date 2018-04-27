@@ -146,25 +146,26 @@ export class App extends React.Component {
 					{project ? (
 						<React.Fragment>
 							<SideBar
-								key="left"
+								side="left"
 								directionVertical
 								onClick={() => store.setSelectedElement()}
+								hasBorder
 							>
 								<ElementPane>
 									<ElementList />
-									<AddButton
-										active={store.getRightPane() === RightPane.Patterns}
-										label="Add Elements"
-										onClick={e => {
-											e.stopPropagation();
-											store.setRightPane(RightPane.Patterns);
-											store.setSelectedElement();
-										}}
-									/>
 								</ElementPane>
+								<AddButton
+									active={store.getRightPane() === RightPane.Patterns}
+									label="Add Elements"
+									onClick={e => {
+										e.stopPropagation();
+										store.setRightPane(RightPane.Patterns);
+										store.setSelectedElement();
+									}}
+								/>
 							</SideBar>
 							<PreviewPaneWrapper key="center" previewFrame={previewFramePath} />
-							<SideBar key="right" directionVertical hasPaddings>
+							<SideBar side="right" directionVertical hasBorder>
 								{store.getRightPane() === RightPane.Properties && (
 									<PropertyPane>
 										<PropertyList />

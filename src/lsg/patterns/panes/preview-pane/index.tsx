@@ -21,7 +21,7 @@ const StyledPreviewWrapper = styled.div`
 `;
 
 const StyledPreviewResizer = styled.div`
-	width: 12px;
+	width: 9px;
 	height: 100%;
 	cursor: ew-resize;
 	&::after {
@@ -33,7 +33,7 @@ const StyledPreviewResizer = styled.div`
 		width: 3px;
 		margin: 3px;
 		border-radius: 5px;
-		background: ${colors.grey80.toString()};
+		background: ${colors.grey60.toString()};
 	}
 `;
 

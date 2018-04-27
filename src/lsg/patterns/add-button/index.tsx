@@ -19,8 +19,6 @@ interface StyledIconProps {
 }
 
 const StyledAddButton = styled.div`
-	position: absolute;
-	bottom: 0;
 	width: 100%;
 	border-top: 1px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
@@ -29,6 +27,7 @@ const StyledAddButton = styled.div`
 	cursor: default;
 	user-select: none;
 	display: flex;
+	flex: none;
 	height: 40px;
 	box-sizing: border-box;
 	padding: ${getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px

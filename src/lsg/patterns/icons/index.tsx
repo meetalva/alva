@@ -15,6 +15,7 @@ export interface IconRegistryProps {
 export interface IconProps {
 	className?: string;
 	color?: Color;
+	dataIcon?: string;
 	handleClick?: React.MouseEventHandler<SVGSVGElement>;
 	name: IconName | null;
 	size?: Size;
@@ -104,6 +105,7 @@ export const Icon: React.StatelessComponent<IconProps> = (props): JSX.Element =>
 			className={props.className}
 			iconColor={props.color}
 			size={props.size}
+			data-icon={props.dataIcon}
 		>
 			{icon !== null && <use xlinkHref={getIconRef(icon)} />}
 		</StyledIcon>

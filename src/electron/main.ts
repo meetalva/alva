@@ -1,4 +1,5 @@
 import { checkForUpdates } from './auto-updater';
+import { colors } from '../lsg/patterns/colors';
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import * as PathUtils from 'path';
 import * as url from 'url';
@@ -17,6 +18,7 @@ function createWindow(): void {
 		minWidth: 780,
 		minHeight: 380,
 		titleBarStyle: 'hiddenInset',
+		backgroundColor: colors.grey97.toString('hex'),
 		title: 'Alva'
 	});
 

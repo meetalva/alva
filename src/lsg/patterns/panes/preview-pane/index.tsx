@@ -32,8 +32,19 @@ const StyledPreviewResizer = styled.div`
 		height: 36px;
 		width: 3px;
 		margin: 3px;
-		border-radius: 5px;
-		background: ${colors.grey60.toString()};
+		border-radius: 2px;
+		background: ${colors.grey80.toString()};
+	}
+
+	&:hover {
+		&::after {
+			background: ${colors.grey60.toString()};
+		}
+	}
+	&:active {
+		&::after {
+			background: ${colors.blue40.toString()};
+		}
 	}
 `;
 

@@ -56,7 +56,7 @@ const StyledIndicator = styled.span`
 			box-shadow: inset 0 0 0 0.5px ${colors.blue40.toString()};
 
 			&:after {
-				content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><polyline points="3.8,6 5.2,7.5 8.2,4.5 " fill="none" stroke="${colors.blue.toString()}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>');
+				content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><polyline points="3.8,6 5.2,7.5 8.2,4.5 " fill="none" stroke="${colors.blue40.toString()}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>');
 				transform: translateX(0px);
 				background: ${colors.white.toString()};
 				border-color: ${colors.blue40.toString()};

@@ -7,13 +7,12 @@ import { Pattern } from '../styleguide/pattern';
 import { Property } from '../styleguide/property/property';
 import { PropertyValue } from './property-value';
 import { Store } from '../store';
-import { StringProperty } from '../styleguide/property/string-property';
-import { Styleguide } from '../styleguide/styleguide';
 import * as Uuid from 'uuid';
 
 export interface PageElementProperties {
 	id?: string;
 	parent?: PageElement;
+	parentSlotId?: string;
 	pattern?: Pattern;
 	setDefaults?: boolean;
 }
@@ -25,9 +24,10 @@ export interface PageElementProperties {
  */
 export class PageElement {
 	/**
-	 * The child page elements of this element.
+	 * The content page elements of this element.
+	 * Key = Slot ID, Value = Slot contents.
 	 */
-	@MobX.observable private children: PageElement[] = [];
+	@MobX.observable private contents: Map<string, PageElement[]> = new Map();
 
 	/**
 	 * The technical (internal) ID of the page element.
@@ -48,6 +48,12 @@ export class PageElement {
 	 * The parent page element if this is not the root element.
 	 */
 	private parent: PageElement | undefined;
+
+	/**
+	 * The id of the slot this element is attached to.
+	 * Undefined means default slot. (for react it's the `children` property)
+	 */
+	private parentSlotId: string | undefined;
 
 	/**
 	 * The pattern this page element reflects. Usually set, may only the undefined if the pattern
@@ -81,6 +87,7 @@ export class PageElement {
 		this.id = properties.id ? properties.id : Uuid.v4();
 		this.pattern = properties.pattern;
 		this.patternId = this.pattern ? this.pattern.getId() : undefined;
+		this.parentSlotId = properties.parentSlotId;
 
 		if (this.name === undefined && this.pattern) {
 			this.name = this.pattern.getName();
@@ -92,7 +99,7 @@ export class PageElement {
 			});
 		}
 
-		this.setParent(properties.parent);
+		this.setParent(properties.parent, properties.parentSlotId);
 	}
 
 	/**
@@ -103,6 +110,7 @@ export class PageElement {
 	public static fromJsonObject(
 		json: JsonObject,
 		parent?: PageElement,
+		parentSlotId?: string,
 		page?: Page
 	): PageElement | undefined {
 		if (!json) {
@@ -130,7 +138,7 @@ export class PageElement {
 			console.warn(`Unknown pattern '${patternId}', please check styleguide`);
 		}
 
-		const element = new PageElement({ id: json.uuid as string, pattern, parent });
+		const element = new PageElement({ id: json.uuid as string, pattern, parent, parentSlotId });
 		element.patternId = patternId;
 
 		if (json.name !== undefined) {
@@ -144,9 +152,27 @@ export class PageElement {
 			});
 		}
 
+		if (json.contents) {
+			const slots = json.contents as JsonObject;
+
+			Object.keys(slots).forEach(slotId => {
+				(slots[slotId] as JsonArray).map(
+					childElement =>
+						PageElement.fromJsonObject(
+							childElement as JsonObject,
+							element,
+							slotId
+						) as PageElement
+				);
+			});
+		}
+
+		// Migrate old children structure
 		if (json.children) {
-			element.children = (json.children as JsonArray).map(
-				(childJson: JsonObject) => element.createChildElement(childJson) as PageElement
+			const children: JsonArray = json.children as JsonArray;
+			children.forEach(
+				childElement =>
+					PageElement.fromJsonObject(childElement as JsonObject, element) as PageElement
 			);
 		}
 
@@ -156,49 +182,32 @@ export class PageElement {
 	/**
 	 * Adds a child element to is element (and removes it from any other parent).
 	 * @param child The child element to add.
-	 * @param index The 0-based new position within the children.
-	 * Leaving out the position adds it at the end of the list.
+	 * @param slotId This indicates the slot, that the element will be attached to. When undefined, the default slot will be used instead.
+	 * @param index The 0-based new position within the children. Leaving out the position adds it at the end of the list.
 	 */
-	public addChild(child: PageElement, index?: number): void {
-		child.setParent(this, index);
+	public addChild(child: PageElement, slotId?: string, index?: number): void {
+		child.setParent(this, slotId, index);
 	}
 
 	/**
 	 * Returns a deep clone of this page element (i.e. cloning all values and children as well).
-	 * The new clone does not have any parent.
+	 * The new clone has neither a parent, nor a slotId.
 	 * @return The new clone.
 	 */
 	public clone(): PageElement {
 		const clone = new PageElement({ pattern: this.pattern });
-		this.children.forEach(child => {
-			clone.addChild(child.clone());
+
+		this.contents.forEach((children, slotId) => {
+			children.forEach(child => {
+				clone.addChild(child.clone(), slotId);
+			});
 		});
+
 		this.propertyValues.forEach((value: PropertyValue, id: string) => {
 			clone.setPropertyValue(id, value);
 		});
+
 		return clone;
-	}
-
-	/**
-	 * Creates a child element (pattern or text) for a given serialization JSON.
-	 * @param json The JSON to read from.
-	 * @return The new child element.
-	 */
-	protected createChildElement(json: JsonValue): PageElement | PropertyValue {
-		if (json && (json as JsonObject)['_type'] === 'pattern') {
-			return PageElement.fromJsonObject(json as JsonObject, this);
-		} else {
-			const store: Store = Store.getInstance();
-			const styleguide = store.getStyleguide() as Styleguide;
-
-			const element: PageElement = new PageElement({
-				pattern: styleguide.getPattern(Pattern.SYNTHETIC_TEXT_ID),
-				setDefaults: false,
-				parent: this
-			});
-			element.setPropertyValue(StringProperty.SYNTHETIC_TEXT_ID, String(json));
-			return element;
-		}
 	}
 
 	/**
@@ -215,11 +224,10 @@ export class PageElement {
 	}
 
 	/**
-	 * Returns the child page elements of this element.
-	 * @return The child page elements of this element.
+	 * Returns all child elements contained by this element, mapped to their containing slots.
 	 */
-	public getChildren(): PageElement[] {
-		return this.children;
+	public getContents(): Map<string, PageElement[]> {
+		return this.contents;
 	}
 
 	/**
@@ -231,14 +239,14 @@ export class PageElement {
 	}
 
 	/**
-	 * Returns the 0-based position of this element within its parent.
+	 * Returns the 0-based position of this element within its parent slot.
 	 * @return The 0-based position of this element.
 	 */
 	public getIndex(): number {
 		if (!this.parent) {
 			throw new Error('This element has no parent');
 		}
-		return this.parent.children.indexOf(this);
+		return this.parent.getSlotContents(this.parentSlotId).indexOf(this);
 	}
 
 	/**
@@ -263,6 +271,14 @@ export class PageElement {
 	 */
 	public getParent(): PageElement | undefined {
 		return this.parent;
+	}
+
+	/**
+	 * Returns the id of the slot this element is attached to.
+	 * @return The slotId of the parent element.
+	 */
+	public getParentSlotId(): string | undefined {
+		return this.parentSlotId;
 	}
 
 	/**
@@ -291,6 +307,22 @@ export class PageElement {
 		}
 
 		return ObjectPath.get(value as {}, path);
+	}
+
+	/**
+	 * Returns the child page elements of this element for a given slot.
+	 * @param slotId The id of the slot to get the children for. Returns the children of the default slot if undefined.
+	 * @return The child page elements of this element and the given slot.
+	 */
+	@MobX.action
+	public getSlotContents(slotId?: string): PageElement[] {
+		const internalSlotId = slotId || Pattern.DEFAULT_SLOT_ID;
+
+		if (!this.contents.has(internalSlotId)) {
+			this.contents.set(internalSlotId, []);
+		}
+
+		return this.contents.get(internalSlotId) as PageElement[];
 	}
 
 	/**
@@ -337,9 +369,7 @@ export class PageElement {
 	 * @return The JSON value.
 	 */
 	protected propertyToJsonValue(value: PropertyValue): JsonValue {
-		if (value instanceof PageElement) {
-			return value.toJsonObject();
-		} else if (value instanceof Object) {
+		if (value instanceof Object) {
 			const jsonObject: JsonObject = {};
 			Object.keys(value).forEach((propertyId: string) => {
 				// tslint:disable-next-line:no-any
@@ -364,7 +394,7 @@ export class PageElement {
 	 * @param index The new 0-based position within the parent's children.
 	 */
 	public setIndex(index: number): void {
-		this.setParent(this.parent, index);
+		this.setParent(this.parent, this.parentSlotId, index);
 	}
 
 	/**
@@ -380,10 +410,11 @@ export class PageElement {
 	 * If no parent is provided, only removes it from its parent.
 	 * @param parent The (optional) new parent for this element.
 	 * @param index The 0-based new position within the children of the new parent.
+	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
 	 * Leaving out the position adds it at the end of the list.
 	 */
-	public setParent(parent?: PageElement, index?: number): void {
-		this.setParentInternal(parent, index, parent ? parent.getPage() : undefined);
+	public setParent(parent?: PageElement, slotId?: string, index?: number): void {
+		this.setParentInternal(parent, slotId, index, parent ? parent.getPage() : undefined);
 	}
 
 	/**
@@ -392,15 +423,28 @@ export class PageElement {
 	 * @param parent The (optional) new parent for this element.
 	 * @param index The 0-based new position within the children of the new parent.
 	 * Leaving out the position adds it at the end of the list.
+	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
 	 * @param page The page of this element.
 	 */
-	public setParentInternal(parent?: PageElement, index?: number, page?: Page): void {
-		if (index !== undefined && this.parent === parent && this.children.indexOf(this) === index) {
+	public setParentInternal(
+		parent?: PageElement,
+		slotId?: string,
+		index?: number,
+		page?: Page
+	): void {
+		if (
+			index !== undefined &&
+			this.parent === parent &&
+			this.getIndex() === index &&
+			this.parentSlotId === slotId
+		) {
 			return;
 		}
 
 		if (this.parent) {
-			(this.parent.children as MobX.IObservableArray<PageElement>).remove(this);
+			(this.parent.getSlotContents(this.parentSlotId) as MobX.IObservableArray<
+				PageElement
+			>).remove(this);
 		}
 
 		if (this.page) {
@@ -408,13 +452,14 @@ export class PageElement {
 		}
 
 		this.parent = parent;
+		this.parentSlotId = slotId;
 		this.updatePageInDescendants(page);
 
 		if (parent) {
-			if (index === undefined || index >= parent.children.length) {
-				parent.children.push(this);
+			if (index === undefined || index >= parent.getSlotContents(slotId).length) {
+				parent.getSlotContents(slotId).push(this);
 			} else {
-				parent.children.splice(index < 0 ? 0 : index, 0, this);
+				parent.getSlotContents(slotId).splice(index < 0 ? 0 : index, 0, this);
 			}
 		}
 
@@ -465,13 +510,16 @@ export class PageElement {
 			pattern: this.patternId
 		};
 
-		json.children = this.children.map(
-			(element: PageElement) =>
-				// tslint:disable-next-line:no-any
-				element.toJsonObject ? element.toJsonObject() : (element as any)
-		);
-		json.properties = {};
+		json.contents = {};
+		this.contents.forEach((slotContents, slotId) => {
+			(json.contents as JsonObject)[slotId] = slotContents.map(
+				(element: PageElement) =>
+					// tslint:disable-next-line:no-any
+					element.toJsonObject ? element.toJsonObject() : (element as any)
+			);
+		});
 
+		json.properties = {};
 		this.propertyValues.forEach((value: PropertyValue, key: string) => {
 			(json.properties as JsonObject)[key] =
 				value !== null && value !== undefined ? this.propertyToJsonValue(value) : value;
@@ -486,6 +534,8 @@ export class PageElement {
 	 */
 	private updatePageInDescendants(page?: Page): void {
 		this.page = page;
-		this.children.forEach(child => child.updatePageInDescendants(page));
+		this.contents.forEach(slotContents => {
+			slotContents.forEach(child => child.updatePageInDescendants(page));
+		});
 	}
 }

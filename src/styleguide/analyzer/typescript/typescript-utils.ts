@@ -25,6 +25,27 @@ export class TypescriptUtils {
 		return;
 	}
 
+	/**
+	 * Returns a TypeScript type declaration for a given symbol.
+	 * @param symbol The symbol to return the declaration for.
+	 * @return TypeScript type declaration.
+	 */
+	public static findTypeDeclaration(symbol: ts.Symbol): ts.Declaration | undefined {
+		if (symbol.valueDeclaration) {
+			return symbol.valueDeclaration;
+		}
+
+		if (symbol.declarations) {
+			return symbol.declarations[0];
+		}
+
+		if (symbol.type && symbol.type.symbol) {
+			return this.findTypeDeclaration(symbol.type.symbol);
+		}
+
+		return;
+	}
+
 	public static getExportInfos(
 		program: ts.Program,
 		statement: ts.Statement

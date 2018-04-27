@@ -40,19 +40,32 @@ export class ElementLocationCommand extends ElementCommand {
 	protected previousParentId?: string | undefined;
 
 	/**
+	 * The slot the element was attached to at creation time of the command. undefined means default slot.
+	 */
+	protected previousSlotId?: string;
+
+	/**
+	 * The slot the element is attached to. undefined means default slot.
+	 */
+	protected slotId?: string;
+
+	/**
 	 * Creates a new user operation to add or remove a child to/from a parent, or to relocate it.
 	 * @param element The element the user operation is performed on.
 	 * @param parent The new parent for the child. undefined removes the child.
 	 * @param index The new position within the parent's children, if a parent is given.
+	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
 	 * Leaving out this value puts the child to the end of the parent's children.
 	 */
-	public constructor(element: PageElement, parent?: PageElement, index?: number) {
+	public constructor(element: PageElement, parent?: PageElement, slotId?: string, index?: number) {
 		super(element);
 
 		this.parent = parent;
+		this.slotId = slotId;
 		this.index = index;
 
 		this.previousParent = element.getParent();
+		this.previousSlotId = element.getParentSlotId();
 		this.previousIndex = this.previousParent ? element.getIndex() : undefined;
 
 		// Memorize the page IDs of the new parent, if the element has no parent.
@@ -84,8 +97,13 @@ export class ElementLocationCommand extends ElementCommand {
 	 * @return The new element command. To register and run the command it, call Store.execute().
 	 * @see Store.execute()
 	 */
-	public static addChild(parent: PageElement, child: PageElement, index?: number): ElementCommand {
-		return new ElementLocationCommand(child, parent, index);
+	public static addChild(
+		parent: PageElement,
+		child: PageElement,
+		slotId?: string,
+		index?: number
+	): ElementCommand {
+		return new ElementLocationCommand(child, parent, slotId, index);
 	}
 
 	/**
@@ -93,6 +111,7 @@ export class ElementLocationCommand extends ElementCommand {
 	 * directly after that element. On execution, also removes the element from any previous parent.
 	 * @param newSibling The element to add at a given location.
 	 * @param location The element to add the new sibling after.
+	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
 	 * @return The new element command. To register and run the command it, call Store.execute().
 	 * @see Store.execute()
 	 */
@@ -101,6 +120,7 @@ export class ElementLocationCommand extends ElementCommand {
 		return new ElementLocationCommand(
 			newSibling,
 			parent,
+			location.getParentSlotId(),
 			parent ? location.getIndex() + 1 : undefined
 		);
 	}
@@ -123,6 +143,7 @@ export class ElementLocationCommand extends ElementCommand {
 	 * from its previous parent). If no parent is provided, only removes it from its parent.
 	 * @param child The element to set the new parent of.
 	 * @param parent The (optional) new parent for the element.
+	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
 	 * @param index The 0-based new position within the children of the new parent.
 	 * Leaving out the position adds it at the end of the list.
 	 * @return The new element command. To register and run the command it, call Store.execute().
@@ -131,9 +152,10 @@ export class ElementLocationCommand extends ElementCommand {
 	public static setParent(
 		child: PageElement,
 		parent: PageElement,
+		slotId?: string,
 		index?: number
 	): ElementCommand {
-		return new ElementLocationCommand(child, parent, index);
+		return new ElementLocationCommand(child, parent, slotId, index);
 	}
 
 	/**
@@ -172,7 +194,7 @@ export class ElementLocationCommand extends ElementCommand {
 			return false;
 		}
 
-		this.element.setParent(this.parent, this.index);
+		this.element.setParent(this.parent, this.slotId, this.index);
 		this.memorizeElementIds();
 
 		return true;
@@ -209,7 +231,7 @@ export class ElementLocationCommand extends ElementCommand {
 			return false;
 		}
 
-		this.element.setParent(this.previousParent, this.previousIndex);
+		this.element.setParent(this.previousParent, this.previousSlotId, this.previousIndex);
 		this.memorizeElementIds();
 
 		return true;

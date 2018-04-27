@@ -1,6 +1,7 @@
 import { ipcRenderer } from 'electron';
 import { JsonObject } from '../../store/json';
 import { Page } from '../../store/page/page';
+import { SketchExporter } from '../../export/sketch-exporter';
 import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
 import { Store } from '../../store/store';
 
@@ -27,6 +28,15 @@ ipcRenderer.on('page-change', (event: {}, message: JsonObject) => {
 ipcRenderer.on('selectedElement-change', (event: {}, message: JsonObject) => {
 	const page = store.getCurrentPage() as Page;
 	store.setSelectedElement(page.getElementById(message.selectedElementId as string));
+});
+
+ipcRenderer.on('export-as-sketch', (event: Electron.Event, id: string) => {
+	try {
+		const contents = SketchExporter.createSketchExport();
+		ipcRenderer.send('export-as-sketch-done', { id, contents });
+	} catch (error) {
+		ipcRenderer.send('export-as-sketch-done', { id, error });
+	}
 });
 
 ipcRenderer.send('preview-ready');

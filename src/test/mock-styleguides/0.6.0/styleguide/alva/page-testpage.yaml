@@ -4,3 +4,7 @@ root:
   children:
     - _type: pattern
       pattern: image
+  properties:
+    alt: Don't look
+    src: www.google.com
+    size: XL

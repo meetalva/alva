@@ -256,19 +256,24 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		if (element) {
 			Store.getInstance().setDraggedElement(element);
-		}
-
-		const target = e.target as HTMLElement;
-		const dragElement = target.querySelector('div');
-
-		// restyle the drag image and move it somewhere invisible
-		if (dragElement) {
-			const dragImg = dragElement.cloneNode(true) as HTMLElement;
+			const dragImg = document.createElement('div');
+			dragImg.textContent = element.getName();
 			dragImg.setAttribute('style', DRAG_IMG_STYLE);
 			document.body.appendChild(dragImg);
 			e.dataTransfer.setDragImage(dragImg, 75, 15);
 			this.dragImg = dragImg;
 		}
+	}
+
+	private handleMouseLeave(e: React.MouseEvent<HTMLElement>): void {
+		const element = elementFromTarget(e.target);
+		if (element) {
+			this.setState({ dragging: true });
+		}
+	}
+
+	private handleMouseOver(e: React.MouseEvent<HTMLElement>): void {
+		this.setState({ dragging: false });
 	}
 
 	public render(): JSX.Element | null {
@@ -295,8 +300,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				onContextMenu={e => this.handleContextMenu(e)}
 				onDragStart={e => this.handleDragStart(e)}
 				onDragEnd={e => this.handleDragEnd(e)}
-				onMouseOver={e => this.setState({ dragging: false })}
-				onMouseLeave={e => this.setState({ dragging: true })}
+				onMouseOver={e => this.handleMouseOver(e)}
+				onMouseLeave={e => this.handleMouseLeave(e)}
 			>
 				<ElementTree {...item} dragging={this.state.dragging} />
 			</div>

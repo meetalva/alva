@@ -803,7 +803,7 @@ export class Store {
 	 * Sets the element that is currently being dragged, or undefined if there is none.
 	 * @param draggedElement The dragged element or undefined.
 	 */
-	public setDraggedElement(draggedElement: PageElement): void {
+	public setDraggedElement(draggedElement?: PageElement): void {
 		this.draggedElement = draggedElement;
 	}
 

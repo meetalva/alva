@@ -180,12 +180,18 @@ const StyledIcon = styled(Icon)`
 	padding: ${getSpace(Size.XS)}px;
 	transition: transform 0.2s;
 
-	${(props: StyledIconProps) => (props.open ? `transform: rotate(90deg)` : '')};
+	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
 	${(props: StyledIconProps) => (props.active ? `fill: ${colors.blue20.toString()}` : '')};
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => (
-	<StyledElement data-id={props.id} onClick={props.onClick}>
+	<StyledElement
+		draggable={props.draggable}
+		data-id={props.id}
+		onClick={props.onClick}
+		onMouseOver={e => e.stopPropagation()}
+		onMouseLeave={e => e.stopPropagation()}
+	>
 		{props.dragging && (
 			<StyledPlaceholder
 				data-element-placeholder
@@ -200,7 +206,6 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 		)}
 		<StyledElementLabel
 			data-element-label
-			draggable={props.draggable}
 			active={props.active}
 			highlight={props.highlight}
 			onContextMenu={props.onContextMenu}

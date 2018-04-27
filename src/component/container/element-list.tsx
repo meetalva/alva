@@ -266,10 +266,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	private handleMouseLeave(e: React.MouseEvent<HTMLElement>): void {
-		const element = elementFromTarget(e.target);
-		if (element) {
-			this.setState({ dragging: true });
-		}
+		this.setState({ dragging: true });
 	}
 
 	private handleMouseOver(e: React.MouseEvent<HTMLElement>): void {

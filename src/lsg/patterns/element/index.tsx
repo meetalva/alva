@@ -3,6 +3,7 @@ import { Icon, IconName, Size as IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, Size } from '../space';
 import styled from 'styled-components';
+import { tag } from '../tag';
 
 export interface ElementProps {
 	active?: boolean;
@@ -51,7 +52,9 @@ const StyledElement = styled.div`
 	z-index: 1;
 `;
 
-const StyledElementLabel = styled.div`
+const div = tag('div').omit(['active', 'highlight']);
+
+const StyledElementLabel = styled(div)`
 	position: relative;
 	display: flex;
 	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px ${getSpace(
@@ -114,7 +117,8 @@ const StyledElementLabel = styled.div`
 			: ''};
 `;
 
-const StyledPlaceholder = styled.div`
+const placeholderDiv = tag('div').omit(['highlightPlaceholder']);
+const StyledPlaceholder = styled(placeholderDiv)`
 	position: relative;
 	height: ${getSpace(Size.S)};
 	width: 100%;
@@ -165,7 +169,8 @@ const StyledPlaceholder = styled.div`
 			: ''};
 `;
 
-const StyledElementChild = styled.div`
+const elementDiv = tag('div').omit(['open']);
+const StyledElementChild = styled(elementDiv)`
 	flex-basis: 100%;
 	padding-left: ${getSpace(Size.L)}px;
 	${(props: StyledElementChildProps) => (props.open ? 'display: block;' : 'display: none;')};

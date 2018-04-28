@@ -24,7 +24,7 @@ const StyledLabel = styled.span`
 	display: inline-block;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey60.toString()};
+	color: ${colors.grey50.toString()};
 	width: 30%;
 	padding: ${getSpace(Size.XS) + getSpace(Size.XXS)}px 0 0;
 	white-space: nowrap;

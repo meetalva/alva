@@ -141,27 +141,12 @@ const StyledPlaceholder = styled(placeholderDiv)`
 		z-index: 20;
 	}
 
-	&::before {
-		content: '';
-		display: block;
-		position: absolute;
-		height: 6px;
-		width: 6px;
-		left: 6px;
-		top: 3px;
-		border-radius: 3px;
-		background: ${colors.blue40.toString()};
-		transform: scale(0);
-		transition: transform 0.2s;
-		z-index: 100;
-	}
-
 	&::after {
 		content: '';
 		display: block;
 		position: absolute;
-		height: 2px;
-		width: 100%;
+		width: calc(100% - 6px);
+		left: ${getSpace(Size.XS)};
 		left: 6px;
 		top: 5px;
 		background: ${colors.blue40.toString()};
@@ -173,7 +158,6 @@ const StyledPlaceholder = styled(placeholderDiv)`
 	${(props: StyledPlaceholder) =>
 		props.highlightPlaceholder
 			? `
-
 			&::before {
 				transform: scale(1);
 			}

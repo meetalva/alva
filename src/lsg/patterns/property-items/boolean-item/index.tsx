@@ -32,11 +32,11 @@ const StyledIndicator = styled.span`
 	height: ${indicatorHeight}px;
 	border-radius: ${indicatorHeight / 2}px;
 	box-sizing: border-box;
-	box-shadow: inset 0 0 0 1px ${colors.grey60.toString()};
+	box-shadow: inset 0 0 0 1px ${colors.grey80.toString()};
 	transition: all ease-in-out 0.15s;
 	user-select: none;
 
-	&:after {
+	&::after {
 		position: absolute;
 		content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><path d="M6,6L4.5,7.5L6,6L4.5,4.5L6,6z M6,6l1.5-1.5L6,6l1.5,1.5L6,6z" fill="none" stroke="${colors.grey60.toString()}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" /></svg>');
 		display: block;
@@ -49,18 +49,30 @@ const StyledIndicator = styled.span`
 		box-sizing: border-box;
 		box-shadow: inset 0 0 0 1px ${colors.grey60.toString()};
 	}
+	
+	&:hover {
+		&::after {
+			box-shadow: inset 0 0 0 1px ${colors.grey60.toString()}, 0.5px 0.5px 3px ${colors.grey60.toString()};
+		}
+	}
 	${(props: IndicatorProps) =>
 		props.checked
 			? `
 			background: ${colors.blue80.toString()};
 			box-shadow: inset 0 0 0 0.5px ${colors.blue40.toString()};
 
-			&:after {
+			&::after {
 				content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><polyline points="3.8,6 5.2,7.5 8.2,4.5 " fill="none" stroke="${colors.blue40.toString()}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>');
 				transform: translateX(0px);
 				background: ${colors.white.toString()};
 				border-color: ${colors.blue40.toString()};
 				box-shadow: inset 0 0 0 1px ${colors.blue40.toString()};
+			}
+
+			&:hover {
+				&::after {
+					box-shadow: inset 0 0 0 1px ${colors.blue40.toString()}, 0.5px 0.5px 3px ${colors.blue40.toString()};
+				}
 			}
 		`
 			: ''};

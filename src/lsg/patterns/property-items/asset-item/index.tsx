@@ -90,7 +90,7 @@ const StyledInput = styled.input`
 
 export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 	<StyledAssetItem className={props.className}>
-		<StyledLabel>{props.label}</StyledLabel>
+		<StyledLabel title={props.label}>{props.label}</StyledLabel>
 		<StyledPreview>
 			<StyledImageBox>
 				<StyledImage src={props.imageSrc} />

@@ -145,9 +145,9 @@ const StyledPlaceholder = styled(placeholderDiv)`
 		content: '';
 		display: block;
 		position: absolute;
+		height: 2px;
 		width: calc(100% - 6px);
 		left: ${getSpace(Size.XS)};
-		left: 6px;
 		top: 5px;
 		background: ${colors.blue40.toString()};
 		transform: scaleY(0);

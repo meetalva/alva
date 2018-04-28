@@ -12,7 +12,7 @@ export interface StringItemProps {
 	value?: string;
 }
 
-const StyledStringItem = styled.div`
+const StyledStringItem = styled.label`
 	width: 100%;
 	display: flex;
 	align-content: center;
@@ -64,8 +64,9 @@ const StyledInput = styled.input`
 
 	&:focus {
 		outline: none;
-		border-color: ${colors.blue20.toString()};
+		border-color: ${colors.blue40.toString()};
 		color: ${colors.black.toString()};
+		box-shadow: 0 0 3px ${colors.blue.toString('rgb', { alpha: 0.4 })};
 	}
 `;
 

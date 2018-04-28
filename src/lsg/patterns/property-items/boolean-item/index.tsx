@@ -23,7 +23,7 @@ const StyledBooleanItem = styled.label`
 `;
 
 const indicatorWidth = 48;
-const indicatorHeight = 27;
+const indicatorHeight = 30;
 
 const StyledIndicator = styled.span`
 	position: relative;

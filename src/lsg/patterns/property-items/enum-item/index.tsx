@@ -39,7 +39,7 @@ const StyledSelectWrapper = styled.div`
 	border: 0.5px solid ${colors.grey90.toString()};
 	border-radius: 3px;
 	background-color: ${colors.white.toString()};
-	transition: all 0.2s;
+	transition: all 0.1s;
 
 	&:hover {
 		border-color: ${colors.grey60.toString()};
@@ -63,7 +63,7 @@ const StyledSelect = styled.select`
 	font-size: 15px;
 
 	text-overflow: ellipsis;
-	transition: all 0.2s;
+	transition: all 0.1s;
 
 	&:hover {
 		color: ${colors.black.toString()};

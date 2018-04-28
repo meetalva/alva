@@ -17,7 +17,6 @@ const AssetItemDemo: React.StatelessComponent<void> = (): JSX.Element => (
 		<StyledDemo>
 			<AssetItem
 				handleChooseClick={NOOP}
-				handleClearClick={NOOP}
 				handleInputChange={NOOP}
 				label="Internal"
 				imageSrc="http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/light-bulb-icon.png"
@@ -26,7 +25,6 @@ const AssetItemDemo: React.StatelessComponent<void> = (): JSX.Element => (
 		<StyledDemo>
 			<AssetItem
 				handleChooseClick={NOOP}
-				handleClearClick={NOOP}
 				handleInputChange={NOOP}
 				label="External"
 				inputValue="http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/light-bulb-icon.png"

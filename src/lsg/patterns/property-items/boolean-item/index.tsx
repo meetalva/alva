@@ -33,7 +33,7 @@ const StyledIndicator = styled.span`
 	border-radius: ${indicatorHeight / 2}px;
 	box-sizing: border-box;
 	box-shadow: inset 0 0 0 1px ${colors.grey80.toString()};
-	transition: all ease-in-out 0.15s;
+	transition: all ease-in-out 0.1s;
 	user-select: none;
 
 	&::after {
@@ -45,7 +45,7 @@ const StyledIndicator = styled.span`
 		transform: translateX(${indicatorWidth - indicatorHeight}px);
 		border-radius: 100%;
 		background: ${colors.white.toString()};
-		transition: all ease-in-out 0.15s;
+		transition: all ease-in-out 0.1s;
 		box-sizing: border-box;
 		box-shadow: inset 0 0 0 1px ${colors.grey60.toString()};
 	}
@@ -83,7 +83,7 @@ const StyledLabel = styled.span`
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey50.toString()};
-	padding: ${getSpace(Size.XS)}px 0;
+	padding: ${getSpace(Size.XS) + getSpace(Size.XXS)}px 0 0;
 	width: 30%;
 	white-space: nowrap;
 	overflow: hidden;

@@ -55,7 +55,10 @@ const StyledImageBox = styled.div`
 	border-right: 0.5px solid ${colors.grey90.toString()};
 	padding: 3px;
 	flex-shrink: 0;
-	text-align: center;
+	vertical-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 `;
 
 const StyledImage = styled.img`

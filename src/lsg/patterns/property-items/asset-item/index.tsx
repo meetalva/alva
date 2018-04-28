@@ -59,6 +59,7 @@ const StyledImageBox = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	pointer-events: none;
 `;
 
 const StyledImage = styled.img`

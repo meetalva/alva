@@ -1,8 +1,8 @@
 import { Directory } from '../directory';
 import { Export } from '../typescript/export';
 import { PatternFolder } from '../../../store/styleguide/folder';
-import * as FileUtils from 'fs';
-import * as PathUtils from 'path';
+import * as Fs from 'fs';
+import * as Path from 'path';
 import { Pattern } from '../../../store/styleguide/pattern';
 import { Property } from '../../../store/styleguide/property/property';
 import { PropertyAnalyzer } from './property-analyzer';
@@ -147,16 +147,16 @@ export class Analyzer extends StyleguideAnalyzer {
 				continue;
 			}
 
-			const name = PathUtils.basename(declarationPath, '.d.ts');
-			const implementationPath = PathUtils.join(directory.getPath(), `${name}.js`);
+			const name = Path.basename(declarationPath, '.d.ts');
+			const implementationPath = Path.join(directory.getPath(), `${name}.js`);
 
-			let iconPath: string | undefined = PathUtils.join(directory.getPath(), 'icon.svg');
-			iconPath = PathUtils.relative(rootDirectory.getPath(), iconPath);
-			iconPath = PathUtils.join(rootDirectory.getPath(), '../../patterns', iconPath);
-			iconPath = PathUtils.resolve(rootDirectory.getPath(), iconPath);
-			iconPath = FileUtils.existsSync(iconPath) ? iconPath : undefined;
+			let iconPath: string | undefined = Path.join(directory.getPath(), 'icon.svg');
+			iconPath = Path.relative(rootDirectory.getPath(), iconPath);
+			iconPath = Path.join(rootDirectory.getPath(), '../../patterns', iconPath);
+			iconPath = Path.resolve(rootDirectory.getPath(), iconPath);
+			iconPath = Fs.existsSync(iconPath) ? iconPath : undefined;
 
-			if (FileUtils.existsSync(implementationPath)) {
+			if (Fs.existsSync(implementationPath)) {
 				patterns.push({
 					directory: directory.getPath(),
 					declarationPath,
@@ -188,10 +188,10 @@ export class Analyzer extends StyleguideAnalyzer {
 	 * @return The pattern ID to use.
 	 */
 	private getPatternId(rootPath: string, fileInfo: PatternInfo, exportInfo: Export): string {
-		const baseName = PathUtils.basename(fileInfo.implementationPath, '.js');
-		const relativePath = PathUtils.relative(rootPath, fileInfo.directory);
-		const absolutePath = PathUtils.join(relativePath, baseName);
-		const baseIdentifier = absolutePath.split(PathUtils.sep).join('/');
+		const baseName = Path.basename(fileInfo.implementationPath, '.js');
+		const relativePath = Path.relative(rootPath, fileInfo.directory);
+		const absolutePath = Path.join(relativePath, baseName);
+		const baseIdentifier = absolutePath.split(Path.sep).join('/');
 		const exportIdentifier = exportInfo.name ? `@${exportInfo.name}` : '';
 		return `${baseIdentifier}${exportIdentifier}`;
 	}
@@ -203,8 +203,8 @@ export class Analyzer extends StyleguideAnalyzer {
 	 * @return The pattern name.
 	 */
 	private getPatternName(fileInfo: PatternInfo, exportInfo: Export): string {
-		const baseName = PathUtils.basename(fileInfo.implementationPath, '.js');
-		const directoryName = PathUtils.basename(fileInfo.directory);
+		const baseName = Path.basename(fileInfo.implementationPath, '.js');
+		const directoryName = Path.basename(fileInfo.directory);
 		return exportInfo.name || (baseName !== 'index' ? baseName : directoryName);
 	}
 }

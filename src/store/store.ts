@@ -1,15 +1,15 @@
 import { Command } from './command/command';
-import * as FileUtils from 'fs';
-import * as FileExtraUtils from 'fs-extra';
+import * as Fs from 'fs';
+import * as FsExtra from 'fs-extra';
 import { JsonArray, JsonObject, Persister } from './json';
 import * as Lodash from 'lodash';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
-import * as OsUtils from 'os';
+import * as Os from 'os';
 import { Page } from './page/page';
 import { PageElement } from './page/page-element';
 import { PageRef } from './page/page-ref';
-import * as PathUtils from 'path';
+import * as Path from 'path';
 import { Preferences } from './preferences';
 import { Project } from './project';
 import { Styleguide } from './styleguide/styleguide';
@@ -389,7 +389,7 @@ export class Store {
 			throw new Error('Cannot open page: No styleguide open');
 		}
 
-		return PathUtils.join(this.styleguide.getPath(), 'alva');
+		return Path.join(this.styleguide.getPath(), 'alva');
 	}
 
 	/**
@@ -405,7 +405,7 @@ export class Store {
 	 * @return The path to the user preferences YAML file.
 	 */
 	public getPreferencesPath(basePreferencePath?: string): string {
-		return PathUtils.join(basePreferencePath || OsUtils.homedir(), '.alva-prefs.yaml');
+		return Path.join(basePreferencePath || Os.homedir(), '.alva-prefs.yaml');
 	}
 
 	/**
@@ -572,7 +572,7 @@ export class Store {
 
 		const pageRef = this.getPageRefById(id);
 		if (pageRef && pageRef.getLastPersistedPath()) {
-			const pagePath: string = PathUtils.join(
+			const pagePath: string = Path.join(
 				this.getPagesPath(),
 				pageRef.getLastPersistedPath() as string
 			);
@@ -621,22 +621,22 @@ export class Store {
 
 		this.currentPage = undefined;
 
-		const alvaYamlPath = PathUtils.join(styleguidePath, 'alva/alva.yaml');
+		const alvaYamlPath = Path.join(styleguidePath, 'alva/alva.yaml');
 
 		// TODO: Converts old alva.yaml structure to new one.
 		// This should be removed after the next version.
-		const projectsPath = PathUtils.join(styleguidePath, 'alva/projects.yaml');
+		const projectsPath = Path.join(styleguidePath, 'alva/projects.yaml');
 		try {
-			const oldFileStructure = Boolean(FileUtils.statSync(projectsPath));
+			const oldFileStructure = Boolean(Fs.statSync(projectsPath));
 			if (oldFileStructure) {
 				const oldAlvaYaml = Persister.loadYamlOrJson(projectsPath);
 				const newAlvaYaml = {
 					analyzerName: 'typescript-react-analyzer',
 					...oldAlvaYaml
 				};
-				FileUtils.writeFileSync(alvaYamlPath, {});
+				Fs.writeFileSync(alvaYamlPath, {});
 				Persister.saveYaml(alvaYamlPath, newAlvaYaml);
-				FileUtils.unlinkSync(projectsPath);
+				Fs.unlinkSync(projectsPath);
 			}
 		} catch (error) {
 			// ignore the correct setup with missing projects.yaml
@@ -755,10 +755,10 @@ export class Store {
 				const lastPath = page.getLastPersistedPath();
 				if (lastPath && page.getPath() !== lastPath) {
 					try {
-						const lastFullPath = PathUtils.join(this.getPagesPath(), lastPath);
-						const newFullPath = PathUtils.join(this.getPagesPath(), page.getPath());
-						FileExtraUtils.mkdirpSync(PathUtils.dirname(newFullPath));
-						FileUtils.renameSync(lastFullPath, newFullPath);
+						const lastFullPath = Path.join(this.getPagesPath(), lastPath);
+						const newFullPath = Path.join(this.getPagesPath(), page.getPath());
+						FsExtra.mkdirpSync(Path.dirname(newFullPath));
+						Fs.renameSync(lastFullPath, newFullPath);
 						page.updateLastPersistedPath();
 					} catch (error) {
 						// Fall back to original path to continue saving
@@ -772,7 +772,7 @@ export class Store {
 
 		const currentPage: Page | undefined = this.getCurrentPage();
 		if (currentPage) {
-			const pagePath: string = PathUtils.join(
+			const pagePath: string = Path.join(
 				this.getPagesPath(),
 				currentPage.getPageRef().getPath()
 			);
@@ -787,7 +787,7 @@ export class Store {
 			projects: this.projects.map(project => project.toJsonObject())
 		};
 
-		const configPath = PathUtils.join(this.getPagesPath(), 'alva.yaml');
+		const configPath = Path.join(this.getPagesPath(), 'alva.yaml');
 		Persister.saveYaml(configPath, json);
 	}
 
@@ -905,9 +905,9 @@ export class Store {
 
 		if (json.styleguidePath && this.analyzerName) {
 			const styleguidePath = json.styleguidePath as string;
-			const patternsPath = PathUtils.join(
+			const patternsPath = Path.join(
 				styleguidePath,
-				this.relativePatternsPath.split('/').join(PathUtils.sep)
+				this.relativePatternsPath.split('/').join(Path.sep)
 			);
 
 			this.styleguide = new Styleguide(styleguidePath, patternsPath, this.analyzerName);

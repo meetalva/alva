@@ -1,11 +1,11 @@
 import { checkForUpdates } from './auto-updater';
 import { colors } from '../lsg/patterns/colors';
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
-import * as FsUtils from 'fs';
+import * as Fs from 'fs';
 import * as getPort from 'get-port';
 import * as stringEscape from 'js-string-escape';
 import { PreviewMessageType, ServerMessage, ServerMessageType } from '../message';
-import * as PathUtils from 'path';
+import * as Path from 'path';
 import { createServer } from './server';
 import * as Url from 'url';
 import * as uuid from 'uuid';
@@ -20,7 +20,7 @@ const RENDERER_DOCUMENT = `<!doctype html>
 </body>
 </html>`;
 
-FsUtils.writeFileSync(PathUtils.join(__dirname, 'app.html'), RENDERER_DOCUMENT);
+Fs.writeFileSync(Path.join(__dirname, 'app.html'), RENDERER_DOCUMENT);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -43,7 +43,7 @@ async function createWindow(): Promise<void> {
 	// and load the index.html of the app.
 	win.loadURL(
 		Url.format({
-			pathname: PathUtils.join(__dirname, 'app.html'),
+			pathname: Path.join(__dirname, 'app.html'),
 			protocol: 'file:',
 			slashes: true
 		})

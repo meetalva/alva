@@ -163,7 +163,7 @@ export class App extends React.Component {
 								key="center"
 								id="preview"
 								previewFrame={`http://localhost:${store.getServerPort()}/preview.html`}
-							/>,
+							/>
 							<SideBar side="right" directionVertical hasBorder>
 								{store.getRightPane() === RightPane.Properties && (
 									<PropertyPane>

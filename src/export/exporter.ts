@@ -1,8 +1,8 @@
 import { WebviewTag } from 'electron';
-import * as FsUtils from 'fs';
+import * as Fs from 'fs';
 import * as Util from 'util';
 
-const writeFile = Util.promisify(FsUtils.writeFile);
+const writeFile = Util.promisify(Fs.writeFile);
 
 export interface ExportResult {
 	error?: Error;

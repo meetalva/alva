@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import * as express from 'express';
 import * as Http from 'http';
 import { ServerMessageType } from '../message';
-import * as PathUtils from 'path';
+import * as Path from 'path';
 import { patternIdToWebpackName } from './pattern-id-to-webpack-name';
 import { previewDocument } from './preview-document';
 import * as QueryString from 'query-string';
@@ -246,11 +246,11 @@ async function setup(update: any): Promise<any> {
 			return componentMap;
 		}
 
-		componentMap[patternIdToWebpackName(pattern.getId())] = `./${PathUtils.relative(
+		componentMap[patternIdToWebpackName(pattern.getId())] = `./${Path.relative(
 			context,
 			patternPath
 		)
-			.split(PathUtils.sep)
+			.split(Path.sep)
 			.join('/')}`;
 		return componentMap;
 	}, init);

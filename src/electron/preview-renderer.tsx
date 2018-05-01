@@ -121,7 +121,16 @@ export function render(init: RenderInit): void {
 			const props = this.props as InjectedPreviewComponentProps;
 			const contents = props.contents || {};
 			const children = typeof contents.default === 'undefined' ? [] : contents.default;
-			const slots = omit(contents, ['default']);
+
+			const renderedSlots = Object.keys(omit(contents, ['default'])).reduce(
+				(previous, slotId) => ({
+					...previous,
+					[slotId]: contents[slotId].map(child => (
+						<PreviewComponent key={child.uuid} {...child} />
+					))
+				}),
+				{}
+			);
 
 			// Access elementId in render method to trigger MobX subscription
 			// tslint:disable-next-line:no-unused-expression
@@ -147,7 +156,7 @@ export function render(init: RenderInit): void {
 
 			return (
 				<ErrorBoundary name={props.name}>
-					<Component {...slots} {...props.properties} data-sketch-name={props.name}>
+					<Component {...props.properties} {...renderedSlots} data-sketch-name={props.name}>
 						{children.map(child => <PreviewComponent key={child.uuid} {...child} />)}
 					</Component>
 				</ErrorBoundary>

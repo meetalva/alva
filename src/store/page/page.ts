@@ -132,10 +132,16 @@ export class Page {
 
 	/**
 	 * Serializes the page into a JSON object for persistence.
+	 * @param forRendering Whether all property values should be converted using
+	 * Property.convertToRender (for the preview app instead of file persistence).
 	 * @return The JSON object to be persisted.
+	 * @see Property.convertToRender()
 	 */
-	public toJsonObject(): JsonObject {
-		return { root: this.root ? this.root.toJsonObject() : undefined };
+	public toJsonObject(props?: { forRendering?: boolean }): JsonObject {
+		return {
+			id: this.getId(),
+			root: this.root ? this.root.toJsonObject(props) : undefined
+		};
 	}
 
 	/**

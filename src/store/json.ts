@@ -1,4 +1,4 @@
-import * as FileUtils from 'fs';
+import * as Fs from 'fs';
 import * as JsYaml from 'js-yaml';
 
 /**
@@ -41,10 +41,10 @@ export class Persister {
 	 */
 	public static loadYamlOrJson(path: string): JsonObject {
 		try {
-			const fileContent: string = FileUtils.readFileSync(path, 'utf8');
+			const fileContent: string = Fs.readFileSync(path, 'utf8');
 			return JsYaml.safeLoad(fileContent, JsYaml.JSON_SCHEMA) as JsonObject;
 		} catch (error) {
-			const fileContent: string = FileUtils.readFileSync(path.replace('.yaml', '.json'), 'utf8');
+			const fileContent: string = Fs.readFileSync(path.replace('.yaml', '.json'), 'utf8');
 			return JSON.parse(fileContent) as JsonObject;
 		}
 	}
@@ -56,6 +56,6 @@ export class Persister {
 	 */
 	public static saveYaml(path: string, jsonObject: JsonObject): void {
 		const fileContent: string = JsYaml.safeDump(jsonObject, { skipInvalid: true, noRefs: true });
-		FileUtils.writeFileSync(path, fileContent, 'utf8');
+		Fs.writeFileSync(path, fileContent, 'utf8');
 	}
 }

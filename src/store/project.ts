@@ -172,18 +172,13 @@ export class Project {
 	 * @return The JSON object to be persisted.
 	 */
 	public toJsonObject(): JsonObject {
-		const pagesJsonObject: JsonObject[] = [];
-		this.pages.forEach(pageRef => {
-			pagesJsonObject.push(pageRef.toJsonObject());
-		});
-
 		return {
 			uuid: this.id,
 			name: this.name,
 			lastChangedAuthor: this.lastChangedAuthor,
 			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
 			previewFrame: this.previewFrame,
-			pages: pagesJsonObject
+			pages: this.pages.map(p => p.toJsonObject())
 		};
 	}
 

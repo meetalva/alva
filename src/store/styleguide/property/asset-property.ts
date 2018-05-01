@@ -1,7 +1,7 @@
-import * as FileUtils from 'fs';
+import * as Fs from 'fs';
 import * as fetch from 'isomorphic-fetch';
 import * as MimeTypes from 'mime-types';
-import * as PathUtils from 'path';
+import * as Path from 'path';
 import { Property } from './property';
 
 /**
@@ -47,13 +47,13 @@ export class AssetProperty extends Property {
 	 * @return The data-URL string.
 	 */
 	public static getValueFromFile(path: string): string {
-		const fileName: string | undefined = path.split(PathUtils.sep).pop();
+		const fileName: string | undefined = path.split(Path.sep).pop();
 		if (fileName === undefined) {
 			throw new Error(`Invalid asset path ${path}`);
 		}
 
 		const mimeType = MimeTypes.lookup(fileName) || 'application/octet-stream';
-		const buffer: Buffer = FileUtils.readFileSync(path);
+		const buffer: Buffer = Fs.readFileSync(path);
 		return this.getValueFromBuffer(buffer, mimeType);
 	}
 

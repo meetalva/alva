@@ -25,7 +25,7 @@ const StyledPreviewResizer = styled.div`
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 9px;
+	width: 11px;
 	height: 100%;
 	cursor: ew-resize;
 	background-color: ${colors.blackAlpha13.toString()};
@@ -38,7 +38,7 @@ const StyledPreviewResizer = styled.div`
 		transform: translateY(-50%);
 		height: 36px;
 		width: 3px;
-		margin: 3px;
+		margin: 4px;
 		border-radius: 2px;
 		background: ${colors.grey80.toString()};
 	}

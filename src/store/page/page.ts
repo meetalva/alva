@@ -1,4 +1,4 @@
-import { JsonObject } from '../json';
+import { JsonObject, Persister } from '../json';
 import * as MobX from 'mobx';
 import { PageElement } from './page-element';
 import { PageRef } from './page-ref';
@@ -38,6 +38,7 @@ export class Page {
 	/**
 	 * Loads and returns a page from a given JSON object.
 	 * @param jsonObject The JSON object to load from.
+	 * @param id The ID of the resulting page
 	 * @return A new page object containing the loaded data.
 	 */
 	public static fromJsonObject(json: JsonObject, id: string): Page {
@@ -51,6 +52,16 @@ export class Page {
 		page.setRoot(PageElement.fromJsonObject(json.root as JsonObject));
 
 		return page;
+	}
+
+	/**
+	 * Loads and returns a page from a given persisted data file
+	 * @param path The absolute file system path to read from
+	 * @param id The ID of the resulting page
+	 * @return A new page object containing the loaded data.
+	 */
+	public static fromPath(path: string, id: string): Page {
+		return Page.fromJsonObject(Persister.loadYamlOrJson(path), id);
 	}
 
 	/**

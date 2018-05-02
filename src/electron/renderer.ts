@@ -42,12 +42,16 @@ MobX.autorun(() => {
 });
 
 MobX.autorun(() => {
-	const page = store.getCurrentPage();
+	const project = store.getCurrentProject();
+	const currentPage = store.getCurrentPage();
 
-	if (page) {
+	if (project && currentPage) {
 		ipcRenderer.send('message', {
 			type: 'page-change',
-			payload: page.toJsonObject({ forRendering: true })
+			payload: {
+				pageId: currentPage.getId(),
+				pages: project.getPages().map(page => page.toJsonObject({ forRendering: true }))
+			}
 		});
 	}
 });

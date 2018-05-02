@@ -21,7 +21,7 @@ export class PageListContainer extends React.Component {
 	}
 	protected getPages(): PageRef[] {
 		const project: Project | undefined = Store.getInstance().getCurrentProject();
-		return project ? project.getPages() : [];
+		return project ? project.getPageRefs() : [];
 	}
 
 	@MobX.action

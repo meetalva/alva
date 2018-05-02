@@ -57,13 +57,13 @@ export function render(init: RenderInit): void {
 	class PreviewApplication extends React.Component {
 		public render(): JSX.Element | null {
 			const props = this.props as InjectedPreviewApplicationProps;
-			const page = props.store.page;
+			const currentPage = props.store.pages.find(page => page.id === props.store.pageId);
 
-			if (!page) {
+			if (!currentPage) {
 				return null;
 			}
 
-			const component = page.root;
+			const component = currentPage.root;
 
 			return (
 				<React.Fragment>

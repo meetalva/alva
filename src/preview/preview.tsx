@@ -28,19 +28,53 @@ export interface Page {
 	root: PageElement;
 }
 
+interface InitialData {
+	data: {
+		pageId: string;
+		pages: Page[];
+	};
+	mode: 'static' | 'live';
+}
+
 export class PreviewStore {
 	@MobX.observable public elementId: string = '';
-	@MobX.observable public page?: Page;
+	@MobX.observable public pageId: string = '';
+	@MobX.observable public pages: Page[] = [];
+
+	private constructor() {}
+
+	// tslint:disable-next-line:no-any
+	public static from(data?: any): PreviewStore {
+		if (!data) {
+			return new PreviewStore();
+		}
+
+		if (!data.hasOwnProperty('payload')) {
+			return new PreviewStore();
+		}
+
+		const payload = data.payload;
+		const store = new PreviewStore();
+
+		if (payload.pageId) {
+			store.pageId = payload.pageId;
+		}
+
+		if (payload.pages) {
+			store.pages = payload.pages;
+		}
+
+		return store;
+	}
 }
 
 function main(): void {
 	SmoothscrollPolyfill.polyfill();
 
-	const store = new PreviewStore();
-	const highlight = new HighlightArea();
+	const initialData = getInitialData();
+	const store = PreviewStore.from(initialData ? initialData.data : undefined);
 
-	const connection = new WebSocket(`ws://${window.location.host}`);
-	const close = () => connection.close();
+	const highlight = new HighlightArea();
 
 	const render = () => {
 		// tslint:disable-next-line:no-any
@@ -50,6 +84,76 @@ function main(): void {
 			store
 		});
 	};
+
+	if (!initialData || initialData.mode === 'live') {
+		listen(store, {
+			onReplacement(): void {
+				render();
+			}
+		});
+	} else {
+		startRouter(store);
+	}
+
+	render();
+}
+
+function getInitialData(): InitialData | undefined {
+	const vaultElement = document.querySelector('[data-data="alva"]');
+
+	if (!vaultElement) {
+		return;
+	}
+
+	try {
+		return JSON.parse(decodeURIComponent(vaultElement.textContent || '{}'));
+	} catch (err) {
+		return;
+	}
+}
+
+// tslint:disable-next-line:no-any
+function parse(data: string): any {
+	try {
+		return JSON.parse(data);
+	} catch (err) {
+		return;
+	}
+}
+
+function refetch(name: string): Promise<boolean> {
+	return new Promise((resolve, reject) => {
+		const candidate = document.querySelector(`script[data-script="${name}"]`);
+
+		if (!candidate) {
+			resolve(false);
+		}
+
+		const componentScript = candidate as HTMLScriptElement;
+		const src = componentScript ? componentScript.getAttribute('src') : '';
+
+		if (!src) {
+			resolve(false);
+		}
+
+		const script = document.createElement('script');
+		script.src = `${src}?reload=${Date.now()}`;
+		script.dataset.script = name;
+
+		script.onload = () => {
+			if (componentScript && document.body.contains(componentScript)) {
+				document.body.removeChild(componentScript);
+			}
+			resolve(true);
+		};
+
+		document.body.appendChild(script);
+	});
+}
+
+function listen(store: PreviewStore, handlers: { onReplacement(): void }): void {
+	const connection = new WebSocket(`ws://${window.location.host}`);
+	const close = () => connection.close();
 
 	connection.addEventListener('open', (...args) => {
 		window.addEventListener('beforeunload', close);
@@ -71,12 +175,13 @@ function main(): void {
 			}
 			case PreviewMessageType.Update: {
 				Promise.all([refetch('renderer'), refetch('components')]).then(() => {
-					render();
+					handlers.onReplacement();
 				});
 				break;
 			}
 			case PreviewMessageType.State: {
-				store.page = payload.page;
+				store.pageId = payload.pageId;
+				store.pages = payload.pages;
 				break;
 			}
 			case PreviewMessageType.ElementChange: {
@@ -124,47 +229,29 @@ function main(): void {
 			}
 		}
 	});
-
-	render();
 }
 
-// tslint:disable-next-line:no-any
-function parse(data: string): any {
-	try {
-		return JSON.parse(data);
-	} catch (err) {
-		return;
+function startRouter(store: PreviewStore): void {
+	const performRouting = () => {
+		const hash = window.location.hash ? window.location.hash.slice(1) : '';
+
+		if (hash.startsWith('page-')) {
+			const index = Number(hash.replace('page-', ''));
+			const currentPage = store.pages[index - 1] || store.pages[0];
+			store.pageId = currentPage.id;
+		} else {
+			const currentPage = store.pages.find(page => page.id === hash) || store.pages[0];
+			store.pageId = currentPage.id;
+		}
+	};
+
+	performRouting();
+
+	if (!window.location.hash) {
+		window.location.hash = '#page-1';
 	}
-}
 
-function refetch(name: string): Promise<boolean> {
-	return new Promise((resolve, reject) => {
-		const candidate = document.querySelector(`script[data-script="${name}"]`);
-
-		if (!candidate) {
-			resolve(false);
-		}
-
-		const componentScript = candidate as HTMLScriptElement;
-		const src = componentScript ? componentScript.getAttribute('src') : '';
-
-		if (!src) {
-			resolve(false);
-		}
-
-		const script = document.createElement('script');
-		script.src = `${src}?reload=${Date.now()}`;
-		script.dataset.script = name;
-
-		script.onload = () => {
-			if (componentScript && document.body.contains(componentScript)) {
-				document.body.removeChild(componentScript);
-			}
-			resolve(true);
-		};
-
-		document.body.appendChild(script);
-	});
+	window.addEventListener('hashchange', performRouting);
 }
 
 main();

@@ -317,7 +317,7 @@ export class Store {
 
 		const currentPageId: string = this.currentPage.getId();
 		for (const project of this.projects) {
-			for (const pageRef of project.getPages()) {
+			for (const pageRef of project.getPageRefs()) {
 				if (pageRef.getId() === currentPageId) {
 					return pageRef;
 				}
@@ -352,7 +352,7 @@ export class Store {
 	 */
 	public getPageRefById(id: string): PageRef | undefined {
 		for (const project of this.projects) {
-			for (const pageRef of project.getPages()) {
+			for (const pageRef of project.getPageRefs()) {
 				if (pageRef.getId() === id) {
 					return pageRef;
 				}
@@ -369,7 +369,7 @@ export class Store {
 	 */
 	public getPageRefByPath(path: string): PageRef | undefined {
 		for (const project of this.projects) {
-			for (const pageRef of project.getPages()) {
+			for (const pageRef of project.getPageRefs()) {
 				if (pageRef.getPath() === path) {
 					return pageRef;
 				}
@@ -515,7 +515,7 @@ export class Store {
 
 		const project: Project = this.projects[0];
 
-		const pages: PageRef[] = project.getPages();
+		const pages: PageRef[] = project.getPageRefs();
 		if (!pages.length) {
 			return;
 		}
@@ -700,7 +700,7 @@ export class Store {
 
 		page
 			.getProject()
-			.getPagesInternal()
+			.getPageRefsInternal()
 			.remove(page);
 	}
 
@@ -718,7 +718,7 @@ export class Store {
 
 		const currentPage: Page | undefined = this.getCurrentPage();
 		if (currentPage) {
-			project.getPages().forEach(pageRef => {
+			project.getPageRefs().forEach(pageRef => {
 				if (currentPage.getPageRef() === pageRef) {
 					this.closePage();
 				}
@@ -751,7 +751,7 @@ export class Store {
 		// Move all page file to their new locations, if the path has changed
 
 		this.projects.forEach(project => {
-			project.getPages().forEach(page => {
+			project.getPageRefs().forEach(page => {
 				const lastPath = page.getLastPersistedPath();
 				if (lastPath && page.getPath() !== lastPath) {
 					try {

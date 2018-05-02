@@ -9,7 +9,6 @@ import * as ReactDom from 'react-dom';
 import { Store } from './store/store';
 
 export interface PreviewComponentProps {
-	connection: WebSocket;
 	contents: {
 		[slot: string]: PageElement[];
 	};
@@ -19,6 +18,60 @@ export interface PreviewComponentProps {
 	// tslint:disable-next-line:no-any
 	properties: { [key: string]: any };
 	uuid: string;
+}
+
+// tslint:disable-next-line:no-any
+function eventActionToHandler(propertyValue: any): any {
+	if (!propertyValue) {
+		return propertyValue;
+	}
+
+	const store = Store.getInstance();
+	if (propertyValue['_type'] === 'set-variable-event-action') {
+		const action = propertyValue;
+		propertyValue = (event: Event) => {
+			let inputValue;
+
+			const target = event.currentTarget;
+			if (
+				target instanceof HTMLInputElement ||
+				target instanceof HTMLSelectElement ||
+				target instanceof HTMLTextAreaElement
+			) {
+				inputValue = target.value;
+			}
+
+			if (inputValue !== undefined && inputValue !== null) {
+				const type: string = typeof inputValue;
+				if (type !== 'string' && type !== 'number' && type !== 'boolean') {
+					inputValue = inputValue.toString();
+				}
+			}
+
+			if (store.connection) {
+				store.connection.send(
+					JSON.stringify({
+						type: PreviewMessageType.SetVariable,
+						payload: { variable: action.variable, inputValue }
+					})
+				);
+			}
+		};
+	} else if (propertyValue['_type'] === 'open-page-event-action') {
+		const action = propertyValue;
+		propertyValue = (event: Event) => {
+			if (store.connection) {
+				store.connection.send(
+					JSON.stringify({
+						type: PreviewMessageType.OpenPage,
+						payload: action.pageId
+					})
+				);
+			}
+		};
+	}
+
+	return propertyValue;
 }
 
 // tslint:disable-next-line:no-any
@@ -86,15 +139,16 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 			(previous, slotId) => ({
 				...previous,
 				[slotId]: contents[slotId].map(child => (
-					<PreviewComponent key={child.uuid} connection={this.props.connection} {...child} />
+					<PreviewComponent key={child.uuid} {...child} />
 				))
 			}),
 			{}
 		);
 
 		// Access elementId in render method to trigger MobX subscription
+		const store = Store.getInstance();
 		// tslint:disable-next-line:no-unused-expression
-		Store.getInstance().selectedElementId;
+		store.selectedElementId;
 
 		// tslint:disable-next-line:no-any
 		const Component = getComponent(this.props) as any;
@@ -104,61 +158,14 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 		const properties = {};
 		Object.keys(this.props.properties).forEach((name: string) => {
-			let propertyValue = this.props.properties[name];
-
-			if (propertyValue['_type'] === 'set-variable-event-action') {
-				const action = propertyValue;
-				propertyValue = (event: Event) => {
-					let inputValue;
-
-					const target = event.currentTarget;
-					if (
-						target instanceof HTMLInputElement ||
-						target instanceof HTMLSelectElement ||
-						target instanceof HTMLTextAreaElement
-					) {
-						inputValue = target.value;
-					}
-
-					if (inputValue !== undefined && inputValue !== null) {
-						const type: string = typeof inputValue;
-						if (type !== 'string' && type !== 'number' && type !== 'boolean') {
-							inputValue = inputValue.toString();
-						}
-					}
-
-					this.props.connection.send(
-						JSON.stringify({
-							type: PreviewMessageType.SetVariable,
-							payload: { variable: action.variable, inputValue }
-						})
-					);
-				};
-			} else if (propertyValue['_type'] === 'open-page-event-action') {
-				const action = propertyValue;
-				propertyValue = (event: Event) => {
-					this.props.connection.send(
-						JSON.stringify({
-							type: PreviewMessageType.OpenPage,
-							payload: action.pageId
-						})
-					);
-				};
-			}
-
-			properties[name] = propertyValue;
+			const propertyValue = this.props.properties[name];
+			properties[name] = eventActionToHandler(propertyValue);
 		});
 
 		return (
 			<ErrorBoundary name={this.props.name}>
 				<Component {...properties} {...renderedSlots} data-sketch-name={this.props.name}>
-					{children.map(child => (
-						<PreviewComponent
-							key={child.uuid}
-							connection={this.props.connection}
-							{...child}
-						/>
-					))}
+					{children.map(child => <PreviewComponent key={child.uuid} {...child} />)}
 				</Component>
 			</ErrorBoundary>
 		);

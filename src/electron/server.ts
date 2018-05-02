@@ -1,36 +1,23 @@
-import { previewDocument } from '../preview/document';
+import { createCompiler } from './create-compiler';
+import { previewDocument, PreviewDocumentMode } from '../preview/document';
 import { EventEmitter } from 'events';
 import * as express from 'express';
 import * as Http from 'http';
 import { ServerMessageType } from '../message';
-import * as Path from 'path';
-import { patternIdToWebpackName } from '../preview/pattern-id-to-webpack-name';
-import * as QueryString from 'query-string';
 import { Store } from '../store/store';
 import { Styleguide } from '../store/styleguide/styleguide';
 import * as uuid from 'uuid';
-import * as webpack from 'webpack';
 import { OPEN, Server as WebsocketServer } from 'ws';
-
-// memory-fs typings on @types are faulty
-const MemoryFs = require('memory-fs');
-
-const PREVIEW_PATH = require.resolve('../preview/preview');
-const LOADER_PATH = require.resolve('../preview/components-loader');
 
 export interface ServerOptions {
 	port: number;
-}
-
-interface StyleguidePattern {
-	[key: string]: string;
 }
 
 interface State {
 	id: string;
 	payload: {
 		// tslint:disable-next-line:no-any
-		page?: any;
+		pages?: any[];
 		selectedElementId?: string;
 	};
 	type: ServerMessageType.State;
@@ -87,7 +74,12 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 
 	app.get('/preview.html', (req, res) => {
 		res.type('html');
-		res.send(previewDocument);
+		res.send(
+			previewDocument({
+				mode: PreviewDocumentMode.Live,
+				data: state
+			})
+		);
 	});
 
 	app.use('/scripts', (req, res, next) => {
@@ -174,7 +166,7 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 			}
 
 			case ServerMessageType.State: {
-				state.payload.page = message.payload;
+				state.payload = message.payload;
 				send(state);
 				break;
 			}
@@ -234,7 +226,6 @@ function startServer(options: ServerStartOptions): Promise<void> {
 // tslint:disable-next-line:no-any
 async function setup(update: any): Promise<any> {
 	const queue: Queue = [];
-	const init: StyleguidePattern = {};
 
 	const styleguide = new Styleguide(
 		update.styleguidePath,
@@ -242,57 +233,7 @@ async function setup(update: any): Promise<any> {
 		update.analyzerName
 	);
 
-	const context = styleguide.getPath();
-
-	const components = styleguide.getPatterns().reduce((componentMap, pattern) => {
-		const patternPath = pattern.getImplementationPath();
-
-		if (!patternPath) {
-			return componentMap;
-		}
-
-		componentMap[patternIdToWebpackName(pattern.getId())] = `./${Path.relative(
-			context,
-			patternPath
-		)
-			.split(Path.sep)
-			.join('/')}`;
-		return componentMap;
-	}, init);
-
-	const compiler = webpack({
-		mode: 'development',
-		context,
-		entry: {
-			components: `${LOADER_PATH}?${QueryString.stringify({
-				cwd: context,
-				components: JSON.stringify(components)
-			})}!`,
-			preview: PREVIEW_PATH
-		},
-		output: {
-			filename: '[name].js',
-			library: '[name]',
-			libraryTarget: 'window',
-			path: '/'
-		},
-		optimization: {
-			splitChunks: {
-				cacheGroups: {
-					vendor: {
-						chunks: 'initial',
-						name: 'vendor',
-						test: /node_modules/,
-						priority: 10,
-						enforce: true
-					}
-				}
-			}
-		},
-		plugins: [new webpack.HotModuleReplacementPlugin()]
-	});
-
-	compiler.outputFileSystem = new MemoryFs();
+	const compiler = createCompiler(styleguide);
 
 	compiler.hooks.compile.tap('alva', () => {
 		queue.unshift({ type: WebpackMessageType.Start, id: uuid.v4() });

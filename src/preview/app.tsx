@@ -4,24 +4,19 @@ import { PreviewComponent } from './preview-component';
 import * as React from 'react';
 import { Store } from './store/store';
 
-export interface AppProps {
-	connection: WebSocket;
-}
-
 @MobXReact.observer
-export class App extends React.Component<AppProps> {
+export class App extends React.Component {
 	public render(): JSX.Element | null {
-		const page = Store.getInstance().page;
-		if (!page) {
+		const currentPage = Store.getInstance().getCurrentPage();
+		if (!currentPage) {
 			return null;
 		}
 
-		const component = page.root;
+		const component = currentPage.root;
 
 		return (
 			<React.Fragment>
 				<PreviewComponent
-					connection={this.props.connection}
 					contents={component.contents}
 					exportName={component.exportName}
 					pattern={component.pattern}

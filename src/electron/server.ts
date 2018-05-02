@@ -3,8 +3,8 @@ import * as express from 'express';
 import * as Http from 'http';
 import { ServerMessageType } from '../message';
 import * as Path from 'path';
-import { patternIdToWebpackName } from './pattern-id-to-webpack-name';
-import { previewDocument } from './preview-document';
+import { patternIdToWebpackName } from '../preview/pattern-id-to-webpack-name';
+import { previewDocument } from '../preview/preview-document';
 import * as QueryString from 'query-string';
 import { Store } from '../store/store';
 import { Styleguide } from '../store/styleguide/styleguide';
@@ -14,6 +14,10 @@ import { OPEN, Server as WebsocketServer } from 'ws';
 
 // memory-fs typings on @types are faulty
 const MemoryFs = require('memory-fs');
+
+const PREVIEW_PATH = require.resolve('../preview/preview');
+const LOADER_PATH = require.resolve('../preview/components-loader');
+const RENDERER_PATH = require.resolve('../preview/preview-renderer');
 
 export interface ServerOptions {
 	port: number;
@@ -47,10 +51,6 @@ interface WebpackMessage {
 
 // tslint:disable-next-line:no-any
 type Queue = WebpackMessage[];
-
-const PREVIEW_PATH = require.resolve('./preview');
-const LOADER_PATH = require.resolve('./loader');
-const RENDERER_PATH = require.resolve('./preview-renderer');
 
 export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 	const store = Store.getInstance();

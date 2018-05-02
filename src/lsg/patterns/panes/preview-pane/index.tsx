@@ -30,6 +30,7 @@ const StyledPreviewResizer = styled.div`
 	cursor: ew-resize;
 	background-color: ${colors.blackAlpha13.toString()};
 	opacity: 0;
+	transition: opacity 0.15s ease-in-out;
 
 	&::after {
 		content: '';
@@ -52,7 +53,7 @@ const StyledPreviewResizer = styled.div`
 	&:active {
 		opacity: 1;
 		&::after {
-			background: ${colors.blue40.toString()};
+			background: ${colors.white.toString()};
 		}
 	}
 	&:last-of-type {

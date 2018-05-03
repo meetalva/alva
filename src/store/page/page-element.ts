@@ -242,9 +242,9 @@ export class PageElement {
 	 * Returns the 0-based position of this element within its parent slot.
 	 * @return The 0-based position of this element.
 	 */
-	public getIndex(): number {
+	public getIndex(): number | undefined {
 		if (!this.parent) {
-			throw new Error('This element has no parent');
+			return undefined;
 		}
 		return this.parent.getSlotContents(this.parentSlotId).indexOf(this);
 	}

@@ -25,7 +25,7 @@ export class ElementNameCommand extends ElementCommand {
 	public constructor(element: PageElement, name: string) {
 		super(element);
 
-		this.name = name;
+		this.name = name.length === 0 ? element.getName({ unedited: true }) : name;
 		this.previousName = element.getName({ unedited: true });
 
 		if (!this.pageId) {

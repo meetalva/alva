@@ -1,5 +1,6 @@
 import { App } from '../component/container/app';
 import { ipcRenderer, webFrame } from 'electron';
+import { ServerMessageType } from '../message';
 import * as MobX from 'mobx';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
@@ -19,9 +20,20 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 	if (!message) {
 		return;
 	}
+
 	switch (message.type) {
 		case 'start-app': {
 			store.setServerPort(message.payload);
+			break;
+		}
+
+		case 'open-page': {
+			store.openPage(message.payload);
+			break;
+		}
+
+		case 'set-variable': {
+			store.setVariableValue(message.payload.variable, message.payload.inputValue);
 		}
 	}
 });
@@ -31,7 +43,7 @@ MobX.autorun(() => {
 
 	if (styleguide) {
 		ipcRenderer.send('message', {
-			type: 'styleguide-change',
+			type: ServerMessageType.StyleGuideChange,
 			payload: {
 				analyzerName: store.getAnalyzerName(),
 				styleguidePath: styleguide.getPath(),
@@ -46,7 +58,7 @@ MobX.autorun(() => {
 
 	if (page) {
 		ipcRenderer.send('message', {
-			type: 'page-change',
+			type: ServerMessageType.State,
 			payload: page.toJsonObject({ forRendering: true })
 		});
 	}
@@ -55,7 +67,7 @@ MobX.autorun(() => {
 MobX.autorun(() => {
 	const selectedElement = store.getSelectedElement();
 	ipcRenderer.send('message', {
-		type: 'element-change',
+		type: ServerMessageType.SelectElement,
 		payload: selectedElement ? selectedElement.getId() : undefined
 	});
 });

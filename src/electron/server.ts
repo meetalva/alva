@@ -1,10 +1,10 @@
+import { previewDocument } from '../preview/document';
 import { EventEmitter } from 'events';
 import * as express from 'express';
 import * as Http from 'http';
 import { ServerMessageType } from '../message';
 import * as Path from 'path';
 import { patternIdToWebpackName } from '../preview/pattern-id-to-webpack-name';
-import { previewDocument } from '../preview/preview-document';
 import * as QueryString from 'query-string';
 import { Store } from '../store/store';
 import { Styleguide } from '../store/styleguide/styleguide';
@@ -17,7 +17,6 @@ const MemoryFs = require('memory-fs');
 
 const PREVIEW_PATH = require.resolve('../preview/preview');
 const LOADER_PATH = require.resolve('../preview/components-loader');
-const RENDERER_PATH = require.resolve('../preview/preview-renderer');
 
 export interface ServerOptions {
 	port: number;
@@ -30,11 +29,11 @@ interface StyleguidePattern {
 interface State {
 	id: string;
 	payload: {
-		elementId?: string;
 		// tslint:disable-next-line:no-any
 		page?: any;
+		selectedElementId?: string;
 	};
-	type: 'state';
+	type: ServerMessageType.State;
 }
 
 enum WebpackMessageType {
@@ -64,7 +63,7 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 
 	const state: State = {
 		id: uuid.v4(),
-		type: 'state',
+		type: ServerMessageType.State,
 		payload: {}
 	};
 
@@ -82,7 +81,7 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 			console.error(err);
 		});
 
-		ws.on('message', message => emitter.emit('client-message', message));
+		ws.on('message', message => emitter.emit('preview-message', message));
 		ws.send(JSON.stringify(state));
 	});
 
@@ -174,14 +173,14 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 				break;
 			}
 
-			case ServerMessageType.PageChange: {
+			case ServerMessageType.State: {
 				state.payload.page = message.payload;
 				send(state);
 				break;
 			}
 
-			case ServerMessageType.ElementChange: {
-				state.payload.elementId = message.payload;
+			case ServerMessageType.SelectElement: {
+				state.payload.selectedElementId = message.payload;
 				send(message);
 				break;
 			}
@@ -269,7 +268,6 @@ async function setup(update: any): Promise<any> {
 				cwd: context,
 				components: JSON.stringify(components)
 			})}!`,
-			renderer: RENDERER_PATH,
 			preview: PREVIEW_PATH
 		},
 		output: {

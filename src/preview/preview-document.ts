@@ -5,6 +5,7 @@ export const previewDocument = `<!doctype html>
 	<style>
 		body {
 			margin: 0;
+			background: white;
 		}
 	</style>
 </head>

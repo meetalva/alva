@@ -177,24 +177,68 @@ export function render(init: RenderInit): void {
 					style={{
 						position: 'absolute',
 						boxSizing: 'border-box',
-						border: '1px dashed rgba(55, 55, 55, .5)',
-						background: `
-						repeating-linear-gradient(
-							135deg,
-							transparent,
-							transparent 2.5px,rgba(51, 141, 222, .5) 2.5px,
-							rgba(51,141,222, .5) 5px),
-							rgba(102,169,230, .5)`,
-						transition: 'all .25s ease-in-out',
+						border: '1px solid rgba(255, 255, 255, 0.5)',
+						transition: 'all .1s ease-in-out',
 						bottom: p.bottom,
 						height: p.height,
 						left: p.left,
 						opacity: p.opacity,
 						right: p.right,
 						top: p.top,
-						width: p.width
+						width: p.width,
+						pointerEvents: 'none',
+						mixBlendMode: 'difference'
 					}}
-				/>
+				>
+					<div
+						style={{
+							position: 'absolute',
+							width: '12px',
+							height: '12px',
+							borderRadius: '3px 0 0 0',
+							borderLeft: '3px solid rgba(255, 255, 255, 0.75)',
+							borderTop: '3px solid rgba(255, 255, 255, 0.75)',
+							left: '-2px',
+							top: '-2px'
+						}}
+					/>
+					<div
+						style={{
+							position: 'absolute',
+							width: '12px',
+							height: '12px',
+							borderRadius: '0 3px 0 0',
+							borderRight: '3px solid rgba(255, 255, 255, 0.75)',
+							borderTop: '3px solid rgba(255, 255, 255, 0.75)',
+							right: '-2px',
+							top: '-2px'
+						}}
+					/>
+					<div
+						style={{
+							position: 'absolute',
+							width: '12px',
+							height: '12px',
+							borderRadius: '0 0 0 3px',
+							borderLeft: '3px solid rgba(255, 255, 255, 0.75)',
+							borderBottom: '3px solid rgba(255, 255, 255, 0.75)',
+							left: '-2px',
+							bottom: '-2px'
+						}}
+					/>
+					<div
+						style={{
+							position: 'absolute',
+							width: '12px',
+							height: '12px',
+							borderRadius: '0 0 3px 0',
+							borderRight: '3px solid rgba(255, 255, 255, 0.75)',
+							borderBottom: '3px solid rgba(255, 255, 255, 0.75)',
+							right: '-2px',
+							bottom: '-2px'
+						}}
+					/>
+				</div>
 			);
 		}
 	}

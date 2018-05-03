@@ -52,13 +52,5 @@ export class HighlightArea {
 			top: clientRect.top + window.scrollY,
 			width: clientRect.width
 		};
-
-		element.scrollIntoView({
-			behavior: 'smooth',
-			block: 'center',
-			inline: 'nearest'
-		});
-
-		setTimeout(() => this.hide(), 500);
 	}
 }

@@ -1,4 +1,4 @@
-import Element from '../../lsg/patterns/element';
+import Element, { ElementAnchors } from '../../lsg/patterns/element';
 import * as React from 'react';
 
 export interface ElementWrapperState {
@@ -29,7 +29,7 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const target = e.target as HTMLElement;
-		const icon = above(target, 'svg[data-icon]');
+		const icon = above(target, `svg[${ElementAnchors.icon}]`);
 
 		if (icon) {
 			e.stopPropagation();

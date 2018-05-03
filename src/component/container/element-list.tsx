@@ -1,5 +1,6 @@
 import { colors } from '../../lsg/patterns/colors';
 import { elementMenu } from '../../electron/context-menus';
+import { ElementAnchors } from '../../lsg/patterns/element';
 import { ElementLocationCommand } from '../../store/command/element-location-command';
 import { ElementWrapper } from './element-wrapper';
 import { ListItemProps } from '../../lsg/patterns/list';
@@ -11,6 +12,7 @@ import { Pattern } from '../../store/styleguide/pattern';
 import * as React from 'react';
 import { Slot } from '../../store/styleguide/slot';
 import { Store } from '../../store/store';
+import { Styleguide } from '../../store/styleguide/styleguide';
 import * as uuid from 'uuid';
 
 export interface ElementListState {
@@ -80,80 +82,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			title: element.getName(),
 			dragging: this.state.dragging,
 			id: element.getId(),
-			onDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
-				this.handleDragEnd(e);
-				const patternId = e.dataTransfer.getData('patternId');
-
-				const newParent = element.getParent();
-				let draggedElement: PageElement | undefined;
-
-				if (!patternId) {
-					draggedElement = store.getDraggedElement();
-				} else {
-					const styleguide = store.getStyleguide();
-					if (!styleguide) {
-						return;
-					}
-
-					draggedElement = new PageElement({
-						pattern: styleguide.getPattern(patternId),
-						setDefaults: true
-					});
-				}
-
-				if (!newParent || !draggedElement || draggedElement.isAncestorOf(newParent)) {
-					return;
-				}
-
-				let newIndex = element.getIndex();
-				if (draggedElement.getParent() === newParent) {
-					const currentIndex = draggedElement.getIndex();
-					if (newIndex > currentIndex) {
-						newIndex--;
-					}
-					if (newIndex === currentIndex) {
-						return;
-					}
-				}
-
-				store.execute(
-					ElementLocationCommand.addChild(
-						newParent,
-						draggedElement,
-						element.getParentSlotId(),
-						newIndex
-					)
-				);
-				store.setSelectedElement(draggedElement);
-			},
-			onDragDrop: (e: React.DragEvent<HTMLElement>) => {
-				this.handleDragEnd(e);
-				const patternId = e.dataTransfer.getData('patternId');
-
-				let draggedElement: PageElement | undefined;
-
-				if (!patternId) {
-					draggedElement = store.getDraggedElement();
-				} else {
-					const styleguide = store.getStyleguide();
-
-					if (!styleguide) {
-						return;
-					}
-
-					draggedElement = new PageElement({
-						pattern: styleguide.getPattern(patternId),
-						setDefaults: true
-					});
-				}
-
-				if (!draggedElement || draggedElement.isAncestorOf(element)) {
-					return;
-				}
-
-				store.execute(ElementLocationCommand.addChild(element, draggedElement));
-				store.setSelectedElement(draggedElement);
-			},
 			children: [...slots, ...defaultSlotItems],
 			active: element === selectedElement && !store.getSelectedSlotId()
 		};
@@ -180,13 +108,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			);
 		});
 
-		const updateSelectedSlot: React.MouseEventHandler<HTMLElement> = event => {
-			event.stopPropagation();
-			store.setSelectedElement(element);
-			store.setSelectedSlot(slotId);
-			store.setElementFocussed(false);
-		};
-
 		const slotListItem: ElementNodeProps = {
 			id: slot.getId(),
 			title: `\uD83D\uDD18 ${slot.getName()}`,
@@ -194,7 +115,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			dragging: this.state.dragging,
 			children: childItems,
 			label: slotId,
-			onClick: updateSelectedSlot,
+			// TODO: Unify this with the event-delegation based drag/drop handling
 			onDragDrop: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');
 
@@ -265,6 +186,52 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		}
 	}
 
+	private handleDrop(e: React.DragEvent<HTMLElement>): void {
+		this.handleDragEnd(e);
+
+		const store = Store.getInstance();
+		const styleguide = store.getStyleguide() as Styleguide;
+		const patternId = e.dataTransfer.getData('patternId');
+		const dropTargetElement = elementFromTarget(e.target);
+		const newParent = dropTargetElement ? dropTargetElement.getParent() : undefined;
+		const isPlaceholder =
+			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
+
+		const draggedElement =
+			store.getDraggedElement() ||
+			new PageElement({
+				pattern: styleguide.getPattern(patternId),
+				setDefaults: true
+			});
+
+		// TODO: The ancestor check should be performed for drag starts to show no drop
+		// indication for impossible drop operations
+		if (!dropTargetElement || !newParent || draggedElement.isAncestorOf(newParent)) {
+			return;
+		}
+
+		if (isPlaceholder) {
+			const dropIndex = calculateDropIndex(dropTargetElement, draggedElement);
+
+			if (dropIndex === draggedElement.getIndex()) {
+				return;
+			}
+
+			store.execute(
+				ElementLocationCommand.addChild(
+					newParent,
+					draggedElement,
+					dropTargetElement.getParentSlotId(),
+					dropIndex
+				)
+			);
+		} else {
+			store.execute(ElementLocationCommand.addChild(dropTargetElement, draggedElement));
+		}
+
+		store.setSelectedElement(draggedElement);
+	}
+
 	private handleMouseLeave(e: React.MouseEvent<HTMLElement>): void {
 		this.setState({ dragging: true });
 	}
@@ -297,6 +264,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				onContextMenu={e => this.handleContextMenu(e)}
 				onDragStart={e => this.handleDragStart(e)}
 				onDragEnd={e => this.handleDragEnd(e)}
+				onDrop={e => this.handleDrop(e)}
 				onMouseOver={e => this.handleMouseOver(e)}
 				onMouseLeave={e => this.handleMouseLeave(e)}
 			>
@@ -345,13 +313,13 @@ function above(node: EventTarget, selector: string): HTMLElement | null {
 }
 
 function elementFromTarget(target: EventTarget): PageElement | undefined {
-	const el = above(target, '[data-id]');
+	const el = above(target, `[${ElementAnchors.element}]`);
 
 	if (!el) {
 		return;
 	}
 
-	const id = el.getAttribute('data-id');
+	const id = el.getAttribute(ElementAnchors.element);
 
 	if (typeof id !== 'string') {
 		return;
@@ -365,4 +333,28 @@ function elementFromTarget(target: EventTarget): PageElement | undefined {
 	}
 
 	return page.getElementById(id);
+}
+
+function calculateDropIndex(target: PageElement, dragged: PageElement): number {
+	// We definitely know the drop target has a parent, thus an index
+	const newIndex = target.getIndex() as number;
+
+	// The dragged element is dropped into another
+	// leaf list than it was dragged from.
+	// True for (1) new elements, (2) elements dragged to other parents
+	if (dragged.getParent() !== target.getParent()) {
+		return newIndex;
+	}
+
+	// If the dragged element has a parent, it has an index
+	const currentIndex = dragged.getParent() ? (dragged.getIndex() as number) : -1;
+
+	// The dragged element is dropped in the same leaf
+	// list as it was dragged from.
+	// Offset the index by the element itself missing from the new list.
+	if (newIndex > currentIndex) {
+		return newIndex - 1;
+	}
+
+	return newIndex;
 }

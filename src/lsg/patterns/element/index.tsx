@@ -5,6 +5,13 @@ import { getSpace, Size } from '../space';
 import styled from 'styled-components';
 import { tag } from '../tag';
 
+export const ElementAnchors = {
+	element: 'data-element-id',
+	icon: 'data-icon',
+	label: 'data-element-label',
+	placeholder: 'data-element-placeholder'
+};
+
 export interface ElementProps {
 	active?: boolean;
 	draggable?: boolean;
@@ -190,10 +197,14 @@ const StyledIcon = styled(Icon)`
 `;
 
 const Element: React.StatelessComponent<ElementProps> = props => (
-	<StyledElement draggable={props.draggable} data-id={props.id} onClick={props.onClick}>
+	<StyledElement
+		{...{ [ElementAnchors.element]: props.id }}
+		draggable={props.draggable}
+		onClick={props.onClick}
+	>
 		{props.dragging && (
 			<StyledPlaceholder
-				data-element-placeholder
+				{...{ [ElementAnchors.placeholder]: true }}
 				highlightPlaceholder={props.highlightPlaceholder}
 				onDragOver={(e: React.DragEvent<HTMLElement>) => {
 					e.preventDefault();
@@ -204,7 +215,7 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 			/>
 		)}
 		<StyledElementLabel
-			data-element-label
+			{...{ [ElementAnchors.label]: true }}
 			active={props.active}
 			highlight={props.highlight}
 			onContextMenu={props.onContextMenu}

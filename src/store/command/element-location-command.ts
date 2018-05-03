@@ -66,7 +66,7 @@ export class ElementLocationCommand extends ElementCommand {
 
 		this.previousParent = element.getParent();
 		this.previousSlotId = element.getParentSlotId();
-		this.previousIndex = this.previousParent ? element.getIndex() : undefined;
+		this.previousIndex = this.previousParent ? (element.getIndex() as number) : undefined;
 
 		// Memorize the page IDs of the new parent, if the element has no parent.
 		// This way, closing and opening a page does not break the command.
@@ -121,7 +121,7 @@ export class ElementLocationCommand extends ElementCommand {
 			newSibling,
 			parent,
 			location.getParentSlotId(),
-			parent ? location.getIndex() + 1 : undefined
+			parent ? (location.getIndex() as number) + 1 : undefined
 		);
 	}
 

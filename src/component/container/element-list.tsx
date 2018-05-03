@@ -1,9 +1,9 @@
 import { colors } from '../../lsg/patterns/colors';
 import { elementMenu } from '../../electron/context-menus';
-import { ElementAnchors } from '../../lsg/patterns/element';
+import { ElementAnchors, ElementProps } from '../../lsg/patterns/element';
 import { ElementLocationCommand } from '../../store/command/element-location-command';
+import { ElementNameCommand } from '../../store/command/element-name-command';
 import { ElementWrapper } from './element-wrapper';
-import { ListItemProps } from '../../lsg/patterns/list';
 import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
@@ -33,6 +33,7 @@ const DRAG_IMG_STYLE = `
 @observer
 export class ElementList extends React.Component<{}, ElementListState> {
 	private dragImg?: HTMLElement;
+	private globalKeyUpListener?: (e: KeyboardEvent) => void;
 
 	public state = {
 		dragging: true
@@ -40,6 +41,15 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 	public componentDidMount(): void {
 		createMenu();
+
+		this.globalKeyUpListener = e => this.handleKeyUp(e);
+		window.addEventListener('keyup', this.globalKeyUpListener);
+	}
+
+	public componentWillUnmount(): void {
+		if (this.globalKeyUpListener) {
+			window.removeEventListener('keyup', this.globalKeyUpListener);
+		}
 	}
 
 	public componentWillUpdate(): void {
@@ -47,7 +57,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	public createItemFromElement(
-		key: string,
 		element: PageElement,
 		selectedElement?: PageElement
 	): ElementNodeProps {
@@ -56,7 +65,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		if (!pattern) {
 			return {
-				label: key,
 				title: '(invalid)',
 				id: uuid.v4(),
 				children: [],
@@ -78,9 +86,9 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		});
 
 		return {
-			label: key,
 			title: element.getName(),
 			dragging: this.state.dragging,
+			editable: element.getNameEditable(),
 			id: element.getId(),
 			children: [...slots, ...defaultSlotItems],
 			active: element === selectedElement && !store.getSelectedSlotId()
@@ -99,22 +107,16 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		const selectedSlot = store.getSelectedSlotId();
 
 		slotContents.forEach((value: PageElement, index: number) => {
-			childItems.push(
-				this.createItemFromElement(
-					slotContents.length > 1 ? `Child ${index + 1}` : 'Child',
-					value,
-					selectedElement
-				)
-			);
+			childItems.push(this.createItemFromElement(value, selectedElement));
 		});
 
 		const slotListItem: ElementNodeProps = {
 			id: slot.getId(),
 			title: `\uD83D\uDD18 ${slot.getName()}`,
+			editable: false,
 			draggable: false,
 			dragging: this.state.dragging,
 			children: childItems,
-			label: slotId,
 			// TODO: Unify this with the event-delegation based drag/drop handling
 			onDragDrop: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');
@@ -149,11 +151,28 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		return slotListItem;
 	}
 
+	private handleBlur(e: React.FormEvent<HTMLElement>): void {
+		const store = Store.getInstance();
+		const editableElement = store.getNameEditableElement();
+
+		if (editableElement) {
+			store.execute(new ElementNameCommand(editableElement, editableElement.getName()));
+			store.setNameEditableElement();
+		}
+	}
+
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const element = elementFromTarget(e.target);
+		const store = Store.getInstance();
+		const label = above(e.target, `[${ElementAnchors.label}]`);
 		e.stopPropagation();
-		Store.getInstance().setSelectedElement(element);
-		Store.getInstance().setElementFocussed(true);
+
+		if (element && store.getSelectedElement() === element && label) {
+			store.setNameEditableElement(element);
+		}
+
+		store.setSelectedElement(element);
+		store.setElementFocussed(true);
 	}
 
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
@@ -232,6 +251,25 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		store.setSelectedElement(draggedElement);
 	}
 
+	private handleKeyUp(e: KeyboardEvent): void {
+		const store = Store.getInstance();
+
+		if (e.keyCode === 13) {
+			// ENTER
+			e.stopPropagation();
+
+			const editableElement = store.getNameEditableElement();
+			const selectedElement = store.getSelectedElement();
+
+			if (editableElement) {
+				store.execute(new ElementNameCommand(editableElement, editableElement.getName()));
+				store.setNameEditableElement();
+			} else {
+				store.setNameEditableElement(selectedElement);
+			}
+		}
+	}
+
 	private handleMouseLeave(e: React.MouseEvent<HTMLElement>): void {
 		this.setState({ dragging: true });
 	}
@@ -255,18 +293,20 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		}
 
 		const selectedElement = store.getSelectedElement();
-		const item = this.createItemFromElement('Root', rootElement, selectedElement);
+		const item = this.createItemFromElement(rootElement, selectedElement);
 
 		return (
 			<div
 				data-drag-root
+				onBlur={e => this.handleBlur(e)}
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
-				onDragStart={e => this.handleDragStart(e)}
 				onDragEnd={e => this.handleDragEnd(e)}
+				onDragStart={e => this.handleDragStart(e)}
 				onDrop={e => this.handleDrop(e)}
-				onMouseOver={e => this.handleMouseOver(e)}
+				onKeyUp={e => this.handleKeyUp(e.nativeEvent)}
 				onMouseLeave={e => this.handleMouseLeave(e)}
+				onMouseOver={e => this.handleMouseOver(e)}
 			>
 				<ElementTree {...item} dragging={this.state.dragging} />
 			</div>
@@ -274,7 +314,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 }
 
-export interface ElementNodeProps extends ListItemProps {
+export interface ElementNodeProps extends ElementProps {
 	children?: ElementNodeProps[];
 	dragging: boolean;
 	id: string;

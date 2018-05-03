@@ -30,6 +30,11 @@ export class PageElement {
 	@MobX.observable private contents: Map<string, PageElement[]> = new Map();
 
 	/**
+	 * The currently edited name of the page element, to be commited
+	 */
+	@MobX.observable private editedName: string;
+
+	/**
 	 * The technical (internal) ID of the page element.
 	 */
 	@MobX.observable private id: string;
@@ -38,6 +43,11 @@ export class PageElement {
 	 * The assigned name of the page element, initially the pattern's human-friendly name.
 	 */
 	@MobX.observable private name: string;
+
+	/**
+	 * Wether the element name is editable
+	 */
+	@MobX.observable private nameEditable: boolean;
 
 	/**
 	 * The page this element belongs to.
@@ -88,6 +98,7 @@ export class PageElement {
 		this.pattern = properties.pattern;
 		this.patternId = this.pattern ? this.pattern.getId() : undefined;
 		this.parentSlotId = properties.parentSlotId;
+		this.nameEditable = false;
 
 		if (this.name === undefined && this.pattern) {
 			this.name = this.pattern.getName();
@@ -253,8 +264,20 @@ export class PageElement {
 	 * Returns the assigned name of the page element, initially the pattern's human-friendly name.
 	 * @return The assigned name of the page element.
 	 */
-	public getName(): string {
+	public getName(opts?: { unedited: boolean }): string {
+		if ((!opts || !opts.unedited) && this.nameEditable) {
+			return this.editedName;
+		}
+
 		return this.name;
+	}
+
+	/**
+	 * Returns the editable state of the element's name
+	 * @return The editable state
+	 */
+	public getNameEditable(): boolean {
+		return this.nameEditable;
 	}
 
 	/**
@@ -402,7 +425,25 @@ export class PageElement {
 	 * @param name The assigned name of the page element.
 	 */
 	public setName(name: string): void {
-		this.name = name;
+		if (this.nameEditable) {
+			this.editedName = name;
+		} else {
+			this.name = name;
+		}
+	}
+
+	/**
+	 * Sets the editable state of the element's name
+	 * @param nameEditable Wether the name is editable
+	 */
+	public setNameEditable(nameEditable: boolean): void {
+		if (nameEditable) {
+			this.editedName = this.name;
+		} else {
+			this.name = this.editedName || this.name;
+		}
+
+		this.nameEditable = nameEditable;
 	}
 
 	/**

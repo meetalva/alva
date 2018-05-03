@@ -34,6 +34,7 @@ const DRAG_IMG_STYLE = `
 export class ElementList extends React.Component<{}, ElementListState> {
 	private dragImg?: HTMLElement;
 	private globalKeyUpListener?: (e: KeyboardEvent) => void;
+	private ref: HTMLElement | null;
 
 	public state = {
 		dragging: true
@@ -253,6 +254,15 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 	private handleKeyUp(e: KeyboardEvent): void {
 		const store = Store.getInstance();
+		const node = e.target as Node;
+		const contains = (target: Node) => (this.ref ? this.ref.contains(target) : false);
+
+		// Only handle key events if either
+		// (1) it is global, thus fires on body
+		// (2) is a node inside the page element list
+		if (e.target !== document.body && !contains(node)) {
+			return;
+		}
 
 		if (e.keyCode === 13) {
 			// ENTER
@@ -307,6 +317,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				onKeyUp={e => this.handleKeyUp(e.nativeEvent)}
 				onMouseLeave={e => this.handleMouseLeave(e)}
 				onMouseOver={e => this.handleMouseOver(e)}
+				ref={ref => (this.ref = ref)}
 			>
 				<ElementTree {...item} dragging={this.state.dragging} />
 			</div>

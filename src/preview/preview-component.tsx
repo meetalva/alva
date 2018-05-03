@@ -28,10 +28,10 @@ function getComponent(props: PreviewComponentProps): any {
 	} else if (props.pattern === 'synthetic:asset') {
 		// tslint:disable-next-line:no-any
 		return p => {
-			if (!p.asset || typeof p.asset !== 'string') {
+			if (!p.src || typeof p.src !== 'string') {
 				return null;
 			}
-			return <img src={p.asset} style={{ width: '100%', height: 'auto' }} />;
+			return <img src={p.src} style={{ width: '100%', height: 'auto' }} onClick={p.onClick} />;
 		};
 	}
 

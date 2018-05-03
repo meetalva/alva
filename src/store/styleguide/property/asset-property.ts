@@ -18,11 +18,6 @@ import { Property } from './property';
  */
 export class AssetProperty extends Property {
 	/**
-	 * The ID of the synthetic string property in the synthetic asset content pattern.
-	 */
-	public static SYNTHETIC_ASSET_ID: string = 'asset';
-
-	/**
 	 * Creates a new asset property.
 	 * @param id The technical ID of this property (e.g. the property name
 	 * in the TypeScript props interface).

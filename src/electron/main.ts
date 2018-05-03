@@ -93,11 +93,30 @@ async function createWindow(): Promise<void> {
 					});
 					break;
 				}
+
 				case PreviewMessageType.SketchExportResponse: {
 					send({
 						id: message.id,
 						payload: message.payload,
 						type: ServerMessageType.SketchExportResponse
+					});
+					break;
+				}
+
+				case PreviewMessageType.OpenPage: {
+					send({
+						id: message.id,
+						payload: message.payload,
+						type: ServerMessageType.OpenPage
+					});
+					break;
+				}
+
+				case PreviewMessageType.SetVariable: {
+					send({
+						id: message.id,
+						payload: message.payload,
+						type: ServerMessageType.SetVariable
 					});
 				}
 			}

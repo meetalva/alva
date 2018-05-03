@@ -1,4 +1,5 @@
-import { Store } from '../../../store/store';
+import { PropertyValue } from '../../page/property-value';
+import { Store } from '../../store';
 
 /**
  * A property is the meta-information about one styleguide pattern component property
@@ -131,6 +132,16 @@ export abstract class Property {
 	 */
 	// tslint:disable-next-line:no-any
 	public convertToRender(value: any): any {
+		// tslint:disable-next-line:no-invalid-template-strings
+		if (typeof value === 'string' && value.indexOf('${') >= 0) {
+			value = value.replace(/\$\{([^\}]+)\}/, (match: string, name: string) => {
+				const variableValue: PropertyValue = Store.getInstance().getVariableValue(name);
+				return variableValue !== undefined && variableValue !== null
+					? variableValue.toString()
+					: '';
+			});
+		}
+
 		return value;
 	}
 

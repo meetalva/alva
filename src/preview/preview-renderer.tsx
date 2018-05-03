@@ -193,8 +193,10 @@ export function render(init: RenderInit): void {
 					<div
 						style={{
 							position: 'absolute',
-							width: '12px',
-							height: '12px',
+							width: '100%',
+							height: '100%',
+							maxWidth: '12px',
+							maxHeight: '12px',
 							borderRadius: '3px 0 0 0',
 							borderLeft: '3px solid rgba(255, 255, 255, 0.75)',
 							borderTop: '3px solid rgba(255, 255, 255, 0.75)',
@@ -205,8 +207,10 @@ export function render(init: RenderInit): void {
 					<div
 						style={{
 							position: 'absolute',
-							width: '12px',
-							height: '12px',
+							width: '100%',
+							height: '100%',
+							maxWidth: '12px',
+							maxHeight: '12px',
 							borderRadius: '0 3px 0 0',
 							borderRight: '3px solid rgba(255, 255, 255, 0.75)',
 							borderTop: '3px solid rgba(255, 255, 255, 0.75)',
@@ -217,8 +221,10 @@ export function render(init: RenderInit): void {
 					<div
 						style={{
 							position: 'absolute',
-							width: '12px',
-							height: '12px',
+							width: '100%',
+							height: '100%',
+							maxWidth: '12px',
+							maxHeight: '12px',
 							borderRadius: '0 0 0 3px',
 							borderLeft: '3px solid rgba(255, 255, 255, 0.75)',
 							borderBottom: '3px solid rgba(255, 255, 255, 0.75)',
@@ -229,8 +235,10 @@ export function render(init: RenderInit): void {
 					<div
 						style={{
 							position: 'absolute',
-							width: '12px',
-							height: '12px',
+							width: '100%',
+							height: '100%',
+							maxWidth: '12px',
+							maxHeight: '12px',
 							borderRadius: '0 0 3px 0',
 							borderRight: '3px solid rgba(255, 255, 255, 0.75)',
 							borderBottom: '3px solid rgba(255, 255, 255, 0.75)',

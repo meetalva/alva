@@ -69,6 +69,11 @@ export class Store {
 	@MobX.observable private elementFocussed?: boolean = false;
 
 	/**
+	 * The currently name-editable element in the element list.
+	 */
+	@MobX.observable private nameEditableElement?: PageElement;
+
+	/**
 	 * The current search term in the patterns list, or an empty string if there is none.
 	 */
 	@MobX.observable private patternSearchTerm: string = '';
@@ -343,6 +348,10 @@ export class Store {
 	 */
 	public getDraggedElement(): PageElement | undefined {
 		return this.draggedElement;
+	}
+
+	public getNameEditableElement(): PageElement | undefined {
+		return this.nameEditableElement;
 	}
 
 	/**
@@ -827,6 +836,18 @@ export class Store {
 		this.elementFocussed = elementFocussed;
 	}
 
+	public setNameEditableElement(editableElement?: PageElement): void {
+		if (this.nameEditableElement && this.nameEditableElement !== editableElement) {
+			this.nameEditableElement.setNameEditable(false);
+		}
+
+		if (editableElement) {
+			editableElement.setNameEditable(true);
+		}
+
+		this.nameEditableElement = editableElement;
+	}
+
 	/**
 	 * Loads a given JSON object into the store as current page.
 	 * Used internally within the store, do not use from UI components.
@@ -866,6 +887,9 @@ export class Store {
 	 * @see setElementFocussed
 	 */
 	public setSelectedElement(selectedElement?: PageElement): void {
+		if (this.selectedElement && this.selectedElement !== selectedElement) {
+			this.setNameEditableElement();
+		}
 		this.rightPane = null;
 		this.selectedElement = selectedElement;
 		this.selectedSlotId = undefined;

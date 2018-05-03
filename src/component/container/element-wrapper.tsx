@@ -1,5 +1,6 @@
 import Element, { ElementAnchors } from '../../lsg/patterns/element';
 import * as React from 'react';
+import { Store } from '../../store/store';
 
 export interface ElementWrapperState {
 	highlight?: boolean;
@@ -10,6 +11,7 @@ export interface ElementWrapperState {
 export interface ElementWrapperProps {
 	active?: boolean;
 	dragging: boolean;
+	editable?: boolean;
 	id: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onContextMenu?: React.MouseEventHandler<HTMLElement>;
@@ -24,8 +26,19 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 	public state = {
 		open: this.props.open,
 		highlightPlaceholder: false,
-		highlight: false
+		highlight: false,
+		editTitle: this.props.title
 	};
+
+	private handleChange(e: React.FormEvent<HTMLInputElement>): void {
+		const target = e.target as HTMLInputElement;
+		const store = Store.getInstance();
+		const element = store.getNameEditableElement();
+
+		if (element) {
+			element.setName(target.value);
+		}
+	}
 
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const target = e.target as HTMLElement;
@@ -97,6 +110,8 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 				active={active}
 				dragging={this.props.dragging}
 				draggable
+				editable={this.props.editable}
+				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}
 				onDragDrop={e => this.handleDragDrop(e)}
 				onDragDropForChild={e => this.handleDragDropForChild(e)}

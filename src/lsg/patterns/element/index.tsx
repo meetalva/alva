@@ -16,9 +16,11 @@ export interface ElementProps {
 	active?: boolean;
 	draggable?: boolean;
 	dragging: boolean;
+	editable?: boolean;
 	highlight?: boolean;
 	highlightPlaceholder?: boolean;
 	id?: string;
+	onChange?: React.FormEventHandler<HTMLInputElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onContextMenu?: React.MouseEventHandler<HTMLElement>;
 	onDragDrop?: React.DragEventHandler<HTMLElement>;
@@ -64,9 +66,6 @@ const div = tag('div').omit(['active', 'highlight']);
 const StyledElementLabel = styled(div)`
 	position: relative;
 	display: flex;
-	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px ${getSpace(
-	Size.XXL
-)}px;
 	align-items: center;
 	color: ${colors.grey20.toString()};
 	position: relative;
@@ -122,6 +121,26 @@ const StyledElementLabel = styled(div)`
 			}
 		`
 			: ''};
+`;
+
+const SeamlessInput = styled.input`
+	box-sizing: border-box;
+	width: 100%;
+	color: ${colors.grey20.toString()};
+	font-size: inherit;
+	line-height: inherit;
+	padding: ${getSpace(Size.XS - 1)}px ${getSpace(Size.L - 1)}px ${getSpace(Size.XS - 1)}px 3px;
+	margin: 1px 1px 1px ${getSpace(Size.XXL - 3)}px;
+	border: 0;
+	&:focus {
+		outline: none;
+	}
+`;
+
+const LabelContent = styled.div`
+	box-sizing: border-box;
+	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px
+		${getSpace(Size.XXL)}px;
 `;
 
 const placeholderDiv = tag('div').omit(['highlightPlaceholder']);
@@ -237,7 +256,11 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 						active={props.active}
 					/>
 				)}
-			<div>{props.title}</div>
+			{props.editable ? (
+				<SeamlessInput value={props.title} onChange={props.onChange} autoFocus />
+			) : (
+				<LabelContent>{props.title}</LabelContent>
+			)}
 		</StyledElementLabel>
 		{props.children && (
 			<StyledElementChild open={props.open}>{props.children}</StyledElementChild>

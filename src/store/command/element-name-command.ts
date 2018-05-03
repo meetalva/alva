@@ -26,7 +26,7 @@ export class ElementNameCommand extends ElementCommand {
 		super(element);
 
 		this.name = name;
-		this.previousName = element.getName();
+		this.previousName = element.getName({ unedited: true });
 
 		if (!this.pageId) {
 			throw new Error(

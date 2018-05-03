@@ -123,20 +123,6 @@ const StyledElementLabel = styled(div)`
 			: ''};
 `;
 
-const SeamlessInput = styled.input`
-	box-sizing: border-box;
-	width: 100%;
-	color: ${colors.grey20.toString()};
-	font-size: inherit;
-	line-height: inherit;
-	padding: ${getSpace(Size.XS - 1)}px ${getSpace(Size.L - 1)}px ${getSpace(Size.XS - 1)}px 3px;
-	margin: 1px 1px 1px ${getSpace(Size.XXL - 3)}px;
-	border: 0;
-	&:focus {
-		outline: none;
-	}
-`;
-
 const LabelContent = styled.div`
 	box-sizing: border-box;
 	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px
@@ -215,6 +201,50 @@ const StyledIcon = styled(Icon)`
 	${(props: StyledIconProps) => (props.active ? `fill: ${colors.blue20.toString()}` : '')};
 `;
 
+const StyledSeamlessInput = styled.input`
+	box-sizing: border-box;
+	width: 100%;
+	color: ${colors.grey20.toString()};
+	font-size: inherit;
+	line-height: inherit;
+	padding: ${getSpace(Size.XS - 1)}px ${getSpace(Size.L - 1)}px ${getSpace(Size.XS - 1)}px 3px;
+	margin: 1px 1px 1px ${getSpace(Size.XXL - 3)}px;
+	border: 0;
+	&:focus {
+		outline: none;
+	}
+`;
+
+interface SeamlessInputProps {
+	autoFocus?: boolean;
+	autoSelect?: boolean;
+	onChange?: React.FormEventHandler<HTMLInputElement>;
+	value: string;
+}
+
+class SeamlessInput extends React.Component<SeamlessInputProps> {
+	private ref: HTMLInputElement | null = null;
+
+	public componentDidMount(): void {
+		if (this.ref !== null && this.props.autoSelect && this.props.autoFocus) {
+			const ref = this.ref as HTMLInputElement;
+			ref.setSelectionRange(0, this.props.value.length);
+		}
+	}
+
+	public render(): JSX.Element {
+		const { props } = this;
+		return (
+			<StyledSeamlessInput
+				autoFocus={props.autoFocus}
+				innerRef={ref => (this.ref = ref)}
+				value={props.value}
+				onChange={props.onChange}
+			/>
+		);
+	}
+}
+
 const Element: React.StatelessComponent<ElementProps> = props => (
 	<StyledElement
 		{...{ [ElementAnchors.element]: props.id }}
@@ -257,7 +287,7 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 					/>
 				)}
 			{props.editable ? (
-				<SeamlessInput value={props.title} onChange={props.onChange} autoFocus />
+				<SeamlessInput value={props.title} onChange={props.onChange} autoFocus autoSelect />
 			) : (
 				<LabelContent>{props.title}</LabelContent>
 			)}

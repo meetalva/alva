@@ -1,9 +1,9 @@
 export enum PreviewMessageType {
 	ContentRequest = 'content-request',
 	ContentResponse = 'content-response',
-	ElementChange = 'element-change',
 	OpenPage = 'open-page',
 	Reload = 'reload',
+	SelectElement = 'select-element',
 	SetVariable = 'set-variable',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
@@ -16,13 +16,13 @@ export enum ServerMessageType {
 	BundleChange = 'bundle-change',
 	ContentRequest = 'content-request',
 	ContentResponse = 'content-response',
-	ElementChange = 'element-change',
 	OpenPage = 'open-page',
-	PageChange = 'page-change',
+	SelectElement = 'select-element',
 	SetVariable = 'set-variable',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
+	State = 'state',
 	StyleGuideChange = 'styleguide-change'
 }
 

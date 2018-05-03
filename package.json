@@ -127,7 +127,7 @@
     "jest": "22.4.3",
     "jest-util": "22.4.3",
     "lint-staged": "7.0.4",
-    "mobx-react-devtools": "4.2.15",
+    "mobx-react-devtools": "5.0.1",
     "mock-fs": "4.4.2",
     "prettier": "1.12.0",
     "standard-version": "4.3.0",

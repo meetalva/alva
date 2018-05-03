@@ -1,5 +1,6 @@
 import { AssetProperty } from './property/asset-property';
 import { Directory } from '../../styleguide/analyzer/directory';
+import { EventProperty } from './property/event/event-property';
 import { PatternFolder } from './folder';
 import { Pattern } from './pattern';
 import { StringProperty } from './property/string-property';
@@ -101,8 +102,10 @@ export class Styleguide {
 		this.addPattern(textPattern);
 
 		const assetPattern = new Pattern(Pattern.SYNTHETIC_ASSET_ID, 'Placeholder', '');
-		const assetProperty = new AssetProperty(AssetProperty.SYNTHETIC_ASSET_ID);
+		const assetProperty = new AssetProperty('src');
 		assetPattern.addProperty(assetProperty);
+		const onClickProperty = new EventProperty('onClick');
+		assetPattern.addProperty(onClickProperty);
 		folder.addPattern(assetPattern);
 		this.addPattern(assetPattern);
 	}

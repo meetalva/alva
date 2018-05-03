@@ -106,6 +106,5 @@ const StyledPreviewFrame = styled('iframe')`
 	width: 100%;
 	height: 100%;
 	border: none;
-	border-radius: 6px 6px 0 0;
 	overflow: hidden;
 `;

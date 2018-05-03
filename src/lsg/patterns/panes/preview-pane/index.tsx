@@ -22,9 +22,16 @@ const StyledPreviewWrapper = styled.div`
 `;
 
 const StyledPreviewResizer = styled.div`
-	width: 9px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 11px;
 	height: 100%;
 	cursor: ew-resize;
+	background-color: ${colors.blackAlpha13.toString()};
+	opacity: 0;
+	transition: opacity 0.15s ease-in-out;
+
 	&::after {
 		content: '';
 		position: absolute;
@@ -32,24 +39,31 @@ const StyledPreviewResizer = styled.div`
 		transform: translateY(-50%);
 		height: 36px;
 		width: 3px;
-		margin: 3px;
+		margin: 4px;
 		border-radius: 2px;
 		background: ${colors.grey80.toString()};
 	}
 
 	&:hover {
+		opacity: 1;
 		&::after {
 			background: ${colors.grey60.toString()};
 		}
 	}
 	&:active {
+		opacity: 1;
 		&::after {
-			background: ${colors.blue40.toString()};
+			background: ${colors.white.toString()};
 		}
+	}
+	&:last-of-type {
+		right: 0;
+		left: auto;
 	}
 `;
 
 const BaseStyledPreviewPane = styled.div`
+	position: relative;
 	flex-grow: 1;
 	overflow: hidden;
 	background: ${colors.white.toString()};
@@ -83,11 +97,11 @@ export default class PreviewPane extends React.Component<PreviewPaneProps> {
 				onMouseMove={props.onMouseMove}
 				onMouseUp={props.onMouseUp}
 			>
-				<StyledPreviewResizer onMouseDown={props.onMouseDownLeft} />
 				<StyledPreviewPane width={props.width}>
+					<StyledPreviewResizer onMouseDown={props.onMouseDownLeft} />
 					<StyledPreviewFrame src={props.previewFrame} />
+					<StyledPreviewResizer onMouseDown={props.onMouseDownRight} />
 				</StyledPreviewPane>
-				<StyledPreviewResizer onMouseDown={props.onMouseDownRight} />
 			</StyledPreviewWrapper>
 		);
 	}

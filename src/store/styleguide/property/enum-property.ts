@@ -64,8 +64,8 @@ export class EnumProperty extends Property {
 	 * @inheritdoc
 	 */
 	// tslint:disable-next-line:no-any
-	public convertToRender(value: any): any {
-		return this.ordinalById[value as string];
+	public convertToRender(value: string): number {
+		return this.ordinalById[value];
 	}
 
 	/**

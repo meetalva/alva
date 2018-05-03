@@ -33,7 +33,7 @@ const DRAG_IMG_STYLE = `
 @observer
 export class ElementList extends React.Component<{}, ElementListState> {
 	private dragImg?: HTMLElement;
-	private globalKeyUpListener?: (e: KeyboardEvent) => void;
+	private globalKeyDownListener?: (e: KeyboardEvent) => void;
 	private ref: HTMLElement | null;
 
 	public state = {
@@ -43,13 +43,13 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	public componentDidMount(): void {
 		createMenu();
 
-		this.globalKeyUpListener = e => this.handleKeyUp(e);
-		window.addEventListener('keyup', this.globalKeyUpListener);
+		this.globalKeyDownListener = e => this.handleKeyDown(e);
+		window.addEventListener('keydown', this.globalKeyDownListener);
 	}
 
 	public componentWillUnmount(): void {
-		if (this.globalKeyUpListener) {
-			window.removeEventListener('keyup', this.globalKeyUpListener);
+		if (this.globalKeyDownListener) {
+			window.removeEventListener('keydown', this.globalKeyDownListener);
 		}
 	}
 
@@ -252,7 +252,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		store.setSelectedElement(draggedElement);
 	}
 
-	private handleKeyUp(e: KeyboardEvent): void {
+	private handleKeyDown(e: KeyboardEvent): void {
 		const store = Store.getInstance();
 		const node = e.target as Node;
 		const contains = (target: Node) => (this.ref ? this.ref.contains(target) : false);
@@ -264,18 +264,33 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
-		if (e.keyCode === 13) {
-			// ENTER
-			e.stopPropagation();
+		switch (e.keyCode) {
+			case 13: {
+				// ENTER
+				e.stopPropagation();
 
-			const editableElement = store.getNameEditableElement();
-			const selectedElement = store.getSelectedElement();
+				const editableElement = store.getNameEditableElement();
+				const selectedElement = store.getSelectedElement();
 
-			if (editableElement) {
-				store.execute(new ElementNameCommand(editableElement, editableElement.getName()));
-				store.setNameEditableElement();
-			} else {
-				store.setNameEditableElement(selectedElement);
+				if (editableElement) {
+					store.execute(new ElementNameCommand(editableElement, editableElement.getName()));
+					store.setNameEditableElement();
+				} else {
+					store.setNameEditableElement(selectedElement);
+				}
+				break;
+			}
+			case 27: {
+				// ESC
+				e.stopPropagation();
+
+				const editableElement = store.getNameEditableElement();
+
+				if (editableElement) {
+					const name = editableElement.getName({ unedited: true });
+					store.setNameEditableElement();
+					editableElement.setName(name);
+				}
 			}
 		}
 	}
@@ -314,7 +329,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				onDragEnd={e => this.handleDragEnd(e)}
 				onDragStart={e => this.handleDragStart(e)}
 				onDrop={e => this.handleDrop(e)}
-				onKeyUp={e => this.handleKeyUp(e.nativeEvent)}
+				onKeyDown={e => this.handleKeyDown(e.nativeEvent)}
 				onMouseLeave={e => this.handleMouseLeave(e)}
 				onMouseOver={e => this.handleMouseOver(e)}
 				ref={ref => (this.ref = ref)}

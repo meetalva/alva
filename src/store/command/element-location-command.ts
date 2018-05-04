@@ -194,6 +194,11 @@ export class ElementLocationCommand extends ElementCommand {
 			return false;
 		}
 
+		// Do not try to add an element to itself
+		if (this.element === this.parent) {
+			return false;
+		}
+
 		this.element.setParent(this.parent, this.slotId, this.index);
 		this.memorizeElementIds();
 

@@ -1,74 +1,31 @@
 import { PreviewTile } from '../../lsg/patterns/preview-tile/index';
-import Space, { Size } from '../../lsg/patterns/space/index';
+import Space, { SpaceSize } from '../../lsg/patterns/space/index';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import { PageRef } from '../../store/page/page-ref';
 import * as React from 'react';
-import { Store } from '../../store/store';
+import { AlvaView, Store } from '../../store/store';
 
 export interface PageTileContainerProps {
 	focused: boolean;
-	onClick: React.MouseEventHandler<HTMLElement>;
 	page: PageRef;
 }
 
 @observer
 export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	@MobX.observable public editable: boolean = false;
+	@MobX.observable public editing: boolean = false;
 	@MobX.observable public inputValue: string = '';
 
-	public constructor(props: PageTileContainerProps) {
-		super(props);
-		this.inputValue = this.inputValue || this.props.page.getName();
-
-		this.handleBlur = this.handleBlur.bind(this);
-		this.handleChange = this.handleChange.bind(this);
-		this.handleClick = this.handleClick.bind(this);
-		this.handleDoubleClick = this.handleDoubleClick.bind(this);
-		this.handleKeyDown = this.handleKeyDown.bind(this);
-		this.renamePage = this.renamePage.bind(this);
+	@MobX.computed
+	public get namedPage(): boolean {
+		return Boolean(this.props.page.getName());
 	}
 
 	@MobX.action
 	protected handleBlur(): void {
-		this.renamePage();
-	}
+		this.editing = false;
 
-	@MobX.action
-	protected handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
-		this.inputValue = e.target.value;
-	}
-
-	@MobX.action
-	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
-		this.props.onClick(e);
-		if (this.props.focused) {
-			this.editable = true;
-		}
-	}
-
-	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
-		Store.getInstance().openPage(this.props.page.getId());
-	}
-
-	@MobX.action
-	protected handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
-		switch (e.key) {
-			case 'Escape':
-				this.inputValue = this.props.page.getName();
-				this.editable = false;
-				break;
-
-			case 'Enter':
-				this.renamePage();
-				break;
-
-			default:
-				return;
-		}
-	}
-	@MobX.action
-	protected renamePage(): void {
 		if (!this.inputValue) {
 			this.inputValue = this.props.page.getName();
 			this.editable = false;
@@ -80,20 +37,84 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		this.editable = false;
 	}
 
+	@MobX.action
+	protected handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
+		this.inputValue = e.target.value;
+	}
+
+	@MobX.action
+	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
+		const store = Store.getInstance();
+		store.openPage(this.props.page.getId());
+
+		const target = e.target as HTMLElement;
+
+		if (this.props.focused && target.matches('[data-title]')) {
+			this.inputValue = this.props.page.getName();
+			this.editable = true;
+		}
+	}
+
+	@MobX.action
+	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
+		if (this.editing) {
+			return;
+		}
+
+		const store = Store.getInstance();
+		const next = store.getActiveView() === AlvaView.Pages ? AlvaView.PageDetail : AlvaView.Pages;
+
+		store.setActiveView(next);
+		store.openPage(this.props.page.getId());
+	}
+
+	@MobX.action
+	protected handleFocus(): void {
+		setTimeout(() => {
+			this.editing = true;
+		}, 300);
+	}
+
+	@MobX.action
+	protected handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
+		switch (e.key) {
+			case 'Escape':
+				this.inputValue = this.props.page.getName();
+				this.editable = false;
+				break;
+
+			case 'Enter':
+				if (!this.inputValue) {
+					this.inputValue = this.props.page.getName();
+					this.editable = false;
+					return;
+				}
+
+				this.props.page.setName(this.inputValue);
+				Store.getInstance().save();
+				this.editable = false;
+				break;
+
+			default:
+				return;
+		}
+	}
+
 	public render(): JSX.Element {
 		return (
-			<Space size={Size.S}>
+			<Space size={SpaceSize.S}>
 				<PreviewTile
 					editable={this.editable}
 					focused={this.props.focused}
 					id={this.props.page.getId()}
-					name={this.inputValue}
-					onBlur={this.handleBlur}
-					onChange={this.handleChange}
-					onClick={this.handleClick}
-					onDoubleClick={this.handleDoubleClick}
-					onKeyDown={this.handleKeyDown}
-					value={this.inputValue}
+					onBlur={e => this.handleBlur()}
+					onChange={e => this.handleChange(e)}
+					onClick={e => this.handleClick(e)}
+					onDoubleClick={e => this.handleDoubleClick(e)}
+					onFocus={e => this.handleFocus()}
+					onKeyDown={e => this.handleKeyDown(e)}
+					named={this.namedPage}
+					value={this.editable ? this.inputValue : this.props.page.getName()}
 				/>
 			</Space>
 		);

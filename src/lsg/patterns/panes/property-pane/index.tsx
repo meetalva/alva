@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { getSpace, Size } from '../../space';
+import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
 
 const StyledPropertyPane = styled.div`
 	flex-grow: 1;
 	flex-shrink: 0;
 	flex-basis: 40%;
-	padding: ${getSpace(Size.M)}px;
+	padding: ${getSpace(SpaceSize.M)}px;
 	overflow: scroll;
 `;
 

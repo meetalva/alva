@@ -1,12 +1,12 @@
 import { Color, colors } from '../colors';
 import DemoContainer from '../demo-container';
-import Space, { Size } from './index';
+import Space, { SpaceSize } from './index';
 import * as React from 'react';
 import styled from 'styled-components';
 
-const blue40: Color = new Color({displayName: 'Demo Blue', rgb: [91, 177, 255]});
-const green: Color = new Color({displayName: 'Demo Green', rgb: [91, 255, 151]});
-const violet: Color = new Color({displayName: 'Demo Violet', rgb: [181, 91, 255]});
+const blue40: Color = new Color({ displayName: 'Demo Blue', rgb: [91, 177, 255] });
+const green: Color = new Color({ displayName: 'Demo Green', rgb: [91, 255, 151] });
+const violet: Color = new Color({ displayName: 'Demo Violet', rgb: [181, 91, 255] });
 
 const DemoTileSpace = styled(Space)`
 	display: flex;
@@ -45,77 +45,119 @@ const Content = styled.div`
 const SpaceDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer title="Space">
 		<Space>Inset</Space>
-		<DemoTileSpace size={[Size.L, Size.None]}>
-			<Space size={Size.XS}>
-				<InsetSpace size={Size.XS} inside={true}><Content>{Size[Size.XS]}</Content></InsetSpace>
+		<DemoTileSpace size={[SpaceSize.L, SpaceSize.None]}>
+			<Space size={SpaceSize.XS}>
+				<InsetSpace size={SpaceSize.XS} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XS]}</Content>
+				</InsetSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InsetSpace size={Size.XS} inside={true}><Content>{Size[Size.XS]}</Content></InsetSpace>
+			<Space size={SpaceSize.XS}>
+				<InsetSpace size={SpaceSize.XS} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XS]}</Content>
+				</InsetSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InsetSpace size={Size.S} inside={true}><Content>{Size[Size.S]}</Content></InsetSpace>
+			<Space size={SpaceSize.XS}>
+				<InsetSpace size={SpaceSize.S} inside={true}>
+					<Content>{SpaceSize[SpaceSize.S]}</Content>
+				</InsetSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InsetSpace size={Size.M} inside={true}><Content>{Size[Size.M]}</Content></InsetSpace>
+			<Space size={SpaceSize.XS}>
+				<InsetSpace size={SpaceSize.M} inside={true}>
+					<Content>{SpaceSize[SpaceSize.M]}</Content>
+				</InsetSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InsetSpace size={Size.L} inside={true}><Content>{Size[Size.L]}</Content></InsetSpace>
+			<Space size={SpaceSize.XS}>
+				<InsetSpace size={SpaceSize.L} inside={true}>
+					<Content>{SpaceSize[SpaceSize.L]}</Content>
+				</InsetSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InsetSpace size={Size.XL} inside={true}><Content>{Size[Size.XL]}</Content></InsetSpace>
+			<Space size={SpaceSize.XS}>
+				<InsetSpace size={SpaceSize.XL} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XL]}</Content>
+				</InsetSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InsetSpace size={Size.XXL} inside={true}><Content>{Size[Size.XXL]}</Content></InsetSpace>
+			<Space size={SpaceSize.XS}>
+				<InsetSpace size={SpaceSize.XXL} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XXL]}</Content>
+				</InsetSpace>
 			</Space>
 		</DemoTileSpace>
 
-		<Space sizeTop={Size.XXL}>Inline</Space>
-		<DemoRowSpace size={[Size.L, Size.None]}>
-			<Space size={Size.XS}>
-				<InlineSpace sizeRight={Size.XS} inside={true}><Content>{Size[Size.XS]}</Content></InlineSpace>
+		<Space sizeTop={SpaceSize.XXL}>Inline</Space>
+		<DemoRowSpace size={[SpaceSize.L, SpaceSize.None]}>
+			<Space size={SpaceSize.XS}>
+				<InlineSpace sizeRight={SpaceSize.XS} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XS]}</Content>
+				</InlineSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InlineSpace sizeRight={Size.XS} inside={true}><Content>{Size[Size.XS]}</Content></InlineSpace>
+			<Space size={SpaceSize.XS}>
+				<InlineSpace sizeRight={SpaceSize.XS} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XS]}</Content>
+				</InlineSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InlineSpace sizeRight={Size.S} inside={true}><Content>{Size[Size.S]}</Content></InlineSpace>
+			<Space size={SpaceSize.XS}>
+				<InlineSpace sizeRight={SpaceSize.S} inside={true}>
+					<Content>{SpaceSize[SpaceSize.S]}</Content>
+				</InlineSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InlineSpace sizeRight={Size.M} inside={true}><Content>{Size[Size.M]}</Content></InlineSpace>
+			<Space size={SpaceSize.XS}>
+				<InlineSpace sizeRight={SpaceSize.M} inside={true}>
+					<Content>{SpaceSize[SpaceSize.M]}</Content>
+				</InlineSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InlineSpace sizeRight={Size.L} inside={true}><Content>{Size[Size.L]}</Content></InlineSpace>
+			<Space size={SpaceSize.XS}>
+				<InlineSpace sizeRight={SpaceSize.L} inside={true}>
+					<Content>{SpaceSize[SpaceSize.L]}</Content>
+				</InlineSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InlineSpace sizeRight={Size.XL} inside={true}><Content>{Size[Size.XL]}</Content></InlineSpace>
+			<Space size={SpaceSize.XS}>
+				<InlineSpace sizeRight={SpaceSize.XL} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XL]}</Content>
+				</InlineSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<InlineSpace sizeRight={Size.XXL} inside={true}><Content>{Size[Size.XXL]}</Content></InlineSpace>
+			<Space size={SpaceSize.XS}>
+				<InlineSpace sizeRight={SpaceSize.XXL} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XXL]}</Content>
+				</InlineSpace>
 			</Space>
 		</DemoRowSpace>
 
-		<Space sizeTop={Size.XXL}>Stack</Space>
-		<Space size={[Size.L, Size.None]}>
-			<Space size={Size.XS}>
-				<StackSpace sizeBottom={Size.XS} inside={true}><Content>{Size[Size.XS]}</Content></StackSpace>
+		<Space sizeTop={SpaceSize.XXL}>Stack</Space>
+		<Space size={[SpaceSize.L, SpaceSize.None]}>
+			<Space size={SpaceSize.XS}>
+				<StackSpace sizeBottom={SpaceSize.XS} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XS]}</Content>
+				</StackSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<StackSpace sizeBottom={Size.XS} inside={true}><Content>{Size[Size.XS]}</Content></StackSpace>
+			<Space size={SpaceSize.XS}>
+				<StackSpace sizeBottom={SpaceSize.XS} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XS]}</Content>
+				</StackSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<StackSpace sizeBottom={Size.S} inside={true}><Content>{Size[Size.S]}</Content></StackSpace>
+			<Space size={SpaceSize.XS}>
+				<StackSpace sizeBottom={SpaceSize.S} inside={true}>
+					<Content>{SpaceSize[SpaceSize.S]}</Content>
+				</StackSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<StackSpace sizeBottom={Size.M} inside={true}><Content>{Size[Size.M]}</Content></StackSpace>
+			<Space size={SpaceSize.XS}>
+				<StackSpace sizeBottom={SpaceSize.M} inside={true}>
+					<Content>{SpaceSize[SpaceSize.M]}</Content>
+				</StackSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<StackSpace sizeBottom={Size.L} inside={true}><Content>{Size[Size.L]}</Content></StackSpace>
+			<Space size={SpaceSize.XS}>
+				<StackSpace sizeBottom={SpaceSize.L} inside={true}>
+					<Content>{SpaceSize[SpaceSize.L]}</Content>
+				</StackSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<StackSpace sizeBottom={Size.XL} inside={true}><Content>{Size[Size.XL]}</Content></StackSpace>
+			<Space size={SpaceSize.XS}>
+				<StackSpace sizeBottom={SpaceSize.XL} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XL]}</Content>
+				</StackSpace>
 			</Space>
-			<Space size={Size.XS}>
-				<StackSpace sizeBottom={Size.XXL} inside={true}><Content>{Size[Size.XXL]}</Content></StackSpace>
+			<Space size={SpaceSize.XS}>
+				<StackSpace sizeBottom={SpaceSize.XXL} inside={true}>
+					<Content>{SpaceSize[SpaceSize.XXL]}</Content>
+				</StackSpace>
 			</Space>
 		</Space>
 	</DemoContainer>

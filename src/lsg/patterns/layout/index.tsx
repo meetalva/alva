@@ -2,35 +2,77 @@ import { colors } from '../colors';
 import * as React from 'react';
 import styled from 'styled-components';
 
+export enum LayoutDirection {
+	Row = 'row',
+	Column = 'column'
+}
+
+export enum LayoutSide {
+	Right = 'Right',
+	Left = 'Left'
+}
+
+export enum LayoutBorder {
+	None = 'None',
+	Side = 'Side'
+}
+
+export enum LayoutWrap {
+	Wrap = 'Wrap',
+	NoWrap = 'NoWrap'
+}
+
 export interface LayoutProps {
+	border?: LayoutBorder;
 	className?: string;
-	directionVertical?: boolean;
-	hasBorder?: boolean;
+	direction?: LayoutDirection;
 	onClick?: React.MouseEventHandler<HTMLElement>;
-	side?: string;
+	side?: LayoutSide;
+}
+
+export interface MainAreaProps {
+	border?: LayoutBorder;
+	className?: string;
+	direction?: LayoutDirection;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+}
+
+export interface SideBarProps {
+	border?: LayoutBorder;
+	className?: string;
+	direction?: LayoutDirection;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+	side?: LayoutSide;
+}
+
+export interface LayoutProps {
+	border?: LayoutBorder;
+	className?: string;
+	direction?: LayoutDirection;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+	wrap?: LayoutWrap;
 }
 
 const StyledLayout = styled.div`
 	display: flex;
-	${(props: LayoutProps) => (props.directionVertical ? 'flex-direction: column;' : '')};
-	${(props: LayoutProps) =>
-		props.hasBorder && props.side == 'left'
-			? `
-		border-right: 1px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
-		@media screen and (-webkit-min-device-pixel-ratio: 2) {
-			border-right-width: 0.5px;
-		}
-	`
-			: ''};
-	${(props: LayoutProps) =>
-		props.hasBorder && props.side == 'right'
-			? `
-		border-left: 1px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
-		@media screen and (-webkit-min-device-pixel-ratio: 2) {
-			border-left-width: 0.5px;
-		}
-	`
-			: ''};
+	width: 100%;
+	flex-direction: ${(props: LayoutProps) =>
+		props.direction === LayoutDirection.Column ? 'column' : 'row'};
+	flex-wrap: ${(props: LayoutProps) => (props.wrap === LayoutWrap.Wrap ? 'wrap' : 'nowrap')};
+	border-width: 0;
+	border-style: solid;
+	border-color: ${colors.black.toString('rgb', { alpha: 0.1 })};
+	border-right-width: ${props =>
+		props.side === LayoutSide.Right && props.border === LayoutBorder.Side ? 1 : 0}px;
+	border-left-width: ${props =>
+		props.side === LayoutSide.Right && props.border === LayoutBorder.Side ? 1 : 0}px;
+
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-right-width: ${props =>
+			props.side === LayoutSide.Right && props.border === LayoutBorder.Side ? 0.5 : 0}px;
+		border-left-width: ${props =>
+			props.side === LayoutSide.Right && props.border === LayoutBorder.Side ? 0.5 : 0}px;
+	}
 `;
 
 const StyledMainArea = styled(StyledLayout)`
@@ -45,21 +87,17 @@ const StyledSideBar = styled(StyledLayout)`
 	overflow-y: hidden;
 `;
 
-export const MainArea: React.StatelessComponent<LayoutProps> = props => (
-	<StyledMainArea
-		className={props.className}
-		directionVertical={props.directionVertical}
-		hasBorder={props.hasBorder}
-	>
+export const MainArea: React.StatelessComponent<MainAreaProps> = props => (
+	<StyledMainArea className={props.className} direction={props.direction} border={props.border}>
 		{props.children}
 	</StyledMainArea>
 );
 
-export const SideBar: React.StatelessComponent<LayoutProps> = props => (
+export const SideBar: React.StatelessComponent<SideBarProps> = props => (
 	<StyledSideBar
 		className={props.className}
-		directionVertical={props.directionVertical}
-		hasBorder={props.hasBorder}
+		direction={props.direction}
+		border={props.border}
 		onClick={props.onClick}
 		side={props.side}
 	>
@@ -70,9 +108,10 @@ export const SideBar: React.StatelessComponent<LayoutProps> = props => (
 const Layout: React.StatelessComponent<LayoutProps> = props => (
 	<StyledLayout
 		className={props.className}
-		directionVertical={props.directionVertical}
-		hasBorder={props.hasBorder}
+		direction={props.direction}
+		border={props.border}
 		onClick={props.onClick}
+		wrap={props.wrap}
 	>
 		{props.children}
 	</StyledLayout>

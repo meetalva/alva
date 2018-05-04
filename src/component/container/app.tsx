@@ -6,10 +6,18 @@ import ElementPane from '../../lsg/patterns/panes/element-pane';
 import * as FsExtra from 'fs-extra';
 import globalStyles from '../../lsg/patterns/global-styles';
 import { IconName, IconRegistry } from '../../lsg/patterns/icons';
-import Layout, { MainArea, SideBar } from '../../lsg/patterns/layout';
+import Layout, {
+	LayoutBorder,
+	LayoutDirection,
+	LayoutSide,
+	MainArea,
+	SideBar
+} from '../../lsg/patterns/layout';
 import { createMenu } from '../../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
+import { PageListContainer } from '../page-list/page-list-container';
+import { PageListPreview } from '../page-list/page-list-preview';
 import * as Path from 'path';
 import { PatternListContainer } from './pattern-list';
 import PatternsPane from '../../lsg/patterns/panes/patterns-pane';
@@ -19,7 +27,7 @@ import { PropertyList } from './property-list';
 import PropertyPane from '../../lsg/patterns/panes/property-pane';
 import * as React from 'react';
 import { SplashScreen } from './splash-screen';
-import { RightPane, Store } from '../../store/store';
+import { AlvaView, RightPane, Store } from '../../store/store';
 
 globalStyles();
 
@@ -29,16 +37,11 @@ const store = Store.getInstance();
 export class App extends React.Component {
 	private static PATTERN_LIST_ID = 'patternlist';
 	private static PROPERTIES_LIST_ID = 'propertieslist';
-
 	@MobX.observable protected activeTab: string = App.PATTERN_LIST_ID;
 
 	private ctrlDown: boolean = false;
-	private shiftDown: boolean = false;
 
-	public constructor(props: {}) {
-		super(props);
-		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
-	}
+	private shiftDown: boolean = false;
 
 	public componentDidMount(): void {
 		createMenu();
@@ -79,10 +82,6 @@ export class App extends React.Component {
 	private handleMainWindowClick(): void {
 		Store.getInstance().setElementFocussed(false);
 		createMenu();
-	}
-
-	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
-		this.activeTab = id;
 	}
 
 	protected get isPatternListVisible(): boolean {
@@ -135,54 +134,66 @@ export class App extends React.Component {
 		const DevTools = this.getDevTools();
 
 		return (
-			<Layout directionVertical onClick={this.handleMainWindowClick}>
+			<Layout direction={LayoutDirection.Column} onClick={() => this.handleMainWindowClick()}>
 				<ChromeContainer />
 				<MainArea>
-					{project ? (
-						<React.Fragment>
-							<SideBar
-								side="left"
-								directionVertical
-								onClick={() => store.setSelectedElement()}
-								hasBorder
-							>
-								<ElementPane>
-									<ElementList />
-								</ElementPane>
-								<AddButton
-									active={store.getRightPane() === RightPane.Patterns}
-									label="Add Elements"
-									onClick={e => {
-										e.stopPropagation();
-										store.setRightPane(RightPane.Patterns);
-										store.setSelectedElement();
-									}}
-								/>
-							</SideBar>
-							<PreviewPaneWrapper
-								key="center"
-								id="preview"
-								previewFrame={`http://localhost:${store.getServerPort()}/preview.html`}
-							/>
-							<SideBar side="right" directionVertical hasBorder>
-								{store.getRightPane() === RightPane.Properties && (
-									<PropertyPane>
-										<PropertyList />
-									</PropertyPane>
-								)}
-								{store.getRightPane() === RightPane.Patterns && (
-									<PatternsPane>
-										<PatternListContainer />
-									</PatternsPane>
-								)}
-							</SideBar>
-						</React.Fragment>
-					) : (
+					{!project && (
 						<SplashScreen
 							onPrimaryButtonClick={() => this.createNewSpace()}
 							onSecondaryButtonClick={() => this.openSpace()}
 						/>
 					)}
+					{project &&
+						store.getActiveView() === AlvaView.Pages && (
+							<PageListPreview>
+								<PageListContainer />
+							</PageListPreview>
+						)}
+					{project &&
+						store.getActiveView() === AlvaView.PageDetail && (
+							<React.Fragment>
+								<SideBar
+									side={LayoutSide.Left}
+									direction={LayoutDirection.Column}
+									onClick={() => store.setSelectedElement()}
+									border={LayoutBorder.Side}
+								>
+									<ElementPane>
+										<ElementList />
+									</ElementPane>
+									<AddButton
+										active={store.getRightPane() === RightPane.Patterns}
+										label="Add Elements"
+										onClick={e => {
+											e.stopPropagation();
+											store.setRightPane(RightPane.Patterns);
+											store.setSelectedElement();
+										}}
+									/>
+								</SideBar>
+								<PreviewPaneWrapper
+									key="center"
+									id="preview"
+									previewFrame={`http://localhost:${store.getServerPort()}/preview.html`}
+								/>
+								<SideBar
+									side={LayoutSide.Right}
+									direction={LayoutDirection.Column}
+									border={LayoutBorder.Side}
+								>
+									{store.getRightPane() === RightPane.Properties && (
+										<PropertyPane>
+											<PropertyList />
+										</PropertyPane>
+									)}
+									{store.getRightPane() === RightPane.Patterns && (
+										<PatternsPane>
+											<PatternListContainer />
+										</PatternsPane>
+									)}
+								</SideBar>
+							</React.Fragment>
+						)}
 				</MainArea>
 				<IconRegistry names={IconName} />
 				{DevTools ? <DevTools /> : null}

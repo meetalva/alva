@@ -1,15 +1,17 @@
 import { colors } from '../colors';
 import * as React from 'react';
-import { getSpace, Size } from '../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface InputProps {
 	className?: string;
 	disabled?: boolean;
 	focused?: boolean;
-	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
-	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
-	handleKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+	onBlur?: React.FocusEventHandler<HTMLInputElement>;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	onClick?: React.MouseEventHandler<HTMLInputElement>;
+	onFocus?: React.FocusEventHandler<HTMLInputElement>;
+	onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 	placeholder?: string;
 	type?: InputTypes;
 	value?: string | number;
@@ -28,12 +30,12 @@ const StyledInput = styled.input`
 	border: none;
 	background: transparent;
 
-	margin: 0 ${getSpace(Size.L)}px;
+	margin: 0 ${getSpace(SpaceSize.L)}px;
 	font-size: 15px;
 
 	box-sizing: border-box;
 	display: block;
-	width: calc(100% - ${getSpace(Size.M) * 2}px);
+	width: calc(100% - ${getSpace(SpaceSize.M) * 2}px);
 	color: ${colors.black.toString()};
 
 	font-weight: 500;
@@ -62,9 +64,11 @@ const Input: React.StatelessComponent<InputProps> = props => (
 		disabled={props.disabled}
 		type={props.type}
 		value={props.value}
-		onBlur={props.handleBlur}
-		onChange={props.handleChange}
-		onKeyDown={props.handleKeyDown}
+		onBlur={props.onBlur}
+		onFocus={props.onFocus}
+		onChange={props.onChange}
+		onClick={props.onClick}
+		onKeyDown={props.onKeyDown}
 		placeholder={props.placeholder}
 	/>
 );

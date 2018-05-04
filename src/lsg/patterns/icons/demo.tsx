@@ -1,5 +1,5 @@
 import DemoContainer from '../demo-container';
-import {Icon, IconName, IconRegistry, reduce, Size as IconSize} from './index';
+import { Icon, IconName, IconRegistry, IconSize, reduce } from './index';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -20,7 +20,7 @@ const StyledDemoListItem = styled.li`
 	width: 20%;
 	min-width: 51px;
 	text-align: center;
-	`;
+`;
 
 const StyledIcon = styled(Icon)`
 	margin-bottom: 20px;
@@ -35,7 +35,7 @@ const DemoIcons = (props: DemoIconsProps) => (
 	<StyledDemoIconList>
 		{reduce(props.names, (name, id) => [
 			<StyledDemoListItem key={name}>
-				<StyledIcon name={id} size={props.size}/>
+				<StyledIcon name={id} size={props.size} />
 			</StyledDemoListItem>
 		])}
 	</StyledDemoIconList>
@@ -43,9 +43,9 @@ const DemoIcons = (props: DemoIconsProps) => (
 
 const IconRegistryDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer title="Icons">
-		<DemoIcons size={IconSize.XS} names={IconName}/>
-		<DemoIcons size={IconSize.S} names={IconName}/>
-		<IconRegistry names={IconName}/>
+		<DemoIcons size={IconSize.XS} names={IconName} />
+		<DemoIcons size={IconSize.S} names={IconName} />
+		<IconRegistry names={IconName} />
 	</DemoContainer>
 );
 

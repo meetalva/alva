@@ -5,7 +5,6 @@ import { Headline } from '../../lsg/patterns/headline';
 import Link from '../../lsg/patterns/link';
 import * as React from 'react';
 import Space, { SpaceSize } from '../../lsg/patterns/space';
-// tslint:disable-next-line
 import SplashScreenContainer from '../../lsg/patterns/splash-screen';
 
 export interface SplashScreenProps {

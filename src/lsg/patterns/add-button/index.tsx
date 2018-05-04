@@ -5,9 +5,9 @@ import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface AddButtonProps {
-	onClick?: React.MouseEventHandler<HTMLElement>;
-	label?: string;
 	active?: boolean;
+	label?: string;
+	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 interface StyledAddButtonProps {

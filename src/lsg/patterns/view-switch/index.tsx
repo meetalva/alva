@@ -45,7 +45,7 @@ const StyledTitle = styled.strong`
 	align-self: center;
 	display: inline-block;
 	width: 130px;
-	margin: 0 ${getSpace(SpaceSize.XS)}px;
+	margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
 	overflow: hidden;
 	color: ${colors.grey36.toString()};
 	font-size: inherit;

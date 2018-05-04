@@ -169,8 +169,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		const store = Store.getInstance();
 		const label = above(e.target, `[${ElementAnchors.label}]`);
 
-		console.log(element, label);
-
 		if (!element) {
 			return;
 		}

@@ -14,6 +14,12 @@ import { Preferences } from './preferences';
 import { Project } from './project';
 import { Styleguide } from './styleguide/styleguide';
 
+export enum AlvaView {
+	Pages = 'Pages',
+	PageDetail = 'PageDetail',
+	SplashScreen = 'SplashScreen'
+}
+
 export enum RightPane {
 	Patterns = 'Patterns',
 	Properties = 'Properties'
@@ -29,6 +35,11 @@ export class Store {
 	 * The store singleton instance.
 	 */
 	private static INSTANCE: Store;
+
+	/**
+	 * The current state of the Page Overview
+	 */
+	@MobX.observable private activeView: AlvaView = AlvaView.PageDetail;
 
 	/**
 	 * The name of the analyzer that should be used for the open styleguide.
@@ -72,11 +83,6 @@ export class Store {
 	 * The currently name-editable element in the element list.
 	 */
 	@MobX.observable private nameEditableElement?: PageElement;
-
-	/**
-	 * The current state of the Page Overview
-	 */
-	@MobX.observable public pageOverviewIsOpened: boolean = false;
 
 	/**
 	 * The current search term in the patterns list, or an empty string if there is none.
@@ -286,6 +292,10 @@ export class Store {
 				.getProject()
 				.getName()}', page '${pageRef.getName()}', giving up`
 		);
+	}
+
+	public getActiveView(): AlvaView {
+		return this.activeView;
 	}
 
 	/**
@@ -812,6 +822,10 @@ export class Store {
 		Persister.saveYaml(this.getPreferencesPath(), this.preferences.toJsonObject());
 	}
 
+	public setActiveView(view: AlvaView): void {
+		this.activeView = view;
+	}
+
 	/**
 	 * Sets the element currently in the clipboard, or undefined if there is none.
 	 * Note: The element is cloned lazily, so you don't need to clone it when setting.
@@ -945,16 +959,6 @@ export class Store {
 		}
 
 		this.clearUndoRedoBuffers();
-	}
-
-	/**
-	 * Toggles the Page Overview layer.
-	 * It toggles between true and false.
-	 * @return void
-	 */
-	@MobX.action
-	public togglePageOverview(): void {
-		this.pageOverviewIsOpened = !this.pageOverviewIsOpened;
 	}
 
 	/**

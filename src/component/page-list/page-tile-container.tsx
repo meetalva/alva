@@ -4,7 +4,7 @@ import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import { PageRef } from '../../store/page/page-ref';
 import * as React from 'react';
-import { Store } from '../../store/store';
+import { AlvaView, Store } from '../../store/store';
 
 export interface PageTileContainerProps {
 	focused: boolean;
@@ -62,7 +62,9 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		}
 
 		const store = Store.getInstance();
-		store.togglePageOverview();
+		const next = store.getActiveView() === AlvaView.Pages ? AlvaView.PageDetail : AlvaView.Pages;
+
+		store.setActiveView(next);
 		store.openPage(this.props.page.getId());
 	}
 

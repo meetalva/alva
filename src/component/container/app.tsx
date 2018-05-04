@@ -21,7 +21,7 @@ import { PropertyList } from './property-list';
 import PropertyPane from '../../lsg/patterns/panes/property-pane';
 import * as React from 'react';
 import { SplashScreen } from './splash-screen';
-import { RightPane, Store } from '../../store/store';
+import { AlvaView, RightPane, Store } from '../../store/store';
 
 globalStyles();
 
@@ -138,13 +138,13 @@ export class App extends React.Component {
 						/>
 					)}
 					{project &&
-						store.pageOverviewIsOpened && (
+						store.getActiveView() === AlvaView.Pages && (
 							<PageListPreview>
 								<PageListContainer />
 							</PageListPreview>
 						)}
 					{project &&
-						!store.pageOverviewIsOpened && (
+						store.getActiveView() === AlvaView.PageDetail && (
 							<React.Fragment>
 								<SideBar
 									side="left"

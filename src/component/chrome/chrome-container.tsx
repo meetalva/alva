@@ -5,7 +5,7 @@ import { OverviewSwitchContainer } from './overview-switch-container';
 import { Page } from '../../store/page/page';
 import { PageRef } from '../../store/page/page-ref';
 import * as React from 'react';
-import { Store } from '../../store/store';
+import { AlvaView, Store } from '../../store/store';
 import { ViewSwitch, ViewTitle } from '../../lsg/patterns/view-switch';
 
 @observer
@@ -42,8 +42,12 @@ export class ChromeContainer extends React.Component {
 
 		return (
 			<Chrome>
-				<OverviewSwitchContainer />
-				{!this.store.pageOverviewIsOpened && (
+				{this.store.getActiveView() === AlvaView.PageDetail ? (
+					<OverviewSwitchContainer />
+				) : (
+					<div />
+				)}
+				{this.store.getActiveView() === AlvaView.PageDetail && (
 					<ViewSwitch
 						fontSize={FontSize.M}
 						justify="center"
@@ -54,7 +58,7 @@ export class ChromeContainer extends React.Component {
 						title={currentPage ? currentPage.getName() : ''}
 					/>
 				)}
-				{this.store.pageOverviewIsOpened && (
+				{this.store.getActiveView() === AlvaView.Pages && (
 					<ViewTitle
 						fontSize={FontSize.M}
 						justify="center"

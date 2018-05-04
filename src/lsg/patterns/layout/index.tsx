@@ -14,7 +14,7 @@ const StyledLayout = styled.div`
 	display: flex;
 	${(props: LayoutProps) => (props.directionVertical ? 'flex-direction: column;' : '')};
 	${(props: LayoutProps) =>
-		props.hasBorder && props.side == 'left'
+		props.hasBorder && props.side === 'left'
 			? `
 		border-right: 1px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
 		@media screen and (-webkit-min-device-pixel-ratio: 2) {
@@ -23,7 +23,7 @@ const StyledLayout = styled.div`
 	`
 			: ''};
 	${(props: LayoutProps) =>
-		props.hasBorder && props.side == 'right'
+		props.hasBorder && props.side === 'right'
 			? `
 		border-left: 1px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
 		@media screen and (-webkit-min-device-pixel-ratio: 2) {

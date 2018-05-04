@@ -8,6 +8,7 @@ export enum IconName {
 	ArrowFillRight,
 	ArrowFillLeft,
 	Robo,
+	Plus,
 	Pattern
 }
 export interface IconRegistryProps {
@@ -60,6 +61,14 @@ const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
 	[IconName.ArrowFillLeft]: [[<path key="arrowFillLeft" d="M16 20l-8-8 8-8v16z" />]],
 	[IconName.Robo]: [
 		[<path key="robo" d="M0 0h24v24H0V0zm15 5v5h5V5h-5zM4 20h16v-1H4v1zM4 5v5h5V5H4z" />]
+	],
+	[IconName.Plus]: [
+		[
+			<path
+				key="plus"
+				d="M11,11 L11,2 L13,2 L13,11 L22,11 L22,13 L13,13 L13,22 L11,22 L11,13 L2,13 L2,11 L11,11 Z"
+			/>
+		]
 	],
 	[IconName.Pattern]: [
 		[

@@ -1,5 +1,6 @@
 import Layout, { LayoutWrap } from '../../lsg/patterns/layout';
 import { observer } from 'mobx-react';
+import { PageAddButton } from './page-add-button';
 import { PageRef } from '../../store/page/page-ref';
 import { PageTileContainer } from './page-tile-container';
 import * as React from 'react';
@@ -28,6 +29,7 @@ export const PageListContainer: React.StatelessComponent = observer((): JSX.Elem
 							page={pageRef}
 						/>
 					))}
+				<PageAddButton />
 			</Layout>
 		</Space>
 	);

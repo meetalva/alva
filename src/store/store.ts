@@ -195,6 +195,24 @@ export class Store {
 		return guessedName.substring(0, 1).toUpperCase() + guessedName.substring(1);
 	}
 
+	public addNewPageRef(): PageRef {
+		const project = this.currentProject as Project;
+
+		// Page refs register with their project automatically
+		// via side effects
+		const pageRef = new PageRef({
+			name: 'New page',
+			project
+		});
+
+		pageRef.setPath(this.findAvailablePagePath(pageRef));
+		pageRef.updateLastPersistedPath();
+
+		pageRef.touch();
+
+		return pageRef;
+	}
+
 	/**
 	 * Add a new project definition to the list of projects.
 	 * Note: Changes to the projects and page references are saved only when calling save().
@@ -595,6 +613,7 @@ export class Store {
 		this.save();
 
 		const pageRef = this.getPageRefById(id);
+
 		if (pageRef && pageRef.getLastPersistedPath()) {
 			const pagePath: string = Path.join(
 				this.getPagesPath(),

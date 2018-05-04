@@ -24,7 +24,6 @@ export const DemoPreviewTile = (): JSX.Element => (
 					editable={false}
 					focused={false}
 					onChange={handleChange}
-					name="Page Name"
 					named={true}
 					value="Editable"
 				/>
@@ -34,7 +33,6 @@ export const DemoPreviewTile = (): JSX.Element => (
 					editable={false}
 					focused={true}
 					onChange={handleChange}
-					name="Focused Page"
 					named={true}
 					value="Page Name"
 				/>
@@ -44,7 +42,6 @@ export const DemoPreviewTile = (): JSX.Element => (
 					editable={true}
 					focused={true}
 					onChange={handleChange}
-					name="Focused and Editable"
 					named={true}
 					value="Editable Page Name"
 				/>
@@ -54,7 +51,6 @@ export const DemoPreviewTile = (): JSX.Element => (
 					editable={false}
 					focused={false}
 					onChange={handleChange}
-					name="Page Name"
 					named={true}
 					value="Editable Page Name"
 				/>
@@ -64,7 +60,6 @@ export const DemoPreviewTile = (): JSX.Element => (
 					editable={false}
 					focused={false}
 					onChange={handleChange}
-					name="Page Name"
 					named={true}
 					value="Editable Page Name"
 				/>

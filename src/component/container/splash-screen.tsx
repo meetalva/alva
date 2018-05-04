@@ -27,7 +27,7 @@ export function SplashScreen(props: SplashScreenProps): JSX.Element {
 				</Copy>
 			</Space>
 			<Space sizeBottom={SpaceSize.S}>
-				<Button handleClick={props.onPrimaryButtonClick} order={Order.Primary}>
+				<Button onClick={props.onPrimaryButtonClick} order={Order.Primary}>
 					Create new Alva space
 				</Button>
 			</Space>

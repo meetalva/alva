@@ -6,9 +6,9 @@ import styled from 'styled-components';
 
 export interface PatternListItemProps {
 	draggable?: boolean;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	icon?: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDragStart?: React.DragEventHandler<HTMLElement>;
 }
 
 const StyledPatternList = styled.div`
@@ -75,9 +75,9 @@ const StyledPatternListItemLabel = styled.div`
 `;
 
 export const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
-	const { draggable, handleDragStart, icon, onClick } = props;
+	const { draggable, onDragStart, icon, onClick } = props;
 	return (
-		<StyledPatternListItem onDragStart={handleDragStart} draggable={draggable} onClick={onClick}>
+		<StyledPatternListItem onDragStart={onDragStart} draggable={draggable} onClick={onClick}>
 			{icon ? (
 				<StyledImg className="pattern__icon" src={icon} />
 			) : (

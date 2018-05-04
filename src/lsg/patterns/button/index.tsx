@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 export interface ButtonProps {
 	color?: Color;
-	handleClick?: React.MouseEventHandler<HTMLElement>;
+	onClick?: React.MouseEventHandler<HTMLElement>;
 	order?: Order;
 }
 
@@ -49,7 +49,7 @@ const StyledButton = styled.button`
 `;
 
 const Button: React.StatelessComponent<ButtonProps> = props => (
-	<StyledButton onClick={props.handleClick}>{props.children}</StyledButton>
+	<StyledButton>{props.children}</StyledButton>
 );
 
 export default Button;

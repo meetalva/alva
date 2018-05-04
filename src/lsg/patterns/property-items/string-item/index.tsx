@@ -6,9 +6,9 @@ import styled from 'styled-components';
 
 export interface StringItemProps {
 	className?: string;
-	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
-	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 	label: string;
+	onBlur?: React.FocusEventHandler<HTMLInputElement>;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	value?: string;
 }
 
@@ -56,15 +56,15 @@ const StyledInput = styled.input`
 `;
 
 export const StringItem: React.StatelessComponent<StringItemProps> = props => {
-	const { className, handleChange, handleBlur, label, value } = props;
+	const { className, onChange, onBlur, label, value } = props;
 
 	return (
 		<StyledStringItem className={className}>
 			<label>
 				<StyledLabel>{label}</StyledLabel>
 				<StyledInput
-					onChange={handleChange}
-					onBlur={handleBlur}
+					onChange={onChange}
+					onBlur={onBlur}
 					type="textarea"
 					value={value}
 					placeholder="Type in"

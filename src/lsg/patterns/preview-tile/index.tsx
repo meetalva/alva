@@ -1,6 +1,7 @@
 import { colors } from '../colors';
 import Input, { InputTypes } from '../input';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
@@ -8,12 +9,25 @@ export interface PreviewTileProps {
 	editable: boolean;
 	focused: boolean;
 	id?: string;
-	name: string;
 	named: boolean;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
+	onFocus?: React.FocusEventHandler<HTMLInputElement>;
+	onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+	value: string;
+}
+
+interface EditableTitleProps {
+	autoFocus: boolean;
+	autoSelect: boolean;
+	focused: boolean;
+	onBlur?: React.FocusEventHandler<HTMLInputElement>;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
+	onFocus?: React.FocusEventHandler<HTMLInputElement>;
 	onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 	value: string;
 }
@@ -22,7 +36,8 @@ interface StyledPreviewTileProps {
 	focused: boolean;
 }
 
-interface StyledPreviewTitle {
+interface StyledPreviewTitleProps {
+	focusable: boolean;
 	named: boolean;
 }
 
@@ -50,9 +65,9 @@ const StyledTitle = styled.strong`
 	margin-bottom: ${getSpace(SpaceSize.S)}px;
 	font-size: 12px;
 	font-weight: normal;
-	color: ${(props: StyledPreviewTitle) =>
-		props.named ? colors.black.toString() : colors.grey80.toString()}
-	cursor: pointer;
+	color: ${(props: StyledPreviewTitleProps) =>
+		props.named ? colors.black.toString() : colors.grey80.toString()};
+	cursor: ${props => (props.focusable ? 'text' : 'pointer')};
 `;
 
 const StyledEditableTitle = styled(Input)`
@@ -72,21 +87,58 @@ const StyledEditableTitle = styled(Input)`
 	}
 `;
 
+class EditableTitle extends React.Component<EditableTitleProps> {
+	public componentDidMount(): void {
+		const node = ReactDOM.findDOMNode(this);
+
+		if (!node) {
+			return;
+		}
+
+		const element = node as HTMLInputElement;
+
+		if (this.props.autoFocus) {
+			element.focus();
+		}
+
+		if (this.props.autoSelect) {
+			element.setSelectionRange(0, this.props.value.length);
+		}
+	}
+
+	public render(): JSX.Element {
+		const { props } = this;
+		return (
+			<StyledEditableTitle
+				focused={props.focused}
+				onBlur={props.onBlur}
+				onChange={props.onChange}
+				onFocus={props.onFocus}
+				onKeyDown={props.onKeyDown}
+				type={InputTypes.string}
+				value={props.value}
+			/>
+		);
+	}
+}
+
 export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): JSX.Element => (
 	<StyledPreview data-id={props.id} onClick={props.onClick} onDoubleClick={props.onDoubleClick}>
 		{props.editable ? (
-			<StyledEditableTitle
+			<EditableTitle
+				autoFocus={props.editable}
+				autoSelect={props.editable}
 				focused={props.focused}
-				handleBlur={props.onBlur}
-				handleChange={props.onChange}
-				handleKeyDown={props.onKeyDown}
-				type={InputTypes.string}
+				onBlur={props.onBlur}
+				onChange={props.onChange}
+				onFocus={props.onFocus}
+				onKeyDown={props.onKeyDown}
 				value={props.value}
-			>
-				{props.value}
-			</StyledEditableTitle>
+			/>
 		) : (
-			<StyledTitle named={props.named}>{props.name}</StyledTitle>
+			<StyledTitle focusable={props.focused} named={props.named}>
+				{props.value}
+			</StyledTitle>
 		)}
 		<StyledPreviewTile focused={props.focused} />
 	</StyledPreview>

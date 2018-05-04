@@ -37,11 +37,6 @@ export class App extends React.Component {
 
 	private shiftDown: boolean = false;
 
-	public constructor(props: {}) {
-		super(props);
-		this.handleTabNaviagtionClick = this.handleTabNaviagtionClick.bind(this);
-	}
-
 	public componentDidMount(): void {
 		createMenu();
 		this.redirectUndoRedo();
@@ -81,10 +76,6 @@ export class App extends React.Component {
 	private handleMainWindowClick(): void {
 		Store.getInstance().setElementFocussed(false);
 		createMenu();
-	}
-
-	protected handleTabNaviagtionClick(evt: React.MouseEvent<HTMLElement>, id: string): void {
-		this.activeTab = id;
 	}
 
 	protected get isPatternListVisible(): boolean {
@@ -137,7 +128,7 @@ export class App extends React.Component {
 		const DevTools = this.getDevTools();
 
 		return (
-			<Layout directionVertical onClick={this.handleMainWindowClick}>
+			<Layout directionVertical onClick={() => this.handleMainWindowClick()}>
 				<ChromeContainer />
 				<MainArea>
 					{!project && (

@@ -77,7 +77,7 @@ export const ViewSwitch: React.StatelessComponent<ViewSwitchProps> = (props): JS
 	<StyledViewSwitch justify={props.justify} fontSize={props.fontSize}>
 		<StyledIcons
 			color={colors.grey60}
-			handleClick={props.onLeftClick}
+			onClick={props.onLeftClick}
 			size={IconSize.XS}
 			name={IconName.ArrowLeft}
 			visible={props.leftVisible}
@@ -85,7 +85,7 @@ export const ViewSwitch: React.StatelessComponent<ViewSwitchProps> = (props): JS
 		<StyledTitle>{props.title}</StyledTitle>
 		<StyledIcons
 			color={colors.grey60}
-			handleClick={props.onRightClick}
+			onClick={props.onRightClick}
 			size={IconSize.XS}
 			name={IconName.ArrowRight}
 			visible={props.rightVisible}

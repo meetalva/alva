@@ -12,11 +12,11 @@ const StyledDemo = styled.div`
 const StringItemDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<div>
 		<StyledDemo>
-			<StringItem handleChange={NOOP} label="Text" />
+			<StringItem onChange={NOOP} label="Text" />
 		</StyledDemo>
 		<StyledDemo>
 			<StringItem
-				handleChange={NOOP}
+				onChange={NOOP}
 				label="Text"
 				value="this is a very long example text to test text overflow and stuff"
 			/>

@@ -18,8 +18,8 @@ export interface IconProps {
 	className?: string;
 	color?: Color;
 	dataIcon?: string;
-	handleClick?: React.MouseEventHandler<SVGSVGElement>;
 	name: IconName | null;
+	onClick?: React.MouseEventHandler<SVGSVGElement>;
 	size?: IconSize;
 }
 
@@ -117,7 +117,7 @@ export const Icon: React.StatelessComponent<IconProps> = (props): JSX.Element =>
 	const icon = typeof props.name === 'number' ? IconName[props.name] : null;
 	return (
 		<StyledIcon
-			onClick={props.handleClick}
+			onClick={props.onClick}
 			className={props.className}
 			iconColor={props.color}
 			size={props.size}

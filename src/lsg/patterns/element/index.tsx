@@ -50,10 +50,10 @@ export interface StyledElementChildProps {
 }
 
 export interface StyledPlaceholder {
-	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragEnterForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
 	highlightPlaceholder?: boolean;
+	onDragDropForChild?: React.DragEventHandler<HTMLElement>;
+	onDragEnterForChild?: React.DragEventHandler<HTMLElement>;
+	onDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
 }
 
 const StyledElement = styled.div`

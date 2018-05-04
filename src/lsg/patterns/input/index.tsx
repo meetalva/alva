@@ -7,9 +7,11 @@ export interface InputProps {
 	className?: string;
 	disabled?: boolean;
 	focused?: boolean;
-	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
-	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
-	handleKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+	onBlur?: React.FocusEventHandler<HTMLInputElement>;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	onClick?: React.MouseEventHandler<HTMLInputElement>;
+	onFocus?: React.FocusEventHandler<HTMLInputElement>;
+	onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 	placeholder?: string;
 	type?: InputTypes;
 	value?: string | number;
@@ -62,9 +64,11 @@ const Input: React.StatelessComponent<InputProps> = props => (
 		disabled={props.disabled}
 		type={props.type}
 		value={props.value}
-		onBlur={props.handleBlur}
-		onChange={props.handleChange}
-		onKeyDown={props.handleKeyDown}
+		onBlur={props.onBlur}
+		onFocus={props.onFocus}
+		onChange={props.onChange}
+		onClick={props.onClick}
+		onKeyDown={props.onKeyDown}
 		placeholder={props.placeholder}
 	/>
 );

@@ -7,8 +7,8 @@ import styled from 'styled-components';
 export interface BooleanItemProps {
 	checked?: boolean;
 	className?: string;
-	handleChange?: React.ChangeEventHandler<HTMLElement>;
 	label: string;
+	onChange?: React.ChangeEventHandler<HTMLElement>;
 }
 
 interface IndicatorProps {
@@ -78,13 +78,13 @@ const StyledInput = styled.input`
 `;
 
 export const BooleanItem: React.StatelessComponent<BooleanItemProps> = props => {
-	const { className, label, children, checked, handleChange } = props;
+	const { className, label, children, checked, onChange } = props;
 
 	return (
 		<StyledBooleanItem className={className}>
 			<StyledLabelWrapper>
 				<StyledLabel>{label}</StyledLabel>
-				<StyledInput onChange={handleChange} type="checkbox" />
+				<StyledInput onChange={onChange} type="checkbox" />
 				<StyledIndicator checked={checked} />
 			</StyledLabelWrapper>
 			{children}

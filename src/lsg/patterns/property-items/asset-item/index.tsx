@@ -6,12 +6,12 @@ import styled from 'styled-components';
 
 export interface AssetItemProps {
 	className?: string;
-	handleChooseClick?: React.MouseEventHandler<HTMLButtonElement>;
-	handleClearClick?: React.MouseEventHandler<HTMLButtonElement>;
-	handleInputChange?: React.ChangeEventHandler<HTMLInputElement>;
 	imageSrc?: string;
 	inputValue?: string;
 	label: string;
+	onChooseClick?: React.MouseEventHandler<HTMLButtonElement>;
+	onClearClick?: React.MouseEventHandler<HTMLButtonElement>;
+	onInputChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
 const StyledAssetItem = styled.div`
@@ -96,15 +96,15 @@ export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 					<StyledImage src={props.imageSrc} />
 				</StyledImageBox>
 				<StyledInput
-					onChange={props.handleInputChange}
+					onChange={props.onInputChange}
 					type="textarea"
 					value={props.inputValue}
 					placeholder="Enter external URL"
 				/>
 			</StyledPreview>
 		</label>
-		<StyledButton onClick={props.handleChooseClick}>Choose...</StyledButton>
-		<StyledButton onClick={props.handleClearClick}>Clear</StyledButton>
+		<StyledButton onClick={props.onChooseClick}>Choose...</StyledButton>
+		<StyledButton onClick={props.onClearClick}>Clear</StyledButton>
 	</StyledAssetItem>
 );
 

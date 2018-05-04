@@ -6,7 +6,13 @@ import ElementPane from '../../lsg/patterns/panes/element-pane';
 import * as FsExtra from 'fs-extra';
 import globalStyles from '../../lsg/patterns/global-styles';
 import { IconName, IconRegistry } from '../../lsg/patterns/icons';
-import Layout, { MainArea, SideBar } from '../../lsg/patterns/layout';
+import Layout, {
+	LayoutBorder,
+	LayoutDirection,
+	LayoutSide,
+	MainArea,
+	SideBar
+} from '../../lsg/patterns/layout';
 import { createMenu } from '../../electron/menu';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
@@ -128,7 +134,7 @@ export class App extends React.Component {
 		const DevTools = this.getDevTools();
 
 		return (
-			<Layout directionVertical onClick={() => this.handleMainWindowClick()}>
+			<Layout direction={LayoutDirection.Column} onClick={() => this.handleMainWindowClick()}>
 				<ChromeContainer />
 				<MainArea>
 					{!project && (
@@ -147,10 +153,10 @@ export class App extends React.Component {
 						store.getActiveView() === AlvaView.PageDetail && (
 							<React.Fragment>
 								<SideBar
-									side="left"
-									directionVertical
+									side={LayoutSide.Left}
+									direction={LayoutDirection.Column}
 									onClick={() => store.setSelectedElement()}
-									hasBorder
+									border={LayoutBorder.Side}
 								>
 									<ElementPane>
 										<ElementList />
@@ -170,7 +176,11 @@ export class App extends React.Component {
 									id="preview"
 									previewFrame={`http://localhost:${store.getServerPort()}/preview.html`}
 								/>
-								<SideBar side="right" directionVertical hasBorder>
+								<SideBar
+									side={LayoutSide.Right}
+									direction={LayoutDirection.Column}
+									border={LayoutBorder.Side}
+								>
 									{store.getRightPane() === RightPane.Properties && (
 										<PropertyPane>
 											<PropertyList />

@@ -1,6 +1,6 @@
 import { colors } from '../colors';
 import DemoContainer from '../demo-container';
-import Layout from './index';
+import Layout, { LayoutBorder, LayoutDirection } from './index';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -16,7 +16,7 @@ const StyledTestDiv = styled.div`
 
 const LayoutDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer title="Layout">
-		<Layout directionVertical>
+		<Layout direction={LayoutDirection.Column}>
 			<StyledTestDiv>Vertical</StyledTestDiv>
 			<StyledTestDiv>Vertical</StyledTestDiv>
 			<StyledTestDiv>Vertical</StyledTestDiv>
@@ -26,7 +26,7 @@ const LayoutDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<StyledTestDiv>Horizontal</StyledTestDiv>
 			<StyledTestDiv>Horizontal</StyledTestDiv>
 		</Layout>
-		<Layout directionVertical hasBorder>
+		<Layout direction={LayoutDirection.Column} border={LayoutBorder.Side}>
 			<StyledTestDiv>Vertical with margins</StyledTestDiv>
 			<StyledTestDiv>Vertical with margins</StyledTestDiv>
 			<StyledTestDiv>Vertical with margins</StyledTestDiv>

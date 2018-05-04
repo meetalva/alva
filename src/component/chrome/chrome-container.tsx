@@ -12,7 +12,7 @@ export class ChromeContainer extends React.Component {
 
 		const store = Store.getInstance();
 		const page = store.getCurrentPage();
-		const pages: PageRef[] = page ? page.getProject().getPages() : [];
+		const pages: PageRef[] = page ? page.getProject().getPageRefs() : [];
 		const currentIndex = page ? pages.indexOf(page.getPageRef()) : 0;
 
 		if (currentIndex > 0) {

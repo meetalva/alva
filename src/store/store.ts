@@ -12,6 +12,7 @@ import { PageRef } from './page/page-ref';
 import * as Path from 'path';
 import { Preferences } from './preferences';
 import { Project } from './project';
+import { PropertyValue } from './page/property-value';
 import { Styleguide } from './styleguide/styleguide';
 
 export enum RightPane {
@@ -139,6 +140,14 @@ export class Store {
 	 * The last command in the list is the most recent executed one.
 	 */
 	@MobX.observable private undoBuffer: Command[] = [];
+
+	/**
+	 * Variables are property values edited by the user while testing pages.
+	 * They receive their values from property event handlers, and can bind to other properties,
+	 * providing a way to transfer data e.g. from an input to a summary page.
+	 * Variables are not persisted in the styleguide.
+	 */
+	@MobX.observable private variableValues: Map<string, PropertyValue> = new Map();
 
 	/**
 	 * Creates a new store.
@@ -322,7 +331,7 @@ export class Store {
 
 		const currentPageId: string = this.currentPage.getId();
 		for (const project of this.projects) {
-			for (const pageRef of project.getPages()) {
+			for (const pageRef of project.getPageRefs()) {
 				if (pageRef.getId() === currentPageId) {
 					return pageRef;
 				}
@@ -361,7 +370,7 @@ export class Store {
 	 */
 	public getPageRefById(id: string): PageRef | undefined {
 		for (const project of this.projects) {
-			for (const pageRef of project.getPages()) {
+			for (const pageRef of project.getPageRefs()) {
 				if (pageRef.getId() === id) {
 					return pageRef;
 				}
@@ -378,7 +387,7 @@ export class Store {
 	 */
 	public getPageRefByPath(path: string): PageRef | undefined {
 		for (const project of this.projects) {
-			for (const pageRef of project.getPages()) {
+			for (const pageRef of project.getPageRefs()) {
 				if (pageRef.getPath() === path) {
 					return pageRef;
 				}
@@ -484,6 +493,27 @@ export class Store {
 	}
 
 	/**
+	 * Returns the names of all variables currently registered.
+	 * @return The names of all variables.
+	 */
+	public getVariableNames(): string[] {
+		return Array.from(this.variableValues.keys());
+	}
+
+	/**
+	 * Returns the current value of a variable.
+	 * Note: Variables are property values edited by the user while testing pages.
+	 * They receive their values from property event handlers, and can bind to other properties,
+	 * providing a way to transfer data e.g. from an input to a summary page.
+	 * Variables are not persisted in the styleguide.
+	 * @param id The ID of the variable (global to the styleguide).
+	 * @return The current property value.
+	 */
+	public getVariableValue(id: string): PropertyValue {
+		return this.variableValues.get(id);
+	}
+
+	/**
 	 * Returns whether there is a user comment (user operation) to redo.
 	 * @return Whether there is a user comment (user operation) to redo.
 	 * @see redo
@@ -524,7 +554,7 @@ export class Store {
 
 		const project: Project = this.projects[0];
 
-		const pages: PageRef[] = project.getPages();
+		const pages: PageRef[] = project.getPageRefs();
 		if (!pages.length) {
 			return;
 		}
@@ -709,7 +739,7 @@ export class Store {
 
 		page
 			.getProject()
-			.getPagesInternal()
+			.getPageRefsInternal()
 			.remove(page);
 	}
 
@@ -727,7 +757,7 @@ export class Store {
 
 		const currentPage: Page | undefined = this.getCurrentPage();
 		if (currentPage) {
-			project.getPages().forEach(pageRef => {
+			project.getPageRefs().forEach(pageRef => {
 				if (currentPage.getPageRef() === pageRef) {
 					this.closePage();
 				}
@@ -760,7 +790,7 @@ export class Store {
 		// Move all page file to their new locations, if the path has changed
 
 		this.projects.forEach(project => {
-			project.getPages().forEach(page => {
+			project.getPageRefs().forEach(page => {
 				const lastPath = page.getLastPersistedPath();
 				if (lastPath && page.getPath() !== lastPath) {
 					try {
@@ -940,6 +970,19 @@ export class Store {
 		}
 
 		this.clearUndoRedoBuffers();
+	}
+
+	/**
+	 * Sets a variable value and updates all pattern properties that use variables.
+	 * Note: Variables are property values edited by the user while testing pages.
+	 * They receive their values from property event handlers, and can bind to other properties,
+	 * providing a way to transfer data e.g. from an input to a summary page.
+	 * Variables are not persisted in the styleguide.
+	 * @param id The ID of the variable (global to the styleguide).
+	 * @param value The new property value.
+	 */
+	public setVariableValue(id: string, value: PropertyValue): void {
+		this.variableValues.set(id, value);
 	}
 
 	/**

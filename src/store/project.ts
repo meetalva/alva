@@ -1,5 +1,6 @@
 import { JsonArray, JsonObject } from './json';
 import * as MobX from 'mobx';
+import { Page } from './page/page';
 import { PageRef } from './page/page-ref';
 import { Store } from './store';
 import * as username from 'username';
@@ -137,7 +138,7 @@ export class Project {
 	 * Instead, they know what pages exist (page references),
 	 * and the store can load them from YAML files when required (open page).
 	 */
-	public getPages(): PageRef[] {
+	public getPageRefs(): PageRef[] {
 		return this.pages;
 	}
 
@@ -146,8 +147,17 @@ export class Project {
 	 * Do not use from the UI components.
 	 * @return The internal pages representation.
 	 */
-	public getPagesInternal(): MobX.IObservableArray<PageRef> {
+	public getPageRefsInternal(): MobX.IObservableArray<PageRef> {
 		return this.pages as MobX.IObservableArray<PageRef>;
+	}
+
+	/**
+	 * Returns fully resolved page objects
+	 */
+	public getPages(): Page[] {
+		return this.getPageRefs()
+			.map(pageRef => pageRef.load())
+			.filter((page => typeof page !== 'undefined') as (page: Page | undefined) => page is Page);
 	}
 
 	/**

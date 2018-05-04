@@ -1,4 +1,5 @@
 import * as deepAssign from 'deep-assign';
+import { EventAction } from '../styleguide/property/event/event-action';
 import { JsonArray, JsonObject, JsonValue } from '../json';
 import * as MobX from 'mobx';
 import * as ObjectPath from 'object-path';
@@ -392,7 +393,9 @@ export class PageElement {
 	 * @return The JSON value.
 	 */
 	protected propertyToJsonValue(value: PropertyValue): JsonValue {
-		if (value instanceof Object) {
+		if (value instanceof EventAction) {
+			return value.toJsonObject();
+		} else if (value instanceof Object) {
 			const jsonObject: JsonObject = {};
 			Object.keys(value).forEach((propertyId: string) => {
 				// tslint:disable-next-line:no-any
@@ -540,7 +543,7 @@ export class PageElement {
 	}
 
 	/**
-	 * Serializes the page element into a JSON object for persistence.
+	 * Serializes the page element into a JSON object for persistence or transport.
 	 * @param forRendering Whether all property values should be converted using
 	 * Property.convertToRender (for the preview app instead of file persistence).
 	 * @return The JSON object to be persisted.

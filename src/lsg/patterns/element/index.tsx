@@ -1,7 +1,7 @@
 import { colors } from '../colors';
-import { Icon, IconName, Size as IconSize } from '../icons';
+import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
-import { getSpace, Size } from '../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 import { tag } from '../tag';
 
@@ -45,15 +45,19 @@ interface StyledIconProps {
 	open?: boolean;
 }
 
+interface LabelContentProps {
+	active?: boolean;
+}
+
 export interface StyledElementChildProps {
 	open?: boolean;
 }
 
 export interface StyledPlaceholder {
-	handleDragDropForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragEnterForChild?: React.DragEventHandler<HTMLElement>;
-	handleDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
 	highlightPlaceholder?: boolean;
+	onDragDropForChild?: React.DragEventHandler<HTMLElement>;
+	onDragEnterForChild?: React.DragEventHandler<HTMLElement>;
+	onDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
 }
 
 const StyledElement = styled.div`
@@ -126,10 +130,10 @@ const StyledElementLabel = styled(div)`
 const placeholderDiv = tag('div').omit(['highlightPlaceholder']);
 const StyledPlaceholder = styled(placeholderDiv)`
 	position: relative;
-	height: ${getSpace(Size.S)}px;
+	height: ${getSpace(SpaceSize.S)}px;
 	width: 100%;
-	margin-top: -${getSpace(Size.XS)}px;
-	margin-bottom: -${getSpace(Size.XS)}px;
+	margin-top: -${getSpace(SpaceSize.XS)}px;
+	margin-bottom: -${getSpace(SpaceSize.XS)}px;
 	z-index: 10;
 
 	&::before {
@@ -153,7 +157,7 @@ const StyledPlaceholder = styled(placeholderDiv)`
 		position: absolute;
 		height: 2px;
 		width: calc(100% - 6px);
-		left: ${getSpace(Size.XS)};
+		left: ${getSpace(SpaceSize.XS)};
 		top: 5px;
 		background: ${colors.blue40.toString()};
 		transform: scaleY(0);
@@ -178,17 +182,17 @@ const StyledPlaceholder = styled(placeholderDiv)`
 const elementDiv = tag('div').omit(['open']);
 const StyledElementChild = styled(elementDiv)`
 	flex-basis: 100%;
-	padding-left: ${getSpace(Size.L)}px;
+	padding-left: ${getSpace(SpaceSize.L)}px;
 	${(props: StyledElementChildProps) => (props.open ? 'display: block;' : 'display: none;')};
 `;
 
 const StyledIcon = styled(Icon)`
 	position: absolute;
-	left: ${getSpace(Size.XS) + getSpace(Size.XXS)}px;
+	left: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px;
 	fill: ${colors.grey60.toString()};
-	width: ${getSpace(Size.S)}px;
-	height: ${getSpace(Size.S)}px;
-	padding: ${getSpace(Size.XS)}px;
+	width: ${getSpace(SpaceSize.S)}px;
+	height: ${getSpace(SpaceSize.S)}px;
+	padding: ${getSpace(SpaceSize.XS)}px;
 	transition: transform 0.2s;
 
 	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
@@ -197,12 +201,13 @@ const StyledIcon = styled(Icon)`
 
 const LabelContent = styled.div`
 	box-sizing: border-box;
-	margin-left: ${getSpace(Size.XXL) - 3}px;
+	margin-left: ${getSpace(SpaceSize.XXL) - 3}px;
 	overflow: hidden;
-	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px 3px;
+	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.L)}px ${getSpace(SpaceSize.XS)}px 3px;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	width: 100%;
+	cursor: ${(props: LabelContentProps) => (props.active ? 'text' : 'default')};
 `;
 
 const StyledSeamlessInput = styled.input`
@@ -211,8 +216,9 @@ const StyledSeamlessInput = styled.input`
 	color: ${colors.grey20.toString()};
 	font-size: inherit;
 	line-height: inherit;
-	padding: ${getSpace(Size.XS - 1)}px ${getSpace(Size.L - 1)}px ${getSpace(Size.XS - 1)}px 3px;
-	margin: 1px 1px 1px ${getSpace(Size.XXL - 3)}px;
+	padding: ${getSpace(SpaceSize.XS - 1)}px ${getSpace(SpaceSize.L - 1)}px
+		${getSpace(SpaceSize.XS - 1)}px 3px;
+	margin: 1px 1px 1px ${getSpace(SpaceSize.XXL - 3)}px;
 	border: 0;
 	&:focus {
 		outline: none;
@@ -282,7 +288,7 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 				props.children.length > 0 && (
 					<StyledIcon
 						dataIcon={props.id}
-						name={IconName.ArrowFill}
+						name={IconName.ArrowFillRight}
 						size={IconSize.XXS}
 						color={colors.grey60}
 						open={props.open}
@@ -298,7 +304,9 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 					autoSelect
 				/>
 			) : (
-				<LabelContent {...{ [ElementAnchors.label]: true }}>{props.title}</LabelContent>
+				<LabelContent active={props.active} {...{ [ElementAnchors.label]: true }}>
+					{props.title}
+				</LabelContent>
 			)}
 		</StyledElementLabel>
 		{props.children && (

@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { getSpace, Size } from '../../space';
+import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
 
 const StyledPatternsPane = styled.div`
 	box-sizing: border-box;
 	flex: 1;
-	padding: ${getSpace(Size.M)}px;
+	padding: ${getSpace(SpaceSize.M)}px;
 	overflow: scroll;
-	margin-left: -${getSpace(Size.L)}px;
-	margin-right: -${getSpace(Size.L)}px;
+	margin-left: -${getSpace(SpaceSize.L)}px;
+	margin-right: -${getSpace(SpaceSize.L)}px;
 `;
 
 const PatternsPane: React.StatelessComponent = props => (

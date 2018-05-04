@@ -12,15 +12,9 @@ export interface BooleanItemDemoState {
 }
 
 export class BooleanItemDemo extends React.Component<{}, BooleanItemDemoState> {
-	public constructor(props: {}) {
-		super(props);
-
-		this.state = {
-			checked: false
-		};
-
-		this.handleChange = this.handleChange.bind(this);
-	}
+	public state = {
+		checked: false
+	};
 
 	private handleChange(e: React.SyntheticEvent<HTMLElement>): void {
 		this.setState({
@@ -35,14 +29,14 @@ export class BooleanItemDemo extends React.Component<{}, BooleanItemDemoState> {
 					<BooleanItem
 						label="Visibility"
 						checked={this.state.checked}
-						handleChange={this.handleChange}
+						onChange={this.handleChange}
 					/>
 				</StyledDemo>
 				<StyledDemo>
 					<BooleanItem
 						label="Spacing"
 						checked={!this.state.checked}
-						handleChange={this.handleChange}
+						onChange={this.handleChange}
 					/>
 				</StyledDemo>
 			</div>

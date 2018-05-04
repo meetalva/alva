@@ -1,7 +1,7 @@
 import { colors } from '../colors';
-import { Icon, IconName, Size as IconSize } from '../icons';
+import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
-import { getSpace, Size as SpaceSize } from '../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface DropdownProps {
@@ -84,7 +84,7 @@ export default class Dropdown extends React.Component<DropdownProps> {
 			<StyledDropdown>
 				<StyledLabel onClick={this.props.handleClick}>
 					{this.props.label}
-					<StyledIcon name={IconName.Arrow} size={IconSize.XXS} open={this.props.open} />
+					<StyledIcon name={IconName.ArrowRight} size={IconSize.XXS} open={this.props.open} />
 				</StyledLabel>
 				<StyledFlyout open={this.props.open}>{this.props.children}</StyledFlyout>
 			</StyledDropdown>

@@ -3,16 +3,16 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export interface CopyProps {
-	size?: Size;
+	size?: CopySize;
 	textColor?: Color;
 }
 
 export interface StyledCopyProps {
-	size?: Size;
+	size?: CopySize;
 	textColor?: Color;
 }
 
-export enum Size {
+export enum CopySize {
 	S = 12,
 	M = 15
 }

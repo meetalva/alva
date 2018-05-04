@@ -1,14 +1,14 @@
 import { colors } from '../../colors';
 import * as React from 'react';
-import { getSpace, Size } from '../../space';
+import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
 
 const StyledElementPane = styled.div`
 	position: relative;
 	flex: 1;
 	overflow: scroll;
-	padding-top: ${getSpace(Size.M)}px;
-	padding-bottom: ${getSpace(Size.XL)}px;
+	padding-top: ${getSpace(SpaceSize.M)}px;
+	padding-bottom: ${getSpace(SpaceSize.XL)}px;
 
 	&::after {
 		content: '';
@@ -16,7 +16,7 @@ const StyledElementPane = styled.div`
 		bottom: 0;
 		display: block;
 		width: 100%;
-		height: ${getSpace(Size.XXXL)}px;
+		height: ${getSpace(SpaceSize.XXXL)}px;
 		background: linear-gradient(
 			to bottom,
 			${colors.grey97.toString('rgb', { alpha: 0 })},

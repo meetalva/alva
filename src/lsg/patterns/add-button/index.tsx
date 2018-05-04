@@ -1,13 +1,13 @@
 import { colors } from '../colors';
-import { Icon, IconName, Size as IconSize } from '../icons';
+import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
-import { getSpace, Size as SpaceSize } from '../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface AddButtonProps {
-	onClick?: React.MouseEventHandler<HTMLElement>;
-	label?: string;
 	active?: boolean;
+	label?: string;
+	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 interface StyledAddButtonProps {
@@ -78,7 +78,7 @@ const AddButton: React.StatelessComponent<AddButtonProps> = props => (
 		<StyledLabelWrapper>{props.label}</StyledLabelWrapper>
 
 		<StyledIconWrapper>
-			<StyledIcon active={props.active} size={IconSize.XS} name={IconName.Arrow} />
+			<StyledIcon active={props.active} size={IconSize.XS} name={IconName.ArrowRight} />
 		</StyledIconWrapper>
 	</StyledAddButton>
 );

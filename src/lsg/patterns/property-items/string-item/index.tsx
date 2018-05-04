@@ -1,14 +1,14 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
 import * as React from 'react';
-import { getSpace, Size } from '../../space';
+import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
 
 export interface StringItemProps {
 	className?: string;
-	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
-	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 	label: string;
+	onBlur?: React.FocusEventHandler<HTMLInputElement>;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	value?: string;
 }
 
@@ -18,7 +18,7 @@ const StyledStringItem = styled.div`
 
 const StyledLabel = styled.span`
 	display: block;
-	margin-bottom: ${getSpace(Size.XS)}px;
+	margin-bottom: ${getSpace(SpaceSize.XS)}px;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
@@ -34,9 +34,9 @@ const StyledInput = styled.input`
 	background: transparent;
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 15px;
-	padding-bottom: ${getSpace(Size.M) / 2}px;
+	padding-bottom: ${getSpace(SpaceSize.M) / 2}px;
 	color: ${colors.grey36.toString()};
-	margin-bottom: ${getSpace(Size.L)}px;
+	margin-bottom: ${getSpace(SpaceSize.L)}px;
 	transition: all 0.2s;
 
 	::-webkit-input-placeholder {
@@ -56,15 +56,15 @@ const StyledInput = styled.input`
 `;
 
 export const StringItem: React.StatelessComponent<StringItemProps> = props => {
-	const { className, handleChange, handleBlur, label, value } = props;
+	const { className, onChange, onBlur, label, value } = props;
 
 	return (
 		<StyledStringItem className={className}>
 			<label>
 				<StyledLabel>{label}</StyledLabel>
 				<StyledInput
-					onChange={handleChange}
-					onBlur={handleBlur}
+					onChange={onChange}
+					onBlur={onBlur}
 					type="textarea"
 					value={value}
 					placeholder="Type in"

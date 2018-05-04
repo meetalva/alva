@@ -14,6 +14,12 @@ import { Preferences } from './preferences';
 import { Project } from './project';
 import { Styleguide } from './styleguide/styleguide';
 
+export enum AlvaView {
+	Pages = 'Pages',
+	PageDetail = 'PageDetail',
+	SplashScreen = 'SplashScreen'
+}
+
 export enum RightPane {
 	Patterns = 'Patterns',
 	Properties = 'Properties'
@@ -29,6 +35,11 @@ export class Store {
 	 * The store singleton instance.
 	 */
 	private static INSTANCE: Store;
+
+	/**
+	 * The current state of the Page Overview
+	 */
+	@MobX.observable private activeView: AlvaView = AlvaView.PageDetail;
 
 	/**
 	 * The name of the analyzer that should be used for the open styleguide.
@@ -281,6 +292,10 @@ export class Store {
 				.getProject()
 				.getName()}', page '${pageRef.getName()}', giving up`
 		);
+	}
+
+	public getActiveView(): AlvaView {
+		return this.activeView;
 	}
 
 	/**
@@ -805,6 +820,10 @@ export class Store {
 	 */
 	private savePreferences(): void {
 		Persister.saveYaml(this.getPreferencesPath(), this.preferences.toJsonObject());
+	}
+
+	public setActiveView(view: AlvaView): void {
+		this.activeView = view;
 	}
 
 	/**

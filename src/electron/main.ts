@@ -15,7 +15,7 @@ const APP_ENTRY = require.resolve('./renderer');
 const RENDERER_DOCUMENT = `<!doctype html>
 <html>
 <body>
-	<div id="app"></div>
+	<div id="app" style="overflow: hidden; width: 100%; height: 100%;"></div>
 	<script>require('${stringEscape(APP_ENTRY)}')</script>
 </body>
 </html>`;

@@ -1,11 +1,10 @@
 import Button, { Order } from '../../lsg/patterns/button';
 import { colors } from '../../lsg/patterns/colors';
-import Copy, { Size as CopySize } from '../../lsg/patterns/copy';
+import Copy, { CopySize } from '../../lsg/patterns/copy';
 import { Headline } from '../../lsg/patterns/headline';
 import Link from '../../lsg/patterns/link';
 import * as React from 'react';
-import Space, { Size as SpaceSize } from '../../lsg/patterns/space';
-// tslint:disable-next-line
+import Space, { SpaceSize } from '../../lsg/patterns/space';
 import SplashScreenContainer from '../../lsg/patterns/splash-screen';
 
 export interface SplashScreenProps {
@@ -28,7 +27,7 @@ export function SplashScreen(props: SplashScreenProps): JSX.Element {
 				</Copy>
 			</Space>
 			<Space sizeBottom={SpaceSize.S}>
-				<Button handleClick={props.onPrimaryButtonClick} order={Order.Primary}>
+				<Button onClick={props.onPrimaryButtonClick} order={Order.Primary}>
 					Create new Alva space
 				</Button>
 			</Space>

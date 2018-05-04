@@ -30,13 +30,6 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 	@MobX.observable protected isOpen = false;
 	protected lastCommand: PropertyValueCommand;
 
-	public constructor(props: PropertyTreeProps) {
-		super(props);
-
-		this.handleClick = this.handleClick.bind(this);
-		this.handleChange = this.handleChange.bind(this);
-	}
-
 	protected convertOptionsToValues(options: Option[]): Values[] {
 		return options.map(option => ({
 			id: option.getId(),
@@ -136,7 +129,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 									key={id}
 									label={name}
 									checked={value as boolean}
-									handleChange={event => this.handleChange(id, !value, context)}
+									onChange={event => this.handleChange(id, !value, context)}
 								/>
 							);
 
@@ -146,10 +139,10 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 									key={id}
 									label={name}
 									value={value as string}
-									handleChange={event =>
+									onChange={event =>
 										this.handleChange(id, event.currentTarget.value, context)
 									}
-									handleBlur={event => this.handleBlur()}
+									onBlur={event => this.handleBlur()}
 								/>
 							);
 
@@ -165,7 +158,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 									label={name}
 									selectedValue={option && option.getId()}
 									values={this.convertOptionsToValues(options)}
-									handleChange={event =>
+									onChange={event =>
 										this.handleChange(id, event.currentTarget.value, context)
 									}
 								/>
@@ -179,11 +172,11 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 									label={name}
 									inputValue={src && !src.startsWith('data:') ? src : ''}
 									imageSrc={src}
-									handleInputChange={event =>
+									onInputChange={event =>
 										this.handleChange(id, event.currentTarget.value, context)
 									}
-									handleChooseClick={event => this.handleChooseAsset(id, context)}
-									handleClearClick={event => this.handleChange(id, undefined, context)}
+									onChooseClick={event => this.handleChooseAsset(id, context)}
+									onClearClick={event => this.handleChange(id, undefined, context)}
 								/>
 							);
 

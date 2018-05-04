@@ -73,7 +73,7 @@ const StyledTitle = (props: StyledPreviewTitleProps): JSX.Element => {
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	`;
-	return <Strong>{props.children}</Strong>;
+	return <Strong data-title={true}>{props.children}</Strong>;
 };
 
 const StyledEditableTitle = styled(Input)`
@@ -145,7 +145,7 @@ export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): 
 				value={props.value}
 			/>
 		) : (
-			<StyledTitle data-title={true} focusable={props.focused} named={props.named}>
+			<StyledTitle focusable={props.focused} named={props.named}>
 				{props.value}
 			</StyledTitle>
 		)}

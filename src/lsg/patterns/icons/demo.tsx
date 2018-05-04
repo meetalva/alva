@@ -1,5 +1,5 @@
 import DemoContainer from '../demo-container';
-import { Icon, IconName, IconRegistry, reduce, IconSize } from './index';
+import { Icon, IconName, IconRegistry, IconSize, reduce } from './index';
 import * as React from 'react';
 import styled from 'styled-components';
 

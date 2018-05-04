@@ -31,6 +31,11 @@ export class PageElement {
 	@MobX.observable private contents: Map<string, PageElement[]> = new Map();
 
 	/**
+	 * The currently edited name of the page element, to be commited
+	 */
+	@MobX.observable private editedName: string;
+
+	/**
 	 * The technical (internal) ID of the page element.
 	 */
 	@MobX.observable private id: string;
@@ -39,6 +44,11 @@ export class PageElement {
 	 * The assigned name of the page element, initially the pattern's human-friendly name.
 	 */
 	@MobX.observable private name: string;
+
+	/**
+	 * Wether the element name is editable
+	 */
+	@MobX.observable private nameEditable: boolean;
 
 	/**
 	 * The page this element belongs to.
@@ -89,6 +99,7 @@ export class PageElement {
 		this.pattern = properties.pattern;
 		this.patternId = this.pattern ? this.pattern.getId() : undefined;
 		this.parentSlotId = properties.parentSlotId;
+		this.nameEditable = false;
 
 		if (this.name === undefined && this.pattern) {
 			this.name = this.pattern.getName();
@@ -243,9 +254,9 @@ export class PageElement {
 	 * Returns the 0-based position of this element within its parent slot.
 	 * @return The 0-based position of this element.
 	 */
-	public getIndex(): number {
+	public getIndex(): number | undefined {
 		if (!this.parent) {
-			throw new Error('This element has no parent');
+			return undefined;
 		}
 		return this.parent.getSlotContents(this.parentSlotId).indexOf(this);
 	}
@@ -254,7 +265,11 @@ export class PageElement {
 	 * Returns the assigned name of the page element, initially the pattern's human-friendly name.
 	 * @return The assigned name of the page element.
 	 */
-	public getName(): string {
+	public getName(opts?: { unedited: boolean }): string {
+		if ((!opts || !opts.unedited) && this.nameEditable) {
+			return this.editedName;
+		}
+
 		return this.name;
 	}
 
@@ -357,6 +372,14 @@ export class PageElement {
 	}
 
 	/**
+	 * Returns the editable state of the element's name
+	 * @return The editable state
+	 */
+	public isNameEditable(): boolean {
+		return this.nameEditable;
+	}
+
+	/**
 	 * Returns whether this page element is the page's root element (i.e. it has no parent).
 	 * @return Whether this page element is the root element.
 	 */
@@ -405,7 +428,25 @@ export class PageElement {
 	 * @param name The assigned name of the page element.
 	 */
 	public setName(name: string): void {
-		this.name = name;
+		if (this.nameEditable) {
+			this.editedName = name;
+		} else {
+			this.name = name;
+		}
+	}
+
+	/**
+	 * Sets the editable state of the element's name
+	 * @param nameEditable Wether the name is editable
+	 */
+	public setNameEditable(nameEditable: boolean): void {
+		if (nameEditable) {
+			this.editedName = this.name;
+		} else {
+			this.name = this.editedName || this.name;
+		}
+
+		this.nameEditable = nameEditable;
 	}
 
 	/**

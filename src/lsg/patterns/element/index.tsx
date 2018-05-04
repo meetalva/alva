@@ -5,13 +5,22 @@ import { getSpace, Size } from '../space';
 import styled from 'styled-components';
 import { tag } from '../tag';
 
+export const ElementAnchors = {
+	element: 'data-element-id',
+	icon: 'data-icon',
+	label: 'data-element-label',
+	placeholder: 'data-element-placeholder'
+};
+
 export interface ElementProps {
 	active?: boolean;
 	draggable?: boolean;
 	dragging: boolean;
+	editable?: boolean;
 	highlight?: boolean;
 	highlightPlaceholder?: boolean;
 	id?: string;
+	onChange?: React.FormEventHandler<HTMLInputElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onContextMenu?: React.MouseEventHandler<HTMLElement>;
 	onDragDrop?: React.DragEventHandler<HTMLElement>;
@@ -57,9 +66,6 @@ const div = tag('div').omit(['active', 'highlight']);
 const StyledElementLabel = styled(div)`
 	position: relative;
 	display: flex;
-	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px ${getSpace(
-	Size.XXL
-)}px;
 	align-items: center;
 	color: ${colors.grey20.toString()};
 	position: relative;
@@ -189,11 +195,69 @@ const StyledIcon = styled(Icon)`
 	${(props: StyledIconProps) => (props.active ? `fill: ${colors.blue20.toString()}` : '')};
 `;
 
+const LabelContent = styled.div`
+	box-sizing: border-box;
+	margin-left: ${getSpace(Size.XXL) - 3}px;
+	overflow: hidden;
+	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px 3px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+`;
+
+const StyledSeamlessInput = styled.input`
+	box-sizing: border-box;
+	width: 100%;
+	color: ${colors.grey20.toString()};
+	font-size: inherit;
+	line-height: inherit;
+	padding: ${getSpace(Size.XS - 1)}px ${getSpace(Size.L - 1)}px ${getSpace(Size.XS - 1)}px 3px;
+	margin: 1px 1px 1px ${getSpace(Size.XXL - 3)}px;
+	border: 0;
+	&:focus {
+		outline: none;
+	}
+`;
+
+interface SeamlessInputProps {
+	autoFocus?: boolean;
+	autoSelect?: boolean;
+	onChange?: React.FormEventHandler<HTMLInputElement>;
+	value: string;
+}
+
+class SeamlessInput extends React.Component<SeamlessInputProps> {
+	private ref: HTMLInputElement | null = null;
+
+	public componentDidMount(): void {
+		if (this.ref !== null && this.props.autoSelect && this.props.autoFocus) {
+			const ref = this.ref as HTMLInputElement;
+			ref.setSelectionRange(0, this.props.value.length);
+		}
+	}
+
+	public render(): JSX.Element {
+		const { props } = this;
+		return (
+			<StyledSeamlessInput
+				autoFocus={props.autoFocus}
+				innerRef={ref => (this.ref = ref)}
+				value={props.value}
+				onChange={props.onChange}
+			/>
+		);
+	}
+}
+
 const Element: React.StatelessComponent<ElementProps> = props => (
-	<StyledElement draggable={props.draggable} data-id={props.id} onClick={props.onClick}>
+	<StyledElement
+		{...{ [ElementAnchors.element]: props.id }}
+		draggable={props.draggable}
+		onClick={props.onClick}
+	>
 		{props.dragging && (
 			<StyledPlaceholder
-				data-element-placeholder
+				{...{ [ElementAnchors.placeholder]: true }}
 				highlightPlaceholder={props.highlightPlaceholder}
 				onDragOver={(e: React.DragEvent<HTMLElement>) => {
 					e.preventDefault();
@@ -204,7 +268,6 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 			/>
 		)}
 		<StyledElementLabel
-			data-element-label
 			active={props.active}
 			highlight={props.highlight}
 			onContextMenu={props.onContextMenu}
@@ -226,7 +289,17 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 						active={props.active}
 					/>
 				)}
-			<div>{props.title}</div>
+			{props.editable ? (
+				<SeamlessInput
+					{...{ [ElementAnchors.label]: true }}
+					value={props.title}
+					onChange={props.onChange}
+					autoFocus
+					autoSelect
+				/>
+			) : (
+				<LabelContent {...{ [ElementAnchors.label]: true }}>{props.title}</LabelContent>
+			)}
 		</StyledElementLabel>
 		{props.children && (
 			<StyledElementChild open={props.open}>{props.children}</StyledElementChild>

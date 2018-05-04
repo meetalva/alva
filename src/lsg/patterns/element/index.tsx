@@ -197,9 +197,12 @@ const StyledIcon = styled(Icon)`
 
 const LabelContent = styled.div`
 	box-sizing: border-box;
-	width: 100%;
 	margin-left: ${getSpace(Size.XXL) - 3}px;
+	overflow: hidden;
 	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px 3px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
 `;
 
 const StyledSeamlessInput = styled.input`

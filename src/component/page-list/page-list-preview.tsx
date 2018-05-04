@@ -13,9 +13,9 @@ export const PageListPreview: React.StatelessComponent = props => {
 	}
 	const dateString = new Intl.DateTimeFormat().format(project.getLastChangedDate());
 	return (
-		<Space size={[SpaceSize.XXXL, SpaceSize.XL, SpaceSize.XS, SpaceSize.XL]}>
+		<Space size={[SpaceSize.XXL * 3]}>
 			<Space size={[SpaceSize.S, SpaceSize.S, SpaceSize.XXXL]}>
-				<Headline order={3} tagName="h1">
+				<Headline order={1} tagName="h1" textColor={colors.grey20}>
 					{project.getName()}
 				</Headline>
 				<Copy textColor={colors.grey60}>

@@ -76,16 +76,18 @@ const StyledPreviewPane = BaseStyledPreviewPane.extend.attrs({
 })`${(props: PreviewPaneProps) => ({})}`;
 
 export default class PreviewPane extends React.Component<PreviewPaneProps> {
+	private onResize: () => void;
 	private previewPane: HTMLElement;
-
-	public constructor(props: PreviewPaneProps) {
-		super(props);
-	}
 
 	public componentDidMount(): void {
 		this.updatePreviewWidth();
 
-		remote.getCurrentWindow().addListener('resize', this.updatePreviewWidth.bind(this));
+		this.onResize = () => this.updatePreviewWidth();
+		remote.getCurrentWindow().addListener('resize', this.onResize);
+	}
+
+	public componentWillUnmount(): void {
+		remote.getCurrentWindow().removeListener('resize', this.onResize);
 	}
 
 	public render(): JSX.Element {

@@ -64,18 +64,24 @@ const StyledTitle = styled.strong`
 	margin-bottom: ${getSpace(SpaceSize.S)}px;
 	font-size: 12px;
 	font-weight: normal;
+	text-align: center;
 	color: ${(props: StyledPreviewTitleProps) =>
 		props.named ? colors.black.toString() : colors.grey80.toString()};
 	cursor: ${props => (props.focusable ? 'text' : 'default')};
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 `;
 
 const StyledEditableTitle = styled(Input)`
 	display: inline-block;
-	padding: 0;
-	margin: 0 0 ${getSpace(SpaceSize.S)}px 0;
+	width: 100%;
 	font-size: 12px;
 	font-weight: normal;
 	text-align: center;
+	margin: 0;
+	margin-bottom: ${getSpace(SpaceSize.S + 3)}px;
+	padding: 0;
 	::placeholder {
 		color: ${colors.grey60.toString()};
 	}

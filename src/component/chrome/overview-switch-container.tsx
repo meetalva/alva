@@ -2,29 +2,21 @@ import { observer } from 'mobx-react';
 import { Project } from '../../store/project';
 import * as React from 'react';
 import { Store } from '../../store/store';
-import { ViewSwitch } from '../../lsg/patterns/view-switch';
+import { ViewButton } from '../../lsg/patterns/view-switch';
 
 @observer
 export class OverviewSwitchContainer extends React.Component {
-	protected getName(): string {
+	public render(): JSX.Element | null {
 		const store = Store.getInstance();
 		const project: Project | undefined = store.getCurrentProject();
-		if (store.pageOverviewIsOpened) {
-			return 'Pages';
-		} else {
-			return project ? project.getName() : 'Unnamed Project';
-		}
-	}
+		const page = store.getCurrentPage();
 
-	public render(): JSX.Element {
-		const store = Store.getInstance();
-		return (
-			<ViewSwitch
-				onLeftClick={() => store.togglePageOverview()}
-				leftVisible={true}
-				rightVisible={false}
-				title={`${this.getName()} Overview`}
-			/>
-		);
+		if (!project || !page) {
+			return null;
+		}
+
+		const title = store.pageOverviewIsOpened ? `Show "${page.getName()}"` : 'Pages';
+
+		return <ViewButton onClick={() => store.togglePageOverview()} title={title} />;
 	}
 }

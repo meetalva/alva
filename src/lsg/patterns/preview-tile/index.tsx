@@ -37,6 +37,7 @@ interface StyledPreviewTileProps {
 }
 
 interface StyledPreviewTitleProps {
+	children: React.ReactNode;
 	focusable: boolean;
 	named: boolean;
 }
@@ -58,20 +59,22 @@ const StyledPreviewTile = styled.div`
 	background-color: ${colors.white.toString()};
 `;
 
-const StyledTitle = styled.strong`
-	display: inline-block;
-	width: 100%;
-	margin-bottom: ${getSpace(SpaceSize.S)}px;
-	font-size: 12px;
-	font-weight: normal;
-	text-align: center;
-	color: ${(props: StyledPreviewTitleProps) =>
-		props.named ? colors.black.toString() : colors.grey80.toString()};
-	cursor: ${props => (props.focusable ? 'text' : 'default')};
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-`;
+const StyledTitle = (props: StyledPreviewTitleProps): JSX.Element => {
+	const Strong = styled.strong`
+		display: inline-block;
+		width: 100%;
+		margin-bottom: ${getSpace(SpaceSize.S)}px;
+		font-size: 12px;
+		font-weight: normal;
+		text-align: center;
+		color: ${props.named ? colors.black.toString() : colors.grey80.toString()};
+		cursor: ${props.focusable ? 'text' : 'default'};
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	`;
+	return <Strong>{props.children}</Strong>;
+};
 
 const StyledEditableTitle = styled(Input)`
 	display: inline-block;

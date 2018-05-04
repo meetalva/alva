@@ -273,14 +273,6 @@ export class PageElement {
 	}
 
 	/**
-	 * Returns the editable state of the element's name
-	 * @return The editable state
-	 */
-	public getNameEditable(): boolean {
-		return this.nameEditable;
-	}
-
-	/**
 	 * Returns the page this element belongs to.
 	 * @return The page this element belongs to.
 	 */
@@ -376,6 +368,14 @@ export class PageElement {
 	 */
 	public isDescendentOf(parent?: PageElement): boolean {
 		return parent ? parent.isAncestorOf(this) : false;
+	}
+
+	/**
+	 * Returns the editable state of the element's name
+	 * @return The editable state
+	 */
+	public isNameEditable(): boolean {
+		return this.nameEditable;
 	}
 
 	/**

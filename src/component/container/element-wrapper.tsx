@@ -10,6 +10,7 @@ export interface ElementWrapperState {
 
 export interface ElementWrapperProps {
 	active?: boolean;
+	draggable: boolean;
 	dragging: boolean;
 	editable?: boolean;
 	id: string;
@@ -109,7 +110,7 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 			<Element
 				active={active}
 				dragging={this.props.dragging}
-				draggable
+				draggable={this.props.draggable}
 				editable={this.props.editable}
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}

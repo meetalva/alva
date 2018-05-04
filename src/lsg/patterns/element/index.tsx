@@ -123,12 +123,6 @@ const StyledElementLabel = styled(div)`
 			: ''};
 `;
 
-const LabelContent = styled.div`
-	box-sizing: border-box;
-	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px
-		${getSpace(Size.XXL)}px;
-`;
-
 const placeholderDiv = tag('div').omit(['highlightPlaceholder']);
 const StyledPlaceholder = styled(placeholderDiv)`
 	position: relative;
@@ -201,6 +195,13 @@ const StyledIcon = styled(Icon)`
 	${(props: StyledIconProps) => (props.active ? `fill: ${colors.blue20.toString()}` : '')};
 `;
 
+const LabelContent = styled.div`
+	box-sizing: border-box;
+	width: 100%;
+	margin-left: ${getSpace(Size.XXL) - 3}px;
+	padding: ${getSpace(Size.XS)}px ${getSpace(Size.L)}px ${getSpace(Size.XS)}px 3px;
+`;
+
 const StyledSeamlessInput = styled.input`
 	box-sizing: border-box;
 	width: 100%;
@@ -264,7 +265,6 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 			/>
 		)}
 		<StyledElementLabel
-			{...{ [ElementAnchors.label]: true }}
 			active={props.active}
 			highlight={props.highlight}
 			onContextMenu={props.onContextMenu}
@@ -287,9 +287,15 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 					/>
 				)}
 			{props.editable ? (
-				<SeamlessInput value={props.title} onChange={props.onChange} autoFocus autoSelect />
+				<SeamlessInput
+					{...{ [ElementAnchors.label]: true }}
+					value={props.title}
+					onChange={props.onChange}
+					autoFocus
+					autoSelect
+				/>
 			) : (
-				<LabelContent>{props.title}</LabelContent>
+				<LabelContent {...{ [ElementAnchors.label]: true }}>{props.title}</LabelContent>
 			)}
 		</StyledElementLabel>
 		{props.children && (

@@ -1,8 +1,9 @@
 import { colors } from '../../lsg/patterns/colors';
 import { elementMenu } from '../../electron/context-menus';
+import { ElementAnchors, ElementProps } from '../../lsg/patterns/element';
 import { ElementLocationCommand } from '../../store/command/element-location-command';
+import { ElementNameCommand } from '../../store/command/element-name-command';
 import { ElementWrapper } from './element-wrapper';
-import { ListItemProps } from '../../lsg/patterns/list';
 import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';
 import { Page } from '../../store/page/page';
@@ -11,6 +12,7 @@ import { Pattern } from '../../store/styleguide/pattern';
 import * as React from 'react';
 import { Slot } from '../../store/styleguide/slot';
 import { Store } from '../../store/store';
+import { Styleguide } from '../../store/styleguide/styleguide';
 import * as uuid from 'uuid';
 
 export interface ElementListState {
@@ -31,6 +33,8 @@ const DRAG_IMG_STYLE = `
 @observer
 export class ElementList extends React.Component<{}, ElementListState> {
 	private dragImg?: HTMLElement;
+	private globalKeyDownListener?: (e: KeyboardEvent) => void;
+	private ref: HTMLElement | null;
 
 	public state = {
 		dragging: true
@@ -38,6 +42,15 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 	public componentDidMount(): void {
 		createMenu();
+
+		this.globalKeyDownListener = e => this.handleKeyDown(e);
+		window.addEventListener('keydown', this.globalKeyDownListener);
+	}
+
+	public componentWillUnmount(): void {
+		if (this.globalKeyDownListener) {
+			window.removeEventListener('keydown', this.globalKeyDownListener);
+		}
 	}
 
 	public componentWillUpdate(): void {
@@ -45,7 +58,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	public createItemFromElement(
-		key: string,
 		element: PageElement,
 		selectedElement?: PageElement
 	): ElementNodeProps {
@@ -54,10 +66,10 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		if (!pattern) {
 			return {
-				label: key,
 				title: '(invalid)',
 				id: uuid.v4(),
 				children: [],
+				draggable: false,
 				dragging: this.state.dragging
 			};
 		}
@@ -76,84 +88,11 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		});
 
 		return {
-			label: key,
 			title: element.getName(),
+			draggable: !element.isNameEditable(),
 			dragging: this.state.dragging,
+			editable: element.isNameEditable(),
 			id: element.getId(),
-			onDragDropForChild: (e: React.DragEvent<HTMLElement>) => {
-				this.handleDragEnd(e);
-				const patternId = e.dataTransfer.getData('patternId');
-
-				const newParent = element.getParent();
-				let draggedElement: PageElement | undefined;
-
-				if (!patternId) {
-					draggedElement = store.getDraggedElement();
-				} else {
-					const styleguide = store.getStyleguide();
-					if (!styleguide) {
-						return;
-					}
-
-					draggedElement = new PageElement({
-						pattern: styleguide.getPattern(patternId),
-						setDefaults: true
-					});
-				}
-
-				if (!newParent || !draggedElement || draggedElement.isAncestorOf(newParent)) {
-					return;
-				}
-
-				let newIndex = element.getIndex();
-				if (draggedElement.getParent() === newParent) {
-					const currentIndex = draggedElement.getIndex();
-					if (newIndex > currentIndex) {
-						newIndex--;
-					}
-					if (newIndex === currentIndex) {
-						return;
-					}
-				}
-
-				store.execute(
-					ElementLocationCommand.addChild(
-						newParent,
-						draggedElement,
-						element.getParentSlotId(),
-						newIndex
-					)
-				);
-				store.setSelectedElement(draggedElement);
-			},
-			onDragDrop: (e: React.DragEvent<HTMLElement>) => {
-				this.handleDragEnd(e);
-				const patternId = e.dataTransfer.getData('patternId');
-
-				let draggedElement: PageElement | undefined;
-
-				if (!patternId) {
-					draggedElement = store.getDraggedElement();
-				} else {
-					const styleguide = store.getStyleguide();
-
-					if (!styleguide) {
-						return;
-					}
-
-					draggedElement = new PageElement({
-						pattern: styleguide.getPattern(patternId),
-						setDefaults: true
-					});
-				}
-
-				if (!draggedElement || draggedElement.isAncestorOf(element)) {
-					return;
-				}
-
-				store.execute(ElementLocationCommand.addChild(element, draggedElement));
-				store.setSelectedElement(draggedElement);
-			},
 			children: [...slots, ...defaultSlotItems],
 			active: element === selectedElement && !store.getSelectedSlotId()
 		};
@@ -171,30 +110,17 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		const selectedSlot = store.getSelectedSlotId();
 
 		slotContents.forEach((value: PageElement, index: number) => {
-			childItems.push(
-				this.createItemFromElement(
-					slotContents.length > 1 ? `Child ${index + 1}` : 'Child',
-					value,
-					selectedElement
-				)
-			);
+			childItems.push(this.createItemFromElement(value, selectedElement));
 		});
-
-		const updateSelectedSlot: React.MouseEventHandler<HTMLElement> = event => {
-			event.stopPropagation();
-			store.setSelectedElement(element);
-			store.setSelectedSlot(slotId);
-			store.setElementFocussed(false);
-		};
 
 		const slotListItem: ElementNodeProps = {
 			id: slot.getId(),
 			title: `\uD83D\uDD18 ${slot.getName()}`,
+			editable: false,
 			draggable: false,
 			dragging: this.state.dragging,
 			children: childItems,
-			label: slotId,
-			onClick: updateSelectedSlot,
+			// TODO: Unify this with the event-delegation based drag/drop handling
 			onDragDrop: (e: React.DragEvent<HTMLElement>) => {
 				const patternId = e.dataTransfer.getData('patternId');
 
@@ -228,11 +154,35 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		return slotListItem;
 	}
 
+	private handleBlur(e: React.FormEvent<HTMLElement>): void {
+		const store = Store.getInstance();
+		const editableElement = store.getNameEditableElement();
+
+		if (editableElement) {
+			store.execute(new ElementNameCommand(editableElement, editableElement.getName()));
+			store.setNameEditableElement();
+		}
+	}
+
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const element = elementFromTarget(e.target);
+		const store = Store.getInstance();
+		const label = above(e.target, `[${ElementAnchors.label}]`);
+
+		if (!element) {
+			return;
+		}
+
 		e.stopPropagation();
-		Store.getInstance().setSelectedElement(element);
-		Store.getInstance().setElementFocussed(true);
+
+		if (store.getSelectedElement() === element && label) {
+			store.setNameEditableElement(element);
+		}
+
+		if (store.getSelectedElement() !== element) {
+			store.setSelectedElement(element);
+			store.setElementFocussed(true);
+		}
 	}
 
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
@@ -254,14 +204,109 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		this.setState({ dragging: true });
 		const element = elementFromTarget(e.target);
 
-		if (element) {
-			Store.getInstance().setDraggedElement(element);
-			const dragImg = document.createElement('div');
-			dragImg.textContent = element.getName();
-			dragImg.setAttribute('style', DRAG_IMG_STYLE);
-			document.body.appendChild(dragImg);
-			e.dataTransfer.setDragImage(dragImg, 75, 15);
-			this.dragImg = dragImg;
+		if (!element) {
+			return;
+		}
+
+		if (element.isNameEditable()) {
+			return;
+		}
+
+		Store.getInstance().setDraggedElement(element);
+		const dragImg = document.createElement('div');
+		dragImg.textContent = element.getName();
+		dragImg.setAttribute('style', DRAG_IMG_STYLE);
+		document.body.appendChild(dragImg);
+		e.dataTransfer.setDragImage(dragImg, 75, 15);
+		this.dragImg = dragImg;
+	}
+
+	private handleDrop(e: React.DragEvent<HTMLElement>): void {
+		this.handleDragEnd(e);
+
+		const store = Store.getInstance();
+		const styleguide = store.getStyleguide() as Styleguide;
+		const patternId = e.dataTransfer.getData('patternId');
+		const dropTargetElement = elementFromTarget(e.target);
+		const newParent = dropTargetElement ? dropTargetElement.getParent() : undefined;
+		const isPlaceholder =
+			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
+
+		const draggedElement =
+			store.getDraggedElement() ||
+			new PageElement({
+				pattern: styleguide.getPattern(patternId),
+				setDefaults: true
+			});
+
+		// TODO: The ancestor check should be performed for drag starts to show no drop
+		// indication for impossible drop operations
+		if (!dropTargetElement || !newParent || draggedElement.isAncestorOf(newParent)) {
+			return;
+		}
+
+		if (isPlaceholder) {
+			const dropIndex = calculateDropIndex(dropTargetElement, draggedElement);
+
+			if (dropIndex === draggedElement.getIndex()) {
+				return;
+			}
+
+			store.execute(
+				ElementLocationCommand.addChild(
+					newParent,
+					draggedElement,
+					dropTargetElement.getParentSlotId(),
+					dropIndex
+				)
+			);
+		} else {
+			store.execute(ElementLocationCommand.addChild(dropTargetElement, draggedElement));
+		}
+
+		store.setSelectedElement(draggedElement);
+	}
+
+	private handleKeyDown(e: KeyboardEvent): void {
+		const store = Store.getInstance();
+		const node = e.target as Node;
+		const contains = (target: Node) => (this.ref ? this.ref.contains(target) : false);
+
+		// Only handle key events if either
+		// (1) it is global, thus fires on body
+		// (2) is a node inside the page element list
+		if (e.target !== document.body && !contains(node)) {
+			return;
+		}
+
+		switch (e.keyCode) {
+			case 13: {
+				// ENTER
+				e.stopPropagation();
+
+				const editableElement = store.getNameEditableElement();
+				const selectedElement = store.getSelectedElement();
+
+				if (editableElement) {
+					store.execute(new ElementNameCommand(editableElement, editableElement.getName()));
+					store.setNameEditableElement();
+				} else {
+					store.setNameEditableElement(selectedElement);
+				}
+				break;
+			}
+			case 27: {
+				// ESC
+				e.stopPropagation();
+
+				const editableElement = store.getNameEditableElement();
+
+				if (editableElement) {
+					const name = editableElement.getName({ unedited: true });
+					store.setNameEditableElement();
+					editableElement.setName(name);
+				}
+			}
 		}
 	}
 
@@ -288,17 +333,21 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		}
 
 		const selectedElement = store.getSelectedElement();
-		const item = this.createItemFromElement('Root', rootElement, selectedElement);
+		const item = this.createItemFromElement(rootElement, selectedElement);
 
 		return (
 			<div
 				data-drag-root
+				onBlur={e => this.handleBlur(e)}
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
-				onDragStart={e => this.handleDragStart(e)}
 				onDragEnd={e => this.handleDragEnd(e)}
-				onMouseOver={e => this.handleMouseOver(e)}
+				onDragStart={e => this.handleDragStart(e)}
+				onDrop={e => this.handleDrop(e)}
+				onKeyDown={e => this.handleKeyDown(e.nativeEvent)}
 				onMouseLeave={e => this.handleMouseLeave(e)}
+				onMouseOver={e => this.handleMouseOver(e)}
+				ref={ref => (this.ref = ref)}
 			>
 				<ElementTree {...item} dragging={this.state.dragging} />
 			</div>
@@ -306,8 +355,9 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 }
 
-export interface ElementNodeProps extends ListItemProps {
+export interface ElementNodeProps extends ElementProps {
 	children?: ElementNodeProps[];
+	draggable: boolean;
 	dragging: boolean;
 	id: string;
 }
@@ -345,13 +395,13 @@ function above(node: EventTarget, selector: string): HTMLElement | null {
 }
 
 function elementFromTarget(target: EventTarget): PageElement | undefined {
-	const el = above(target, '[data-id]');
+	const el = above(target, `[${ElementAnchors.element}]`);
 
 	if (!el) {
 		return;
 	}
 
-	const id = el.getAttribute('data-id');
+	const id = el.getAttribute(ElementAnchors.element);
 
 	if (typeof id !== 'string') {
 		return;
@@ -365,4 +415,28 @@ function elementFromTarget(target: EventTarget): PageElement | undefined {
 	}
 
 	return page.getElementById(id);
+}
+
+function calculateDropIndex(target: PageElement, dragged: PageElement): number {
+	// We definitely know the drop target has a parent, thus an index
+	const newIndex = target.getIndex() as number;
+
+	// The dragged element is dropped into another
+	// leaf list than it was dragged from.
+	// True for (1) new elements, (2) elements dragged to other parents
+	if (dragged.getParent() !== target.getParent()) {
+		return newIndex;
+	}
+
+	// If the dragged element has a parent, it has an index
+	const currentIndex = dragged.getParent() ? (dragged.getIndex() as number) : -1;
+
+	// The dragged element is dropped in the same leaf
+	// list as it was dragged from.
+	// Offset the index by the element itself missing from the new list.
+	if (newIndex > currentIndex) {
+		return newIndex - 1;
+	}
+
+	return newIndex;
 }

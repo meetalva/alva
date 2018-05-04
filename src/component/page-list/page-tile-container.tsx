@@ -47,7 +47,9 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		const store = Store.getInstance();
 		store.openPage(this.props.page.getId());
 
-		if (this.props.focused) {
+		const target = e.target as HTMLElement;
+
+		if (this.props.focused && target.matches('[data-title]')) {
 			this.inputValue = this.props.page.getName();
 			this.editable = true;
 		}

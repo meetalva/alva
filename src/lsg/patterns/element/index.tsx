@@ -45,6 +45,10 @@ interface StyledIconProps {
 	open?: boolean;
 }
 
+interface LabelContentProps {
+	active?: boolean;
+}
+
 export interface StyledElementChildProps {
 	open?: boolean;
 }
@@ -203,6 +207,7 @@ const LabelContent = styled.div`
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	width: 100%;
+	cursor: ${(props: LabelContentProps) => (props.active ? 'text' : 'default')};
 `;
 
 const StyledSeamlessInput = styled.input`
@@ -299,7 +304,9 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 					autoSelect
 				/>
 			) : (
-				<LabelContent {...{ [ElementAnchors.label]: true }}>{props.title}</LabelContent>
+				<LabelContent active={props.active} {...{ [ElementAnchors.label]: true }}>
+					{props.title}
+				</LabelContent>
 			)}
 		</StyledElementLabel>
 		{props.children && (

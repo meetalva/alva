@@ -56,7 +56,6 @@ const StyledPreviewTile = styled.div`
 	border-radius: 5px;
 	box-shadow: 0 3px 12px ${colors.blackAlpha13.toString()};
 	background-color: ${colors.white.toString()};
-	cursor: pointer;
 `;
 
 const StyledTitle = styled.strong`
@@ -67,7 +66,7 @@ const StyledTitle = styled.strong`
 	font-weight: normal;
 	color: ${(props: StyledPreviewTitleProps) =>
 		props.named ? colors.black.toString() : colors.grey80.toString()};
-	cursor: ${props => (props.focusable ? 'text' : 'pointer')};
+	cursor: ${props => (props.focusable ? 'text' : 'default')};
 `;
 
 const StyledEditableTitle = styled(Input)`
@@ -128,6 +127,7 @@ export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): 
 			<EditableTitle
 				autoFocus={props.editable}
 				autoSelect={props.editable}
+				data-title={true}
 				focused={props.focused}
 				onBlur={props.onBlur}
 				onChange={props.onChange}
@@ -136,7 +136,7 @@ export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): 
 				value={props.value}
 			/>
 		) : (
-			<StyledTitle focusable={props.focused} named={props.named}>
+			<StyledTitle data-title={true} focusable={props.focused} named={props.named}>
 				{props.value}
 			</StyledTitle>
 		)}

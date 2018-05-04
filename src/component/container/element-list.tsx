@@ -69,6 +69,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				title: '(invalid)',
 				id: uuid.v4(),
 				children: [],
+				draggable: false,
 				dragging: this.state.dragging
 			};
 		}
@@ -88,8 +89,9 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		return {
 			title: element.getName(),
+			draggable: !element.isNameEditable(),
 			dragging: this.state.dragging,
-			editable: element.getNameEditable(),
+			editable: element.isNameEditable(),
 			id: element.getId(),
 			children: [...slots, ...defaultSlotItems],
 			active: element === selectedElement && !store.getSelectedSlotId()
@@ -166,14 +168,23 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		const element = elementFromTarget(e.target);
 		const store = Store.getInstance();
 		const label = above(e.target, `[${ElementAnchors.label}]`);
+
+		console.log(element, label);
+
+		if (!element) {
+			return;
+		}
+
 		e.stopPropagation();
 
-		if (element && store.getSelectedElement() === element && label) {
+		if (store.getSelectedElement() === element && label) {
 			store.setNameEditableElement(element);
 		}
 
-		store.setSelectedElement(element);
-		store.setElementFocussed(true);
+		if (store.getSelectedElement() !== element) {
+			store.setSelectedElement(element);
+			store.setElementFocussed(true);
+		}
 	}
 
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
@@ -195,15 +206,21 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		this.setState({ dragging: true });
 		const element = elementFromTarget(e.target);
 
-		if (element) {
-			Store.getInstance().setDraggedElement(element);
-			const dragImg = document.createElement('div');
-			dragImg.textContent = element.getName();
-			dragImg.setAttribute('style', DRAG_IMG_STYLE);
-			document.body.appendChild(dragImg);
-			e.dataTransfer.setDragImage(dragImg, 75, 15);
-			this.dragImg = dragImg;
+		if (!element) {
+			return;
 		}
+
+		if (element.isNameEditable()) {
+			return;
+		}
+
+		Store.getInstance().setDraggedElement(element);
+		const dragImg = document.createElement('div');
+		dragImg.textContent = element.getName();
+		dragImg.setAttribute('style', DRAG_IMG_STYLE);
+		document.body.appendChild(dragImg);
+		e.dataTransfer.setDragImage(dragImg, 75, 15);
+		this.dragImg = dragImg;
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
@@ -342,6 +359,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 export interface ElementNodeProps extends ElementProps {
 	children?: ElementNodeProps[];
+	draggable: boolean;
 	dragging: boolean;
 	id: string;
 }

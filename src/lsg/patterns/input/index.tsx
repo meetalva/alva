@@ -22,14 +22,15 @@ export enum InputTypes {
 }
 
 const StyledInput = styled.input`
-	/* reset Styles */
-	-webkit-appearance: textfield;
 	outline: none;
-	border: none;
-	background: transparent;
+	border: 0.5px solid ${colors.grey90.toString()};
+	border-radius: 1px;
+	background: ${colors.white.toString()};
+
+	padding: ${getSpace(Size.XS)}px;
 
 	margin: 0 ${getSpace(Size.L)}px;
-	font-size: 15px;
+	font-size: 12px;
 
 	box-sizing: border-box;
 	display: block;
@@ -37,21 +38,16 @@ const StyledInput = styled.input`
 	color: ${colors.black.toString()};
 
 	font-weight: 500;
-	transition: color 0.2s;
+	transition: background-color 0.2s;
 
 	::placeholder {
 		color: ${colors.grey50.toString()};
-		transition: color 0.2s;
 	}
 
 	:hover {
 		::placeholder {
 			color: ${colors.black.toString()};
 		}
-	}
-
-	::-webkit-search-decoration {
-		display: none;
 	}
 `;
 

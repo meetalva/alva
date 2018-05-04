@@ -183,7 +183,6 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 										this.handleChange(id, event.currentTarget.value, context)
 									}
 									handleChooseClick={event => this.handleChooseAsset(id, context)}
-									handleClearClick={event => this.handleChange(id, undefined, context)}
 								/>
 							);
 

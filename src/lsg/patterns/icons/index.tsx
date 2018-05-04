@@ -3,7 +3,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export enum IconName {
-	Arrow,
+	ArrowRight,
+	ArrowLeft,
 	ArrowFillRight,
 	ArrowFillLeft,
 	Robo,
@@ -39,8 +40,21 @@ interface IconRegistrySymbolProps {
 }
 
 const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
-	[IconName.Arrow]: [
-		[<path key="arrow" d="M17.5 12l-8.486 8.485L7.6 19.071 14.671 12 7.6 4.929l1.414-1.414z" />]
+	[IconName.ArrowRight]: [
+		[
+			<path
+				key="arrowRight"
+				d="M17.5 12l-8.486 8.485L7.6 19.071 14.671 12 7.6 4.929l1.414-1.414z"
+			/>
+		]
+	],
+	[IconName.ArrowLeft]: [
+		[
+			<path
+				key="arrowLeft"
+				d="M7.5 12 15.986 3.515 17.4 4.929 10.329 12 17.4 19.071 15.986 20.485z"
+			/>
+		]
 	],
 	[IconName.ArrowFillRight]: [[<path key="arrowFillRight" d="M8 4l8 8-8 8z" />]],
 	[IconName.ArrowFillLeft]: [[<path key="arrowFillLeft" d="M16 20l-8-8 8-8v16z" />]],

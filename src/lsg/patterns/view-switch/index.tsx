@@ -56,7 +56,7 @@ const StyledTitle = styled.strong`
 `;
 
 const StyledIcons = styled(Icon)`
-	padding: ${getSpace(SpaceSize.XS)}px;
+	padding: ${getSpace(SpaceSize.XXS)}px;
 	border-radius: ${getSpace(SpaceSize.XXS)}px;
 	visibility: ${(props: StyledIconProps) => (props.visible ? 'visible' : 'hidden')};
 	cursor: pointer;
@@ -79,7 +79,7 @@ export const ViewSwitch: React.StatelessComponent<ViewSwitchProps> = (props): JS
 			color={colors.grey60}
 			handleClick={props.onLeftClick}
 			size={IconSize.XS}
-			name={IconName.ArrowFillLeft}
+			name={IconName.ArrowLeft}
 			visible={props.leftVisible}
 		/>
 		<StyledTitle>{props.title}</StyledTitle>
@@ -87,7 +87,7 @@ export const ViewSwitch: React.StatelessComponent<ViewSwitchProps> = (props): JS
 			color={colors.grey60}
 			handleClick={props.onRightClick}
 			size={IconSize.XS}
-			name={IconName.ArrowFillRight}
+			name={IconName.ArrowRight}
 			visible={props.rightVisible}
 		/>
 	</StyledViewSwitch>

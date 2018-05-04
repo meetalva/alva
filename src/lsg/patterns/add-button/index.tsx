@@ -78,7 +78,7 @@ const AddButton: React.StatelessComponent<AddButtonProps> = props => (
 		<StyledLabelWrapper>{props.label}</StyledLabelWrapper>
 
 		<StyledIconWrapper>
-			<StyledIcon active={props.active} size={IconSize.XS} name={IconName.Arrow} />
+			<StyledIcon active={props.active} size={IconSize.XS} name={IconName.ArrowRight} />
 		</StyledIconWrapper>
 	</StyledAddButton>
 );

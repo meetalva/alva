@@ -219,7 +219,7 @@ const Element: React.StatelessComponent<ElementProps> = props => (
 				props.children.length > 0 && (
 					<StyledIcon
 						dataIcon={props.id}
-						name={IconName.Arrow}
+						name={IconName.ArrowFillRight}
 						size={IconSize.XXS}
 						color={colors.grey60}
 						open={props.open}

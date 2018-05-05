@@ -27,7 +27,8 @@ export class Highlight extends React.Component {
 					opacity: highlightProps.opacity,
 					right: highlightProps.right,
 					top: highlightProps.top,
-					width: highlightProps.width
+					width: highlightProps.width,
+					pointerEvents: 'none'
 				}}
 			/>
 		);

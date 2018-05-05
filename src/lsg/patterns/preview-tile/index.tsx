@@ -5,18 +5,22 @@ import * as ReactDOM from 'react-dom';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
+export enum EditState {
+	Editable = 'Editable',
+	Editing = 'Editing'
+}
+
 export interface PreviewTileProps {
-	editable: boolean;
 	focused: boolean;
 	id?: string;
-	named: boolean;
+	name: string;
+	nameState: EditState;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 	onFocus?: React.FocusEventHandler<HTMLInputElement>;
 	onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
-	value: string;
 }
 
 interface EditableTitleProps {
@@ -38,8 +42,7 @@ interface StyledPreviewTileProps {
 
 interface StyledPreviewTitleProps {
 	children: React.ReactNode;
-	focusable: boolean;
-	named: boolean;
+	editable: boolean;
 }
 
 const StyledPreview = styled.section`
@@ -67,8 +70,7 @@ const StyledTitle = (props: StyledPreviewTitleProps): JSX.Element => {
 		font-size: 12px;
 		font-weight: normal;
 		text-align: center;
-		color: ${props.named ? colors.black.toString() : colors.grey80.toString()};
-		cursor: ${props.focusable ? 'text' : 'default'};
+		cursor: ${props.editable ? 'text' : 'default'};
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
@@ -132,22 +134,20 @@ class EditableTitle extends React.Component<EditableTitleProps> {
 
 export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): JSX.Element => (
 	<StyledPreview data-id={props.id} onClick={props.onClick} onDoubleClick={props.onDoubleClick}>
-		{props.editable ? (
+		{props.nameState === EditState.Editing ? (
 			<EditableTitle
-				autoFocus={props.editable}
-				autoSelect={props.editable}
+				autoFocus
+				autoSelect
 				data-title={true}
 				focused={props.focused}
 				onBlur={props.onBlur}
 				onChange={props.onChange}
 				onFocus={props.onFocus}
 				onKeyDown={props.onKeyDown}
-				value={props.value}
+				value={props.name}
 			/>
 		) : (
-			<StyledTitle focusable={props.focused} named={props.named}>
-				{props.value}
-			</StyledTitle>
+			<StyledTitle editable={props.focused}>{props.name}</StyledTitle>
 		)}
 		<StyledPreviewTile focused={props.focused} />
 	</StyledPreview>

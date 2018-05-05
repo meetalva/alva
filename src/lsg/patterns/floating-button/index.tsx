@@ -25,6 +25,9 @@ const StyledFloatingButton = styled.button`
 		background: ${colors.blue.toString()};
 		border-radius: 50%;
 	}
+	&:focus {
+		outline: none;
+	}
 	&:hover {
 		&::before {
 			content: '';

@@ -2,9 +2,9 @@ import * as React from 'react';
 
 import Copy from '../copy';
 import { Headline } from '../headline';
-import { PreviewTile } from './index';
 import Layout from '../layout';
 import Space, { SpaceSize } from '../space';
+import { EditState, PreviewTile } from '.';
 
 const handleChange = (e: React.ChangeEvent<HTMLInputElement>): string => e.target.value;
 
@@ -21,47 +21,42 @@ export const DemoPreviewTile = (): JSX.Element => (
 		<Layout>
 			<Space size={SpaceSize.S}>
 				<PreviewTile
-					editable={false}
 					focused={false}
 					onChange={handleChange}
-					named={true}
-					value="Editable"
+					name="Editable"
+					nameState={EditState.Editable}
 				/>
 			</Space>
 			<Space size={SpaceSize.S}>
 				<PreviewTile
-					editable={false}
 					focused={true}
 					onChange={handleChange}
-					named={true}
-					value="Page Name"
+					name="Page Name"
+					nameState={EditState.Editable}
 				/>
 			</Space>
 			<Space size={SpaceSize.S}>
 				<PreviewTile
-					editable={true}
 					focused={true}
 					onChange={handleChange}
-					named={true}
-					value="Editable Page Name"
+					name="Editable Page Name"
+					nameState={EditState.Editable}
 				/>
 			</Space>
 			<Space size={SpaceSize.S}>
 				<PreviewTile
-					editable={false}
 					focused={false}
 					onChange={handleChange}
-					named={true}
-					value="Editable Page Name"
+					name="Editable Page Name"
+					nameState={EditState.Editable}
 				/>
 			</Space>
 			<Space size={SpaceSize.S}>
 				<PreviewTile
-					editable={false}
 					focused={false}
 					onChange={handleChange}
-					named={true}
-					value="Editable Page Name"
+					name="Editable Page Name"
+					nameState={EditState.Editable}
 				/>
 			</Space>
 		</Layout>

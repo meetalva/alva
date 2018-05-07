@@ -253,11 +253,14 @@ function startRouter(store: PreviewStore): void {
 
 		const previousPage = store.pages.find(page => page.id === store.pageId) || store.pages[0];
 
-		const nextCandidate = hash.startsWith('page-')
+		const nextPage = hash.startsWith('page-')
 			? store.pages[Number(hash.replace('page-', '')) - 1]
 			: store.pages.find(page => page.id === hash);
 
-		const nextPage = nextCandidate || store.pages[0];
+		if (!nextPage) {
+			return;
+		}
+
 		store.pageId = nextPage.id;
 
 		if (document.title === '' || document.title === previousPage.name) {

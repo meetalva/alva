@@ -5,6 +5,12 @@ import { Pattern } from './pattern';
 import { StringProperty } from './property/string-property';
 import { StyleguideAnalyzer } from '../../styleguide/analyzer/styleguide-analyzer';
 
+export enum SyntheticPatternType {
+	Page = 'synthetic:page',
+	Placeholder = 'synthetic:placeholder',
+	Text = 'synthetic:text'
+}
+
 /**
  * The styleguide is the component library the current Alva space bases on.
  * It consists of a set of patterns the page element themselves base on.
@@ -68,7 +74,20 @@ export class Styleguide {
 		const patternsDir = new Directory(this.getPatternsPath());
 		this.patternRoot = new PatternFolder(patternsDir.getName());
 
-		this.addSyntheticPatterns();
+		const folder = new PatternFolder('synthetic', this.patternRoot);
+
+		const pagePattern = new Pattern(SyntheticPatternType.Page, 'Page', '');
+		this.addPattern(pagePattern);
+
+		const textPattern = new Pattern(SyntheticPatternType.Text, 'Text', '');
+		textPattern.addProperty(new StringProperty(StringProperty.SYNTHETIC_TEXT_ID));
+		folder.addPattern(textPattern);
+		this.addPattern(textPattern);
+
+		const assetPattern = new Pattern(SyntheticPatternType.Placeholder, 'Placeholder', '');
+		assetPattern.addProperty(new AssetProperty(AssetProperty.SYNTHETIC_ASSET_ID));
+		folder.addPattern(assetPattern);
+		this.addPattern(assetPattern);
 
 		if (this.analyzer) {
 			this.analyzer.analyze(this);
@@ -83,28 +102,6 @@ export class Styleguide {
 	 */
 	public addPattern(pattern: Pattern): void {
 		this.patterns.set(pattern.getId(), pattern);
-	}
-
-	/**
-	 * Adds Alva's synthetic patterns to this styleguide.
-	 * Synthetic patterns do not have a physical implementation.
-	 * They are required to create page elements that represent values only,
-	 * such as child text nodes.
-	 */
-	private addSyntheticPatterns(): void {
-		const folder = new PatternFolder('synthetic', this.patternRoot);
-
-		const textPattern = new Pattern(Pattern.SYNTHETIC_TEXT_ID, 'Text', '');
-		const textProperty = new StringProperty(StringProperty.SYNTHETIC_TEXT_ID);
-		textPattern.addProperty(textProperty);
-		folder.addPattern(textPattern);
-		this.addPattern(textPattern);
-
-		const assetPattern = new Pattern(Pattern.SYNTHETIC_ASSET_ID, 'Placeholder', '');
-		const assetProperty = new AssetProperty(AssetProperty.SYNTHETIC_ASSET_ID);
-		assetPattern.addProperty(assetProperty);
-		folder.addPattern(assetPattern);
-		this.addPattern(assetPattern);
 	}
 
 	/**
@@ -160,5 +157,14 @@ export class Styleguide {
 	 */
 	public getPatternsPath(): string {
 		return this.patternsPath;
+	}
+
+	/**
+	 * Returns a parsed pattern information object for a given pattern ID.
+	 * @param type The type of the synthetic pattern.
+	 * @return The resolved pattern
+	 */
+	public getSyntheticPattern(type: SyntheticPatternType): Pattern {
+		return this.patterns.get(type) as Pattern;
 	}
 }

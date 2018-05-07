@@ -157,14 +157,16 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		// tslint:disable-next-line:no-any
 		const Component = props.getComponent(props, {
 			// tslint:disable-next-line:no-any
-			text: (p: any) => p.text,
-			// tslint:disable-next-line:no-any
 			asset: (p: any) => {
 				if (!p.asset || typeof p.asset !== 'string') {
 					return null;
 				}
 				return <img src={p.asset} style={{ width: '100%', height: 'auto' }} />;
-			}
+			},
+			// tslint:disable-next-line:no-any
+			page: (p: any) => <>{p.children}</>,
+			// tslint:disable-next-line:no-any
+			text: (p: any) => p.text
 			// tslint:disable-next-line:no-any
 		}) as any;
 

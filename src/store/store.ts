@@ -1,4 +1,5 @@
 import { Command } from './command/command';
+import { ElementLocationCommand } from '../store/command/element-location-command';
 import * as Fs from 'fs';
 import * as FsExtra from 'fs-extra';
 import { JsonArray, JsonObject, Persister } from './json';
@@ -23,6 +24,23 @@ export enum AlvaView {
 export enum RightPane {
 	Patterns = 'Patterns',
 	Properties = 'Properties'
+}
+
+export enum ClipBoardType {
+	PageRef = 'PageRef',
+	PageElement = 'PageElement'
+}
+
+export type ClipBoardItem = ClipboardPageRef | ClipboardPageElement;
+
+export interface ClipboardPageRef {
+	item: PageRef;
+	type: ClipBoardType.PageRef;
+}
+
+export interface ClipboardPageElement {
+	item: PageElement;
+	type: ClipBoardType.PageElement;
 }
 
 /**
@@ -51,7 +69,7 @@ export class Store {
 	 * Note: The element is cloned lazily, so it may represent a still active element.
 	 * When adding the clipboard element to paste it, clone it first.
 	 */
-	@MobX.observable private clipboardElement?: PageElement;
+	@MobX.observable private clipboardItem?: ClipBoardItem;
 
 	/**
 	 * The page that is currently being displayed in the preview, and edited in the elements
@@ -70,14 +88,6 @@ export class Store {
 	 * The element that is currently being dragged, or undefined if there is none.
 	 */
 	@MobX.observable private draggedElement?: PageElement;
-
-	/**
-	 * Whether the currently selected element also has focus.
-	 * In this case, keyboard operations such as copy, cut, or delete
-	 * should operate on that element.
-	 * @see selectedElement
-	 */
-	@MobX.observable private elementFocussed?: boolean = false;
 
 	/**
 	 * The currently name-editable element in the element list.
@@ -250,6 +260,74 @@ export class Store {
 		this.closePage();
 	}
 
+	public copyElementById(id: string): PageElement | undefined {
+		const element = this.getElementById(id);
+
+		if (!element) {
+			return;
+		}
+
+		this.setClipboardItem(element);
+		return element;
+	}
+
+	/**
+	 * Copy the currently selected element to clip
+	 */
+	public copySelectedElement(): PageElement | undefined {
+		if (!this.selectedElement) {
+			return;
+		}
+
+		const element = this.selectedElement;
+		this.setClipboardItem(element);
+		return element;
+	}
+
+	/**
+	 * Remove the given element from its page and add it to clipboard
+	 * @param element
+	 */
+	public cutElement(element: PageElement): void {
+		this.setClipboardItem(element);
+		this.execute(ElementLocationCommand.remove(element));
+	}
+
+	public cutElementById(id: string): void {
+		const element = this.getElementById(id);
+		if (!element) {
+			return;
+		}
+
+		this.cutElement(element);
+	}
+
+	/**
+	 * Remove the currently selected element and add it to clipboard
+	 */
+	public cutSelectedElement(): PageElement | undefined {
+		if (!this.selectedElement) {
+			return;
+		}
+
+		const element = this.selectedElement;
+		this.cutElement(element);
+		return element;
+	}
+
+	public duplicateElement(element: PageElement): PageElement {
+		const duplicatedElement = element.clone();
+		this.execute(ElementLocationCommand.addSibling(duplicatedElement, element));
+		return duplicatedElement;
+	}
+
+	public duplicateSelectedElement(): PageElement | undefined {
+		if (!this.selectedElement) {
+			return;
+		}
+		return this.duplicateElement(this.selectedElement);
+	}
+
 	/**
 	 * Executes a user command (user operation) and registers it as undoable command.
 	 * @param command The command to execute and register.
@@ -330,8 +408,17 @@ export class Store {
 	 * When adding the clipboard element to paste it, clone it first.
 	 * @return The element currently in the clipboard, or undefined if there is none.
 	 */
-	public getClipboardElement(): PageElement | undefined {
-		return this.clipboardElement;
+
+	public getClipboardItem(type: ClipBoardType.PageElement): PageElement | undefined;
+	public getClipboardItem(type: ClipBoardType.PageRef): PageRef | undefined;
+	public getClipboardItem(type: ClipBoardType): PageRef | PageElement | undefined {
+		const item = this.clipboardItem;
+
+		if (!item || item.type !== type) {
+			return;
+		}
+
+		return item.item.clone();
 	}
 
 	/**
@@ -381,6 +468,16 @@ export class Store {
 	 */
 	public getDraggedElement(): PageElement | undefined {
 		return this.draggedElement;
+	}
+
+	public getElementById(id: string): PageElement | undefined {
+		const page = this.currentPage;
+
+		if (!page) {
+			return;
+		}
+
+		return page.getElementById(id);
 	}
 
 	public getNameEditableElement(): PageElement | undefined {
@@ -476,7 +573,6 @@ export class Store {
 
 	/**
 	 * @return The content id to show in the right-hand sidebar
-	 * @see isElementFocussed
 	 */
 	public getRightPane(): RightPane {
 		if (this.rightPane === null) {
@@ -491,7 +587,6 @@ export class Store {
 	 * and keyboard commands like cut, copy, or delete operate on this element.
 	 * May be empty if no element is selected.
 	 * @return The selected element or undefined.
-	 * @see isElementFocussed
 	 */
 	public getSelectedElement(): PageElement | undefined {
 		return this.selectedElement;
@@ -516,6 +611,20 @@ export class Store {
 		return this.styleguide;
 	}
 
+	public hasApplicableClipboardItem(): boolean {
+		const view = this.getActiveView();
+
+		if (view === AlvaView.PageDetail) {
+			return Boolean(this.getClipboardItem(ClipBoardType.PageElement));
+		}
+
+		if (view === AlvaView.Pages) {
+			return Boolean(this.getClipboardItem(ClipBoardType.PageRef));
+		}
+
+		return false;
+	}
+
 	/**
 	 * Returns whether there is a user comment (user operation) to redo.
 	 * @return Whether there is a user comment (user operation) to redo.
@@ -532,17 +641,6 @@ export class Store {
 	 */
 	public hasUndoCommand(): boolean {
 		return this.undoBuffer.length > 0;
-	}
-
-	/**
-	 * Returns whether the currently selected element also has focus.
-	 * In this case, keyboard operations such as copy, cut, or delete
-	 * should operate on that element.
-	 * @return Whether the currently selected element also has focus.
-	 * @see getSelectedElement()
-	 */
-	public isElementFocussed(): boolean | undefined {
-		return this.elementFocussed;
 	}
 
 	/**
@@ -700,6 +798,58 @@ export class Store {
 		this.savePreferences();
 	}
 
+	public pasteAfterElement(targetElement: PageElement): PageElement | undefined {
+		const clipboardElement = this.getClipboardItem(ClipBoardType.PageElement);
+
+		if (!clipboardElement) {
+			return;
+		}
+
+		this.execute(ElementLocationCommand.addSibling(clipboardElement, targetElement));
+		this.setSelectedElement(clipboardElement);
+
+		return clipboardElement;
+	}
+
+	public pasteAfterElementById(id: string): PageElement | undefined {
+		const element = this.getElementById(id);
+
+		if (!element) {
+			return;
+		}
+
+		return this.pasteAfterElement(element);
+	}
+
+	public pasteAfterSelectedElement(): PageElement | undefined {
+		const selectedElement = this.getSelectedElement();
+
+		if (!selectedElement) {
+			return;
+		}
+
+		return this.pasteAfterElement(selectedElement);
+	}
+
+	public pasteInsideElementById(id: string): PageElement | undefined {
+		const element = this.getElementById(id);
+
+		if (!element) {
+			return;
+		}
+
+		const clipboardElement = this.getClipboardItem(ClipBoardType.PageElement);
+
+		if (!clipboardElement) {
+			return;
+		}
+
+		this.execute(ElementLocationCommand.addChild(element, clipboardElement));
+		this.setSelectedElement(clipboardElement);
+
+		return clipboardElement;
+	}
+
 	/**
 	 * Redoes the last undone user operation, if available.
 	 * @return Whether the redo was successful.
@@ -722,6 +872,23 @@ export class Store {
 
 		this.undoBuffer.push(command);
 		return true;
+	}
+
+	/**
+	 * Removes the given element from its page
+	 * @param element The PageElement to remove
+	 */
+	public removeElement(element: PageElement): void {
+		this.execute(ElementLocationCommand.remove(element));
+		this.setSelectedElement(undefined);
+	}
+
+	public removeElementById(id: string): void {
+		const element = this.getElementById(id);
+
+		if (element) {
+			this.execute(ElementLocationCommand.remove(element));
+		}
 	}
 
 	/**
@@ -773,6 +940,35 @@ export class Store {
 		if (this.currentProject === project) {
 			this.closeProject();
 		}
+	}
+
+	/**
+	 * Remove the currently selected element from its page
+	 * Returns the deleted PageElement or undefined if nothing was deleted
+	 */
+	public removeSelectedElement(): PageElement | undefined {
+		if (!this.selectedElement) {
+			return;
+		}
+
+		const element = this.selectedElement;
+		this.removeElement(this.selectedElement);
+		return element;
+	}
+
+	/**
+	 * Remove the currently selected page from its project
+	 * Returns the deleted PageRef or undefined if nothing was deleted
+	 */
+	public removeSelectedPage(): PageRef | undefined {
+		const pageRef = this.getCurrentPageRef();
+
+		if (!pageRef) {
+			return;
+		}
+
+		this.removePage(pageRef);
+		return pageRef;
 	}
 
 	/**
@@ -848,11 +1044,22 @@ export class Store {
 	/**
 	 * Sets the element currently in the clipboard, or undefined if there is none.
 	 * Note: The element is cloned lazily, so you don't need to clone it when setting.
-	 * @return The element currently in the clipboard, or undefined if there is none.
 	 * @see getClipboardElement
 	 */
-	public setClipboardElement(clipboardElement: PageElement): void {
-		this.clipboardElement = clipboardElement;
+	public setClipboardItem(item: PageElement | PageRef): void {
+		if (item instanceof PageElement) {
+			this.clipboardItem = {
+				type: ClipBoardType.PageElement,
+				item
+			};
+		}
+
+		if (item instanceof PageRef) {
+			this.clipboardItem = {
+				type: ClipBoardType.PageRef,
+				item
+			};
+		}
 	}
 
 	/**
@@ -861,17 +1068,6 @@ export class Store {
 	 */
 	public setDraggedElement(draggedElement?: PageElement): void {
 		this.draggedElement = draggedElement;
-	}
-
-	/**
-	 * Sets whether the currently selected element also has focus.
-	 * In this case, keyboard operations such as copy, cut, or delete
-	 * should operate on that element.
-	 * @param elementFocussed Whether the currently selected element also has focus.
-	 * @see setSelectedElement()
-	 */
-	public setElementFocussed(elementFocussed: boolean): void {
-		this.elementFocussed = elementFocussed;
 	}
 
 	public setNameEditableElement(editableElement?: PageElement): void {

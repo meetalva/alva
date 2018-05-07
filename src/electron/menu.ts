@@ -1,9 +1,8 @@
 import { BrowserWindow, ipcRenderer, MenuItem, MenuItemConstructorOptions, remote } from 'electron';
-import { ElementLocationCommand } from '../store/command/element-location-command';
 import * as FsExtra from 'fs-extra';
 import { HtmlExporter } from '../export/html-exporter';
+import { ServerMessageType } from '../message';
 import { Page } from '../store/page/page';
-import { PageElement } from '../store/page/page-element';
 import * as Path from 'path';
 import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
@@ -103,9 +102,7 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+S',
 					role: 'save',
-					click: () => {
-						store.save();
-					}
+					click: () => store.save()
 				},
 				{
 					label: '&Rename',
@@ -224,16 +221,12 @@ export function createMenu(): void {
 				{
 					label: '&Undo',
 					accelerator: 'CmdOrCtrl+Z',
-					click: () => {
-						store.undo();
-					}
+					click: () => ipcRenderer.send('message', { type: ServerMessageType.Undo })
 				},
 				{
 					label: '&Redo',
 					accelerator: 'Shift+CmdOrCtrl+Z',
-					click: () => {
-						store.redo();
-					}
+					click: () => ipcRenderer.send('message', { type: ServerMessageType.Redo })
 				},
 				{
 					type: 'separator'
@@ -243,11 +236,7 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+X',
 					click: () => {
-						const selectedElement: PageElement | undefined = store.getSelectedElement();
-						if (selectedElement && store.isElementFocussed()) {
-							store.setClipboardElement(selectedElement);
-							store.execute(ElementLocationCommand.remove(selectedElement));
-						}
+						ipcRenderer.send('message', { type: ServerMessageType.Cut });
 						Menu.sendActionToFirstResponder('cut:');
 					}
 				},
@@ -256,10 +245,7 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+C',
 					click: () => {
-						const selectedElement: PageElement | undefined = store.getSelectedElement();
-						if (selectedElement && store.isElementFocussed()) {
-							store.setClipboardElement(selectedElement);
-						}
+						ipcRenderer.send('message', { type: ServerMessageType.Copy });
 						Menu.sendActionToFirstResponder('copy:');
 					}
 				},
@@ -268,15 +254,7 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+V',
 					click: () => {
-						const selectedElement: PageElement | undefined = store.getSelectedElement();
-						const clipboardElement: PageElement | undefined = store.getClipboardElement();
-						if (selectedElement && clipboardElement && store.isElementFocussed()) {
-							const newPageElement = clipboardElement.clone();
-							store.execute(
-								ElementLocationCommand.addSibling(selectedElement, newPageElement)
-							);
-							store.setSelectedElement(newPageElement);
-						}
+						ipcRenderer.send('message', { type: ServerMessageType.Paste });
 						Menu.sendActionToFirstResponder('paste:');
 					}
 				},
@@ -288,14 +266,7 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+D',
 					click: () => {
-						const selectedElement: PageElement | undefined = store.getSelectedElement();
-						if (selectedElement && store.isElementFocussed()) {
-							const newPageElement = selectedElement.clone();
-							store.execute(
-								ElementLocationCommand.addSibling(newPageElement, selectedElement)
-							);
-							store.setSelectedElement(newPageElement);
-						}
+						ipcRenderer.send('message', { type: ServerMessageType.Duplicate });
 					}
 				},
 				{
@@ -320,22 +291,10 @@ export function createMenu(): void {
 						}
 					})(),
 					click: () => {
-						if (store.getSelectedSlotId()) {
-							return;
-						}
-
-						const selectedElement: PageElement | undefined = store.getSelectedElement();
-
-						if (selectedElement) {
-							store.execute(ElementLocationCommand.remove(selectedElement));
-							store.setSelectedElement(undefined);
-						} else {
-							if (process.platform === 'darwin') {
-								Menu.sendActionToFirstResponder('Backspace');
-							} else {
-								Menu.sendActionToFirstResponder('Delete');
-							}
-						}
+						ipcRenderer.send('message', { type: ServerMessageType.Delete });
+						Menu.sendActionToFirstResponder(
+							process.platform === 'darwin' ? 'Backspace' : 'Delete'
+						);
 					}
 				}
 			]

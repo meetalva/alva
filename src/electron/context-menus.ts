@@ -1,30 +1,37 @@
-import { MenuItemConstructorOptions, remote } from 'electron';
-import { ElementLocationCommand } from '../store/command/element-location-command';
+import { ipcRenderer, MenuItemConstructorOptions, remote } from 'electron';
+import { ServerMessageType } from '../message';
 import { PageElement } from '../store/page/page-element';
 import { Store } from '../store/store';
 
 const store = Store.getInstance();
-export function elementMenu(element: PageElement): void {
-	const clipboardElement: PageElement | undefined = store.getClipboardElement();
 
+export function elementMenu(element: PageElement): void {
 	const template: MenuItemConstructorOptions[] = [
 		{
 			label: 'Cut Element',
 			click: () => {
-				store.setClipboardElement(element);
-				store.execute(ElementLocationCommand.remove(element));
+				ipcRenderer.send('message', {
+					type: ServerMessageType.CutPageElement,
+					payload: element.getId()
+				});
 			}
 		},
 		{
 			label: 'Copy Element',
 			click: () => {
-				store.setClipboardElement(element);
+				ipcRenderer.send('message', {
+					type: ServerMessageType.CopyPageElement,
+					payload: element.getId()
+				});
 			}
 		},
 		{
 			label: 'Delete element',
 			click: () => {
-				store.execute(ElementLocationCommand.remove(element));
+				ipcRenderer.send('message', {
+					type: ServerMessageType.DeletePageElement,
+					payload: element.getId()
+				});
 			}
 		},
 		{
@@ -32,28 +39,25 @@ export function elementMenu(element: PageElement): void {
 		},
 		{
 			label: 'Paste element below',
-			enabled: Boolean(clipboardElement),
+			enabled: store.hasApplicableClipboardItem(),
 			click: () => {
-				const newPageElement = clipboardElement && clipboardElement.clone();
-
-				if (newPageElement) {
-					store.execute(ElementLocationCommand.addSibling(newPageElement, element));
-				}
+				ipcRenderer.send('message', {
+					type: ServerMessageType.PastePageElementBelow,
+					payload: element.getId()
+				});
 			}
 		},
 		{
 			label: 'Paste element inside',
-			enabled: Boolean(clipboardElement),
+			enabled: store.hasApplicableClipboardItem(),
 			click: () => {
-				const newPageElement = clipboardElement && clipboardElement.clone();
-
-				if (newPageElement) {
-					store.execute(ElementLocationCommand.addChild(element, newPageElement));
-				}
+				ipcRenderer.send('message', {
+					type: ServerMessageType.PastepageElementInside,
+					payload: element.getId()
+				});
 			}
 		}
 	];
 
-	const menu = remote.Menu.buildFromTemplate(template);
-	menu.popup();
+	remote.Menu.buildFromTemplate(template).popup();
 }

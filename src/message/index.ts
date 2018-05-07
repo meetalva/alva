@@ -14,12 +14,24 @@ export enum ServerMessageType {
 	BundleChange = 'bundle-change',
 	ContentRequest = 'content-request',
 	ContentResponse = 'content-response',
+	Copy = 'copy',
+	CopyPageElement = 'copy-page-element',
+	Cut = 'cut',
+	CutPageElement = 'cut-page-element',
+	Delete = 'delete',
+	DeletePageElement = 'delete-page-element',
+	Duplicate = 'duplicate',
 	ElementChange = 'element-change',
 	PageChange = 'page-change',
+	Paste = 'paste',
+	PastePageElementBelow = 'paste-page-element-below',
+	PastepageElementInside = 'paste-page-element-inside',
+	Redo = 'redo',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
-	StyleGuideChange = 'styleguide-change'
+	StyleGuideChange = 'styleguide-change',
+	Undo = 'undo'
 }
 
 export interface Envelope<V, T> {

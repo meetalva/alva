@@ -112,6 +112,11 @@ export class PageRef {
 		}
 	}
 
+	public clone(): PageRef {
+		// TODO: implement this
+		return this;
+	}
+
 	public getEditedName(): string {
 		return this.editedName;
 	}

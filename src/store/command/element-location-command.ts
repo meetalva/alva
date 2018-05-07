@@ -58,6 +58,12 @@ export class ElementLocationCommand extends ElementCommand {
 	 * Leaving out this value puts the child to the end of the parent's children.
 	 */
 	public constructor(element: PageElement, parent?: PageElement, slotId?: string, index?: number) {
+		console.log({
+			element,
+			parent,
+			slotId,
+			index
+		});
 		super(element);
 
 		this.parent = parent;

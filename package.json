@@ -145,7 +145,7 @@
     "electron-log": "2.2.14",
     "electron-updater": "2.21.4",
     "express": "4.16.3",
-    "fs-extra": "5.0.0",
+    "fs-extra": "6.0.0",
     "get-port": "3.2.0",
     "js-string-escape": "1.0.1",
     "js-yaml": "3.11.0",

@@ -318,6 +318,7 @@ export class Store {
 	public duplicateElement(element: PageElement): PageElement {
 		const duplicatedElement = element.clone();
 		this.execute(ElementLocationCommand.addSibling(duplicatedElement, element));
+		this.setSelectedElement(duplicatedElement);
 		return duplicatedElement;
 	}
 

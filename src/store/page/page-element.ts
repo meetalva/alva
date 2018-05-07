@@ -206,7 +206,7 @@ export class PageElement {
 	 * @return The new clone.
 	 */
 	public clone(): PageElement {
-		const payload = this.toJsonObject() as JsonObject;
+		const payload = this.toJsonObject();
 		delete payload.id;
 
 		const clone = new PageElement({ pattern: this.pattern });

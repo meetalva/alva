@@ -1,14 +1,14 @@
 export interface ResizeProps {
 	// tslint:disable-next-line:prefer-method-signature
-	add: (cb: () => {}) => void;
+	add: (cb: () => void) => void;
 }
+
 export function optimizedResize(): ResizeProps {
 	const callbacks = [];
 	let running = false;
 
 	const runCallbacks = () => {
 		callbacks.forEach((cb: () => void) => {
-			// console.log('run callbacks', cb);
 			cb();
 		});
 		running = false;
@@ -17,7 +17,6 @@ export function optimizedResize(): ResizeProps {
 	const resize = () => {
 		if (!running) {
 			running = true;
-			console.log('run callbacks', running);
 			window.requestAnimationFrame(runCallbacks);
 		}
 	};
@@ -29,7 +28,7 @@ export function optimizedResize(): ResizeProps {
 	};
 
 	return {
-		add: (cb: () => {}) => {
+		add: (cb: () => void) => {
 			if (!callbacks.length) {
 				window.addEventListener('resize', resize);
 			}

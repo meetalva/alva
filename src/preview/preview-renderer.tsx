@@ -58,6 +58,12 @@ export function render(init: RenderInit): void {
 		public render(): JSX.Element | null {
 			const props = this.props as InjectedPreviewApplicationProps;
 			const page = props.store.page;
+			console.log('*******', props.store.elementId);
+			if (props.store.elementId) {
+				props.highlight.show();
+			} else {
+				props.highlight.hide();
+			}
 
 			if (!page) {
 				return null;
@@ -109,10 +115,7 @@ export function render(init: RenderInit): void {
 			if (props.uuid === props.store.elementId) {
 				const node = ReactDom.findDOMNode(this);
 				if (node) {
-					props.highlight.show(node as Element, props.uuid);
-					setTimeout(() => {
-						props.store.elementId = '';
-					}, 500);
+					props.highlight.setSize(node as Element);
 				}
 			}
 		}
@@ -170,7 +173,7 @@ export function render(init: RenderInit): void {
 		public render(): JSX.Element {
 			const props = this.props as InjectedPreviewHighlightProps;
 			const { highlight } = props;
-			const p = highlight.getProps();
+			// const p = highlight.getProps();
 
 			return (
 				<div
@@ -179,13 +182,13 @@ export function render(init: RenderInit): void {
 						boxSizing: 'border-box',
 						border: '1px solid rgba(255, 255, 255, 0.5)',
 						transition: 'all .1s ease-in-out',
-						bottom: p.bottom,
-						height: p.height,
-						left: p.left,
-						opacity: p.opacity,
-						right: p.right,
-						top: p.top,
-						width: p.width,
+						bottom: highlight.bottom,
+						height: highlight.height,
+						left: highlight.left,
+						opacity: highlight.opacity,
+						right: highlight.right,
+						top: highlight.top,
+						width: highlight.width,
 						pointerEvents: 'none',
 						mixBlendMode: 'difference'
 					}}

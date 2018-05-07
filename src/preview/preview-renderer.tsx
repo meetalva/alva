@@ -58,7 +58,6 @@ export function render(init: RenderInit): void {
 		public render(): JSX.Element | null {
 			const props = this.props as InjectedPreviewApplicationProps;
 			const page = props.store.page;
-			console.log('*******', props.store.elementId);
 			if (props.store.elementId) {
 				props.highlight.show();
 			} else {

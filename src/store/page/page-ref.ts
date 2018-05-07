@@ -168,6 +168,28 @@ export class PageRef {
 	}
 
 	/**
+	 * Obtain the resolved page object for this page reference
+	 * @return The resolved page object
+	 */
+	public load(): Page | undefined {
+		const store = Store.getInstance();
+		const currentPageRef = store.getCurrentPageRef();
+		const styleguide = store.getStyleguide();
+
+		if (!styleguide) {
+			return;
+		}
+
+		const pagesPath = styleguide.getPath();
+
+		if (currentPageRef === this) {
+			return store.getCurrentPage() as Page;
+		}
+
+		return Page.fromPath(Path.join(pagesPath, 'alva', this.path), this.id);
+	}
+
+	/**
 	 * Sets the human-friendly name of the page.
 	 * @param name The human-friendly name of the page.
 	 */
@@ -204,13 +226,13 @@ export class PageRef {
 	 */
 	public setProject(project: Project): void {
 		if (this.project) {
-			this.project.getPagesInternal().remove(this);
+			this.project.getPageRefsInternal().remove(this);
 		}
 
 		this.project = project;
 
 		if (project) {
-			project.getPagesInternal().push(this);
+			project.getPageRefsInternal().push(this);
 		}
 	}
 

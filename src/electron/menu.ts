@@ -1,18 +1,24 @@
 import { BrowserWindow, ipcRenderer, MenuItem, MenuItemConstructorOptions, remote } from 'electron';
 import { ElementLocationCommand } from '../store/command/element-location-command';
 import * as FsExtra from 'fs-extra';
+import { HtmlExporter } from '../export/html-exporter';
 import { Page } from '../store/page/page';
 import { PageElement } from '../store/page/page-element';
 import * as Path from 'path';
 import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
 import * as Process from 'process';
+import { Project } from '../store/project';
 import { SketchExporter } from '../export/sketch-exporter';
 import { Store } from '../store/store';
 const { Menu, shell, app, dialog } = remote;
 
 function getPageFileName(): string {
 	return (Store.getInstance().getCurrentPage() as Page).getName();
+}
+
+function getProjectFileName(): string {
+	return (Store.getInstance().getCurrentProject() as Project).getName();
 }
 
 interface PathQuery {
@@ -113,7 +119,7 @@ export function createMenu(): void {
 					label: '&Export',
 					submenu: [
 						{
-							label: 'Export page as Sketch',
+							label: 'Export Page as Sketch',
 							enabled: !isSplashscreen,
 							click: async () => {
 								const path = await queryPath({
@@ -131,7 +137,7 @@ export function createMenu(): void {
 							}
 						},
 						{
-							label: 'Export page as PDF',
+							label: 'Export Page as PDF',
 							enabled: !isSplashscreen,
 							click: async () => {
 								const path = await queryPath({
@@ -149,7 +155,7 @@ export function createMenu(): void {
 							}
 						},
 						{
-							label: 'Export page as PNG',
+							label: 'Export Page as PNG',
 							enabled: !isSplashscreen,
 							click: async () => {
 								const path = await queryPath({
@@ -163,6 +169,27 @@ export function createMenu(): void {
 									const pngExporter = new PngExporter();
 									await pngExporter.createExport();
 									await pngExporter.writeToDisk(path);
+								}
+							}
+						},
+						{
+							type: 'separator'
+						},
+						{
+							label: 'Export Project as HTML',
+							enabled: !isSplashscreen,
+							click: async () => {
+								const path = await queryPath({
+									title: 'Export HTML as',
+									typeName: 'HTML File',
+									defaultName: getProjectFileName(),
+									extname: 'html'
+								});
+
+								if (path) {
+									const htmlExporter = new HtmlExporter();
+									await htmlExporter.createExport();
+									await htmlExporter.writeToDisk(path);
 								}
 							}
 						}

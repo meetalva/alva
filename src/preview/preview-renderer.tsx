@@ -27,6 +27,7 @@ export interface InjectedPreviewApplicationProps {
 }
 
 interface InjectedPreviewComponentProps extends PreviewComponentProps {
+	getComponent: ComponentGetter<React.Component | React.SFC>;
 	highlight: HighlightArea;
 	store: PreviewStore;
 }
@@ -52,155 +53,12 @@ interface ErrorBoundaryState {
 }
 
 export function render(init: RenderInit): void {
-	@MobXReact.inject('store', 'highlight')
-	@MobXReact.observer
-	class PreviewApplication extends React.Component {
-		public render(): JSX.Element | null {
-			const props = this.props as InjectedPreviewApplicationProps;
-			const page = props.store.page;
-
-			if (!page) {
-				return null;
-			}
-
-			const component = page.root;
-
-			return (
-				<React.Fragment>
-					<PreviewComponent
-						contents={component.contents}
-						exportName={component.exportName}
-						pattern={component.pattern}
-						properties={component.properties}
-						name={component.name}
-						uuid={component.uuid}
-					/>
-					<PreviewHighlight />
-				</React.Fragment>
-			);
-		}
-	}
-
-	class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-		public state = {
-			errorMessage: ''
-		};
-
-		public componentDidCatch(error: Error): void {
-			this.setState({
-				errorMessage: error.message
-			});
-		}
-
-		public render(): JSX.Element {
-			if (this.state.errorMessage) {
-				return <ErrorMessage patternName={this.props.name} error={this.state.errorMessage} />;
-			}
-			return this.props.children as JSX.Element;
-		}
-	}
-
-	@MobXReact.inject('store', 'highlight')
-	@MobXReact.observer
-	class PreviewComponent extends React.Component<PreviewComponentProps> {
-		public componentWillUpdate(): void {
-			const props = this.props as InjectedPreviewComponentProps;
-
-			if (props.uuid === props.store.elementId) {
-				const node = ReactDom.findDOMNode(this);
-				if (node) {
-					props.highlight.show(node as Element, props.uuid);
-					setTimeout(() => {
-						props.store.elementId = '';
-					}, 500);
-				}
-			}
-		}
-
-		public render(): JSX.Element | null {
-			const props = this.props as InjectedPreviewComponentProps;
-			const contents = props.contents || {};
-			const children = typeof contents.default === 'undefined' ? [] : contents.default;
-
-			const renderedSlots = Object.keys(omit(contents, ['default'])).reduce(
-				(previous, slotId) => ({
-					...previous,
-					[slotId]: contents[slotId].map(child => (
-						<PreviewComponent key={child.uuid} {...child} />
-					))
-				}),
-				{}
-			);
-
-			// Access elementId in render method to trigger MobX subscription
-			// tslint:disable-next-line:no-unused-expression
-			props.store.elementId;
-
-			// tslint:disable-next-line:no-any
-			const Component = init.getComponent(props, {
-				// tslint:disable-next-line:no-any
-				text: (p: any) => p.text,
-				// tslint:disable-next-line:no-any
-				asset: (p: any) => {
-					if (!p.asset || typeof p.asset !== 'string') {
-						return null;
-					}
-					return <img src={p.asset} style={{ width: '100%', height: 'auto' }} />;
-				}
-				// tslint:disable-next-line:no-any
-			}) as any;
-
-			if (!Component) {
-				return null;
-			}
-
-			return (
-				<ErrorBoundary name={props.name}>
-					<Component {...props.properties} {...renderedSlots} data-sketch-name={props.name}>
-						{children.map(child => <PreviewComponent key={child.uuid} {...child} />)}
-					</Component>
-				</ErrorBoundary>
-			);
-		}
-	}
-
-	@MobXReact.inject('store', 'highlight')
-	@MobXReact.observer
-	class PreviewHighlight extends React.Component {
-		public render(): JSX.Element {
-			const props = this.props as InjectedPreviewHighlightProps;
-			const { highlight } = props;
-			const p = highlight.getProps();
-
-			return (
-				<div
-					style={{
-						position: 'absolute',
-						boxSizing: 'border-box',
-						border: '1px dashed rgba(55, 55, 55, .5)',
-						background: `
-						repeating-linear-gradient(
-							135deg,
-							transparent,
-							transparent 2.5px,rgba(51, 141, 222, .5) 2.5px,
-							rgba(51,141,222, .5) 5px),
-							rgba(102,169,230, .5)`,
-						transition: 'all .25s ease-in-out',
-						bottom: p.bottom,
-						height: p.height,
-						left: p.left,
-						opacity: p.opacity,
-						right: p.right,
-						top: p.top,
-						width: p.width
-					}}
-				/>
-			);
-		}
-	}
-
 	ReactDom.render(
-		<MobXReact.Provider store={init.store} highlight={init.highlight}>
+		<MobXReact.Provider
+			getComponent={init.getComponent}
+			store={init.store}
+			highlight={init.highlight}
+		>
 			<PreviewApplication />
 		</MobXReact.Provider>,
 		document.getElementById('preview')
@@ -210,6 +68,153 @@ export function render(init: RenderInit): void {
 interface ErrorMessageProps {
 	error: string;
 	patternName: string;
+}
+
+@MobXReact.inject('store', 'highlight')
+@MobXReact.observer
+class PreviewApplication extends React.Component {
+	public render(): JSX.Element | null {
+		const props = this.props as InjectedPreviewApplicationProps;
+		const currentPage = props.store.pages.find(page => page.id === props.store.pageId);
+
+		if (!currentPage) {
+			return null;
+		}
+
+		const component = currentPage.root;
+
+		return (
+			<React.Fragment>
+				<PreviewComponent
+					contents={component.contents}
+					exportName={component.exportName}
+					pattern={component.pattern}
+					properties={component.properties}
+					name={component.name}
+					uuid={component.uuid}
+				/>
+				<PreviewHighlight />
+			</React.Fragment>
+		);
+	}
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+	public state = {
+		errorMessage: ''
+	};
+
+	public componentDidCatch(error: Error): void {
+		this.setState({
+			errorMessage: error.message
+		});
+	}
+
+	public render(): JSX.Element {
+		if (this.state.errorMessage) {
+			return <ErrorMessage patternName={this.props.name} error={this.state.errorMessage} />;
+		}
+		return this.props.children as JSX.Element;
+	}
+}
+
+@MobXReact.inject('getComponent', 'store', 'highlight')
+@MobXReact.observer
+class PreviewComponent extends React.Component<PreviewComponentProps> {
+	public componentWillUpdate(): void {
+		const props = this.props as InjectedPreviewComponentProps;
+
+		if (props.uuid === props.store.elementId) {
+			const node = ReactDom.findDOMNode(this);
+			if (node) {
+				props.highlight.show(node as Element, props.uuid);
+				setTimeout(() => {
+					props.store.elementId = '';
+				}, 500);
+			}
+		}
+	}
+
+	public render(): JSX.Element | null {
+		const props = this.props as InjectedPreviewComponentProps;
+		const contents = props.contents || {};
+		const children = typeof contents.default === 'undefined' ? [] : contents.default;
+
+		const renderedSlots = Object.keys(omit(contents, ['default'])).reduce(
+			(previous, slotId) => ({
+				...previous,
+				[slotId]: contents[slotId].map(child => (
+					<PreviewComponent key={child.uuid} {...child} />
+				))
+			}),
+			{}
+		);
+
+		// Access elementId in render method to trigger MobX subscription
+		// tslint:disable-next-line:no-unused-expression
+		props.store.elementId;
+
+		// tslint:disable-next-line:no-any
+		const Component = props.getComponent(props, {
+			// tslint:disable-next-line:no-any
+			text: (p: any) => p.text,
+			// tslint:disable-next-line:no-any
+			asset: (p: any) => {
+				if (!p.asset || typeof p.asset !== 'string') {
+					return null;
+				}
+				return <img src={p.asset} style={{ width: '100%', height: 'auto' }} />;
+			}
+			// tslint:disable-next-line:no-any
+		}) as any;
+
+		if (!Component) {
+			return null;
+		}
+
+		return (
+			<ErrorBoundary name={props.name}>
+				<Component {...props.properties} {...renderedSlots} data-sketch-name={props.name}>
+					{children.map(child => <PreviewComponent key={child.uuid} {...child} />)}
+				</Component>
+			</ErrorBoundary>
+		);
+	}
+}
+
+@MobXReact.inject('store', 'highlight')
+@MobXReact.observer
+class PreviewHighlight extends React.Component {
+	public render(): JSX.Element {
+		const props = this.props as InjectedPreviewHighlightProps;
+		const { highlight } = props;
+		const p = highlight.getProps();
+
+		return (
+			<div
+				style={{
+					position: 'absolute',
+					boxSizing: 'border-box',
+					border: '1px dashed rgba(55, 55, 55, .5)',
+					background: `
+					repeating-linear-gradient(
+						135deg,
+						transparent,
+						transparent 2.5px,rgba(51, 141, 222, .5) 2.5px,
+						rgba(51,141,222, .5) 5px),
+						rgba(102,169,230, .5)`,
+					transition: 'all .25s ease-in-out',
+					bottom: p.bottom,
+					height: p.height,
+					left: p.left,
+					opacity: p.opacity,
+					right: p.right,
+					top: p.top,
+					width: p.width
+				}}
+			/>
+		);
+	}
 }
 
 const ErrorMessage: React.StatelessComponent<ErrorMessageProps> = props => (

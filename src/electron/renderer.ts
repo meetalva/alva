@@ -105,6 +105,12 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			if (store.getActiveView() === AlvaView.PageDetail) {
 				store.duplicateSelectedElement();
 			}
+			break;
+		}
+		case ServerMessageType.DuplicatePageElement: {
+			if (store.getActiveView() === AlvaView.PageDetail) {
+				store.duplicateElementById(message.payload);
+			}
 		}
 	}
 });

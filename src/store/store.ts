@@ -289,6 +289,10 @@ export class Store {
 	 * @param element
 	 */
 	public cutElement(element: PageElement): void {
+		if (element.isRoot()) {
+			return;
+		}
+
 		this.setClipboardItem(element);
 		this.execute(ElementLocationCommand.remove(element));
 	}
@@ -320,6 +324,16 @@ export class Store {
 		this.execute(ElementLocationCommand.addSibling(duplicatedElement, element));
 		this.setSelectedElement(duplicatedElement);
 		return duplicatedElement;
+	}
+
+	public duplicateElementById(id: string): PageElement | undefined {
+		const element = this.getElementById(id);
+
+		if (!element) {
+			return;
+		}
+
+		return this.duplicateElement(element);
 	}
 
 	public duplicateSelectedElement(): PageElement | undefined {
@@ -806,9 +820,12 @@ export class Store {
 			return;
 		}
 
+		if (targetElement.isRoot()) {
+			return this.pasteInsideElement(targetElement);
+		}
+
 		this.execute(ElementLocationCommand.addSibling(clipboardElement, targetElement));
 		this.setSelectedElement(clipboardElement);
-
 		return clipboardElement;
 	}
 
@@ -832,13 +849,7 @@ export class Store {
 		return this.pasteAfterElement(selectedElement);
 	}
 
-	public pasteInsideElementById(id: string): PageElement | undefined {
-		const element = this.getElementById(id);
-
-		if (!element) {
-			return;
-		}
-
+	public pasteInsideElement(element: PageElement): PageElement | undefined {
 		const clipboardElement = this.getClipboardItem(ClipBoardType.PageElement);
 
 		if (!clipboardElement) {
@@ -849,6 +860,24 @@ export class Store {
 		this.setSelectedElement(clipboardElement);
 
 		return clipboardElement;
+	}
+
+	public pasteInsideElementById(id: string): PageElement | undefined {
+		const element = this.getElementById(id);
+
+		if (!element) {
+			return;
+		}
+
+		return this.pasteInsideElement(element);
+	}
+
+	public pasteInsideSelectedElement(): PageElement | undefined {
+		if (!this.selectedElement) {
+			return;
+		}
+
+		return this.pasteInsideElement(this.selectedElement);
 	}
 
 	/**
@@ -880,6 +909,10 @@ export class Store {
 	 * @param element The PageElement to remove
 	 */
 	public removeElement(element: PageElement): void {
+		if (element.isRoot()) {
+			return;
+		}
+
 		const index = element.getIndex();
 
 		const getNextSelected = (): PageElement | undefined => {
@@ -1063,6 +1096,10 @@ export class Store {
 	 */
 	public setClipboardItem(item: PageElement | PageRef): void {
 		if (item instanceof PageElement) {
+			if (item.isRoot()) {
+				return;
+			}
+
 			this.clipboardItem = {
 				type: ClipBoardType.PageElement,
 				item

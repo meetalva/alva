@@ -21,6 +21,7 @@ export enum ServerMessageType {
 	Delete = 'delete',
 	DeletePageElement = 'delete-page-element',
 	Duplicate = 'duplicate',
+	DuplicatePageElement = 'duplicate-page-element',
 	ElementChange = 'element-change',
 	PageChange = 'page-change',
 	Paste = 'paste',

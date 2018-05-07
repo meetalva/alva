@@ -8,7 +8,8 @@ const store = Store.getInstance();
 export function elementMenu(element: PageElement): void {
 	const template: MenuItemConstructorOptions[] = [
 		{
-			label: 'Cut Element',
+			label: 'Cut',
+			enabled: !element.isRoot(),
 			click: () => {
 				ipcRenderer.send('message', {
 					type: ServerMessageType.CutPageElement,
@@ -17,7 +18,8 @@ export function elementMenu(element: PageElement): void {
 			}
 		},
 		{
-			label: 'Copy Element',
+			label: 'Copy',
+			enabled: !element.isRoot(),
 			click: () => {
 				ipcRenderer.send('message', {
 					type: ServerMessageType.CopyPageElement,
@@ -26,7 +28,8 @@ export function elementMenu(element: PageElement): void {
 			}
 		},
 		{
-			label: 'Delete element',
+			label: 'Delete',
+			enabled: !element.isRoot(),
 			click: () => {
 				ipcRenderer.send('message', {
 					type: ServerMessageType.DeletePageElement,
@@ -38,8 +41,8 @@ export function elementMenu(element: PageElement): void {
 			type: 'separator'
 		},
 		{
-			label: 'Paste element below',
-			enabled: store.hasApplicableClipboardItem(),
+			label: 'Paste Below',
+			enabled: store.hasApplicableClipboardItem() && !element.isRoot(),
 			click: () => {
 				ipcRenderer.send('message', {
 					type: ServerMessageType.PastePageElementBelow,
@@ -48,11 +51,21 @@ export function elementMenu(element: PageElement): void {
 			}
 		},
 		{
-			label: 'Paste element inside',
+			label: 'Paste Inside',
 			enabled: store.hasApplicableClipboardItem(),
 			click: () => {
 				ipcRenderer.send('message', {
 					type: ServerMessageType.PastepageElementInside,
+					payload: element.getId()
+				});
+			}
+		},
+		{
+			label: 'Duplicate',
+			enabled: !element.isRoot(),
+			click: () => {
+				ipcRenderer.send('message', {
+					type: ServerMessageType.DuplicatePageElement,
 					payload: element.getId()
 				});
 			}

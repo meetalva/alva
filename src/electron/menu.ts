@@ -119,7 +119,7 @@ export function createMenu(): void {
 					label: '&Export',
 					submenu: [
 						{
-							label: 'Export page as Sketch',
+							label: 'Export Page as Sketch',
 							enabled: !isSplashscreen,
 							click: async () => {
 								const path = await queryPath({
@@ -137,7 +137,7 @@ export function createMenu(): void {
 							}
 						},
 						{
-							label: 'Export page as PDF',
+							label: 'Export Page as PDF',
 							enabled: !isSplashscreen,
 							click: async () => {
 								const path = await queryPath({
@@ -155,7 +155,7 @@ export function createMenu(): void {
 							}
 						},
 						{
-							label: 'Export page as PNG',
+							label: 'Export Page as PNG',
 							enabled: !isSplashscreen,
 							click: async () => {
 								const path = await queryPath({
@@ -173,7 +173,10 @@ export function createMenu(): void {
 							}
 						},
 						{
-							label: 'Export to HTML',
+							type: 'separator'
+						},
+						{
+							label: 'Export Project as HTML',
 							enabled: !isSplashscreen,
 							click: async () => {
 								const path = await queryPath({

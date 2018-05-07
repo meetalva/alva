@@ -15,62 +15,77 @@ interface IndicatorProps {
 	checked?: boolean;
 }
 
-const StyledBooleanItem = styled.div`
+const StyledBooleanItem = styled.label`
+	display: flex;
+	align-content: center;
 	width: 100%;
+	margin-bottom: ${getSpace(SpaceSize.M)}px;
 `;
 
-const StyledLabelWrapper = styled.label`
-	display: block;
-	margin-bottom: ${getSpace(SpaceSize.L)}px;
-`;
-
-const indicatorWidth = 42;
-const indicatorHeight = 24;
-const indicatorBorderWidth = 1;
+const indicatorWidth = 48;
+const indicatorHeight = 30;
 
 const StyledIndicator = styled.span`
 	position: relative;
-	display: block;
+	display: inline-block;
 	width: ${indicatorWidth}px;
 	height: ${indicatorHeight}px;
 	border-radius: ${indicatorHeight / 2}px;
-	background: ${colors.grey90.toString()};
 	box-sizing: border-box;
-	box-shadow: inset 0 0 0 ${indicatorBorderWidth}px ${colors.grey60.toString()};
-
-	&:after {
-		content: '';
+	box-shadow: inset 0 0 0 1px ${colors.grey80.toString()};
+	transition: all ease-in-out 0.1s;
+	user-select: none;
+	&::after {
+		position: absolute;
+		content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><path d="M6,6L4.5,7.5L6,6L4.5,4.5L6,6z M6,6l1.5-1.5L6,6l1.5,1.5L6,6z" fill="none" stroke="${colors.grey60.toString()}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" /></svg>');
 		display: block;
 		width: ${indicatorHeight}px;
 		height: ${indicatorHeight}px;
-		border: ${indicatorBorderWidth}px solid ${colors.grey60.toString()};
-		transform: translateX(0px);
+		transform: translateX(${indicatorWidth - indicatorHeight}px);
 		border-radius: 100%;
 		background: ${colors.white.toString()};
-		transition: all ease-in-out 0.25s;
+		transition: all ease-in-out 0.1s;
 		box-sizing: border-box;
+		box-shadow: inset 0 0 0 1px ${colors.grey60.toString()};
+	}
+	&:hover {
+		&::after {
+			box-shadow: inset 0 0 0 1px ${colors.grey60.toString()}, 0.5px 0.5px 3px ${colors.grey60.toString()};
+		}
 	}
 	${(props: IndicatorProps) =>
 		props.checked
 			? `
-			background: ${colors.blue40.toString()};
-			box-shadow: inset 0 0 0 ${indicatorBorderWidth}px ${colors.blue40.toString()};
-
-			&:after {
-				transform: translateX(${indicatorWidth - indicatorHeight}px);
+			background: ${colors.blue80.toString()};
+			box-shadow: inset 0 0 0 0.5px ${colors.blue40.toString()};
+			&::after {
+				content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><polyline points="3.8,6 5.2,7.5 8.2,4.5 " fill="none" stroke="${colors.blue40.toString()}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>');
+				transform: translateX(0px);
 				background: ${colors.white.toString()};
 				border-color: ${colors.blue40.toString()};
+				box-shadow: inset 0 0 0 1px ${colors.blue40.toString()};
+			}
+			&:hover {
+				&::after {
+					box-shadow: inset 0 0 0 1px ${colors.blue40.toString()}, 0.5px 0.5px 3px ${colors.blue40.toString()};
+				}
 			}
 		`
 			: ''};
 `;
 
 const StyledLabel = styled.span`
-	display: block;
+	display: inline-block;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey36.toString()};
-	margin-bottom: ${getSpace(SpaceSize.XS)}px;
+	color: ${colors.grey50.toString()};
+	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px 0 0;
+	width: 30%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis
+	user-select: none;
+	cursor: default;
 `;
 
 const StyledInput = styled.input`
@@ -82,11 +97,9 @@ export const BooleanItem: React.StatelessComponent<BooleanItemProps> = props => 
 
 	return (
 		<StyledBooleanItem className={className}>
-			<StyledLabelWrapper>
-				<StyledLabel>{label}</StyledLabel>
-				<StyledInput onChange={onChange} type="checkbox" />
-				<StyledIndicator checked={checked} />
-			</StyledLabelWrapper>
+			<StyledLabel title={label}>{label}</StyledLabel>
+			<StyledInput onChange={onChange} type="checkbox" />
+			<StyledIndicator checked={checked} />
 			{children}
 		</StyledBooleanItem>
 	);

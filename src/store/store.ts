@@ -218,7 +218,7 @@ export class Store {
 		pageRef.setPath(this.findAvailablePagePath(pageRef));
 		pageRef.updateLastPersistedPath();
 
-		pageRef.touch();
+		pageRef.createFile();
 
 		return pageRef;
 	}
@@ -960,6 +960,9 @@ export class Store {
 			.getProject()
 			.getPageRefsInternal()
 			.remove(page);
+
+		page.removeFile();
+		this.save();
 	}
 
 	/**

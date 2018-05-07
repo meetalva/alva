@@ -117,6 +117,20 @@ export class PageRef {
 		return this;
 	}
 
+	/**
+	 * Create the persistence file for this page ref if it does not exist
+	 */
+	public createFile(): void {
+		const store = Store.getInstance();
+		const path = Path.resolve(store.getPagesPath(), this.path);
+
+		if (!Fs.existsSync(path)) {
+			const page = Page.create(this.id);
+			Persister.saveYaml(path, page.toJsonObject());
+			this.updateLastPersistedPath();
+		}
+	}
+
 	public getEditedName(): string {
 		return this.editedName;
 	}
@@ -194,6 +208,22 @@ export class PageRef {
 		return Page.fromPath(Path.join(pagesPath, 'alva', this.path), this.id);
 	}
 
+	public removeFile(): void {
+		const store = Store.getInstance();
+		const path = Path.resolve(store.getPagesPath(), this.path);
+
+		if (Fs.existsSync(path)) {
+			Fs.unlinkSync(path);
+		}
+	}
+
+	public renameFile(newPath: string): void {
+		if (this.lastPersistedPath && Fs.existsSync(this.lastPersistedPath)) {
+			Fs.renameSync(this.lastPersistedPath, newPath);
+			this.lastPersistedPath = newPath;
+		}
+	}
+
 	/**
 	 * Sets the human-friendly name of the page.
 	 * @param name The human-friendly name of the page.
@@ -251,20 +281,6 @@ export class PageRef {
 			name: this.name,
 			path: this.path
 		};
-	}
-
-	/**
-	 * Create the persistence file for this page ref if it does not exist
-	 */
-	public touch(): void {
-		const store = Store.getInstance();
-		const path = Path.resolve(store.getPagesPath(), this.path);
-
-		if (!Fs.existsSync(path)) {
-			const page = Page.create(this.id);
-			Persister.saveYaml(path, page.toJsonObject());
-			this.updateLastPersistedPath();
-		}
 	}
 
 	/**

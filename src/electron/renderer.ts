@@ -30,7 +30,6 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 	// Do not perform custom operations
 	// if anything on the page has focus
 	if (document.activeElement !== document.body) {
-		console.log(document.activeElement);
 		return;
 	}
 

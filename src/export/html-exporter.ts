@@ -10,7 +10,7 @@ import * as uuid from 'uuid';
 const SCRIPTS = ['vendor', 'renderer', 'components', 'preview'];
 
 const createScript = (name: string, content: string) =>
-	`<script data-script="${name}">${content}</script>`;
+	`<script data-script="${name}">${content}<\/script>`;
 
 export class HtmlExporter extends Exporter {
 	public async createExport(): Promise<ExportResult> {
@@ -28,6 +28,7 @@ export class HtmlExporter extends Exporter {
 			id: uuid.v4(),
 			type: 'state',
 			payload: {
+				mode: PreviewDocumentMode.Static,
 				pageId: currentPage.getId(),
 				pages: project.getPages().map(page => page.toJsonObject({ forRendering: true }))
 			}

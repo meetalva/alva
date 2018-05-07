@@ -3,6 +3,7 @@ import { getComponent } from './get-component';
 import { HighlightArea } from './highlight-area';
 import { PreviewMessageType } from '../message';
 import * as MobX from 'mobx';
+import { PreviewDocumentMode } from './preview-document';
 import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
 
 // TODO: Produces a deprecation warning, find a way
@@ -25,6 +26,7 @@ export interface PageElement {
 
 export interface Page {
 	id: string;
+	name: string;
 	root: PageElement;
 }
 
@@ -38,6 +40,7 @@ interface InitialData {
 
 export class PreviewStore {
 	@MobX.observable public elementId: string = '';
+	@MobX.observable public mode: PreviewDocumentMode = PreviewDocumentMode.Live;
 	@MobX.observable public pageId: string = '';
 	@MobX.observable public pages: Page[] = [];
 
@@ -55,6 +58,15 @@ export class PreviewStore {
 
 		const payload = data.payload;
 		const store = new PreviewStore();
+
+		switch (payload.mode) {
+			case 'static':
+				store.mode = PreviewDocumentMode.Static;
+				break;
+			case 'live':
+			default:
+				store.mode = PreviewDocumentMode.Live;
+		}
 
 		if (payload.pageId) {
 			store.pageId = payload.pageId;
@@ -85,16 +97,15 @@ function main(): void {
 		});
 	};
 
-	if (!initialData || initialData.mode === 'live') {
+	if (store.mode === PreviewDocumentMode.Live) {
 		listen(store, {
 			onReplacement(): void {
 				render();
 			}
 		});
-	} else {
-		startRouter(store);
 	}
 
+	startRouter(store);
 	render();
 }
 
@@ -180,8 +191,13 @@ function listen(store: PreviewStore, handlers: { onReplacement(): void }): void 
 				break;
 			}
 			case PreviewMessageType.State: {
+				if (window.location.hash && store.pageId !== payload.pageId) {
+					window.location.hash = '';
+				}
+
 				store.pageId = payload.pageId;
 				store.pages = payload.pages;
+
 				break;
 			}
 			case PreviewMessageType.ElementChange: {
@@ -235,19 +251,23 @@ function startRouter(store: PreviewStore): void {
 	const performRouting = () => {
 		const hash = window.location.hash ? window.location.hash.slice(1) : '';
 
-		if (hash.startsWith('page-')) {
-			const index = Number(hash.replace('page-', ''));
-			const currentPage = store.pages[index - 1] || store.pages[0];
-			store.pageId = currentPage.id;
-		} else {
-			const currentPage = store.pages.find(page => page.id === hash) || store.pages[0];
-			store.pageId = currentPage.id;
+		const previousPage = store.pages.find(page => page.id === store.pageId) || store.pages[0];
+
+		const nextCandidate = hash.startsWith('page-')
+			? store.pages[Number(hash.replace('page-', '')) - 1]
+			: store.pages.find(page => page.id === hash);
+
+		const nextPage = nextCandidate || store.pages[0];
+		store.pageId = nextPage.id;
+
+		if (document.title === '' || document.title === previousPage.name) {
+			document.title = nextPage.name;
 		}
 	};
 
 	performRouting();
 
-	if (!window.location.hash) {
+	if (store.mode === PreviewDocumentMode.Static && !window.location.hash) {
 		window.location.hash = '#page-1';
 	}
 

@@ -151,6 +151,7 @@ export class Page {
 	public toJsonObject(props?: { forRendering?: boolean }): JsonObject {
 		return {
 			id: this.getId(),
+			name: this.getName(),
 			root: this.root ? this.root.toJsonObject(props) : undefined
 		};
 	}

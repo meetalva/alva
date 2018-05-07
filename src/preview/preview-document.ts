@@ -93,7 +93,7 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 <html>
 <head>
 	<meta charset="utf-8"/>
-	<title>alva&trade;</title>
+	<title></title>
 	<style>
 		body {
 			margin: 0;
@@ -110,10 +110,10 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 	)}</textarea>
 	${
 		config.mode === PreviewDocumentMode.Live
-			? `<script src="/scripts/vendor.js" data-script="vendor"></script>
-		<script src="/scripts/renderer.js" data-script="renderer"></script>
-		<script src="/scripts/components.js" data-script="components"></script>
-		<script src="/scripts/preview.js" data-script="preview"></script>`
+			? `<script src="/scripts/vendor.js" data-script="vendor"><\/script>
+		<script src="/scripts/renderer.js" data-script="renderer"><\/script>
+		<script src="/scripts/components.js" data-script="components"><\/script>
+		<script src="/scripts/preview.js" data-script="preview"><\/script>`
 			: config.scripts
 	}
 </body>

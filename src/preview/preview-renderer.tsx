@@ -53,7 +53,6 @@ interface ErrorBoundaryState {
 }
 
 export function render(init: RenderInit): void {
-	console.log(init.store.pageId);
 	ReactDom.render(
 		<MobXReact.Provider
 			getComponent={init.getComponent}
@@ -77,8 +76,6 @@ class PreviewApplication extends React.Component {
 	public render(): JSX.Element | null {
 		const props = this.props as InjectedPreviewApplicationProps;
 		const currentPage = props.store.pages.find(page => page.id === props.store.pageId);
-
-		console.log(props.store.pageId);
 
 		if (!currentPage) {
 			return null;

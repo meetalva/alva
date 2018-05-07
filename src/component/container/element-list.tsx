@@ -80,7 +80,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		pattern.getSlots().forEach(slot => {
 			const listItem = this.createItemFromSlot(slot, element, selectedElement);
 
-			if (slot.getId() === Pattern.DEFAULT_SLOT_ID) {
+			if (slot.getId() === Pattern.DEFAULT_SLOT_PROPERTY_NAME) {
 				defaultSlotItems = listItem.children;
 			} else {
 				slots.push(listItem);

@@ -331,7 +331,7 @@ export class PageElement {
 	 */
 	@MobX.action
 	public getSlotContents(slotId?: string): PageElement[] {
-		const internalSlotId = slotId || Pattern.DEFAULT_SLOT_ID;
+		const internalSlotId = slotId || Pattern.DEFAULT_SLOT_PROPERTY_NAME;
 
 		if (!this.contents.has(internalSlotId)) {
 			this.contents.set(internalSlotId, []);

@@ -94,13 +94,13 @@ export class Styleguide {
 	private addSyntheticPatterns(): void {
 		const folder = new PatternFolder('synthetic', this.patternRoot);
 
-		const textPattern = new Pattern(Pattern.SYNTHETIC_TEXT_ID, 'Text', '');
+		const textPattern = new Pattern(Pattern.SYNTHETIC_TEXT_TYPE, 'Text', '');
 		const textProperty = new StringProperty(StringProperty.SYNTHETIC_TEXT_ID);
 		textPattern.addProperty(textProperty);
 		folder.addPattern(textPattern);
 		this.addPattern(textPattern);
 
-		const assetPattern = new Pattern(Pattern.SYNTHETIC_ASSET_ID, 'Placeholder', '');
+		const assetPattern = new Pattern(Pattern.SYNTHETIC_PLACEHOLDER_TYPE, 'Placeholder', '');
 		const assetProperty = new AssetProperty(AssetProperty.SYNTHETIC_ASSET_ID);
 		assetPattern.addProperty(assetProperty);
 		folder.addPattern(assetPattern);

@@ -17,17 +17,17 @@ export class Pattern {
 	/**
 	 * The ID of the default slot.
 	 */
-	public static DEFAULT_SLOT_ID: string = 'default';
+	public static DEFAULT_SLOT_PROPERTY_NAME: string = 'default';
 
 	/**
 	 * The ID of the synthetic asset content pattern.
 	 */
-	public static SYNTHETIC_ASSET_ID: string = 'synthetic:asset';
+	public static SYNTHETIC_PLACEHOLDER_TYPE: string = 'synthetic:asset';
 
 	/**
 	 * The ID of the synthetic text content pattern.
 	 */
-	public static SYNTHETIC_TEXT_ID: string = 'synthetic:text';
+	public static SYNTHETIC_TEXT_TYPE: string = 'synthetic:text';
 
 	/**
 	 * The name of the export in the JavaScript implementation of the pattern.
@@ -72,7 +72,7 @@ export class Pattern {
 	 * The slots this pattern supports
 	 */
 	protected slots: Map<string, Slot> = new Map([
-		[Pattern.DEFAULT_SLOT_ID, new Slot(Pattern.DEFAULT_SLOT_ID)]
+		[Pattern.DEFAULT_SLOT_PROPERTY_NAME, new Slot(Pattern.DEFAULT_SLOT_PROPERTY_NAME)]
 	]);
 
 	/**

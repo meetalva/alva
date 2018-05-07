@@ -10,7 +10,7 @@ import PatternList, {
 	PatternListItemProps
 } from '../../lsg/patterns/pattern-list';
 import * as React from 'react';
-import Space, { Size } from '../../lsg/patterns/space';
+import Space, { SpaceSize } from '../../lsg/patterns/space';
 import { Store } from '../../store/store';
 
 export interface PatternListContainerItemProps {
@@ -26,14 +26,6 @@ export interface NamedPatternListItemProps extends PatternListItemProps {
 export class PatternListContainer extends React.Component {
 	public items: PatternListContainerItemProps[] = [];
 
-	public constructor(props: {}) {
-		super(props);
-
-		this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
-		this.handlePatternClick = this.handlePatternClick.bind(this);
-		this.handleDragStart = this.handleDragStart.bind(this);
-	}
-
 	public createItemsFromFolder(parent: PatternFolder): PatternListContainerItemProps[] {
 		const result: PatternListContainerItemProps[] = [];
 
@@ -48,7 +40,7 @@ export class PatternListContainer extends React.Component {
 					name: pattern.getName(),
 					draggable: true,
 					icon: pattern.getIconPath(),
-					handleDragStart: (e: React.DragEvent<HTMLElement>) => {
+					onDragStart: (e: React.DragEvent<HTMLElement>) => {
 						this.handleDragStart(e, pattern);
 					},
 					onClick: () => {
@@ -74,7 +66,7 @@ export class PatternListContainer extends React.Component {
 								{container.items.map((item, itemIndex) => (
 									<PatternListItem
 										draggable={item.draggable}
-										handleDragStart={item.handleDragStart}
+										onDragStart={item.onDragStart}
 										key={itemIndex}
 										icon={item.icon}
 										onClick={item.onClick}
@@ -136,10 +128,13 @@ export class PatternListContainer extends React.Component {
 		const list = this.createList(this.items);
 		return (
 			<div>
-				<Space sizeBottom={Size.XXS}>
-					<Input handleChange={this.handleSearchInputChange} placeholder="Search patterns" />
+				<Space sizeBottom={SpaceSize.XXS}>
+					<Input
+						onChange={e => this.handleSearchInputChange(e)}
+						placeholder="Search patterns"
+					/>
 				</Space>
-				<Space size={[0, Size.L]}>{list}</Space>
+				<Space size={[0, SpaceSize.L]}>{list}</Space>
 			</div>
 		);
 	}

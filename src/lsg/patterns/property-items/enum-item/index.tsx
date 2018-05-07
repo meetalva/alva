@@ -1,7 +1,7 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
 import * as React from 'react';
-import { getSpace, Size } from '../../space';
+import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
 
 export interface Values {
@@ -11,8 +11,8 @@ export interface Values {
 
 export interface EnumItemProps {
 	className?: string;
-	handleChange?: React.ChangeEventHandler<HTMLSelectElement>;
 	label: string;
+	onChange?: React.ChangeEventHandler<HTMLSelectElement>;
 	required?: boolean;
 	selectedValue?: string;
 	values: Values[];
@@ -32,8 +32,8 @@ const StyledSelect = styled.select`
 	color: ${colors.grey36.toString()};
 	font-size: 15px;
 	border-bottom: 1px solid transparent;
-	padding-bottom: ${getSpace(Size.M) / 2}px;
-	margin-bottom: ${getSpace(Size.L)}px;
+	padding-bottom: ${getSpace(SpaceSize.M) / 2}px;
+	margin-bottom: ${getSpace(SpaceSize.L)}px;
 	transition: all 0.2s;
 
 	&:hover {
@@ -50,21 +50,21 @@ const StyledSelect = styled.select`
 
 const StyledLabel = styled.span`
 	display: block;
-	margin-bottom: ${getSpace(Size.XS)}px;
+	margin-bottom: ${getSpace(SpaceSize.XS)}px;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey36.toString()};
 `;
 
 export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
-	const { className, values, selectedValue, handleChange, label, required } = props;
+	const { className, values, selectedValue, onChange, label, required } = props;
 
 	return (
 		<StyledEnumItem className={className}>
 			<StyledLabel>{label}</StyledLabel>
 			<StyledSelect
 				className={className}
-				onChange={handleChange}
+				onChange={onChange}
 				value={selectedValue ? selectedValue : ''}
 			>
 				{!required && <option key="empty" value="" />}

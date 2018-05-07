@@ -1,14 +1,14 @@
 import { colors } from '../colors';
-import { Icon, IconName, Size as IconSize } from '../icons';
+import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
-import { getSpace, Size } from '../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface PatternListItemProps {
 	draggable?: boolean;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	icon?: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDragStart?: React.DragEventHandler<HTMLElement>;
 }
 
 const StyledPatternList = styled.div`
@@ -22,21 +22,21 @@ const StyledPatternList = styled.div`
 
 const StyledPatternLabel = styled.div`
 	flex-basis: 100%;
-	margin-top: ${getSpace(Size.L)}px;
-	margin-bottom: ${getSpace(Size.S)}px;
+	margin-top: ${getSpace(SpaceSize.L)}px;
+	margin-bottom: ${getSpace(SpaceSize.S)}px;
 	color: ${colors.grey60.toString()};
 	text-transform: capitalize;
 
 	&:first-of-type {
-		margin-top: ${getSpace(Size.S)}px;
+		margin-top: ${getSpace(SpaceSize.S)}px;
 	}
 `;
 
 const StyledPatternListItem = styled.div`
 	box-sizing: border-box;
-	width: calc(50% - ${getSpace(Size.XS) / 2}px);
-	padding: ${getSpace(Size.S)}px;
-	margin-bottom: ${getSpace(Size.XS)}px;
+	width: calc(50% - ${getSpace(SpaceSize.XS) / 2}px);
+	padding: ${getSpace(SpaceSize.S)}px;
+	margin-bottom: ${getSpace(SpaceSize.XS)}px;
 	border-radius: 3px;
 	background: ${colors.white.toString()};
 	font-size: 12px;
@@ -56,14 +56,14 @@ const StyledPatternListItem = styled.div`
 
 const StyledIcon = styled(Icon)`
 	display: block;
-	margin: 0 auto ${getSpace(Size.XS)}px;
+	margin: 0 auto ${getSpace(SpaceSize.XS)}px;
 `;
 
 const StyledImg = styled.img`
 	display: block;
 	width: 18px;
 	height: 18px;
-	margin: 0 auto ${getSpace(Size.XS)}px;
+	margin: 0 auto ${getSpace(SpaceSize.XS)}px;
 	user-drag: none;
 	user-select: none;
 `;
@@ -75,9 +75,9 @@ const StyledPatternListItemLabel = styled.div`
 `;
 
 export const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
-	const { draggable, handleDragStart, icon, onClick } = props;
+	const { draggable, onDragStart, icon, onClick } = props;
 	return (
-		<StyledPatternListItem onDragStart={handleDragStart} draggable={draggable} onClick={onClick}>
+		<StyledPatternListItem onDragStart={onDragStart} draggable={draggable} onClick={onClick}>
 			{icon ? (
 				<StyledImg className="pattern__icon" src={icon} />
 			) : (

@@ -1,8 +1,8 @@
 import { Color, colors } from '../colors';
-import { Icon, IconName, Size as IconSize } from '../icons';
+import { Icon, IconName, IconSize } from '../icons';
 import Input, { InputTypes } from '../input';
 import * as React from 'react';
-import { getSpace, Size as SpaceSize } from '../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface DropdownItemProps {
@@ -19,13 +19,13 @@ export interface DropdownItemEditableProps {
 	color?: Color;
 	editable: boolean;
 	focused: boolean;
-	handleBlur?: React.FocusEventHandler<HTMLInputElement>;
-	handleChange?: React.ChangeEventHandler<HTMLInputElement>;
-	handleClick: React.MouseEventHandler<HTMLElement>;
-	handleDoubleClick: React.MouseEventHandler<HTMLElement>;
-	handleKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
 	icon?: IconName;
 	name: string;
+	onBlur?: React.FocusEventHandler<HTMLInputElement>;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	onClick: React.MouseEventHandler<HTMLElement>;
+	onDoubleClick: React.MouseEventHandler<HTMLElement>;
+	onKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
 	value?: string;
 }
 
@@ -129,18 +129,18 @@ export class DropdownItemLinkAttributeItem extends React.Component {
 export const DropdownItemEditableLink: React.StatelessComponent<DropdownItemEditableProps> = (
 	props
 ): JSX.Element => (
-	<StyledDropdownItem onDoubleClick={props.handleDoubleClick}>
+	<StyledDropdownItem onDoubleClick={props.onDoubleClick}>
 		{!props.editable ? (
-			<StyledDropdownItemLink onClick={props.handleClick}>
+			<StyledDropdownItemLink onClick={props.onClick}>
 				{props.icon && <StyledDropdownItemIcon size={IconSize.S} name={props.icon} />}
 				{props.name}
 			</StyledDropdownItemLink>
 		) : (
 			<StyledDropdownItemInput
 				focused={props.focused}
-				handleChange={props.handleChange}
-				handleKeyDown={props.handleKeyDown}
-				handleBlur={props.handleBlur}
+				onChange={props.onChange}
+				onKeyDown={props.onKeyDown}
+				onBlur={props.onBlur}
 				type={InputTypes.string}
 				value={props.value}
 			/>

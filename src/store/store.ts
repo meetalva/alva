@@ -14,6 +14,12 @@ import { Preferences } from './preferences';
 import { Project } from './project';
 import { Styleguide } from './styleguide/styleguide';
 
+export enum AlvaView {
+	Pages = 'Pages',
+	PageDetail = 'PageDetail',
+	SplashScreen = 'SplashScreen'
+}
+
 export enum RightPane {
 	Patterns = 'Patterns',
 	Properties = 'Properties'
@@ -29,6 +35,11 @@ export class Store {
 	 * The store singleton instance.
 	 */
 	private static INSTANCE: Store;
+
+	/**
+	 * The current state of the Page Overview
+	 */
+	@MobX.observable private activeView: AlvaView = AlvaView.PageDetail;
 
 	/**
 	 * The name of the analyzer that should be used for the open styleguide.
@@ -67,6 +78,11 @@ export class Store {
 	 * @see selectedElement
 	 */
 	@MobX.observable private elementFocussed?: boolean = false;
+
+	/**
+	 * The currently name-editable element in the element list.
+	 */
+	@MobX.observable private nameEditableElement?: PageElement;
 
 	/**
 	 * The current search term in the patterns list, or an empty string if there is none.
@@ -179,6 +195,24 @@ export class Store {
 		return guessedName.substring(0, 1).toUpperCase() + guessedName.substring(1);
 	}
 
+	public addNewPageRef(): PageRef {
+		const project = this.currentProject as Project;
+
+		// Page refs register with their project automatically
+		// via side effects
+		const pageRef = new PageRef({
+			name: 'New page',
+			project
+		});
+
+		pageRef.setPath(this.findAvailablePagePath(pageRef));
+		pageRef.updateLastPersistedPath();
+
+		pageRef.touch();
+
+		return pageRef;
+	}
+
 	/**
 	 * Add a new project definition to the list of projects.
 	 * Note: Changes to the projects and page references are saved only when calling save().
@@ -278,6 +312,10 @@ export class Store {
 		);
 	}
 
+	public getActiveView(): AlvaView {
+		return this.activeView;
+	}
+
 	/**
 	 * Returns the name of the analyzer that should be used for the open styleguide.
 	 * @return The name of the analyzer that should be used for the open styleguide.
@@ -343,6 +381,10 @@ export class Store {
 	 */
 	public getDraggedElement(): PageElement | undefined {
 		return this.draggedElement;
+	}
+
+	public getNameEditableElement(): PageElement | undefined {
+		return this.nameEditableElement;
 	}
 
 	/**
@@ -571,6 +613,7 @@ export class Store {
 		this.save();
 
 		const pageRef = this.getPageRefById(id);
+
 		if (pageRef && pageRef.getLastPersistedPath()) {
 			const pagePath: string = Path.join(
 				this.getPagesPath(),
@@ -798,6 +841,10 @@ export class Store {
 		Persister.saveYaml(this.getPreferencesPath(), this.preferences.toJsonObject());
 	}
 
+	public setActiveView(view: AlvaView): void {
+		this.activeView = view;
+	}
+
 	/**
 	 * Sets the element currently in the clipboard, or undefined if there is none.
 	 * Note: The element is cloned lazily, so you don't need to clone it when setting.
@@ -825,6 +872,18 @@ export class Store {
 	 */
 	public setElementFocussed(elementFocussed: boolean): void {
 		this.elementFocussed = elementFocussed;
+	}
+
+	public setNameEditableElement(editableElement?: PageElement): void {
+		if (this.nameEditableElement && this.nameEditableElement !== editableElement) {
+			this.nameEditableElement.setNameEditable(false);
+		}
+
+		if (editableElement) {
+			editableElement.setNameEditable(true);
+		}
+
+		this.nameEditableElement = editableElement;
 	}
 
 	/**
@@ -866,6 +925,9 @@ export class Store {
 	 * @see setElementFocussed
 	 */
 	public setSelectedElement(selectedElement?: PageElement): void {
+		if (this.selectedElement && this.selectedElement !== selectedElement) {
+			this.setNameEditableElement();
+		}
 		this.rightPane = null;
 		this.selectedElement = selectedElement;
 		this.selectedSlotId = undefined;

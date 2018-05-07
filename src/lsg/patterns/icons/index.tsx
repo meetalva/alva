@@ -3,9 +3,12 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export enum IconName {
-	Arrow,
-	ArrowFill,
+	ArrowRight,
+	ArrowLeft,
+	ArrowFillRight,
+	ArrowFillLeft,
 	Robo,
+	Plus,
 	Pattern
 }
 export interface IconRegistryProps {
@@ -16,12 +19,12 @@ export interface IconProps {
 	className?: string;
 	color?: Color;
 	dataIcon?: string;
-	handleClick?: React.MouseEventHandler<SVGSVGElement>;
 	name: IconName | null;
-	size?: Size;
+	onClick?: React.MouseEventHandler<SVGSVGElement>;
+	size?: IconSize;
 }
 
-export enum Size {
+export enum IconSize {
 	XXS = 12,
 	XS = 15,
 	S = 24
@@ -30,7 +33,7 @@ export enum Size {
 interface StyledIconProps {
 	className?: string;
 	iconColor?: Color;
-	size?: Size;
+	size?: IconSize;
 }
 
 interface IconRegistrySymbolProps {
@@ -38,12 +41,34 @@ interface IconRegistrySymbolProps {
 }
 
 const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
-	[IconName.Arrow]: [
-		[<path key="arrow" d="M17.5 12l-8.486 8.485L7.6 19.071 14.671 12 7.6 4.929l1.414-1.414z" />]
+	[IconName.ArrowRight]: [
+		[
+			<path
+				key="arrowRight"
+				d="M17.5 12l-8.486 8.485L7.6 19.071 14.671 12 7.6 4.929l1.414-1.414z"
+			/>
+		]
 	],
-	[IconName.ArrowFill]: [[<path key="arrowFill" d="M8 4l8 8-8 8z" />]],
+	[IconName.ArrowLeft]: [
+		[
+			<path
+				key="arrowLeft"
+				d="M7.5 12 15.986 3.515 17.4 4.929 10.329 12 17.4 19.071 15.986 20.485z"
+			/>
+		]
+	],
+	[IconName.ArrowFillRight]: [[<path key="arrowFillRight" d="M8 4l8 8-8 8z" />]],
+	[IconName.ArrowFillLeft]: [[<path key="arrowFillLeft" d="M16 20l-8-8 8-8v16z" />]],
 	[IconName.Robo]: [
 		[<path key="robo" d="M0 0h24v24H0V0zm15 5v5h5V5h-5zM4 20h16v-1H4v1zM4 5v5h5V5H4z" />]
+	],
+	[IconName.Plus]: [
+		[
+			<path
+				key="plus"
+				d="M11,11 L11,2 L13,2 L13,11 L22,11 L22,13 L13,13 L13,22 L11,22 L11,13 L2,13 L2,11 L11,11 Z"
+			/>
+		]
 	],
 	[IconName.Pattern]: [
 		[
@@ -60,8 +85,8 @@ const StyledIconRegistry = styled.svg`
 `;
 
 const StyledIcon = styled.svg`
-	width: ${(props: StyledIconProps) => props.size || Size.S}px;
-	height: ${(props: StyledIconProps) => props.size || Size.S}px;
+	width: ${(props: StyledIconProps) => props.size || IconSize.S}px;
+	height: ${(props: StyledIconProps) => props.size || IconSize.S}px;
 
 	color: ${(props: StyledIconProps) => (props.iconColor ? props.iconColor.toString() : 'inherit')};
 	fill: currentColor;
@@ -101,7 +126,7 @@ export const Icon: React.StatelessComponent<IconProps> = (props): JSX.Element =>
 	const icon = typeof props.name === 'number' ? IconName[props.name] : null;
 	return (
 		<StyledIcon
-			onClick={props.handleClick}
+			onClick={props.onClick}
 			className={props.className}
 			iconColor={props.color}
 			size={props.size}

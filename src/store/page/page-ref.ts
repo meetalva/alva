@@ -1,10 +1,16 @@
-import { JsonObject } from '../json';
+import * as Fs from 'fs';
+import { JsonObject, Persister } from '../json';
 import * as MobX from 'mobx';
 import { Page } from './page';
 import * as Path from 'path';
 import { Project } from '../project';
 import { Store } from '../store';
 import * as Uuid from 'uuid';
+
+export enum EditState {
+	Editable = 'Editable',
+	Editing = 'Editing'
+}
 
 export interface PageRefProperties {
 	id?: string;
@@ -23,6 +29,11 @@ export interface PageRefProperties {
  */
 export class PageRef {
 	/**
+	 * Intermediary edited name
+	 */
+	@MobX.observable public editedName: string = '';
+
+	/**
 	 * The technical (internal) ID of the page.
 	 */
 	@MobX.observable private id: string;
@@ -39,6 +50,11 @@ export class PageRef {
 	 * In the frontend, to be displayed instead of the ID.
 	 */
 	@MobX.observable private name: string;
+
+	/**
+	 * Wether the name may be edited
+	 */
+	@MobX.observable public nameState: EditState = EditState.Editable;
 
 	/**
 	 * The path of the page file, relative to the alva.yaml.
@@ -96,6 +112,10 @@ export class PageRef {
 		}
 	}
 
+	public getEditedName(): string {
+		return this.editedName;
+	}
+
 	/**
 	 * Returns the technical (internal) ID of the page.
 	 * @return The technical (internal) ID of the page.
@@ -119,8 +139,16 @@ export class PageRef {
 	 * In the frontend, to be displayed instead of the ID.
 	 * @return The human-friendly name of the page.
 	 */
-	public getName(): string {
+	public getName(options?: { unedited: boolean }): string {
+		if ((!options || !options.unedited) && this.nameState === EditState.Editing) {
+			return this.editedName;
+		}
+
 		return this.name;
+	}
+
+	public getNameState(): EditState {
+		return this.nameState;
 	}
 
 	/**
@@ -165,8 +193,22 @@ export class PageRef {
 	 * Sets the human-friendly name of the page.
 	 * @param name The human-friendly name of the page.
 	 */
+	@MobX.action
 	public setName(name: string): void {
+		if (this.nameState === EditState.Editing) {
+			this.editedName = name;
+			return;
+		}
+
 		this.name = name;
+	}
+
+	public setNameState(state: EditState): void {
+		if (state === EditState.Editing) {
+			this.editedName = this.name;
+		}
+
+		this.nameState = state;
 	}
 
 	/**
@@ -204,6 +246,20 @@ export class PageRef {
 			name: this.name,
 			path: this.path
 		};
+	}
+
+	/**
+	 * Create the persistence file for this page ref if it does not exist
+	 */
+	public touch(): void {
+		const store = Store.getInstance();
+		const path = Path.resolve(store.getPagesPath(), this.path);
+
+		if (!Fs.existsSync(path)) {
+			const page = Page.fromJsonObject({}, this.id);
+			Persister.saveYaml(path, page.toJsonObject());
+			this.updateLastPersistedPath();
+		}
 	}
 
 	/**

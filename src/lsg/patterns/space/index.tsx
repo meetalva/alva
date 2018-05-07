@@ -4,21 +4,21 @@ import styled from 'styled-components';
 export interface SpaceProps {
 	className?: string;
 	inside?: boolean;
-	size?: Size | Size[];
-	sizeBottom?: Size;
-	sizeLeft?: Size;
-	sizeRight?: Size;
-	sizeTop?: Size;
+	size?: SpaceSize | SpaceSize[];
+	sizeBottom?: SpaceSize;
+	sizeLeft?: SpaceSize;
+	sizeRight?: SpaceSize;
+	sizeTop?: SpaceSize;
 }
 
 export interface StyledSpaceProps {
 	inside: boolean;
 	// Redefine `size` as `spaceSize` property for styled components to avoid collision
 	// with `size` property on `React.HTMLAttributes` interface.
-	spaceSize: Size[];
+	spaceSize: SpaceSize[];
 }
 
-export enum Size {
+export enum SpaceSize {
 	// Explicity set enum values to indicate that they will be used later on as
 	// array indicies.
 	None = 0,
@@ -46,7 +46,7 @@ export enum PageInset {
  * given growth mapping.
  * @param size The size used for calculation.
  */
-export function getSpace(size: Size): number {
+export function getSpace(size: SpaceSize): number {
 	if (undefined !== size) {
 		return size;
 	}
@@ -80,7 +80,7 @@ function merge<T>(shorthand: T | T[], top?: T, right?: T, bottom?: T, left?: T):
 	];
 }
 
-function calculate(property: string, space: Size[]): string {
+function calculate(property: string, space: SpaceSize[]): string {
 	const values = space.map<string>((value, index) => `${getSpace(value)}px`);
 
 	const result = `${property}: ${values.join(' ')};`;

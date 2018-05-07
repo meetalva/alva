@@ -23,15 +23,15 @@ export interface ListItemProps {
 interface StyledListItemProps {
 	active?: boolean;
 	draggable?: boolean;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDragStart?: React.DragEventHandler<HTMLElement>;
 }
 
 export interface LiProps {
 	active?: boolean;
 	draggable?: boolean;
-	handleDragStart?: React.DragEventHandler<HTMLElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDragStart?: React.DragEventHandler<HTMLElement>;
 }
 
 const StyledUl = styled.ul`
@@ -70,13 +70,13 @@ export class Li extends React.Component<LiProps> {
 	}
 
 	public render(): JSX.Element {
-		const { active, draggable, onClick, handleDragStart } = this.props;
+		const { active, draggable, onClick, onDragStart } = this.props;
 		return (
 			<StyledLi
 				active={active}
 				draggable={draggable}
 				onClick={onClick}
-				onDragStart={handleDragStart}
+				onDragStart={onDragStart}
 			>
 				{this.props.children}
 			</StyledLi>

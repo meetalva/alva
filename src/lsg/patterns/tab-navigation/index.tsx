@@ -1,7 +1,7 @@
 import { colors } from '../colors';
 import { fonts } from '../fonts';
 import * as React from 'react';
-import { getSpace, Size } from '../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface TabNavigationProps {
@@ -26,32 +26,29 @@ const StyledTabNavigation = styled.div`
 
 const StyledTabNavigationItem = styled.div`
 	flex-grow: 1;
-	padding: ${getSpace(Size.XS)}px ${getSpace(Size.M)}px;
-	${(props: TabNavigationItemProps) => props.active
-		? `background: ${colors.grey60.toString()};
+	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.M)}px;
+	${(props: TabNavigationItemProps) =>
+		props.active
+			? `background: ${colors.grey60.toString()};
 			color: ${colors.white.toString()};`
-		: `background: ${colors.white.toString()};
-			color: ${colors.grey60.toString()};`
-	}
+			: `background: ${colors.white.toString()};
+			color: ${colors.grey60.toString()};`}
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 12px;
 	text-align: center;
 	cursor: pointer;
 `;
 
-export const TabNavigationItem: React.StatelessComponent<TabNavigationItemProps> = (props): JSX.Element => (
-	<StyledTabNavigationItem
-		active={props.active}
-		onClick={props.onClick}
-	>
+export const TabNavigationItem: React.StatelessComponent<TabNavigationItemProps> = (
+	props
+): JSX.Element => (
+	<StyledTabNavigationItem active={props.active} onClick={props.onClick}>
 		{props.tabText}
 	</StyledTabNavigationItem>
 );
 
 export const TabNavigation: React.StatelessComponent<TabNavigationProps> = (props): JSX.Element => (
-	<StyledTabNavigation>
-		{props.children}
-	</StyledTabNavigation>
+	<StyledTabNavigation>{props.children}</StyledTabNavigation>
 );
 
 export default TabNavigation;

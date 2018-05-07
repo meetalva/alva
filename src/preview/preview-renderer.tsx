@@ -3,6 +3,7 @@ import { HighlightArea } from './highlight-area';
 import { omit } from 'lodash';
 import * as MobX from 'mobx';
 import * as MobXReact from 'mobx-react';
+import { optimizedResize } from './optimized-resize';
 import { PreviewStore } from './preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
@@ -108,9 +109,19 @@ export function render(init: RenderInit): void {
 	@MobXReact.inject('store', 'highlight')
 	@MobXReact.observer
 	class PreviewComponent extends React.Component<PreviewComponentProps> {
+		public componentDidMount(): void {
+			const resize = optimizedResize();
+			const props = this.props as InjectedPreviewComponentProps;
+			resize.add(() => {
+				if (props.uuid === props.store.elementId) {
+					const node = ReactDom.findDOMNode(this);
+					props.highlight.setSize(node as Element);
+				}
+			});
+		}
+
 		public componentWillUpdate(): void {
 			const props = this.props as InjectedPreviewComponentProps;
-
 			if (props.uuid === props.store.elementId) {
 				const node = ReactDom.findDOMNode(this);
 				if (node) {
@@ -172,7 +183,6 @@ export function render(init: RenderInit): void {
 		public render(): JSX.Element {
 			const props = this.props as InjectedPreviewHighlightProps;
 			const { highlight } = props;
-			// const p = highlight.getProps();
 
 			return (
 				<div

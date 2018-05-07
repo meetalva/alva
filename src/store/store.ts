@@ -880,8 +880,22 @@ export class Store {
 	 * @param element The PageElement to remove
 	 */
 	public removeElement(element: PageElement): void {
+		const index = element.getIndex();
+
+		const getNextSelected = (): PageElement | undefined => {
+			if (typeof index !== 'number') {
+				return;
+			}
+
+			const nextIndex = index > 0 ? Math.max(index - 1, 0) : 1;
+
+			return element.getParentSlotContents()[nextIndex];
+		};
+
+		const elementBefore = getNextSelected();
+
 		this.execute(ElementLocationCommand.remove(element));
-		this.setSelectedElement(undefined);
+		this.setSelectedElement(elementBefore);
 	}
 
 	public removeElementById(id: string): void {

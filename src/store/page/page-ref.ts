@@ -256,7 +256,7 @@ export class PageRef {
 		const path = Path.resolve(store.getPagesPath(), this.path);
 
 		if (!Fs.existsSync(path)) {
-			const page = Page.fromJsonObject({}, this.id);
+			const page = Page.create(this.id);
 			Persister.saveYaml(path, page.toJsonObject());
 			this.updateLastPersistedPath();
 		}

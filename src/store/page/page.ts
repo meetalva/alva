@@ -4,6 +4,7 @@ import { PageElement } from './page-element';
 import { PageRef } from './page-ref';
 import { Project } from '../project';
 import { Store } from '../store';
+import { Styleguide, SyntheticPatternType } from '../styleguide/styleguide';
 
 /**
  * The current actually loaded page of a project. It consists of a tree of page elements,
@@ -33,6 +34,29 @@ export class Page {
 	 */
 	public constructor(pageRef: PageRef) {
 		this.pageRef = pageRef;
+	}
+
+	/**
+	 * Create a new empty page
+	 */
+	public static create(id: string): Page {
+		const store = Store.getInstance();
+		const styleguide = store.getStyleguide() as Styleguide;
+		const pageRef = store.getPageRefById(id);
+
+		if (!pageRef) {
+			throw new Error(`Unknown page ID '${id}'`);
+		}
+
+		const page = new Page(pageRef);
+
+		page.setRoot(
+			new PageElement({
+				pattern: styleguide.getSyntheticPattern(SyntheticPatternType.Page)
+			})
+		);
+
+		return page;
 	}
 
 	/**

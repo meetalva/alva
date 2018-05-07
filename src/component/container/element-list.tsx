@@ -228,7 +228,9 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		const styleguide = store.getStyleguide() as Styleguide;
 		const patternId = e.dataTransfer.getData('patternId');
 		const dropTargetElement = elementFromTarget(e.target);
-		const newParent = dropTargetElement ? dropTargetElement.getParent() : undefined;
+		const newParent = dropTargetElement
+			? dropTargetElement.getParent() || dropTargetElement
+			: undefined;
 		const isPlaceholder =
 			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
 

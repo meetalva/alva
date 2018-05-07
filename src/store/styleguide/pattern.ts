@@ -20,16 +20,6 @@ export class Pattern {
 	public static DEFAULT_SLOT_PROPERTY_NAME: string = 'default';
 
 	/**
-	 * The ID of the synthetic asset content pattern.
-	 */
-	public static SYNTHETIC_PLACEHOLDER_TYPE: string = 'synthetic:asset';
-
-	/**
-	 * The ID of the synthetic text content pattern.
-	 */
-	public static SYNTHETIC_TEXT_TYPE: string = 'synthetic:text';
-
-	/**
 	 * The name of the export in the JavaScript implementation of the pattern.
 	 * For default export, the value is 'default'.
 	 */

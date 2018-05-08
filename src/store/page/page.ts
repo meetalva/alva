@@ -1,9 +1,10 @@
-import { JsonObject } from '../json';
+import { JsonObject, Persister } from '../json';
 import * as MobX from 'mobx';
 import { PageElement } from './page-element';
 import { PageRef } from './page-ref';
 import { Project } from '../project';
 import { Store } from '../store';
+import { Styleguide, SyntheticPatternType } from '../styleguide/styleguide';
 
 /**
  * The current actually loaded page of a project. It consists of a tree of page elements,
@@ -36,8 +37,32 @@ export class Page {
 	}
 
 	/**
+	 * Create a new empty page
+	 */
+	public static create(id: string): Page {
+		const store = Store.getInstance();
+		const styleguide = store.getStyleguide() as Styleguide;
+		const pageRef = store.getPageRefById(id);
+
+		if (!pageRef) {
+			throw new Error(`Unknown page ID '${id}'`);
+		}
+
+		const page = new Page(pageRef);
+
+		page.setRoot(
+			new PageElement({
+				pattern: styleguide.getSyntheticPattern(SyntheticPatternType.Page)
+			})
+		);
+
+		return page;
+	}
+
+	/**
 	 * Loads and returns a page from a given JSON object.
 	 * @param jsonObject The JSON object to load from.
+	 * @param id The ID of the resulting page
 	 * @return A new page object containing the loaded data.
 	 */
 	public static fromJsonObject(json: JsonObject, id: string): Page {
@@ -51,6 +76,16 @@ export class Page {
 		page.setRoot(PageElement.fromJsonObject(json.root as JsonObject));
 
 		return page;
+	}
+
+	/**
+	 * Loads and returns a page from a given persisted data file
+	 * @param path The absolute file system path to read from
+	 * @param id The ID of the resulting page
+	 * @return A new page object containing the loaded data.
+	 */
+	public static fromPath(path: string, id: string): Page {
+		return Page.fromJsonObject(Persister.loadYamlOrJson(path), id);
 	}
 
 	/**
@@ -140,6 +175,7 @@ export class Page {
 	public toJsonObject(props?: { forRendering?: boolean }): JsonObject {
 		return {
 			id: this.getId(),
+			name: this.getName(),
 			root: this.root ? this.root.toJsonObject(props) : undefined
 		};
 	}

@@ -63,13 +63,13 @@ const StyledLayout = styled.div`
 	border-style: solid;
 	border-color: ${colors.black.toString('rgb', { alpha: 0.1 })};
 	border-right-width: ${props =>
-		props.side === LayoutSide.Right && props.border === LayoutBorder.Side ? 1 : 0}px;
+		props.side === LayoutSide.Left && props.border === LayoutBorder.Side ? 1 : 0}px;
 	border-left-width: ${props =>
 		props.side === LayoutSide.Right && props.border === LayoutBorder.Side ? 1 : 0}px;
 
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-right-width: ${props =>
-			props.side === LayoutSide.Right && props.border === LayoutBorder.Side ? 0.5 : 0}px;
+			props.side === LayoutSide.Left && props.border === LayoutBorder.Side ? 0.5 : 0}px;
 		border-left-width: ${props =>
 			props.side === LayoutSide.Right && props.border === LayoutBorder.Side ? 0.5 : 0}px;
 	}

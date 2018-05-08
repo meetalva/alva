@@ -21,7 +21,7 @@ export const PageListContainer: React.StatelessComponent = observer((): JSX.Elem
 		<Space sizeBottom={SpaceSize.XXXL * 3}>
 			<Layout wrap={LayoutWrap.Wrap}>
 				{project
-					.getPages()
+					.getPageRefs()
 					.map((pageRef: PageRef, i: number) => (
 						<PageTileContainer
 							focused={pageRef.getId() === currentPageId}

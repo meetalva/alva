@@ -12,9 +12,8 @@ export interface InputComponentProps extends PassedComponentProps {
 }
 
 export interface SyntheticComponents<T> {
-	// tslint:disable-next-line:no-any
 	asset: T;
-	// tslint:disable-next-line:no-any
+	page: T;
 	text: T;
 }
 

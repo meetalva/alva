@@ -24,7 +24,7 @@ function createMockConfigFromFolder(path: string, symlink?: boolean): MockFs.Con
 	return virtualFolder;
 }
 
-function setupVirtualFileSystem() {
+function setupVirtualFileSystem(): void {
 	const mockFolderStructure: MockFs.Config = {
 		'src/': createMockConfigFromFolder('src/'),
 		'node_modules/': createMockConfigFromFolder('node_modules/', true),
@@ -52,7 +52,7 @@ function setupVirtualFileSystem() {
 	MockFs(mockFolderStructure);
 }
 
-describe(`Test for backwards compatibility of config files`, () => {
+describe('Test for backwards compatibility of config files', () => {
 	afterAll(() => {
 		MockFs.restore();
 	});

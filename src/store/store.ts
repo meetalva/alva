@@ -1,11 +1,13 @@
-import { Command } from './command/command';
 import * as FileUtils from 'fs';
 import * as FileExtraUtils from 'fs-extra';
-import { JsonArray, JsonObject, Persister } from './json';
 import * as Lodash from 'lodash';
 import * as MobX from 'mobx';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
 import * as OsUtils from 'os';
+
+import { Command } from './command/command';
+import { JsonArray, JsonObject, Persister } from './json';
+import { migrate } from '../migrator';
 import { Page } from './page/page';
 import { PageElement } from './page/page-element';
 import { PageRef } from './page/page-ref';
@@ -137,7 +139,7 @@ export class Store {
 	 * @return The one global store instance.
 	 */
 	public static getInstance(basePreferencePath?: string): Store {
-		if (!Store.INSTANCE) {
+		if (!Store.INSTANCE || basePreferencePath) {
 			Store.INSTANCE = new Store(basePreferencePath);
 		}
 
@@ -592,32 +594,9 @@ export class Store {
 
 		const alvaYamlPath = PathUtils.join(styleguidePath, 'alva/alva.yaml');
 
-		// TODO: Converts old alva.yaml structure to new one.
-		// This should be removed after the next version.
-		const projectsPath = PathUtils.join(styleguidePath, 'alva/projects.yaml');
-		try {
-			const oldFileStructure = Boolean(FileUtils.statSync(projectsPath));
-			if (oldFileStructure) {
-				const oldAlvaYaml = Persister.loadYamlOrJson(projectsPath);
-				const newAlvaYaml = {
-					analyzerName: 'typescript-react-analyzer',
-					...oldAlvaYaml
-				};
-				FileUtils.writeFileSync(alvaYamlPath, {});
-				Persister.saveYaml(alvaYamlPath, newAlvaYaml);
-				FileUtils.unlinkSync(projectsPath);
-			}
-		} catch (error) {
-			// ignore the correct setup with missing projects.yaml
-		}
+		migrate(styleguidePath);
 
-		let json: JsonObject = Persister.loadYamlOrJson(alvaYamlPath);
-
-		// TODO: Converts old alva.yaml structure to new one.
-		// This should be removed after the next version.
-		if (json.config) {
-			json = json.config as JsonObject;
-		}
+		const json: JsonObject = Persister.loadYamlOrJson(alvaYamlPath);
 
 		json.styleguidePath = styleguidePath;
 		this.setStyleguideFromJsonInternal(json);

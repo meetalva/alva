@@ -1,9 +1,8 @@
 import AddButton from '../../lsg/patterns/add-button';
 import { ChromeContainer } from '../chrome/chrome-container';
-import { remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import { ElementList } from '../../component/container/element-list';
 import ElementPane from '../../lsg/patterns/panes/element-pane';
-import * as FsExtra from 'fs-extra';
 import globalStyles from '../../lsg/patterns/global-styles';
 import { IconName, IconRegistry } from '../../lsg/patterns/icons';
 import Layout, {
@@ -14,60 +13,30 @@ import Layout, {
 	SideBar
 } from '../../lsg/patterns/layout';
 import { createMenu } from '../../electron/menu';
-import * as MobX from 'mobx';
+import { ServerMessageType } from '../../message';
 import { observer } from 'mobx-react';
 import { PageListContainer } from '../page-list/page-list-container';
 import { PageListPreview } from '../page-list/page-list-preview';
-import * as Path from 'path';
 import { PatternListContainer } from './pattern-list';
 import PatternsPane from '../../lsg/patterns/panes/patterns-pane';
 import { PreviewPaneWrapper } from '../../component/container/preview-pane-wrapper';
-import * as Process from 'process';
 import { PropertyList } from './property-list';
 import PropertyPane from '../../lsg/patterns/panes/property-pane';
 import * as React from 'react';
 import { SplashScreen } from './splash-screen';
-import { AlvaView, RightPane, Store } from '../../store/store';
+import { AlvaView, RightPane, ViewStore } from '../../store';
+import * as uuid from 'uuid';
 
 globalStyles();
 
-const store = Store.getInstance();
-
 @observer
 export class App extends React.Component {
-	private static PATTERN_LIST_ID = 'patternlist';
-	private static PROPERTIES_LIST_ID = 'propertieslist';
-	@MobX.observable protected activeTab: string = App.PATTERN_LIST_ID;
-
 	private ctrlDown: boolean = false;
-
 	private shiftDown: boolean = false;
 
 	public componentDidMount(): void {
 		createMenu();
 		this.redirectUndoRedo();
-	}
-
-	// TODO: Should move to store
-	protected createNewSpace(): void {
-		let appPath: string = remote.app.getAppPath().replace('.asar', '.asar.unpacked');
-		if (appPath.indexOf('node_modules') >= 0) {
-			appPath = Process.cwd();
-		}
-
-		const designkitPath = Path.join(appPath, 'build', 'designkit');
-		remote.dialog.showOpenDialog(
-			{ properties: ['openDirectory', 'createDirectory'] },
-			filePaths => {
-				if (filePaths.length <= 0) {
-					return;
-				}
-
-				FsExtra.copySync(designkitPath, Path.join(filePaths[0], 'designkit'));
-				store.openStyleguide(`${filePaths[0]}/designkit`);
-				store.openFirstPage();
-			}
-		);
 	}
 
 	private getDevTools(): React.StatelessComponent | null {
@@ -79,22 +48,6 @@ export class App extends React.Component {
 		}
 	}
 
-	protected get isPatternListVisible(): boolean {
-		return this.activeTab === App.PATTERN_LIST_ID;
-	}
-
-	protected get isPropertiesListVisible(): boolean {
-		return this.activeTab === App.PROPERTIES_LIST_ID;
-	}
-
-	// TODO: Should move to store
-	protected openSpace(): void {
-		remote.dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
-			store.openStyleguide(filePaths[0]);
-			store.openFirstPage();
-		});
-	}
-
 	private redirectUndoRedo(): void {
 		document.body.onkeydown = event => {
 			if (event.keyCode === 16) {
@@ -104,9 +57,9 @@ export class App extends React.Component {
 			} else if (this.ctrlDown && event.keyCode === 90) {
 				event.preventDefault();
 				if (this.shiftDown) {
-					Store.getInstance().redo();
+					ViewStore.getInstance().redo();
 				} else {
-					Store.getInstance().undo();
+					ViewStore.getInstance().undo();
 				}
 
 				return false;
@@ -125,70 +78,78 @@ export class App extends React.Component {
 	}
 
 	public render(): JSX.Element {
-		const project = store.getCurrentProject();
+		const store = ViewStore.getInstance();
 		const DevTools = this.getDevTools();
 
 		return (
 			<Layout direction={LayoutDirection.Column}>
 				<ChromeContainer />
 				<MainArea>
-					{!project && (
+					{store.getActiveView() === AlvaView.SplashScreen && (
 						<SplashScreen
-							onPrimaryButtonClick={() => this.createNewSpace()}
-							onSecondaryButtonClick={() => this.openSpace()}
+							onPrimaryButtonClick={() => {
+								ipcRenderer.send('message', {
+									type: ServerMessageType.CreateNewFileRequest,
+									id: uuid.v4()
+								});
+							}}
+							onSecondaryButtonClick={() => {
+								ipcRenderer.send('message', {
+									type: ServerMessageType.OpenFileRequest,
+									id: uuid.v4()
+								});
+							}}
 						/>
 					)}
-					{project &&
-						store.getActiveView() === AlvaView.Pages && (
-							<PageListPreview>
-								<PageListContainer />
-							</PageListPreview>
-						)}
-					{project &&
-						store.getActiveView() === AlvaView.PageDetail && (
-							<React.Fragment>
-								<SideBar
-									side={LayoutSide.Left}
-									direction={LayoutDirection.Column}
-									onClick={() => store.setSelectedElement()}
-									border={LayoutBorder.Side}
-								>
-									<ElementPane>
-										<ElementList />
-									</ElementPane>
-									<AddButton
-										active={store.getRightPane() === RightPane.Patterns}
-										label="Add Elements"
-										onClick={e => {
-											e.stopPropagation();
-											store.setRightPane(RightPane.Patterns);
-											store.setSelectedElement();
-										}}
-									/>
-								</SideBar>
-								<PreviewPaneWrapper
-									key="center"
-									id="preview"
-									previewFrame={`http://localhost:${store.getServerPort()}/preview.html`}
+					{store.getActiveView() === AlvaView.Pages && (
+						<PageListPreview>
+							<PageListContainer />
+						</PageListPreview>
+					)}
+					{store.getActiveView() === AlvaView.PageDetail && (
+						<React.Fragment>
+							<SideBar
+								side={LayoutSide.Left}
+								direction={LayoutDirection.Column}
+								onClick={() => store.setSelectedElement()}
+								border={LayoutBorder.Side}
+							>
+								<ElementPane>
+									<ElementList />
+								</ElementPane>
+								<AddButton
+									active={store.getRightPane() === RightPane.Patterns}
+									label="Add Elements"
+									onClick={e => {
+										e.stopPropagation();
+										store.setRightPane(RightPane.Patterns);
+										store.setSelectedElement();
+									}}
 								/>
-								<SideBar
-									side={LayoutSide.Right}
-									direction={LayoutDirection.Column}
-									border={LayoutBorder.Side}
-								>
-									{store.getRightPane() === RightPane.Properties && (
-										<PropertyPane>
-											<PropertyList />
-										</PropertyPane>
-									)}
-									{store.getRightPane() === RightPane.Patterns && (
-										<PatternsPane>
-											<PatternListContainer />
-										</PatternsPane>
-									)}
-								</SideBar>
-							</React.Fragment>
-						)}
+							</SideBar>
+							<PreviewPaneWrapper
+								key="center"
+								id="preview"
+								previewFrame={`http://localhost:${store.getServerPort()}/preview.html`}
+							/>
+							<SideBar
+								side={LayoutSide.Right}
+								direction={LayoutDirection.Column}
+								border={LayoutBorder.Side}
+							>
+								{store.getRightPane() === RightPane.Properties && (
+									<PropertyPane>
+										<PropertyList />
+									</PropertyPane>
+								)}
+								{store.getRightPane() === RightPane.Patterns && (
+									<PatternsPane>
+										<PatternListContainer />
+									</PatternsPane>
+								)}
+							</SideBar>
+						</React.Fragment>
+					)}
 				</MainArea>
 				<IconRegistry names={IconName} />
 				{DevTools ? <DevTools /> : null}

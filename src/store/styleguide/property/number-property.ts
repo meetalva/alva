@@ -1,4 +1,5 @@
-import { Property } from './property';
+import { Property, PropertyType } from './property';
+import * as Types from '../../types';
 
 /**
  * A number property is a property that supports numbers only, and undefined.
@@ -8,14 +9,7 @@ import { Property } from './property';
  * @see Property
  */
 export class NumberProperty extends Property {
-	/**
-	 * Creates a new number property.
-	 * @param id The technical ID of this property (e.g. the property name
-	 * in the TypeScript props interface).
-	 */
-	public constructor(id: string) {
-		super(id);
-	}
+	public readonly type = PropertyType.Number;
 
 	/**
 	 * @inheritdoc
@@ -26,17 +20,14 @@ export class NumberProperty extends Property {
 		return isNaN(result) ? undefined : result;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public getType(): string {
-		return 'number';
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public toString(): string {
-		return `NumberProperty(${super.toString()})`;
+	public toJSON(): Types.SerializedNumberProperty {
+		return {
+			hidden: this.hidden,
+			defaultValue: this.defaultValue,
+			id: this.id,
+			name: this.name,
+			required: this.required,
+			type: this.type
+		};
 	}
 }

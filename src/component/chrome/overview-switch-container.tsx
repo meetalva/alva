@@ -1,13 +1,13 @@
 import { observer } from 'mobx-react';
 import { Project } from '../../store/project';
 import * as React from 'react';
-import { AlvaView, Store } from '../../store/store';
+import { AlvaView, ViewStore } from '../../store';
 import { ViewButton } from '../../lsg/patterns/view-switch';
 
 @observer
 export class OverviewSwitchContainer extends React.Component {
 	public render(): JSX.Element | null {
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const project: Project | undefined = store.getCurrentProject();
 		const page = store.getCurrentPage();
 

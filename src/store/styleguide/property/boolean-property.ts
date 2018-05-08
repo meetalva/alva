@@ -1,4 +1,5 @@
-import { Property } from './property';
+import { Property, PropertyType } from './property';
+import * as Types from '../../types';
 
 /**
  * A boolean property is a property that supports the values true and false only.
@@ -7,14 +8,7 @@ import { Property } from './property';
  * @see Property
  */
 export class BooleanProperty extends Property {
-	/**
-	 * Creates a new boolean property.
-	 * @param id The technical ID of this property (e.g. the property name
-	 * in the TypeScript props interface).
-	 */
-	public constructor(id: string) {
-		super(id);
-	}
+	public readonly type = PropertyType.Boolean;
 
 	/**
 	 * @inheritdoc
@@ -24,17 +18,26 @@ export class BooleanProperty extends Property {
 		return value === true || value === 'true' || value === 1;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public getType(): string {
-		return 'boolean';
+	public from(serializedProperty: Types.SerializedBooleanProperty): BooleanProperty {
+		const property = new BooleanProperty({
+			hidden: serializedProperty.hidden,
+			defaultValue: serializedProperty.defaultValue,
+			id: serializedProperty.id,
+			name: serializedProperty.name,
+			required: serializedProperty.required
+		});
+
+		return property;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public toString(): string {
-		return `BooleanProperty(${super.toString()})`;
+	public toJSON(): Types.SerializedBooleanProperty {
+		return {
+			hidden: this.hidden,
+			defaultValue: this.defaultValue,
+			id: this.id,
+			name: this.name,
+			required: this.required,
+			type: this.type
+		};
 	}
 }

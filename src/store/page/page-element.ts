@@ -1,20 +1,24 @@
+// tslint:disable:no-any
 import * as deepAssign from 'deep-assign';
-import { JsonArray, JsonObject, JsonValue } from '../json';
 import * as MobX from 'mobx';
 import * as ObjectPath from 'object-path';
 import { Page } from './page';
-import { Pattern } from '../styleguide/pattern';
-import { Property } from '../styleguide/property/property';
 import { PropertyValue } from './property-value';
-import { Store } from '../store';
+import { Pattern, Property, Styleguide } from '../styleguide';
+import * as Types from '../types';
 import * as Uuid from 'uuid';
 
 export interface PageElementProperties {
 	id?: string;
+	name?: string;
 	parent?: PageElement;
 	parentSlotId?: string;
-	pattern?: Pattern;
+	pattern: Pattern;
 	setDefaults?: boolean;
+}
+
+export interface PageElementContext {
+	styleguide: Styleguide;
 }
 
 /**
@@ -69,14 +73,7 @@ export class PageElement {
 	 * The pattern this page element reflects. Usually set, may only the undefined if the pattern
 	 * has disappeared or got invalid in the mean-time.
 	 */
-	private pattern?: Pattern;
-
-	/**
-	 * The ID of the pattern this page element reflects. This is a cached value equal to the ID of
-	 * the pattern property, for cases where the pattern could not be resolved on load, to not lose
-	 * the ID on save.
-	 */
-	private patternId?: string;
+	private pattern: Pattern;
 
 	/**
 	 * The pattern property values of this element's component instance.
@@ -96,9 +93,12 @@ export class PageElement {
 	public constructor(properties: PageElementProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
 		this.pattern = properties.pattern;
-		this.patternId = this.pattern ? this.pattern.getId() : undefined;
 		this.parentSlotId = properties.parentSlotId;
 		this.nameEditable = false;
+
+		if (typeof properties.name !== 'undefined') {
+			this.name = properties.name;
+		}
 
 		if (this.name === undefined && this.pattern) {
 			this.name = this.pattern.getName();
@@ -118,76 +118,15 @@ export class PageElement {
 	 * @param jsonObject The JSON object to load from.
 	 * @return A new page element object containing the loaded data.
 	 */
-	public static fromJsonObject(
-		json: JsonObject,
-		parent?: PageElement,
-		parentSlotId?: string,
-		page?: Page
-	): PageElement | undefined {
-		if (!json) {
-			return undefined;
-		}
-
-		const store: Store = Store.getInstance();
-		const styleguide = store.getStyleguide();
-		if (!styleguide) {
-			return undefined;
-		}
-
-		let patternId = json['pattern'] as string;
-		let pattern: Pattern | undefined = styleguide.getPattern(patternId);
-
-		if (!pattern) {
-			const indexPatternId = `${patternId}/index`;
-			pattern = styleguide.getPattern(indexPatternId);
-			if (pattern) {
-				patternId = indexPatternId;
-			}
-		}
-
-		if (!pattern && patternId) {
-			console.warn(`Unknown pattern '${patternId}', please check styleguide`);
-		}
-
-		const element = new PageElement({ id: json.uuid as string, pattern, parent, parentSlotId });
-		element.patternId = patternId;
-
-		if (json.name !== undefined) {
-			element.name = json.name as string;
-		}
-
-		if (json.properties) {
-			Object.keys(json.properties as JsonObject).forEach((propertyId: string) => {
-				const value: JsonValue = (json.properties as JsonObject)[propertyId];
-				element.setPropertyValue(propertyId, element.createPropertyValue(value));
-			});
-		}
-
-		if (json.contents) {
-			const slots = json.contents as JsonObject;
-
-			Object.keys(slots).forEach(slotId => {
-				(slots[slotId] as JsonArray).map(
-					childElement =>
-						PageElement.fromJsonObject(
-							childElement as JsonObject,
-							element,
-							slotId
-						) as PageElement
-				);
-			});
-		}
-
-		// Migrate old children structure
-		if (json.children) {
-			const children: JsonArray = json.children as JsonArray;
-			children.forEach(
-				childElement =>
-					PageElement.fromJsonObject(childElement as JsonObject, element) as PageElement
-			);
-		}
-
-		return element;
+	public static from(
+		serializedPageElement: Types.SerializedPageElement,
+		context: PageElementContext
+	): PageElement {
+		return new PageElement({
+			id: serializedPageElement.id,
+			name: serializedPageElement.name,
+			pattern: context.styleguide.getPattern(serializedPageElement.pattern) as Pattern
+		});
 	}
 
 	/**
@@ -206,7 +145,7 @@ export class PageElement {
 	 * @return The new clone.
 	 */
 	public clone(): PageElement {
-		const payload = this.toJsonObject();
+		const payload = this.toJSON();
 		delete payload.id;
 
 		const clone = new PageElement({ pattern: this.pattern });
@@ -224,19 +163,6 @@ export class PageElement {
 		clone.setName(this.name);
 
 		return clone;
-	}
-
-	/**
-	 * Creates a property value or element for a given serialization JSON.
-	 * @param json The JSON to read from.
-	 * @return The new property value or element.
-	 */
-	protected createPropertyValue(json: JsonValue): PageElement | PropertyValue {
-		if (json && (json as JsonObject)['_type'] === 'pattern') {
-			return PageElement.fromJsonObject(json as JsonObject, this);
-		} else {
-			return json as PropertyValue;
-		}
 	}
 
 	/**
@@ -406,16 +332,16 @@ export class PageElement {
 	 * @return value The property value to serialize.
 	 * @return The JSON value.
 	 */
-	protected propertyToJsonValue(value: PropertyValue): JsonValue {
+	protected propertyToJsonValue(value: PropertyValue): any {
 		if (value instanceof Object) {
-			const jsonObject: JsonObject = {};
+			const jsonObject: any = {};
 			Object.keys(value).forEach((propertyId: string) => {
 				// tslint:disable-next-line:no-any
 				jsonObject[propertyId] = this.propertyToJsonValue((value as any)[propertyId]);
 			});
 			return jsonObject;
 		} else {
-			return value as JsonValue;
+			return value as any;
 		}
 	}
 
@@ -540,7 +466,7 @@ export class PageElement {
 		if (this.pattern) {
 			property = this.pattern.getProperty(id, path);
 			if (!property) {
-				console.warn(`Unknown property '${id}' in pattern '${this.patternId}'`);
+				console.warn(`Unknown property '${id}' in pattern '${this.pattern.getId()}'`);
 			}
 		}
 
@@ -560,21 +486,18 @@ export class PageElement {
 	 * Property.convertToRender (for the preview app instead of file persistence).
 	 * @return The JSON object to be persisted.
 	 */
-	public toJsonObject(props?: { forRendering?: boolean }): JsonObject {
-		const json: JsonObject = {
-			_type: 'pattern',
-			uuid: this.id,
+	public toJSON(props?: { forRendering?: boolean }): Types.SerializedPageElement {
+		return {
+			id: this.id,
 			name: this.name,
-			pattern: this.patternId,
-			exportName: this.pattern ? this.pattern.getExportName() : 'default'
+			pattern: this.pattern.getId()
 		};
-
-		json.contents = {};
+		/* json.contents = {};
 		this.contents.forEach((slotContents, slotId) => {
-			(json.contents as JsonObject)[slotId] = slotContents.map(
+			(json.contents as any)[slotId] = slotContents.map(
 				(element: PageElement) =>
 					// tslint:disable-next-line:no-any
-					element.toJsonObject ? element.toJsonObject(props) : (element as any)
+					element.toJSON ? element.toJSON(props) : (element as any)
 			);
 		});
 
@@ -589,10 +512,8 @@ export class PageElement {
 			}
 
 			const jsonValue = this.propertyToJsonValue(value);
-			(json.properties as JsonObject)[key] = jsonValue;
-		});
-
-		return json;
+			(json.properties as any)[key] = jsonValue;
+		}); */
 	}
 
 	/**

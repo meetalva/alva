@@ -1,15 +1,11 @@
-import { AssetProperty } from './property/asset-property';
-import { Directory } from '../../styleguide/analyzer/directory';
-import { PatternFolder } from './folder';
-import { Pattern } from './pattern';
-import { StringProperty } from './property/string-property';
-import { StyleguideAnalyzer } from '../../styleguide/analyzer/styleguide-analyzer';
-
-export enum SyntheticPatternType {
-	Page = 'synthetic:page',
-	Placeholder = 'synthetic:placeholder',
-	Text = 'synthetic:text'
-}
+// import { AssetProperty } from './property/asset-property';
+// import { Directory } from '../../styleguide/analyzer/directory';
+// import { PatternFolder } from './folder';
+import { Pattern, SyntheticPatternType } from './pattern';
+// import { StringProperty } from './property/string-property';
+// import { StyleguideAnalyzer } from '../../styleguide/analyzer/styleguide-analyzer';
+import * as Types from '../types';
+import * as uuid from 'uuid';
 
 /**
  * The styleguide is the component library the current Alva space bases on.
@@ -22,35 +18,15 @@ export enum SyntheticPatternType {
  * @see PageElement
  * @see StyleguideAnalyzer
  */
+
+export interface StyleguideInit {
+	id: string;
+	patterns?: Pattern[];
+}
+
 export class Styleguide {
-	/**
-	 * The analyzer active in this styleguide. The actual one depends on the type of styleguide.
-	 * The analyzers detects patterns (and pattern folders) it finds to the list of styleguide
-	 * patterns.
-	 */
-	private readonly analyzer?: StyleguideAnalyzer;
-
-	/**
-	 * The absolute and OS-specific path to the styleguide top-level folders.
-	 * This is where all pattern implementations are located.
-	 */
-	private readonly path: string;
-
-	/**
-	 * The root folder of the patterns of the currently opened styleguide.
-	 */
-	private patternRoot: PatternFolder;
-
-	/**
-	 * The global pattern registry, a lookup of all pattern by their IDs.
-	 */
-	private patterns: Map<string, Pattern> = new Map();
-
-	/**
-	 * The path of the root folder of the built patterns (like atoms, modules etc.)
-	 * in the currently opened styleguide.
-	 */
-	private patternsPath: string;
+	private id: string;
+	private patterns: Pattern[] = [];
 
 	/**
 	 * Creates a new styleguide. Then loads the styleguide's patterns using the configured
@@ -63,8 +39,32 @@ export class Styleguide {
 	 * depends on the type of styleguide. The analyzers detects patterns (and pattern folders)
 	 * it finds to the list of styleguide patterns.
 	 */
-	public constructor(path: string, patternsPath: string, analyzerName: string) {
-		this.path = path;
+	public constructor(
+		init: StyleguideInit /* path: string, patternsPath: string, analyzerName: string*/
+	) {
+		if (init.patterns) {
+			this.patterns = init.patterns;
+		} else {
+			this.patterns = [
+				new Pattern({
+					name: 'page',
+					path: '',
+					type: SyntheticPatternType.SyntheticPage
+				}),
+				new Pattern({
+					name: 'placeholder',
+					path: '',
+					type: SyntheticPatternType.SyntheticPlaceholder
+				}),
+				new Pattern({
+					name: 'text',
+					path: '',
+					type: SyntheticPatternType.SyntheticText
+				})
+			];
+		}
+
+		/* this.path = path;
 		this.patternsPath = patternsPath;
 
 		const Analyzer = require(`../../styleguide/analyzer/${analyzerName}/${analyzerName}`)
@@ -91,7 +91,20 @@ export class Styleguide {
 
 		if (this.analyzer) {
 			this.analyzer.analyze(this);
-		}
+		} */
+	}
+
+	public static create(): Styleguide {
+		return new Styleguide({
+			id: uuid.v4()
+		});
+	}
+
+	public static from(serializedStyleguide: Types.SerializedStyleguide): Styleguide {
+		return new Styleguide({
+			id: serializedStyleguide.id,
+			patterns: serializedStyleguide.patterns.map(pattern => Pattern.from(pattern))
+		});
 	}
 
 	/**
@@ -101,26 +114,7 @@ export class Styleguide {
 	 * @param pattern The pattern to add.
 	 */
 	public addPattern(pattern: Pattern): void {
-		this.patterns.set(pattern.getId(), pattern);
-	}
-
-	/**
-	 * Returns the analyzer active in this styleguide. The actual one depends on the type of
-	 * styleguide. The analyzers detects patterns (and pattern folders) it finds to the list of
-	 * styleguide patterns.
-	 * @return The analyzer active in this styleguide.
-	 */
-	public getAnalyzer(): StyleguideAnalyzer | undefined {
-		return this.analyzer;
-	}
-
-	/**
-	 * Returns the absolute and OS-specific path to the styleguide top-level directories.
-	 * This is where the projects, pages, and the pattern implementations are located.
-	 * @return The absolute and OS-specific root path of the styleguide.
-	 */
-	public getPath(): string {
-		return this.path;
+		this.patterns.push(pattern);
 	}
 
 	/**
@@ -131,15 +125,11 @@ export class Styleguide {
 	 * @return The resolved pattern, or undefined, if no such ID exists.
 	 */
 	public getPattern(id: string): Pattern | undefined {
-		return this.patterns.get(id);
+		return this.patterns.find(pattern => pattern.getId() === id);
 	}
 
-	/**
-	 * Returns the root folder of the patterns of the currently opened styleguide.
-	 * @return The root folder object.
-	 */
-	public getPatternRoot(): PatternFolder {
-		return this.patternRoot;
+	public getPatternByType(type: SyntheticPatternType): Pattern {
+		return this.patterns.find(pattern => pattern.getType() === type) as Pattern;
 	}
 
 	/**
@@ -150,21 +140,10 @@ export class Styleguide {
 		return Array.from(this.patterns.values());
 	}
 
-	/**
-	 * Returns the absolute and OS-specific path of the root folder of the built patterns
-	 * (like atoms, modules etc.) in the currently opened styleguide.
-	 * @return The absolute and OS-specific patterns root path.
-	 */
-	public getPatternsPath(): string {
-		return this.patternsPath;
-	}
-
-	/**
-	 * Returns a parsed pattern information object for a given pattern ID.
-	 * @param type The type of the synthetic pattern.
-	 * @return The resolved pattern
-	 */
-	public getSyntheticPattern(type: SyntheticPatternType): Pattern {
-		return this.patterns.get(type) as Pattern;
+	public toJSON(): Types.SerializedStyleguide {
+		return {
+			id: this.id,
+			patterns: this.patterns.map(p => p.toJSON())
+		};
 	}
 }

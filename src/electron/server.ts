@@ -4,7 +4,6 @@ import * as express from 'express';
 import * as Http from 'http';
 import { ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
-import { Store } from '../store/store';
 import { Styleguide } from '../store/styleguide/styleguide';
 import * as uuid from 'uuid';
 import { OPEN, Server as WebsocketServer } from 'ws';
@@ -41,8 +40,7 @@ interface WebpackMessage {
 type Queue = WebpackMessage[];
 
 export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
-	const store = Store.getInstance();
-	store.openFromPreferences();
+	// const store = Store.getInstance();
 
 	const emitter = new EventEmitter();
 	const app = express();

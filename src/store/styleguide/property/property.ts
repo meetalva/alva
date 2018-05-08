@@ -1,4 +1,26 @@
-import { Store } from '../../../store/store';
+import * as AlvaUtil from '../../../alva-util';
+import * as Types from '../../types';
+import * as uuid from 'uuid';
+
+/* import {AssetProperty} from './asset-property';
+import {BooleanProperty} from './boolean-property';
+import {EnumProperty} from './enum-property';
+import {NumberArrayProperty} from './number-array-property';
+import {NumberProperty} from './number-property';
+import {ObjectProperty} from './object-property';
+import {StringArrayProperty} from './string-array-property';
+import {StringProperty} from './string-property'; */
+
+export { PropertyType } from '../../types';
+
+export interface PropertyInit {
+	// tslint:disable-next-line:no-any
+	defaultValue?: any;
+	hidden?: boolean;
+	id?: string;
+	name: string;
+	required?: boolean;
+}
 
 /**
  * A property is the meta-information about one styleguide pattern component property
@@ -15,40 +37,72 @@ export abstract class Property {
 	 * instantiation (where such defaults sometimes do not make sense).
 	 */
 	// tslint:disable-next-line:no-any
-	private defaultValue: any;
+	protected defaultValue: any;
 
 	/**
 	 * Whether this property is marked as hidden in Alva (exists in the pattern, but the designer
 	 * should not provide content for it).
 	 */
-	private hidden: boolean = false;
+	protected hidden: boolean = false;
 
 	/**
 	 * The technical ID of this property (e.g. the property name in the TypeScript props interface).
 	 */
-	private id: string;
+	protected id: string;
 
 	/**
 	 * The human-friendly name of the property, usually provided by an annotation.
 	 * In the frontend, to be displayed instead of the ID.
 	 */
-	private name: string;
+	protected name: string;
 
 	/**
 	 * Whether the designer, when editing a page element, is required to enter a value
 	 * for this property.
 	 */
-	private required: boolean = false;
+	protected required: boolean = false;
+
+	public readonly type: Types.PropertyType;
 
 	/**
 	 * Creates a new property.
 	 * @param id The technical ID of this property (e.g. the property name in the TypeScript
 	 * props interface). Initially, the name is guessed automatically.
 	 */
-	public constructor(id: string) {
-		this.id = id;
-		this.name = Store.guessName(id);
+	public constructor(init: PropertyInit) {
+		this.id = init.id || uuid.v4();
+		this.name = AlvaUtil.guessName(init.name);
+		this.defaultValue = init.defaultValue;
+
+		if (typeof init.hidden !== 'undefined') {
+			this.hidden = init.hidden;
+		}
+
+		if (typeof init.required !== 'undefined') {
+			this.required = init.required;
+		}
 	}
+
+	/* public static from(serializedProperty: Types.SerializedProperty): Property {
+		switch (serializedProperty.type) {
+			case Types.PropertyType.Asset:
+				return AssetProperty.from(serializedProperty);
+			case Types.PropertyType.Boolean:
+				return BooleanProperty.from(serializedProperty);
+			case Types.PropertyType.Enum:
+				return EnumProperty.from(serializedProperty);
+			case Types.PropertyType.Number:
+				return NumberProperty.from(serializedProperty);
+			case Types.PropertyType.NumberArray:
+				return NumberArrayProperty.from(serializedProperty);
+			case Types.PropertyType.Object:
+				return ObjectProperty.from(serializedProperty);
+			case Types.PropertyType.String:
+				return StringProperty.from(serializedProperty);
+			case Types.PropertyType.StringArray:
+				return StringArrayProperty.from(serializedProperty);
+		}
+	} */
 
 	/**
 	 * Returns whether two given values are arrays and their content is the same (shallow equal).
@@ -163,23 +217,6 @@ export abstract class Property {
 		return this.name;
 	}
 
-	// tslint:disable-next-line:no-any
-	protected getToStringProperties(): [string, any][] {
-		return [
-			['id', this.id],
-			['name', this.name],
-			['required', this.required],
-			['default', this.defaultValue]
-		];
-	}
-
-	/**
-	 * Returns the type ID of this property, a reflection of the sub-class, or easier case-switching.
-	 * E.g. "boolean" for the BooleanProperty type.
-	 * @return The type ID of this property.
-	 */
-	public abstract getType(): string;
-
 	/**
 	 * Returns whether this property is marked as hidden in Alva (exists in the pattern, but the designer
 	 * should not provide content for it).
@@ -240,12 +277,5 @@ export abstract class Property {
 		this.required = required;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public toString(): string {
-		// tslint:disable-next-line:no-any
-		const properties: [string, any][] = this.getToStringProperties();
-		return properties.map(([id, value]) => `${id}=${JSON.stringify(value)}`).join(', ');
-	}
+	public abstract toJSON(): Types.SerializedProperty;
 }

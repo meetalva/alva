@@ -7,6 +7,8 @@ export enum IconName {
 	ArrowLeft,
 	ArrowFillRight,
 	ArrowFillLeft,
+	Check,
+	Uncheck,
 	Robo,
 	Plus,
 	Pattern
@@ -77,6 +79,22 @@ const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
 				d="M6 15h5v2H6v-2zm0-8h10v1H6V7zm0 3h7v1H6v-1zM4 5v14h16V5H4zm0-1h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"
 			/>
 		]
+	],
+	[IconName.Uncheck]: [
+		[
+			<path
+				key="check"
+				d="M14.77 12l4.16 4.16a1.96 1.96 0 0 1-2.77 2.77L12 14.77l-4.16 4.16a1.96 1.96 0 0 1-2.77-2.77L9.23 12 5.07 7.84a1.96 1.96 0 1 1 2.77-2.77L12 9.23l4.16-4.16a1.96 1.96 0 0 1 2.77 2.77L14.77 12z"
+			/>
+		]
+	],
+	[IconName.Check]: [
+		[
+			<path
+				key="check"
+				d="M8.66 15.2l10.6-10.61A2 2 0 1 1 22.1 7.4L10.07 19.44a2 2 0 0 1-2.83 0L1.6 13.78a2 2 0 1 1 2.82-2.83l4.25 4.24z"
+			/>
+		]
 	]
 };
 
@@ -92,10 +110,6 @@ const StyledIcon = styled.svg`
 	fill: currentColor;
 	stroke: none;
 	stroke-miterlimit: 10;
-
-	@media (max-resolution: 124dpi) {
-		stroke-width: 1.2px;
-	}
 `;
 
 const IconRegistrySymbol: React.StatelessComponent<IconRegistrySymbolProps> = props => (

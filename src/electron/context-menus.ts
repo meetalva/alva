@@ -6,40 +6,7 @@ import { Store } from '../store/store';
 const store = Store.getInstance();
 
 export function elementMenu(element: PageElement): void {
-	const template: MenuItemConstructorOptions[] = [
-		{
-			label: 'Cut',
-			enabled: !element.isRoot(),
-			click: () => {
-				ipcRenderer.send('message', {
-					type: ServerMessageType.CutPageElement,
-					payload: element.getId()
-				});
-			}
-		},
-		{
-			label: 'Copy',
-			enabled: !element.isRoot(),
-			click: () => {
-				ipcRenderer.send('message', {
-					type: ServerMessageType.CopyPageElement,
-					payload: element.getId()
-				});
-			}
-		},
-		{
-			label: 'Delete',
-			enabled: !element.isRoot(),
-			click: () => {
-				ipcRenderer.send('message', {
-					type: ServerMessageType.DeletePageElement,
-					payload: element.getId()
-				});
-			}
-		},
-		{
-			type: 'separator'
-		},
+	const defaultPasteItems = [
 		{
 			label: 'Paste Below',
 			enabled: store.hasApplicableClipboardItem() && !element.isRoot(),
@@ -55,7 +22,7 @@ export function elementMenu(element: PageElement): void {
 			enabled: store.hasApplicableClipboardItem(),
 			click: () => {
 				ipcRenderer.send('message', {
-					type: ServerMessageType.PastepageElementInside,
+					type: ServerMessageType.PastePageElementInside,
 					payload: element.getId()
 				});
 			}
@@ -70,6 +37,54 @@ export function elementMenu(element: PageElement): void {
 				});
 			}
 		}
+	];
+
+	const template: MenuItemConstructorOptions[] = [
+		{
+			label: 'Cut',
+			enabled: !element.isRoot(),
+			click: () => {
+				ipcRenderer.send('message', {
+					type: ServerMessageType.CutPageElement,
+					payload: element.getId()
+				});
+				remote.Menu.sendActionToFirstResponder('cut:');
+			}
+		},
+		{
+			label: 'Copy',
+			enabled: !element.isRoot(),
+			click: () => {
+				ipcRenderer.send('message', {
+					type: ServerMessageType.CopyPageElement,
+					payload: element.getId()
+				});
+				remote.Menu.sendActionToFirstResponder('copy:');
+			}
+		},
+		{
+			label: 'Delete',
+			enabled: !element.isRoot(),
+			click: () => {
+				ipcRenderer.send('message', {
+					type: ServerMessageType.DeletePageElement,
+					payload: element.getId()
+				});
+				remote.Menu.sendActionToFirstResponder('delete:');
+			}
+		},
+		{
+			type: 'separator'
+		},
+		// TODO: Find out why pasting via sendActionToFirstResponder
+		// sets the caret to position 0 and overwrites the entire input
+		/* {
+			label: 'Paste',
+			click: () => {
+				remote.Menu.sendActionToFirstResponder('paste:');
+			}
+		} */
+		...(!element.isNameEditable() ? defaultPasteItems : [])
 	];
 
 	remote.Menu.buildFromTemplate(template).popup();

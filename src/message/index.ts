@@ -26,7 +26,7 @@ export enum ServerMessageType {
 	PageChange = 'page-change',
 	Paste = 'paste',
 	PastePageElementBelow = 'paste-page-element-below',
-	PastepageElementInside = 'paste-page-element-inside',
+	PastePageElementInside = 'paste-page-element-inside',
 	Redo = 'redo',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',

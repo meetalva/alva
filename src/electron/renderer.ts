@@ -97,7 +97,7 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			store.pasteAfterElementById(message.payload);
 			break;
 		}
-		case ServerMessageType.PastepageElementInside: {
+		case ServerMessageType.PastePageElementInside: {
 			store.pasteInsideElementById(message.payload);
 			break;
 		}

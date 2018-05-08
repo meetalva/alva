@@ -292,9 +292,7 @@ export function createMenu(): void {
 					})(),
 					click: () => {
 						ipcRenderer.send('message', { type: ServerMessageType.Delete });
-						Menu.sendActionToFirstResponder(
-							process.platform === 'darwin' ? 'Backspace' : 'Delete'
-						);
+						remote.Menu.sendActionToFirstResponder('delete:');
 					}
 				}
 			]

@@ -1,4 +1,5 @@
-import { Store } from '../../store/store';
+import * as AlvaUtil from '../../alva-util';
+import * as Types from '../types';
 
 /**
  * A Slot is the meta-information about one styleguide patterns supported composition points.
@@ -30,7 +31,7 @@ export class Slot {
 
 	public constructor(id: string) {
 		this.id = id;
-		this.name = Store.guessName(id);
+		this.name = AlvaUtil.guessName(id);
 	}
 
 	/**
@@ -49,5 +50,12 @@ export class Slot {
 	 */
 	public getName(): string {
 		return this.name;
+	}
+
+	public toJSON(): Types.SerializedPatternSlot {
+		return {
+			id: this.id,
+			name: this.name
+		};
 	}
 }

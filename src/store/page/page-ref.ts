@@ -1,8 +1,5 @@
-import * as Fs from 'fs';
-import { JsonObject, Persister } from '../json';
+import { JsonObject } from '../json';
 import * as MobX from 'mobx';
-import { Page } from './page';
-import * as Path from 'path';
 import { Project } from '../project';
 import { Store } from '../store';
 import * as Uuid from 'uuid';
@@ -75,14 +72,6 @@ export class PageRef {
 	public constructor(properties: PageRefProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
 		this.setProject(properties.project);
-
-		if (properties.path) {
-			this.path = properties.path;
-			this.lastPersistedPath = this.path;
-		} else {
-			this.updatePathFromNames();
-		}
-
 		this.name = Store.guessName(this.id, properties.name);
 	}
 
@@ -103,7 +92,6 @@ export class PageRef {
 			// Migrate from previous alva.yaml version
 			const path = `./page-${json.id}.yaml`;
 			const pageRef = new PageRef({ path, name: json.name as string, project });
-			pageRef.updatePathFromNames();
 			return pageRef;
 		} else {
 			throw new Error(
@@ -115,20 +103,6 @@ export class PageRef {
 	public clone(): PageRef {
 		// TODO: implement this
 		return this;
-	}
-
-	/**
-	 * Create the persistence file for this page ref if it does not exist
-	 */
-	public createFile(): void {
-		const store = Store.getInstance();
-		const path = Path.resolve(store.getPagesPath(), this.path);
-
-		if (!Fs.existsSync(path)) {
-			const page = Page.create(this.id);
-			Persister.saveYaml(path, page.toJsonObject());
-			this.updateLastPersistedPath();
-		}
 	}
 
 	public getEditedName(): string {
@@ -187,44 +161,6 @@ export class PageRef {
 	}
 
 	/**
-	 * Obtain the resolved page object for this page reference
-	 * @return The resolved page object
-	 */
-	public load(): Page | undefined {
-		const store = Store.getInstance();
-		const currentPageRef = store.getCurrentPageRef();
-		const styleguide = store.getStyleguide();
-
-		if (!styleguide) {
-			return;
-		}
-
-		const pagesPath = styleguide.getPath();
-
-		if (currentPageRef === this) {
-			return store.getCurrentPage() as Page;
-		}
-
-		return Page.fromPath(Path.join(pagesPath, 'alva', this.path), this.id);
-	}
-
-	public removeFile(): void {
-		const store = Store.getInstance();
-		const path = Path.resolve(store.getPagesPath(), this.path);
-
-		if (Fs.existsSync(path)) {
-			Fs.unlinkSync(path);
-		}
-	}
-
-	public renameFile(newPath: string): void {
-		if (this.lastPersistedPath && Fs.existsSync(this.lastPersistedPath)) {
-			Fs.renameSync(this.lastPersistedPath, newPath);
-			this.lastPersistedPath = newPath;
-		}
-	}
-
-	/**
 	 * Sets the human-friendly name of the page.
 	 * @param name The human-friendly name of the page.
 	 */
@@ -260,15 +196,15 @@ export class PageRef {
 	 * @param project The new project for this page.
 	 */
 	public setProject(project: Project): void {
-		if (this.project) {
+		/* if (this.project) {
 			this.project.getPageRefsInternal().remove(this);
 		}
 
 		this.project = project;
 
 		if (project) {
-			project.getPageRefsInternal().push(this);
-		}
+			project.getPages().push(this);
+		} */
 	}
 
 	/**
@@ -281,21 +217,5 @@ export class PageRef {
 			name: this.name,
 			path: this.path
 		};
-	}
-
-	/**
-	 * Updates the last persisted path from the path properties.
-	 * Call this method after saving the alva.yaml.
-	 */
-	public updateLastPersistedPath(): void {
-		this.lastPersistedPath = this.path;
-	}
-
-	/**
-	 * Updates the path of the page file from the project and page names, trying to use normalized
-	 * versions of those names, and then finding the next unused file name.
-	 */
-	public updatePathFromNames(): void {
-		this.path = Store.getInstance().findAvailablePagePath(this);
 	}
 }

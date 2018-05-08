@@ -4,14 +4,13 @@ import { ServerMessageType } from '../message';
 import * as MobX from 'mobx';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { AlvaView, Store } from '../store/store';
+import { AlvaView, Project, ViewStore } from '../store';
 
 // prevent app zooming
 webFrame.setVisualZoomLevelLimits(1, 1);
 webFrame.setLayoutZoomLevelLimits(0, 0);
 
-const store = Store.getInstance();
-store.openFromPreferences();
+const store = ViewStore.getInstance();
 
 ipcRenderer.send('message', { type: 'app-loaded' });
 
@@ -24,6 +23,15 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 	switch (message.type) {
 		case ServerMessageType.StartApp: {
 			store.setServerPort(message.payload);
+			break;
+		}
+		case ServerMessageType.OpenFileResponse: {
+			break;
+		}
+		case ServerMessageType.CreateNewFileResponse: {
+			const project = Project.from(message.payload.contents);
+			store.setProject(project);
+			store.setActiveView(AlvaView.PageDetail);
 		}
 	}
 
@@ -121,11 +129,7 @@ MobX.autorun(() => {
 	if (styleguide) {
 		ipcRenderer.send('message', {
 			type: 'styleguide-change',
-			payload: {
-				analyzerName: store.getAnalyzerName(),
-				styleguidePath: styleguide.getPath(),
-				patternsPath: styleguide.getPatternsPath()
-			}
+			payload: {}
 		});
 	}
 });
@@ -139,7 +143,7 @@ MobX.autorun(() => {
 			type: 'page-change',
 			payload: {
 				pageId: currentPage.getId(),
-				pages: project.getPages().map(page => page.toJsonObject({ forRendering: true }))
+				pages: project.getPages().map(page => page.toJSON({ forRendering: true }))
 			}
 		});
 	}

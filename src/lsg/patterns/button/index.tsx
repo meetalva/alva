@@ -49,7 +49,7 @@ const StyledButton = styled.button`
 `;
 
 const Button: React.StatelessComponent<ButtonProps> = props => (
-	<StyledButton>{props.children}</StyledButton>
+	<StyledButton onClick={props.onClick}>{props.children}</StyledButton>
 );
 
 export default Button;

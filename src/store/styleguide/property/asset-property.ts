@@ -2,7 +2,8 @@ import * as Fs from 'fs';
 import * as fetch from 'isomorphic-fetch';
 import * as MimeTypes from 'mime-types';
 import * as Path from 'path';
-import { Property } from './property';
+import { Property, PropertyType } from './property';
+import * as Types from '../../types';
 
 /**
  * An asset property is a property that takes an uploaded file (e.g. an image)
@@ -22,15 +23,7 @@ export class AssetProperty extends Property {
 	 */
 	public static SYNTHETIC_ASSET_ID: string = 'asset';
 
-	/**
-	 * Creates a new asset property.
-	 * @param id The technical ID of this property (e.g. the property name
-	 * in the TypeScript props interface).
-	 */
-	public constructor(id: string) {
-		super(id);
-	}
-
+	public readonly type = PropertyType.Asset;
 	/**
 	 * Converts a given buffer and mime type into a data-URL string, a valid value for this property.
 	 * @param buffer The buffer to read.
@@ -91,17 +84,26 @@ export class AssetProperty extends Property {
 		return undefined;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public getType(): string {
-		return 'asset';
+	public from(serializedProperty: Types.SerializedAssetProperty): AssetProperty {
+		const property = new AssetProperty({
+			hidden: serializedProperty.hidden,
+			defaultValue: serializedProperty.defaultValue,
+			id: serializedProperty.id,
+			name: serializedProperty.name,
+			required: serializedProperty.required
+		});
+
+		return property;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public toString(): string {
-		return `AssetProperty(${super.toString()})`;
+	public toJSON(): Types.SerializedAssetProperty {
+		return {
+			hidden: this.hidden,
+			defaultValue: this.defaultValue,
+			id: this.id,
+			name: this.name,
+			required: this.required,
+			type: this.type
+		};
 	}
 }

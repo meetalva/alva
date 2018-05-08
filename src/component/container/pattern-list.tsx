@@ -1,9 +1,6 @@
 import Input from '../../lsg/patterns/input/';
 import { ElementLocationCommand } from '../../store/command/element-location-command';
-import { PatternFolder } from '../../store/styleguide/folder';
 import { observer } from 'mobx-react';
-import { PageElement } from '../../store/page/page-element';
-import { Pattern } from '../../store/styleguide/pattern';
 import PatternList, {
 	PatternLabel,
 	PatternListItem,
@@ -11,7 +8,7 @@ import PatternList, {
 } from '../../lsg/patterns/pattern-list';
 import * as React from 'react';
 import Space, { SpaceSize } from '../../lsg/patterns/space';
-import { Store } from '../../store/store';
+import { PageElement, Pattern, PatternFolder, ViewStore } from '../../store';
 
 export interface PatternListContainerItemProps {
 	items: NamedPatternListItemProps[];
@@ -39,7 +36,7 @@ export class PatternListContainer extends React.Component {
 				containerItem.items.push({
 					name: pattern.getName(),
 					draggable: true,
-					icon: pattern.getIconPath(),
+					icon: '',
 					onDragStart: (e: React.DragEvent<HTMLElement>) => {
 						this.handleDragStart(e, pattern);
 					},
@@ -96,7 +93,7 @@ export class PatternListContainer extends React.Component {
 	}
 
 	protected handlePatternClick(pattern: Pattern): void {
-		const store: Store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const selectedElement: PageElement | undefined = store.getSelectedElement();
 		const selectedSlot = store.getSelectedSlotId();
 		if (selectedElement) {
@@ -112,14 +109,14 @@ export class PatternListContainer extends React.Component {
 	}
 
 	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
-		Store.getInstance().setPatternSearchTerm(evt.target.value);
+		ViewStore.getInstance().setPatternSearchTerm(evt.target.value);
 	}
 
 	public render(): JSX.Element {
-		const store: Store = Store.getInstance();
-		const styleguide = store.getStyleguide();
-		const patternRoot = styleguide && styleguide.getPatternRoot();
-		this.items = patternRoot ? this.createItemsFromFolder(patternRoot) : [];
+		const store = ViewStore.getInstance();
+		// const styleguide = store.getStyleguide();
+		// const patternRoot = styleguide && styleguide.getPatternRoot();
+		// this.items = patternRoot ? this.createItemsFromFolder(patternRoot) : [];
 
 		if (store.getPatternSearchTerm() !== '') {
 			this.items = this.search(this.items, store.getPatternSearchTerm());

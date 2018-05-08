@@ -1,13 +1,12 @@
 import { PreviewTile } from '../../lsg/patterns/preview-tile/index';
 import Space, { SpaceSize } from '../../lsg/patterns/space/index';
 import { observer } from 'mobx-react';
-import { EditState, PageRef } from '../../store/page/page-ref';
 import * as React from 'react';
-import { AlvaView, Store } from '../../store/store';
+import { AlvaView, EditState, Page, ViewStore } from '../../store';
 
 export interface PageTileContainerProps {
 	focused: boolean;
-	page: PageRef;
+	page: Page;
 }
 
 @observer
@@ -34,7 +33,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 
 		this.props.page.setNameState(EditState.Editable);
 		this.props.page.setName(this.props.page.getEditedName());
-		Store.getInstance().save();
+		ViewStore.getInstance().save();
 	}
 
 	protected handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -42,12 +41,12 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	}
 
 	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
-		const store = Store.getInstance();
+		// const store = Store.getInstance();
 
 		const target = e.target as HTMLElement;
 
 		if (!this.props.focused) {
-			store.openPage(this.props.page.getId());
+			// store.openPage(this.props.page.getId());
 		}
 
 		if (this.props.focused && target.matches('[data-title]')) {
@@ -60,10 +59,10 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 			return;
 		}
 
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const next = store.getActiveView() === AlvaView.Pages ? AlvaView.PageDetail : AlvaView.Pages;
 
-		store.openPage(this.props.page.getId());
+		// store.openPage(this.props.page.getId());
 		store.setActiveView(next);
 	}
 

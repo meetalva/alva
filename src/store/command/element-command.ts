@@ -57,9 +57,9 @@ export abstract class ElementCommand extends Command {
 	protected ensurePageAndElement(): boolean {
 		let currentPage: Page | undefined = Store.getInstance().getCurrentPage();
 		if (!currentPage || currentPage.getId() !== this.pageId) {
-			if (!Store.getInstance().openPage(this.pageId)) {
-				return false;
-			}
+			// if (!Store.getInstance().openPage(this.pageId)) {
+			// 	return false;
+			// }
 			currentPage = Store.getInstance().getCurrentPage() as Page;
 		}
 

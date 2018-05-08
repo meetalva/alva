@@ -1,4 +1,5 @@
-import { Property } from './property';
+import { Property, PropertyType } from './property';
+import * as Types from '../../types';
 
 /**
  * A string property is a property that supports text only.
@@ -13,14 +14,7 @@ export class StringProperty extends Property {
 	 */
 	public static SYNTHETIC_TEXT_ID: string = 'text';
 
-	/**
-	 * Creates a new string property.
-	 * @param id The technical ID of this property (e.g. the property name
-	 * in the TypeScript props interface).
-	 */
-	public constructor(id: string) {
-		super(id);
-	}
+	public readonly type = PropertyType.String;
 
 	/**
 	 * @inheritdoc
@@ -32,19 +26,5 @@ export class StringProperty extends Property {
 		} else {
 			return String(value);
 		}
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public getType(): string {
-		return 'string';
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public toString(): string {
-		return `StringProperty(${super.toString()})`;
 	}
 }

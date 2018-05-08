@@ -10,9 +10,7 @@ import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/styleguide/pattern';
 import * as React from 'react';
-import { Slot } from '../../store/styleguide/slot';
-import { Store } from '../../store/store';
-import { Styleguide } from '../../store/styleguide/styleguide';
+import { Slot, ViewStore } from '../../store';
 import * as uuid from 'uuid';
 
 export interface ElementListState {
@@ -61,7 +59,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		element: PageElement,
 		selectedElement?: PageElement
 	): ElementNodeProps {
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const pattern: Pattern | undefined = element.getPattern();
 
 		if (!pattern) {
@@ -103,7 +101,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		element: PageElement,
 		selectedElement?: PageElement
 	): ElementNodeProps {
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const slotId = slot.getId();
 		const slotContents: PageElement[] = element.getSlotContents(slotId);
 		const childItems: ElementNodeProps[] = [];
@@ -136,7 +134,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 					}
 
 					draggedElement = new PageElement({
-						pattern: styleguide.getPattern(patternId),
+						pattern: styleguide.getPattern(patternId) as Pattern,
 						setDefaults: true
 					});
 				}
@@ -155,7 +153,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	private handleBlur(e: React.FormEvent<HTMLElement>): void {
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const editableElement = store.getNameEditableElement();
 
 		if (editableElement) {
@@ -166,7 +164,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const element = elementFromTarget(e.target);
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const label = above(e.target, `[${ElementAnchors.label}]`);
 
 		if (!element) {
@@ -211,7 +209,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
-		Store.getInstance().setDraggedElement(element);
+		ViewStore.getInstance().setDraggedElement(element);
 		const dragImg = document.createElement('div');
 		dragImg.textContent = element.getName();
 		dragImg.setAttribute('style', DRAG_IMG_STYLE);
@@ -221,9 +219,9 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
-		this.handleDragEnd(e);
+		/*this.handleDragEnd(e);
 
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const styleguide = store.getStyleguide() as Styleguide;
 		const patternId = e.dataTransfer.getData('patternId');
 		const dropTargetElement = elementFromTarget(e.target);
@@ -233,7 +231,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		const isPlaceholder =
 			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
 
-		const draggedElement =
+		 const draggedElement =
 			store.getDraggedElement() ||
 			new PageElement({
 				pattern: styleguide.getPattern(patternId),
@@ -265,11 +263,11 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			store.execute(ElementLocationCommand.addChild(dropTargetElement, draggedElement));
 		}
 
-		store.setSelectedElement(draggedElement);
+		store.setSelectedElement(draggedElement); */
 	}
 
 	private handleKeyDown(e: KeyboardEvent): void {
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const node = e.target as Node;
 		const contains = (target: Node) => (this.ref ? this.ref.contains(target) : false);
 
@@ -320,7 +318,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	public render(): JSX.Element | null {
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const page: Page | undefined = store.getCurrentPage();
 
 		if (!page) {
@@ -408,7 +406,7 @@ function elementFromTarget(target: EventTarget): PageElement | undefined {
 		return;
 	}
 
-	const store = Store.getInstance();
+	const store = ViewStore.getInstance();
 	const page = store.getCurrentPage();
 
 	if (!page) {

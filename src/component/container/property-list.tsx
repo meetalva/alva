@@ -1,7 +1,6 @@
 import { AssetItem } from '../../lsg/patterns/property-items/asset-item';
-import { AssetProperty } from '../../store/styleguide/property/asset-property';
+// import { AssetProperty } from '../../store/styleguide/property/asset-property';
 import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item';
-import { remote } from 'electron';
 import Element from '../../lsg/patterns/element';
 import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item';
 import { EnumProperty, Option } from '../../store/styleguide/property/enum-property';
@@ -12,7 +11,7 @@ import { PageElement } from '../../store/page/page-element';
 import { PropertyValue } from '../../store/page/property-value';
 import { PropertyValueCommand } from '../../store/command/property-value-command';
 import * as React from 'react';
-import { Store } from '../../store/store';
+import { ViewStore } from '../../store';
 import { StringItem } from '../../lsg/patterns/property-items/string-item';
 
 interface ObjectContext {
@@ -59,11 +58,11 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 			value,
 			propertyPath.join('.')
 		);
-		Store.getInstance().execute(this.lastCommand);
+		ViewStore.getInstance().execute(this.lastCommand);
 	}
 
 	protected handleChooseAsset(id: string, context?: ObjectContext): void {
-		remote.dialog.showOpenDialog(
+		/* remote.dialog.showOpenDialog(
 			{
 				title: 'Select an image',
 				properties: ['openFile']
@@ -74,7 +73,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 					this.handleChange(id, dataUrl, context);
 				}
 			}
-		);
+		); */
 	}
 
 	protected handleClick(): void {
@@ -119,10 +118,9 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 				{properties.map(property => {
 					const id = property.getId();
 					const name = property.getName();
-					const type = property.getType();
 					const value = this.getValue(id, context && context.path);
 
-					switch (type) {
+					switch (property.type) {
 						case 'boolean':
 							return (
 								<BooleanItem
@@ -192,7 +190,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 							return <PropertyTree key={id} context={newContext} element={element} />;
 
 						default:
-							return <div key={id}>Unknown type: {type}</div>;
+							return <div key={id}>Unknown type: {property.type}</div>;
 					}
 				})}
 			</>
@@ -203,7 +201,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 @observer
 export class PropertyList extends React.Component {
 	public render(): React.ReactNode {
-		const selectedElement = Store.getInstance().getSelectedElement();
+		const selectedElement = ViewStore.getInstance().getSelectedElement();
 
 		if (!selectedElement) {
 			return <div>No Element selected</div>;

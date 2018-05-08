@@ -30,7 +30,7 @@ export class HtmlExporter extends Exporter {
 			payload: {
 				mode: PreviewDocumentMode.Static,
 				pageId: currentPage.getId(),
-				pages: project.getPages().map(page => page.toJsonObject({ forRendering: true }))
+				pages: project.getPages().map(page => page.toJSON({ forRendering: true }))
 			}
 		};
 

@@ -1,62 +1,101 @@
-import { JsonObject, Persister } from '../json';
 import * as MobX from 'mobx';
 import { PageElement } from './page-element';
-import { PageRef } from './page-ref';
 import { Project } from '../project';
-import { Store } from '../store';
-import { Styleguide, SyntheticPatternType } from '../styleguide/styleguide';
+import { Styleguide, SyntheticPatternType } from '../styleguide';
+import * as Types from '../types';
+import * as uuid from 'uuid';
+
+export enum EditState {
+	Editable = 'Editable',
+	Editing = 'Editing'
+}
+
+export interface PageInit {
+	id: string;
+	name?: string;
+	root: PageElement;
+}
+
+export interface PageCreateInit {
+	id?: string;
+	name: string;
+	root?: PageElement;
+	styleguide: Styleguide;
+}
+
+export interface PageContext {
+	styleguide: Styleguide;
+}
 
 /**
  * The current actually loaded page of a project. It consists of a tree of page elements,
  * which in turn provide the properties data for the pattern components.
- * @see PageRef
  */
 export class Page {
+	/**
+	 * Intermediary edited name
+	 */
+	@MobX.observable public editedName: string = '';
+
 	/**
 	 * A lookup of all page elements by their ID.
 	 */
 	@MobX.observable private elementsById: Map<string, PageElement> = new Map();
 
 	/**
-	 * The page reference, containing the technical ID and the human-friendly name of this page.
+	 * The technical unique identifier of this page
 	 */
-	@MobX.observable private pageRef: PageRef;
+	@MobX.observable private id: string;
+
+	/**
+	 * The human-friendly name of the page.
+	 * In the frontend, to be displayed instead of the ID.
+	 */
+	@MobX.observable private name: string = 'Page';
+
+	/**
+	 * Wether the name may be edited
+	 */
+	@MobX.observable public nameState: EditState = EditState.Editable;
+
+	/**
+	 * The project this page belongs to.
+	 */
+	@MobX.observable private project: Project;
 
 	/**
 	 * The root element of the page, the first pattern element of the content tree.
 	 */
-	private root?: PageElement;
+	private root: PageElement;
 
 	/**
 	 * Creates a new page.
 	 * @param id The technical (internal) ID of the page.
 	 * @param store The global application store.
 	 */
-	public constructor(pageRef: PageRef) {
-		this.pageRef = pageRef;
+	public constructor(init: PageInit) {
+		this.id = init.id;
+		this.root = init.root;
+
+		if (typeof init.name !== 'undefined') {
+			this.name = init.name;
+		}
 	}
 
 	/**
 	 * Create a new empty page
 	 */
-	public static create(id: string): Page {
-		const store = Store.getInstance();
-		const styleguide = store.getStyleguide() as Styleguide;
-		const pageRef = store.getPageRefById(id);
-
-		if (!pageRef) {
-			throw new Error(`Unknown page ID '${id}'`);
-		}
-
-		const page = new Page(pageRef);
-
-		page.setRoot(
-			new PageElement({
-				pattern: styleguide.getSyntheticPattern(SyntheticPatternType.Page)
-			})
-		);
-
-		return page;
+	public static create(init: PageCreateInit): Page {
+		return new Page({
+			id: init.id || uuid.v4(),
+			name: init.name,
+			root:
+				init.root ||
+				new PageElement({
+					name: init.name,
+					pattern: init.styleguide.getPatternByType(SyntheticPatternType.SyntheticPage)
+				})
+		});
 	}
 
 	/**
@@ -65,27 +104,19 @@ export class Page {
 	 * @param id The ID of the resulting page
 	 * @return A new page object containing the loaded data.
 	 */
-	public static fromJsonObject(json: JsonObject, id: string): Page {
-		const store = Store.getInstance();
-		const pageRef = store.getPageRefById(id);
-		if (!pageRef) {
-			throw new Error(`Unknown page ID '${id}'`);
-		}
-
-		const page = new Page(pageRef);
-		page.setRoot(PageElement.fromJsonObject(json.root as JsonObject));
-
-		return page;
+	public static from(serializedPage: Types.SerializedPage, context: PageContext): Page {
+		return new Page({
+			id: serializedPage.id,
+			name: serializedPage.name,
+			root: PageElement.from(serializedPage.root, context)
+		});
 	}
 
 	/**
-	 * Loads and returns a page from a given persisted data file
-	 * @param path The absolute file system path to read from
-	 * @param id The ID of the resulting page
-	 * @return A new page object containing the loaded data.
+	 * Get the current edited value of the page name
 	 */
-	public static fromPath(path: string, id: string): Page {
-		return Page.fromJsonObject(Persister.loadYamlOrJson(path), id);
+	public getEditedName(): string {
+		return this.editedName;
 	}
 
 	/**
@@ -101,7 +132,7 @@ export class Page {
 	 * @return The technical (internal) ID of the page.
 	 */
 	public getId(): string {
-		return this.pageRef.getId();
+		return this.id;
 	}
 
 	/**
@@ -109,17 +140,20 @@ export class Page {
 	 * In the frontend, to be displayed instead of the ID.
 	 * @return The human-friendly name of the page.
 	 */
-	public getName(): string {
-		return this.pageRef.getName();
+	public getName(options?: { unedited: boolean }): string {
+		if ((!options || !options.unedited) && this.nameState === EditState.Editing) {
+			return this.editedName;
+		}
+
+		return this.name;
 	}
 
 	/**
-	 * Returns the page reference, containing the technical ID and the human-friendly name of this
-	 * page.
-	 * @return The page reference.
+	 * Get the editable state of the page name
+	 * @param state
 	 */
-	public getPageRef(): PageRef {
-		return this.pageRef;
+	public getNameState(): EditState {
+		return this.nameState;
 	}
 
 	/**
@@ -127,7 +161,7 @@ export class Page {
 	 * @return The project of this page.
 	 */
 	public getProject(): Project {
-		return this.pageRef.getProject();
+		return this.project;
 	}
 
 	/**
@@ -150,19 +184,29 @@ export class Page {
 	}
 
 	/**
-	 * Sets the root element of the page, the first pattern element of the content tree.
-	 * @param root The new root element of the page.
+	 * Sets the human-friendly name of the page.
+	 * @param name The human-friendly name of the page.
 	 */
-	public setRoot(root?: PageElement | undefined): void {
-		if (this.root) {
-			this.root.setParentInternal(undefined, undefined, undefined, undefined);
+	@MobX.action
+	public setName(name: string): void {
+		if (this.nameState === EditState.Editing) {
+			this.editedName = name;
+			return;
 		}
 
-		this.root = root;
+		this.name = name;
+	}
 
-		if (root) {
-			root.setParentInternal(undefined, undefined, undefined, this);
+	/**
+	 * Sets the editable state of the page name
+	 * @param state
+	 */
+	public setNameState(state: EditState): void {
+		if (state === EditState.Editing) {
+			this.editedName = this.name;
 		}
+
+		this.nameState = state;
 	}
 
 	/**
@@ -172,11 +216,11 @@ export class Page {
 	 * @return The JSON object to be persisted.
 	 * @see Property.convertToRender()
 	 */
-	public toJsonObject(props?: { forRendering?: boolean }): JsonObject {
+	public toJSON(props?: { forRendering?: boolean }): Types.SerializedPage {
 		return {
 			id: this.getId(),
 			name: this.getName(),
-			root: this.root ? this.root.toJsonObject(props) : undefined
+			root: this.root.toJSON(props)
 		};
 	}
 

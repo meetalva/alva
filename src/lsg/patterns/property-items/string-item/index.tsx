@@ -50,7 +50,7 @@ const StyledInput = styled.input`
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 15px;
 	text-overflow: ellipsis;
-	transition: all 0.1s;
+	transition: border-color 0.1s, box-shadow 0.1s, color 0.1s;
 	::-webkit-input-placeholder {
 		color: ${colors.grey60.toString()};
 	}

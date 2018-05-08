@@ -32,7 +32,7 @@ const StyledIndicator = styled.span`
 	height: ${indicatorHeight}px;
 	border-radius: ${indicatorHeight / 2}px;
 	box-sizing: border-box;
-	box-shadow: inset 0 0 0 1px ${colors.grey80.toString()};
+	border: 1px solid ${colors.grey80.toString()};
 	transition: background 0.1s, box-shadow 0.1s;
 	user-select: none;
 	&::after {
@@ -41,33 +41,38 @@ const StyledIndicator = styled.span`
 		display: block;
 		width: ${indicatorHeight}px;
 		height: ${indicatorHeight}px;
+		margin: -1px 0 0 -1px;
 		transform: translateX(0);
 		border-radius: 100%;
 		background: ${colors.white.toString()};
 		transition: transform 0.1s, border-color 0.1s, box-shadow 0.1s;
 		box-sizing: border-box;
-		box-shadow: inset 0 0 0 1px ${colors.grey60.toString()};
+		border: 1px solid ${colors.grey60.toString()};
+		@media screen and (-webkit-min-device-pixel-ratio: 2) {
+			border-width: 0.5px;
+		}
 	}
 	&:hover {
 		&::after {
-			box-shadow: inset 0 0 0 1px ${colors.grey60.toString()}, 0.5px 0.5px 3px ${colors.grey60.toString()};
+			border-color: ${colors.grey60.toString()};
+			box-shadow: 0.5px 0.5px 3px ${colors.grey60.toString()};
 		}
 	}
 	${(props: IndicatorProps) =>
 		props.checked
 			? `
 			background: ${colors.blue80.toString()};
-			box-shadow: inset 0 0 0 0.5px ${colors.blue40.toString()};
+			border-color: ${colors.blue40.toString()};
 			&::after {
 				content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><polyline points="3.8,6 5.2,7.5 8.2,4.5 " fill="none" stroke="${colors.blue40.toString()}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>');
 				transform: translateX(${indicatorWidth - indicatorHeight}px);
 				background: ${colors.white.toString()};
 				border-color: ${colors.blue40.toString()};
-				box-shadow: inset 0 0 0 1px ${colors.blue40.toString()};
 			}
 			&:hover {
 				&::after {
-					box-shadow: inset 0 0 0 1px ${colors.blue40.toString()}, 0.5px 0.5px 3px ${colors.blue40.toString()};
+					border-color: ${colors.blue40.toString()};
+					box-shadow: 0.5px 0.5px 3px ${colors.blue40.toString()};
 				}
 			}
 		`

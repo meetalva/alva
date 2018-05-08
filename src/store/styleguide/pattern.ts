@@ -1,8 +1,36 @@
+import * as AlvaUtil from '../../alva-util';
 import { PatternFolder } from './folder';
-import { ObjectProperty } from './property/object-property';
-import { Property } from './property/property';
+import * as Property from './property';
 import { Slot } from './slot';
-import { Store } from '../store';
+import { Styleguide } from './styleguide';
+import * as Types from '../types';
+import * as uuid from 'uuid';
+
+export type PatternType = SyntheticPatternType | ConcretePatternType;
+
+export enum SyntheticPatternType {
+	SyntheticPage = 'synthetic:page',
+	SyntheticPlaceholder = 'synthetic:placeholder',
+	SyntheticText = 'synthetic:text'
+}
+
+export enum ConcretePatternType {
+	Pattern = 'pattern'
+}
+
+export interface PatternInit {
+	exportName?: string;
+	id?: string;
+	name: string;
+	path: string;
+	properties?: Property.Property[];
+	slots?: Slot[];
+	type: PatternType;
+}
+
+export interface PatternContext {
+	styleguide: Styleguide;
+}
 
 /**
  * A pattern represents a reusable, styled component (e.g. a React component) of the styleguide.
@@ -23,47 +51,42 @@ export class Pattern {
 	 * The name of the export in the JavaScript implementation of the pattern.
 	 * For default export, the value is 'default'.
 	 */
-	protected exportName: string;
+	private exportName: string;
 
 	/**
 	 * The folder containing the pattern.
 	 */
-	protected folder: PatternFolder;
-
-	/**
-	 * The absolute path to the icon of the pattern, if provided by the implementation.
-	 */
-	protected iconPath?: string;
+	private folder: PatternFolder;
 
 	/**
 	 * The ID of the pattern. How this is generated is completely up to the styleguide analyzer
 	 * that creates the pattern (and does not necessarily represent the file path).
 	 */
-	protected id: string;
-
-	/**
-	 * The absolute path to the JavaScript implementation of the pattern,
-	 * used to preview page elements.
-	 */
-	protected implementationPath: string;
+	private id: string;
 
 	/**
 	 * The human-readable name of the pattern.
 	 * In the frontend, to be displayed instead of the ID.
 	 */
-	protected name: string;
+	private name: string;
+
+	/**
+	 * The absolute path to the JavaScript implementation of the pattern,
+	 * used to preview page elements.
+	 */
+	private path: string;
 
 	/**
 	 * The properties this pattern supports.
 	 */
-	protected properties: Map<string, Property> = new Map();
+	private properties: Property.Property[];
 
 	/**
 	 * The slots this pattern supports
 	 */
-	protected slots: Map<string, Slot> = new Map([
-		[Pattern.DEFAULT_SLOT_PROPERTY_NAME, new Slot(Pattern.DEFAULT_SLOT_PROPERTY_NAME)]
-	]);
+	private slots: Slot[];
+
+	private type: PatternType;
 
 	/**
 	 * Creates a new pattern.
@@ -75,19 +98,38 @@ export class Pattern {
 	 * @param exportName The name of the export in the JavaScript implementation of the pattern.
 	 * For default export, the value is 'default'.
 	 */
-	public constructor(id: string, name: string, implementationPath: string, exportName?: string) {
-		this.id = id;
-		this.name = Store.guessName(name);
-		this.implementationPath = implementationPath || '';
-		this.exportName = exportName || 'default';
+	public constructor(init: PatternInit) {
+		this.id = init.id || uuid.v4();
+		this.name = AlvaUtil.guessName(init.name);
+		this.path = init.path || '';
+		this.exportName = init.exportName || 'default';
+		this.type = init.type;
+		this.properties = init.properties || [];
+		this.slots = init.slots || [new Slot({ id: 'default', name: AlvaUtil.guessName('default') })];
+	}
+
+	public static from(serializedPattern: Types.SerializedPattern): Pattern {
+		return new Pattern({
+			exportName: serializedPattern.exportName,
+			id: serializedPattern.id,
+			name: serializedPattern.name,
+			path: serializedPattern.path,
+			properties: serializedPattern.properties.map(unserializeProperty),
+			slots: serializedPattern.slots.map(slot => Slot.from(slot)),
+			type: stringToType(serializedPattern.type)
+		});
+	}
+
+	public static fromTypeString(type: string, context: PatternContext): Pattern {
+		return context.styleguide.getPatternById(type) as Pattern;
 	}
 
 	/**
 	 * Adds a property to this pattern. This method is called by the pattern parser only.
 	 * @param property The new property to add.
 	 */
-	public addProperty(property: Property): void {
-		this.properties.set(property.getId(), property);
+	public addProperty(property: Property.Property): void {
+		this.properties.push(property);
 	}
 
 	/**
@@ -95,17 +137,7 @@ export class Pattern {
 	 * @param name The slot to add.
 	 */
 	public addSlot(slot: Slot): void {
-		this.slots.set(slot.getId(), slot);
-	}
-
-	/**
-	 * Writes information about this pattern to the console.
-	 * @param indentation The current indentation level, if invoked from a pattern folder.
-	 */
-	public dump(indentation: number = 0): void {
-		console.info(
-			`${'  '.repeat(indentation)}Pattern '${this.id}', path '${this.implementationPath}'`
-		);
+		this.slots.push(slot);
 	}
 
 	/**
@@ -117,12 +149,8 @@ export class Pattern {
 		return this.exportName;
 	}
 
-	/**
-	 * Returns the absolute path to the icon of the pattern, if provided by the implementation.
-	 * @return The absolute path to the icon of the pattern.
-	 */
-	public getIconPath(): string | undefined {
-		return this.iconPath;
+	public getFolder(): PatternFolder {
+		return this.folder;
 	}
 
 	/**
@@ -136,15 +164,6 @@ export class Pattern {
 	}
 
 	/**
-	 * Returns the absolute path to the JavaScript implementation of the pattern,
-	 * used to preview page elements.
-	 * @return The absolute path to the JavaScript implementation.
-	 */
-	public getImplementationPath(): string {
-		return this.implementationPath;
-	}
-
-	/**
 	 * Returns the human-readable name of the pattern.
 	 * In the frontend, to be displayed instead of the ID.
 	 * @return The human-readable name of the pattern.
@@ -153,12 +172,16 @@ export class Pattern {
 		return this.name;
 	}
 
+	public getPath(): string {
+		return this.path;
+	}
+
 	/**
 	 * Returns the properties this pattern supports.
 	 * @return The properties this pattern supports.
 	 */
-	public getProperties(): Property[] {
-		return Array.from(this.properties.values());
+	public getProperties(): Property.Property[] {
+		return this.properties;
 	}
 
 	/**
@@ -168,16 +191,16 @@ export class Pattern {
 	 * eg: `getProperty('image', 'src.srcSet')`.
 	 * @return The property for the given ID, if it exists.
 	 */
-	public getProperty(id: string, path?: string): Property | undefined {
-		let property = this.properties.get(id);
+	public getProperty(id: string, path?: string): Property.Property | undefined {
+		let property = this.properties.find(p => p.getId() === id);
 
 		if (!property || !path) {
 			return property;
 		}
 
 		for (const part of path.split('.')) {
-			if (property && property.getType() === 'object') {
-				property = (property as ObjectProperty).getProperty(part);
+			if (property && property.type === Property.PropertyType.Object) {
+				property = (property as Property.ObjectProperty).getProperty(part);
 			} else {
 				return;
 			}
@@ -191,15 +214,57 @@ export class Pattern {
 	 * @return The slots this pattern supports.
 	 */
 	public getSlots(): Slot[] {
-		return Array.from(this.slots.values());
+		return this.slots;
 	}
 
-	/**
-	 * Sets the absolute path to the icon of the pattern.
-	 * This method is called by any pattern parser implementation to enrich meta-information.
-	 * @param iconPath The absolute path to the icon of the pattern.
-	 */
-	public setIconPath(iconPath?: string): void {
-		this.iconPath = iconPath;
+	public getType(): PatternType {
+		return this.type;
+	}
+
+	public toJSON(): Types.SerializedPattern {
+		return {
+			exportName: this.exportName,
+			id: this.id,
+			name: this.name,
+			path: this.path,
+			slots: this.slots.map(slot => slot.toJSON()),
+			type: this.type,
+			properties: this.properties.map(property => property.toJSON())
+		};
 	}
 }
+
+const stringToType = (input: string): PatternType => {
+	switch (input) {
+		case 'synthetic:page':
+			return SyntheticPatternType.SyntheticPage;
+		case 'synthetic:placeholder':
+			return SyntheticPatternType.SyntheticPlaceholder;
+		case 'synthetic:text':
+			return SyntheticPatternType.SyntheticText;
+		case 'pattern':
+		default:
+			return ConcretePatternType.Pattern;
+	}
+};
+
+const unserializeProperty = (serialized: Types.SerializedProperty): Property.Property => {
+	switch (serialized.type) {
+		case Types.PropertyType.Asset:
+			return Property.AssetProperty.from(serialized);
+		case Types.PropertyType.Boolean:
+			return Property.BooleanProperty.from(serialized);
+		case Types.PropertyType.Enum:
+			return Property.EnumProperty.from(serialized);
+		case Types.PropertyType.Number:
+			return Property.NumberProperty.from(serialized);
+		case Types.PropertyType.NumberArray:
+			return Property.NumberArrayProperty.from(serialized);
+		case Types.PropertyType.Object:
+			return Property.ObjectProperty.from(serialized);
+		case Types.PropertyType.String:
+			return Property.StringProperty.from(serialized);
+		case Types.PropertyType.StringArray:
+			return Property.StringArrayProperty.from(serialized);
+	}
+};

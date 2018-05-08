@@ -1,5 +1,5 @@
-import * as Path from 'path';
-import { patternIdToWebpackName } from './pattern-id-to-webpack-name';
+// import * as Path from 'path';
+// import { patternIdToWebpackName } from './pattern-id-to-webpack-name';
 import * as QueryString from 'query-string';
 import { Styleguide } from '../store/styleguide/styleguide';
 import * as webpack from 'webpack';
@@ -16,11 +16,10 @@ interface StyleguidePattern {
 }
 
 export function createCompiler(styleguide: Styleguide): webpack.Compiler {
-	const init: StyleguidePattern = {};
+	// const context = styleguide.getPath();
+	const context = process.cwd();
 
-	const context = styleguide.getPath();
-
-	const components = styleguide.getPatterns().reduce((componentMap, pattern) => {
+	/*const components =  styleguide.getPatterns().reduce((componentMap, pattern) => {
 		const patternPath = pattern.getImplementationPath();
 
 		if (!patternPath) {
@@ -34,7 +33,8 @@ export function createCompiler(styleguide: Styleguide): webpack.Compiler {
 			.split(Path.sep)
 			.join('/')}`;
 		return componentMap;
-	}, init);
+	}, init); */
+	const components: StyleguidePattern = {};
 
 	const compiler = webpack({
 		mode: 'development',

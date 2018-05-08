@@ -1,17 +1,22 @@
-import { JsonArray, JsonObject } from './json';
 import * as MobX from 'mobx';
-import { Page } from './page/page';
-import { PageRef } from './page/page-ref';
-import { Store } from './store';
+import * as Types from './types';
 import * as username from 'username';
 import * as Uuid from 'uuid';
+import { Page, Styleguide } from '.';
 
 export interface ProjectProperties {
 	id?: string;
 	lastChangedAuthor?: string;
 	lastChangedDate?: Date;
 	name: string;
-	previewFrame: string;
+	pages: Page[];
+	path: string;
+	styleguide: Styleguide;
+}
+
+export interface ProjectCreateInit {
+	name: string;
+	path: string;
 }
 
 /**
@@ -53,25 +58,46 @@ export class Project {
 	 * Instead, they know what pages exist (page references),
 	 * and the store can load them from YAML files when required (open page).
 	 */
-	@MobX.observable private pages: PageRef[] = [];
+	@MobX.observable private pages: Page[] = [];
+
+	private path;
 
 	/**
-	 * Path to the preview frame, relative to the alva.yaml file.
+	 * The underlying styleguide for this project
 	 */
-	@MobX.observable private previewFrame: string;
+	@MobX.observable private styleguide: Styleguide;
 
 	/**
 	 * Creates a new project.
 	 * @param id The technical (internal) ID of the project.
 	 * @param name The human-friendly name of the project.
-	 * @param previewFrame Path to the preview frame, relative to the alva.yaml file.
 	 */
 	public constructor(properties: ProjectProperties) {
-		this.id = properties.id ? properties.id : Uuid.v4();
+		this.styleguide = properties.styleguide;
 		this.name = properties.name;
+
+		this.id = properties.id ? properties.id : Uuid.v4();
 		this.lastChangedAuthor = properties.lastChangedAuthor || 'unknown';
 		this.lastChangedDate = properties.lastChangedDate || new Date();
-		this.previewFrame = properties.previewFrame;
+
+		this.pages = properties.pages ? properties.pages : [];
+		this.path = properties.path;
+	}
+
+	public static create(init: ProjectCreateInit): Project {
+		const styleguide = Styleguide.create();
+
+		const page = Page.create({
+			styleguide,
+			name: init.name
+		});
+
+		return new Project({
+			name: init.name,
+			pages: [page],
+			path: init.path,
+			styleguide
+		});
 	}
 
 	/**
@@ -79,23 +105,24 @@ export class Project {
 	 * @param jsonObject The JSON object to load from.
 	 * @return A new project object containing the loaded data.
 	 */
-	public static fromJsonObject(json: JsonObject): Project {
-		const lastChangedDate = new Date(json.lastChangedDate as string);
+	public static from(serializedProject: Types.SerializedProject): Project {
+		const styleguide = Styleguide.from(serializedProject.styleguide);
 
-		const project: Project = new Project({
-			id: json.uuid as string,
-			name: json.name as string,
-			lastChangedAuthor: json.lastChangedAuthor as string | undefined,
-			lastChangedDate: isNaN(lastChangedDate.getTime()) ? undefined : lastChangedDate,
-			previewFrame: json.previewFrame as string
+		return new Project({
+			id: serializedProject.uuid,
+			lastChangedAuthor: serializedProject.lastChangedAuthor,
+			lastChangedDate: serializedProject.lastChangedDate
+				? new Date(serializedProject.lastChangedDate)
+				: undefined,
+			name: serializedProject.name,
+			path: serializedProject.path,
+			pages: serializedProject.pages.map(page => Page.from(page, { styleguide })),
+			styleguide
 		});
+	}
 
-		const pages: PageRef[] = [];
-		(json.pages as JsonArray).forEach((pageJson: JsonObject) => {
-			pages.push(PageRef.fromJsonObject(pageJson, project));
-		});
-
-		return project;
+	public addPage(page: Page): void {
+		this.pages.push(page);
 	}
 
 	/**
@@ -124,72 +151,67 @@ export class Project {
 		return this.lastChangedDate;
 	}
 
-	/**
-	 * Returns the human-friendly name of the project.
-	 * In the frontend, to be displayed instead of the ID.
-	 * @return The human-friendly name of the project.
-	 */
 	public getName(): string {
 		return this.name;
 	}
 
-	/**
-	 * The page references of the project. Projects do not contain the page elements directly.
-	 * Instead, they know what pages exist (page references),
-	 * and the store can load them from YAML files when required (open page).
-	 */
-	public getPageRefs(): PageRef[] {
+	public getPageById(id: string): Page | undefined {
+		return this.pages.find(page => page.getId() === id);
+	}
+
+	public getPages(): Page[] {
 		return this.pages;
 	}
 
-	/**
-	 * Internal method to get the pages as a MobX observable.
-	 * Do not use from the UI components.
-	 * @return The internal pages representation.
-	 */
-	public getPageRefsInternal(): MobX.IObservableArray<PageRef> {
-		return this.pages as MobX.IObservableArray<PageRef>;
+	public getPath(): string {
+		return this.path;
 	}
 
-	/**
-	 * Returns fully resolved page objects
-	 */
-	public getPages(): Page[] {
-		return this.getPageRefs()
-			.map(pageRef => pageRef.load())
-			.filter((page => typeof page !== 'undefined') as (page: Page | undefined) => page is Page);
+	public getStyleguide(): Styleguide {
+		return this.styleguide;
 	}
 
-	/**
-	 * Returns the configured path to the preview frame, relative to the alva.yaml file.
-	 * @return Path to the configured preview frame
-	 */
-	public getPreviewFrame(): string {
-		return this.previewFrame;
-	}
-
-	/**
-	 * Sets the human-friendly name of the project.
-	 * In the frontend, to be displayed instead of the ID.
-	 * @param name The human-friendly name of the project.
-	 */
 	public setName(name: string): void {
 		this.name = name;
 	}
 
-	/**
-	 * Serializes the project into a JSON object for persistence.
-	 * @return The JSON object to be persisted.
-	 */
-	public toJsonObject(): JsonObject {
+	public setPath(path: string): void {
+		this.path = path;
+	}
+
+	public toDisk(): Types.SavedProject {
 		return {
 			uuid: this.id,
 			name: this.name,
 			lastChangedAuthor: this.lastChangedAuthor,
 			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
-			previewFrame: this.previewFrame,
-			pages: this.pages.map(p => p.toJsonObject())
+			pages: this.pages.map(p => p.toJSON()),
+			styleguide: this.styleguide.toJSON()
 		};
+	}
+
+	/**
+	 * Extract serializable object from project.
+	 * @return The JSON object
+	 */
+	public toJSON(): Types.SerializedProject {
+		return {
+			uuid: this.id,
+			name: this.name,
+			lastChangedAuthor: this.lastChangedAuthor,
+			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
+			pages: this.pages.map(p => p.toJSON()),
+			path: this.path,
+			styleguide: this.styleguide.toJSON()
+		};
+	}
+
+	/**
+	 * Serialize the project into a string for persistence and transfer
+	 * @return The JSON string
+	 */
+	public toString(): string {
+		return JSON.stringify(this.toJSON());
 	}
 
 	/**
@@ -200,13 +222,5 @@ export class Project {
 			this.lastChangedAuthor = await username();
 			this.lastChangedDate = new Date();
 		})();
-	}
-
-	/**
-	 * Updates the path of each project's page file from the project and page names, trying to use
-	 * normalized versions of those names, and then finding the next unused file name.
-	 */
-	public updatePathFromNames(): void {
-		this.pages.forEach(project => Store.getInstance().findAvailablePagePath(project));
 	}
 }

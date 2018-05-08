@@ -1,27 +1,30 @@
 import * as HtmlSketchApp from '@brainly/html-sketchapp';
-import { getComponent } from './get-component';
 import { HighlightArea } from './highlight-area';
 import { PreviewMessageType } from '../message';
 import * as MobX from 'mobx';
 import { PreviewDocumentMode } from './preview-document';
 import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
+import * as Types from '../store/types';
 
 // TODO: Produces a deprecation warning, find a way
 // to dedupe MobX when upgrading to 4.x
 MobX.extras.shareGlobalState();
 
+export interface PageComponentContents {
+	elements: PageElement[];
+	id: string;
+}
+
 export interface PageElement {
-	contents: {
-		[propName: string]: PageElement[];
-	};
+	contents: PageComponentContents[];
 	exportName: string;
+	id: string;
 	name: string;
 	pattern: string;
 	properties: {
 		// tslint:disable-next-line:no-any
 		[propName: string]: any;
 	};
-	uuid: string;
 }
 
 export interface Page {
@@ -39,6 +42,7 @@ interface InitialData {
 }
 
 export class PreviewStore {
+	@MobX.observable public components: Types.SerializedPattern[] = [];
 	@MobX.observable public elementId: string = '';
 	@MobX.observable public mode: PreviewDocumentMode = PreviewDocumentMode.Live;
 	@MobX.observable public pageId: string = '';
@@ -91,7 +95,8 @@ function main(): void {
 	const render = () => {
 		// tslint:disable-next-line:no-any
 		(window as any).renderer.render({
-			getComponent,
+			// tslint:disable-next-line:no-any
+			getComponent: createComponentGetter(store),
 			highlight,
 			store
 		});
@@ -195,8 +200,17 @@ function listen(store: PreviewStore, handlers: { onReplacement(): void }): void 
 					window.location.hash = '';
 				}
 
-				store.pageId = payload.pageId;
-				store.pages = payload.pages;
+				if (typeof payload.pageId === 'string') {
+					store.pageId = payload.pageId;
+				}
+
+				if (Array.isArray(payload.pages)) {
+					store.pages = payload.pages;
+				}
+
+				if (Array.isArray(payload.components)) {
+					store.components = payload.components;
+				}
 
 				break;
 			}
@@ -275,6 +289,28 @@ function startRouter(store: PreviewStore): void {
 	}
 
 	window.addEventListener('hashchange', performRouting);
+}
+
+// tslint:disable-next-line:no-any
+function createComponentGetter(store: PreviewStore): (props: any, synthetics: any) => any {
+	return (props, synthetics) => {
+		const pattern = store.components.find(component => component.id === props.pattern);
+
+		if (!pattern) {
+			return;
+		}
+
+		switch (pattern.type) {
+			case 'pattern':
+			// TODO: Restore window[pattern] access here
+			case 'synthetic:page':
+				return synthetics.page;
+			case 'synthetic:placeholder':
+				return synthetics.placeholder;
+			case 'synthetic:text':
+				return synthetics.text;
+		}
+	};
 }
 
 main();

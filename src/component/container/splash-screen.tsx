@@ -28,11 +28,11 @@ export function SplashScreen(props: SplashScreenProps): JSX.Element {
 			</Space>
 			<Space sizeBottom={SpaceSize.S}>
 				<Button onClick={props.onPrimaryButtonClick} order={Order.Primary}>
-					Create new Alva space
+					Create New Alva File
 				</Button>
 			</Space>
 			<Link color={colors.grey50} onClick={props.onSecondaryButtonClick}>
-				<Copy size={CopySize.S}>or open existing Alva space</Copy>
+				<Copy size={CopySize.S}>Open Existing Alva File</Copy>
 			</Link>
 		</SplashScreenContainer>
 	);

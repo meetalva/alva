@@ -4,14 +4,14 @@ import { ServerMessageType } from '../message';
 import * as MobX from 'mobx';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { AlvaView, Store } from '../store/store';
+import { Project, ViewStore } from '../store';
+import * as Types from '../store/types';
 
 // prevent app zooming
 webFrame.setVisualZoomLevelLimits(1, 1);
 webFrame.setLayoutZoomLevelLimits(0, 0);
 
-const store = Store.getInstance();
-store.openFromPreferences();
+const store = ViewStore.getInstance();
 
 ipcRenderer.send('message', { type: 'app-loaded' });
 
@@ -24,6 +24,20 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 	switch (message.type) {
 		case ServerMessageType.StartApp: {
 			store.setServerPort(message.payload);
+			break;
+		}
+		case ServerMessageType.OpenFileResponse: {
+			const project = Project.from(message.payload.contents);
+			project.setPath(message.payload.path);
+
+			store.setProject(project);
+			store.setActiveView(Types.AlvaView.PageDetail);
+			break;
+		}
+		case ServerMessageType.CreateNewFileResponse: {
+			const project = Project.from(message.payload.contents);
+			store.setProject(project);
+			store.setActiveView(Types.AlvaView.PageDetail);
 		}
 	}
 
@@ -43,11 +57,11 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.Cut: {
-			if (store.getActiveView() === AlvaView.Pages) {
+			if (store.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.cutSelectedPage();
 			}
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.cutSelectedElement();
 			}
 			break;
@@ -57,10 +71,10 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.Delete: {
-			if (store.getActiveView() === AlvaView.Pages) {
+			if (store.getActiveView() === Types.AlvaView.Pages) {
 				store.removeSelectedPage();
 			}
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.removeSelectedElement();
 			}
 			break;
@@ -70,11 +84,11 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.Copy: {
-			if (store.getActiveView() === AlvaView.Pages) {
+			if (store.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.copySelectedPage();
 			}
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.copySelectedElement();
 			}
 			break;
@@ -84,11 +98,11 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.Paste: {
-			if (store.getActiveView() === AlvaView.Pages) {
+			if (store.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.pasteAfterSelectedPage();
 			}
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.pasteAfterSelectedElement();
 			}
 			break;
@@ -102,13 +116,13 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.Duplicate: {
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.duplicateSelectedElement();
 			}
 			break;
 		}
 		case ServerMessageType.DuplicatePageElement: {
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.duplicateElementById(message.payload);
 			}
 		}
@@ -121,11 +135,7 @@ MobX.autorun(() => {
 	if (styleguide) {
 		ipcRenderer.send('message', {
 			type: 'styleguide-change',
-			payload: {
-				analyzerName: store.getAnalyzerName(),
-				styleguidePath: styleguide.getPath(),
-				patternsPath: styleguide.getPatternsPath()
-			}
+			payload: styleguide.toJSON()
 		});
 	}
 });
@@ -139,7 +149,7 @@ MobX.autorun(() => {
 			type: 'page-change',
 			payload: {
 				pageId: currentPage.getId(),
-				pages: project.getPages().map(page => page.toJsonObject({ forRendering: true }))
+				pages: project.getPages().map(page => page.toJSON({ forRendering: true }))
 			}
 		});
 	}

@@ -1,20 +1,88 @@
+// tslint:disable:no-any
 import * as deepAssign from 'deep-assign';
-import { JsonArray, JsonObject, JsonValue } from '../json';
 import * as MobX from 'mobx';
 import * as ObjectPath from 'object-path';
 import { Page } from './page';
-import { Pattern } from '../styleguide/pattern';
-import { Property } from '../styleguide/property/property';
-import { PropertyValue } from './property-value';
-import { Store } from '../store';
+import { Pattern, Property, Styleguide } from '../styleguide';
+import * as Types from '../types';
 import * as Uuid from 'uuid';
 
 export interface PageElementProperties {
+	container?: PageElementContent;
+	contents: PageElementContent[];
 	id?: string;
+	name?: string;
 	parent?: PageElement;
-	parentSlotId?: string;
-	pattern?: Pattern;
+	pattern: Pattern;
+	properties?: Map<string, Types.PropertyValue>;
 	setDefaults?: boolean;
+}
+
+export interface PageElementContext {
+	styleguide: Styleguide;
+}
+
+export interface PageElementContentInit {
+	elements: PageElement[];
+	id: string;
+	name: string;
+}
+
+// TODO: Distinguish between content id and slot id
+export class PageElementContent {
+	@MobX.observable private elements: PageElement[] = [];
+	@MobX.observable private id: string;
+	@MobX.observable private name: string;
+
+	public constructor(init: PageElementContentInit) {
+		this.id = init.id;
+		this.name = init.name;
+		this.elements = init.elements;
+		this.elements.forEach(element => element.setContainer(this));
+	}
+
+	public static from(
+		serialized: Types.SerializedPageElementContent,
+		context: PageElementContext
+	): PageElementContent {
+		return new PageElementContent({
+			id: serialized.id,
+			name: serialized.name,
+			elements: serialized.elements.map(element => PageElement.from(element, context))
+		});
+	}
+
+	public getElements(): PageElement[] {
+		return this.elements;
+	}
+
+	public getId(): string {
+		return this.id;
+	}
+
+	@MobX.action
+	public insert(options: { at: number; element: PageElement }): void {
+		this.elements.splice(options.at, 0, options.element);
+	}
+
+	@MobX.action
+	public remove(options: { element: PageElement }): void {
+		const index = this.elements.indexOf(options.element);
+
+		if (index === -1) {
+			return;
+		}
+
+		this.elements.splice(index, 1);
+	}
+
+	public toJSON(): Types.SerializedPageElementContent {
+		return {
+			id: this.id,
+			name: this.name,
+			elements: this.elements.map(element => element.toJSON())
+		};
+	}
 }
 
 /**
@@ -23,11 +91,13 @@ export interface PageElementProperties {
  * Page elements are nested within a page.
  */
 export class PageElement {
+	private container?: PageElementContent;
+
 	/**
 	 * The content page elements of this element.
 	 * Key = Slot ID, Value = Slot contents.
 	 */
-	@MobX.observable private contents: Map<string, PageElement[]> = new Map();
+	@MobX.observable private contents: PageElementContent[] = [];
 
 	/**
 	 * The currently edited name of the page element, to be commited
@@ -57,33 +127,20 @@ export class PageElement {
 	/**
 	 * The parent page element if this is not the root element.
 	 */
-	private parent: PageElement | undefined;
-
-	/**
-	 * The id of the slot this element is attached to.
-	 * Undefined means default slot. (for react it's the `children` property)
-	 */
-	private parentSlotId: string | undefined;
+	private parent: PageElement;
 
 	/**
 	 * The pattern this page element reflects. Usually set, may only the undefined if the pattern
 	 * has disappeared or got invalid in the mean-time.
 	 */
-	private pattern?: Pattern;
-
-	/**
-	 * The ID of the pattern this page element reflects. This is a cached value equal to the ID of
-	 * the pattern property, for cases where the pattern could not be resolved on load, to not lose
-	 * the ID on save.
-	 */
-	private patternId?: string;
+	private pattern: Pattern;
 
 	/**
 	 * The pattern property values of this element's component instance.
 	 * Each key represents the property ID of the pattern, while the value holds the content
 	 * as provided by the designer.
 	 */
-	@MobX.observable private propertyValues: Map<string, PropertyValue> = new Map();
+	@MobX.observable private properties: Map<string, Types.PropertyValue> = new Map();
 
 	/**
 	 * Creates a new page element.
@@ -96,9 +153,24 @@ export class PageElement {
 	public constructor(properties: PageElementProperties) {
 		this.id = properties.id ? properties.id : Uuid.v4();
 		this.pattern = properties.pattern;
-		this.patternId = this.pattern ? this.pattern.getId() : undefined;
-		this.parentSlotId = properties.parentSlotId;
 		this.nameEditable = false;
+		this.container = properties.container;
+
+		this.pattern.getSlots().forEach(slot => {
+			const hydratedSlot = properties.contents.find(content => content.getId() === slot.getId());
+
+			this.contents.push(
+				new PageElementContent({
+					id: slot.getId(),
+					name: slot.getName(),
+					elements: hydratedSlot ? hydratedSlot.getElements() : []
+				})
+			);
+		});
+
+		if (typeof properties.name !== 'undefined') {
+			this.name = properties.name;
+		}
 
 		if (this.name === undefined && this.pattern) {
 			this.name = this.pattern.getName();
@@ -110,7 +182,9 @@ export class PageElement {
 			});
 		}
 
-		this.setParent(properties.parent, properties.parentSlotId);
+		if (properties.properties) {
+			this.properties = properties.properties;
+		}
 	}
 
 	/**
@@ -118,76 +192,19 @@ export class PageElement {
 	 * @param jsonObject The JSON object to load from.
 	 * @return A new page element object containing the loaded data.
 	 */
-	public static fromJsonObject(
-		json: JsonObject,
-		parent?: PageElement,
-		parentSlotId?: string,
-		page?: Page
-	): PageElement | undefined {
-		if (!json) {
-			return undefined;
-		}
-
-		const store: Store = Store.getInstance();
-		const styleguide = store.getStyleguide();
-		if (!styleguide) {
-			return undefined;
-		}
-
-		let patternId = json['pattern'] as string;
-		let pattern: Pattern | undefined = styleguide.getPattern(patternId);
-
-		if (!pattern) {
-			const indexPatternId = `${patternId}/index`;
-			pattern = styleguide.getPattern(indexPatternId);
-			if (pattern) {
-				patternId = indexPatternId;
-			}
-		}
-
-		if (!pattern && patternId) {
-			console.warn(`Unknown pattern '${patternId}', please check styleguide`);
-		}
-
-		const element = new PageElement({ id: json.uuid as string, pattern, parent, parentSlotId });
-		element.patternId = patternId;
-
-		if (json.name !== undefined) {
-			element.name = json.name as string;
-		}
-
-		if (json.properties) {
-			Object.keys(json.properties as JsonObject).forEach((propertyId: string) => {
-				const value: JsonValue = (json.properties as JsonObject)[propertyId];
-				element.setPropertyValue(propertyId, element.createPropertyValue(value));
-			});
-		}
-
-		if (json.contents) {
-			const slots = json.contents as JsonObject;
-
-			Object.keys(slots).forEach(slotId => {
-				(slots[slotId] as JsonArray).map(
-					childElement =>
-						PageElement.fromJsonObject(
-							childElement as JsonObject,
-							element,
-							slotId
-						) as PageElement
-				);
-			});
-		}
-
-		// Migrate old children structure
-		if (json.children) {
-			const children: JsonArray = json.children as JsonArray;
-			children.forEach(
-				childElement =>
-					PageElement.fromJsonObject(childElement as JsonObject, element) as PageElement
-			);
-		}
-
-		return element;
+	public static from(
+		serializedPageElement: Types.SerializedPageElement,
+		context: PageElementContext
+	): PageElement {
+		return new PageElement({
+			id: serializedPageElement.id,
+			name: serializedPageElement.name,
+			pattern: context.styleguide.getPatternById(serializedPageElement.pattern) as Pattern,
+			contents: serializedPageElement.contents.map(content =>
+				PageElementContent.from(content, context)
+			),
+			properties: toMap(serializedPageElement.properties)
+		});
 	}
 
 	/**
@@ -196,8 +213,12 @@ export class PageElement {
 	 * @param slotId This indicates the slot, that the element will be attached to. When undefined, the default slot will be used instead.
 	 * @param index The 0-based new position within the children. Leaving out the position adds it at the end of the list.
 	 */
-	public addChild(child: PageElement, slotId?: string, index?: number): void {
-		child.setParent(this, slotId, index);
+	public addChild(child: PageElement, slotId: string, index: number): void {
+		child.setParent({
+			index,
+			parent: this,
+			slotId
+		});
 	}
 
 	/**
@@ -206,18 +227,21 @@ export class PageElement {
 	 * @return The new clone.
 	 */
 	public clone(): PageElement {
-		const payload = this.toJsonObject();
+		const payload = this.toJSON();
 		delete payload.id;
 
-		const clone = new PageElement({ pattern: this.pattern });
+		const clone = new PageElement({
+			pattern: this.pattern,
+			contents: this.contents
+		});
 
-		this.contents.forEach((children, slotId) => {
-			children.forEach(child => {
-				clone.addChild(child.clone(), slotId);
+		this.contents.forEach(content => {
+			content.getElements().forEach((child, index) => {
+				clone.addChild(child.clone(), content.getId(), index);
 			});
 		});
 
-		this.propertyValues.forEach((value: PropertyValue, id: string) => {
+		this.properties.forEach((value: Types.PropertyValue, id: string) => {
 			clone.setPropertyValue(id, value);
 		});
 
@@ -226,24 +250,54 @@ export class PageElement {
 		return clone;
 	}
 
+	public getContainer(): PageElementContent | undefined {
+		return this.container;
+	}
+
 	/**
-	 * Creates a property value or element for a given serialization JSON.
-	 * @param json The JSON to read from.
-	 * @return The new property value or element.
+	 * Returns the id of the slot this element is attached to.
+	 * @return The slotId of the parent element.
 	 */
-	protected createPropertyValue(json: JsonValue): PageElement | PropertyValue {
-		if (json && (json as JsonObject)['_type'] === 'pattern') {
-			return PageElement.fromJsonObject(json as JsonObject, this);
-		} else {
-			return json as PropertyValue;
+	public getContainerId(): string | undefined {
+		if (!this.container) {
+			return;
 		}
+		return this.container.getId();
+	}
+
+	public getContentById(slotId: string): PageElementContent | undefined {
+		return this.contents.find(content => content.getId() === slotId);
 	}
 
 	/**
 	 * Returns all child elements contained by this element, mapped to their containing slots.
 	 */
-	public getContents(): Map<string, PageElement[]> {
+	public getContents(): PageElementContent[] {
 		return this.contents;
+	}
+
+	public getElementById(id: string): PageElement | undefined {
+		let result;
+
+		if (this.id === id) {
+			return this;
+		}
+
+		for (const content of this.contents) {
+			for (const element of content.getElements()) {
+				result = element.getElementById(id);
+
+				if (result) {
+					break;
+				}
+			}
+
+			if (result) {
+				break;
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -259,10 +313,17 @@ export class PageElement {
 	 * @return The 0-based position of this element.
 	 */
 	public getIndex(): number | undefined {
-		if (!this.parent) {
-			return undefined;
+		if (!this.parent || !this.container) {
+			return;
 		}
-		return this.parent.getSlotContents(this.parentSlotId).indexOf(this);
+
+		const content = this.parent.getContentById(this.container.getId());
+
+		if (!content) {
+			return;
+		}
+
+		return content.getElements().indexOf(this);
 	}
 
 	/**
@@ -282,7 +343,15 @@ export class PageElement {
 	 * @return The page this element belongs to.
 	 */
 	public getPage(): Page | undefined {
-		return this.page;
+		if (this.page) {
+			return this.page;
+		}
+
+		if (this.parent) {
+			return this.parent.getPage();
+		}
+
+		return;
 	}
 
 	/**
@@ -291,24 +360,6 @@ export class PageElement {
 	 */
 	public getParent(): PageElement | undefined {
 		return this.parent;
-	}
-
-	public getParentSlotContents(): PageElement[] {
-		const parent = this.getParent();
-
-		if (!parent) {
-			return [];
-		}
-
-		return parent.getSlotContents(this.getParentSlotId());
-	}
-
-	/**
-	 * Returns the id of the slot this element is attached to.
-	 * @return The slotId of the parent element.
-	 */
-	public getParentSlotId(): string | undefined {
-		return this.parentSlotId;
 	}
 
 	/**
@@ -329,30 +380,14 @@ export class PageElement {
 	 * the operation edits 'image.src.srcSet.xs' on the element.
 	 * @return The content value (as provided by the designer).
 	 */
-	public getPropertyValue(id: string, path?: string): PropertyValue {
-		const value: PropertyValue = this.propertyValues.get(id);
+	public getPropertyValue(id: string, path?: string): Types.PropertyValue {
+		const value: Types.PropertyValue = this.properties.get(id);
 
 		if (!path) {
 			return value;
 		}
 
 		return ObjectPath.get(value as {}, path);
-	}
-
-	/**
-	 * Returns the child page elements of this element for a given slot.
-	 * @param slotId The id of the slot to get the children for. Returns the children of the default slot if undefined.
-	 * @return The child page elements of this element and the given slot.
-	 */
-	@MobX.action
-	public getSlotContents(slotId?: string): PageElement[] {
-		const internalSlotId = slotId || Pattern.DEFAULT_SLOT_PROPERTY_NAME;
-
-		if (!this.contents.has(internalSlotId)) {
-			this.contents.set(internalSlotId, []);
-		}
-
-		return this.contents.get(internalSlotId) as PageElement[];
 	}
 
 	/**
@@ -406,25 +441,31 @@ export class PageElement {
 	 * @return value The property value to serialize.
 	 * @return The JSON value.
 	 */
-	protected propertyToJsonValue(value: PropertyValue): JsonValue {
+	/* protected propertyToJsonValue(value: Types.PropertyValue): any {
 		if (value instanceof Object) {
-			const jsonObject: JsonObject = {};
+			const jsonObject: any = {};
 			Object.keys(value).forEach((propertyId: string) => {
 				// tslint:disable-next-line:no-any
 				jsonObject[propertyId] = this.propertyToJsonValue((value as any)[propertyId]);
 			});
 			return jsonObject;
 		} else {
-			return value as JsonValue;
+			return value as any;
 		}
-	}
+	} */
 
 	/**
 	 * Removes this page element from its parent. You may later re-add it using setParent().
 	 * @see setParent()
 	 */
 	public remove(): void {
-		this.setParent(undefined);
+		if (this.container) {
+			this.container.remove({ element: this });
+		}
+	}
+
+	public setContainer(container: PageElementContent): void {
+		this.container = container;
 	}
 
 	/**
@@ -432,7 +473,15 @@ export class PageElement {
 	 * @param index The new 0-based position within the parent's children.
 	 */
 	public setIndex(index: number): void {
-		this.setParent(this.parent, this.parentSlotId, index);
+		if (!this.container) {
+			return;
+		}
+
+		this.setParent({
+			parent: this.parent,
+			slotId: this.container.getId(),
+			index
+		});
 	}
 
 	/**
@@ -461,6 +510,10 @@ export class PageElement {
 		this.nameEditable = nameEditable;
 	}
 
+	public setPage(page: Page): void {
+		this.page = page;
+	}
+
 	/**
 	 * Sets a new parent for this element (and removes it from its previous parent).
 	 * If no parent is provided, only removes it from its parent.
@@ -469,58 +522,17 @@ export class PageElement {
 	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
 	 * Leaving out the position adds it at the end of the list.
 	 */
-	public setParent(parent?: PageElement, slotId?: string, index?: number): void {
-		this.setParentInternal(parent, slotId, index, parent ? parent.getPage() : undefined);
-	}
+	public setParent(init: { index: number; parent: PageElement; slotId: string }): void {
+		this.parent = init.parent;
 
-	/**
-	 * Internal method to set the parent, index, and page the root belongs to.
-	 * Do not call from components code.
-	 * @param parent The (optional) new parent for this element.
-	 * @param index The 0-based new position within the children of the new parent.
-	 * Leaving out the position adds it at the end of the list.
-	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
-	 * @param page The page of this element.
-	 */
-	public setParentInternal(
-		parent?: PageElement,
-		slotId?: string,
-		index?: number,
-		page?: Page
-	): void {
-		if (
-			index !== undefined &&
-			this.parent === parent &&
-			this.getIndex() === index &&
-			this.parentSlotId === slotId
-		) {
-			return;
+		const container = init.parent.getContentById(init.slotId);
+
+		if (this.container) {
+			this.container.remove({ element: this });
 		}
 
-		if (this.parent) {
-			(this.parent.getSlotContents(this.parentSlotId) as MobX.IObservableArray<
-				PageElement
-			>).remove(this);
-		}
-
-		if (this.page) {
-			this.page.unregisterElementAndChildren(this);
-		}
-
-		this.parent = parent;
-		this.parentSlotId = slotId;
-		this.updatePageInDescendants(page);
-
-		if (parent) {
-			if (index === undefined || index >= parent.getSlotContents(slotId).length) {
-				parent.getSlotContents(slotId).push(this);
-			} else {
-				parent.getSlotContents(slotId).splice(index < 0 ? 0 : index, 0, this);
-			}
-		}
-
-		if (this.page) {
-			this.page.registerElementAndChildren(this);
+		if (container) {
+			container.insert({ element: this, at: init.index });
 		}
 	}
 
@@ -540,17 +552,17 @@ export class PageElement {
 		if (this.pattern) {
 			property = this.pattern.getProperty(id, path);
 			if (!property) {
-				console.warn(`Unknown property '${id}' in pattern '${this.patternId}'`);
+				console.warn(`Unknown property '${id}' in pattern '${this.pattern.getId()}'`);
 			}
 		}
 
 		const coercedValue = property ? property.coerceValue(value) : value;
 		if (path) {
-			const rootPropertyValue = this.propertyValues.get(id) || {};
-			ObjectPath.set<{}, PropertyValue>(rootPropertyValue, path, coercedValue);
-			this.propertyValues.set(id, deepAssign({}, rootPropertyValue));
+			const rootPropertyValue = this.properties.get(id) || {};
+			ObjectPath.set<{}, Types.PropertyValue>(rootPropertyValue, path, coercedValue);
+			this.properties.set(id, deepAssign({}, rootPropertyValue));
 		} else {
-			this.propertyValues.set(id, coercedValue);
+			this.properties.set(id, coercedValue);
 		}
 	}
 
@@ -560,49 +572,33 @@ export class PageElement {
 	 * Property.convertToRender (for the preview app instead of file persistence).
 	 * @return The JSON object to be persisted.
 	 */
-	public toJsonObject(props?: { forRendering?: boolean }): JsonObject {
-		const json: JsonObject = {
-			_type: 'pattern',
-			uuid: this.id,
+	public toJSON(props?: { forRendering?: boolean }): Types.SerializedPageElement {
+		return {
+			contents: this.contents.map(content => content.toJSON()),
+			id: this.id,
 			name: this.name,
-			pattern: this.patternId,
-			exportName: this.pattern ? this.pattern.getExportName() : 'default'
+			pattern: this.pattern.getId(),
+			properties: toObject(this.properties)
 		};
-
-		json.contents = {};
-		this.contents.forEach((slotContents, slotId) => {
-			(json.contents as JsonObject)[slotId] = slotContents.map(
-				(element: PageElement) =>
-					// tslint:disable-next-line:no-any
-					element.toJsonObject ? element.toJsonObject(props) : (element as any)
-			);
-		});
-
-		json.properties = {};
-		this.propertyValues.forEach((value: PropertyValue, key: string) => {
-			if (props && props.forRendering) {
-				const pattern: Pattern | undefined = this.getPattern();
-				const property: Property | undefined = pattern ? pattern.getProperty(key) : undefined;
-				if (property) {
-					value = property.convertToRender(value);
-				}
-			}
-
-			const jsonValue = this.propertyToJsonValue(value);
-			(json.properties as JsonObject)[key] = jsonValue;
-		});
-
-		return json;
 	}
+}
 
-	/**
-	 * Updates the page property in this element and all its descendants
-	 * @param page The new page.
-	 */
-	private updatePageInDescendants(page?: Page): void {
-		this.page = page;
-		this.contents.forEach(slotContents => {
-			slotContents.forEach(child => child.updatePageInDescendants(page));
-		});
-	}
+function toObject<T>(map: Map<string, T>): { [key: string]: T } {
+	const mapLike = {};
+
+	map.forEach((value: T, key) => {
+		mapLike[key] = value;
+	});
+
+	return mapLike;
+}
+
+function toMap<T>(o: { [key: string]: T }): Map<string, T> {
+	const map = new Map();
+
+	Object.keys(o).forEach(key => {
+		map.set(key, o[key]);
+	});
+
+	return map;
 }

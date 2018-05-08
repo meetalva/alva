@@ -1,4 +1,5 @@
-import { Property } from './property';
+import { Property, PropertyType } from './property';
+import * as Types from '../../types';
 
 /**
  * An enum property is a property that supports the elements of a given enum only, and undefined.
@@ -20,13 +21,21 @@ export class EnumProperty extends Property {
 	 */
 	private ordinalById: { [id: string]: number } = {};
 
-	/**
-	 * Creates a new enum property.
-	 * @param id The technical ID of this property (e.g. the property name
-	 * in the TypeScript props interface).
-	 */
-	public constructor(id: string) {
-		super(id);
+	public readonly type = PropertyType.Enum;
+
+	public static from(serializedProperty: Types.SerializedEnumProperty): EnumProperty {
+		const property = new EnumProperty({
+			hidden: serializedProperty.hidden,
+			defaultValue: serializedProperty.defaultValue,
+			id: serializedProperty.id,
+			name: serializedProperty.name,
+			required: serializedProperty.required
+		});
+
+		property.setOptions(
+			serializedProperty.options.map(serializedOption => Option.from(serializedOption))
+		);
+		return property;
 	}
 
 	/**
@@ -91,20 +100,6 @@ export class EnumProperty extends Property {
 		return this.options;
 	}
 
-	// tslint:disable-next-line:no-any
-	protected getToStringProperties(): [string, any][] {
-		const result = super.getToStringProperties();
-		result.push(['options', this.options]);
-		return result;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public getType(): string {
-		return 'enum';
-	}
-
 	/**
 	 * Sets the options supported by this enum.<br>
 	 * <b>Note:</b> This method should only be called from the pattern parsers.
@@ -117,11 +112,16 @@ export class EnumProperty extends Property {
 		});
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public toString(): string {
-		return `EnumProperty(${super.toString()})`;
+	public toJSON(): Types.SerializedEnumProperty {
+		return {
+			hidden: this.hidden,
+			defaultValue: this.defaultValue,
+			id: this.id,
+			name: this.name,
+			options: this.options.map(option => option.toJSON()),
+			required: this.required,
+			type: this.type
+		};
 	}
 }
 
@@ -136,6 +136,10 @@ export class Option {
 		this.ordinal = ordinal !== undefined ? ordinal : 0;
 	}
 
+	public static from(serializedOption: Types.SerializedEnumOption): Option {
+		return new Option(serializedOption.id, serializedOption.name, serializedOption.ordinal);
+	}
+
 	public getId(): string {
 		return this.id;
 	}
@@ -148,11 +152,11 @@ export class Option {
 		return this.ordinal;
 	}
 
-	/**
-	 * Returns a string representation of this option.
-	 * @return The string representation.
-	 */
-	public toString(): string {
-		return `Option(id="${this.id}", name="${this.name}", ordinal="${this.ordinal}")`;
+	public toJSON(): Types.SerializedEnumOption {
+		return {
+			id: this.id,
+			name: this.name,
+			ordinal: this.ordinal
+		};
 	}
 }

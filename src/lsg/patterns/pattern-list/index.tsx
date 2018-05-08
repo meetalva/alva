@@ -4,6 +4,10 @@ import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
+export const PatternAnchor = {
+	icon: 'data-icon'
+};
+
 export interface PatternListItemProps {
 	draggable?: boolean;
 	icon?: string;
@@ -64,7 +68,6 @@ const StyledImg = styled.img`
 	width: 18px;
 	height: 18px;
 	margin: 0 auto ${getSpace(SpaceSize.XS)}px;
-	user-drag: none;
 	user-select: none;
 `;
 
@@ -74,15 +77,26 @@ const StyledPatternListItemLabel = styled.div`
 	user-select: none;
 `;
 
+export interface PatternFolderViewProps {
+	name: string;
+}
+
+export const PatternFolderView: React.SFC<PatternFolderViewProps> = props => (
+	<PatternList>
+		{props.name && <PatternLabel>{props.name}</PatternLabel>}
+		{props.children}
+	</PatternList>
+);
+
 export const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
 	const { draggable, onDragStart, icon, onClick } = props;
 	return (
 		<StyledPatternListItem onDragStart={onDragStart} draggable={draggable} onClick={onClick}>
 			{icon ? (
-				<StyledImg className="pattern__icon" src={icon} />
+				<StyledImg {...{ [PatternAnchor.icon]: 'true' }} src={icon} />
 			) : (
 				<StyledIcon
-					className="pattern__icon"
+					dataIcon="true"
 					name={IconName.Pattern}
 					size={IconSize.S}
 					color={colors.grey50}

@@ -1,15 +1,14 @@
 import { ipcRenderer } from 'electron';
 import { Exporter, ExportResult } from './exporter';
 import { ServerMessageType } from '../message';
-import { Page } from '../store/page/page';
-import { Store } from '../store/store';
+import { Page, ViewStore } from '../store';
 import * as uuid from 'uuid';
 
 export class SketchExporter extends Exporter {
 	public async createExport(): Promise<ExportResult> {
 		return new Promise<ExportResult>((resolve, reject) => {
 			const id = uuid.v4();
-			const page = Store.getInstance().getCurrentPage() as Page;
+			const page = ViewStore.getInstance().getCurrentPage() as Page;
 			const artboardName = page.getName();
 			const pageName = page.getName();
 

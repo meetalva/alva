@@ -1,4 +1,3 @@
-import { JsonObject } from './json';
 import * as MobX from 'mobx';
 
 /**
@@ -26,7 +25,8 @@ export class Preferences {
 	 * @param jsonObject The JSON object to load from.
 	 * @return A new preferences object containing the loaded data.
 	 */
-	public static fromJsonObject(jsonObject: JsonObject): Preferences {
+	// tslint:disable-next-line:no-any
+	public static fromJsonObject(jsonObject: any): Preferences {
 		const preferences: Preferences = new Preferences();
 		preferences.lastStyleguidePath = jsonObject.lastStyleguidePath as string;
 		preferences.lastPageId = jsonObject.lastPageId as string;
@@ -85,7 +85,8 @@ export class Preferences {
 	 * Serializes the preferences into a JSON object for persistence.
 	 * @return The JSON object to be persisted.
 	 */
-	public toJsonObject(): JsonObject {
+	// tslint:disable-next-line:no-any
+	public toJsonObject(): any {
 		return {
 			lastStyleguidePath: this.getLastStyleguidePath(),
 			lastPageId: this.getLastPageId()

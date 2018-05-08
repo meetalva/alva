@@ -1,9 +1,10 @@
 import { App } from '../component/container/app';
 import { ipcRenderer, webFrame } from 'electron';
+import { ServerMessageType } from '../message';
 import * as MobX from 'mobx';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Store } from '../store/store';
+import { AlvaView, Store } from '../store/store';
 
 // prevent app zooming
 webFrame.setVisualZoomLevelLimits(1, 1);
@@ -14,14 +15,102 @@ store.openFromPreferences();
 
 ipcRenderer.send('message', { type: 'app-loaded' });
 
-// tslint:disable-next-line:no-any
+// tslint:disable-next-line
 ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 	if (!message) {
 		return;
 	}
+
 	switch (message.type) {
-		case 'start-app': {
+		case ServerMessageType.StartApp: {
 			store.setServerPort(message.payload);
+		}
+	}
+
+	// Do not perform custom operations
+	// if anything on the page has focus
+	if (document.activeElement !== document.body) {
+		return;
+	}
+
+	switch (message.type) {
+		case ServerMessageType.Undo: {
+			store.undo();
+			break;
+		}
+		case ServerMessageType.Redo: {
+			store.redo();
+			break;
+		}
+		case ServerMessageType.Cut: {
+			if (store.getActiveView() === AlvaView.Pages) {
+				// TODO: implement this
+				// store.cutSelectedPage();
+			}
+			if (store.getActiveView() === AlvaView.PageDetail) {
+				store.cutSelectedElement();
+			}
+			break;
+		}
+		case ServerMessageType.CutPageElement: {
+			store.cutElementById(message.payload);
+			break;
+		}
+		case ServerMessageType.Delete: {
+			if (store.getActiveView() === AlvaView.Pages) {
+				store.removeSelectedPage();
+			}
+			if (store.getActiveView() === AlvaView.PageDetail) {
+				store.removeSelectedElement();
+			}
+			break;
+		}
+		case ServerMessageType.DeletePageElement: {
+			store.removeElementById(message.payload);
+			break;
+		}
+		case ServerMessageType.Copy: {
+			if (store.getActiveView() === AlvaView.Pages) {
+				// TODO: implement this
+				// store.copySelectedPage();
+			}
+			if (store.getActiveView() === AlvaView.PageDetail) {
+				store.copySelectedElement();
+			}
+			break;
+		}
+		case ServerMessageType.CopyPageElement: {
+			store.copyElementById(message.payload);
+			break;
+		}
+		case ServerMessageType.Paste: {
+			if (store.getActiveView() === AlvaView.Pages) {
+				// TODO: implement this
+				// store.pasteAfterSelectedPage();
+			}
+			if (store.getActiveView() === AlvaView.PageDetail) {
+				store.pasteAfterSelectedElement();
+			}
+			break;
+		}
+		case ServerMessageType.PastePageElementBelow: {
+			store.pasteAfterElementById(message.payload);
+			break;
+		}
+		case ServerMessageType.PastePageElementInside: {
+			store.pasteInsideElementById(message.payload);
+			break;
+		}
+		case ServerMessageType.Duplicate: {
+			if (store.getActiveView() === AlvaView.PageDetail) {
+				store.duplicateSelectedElement();
+			}
+			break;
+		}
+		case ServerMessageType.DuplicatePageElement: {
+			if (store.getActiveView() === AlvaView.PageDetail) {
+				store.duplicateElementById(message.payload);
+			}
 		}
 	}
 });

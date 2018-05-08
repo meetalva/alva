@@ -206,6 +206,9 @@ export class PageElement {
 	 * @return The new clone.
 	 */
 	public clone(): PageElement {
+		const payload = this.toJsonObject();
+		delete payload.id;
+
 		const clone = new PageElement({ pattern: this.pattern });
 
 		this.contents.forEach((children, slotId) => {
@@ -217,6 +220,8 @@ export class PageElement {
 		this.propertyValues.forEach((value: PropertyValue, id: string) => {
 			clone.setPropertyValue(id, value);
 		});
+
+		clone.setName(this.name);
 
 		return clone;
 	}
@@ -286,6 +291,16 @@ export class PageElement {
 	 */
 	public getParent(): PageElement | undefined {
 		return this.parent;
+	}
+
+	public getParentSlotContents(): PageElement[] {
+		const parent = this.getParent();
+
+		if (!parent) {
+			return [];
+		}
+
+		return parent.getSlotContents(this.getParentSlotId());
 	}
 
 	/**

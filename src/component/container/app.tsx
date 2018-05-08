@@ -79,11 +79,6 @@ export class App extends React.Component {
 		}
 	}
 
-	private handleMainWindowClick(): void {
-		Store.getInstance().setElementFocussed(false);
-		createMenu();
-	}
-
 	protected get isPatternListVisible(): boolean {
 		return this.activeTab === App.PATTERN_LIST_ID;
 	}
@@ -134,7 +129,7 @@ export class App extends React.Component {
 		const DevTools = this.getDevTools();
 
 		return (
-			<Layout direction={LayoutDirection.Column} onClick={() => this.handleMainWindowClick()}>
+			<Layout direction={LayoutDirection.Column}>
 				<ChromeContainer />
 				<MainArea>
 					{!project && (

@@ -97,12 +97,13 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 	<style>
 		body {
 			margin: 0;
-			background: white;
 		}
 	</style>
 </head>
 <body>
-	<div id="preview">${config.mode === PreviewDocumentMode.Live ? PRELOADER : ''}</div>
+	<div id="preview" style="background: #fff">${
+		config.mode === PreviewDocumentMode.Live ? PRELOADER : ''
+	}</div>
 	<textarea data-data="alva" style="display: none">${encodeURIComponent(
 		JSON.stringify({
 			data: config.data,

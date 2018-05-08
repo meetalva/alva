@@ -1,9 +1,9 @@
 import { ipcRenderer, MenuItemConstructorOptions, remote } from 'electron';
 import { ServerMessageType } from '../message';
 import { PageElement } from '../store/page/page-element';
-import { Store } from '../store/store';
+import { ViewStore } from '../store';
 
-const store = Store.getInstance();
+const store = ViewStore.getInstance();
 
 export function elementMenu(element: PageElement): void {
 	const defaultPasteItems = [

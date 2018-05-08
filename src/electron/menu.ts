@@ -1,23 +1,22 @@
 import { BrowserWindow, ipcRenderer, MenuItem, MenuItemConstructorOptions, remote } from 'electron';
-import * as FsExtra from 'fs-extra';
 import { HtmlExporter } from '../export/html-exporter';
 import { ServerMessageType } from '../message';
 import { Page } from '../store/page/page';
-import * as Path from 'path';
 import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
-import * as Process from 'process';
 import { Project } from '../store/project';
 import { SketchExporter } from '../export/sketch-exporter';
-import { Store } from '../store/store';
+import { ViewStore } from '../store';
+import * as uuid from 'uuid';
+
 const { Menu, shell, app, dialog } = remote;
 
 function getPageFileName(): string {
-	return (Store.getInstance().getCurrentPage() as Page).getName();
+	return (ViewStore.getInstance().getCurrentPage() as Page).getName();
 }
 
 function getProjectFileName(): string {
-	return (Store.getInstance().getCurrentProject() as Project).getName();
+	return (ViewStore.getInstance().getCurrentProject() as Project).getName();
 }
 
 interface PathQuery {
@@ -42,42 +41,29 @@ function queryPath(options: PathQuery): Promise<string> {
 }
 
 export function createMenu(): void {
-	const store = Store.getInstance();
+	const store = ViewStore.getInstance();
 	const isSplashscreen: boolean = !Boolean(store.getCurrentProject());
 	const template: MenuItemConstructorOptions[] = [
 		{
 			label: '&File',
 			submenu: [
 				{
-					label: '&Create Styleguide',
+					label: '&New',
+					accelerator: 'CmdOrCtrl+N',
 					click: () => {
-						let appPath: string = app.getAppPath().replace('.asar', '.asar.unpacked');
-						if (appPath.indexOf('node_modules') >= 0) {
-							appPath = Process.cwd();
-						}
-
-						const designkitPath = Path.join(appPath, 'build', 'designkit');
-						dialog.showOpenDialog(
-							{ properties: ['openDirectory', 'createDirectory'] },
-							filePaths => {
-								if (filePaths.length <= 0) {
-									return;
-								}
-
-								FsExtra.copySync(designkitPath, Path.join(filePaths[0], 'designkit'));
-								store.openStyleguide(`${filePaths[0]}/designkit`);
-								store.openFirstPage();
-							}
-						);
+						ipcRenderer.send('message', {
+							type: ServerMessageType.CreateNewFileRequest,
+							id: uuid.v4()
+						});
 					}
 				},
 				{
-					label: '&Open Styleguide',
+					label: '&Open',
 					accelerator: 'CmdOrCtrl+O',
 					click: () => {
-						dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
-							store.openStyleguide(filePaths[0]);
-							store.openFirstPage();
+						ipcRenderer.send('message', {
+							type: ServerMessageType.OpenFileRequest,
+							id: uuid.v4()
 						});
 					}
 				},
@@ -86,11 +72,6 @@ export function createMenu(): void {
 				},
 				{
 					label: 'New &Page',
-					enabled: !isSplashscreen,
-					accelerator: 'CmdOrCtrl+N'
-				},
-				{
-					label: 'New P&roject',
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+Shift+N'
 				},
@@ -102,7 +83,22 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+S',
 					role: 'save',
-					click: () => store.save()
+					click: () => {
+						const project = store.getCurrentProject();
+
+						if (!project) {
+							return;
+						}
+
+						ipcRenderer.send('message', {
+							type: ServerMessageType.Save,
+							id: uuid.v4(),
+							payload: {
+								path: project.getPath(),
+								project: project.toJSON()
+							}
+						});
+					}
 				},
 				{
 					label: '&Rename',

@@ -4,11 +4,11 @@ import { colors } from '../../lsg/patterns/colors';
 import Copy from '../../lsg/patterns/copy';
 import { Headline } from '../../lsg/patterns/headline';
 import Space, { SpaceSize } from '../../lsg/patterns/space';
-import { Store } from '../../store/store';
+import { ViewStore } from '../../store';
 import styled from 'styled-components';
 
 export const PageListPreview: React.StatelessComponent = props => {
-	const project = Store.getInstance().getCurrentProject();
+	const project = ViewStore.getInstance().getCurrentProject();
 	if (!project) {
 		return <>props.children</>;
 	}

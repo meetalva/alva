@@ -1,8 +1,7 @@
-// import { WebviewTag } from 'electron';
 import { ipcRenderer } from 'electron';
 import { Exporter, ExportResult } from './exporter';
 import { ServerMessageType } from '../message';
-import { Store } from '../store/store';
+import { ViewStore } from '../store';
 import * as Url from 'url';
 import * as uuid from 'uuid';
 
@@ -19,7 +18,7 @@ export class PdfExporter extends Exporter {
 			webview.webpreferences = 'useContentSize=yes, javascript=no';
 			document.body.insertBefore(webview, document.body.firstChild);
 
-			const store = Store.getInstance();
+			const store = ViewStore.getInstance();
 			let started;
 
 			// (1) Request HTML contents from preview

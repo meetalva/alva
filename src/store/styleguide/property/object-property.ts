@@ -1,4 +1,5 @@
-import { Property } from './property';
+import { Property, PropertyType } from './property';
+import * as Types from '../../types';
 
 export type PropertyResolver = () => Property[];
 
@@ -17,13 +18,16 @@ export class ObjectProperty extends Property {
 
 	private propertyResolver?: PropertyResolver;
 
-	/**
-	 * Creates a new object property.
-	 * @param id The technical ID of this property (e.g. the property name
-	 * in the TypeScript props interface).
-	 */
-	public constructor(id: string) {
-		super(id);
+	public readonly type = PropertyType.Object;
+
+	public static from(serialized: Types.SerializedObjectProperty): ObjectProperty {
+		return new ObjectProperty({
+			hidden: serialized.hidden,
+			defaultValue: serialized.defaultValue,
+			id: serialized.id,
+			name: serialized.name,
+			required: serialized.required
+		});
 	}
 
 	/**
@@ -55,13 +59,6 @@ export class ObjectProperty extends Property {
 		return this.resolveProperties().get(id);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public getType(): string {
-		return 'object';
-	}
-
 	private resolveProperties(): Map<string, Property> {
 		if (!this.properties) {
 			if (!this.propertyResolver) {
@@ -88,10 +85,14 @@ export class ObjectProperty extends Property {
 		this.propertyResolver = propertyResolver;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public toString(): string {
-		return `ObjectProperty(${super.toString()})`;
+	public toJSON(): Types.SerializedObjectProperty {
+		return {
+			hidden: this.hidden,
+			defaultValue: this.defaultValue,
+			id: this.id,
+			name: this.name,
+			required: this.required,
+			type: this.type
+		};
 	}
 }

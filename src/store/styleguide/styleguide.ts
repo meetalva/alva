@@ -1,15 +1,9 @@
 import { AssetProperty } from './property/asset-property';
-import { Directory } from '../../styleguide/analyzer/directory';
 import { PatternFolder } from './folder';
-import { Pattern } from './pattern';
+import { Pattern, SyntheticPatternType } from './pattern';
 import { StringProperty } from './property/string-property';
-import { StyleguideAnalyzer } from '../../styleguide/analyzer/styleguide-analyzer';
-
-export enum SyntheticPatternType {
-	Page = 'synthetic:page',
-	Placeholder = 'synthetic:placeholder',
-	Text = 'synthetic:text'
-}
+import * as Types from '../types';
+import * as uuid from 'uuid';
 
 /**
  * The styleguide is the component library the current Alva space bases on.
@@ -22,35 +16,17 @@ export enum SyntheticPatternType {
  * @see PageElement
  * @see StyleguideAnalyzer
  */
+
+export interface StyleguideInit {
+	id?: string;
+	patterns?: Pattern[];
+	root?: PatternFolder;
+}
+
 export class Styleguide {
-	/**
-	 * The analyzer active in this styleguide. The actual one depends on the type of styleguide.
-	 * The analyzers detects patterns (and pattern folders) it finds to the list of styleguide
-	 * patterns.
-	 */
-	private readonly analyzer?: StyleguideAnalyzer;
-
-	/**
-	 * The absolute and OS-specific path to the styleguide top-level folders.
-	 * This is where all pattern implementations are located.
-	 */
-	private readonly path: string;
-
-	/**
-	 * The root folder of the patterns of the currently opened styleguide.
-	 */
-	private patternRoot: PatternFolder;
-
-	/**
-	 * The global pattern registry, a lookup of all pattern by their IDs.
-	 */
-	private patterns: Map<string, Pattern> = new Map();
-
-	/**
-	 * The path of the root folder of the built patterns (like atoms, modules etc.)
-	 * in the currently opened styleguide.
-	 */
-	private patternsPath: string;
+	private id: string;
+	private patterns: Pattern[] = [];
+	private root: PatternFolder;
 
 	/**
 	 * Creates a new styleguide. Then loads the styleguide's patterns using the configured
@@ -63,8 +39,55 @@ export class Styleguide {
 	 * depends on the type of styleguide. The analyzers detects patterns (and pattern folders)
 	 * it finds to the list of styleguide patterns.
 	 */
-	public constructor(path: string, patternsPath: string, analyzerName: string) {
-		this.path = path;
+	public constructor(
+		init: StyleguideInit /* path: string, patternsPath: string, analyzerName: string*/
+	) {
+		this.id = init.id || uuid.v4();
+		this.root = init.root || new PatternFolder({ name: 'root' });
+
+		if (init.patterns) {
+			this.patterns = init.patterns;
+		} else {
+			const syntheticFolder = new PatternFolder({
+				name: 'synthetic',
+				parent: this.root
+			});
+
+			this.patterns = [
+				new Pattern({
+					name: 'page',
+					path: '',
+					type: SyntheticPatternType.SyntheticPage
+				}),
+				new Pattern({
+					name: 'placeholder',
+					path: '',
+					type: SyntheticPatternType.SyntheticPlaceholder,
+					properties: [
+						new AssetProperty({
+							name: 'src',
+							id: AssetProperty.SYNTHETIC_ASSET_ID
+						})
+					]
+				}),
+				new Pattern({
+					name: 'text',
+					path: '',
+					type: SyntheticPatternType.SyntheticText,
+					properties: [
+						new StringProperty({
+							name: 'text',
+							id: StringProperty.SYNTHETIC_TEXT_ID
+						})
+					]
+				})
+			];
+
+			syntheticFolder.addPattern(this.patterns[1]);
+			syntheticFolder.addPattern(this.patterns[2]);
+		}
+
+		/* this.path = path;
 		this.patternsPath = patternsPath;
 
 		const Analyzer = require(`../../styleguide/analyzer/${analyzerName}/${analyzerName}`)
@@ -91,80 +114,46 @@ export class Styleguide {
 
 		if (this.analyzer) {
 			this.analyzer.analyze(this);
-		}
+		} */
 	}
 
-	/**
-	 * Adds a new pattern to the styleguide. Call this method from the styleguide analyzer.
-	 * Note that you can optionally also call addPattern on one or more pattern folders to organize
-	 * patterns, but you always have to add it to the styleguide.
-	 * @param pattern The pattern to add.
-	 */
+	public static create(): Styleguide {
+		return new Styleguide({});
+	}
+
+	public static from(serializedStyleguide: Types.SerializedStyleguide): Styleguide {
+		return new Styleguide({
+			id: serializedStyleguide.id,
+			patterns: serializedStyleguide.patterns.map(pattern => Pattern.from(pattern)),
+			root: PatternFolder.from(serializedStyleguide.root)
+		});
+	}
+
 	public addPattern(pattern: Pattern): void {
-		this.patterns.set(pattern.getId(), pattern);
+		this.patterns.push(pattern);
 	}
 
-	/**
-	 * Returns the analyzer active in this styleguide. The actual one depends on the type of
-	 * styleguide. The analyzers detects patterns (and pattern folders) it finds to the list of
-	 * styleguide patterns.
-	 * @return The analyzer active in this styleguide.
-	 */
-	public getAnalyzer(): StyleguideAnalyzer | undefined {
-		return this.analyzer;
+	public getPatternById(id: string): Pattern | undefined {
+		return this.patterns.find(pattern => pattern.getId() === id);
 	}
 
-	/**
-	 * Returns the absolute and OS-specific path to the styleguide top-level directories.
-	 * This is where the projects, pages, and the pattern implementations are located.
-	 * @return The absolute and OS-specific root path of the styleguide.
-	 */
-	public getPath(): string {
-		return this.path;
+	public getPatternByType(type: SyntheticPatternType): Pattern {
+		return this.patterns.find(pattern => pattern.getType() === type) as Pattern;
 	}
 
-	/**
-	 * Returns a parsed pattern information object for a given pattern ID.
-	 * @param id The ID of the pattern. It's local to the styleguide analyzer that detected the
-	 * pattern. How this is generated is completely up to the styleguide analyzer that creates the
-	 * pattern.
-	 * @return The resolved pattern, or undefined, if no such ID exists.
-	 */
-	public getPattern(id: string): Pattern | undefined {
-		return this.patterns.get(id);
-	}
-
-	/**
-	 * Returns the root folder of the patterns of the currently opened styleguide.
-	 * @return The root folder object.
-	 */
-	public getPatternRoot(): PatternFolder {
-		return this.patternRoot;
-	}
-
-	/**
-	 * Returns all known (parsed) pattern informations.
-	 * @return All known (parsed) pattern informations.
-	 */
 	public getPatterns(): Pattern[] {
-		return Array.from(this.patterns.values());
+		return this.patterns;
 	}
 
-	/**
-	 * Returns the absolute and OS-specific path of the root folder of the built patterns
-	 * (like atoms, modules etc.) in the currently opened styleguide.
-	 * @return The absolute and OS-specific patterns root path.
-	 */
-	public getPatternsPath(): string {
-		return this.patternsPath;
+	public getRoot(): PatternFolder {
+		return this.root;
 	}
 
-	/**
-	 * Returns a parsed pattern information object for a given pattern ID.
-	 * @param type The type of the synthetic pattern.
-	 * @return The resolved pattern
-	 */
-	public getSyntheticPattern(type: SyntheticPatternType): Pattern {
-		return this.patterns.get(type) as Pattern;
+	public toJSON(): Types.SerializedStyleguide {
+		return {
+			id: this.id,
+			patterns: this.patterns.map(p => p.toJSON()),
+			root: this.root.toJSON()
+		};
 	}
 }

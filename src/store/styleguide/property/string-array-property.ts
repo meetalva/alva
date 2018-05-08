@@ -1,4 +1,5 @@
-import { Property } from './property';
+import { Property, PropertyType } from './property';
+import * as Types from '../../types';
 
 /**
  * A string array property is a property that supports a list of text only.
@@ -9,13 +10,16 @@ import { Property } from './property';
  * @see Property
  */
 export class StringArrayProperty extends Property {
-	/**
-	 * Creates a new string array property.
-	 * @param id The technical ID of this property (e.g. the property name
-	 * in the TypeScript props interface).
-	 */
-	public constructor(id: string) {
-		super(id);
+	public readonly type = PropertyType.StringArray;
+
+	public static from(serialized: Types.SerializedStringArrayProperty): StringArrayProperty {
+		return new StringArrayProperty({
+			hidden: serialized.hidden,
+			defaultValue: serialized.defaultValue,
+			id: serialized.id,
+			name: serialized.name,
+			required: serialized.required
+		});
 	}
 
 	/**
@@ -27,17 +31,14 @@ export class StringArrayProperty extends Property {
 		return this.coerceArrayValue(value, (element: any) => String(value));
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public getType(): string {
-		return 'string[]';
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public toString(): string {
-		return `StringArrayProperty(${super.toString()})`;
+	public toJSON(): Types.SerializedStringArrayProperty {
+		return {
+			hidden: this.hidden,
+			defaultValue: this.defaultValue,
+			id: this.id,
+			name: this.name,
+			required: this.required,
+			type: this.type
+		};
 	}
 }

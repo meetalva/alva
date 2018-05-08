@@ -3,7 +3,7 @@ import { Exporter, ExportResult } from './exporter';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
-import { Store } from '../store/store';
+import { ViewStore } from '../store';
 import * as Util from 'util';
 import * as uuid from 'uuid';
 
@@ -14,7 +14,7 @@ const createScript = (name: string, content: string) =>
 
 export class HtmlExporter extends Exporter {
 	public async createExport(): Promise<ExportResult> {
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const project = store.getCurrentProject();
 		const currentPage = store.getCurrentPage();
 		const styleguide = store.getStyleguide();
@@ -30,7 +30,7 @@ export class HtmlExporter extends Exporter {
 			payload: {
 				mode: PreviewDocumentMode.Static,
 				pageId: currentPage.getId(),
-				pages: project.getPages().map(page => page.toJsonObject({ forRendering: true }))
+				pages: project.getPages().map(page => page.toJSON({ forRendering: true }))
 			}
 		};
 

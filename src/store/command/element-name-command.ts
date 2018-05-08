@@ -27,12 +27,6 @@ export class ElementNameCommand extends ElementCommand {
 
 		this.name = name.length === 0 ? element.getName({ unedited: true }) : name;
 		this.previousName = element.getName({ unedited: true });
-
-		if (!this.pageId) {
-			throw new Error(
-				'Element name commands require that the element is already added to a page'
-			);
-		}
 	}
 
 	/**

@@ -1,41 +1,22 @@
-import { Command } from './command/command';
-import { ElementLocationCommand } from '../store/command/element-location-command';
-import * as Fs from 'fs';
-import * as FsExtra from 'fs-extra';
-import { JsonArray, JsonObject, Persister } from './json';
-import * as Lodash from 'lodash';
+import { Command, ElementLocationCommand, ElementRemoveCommand } from './command';
 import * as MobX from 'mobx';
-import { IObservableArray } from 'mobx/lib/types/observablearray';
 import * as Os from 'os';
-import { Page } from './page/page';
-import { PageElement } from './page/page-element';
-import { PageRef } from './page/page-ref';
+import { Page, PageElement } from './page';
 import * as Path from 'path';
-import { Preferences } from './preferences';
 import { Project } from './project';
-import { Styleguide } from './styleguide/styleguide';
-
-export enum AlvaView {
-	Pages = 'Pages',
-	PageDetail = 'PageDetail',
-	SplashScreen = 'SplashScreen'
-}
-
-export enum RightPane {
-	Patterns = 'Patterns',
-	Properties = 'Properties'
-}
+import { Pattern, Styleguide } from './styleguide';
+import * as Types from './types';
 
 export enum ClipBoardType {
-	PageRef = 'PageRef',
+	Page = 'Page',
 	PageElement = 'PageElement'
 }
 
-export type ClipBoardItem = ClipboardPageRef | ClipboardPageElement;
+export type ClipBoardItem = ClipboardPage | ClipboardPageElement;
 
-export interface ClipboardPageRef {
-	item: PageRef;
-	type: ClipBoardType.PageRef;
+export interface ClipboardPage {
+	item: Page;
+	type: ClipBoardType.Page;
 }
 
 export interface ClipboardPageElement {
@@ -44,20 +25,26 @@ export interface ClipboardPageElement {
 }
 
 /**
- * The central entry-point for all application state, managed by MobX.
+ * The central entry-point for all view-related application state, managed by MobX.
  * Use this object and its properties in your React components,
  * and call the respective business methods to perform operations.
  */
-export class Store {
+export class ViewStore {
 	/**
 	 * The store singleton instance.
 	 */
-	private static INSTANCE: Store;
+	private static INSTANCE: ViewStore;
+
+	/**
+	 * The page that is currently being displayed in the preview, and edited in the elements
+	 * and properties panes. May be undefined if there is none.
+	 */
+	@MobX.observable private activePage: number = 0;
 
 	/**
 	 * The current state of the Page Overview
 	 */
-	@MobX.observable private activeView: AlvaView = AlvaView.PageDetail;
+	@MobX.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
 
 	/**
 	 * The name of the analyzer that should be used for the open styleguide.
@@ -72,22 +59,11 @@ export class Store {
 	@MobX.observable private clipboardItem?: ClipBoardItem;
 
 	/**
-	 * The page that is currently being displayed in the preview, and edited in the elements
-	 * and properties panes. May be undefined if there is none.
-	 */
-	@MobX.observable private currentPage?: Page;
-
-	/**
 	 * The project that is currently being selected to add, edit, or remove pages of. May be
 	 * undefined if none is selected is none. Opening a page automatically changes the selected
 	 * project.
 	 */
 	@MobX.observable private currentProject?: Project;
-
-	/**
-	 * The element that is currently being dragged, or undefined if there is none.
-	 */
-	@MobX.observable private draggedElement?: PageElement;
 
 	/**
 	 * The currently name-editable element in the element list.
@@ -98,12 +74,6 @@ export class Store {
 	 * The current search term in the patterns list, or an empty string if there is none.
 	 */
 	@MobX.observable private patternSearchTerm: string = '';
-
-	/**
-	 * The internal data storage for preferences, i.e. personal settings
-	 * saved in the user's home directory (.alva-prefs.yaml).
-	 */
-	@MobX.observable private preferences: Preferences;
 
 	/**
 	 * All projects (references) of this styleguide. Projects point to page references,
@@ -119,16 +89,10 @@ export class Store {
 	@MobX.observable private redoBuffer: Command[] = [];
 
 	/**
-	 * The path of the built pattern implementation's root folder, e.g. 'lib/patterns',
-	 * relative to the styleguide root, always using forward slashes.
-	 */
-	@MobX.observable private relativePatternsPath: string;
-
-	/**
 	 * The well-known enum name of content that should be visible in
 	 * the right-hand sidebar/pane.
 	 */
-	@MobX.observable private rightPane: RightPane | null = null;
+	@MobX.observable private rightPane: Types.RightPane | null = null;
 
 	/**
 	 * The currently selected element in the element list.
@@ -150,11 +114,6 @@ export class Store {
 	@MobX.observable private serverPort: number = 1879;
 
 	/**
-	 * The currently opened styleguide or undefined, if no styleguide is open.
-	 */
-	@MobX.observable private styleguide?: Styleguide;
-
-	/**
 	 * The most recent user commands (user operations) to provide an undo feature.
 	 * Note that operations that close or open a page clear this buffer.
 	 * The last command in the list is the most recent executed one.
@@ -164,61 +123,31 @@ export class Store {
 	/**
 	 * Creates a new store.
 	 */
-	private constructor(basePreferencePath?: string) {
-		try {
-			this.preferences = Preferences.fromJsonObject(
-				Persister.loadYamlOrJson(this.getPreferencesPath(basePreferencePath))
-			);
-		} catch (error) {
-			this.preferences = new Preferences();
-		}
-	}
+	private constructor() {}
 
 	/**
 	 * Returns (or creates) the one global store instance.
 	 * @return The one global store instance.
 	 */
-	public static getInstance(basePreferencePath?: string): Store {
-		if (!Store.INSTANCE) {
-			Store.INSTANCE = new Store(basePreferencePath);
+	public static getInstance(): ViewStore {
+		if (!ViewStore.INSTANCE) {
+			ViewStore.INSTANCE = new ViewStore();
 		}
 
-		return Store.INSTANCE;
+		return ViewStore.INSTANCE;
 	}
 
-	/**
-	 * Tries to guess a human-friendly name from an ID by splitting words at camel-case positions,
-	 * and capitalizing the first letter. If an actual name is provided, this comes first.
-	 * @param id The technical (internal) ID.
-	 * @param name The human-friendly name.
-	 * @return The guessed (or given) human-friendly name.
-	 */
-	public static guessName(id: string, name?: string): string {
-		if (name) {
-			return name;
-		}
-
-		const guessedName = id
-			.replace(/[_-]+/, ' ')
-			.replace(/([a-z])([A-Z])/g, '$1 $2')
-			.toLowerCase();
-		return guessedName.substring(0, 1).toUpperCase() + guessedName.substring(1);
-	}
-
-	public addNewPageRef(): PageRef {
+	public addNewPage(): Page {
 		const project = this.currentProject as Project;
 
 		// Page refs register with their project automatically
 		// via side effects
-		const pageRef = new PageRef({
-			name: 'New page',
-			project
+		const pageRef = Page.create({
+			name: 'New Page',
+			styleguide: project.getStyleguide()
 		});
 
-		pageRef.setPath(this.findAvailablePagePath(pageRef));
-		pageRef.updateLastPersistedPath();
-
-		pageRef.createFile();
+		// pageRef.createFile();
 
 		return pageRef;
 	}
@@ -227,7 +156,6 @@ export class Store {
 	 * Add a new project definition to the list of projects.
 	 * Note: Changes to the projects and page references are saved only when calling save().
 	 * @param project The new project.
-	 * @see save
 	 */
 	public addProject(project: Project): void {
 		this.projects.push(project);
@@ -240,24 +168,6 @@ export class Store {
 	public clearUndoRedoBuffers(): void {
 		this.undoBuffer = [];
 		this.redoBuffer = [];
-	}
-
-	/**
-	 * Closes the current page in edit and preview, setting it to undefined.
-	 * @see getCurrentPage()
-	 */
-	public closePage(): void {
-		this.currentPage = undefined;
-	}
-
-	/**
-	 * Closes the current project in edit, also closing any open close.
-	 * @see getCurrentProject()
-	 */
-	@MobX.action
-	public closeProject(): void {
-		this.currentProject = undefined;
-		this.closePage();
 	}
 
 	public copyElementById(id: string): PageElement | undefined {
@@ -294,7 +204,7 @@ export class Store {
 		}
 
 		this.setClipboardItem(element);
-		this.execute(ElementLocationCommand.remove(element));
+		this.execute(new ElementRemoveCommand({ element }));
 	}
 
 	public cutElementById(id: string): void {
@@ -321,7 +231,12 @@ export class Store {
 
 	public duplicateElement(element: PageElement): PageElement {
 		const duplicatedElement = element.clone();
-		this.execute(ElementLocationCommand.addSibling(duplicatedElement, element));
+		this.execute(
+			ElementLocationCommand.addSibling({
+				newSibling: duplicatedElement,
+				sibling: element
+			})
+		);
 		this.setSelectedElement(duplicatedElement);
 		return duplicatedElement;
 	}
@@ -378,34 +293,7 @@ export class Store {
 		this.redoBuffer = [];
 	}
 
-	/**
-	 * Tries to find an available path for the page file, starting with a normalized version of
-	 * the project and page names.
-	 * @param projectName The human-friendly project name.
-	 * @param pageName The human-friendly page name.
-	 * @return An available page file path.
-	 */
-	public findAvailablePagePath(pageRef: PageRef): string {
-		const projectPart: string = Lodash.kebabCase(pageRef.getProject().getName());
-		const pagePart: string = Lodash.kebabCase(pageRef.getName());
-
-		for (let no = 1; no <= 1000; no++) {
-			const suffix = no > 1 ? `-${no}` : '';
-			const candidate = `./${projectPart}/${pagePart}${suffix}.yaml`;
-			const collision = this.getPageRefByPath(candidate);
-			if (!collision || collision === pageRef) {
-				return candidate;
-			}
-		}
-
-		throw new Error(
-			`Tried 1000 page file paths for project '${pageRef
-				.getProject()
-				.getName()}', page '${pageRef.getName()}', giving up`
-		);
-	}
-
-	public getActiveView(): AlvaView {
+	public getActiveView(): Types.AlvaView {
 		return this.activeView;
 	}
 
@@ -425,8 +313,8 @@ export class Store {
 	 */
 
 	public getClipboardItem(type: ClipBoardType.PageElement): PageElement | undefined;
-	public getClipboardItem(type: ClipBoardType.PageRef): PageRef | undefined;
-	public getClipboardItem(type: ClipBoardType): PageRef | PageElement | undefined {
+	public getClipboardItem(type: ClipBoardType.Page): Page | undefined;
+	public getClipboardItem(type: ClipBoardType): Page | PageElement | undefined {
 		const item = this.clipboardItem;
 
 		if (!item || item.type !== type) {
@@ -442,29 +330,13 @@ export class Store {
 	 * @return The page content that is currently being displayed in the preview, or undefined.
 	 */
 	public getCurrentPage(): Page | undefined {
-		return this.currentPage;
-	}
+		const project = this.getCurrentProject();
 
-	/**
-	 * Returns the page reference (IDs only) that is currently being displayed in the preview,
-	 * and edited in the elements and properties panes. May be undefined if there is none.
-	 * @return The page reference that is currently being displayed in the preview, or undefined.
-	 */
-	public getCurrentPageRef(): PageRef | undefined {
-		if (!this.currentPage) {
+		if (!project) {
 			return;
 		}
 
-		const currentPageId: string = this.currentPage.getId();
-		for (const project of this.projects) {
-			for (const pageRef of project.getPageRefs()) {
-				if (pageRef.getId() === currentPageId) {
-					return pageRef;
-				}
-			}
-		}
-
-		return;
+		return project.getPages()[this.activePage];
 	}
 
 	/**
@@ -477,16 +349,8 @@ export class Store {
 		return this.currentProject;
 	}
 
-	/**
-	 * Returns the element that is currently being dragged, or undefined if there is none.
-	 * @return The dragged element or undefined.
-	 */
-	public getDraggedElement(): PageElement | undefined {
-		return this.draggedElement;
-	}
-
 	public getElementById(id: string): PageElement | undefined {
-		const page = this.currentPage;
+		const page = this.getCurrentPage();
 
 		if (!page) {
 			return;
@@ -499,51 +363,30 @@ export class Store {
 		return this.nameEditableElement;
 	}
 
-	/**
-	 * Returns a page reference (containing ID and name) object by its ID.
-	 * @param id The page ID.
-	 * @return The page reference or undefined, if no such ID exists.
-	 */
-	public getPageRefById(id: string): PageRef | undefined {
-		for (const project of this.projects) {
-			for (const pageRef of project.getPageRefs()) {
-				if (pageRef.getId() === id) {
-					return pageRef;
-				}
-			}
+	public getPageById(id: string): Page | undefined {
+		const project = this.getCurrentProject();
+
+		if (!project) {
+			return;
 		}
 
-		return;
+		return project.getPageById(id);
 	}
 
-	/**
-	 * Returns a page reference (containing ID and name) object by its page file path.
-	 * @param path The page file path.
-	 * @return The page reference or undefined, if no such page exists.
-	 */
-	public getPageRefByPath(path: string): PageRef | undefined {
-		for (const project of this.projects) {
-			for (const pageRef of project.getPageRefs()) {
-				if (pageRef.getPath() === path) {
-					return pageRef;
-				}
-			}
+	public getPatternById(id: string): Pattern | undefined {
+		const project = this.getCurrentProject();
+
+		if (!project) {
+			return;
 		}
 
-		return;
-	}
+		const styleguide = project.getStyleguide();
 
-	/**
-	 * Returns the absolute and OS-specific path of the root folder of the designs (projects, pages)
-	 * in the currently opened styleguide.
-	 * @return The absolute and OS-specific page root path.
-	 */
-	public getPagesPath(): string {
-		if (!this.styleguide) {
-			throw new Error('Cannot open page: No styleguide open');
+		if (!styleguide) {
+			return;
 		}
 
-		return Path.join(this.styleguide.getPath(), 'alva');
+		return styleguide.getPatternById(id);
 	}
 
 	/**
@@ -563,35 +406,11 @@ export class Store {
 	}
 
 	/**
-	 * Returns a project by its ID.
-	 * @param id The project ID.
-	 * @return The project or undefined, if no such ID exists.
-	 */
-	public getProjectById(id: string): Project | undefined {
-		for (const project of this.projects) {
-			if (project.getId() === id) {
-				return project;
-			}
-		}
-
-		return;
-	}
-
-	/**
-	 * Returns all projects (references) of this styleguide. Projects point to page references,
-	 * and both do not contain the actual page data (element), but only their IDs.
-	 * @return All project objects.
-	 */
-	public getProjects(): Project[] {
-		return this.projects;
-	}
-
-	/**
 	 * @return The content id to show in the right-hand sidebar
 	 */
-	public getRightPane(): RightPane {
+	public getRightPane(): Types.RightPane {
 		if (this.rightPane === null) {
-			return this.selectedElement ? RightPane.Properties : RightPane.Patterns;
+			return this.selectedElement ? Types.RightPane.Properties : Types.RightPane.Patterns;
 		}
 		return this.rightPane;
 	}
@@ -619,22 +438,25 @@ export class Store {
 		return this.serverPort;
 	}
 
-	/**
-	 * Returns the specified styleguide by id.
-	 */
 	public getStyleguide(): Styleguide | undefined {
-		return this.styleguide;
+		const project = this.getCurrentProject();
+
+		if (!project) {
+			return;
+		}
+
+		return project.getStyleguide();
 	}
 
 	public hasApplicableClipboardItem(): boolean {
 		const view = this.getActiveView();
 
-		if (view === AlvaView.PageDetail) {
+		if (view === Types.AlvaView.PageDetail) {
 			return Boolean(this.getClipboardItem(ClipBoardType.PageElement));
 		}
 
-		if (view === AlvaView.Pages) {
-			return Boolean(this.getClipboardItem(ClipBoardType.PageRef));
+		if (view === Types.AlvaView.Pages) {
+			return Boolean(this.getClipboardItem(ClipBoardType.Page));
 		}
 
 		return false;
@@ -658,161 +480,6 @@ export class Store {
 		return this.undoBuffer.length > 0;
 	}
 
-	/**
-	 * Opens the first page of a given project for preview and editing.
-	 * @param projectId The ID of the project to open the first page of.
-	 * May be undefined, in this case, the first project of the styleguide is used.
-	 */
-	public openFirstPage(projectId?: string): void {
-		if (!this.projects.length) {
-			return;
-		}
-
-		const project: Project = this.projects[0];
-
-		const pages: PageRef[] = project.getPageRefs();
-		if (!pages.length) {
-			return;
-		}
-
-		this.openPage(pages[0].getId());
-	}
-
-	/**
-	 * Opens the last used styleguide, project, and page from the user's preferences.
-	 */
-	public openFromPreferences(): void {
-		try {
-			const lastStyleguidePath = this.preferences.getLastStyleguidePath();
-			if (lastStyleguidePath) {
-				this.openStyleguide(lastStyleguidePath);
-
-				const lastProjectId = this.preferences.getLastProjectId();
-				if (lastProjectId) {
-					this.openProject(lastProjectId);
-				}
-
-				const lastPageId = this.preferences.getLastPageId();
-				if (lastPageId) {
-					try {
-						this.openPage(lastPageId);
-					} catch (error) {
-						// Ignored: The page does not exist anymore
-					}
-				}
-
-				if (!this.currentPage) {
-					this.openFirstPage();
-				}
-			}
-		} catch (error) {
-			console.error(`Failed to open last styleguide or page: ${error}`);
-		}
-	}
-
-	/**
-	 * Opens a given page for preview and editing (elements and properties panes).
-	 * Any previously edited page is discarded (not saved), so call save() first.
-	 * @param id The ID of the page to open.
-	 * @see save
-	 */
-	@MobX.action
-	public openPage(id: string): boolean {
-		const styleguide = this.styleguide;
-		if (!styleguide) {
-			throw new Error('Cannot open page: No styleguide open');
-		}
-
-		this.save();
-
-		const pageRef = this.getPageRefById(id);
-
-		if (pageRef && pageRef.getLastPersistedPath()) {
-			const pagePath: string = Path.join(
-				this.getPagesPath(),
-				pageRef.getLastPersistedPath() as string
-			);
-			const json: JsonObject = Persister.loadYamlOrJson(pagePath);
-			this.currentPage = Page.fromJsonObject(json, id);
-			this.currentProject = this.currentPage.getProject();
-		} else {
-			this.currentPage = undefined;
-		}
-
-		this.selectedElement = undefined;
-
-		this.preferences.setLastPageId(this.currentPage ? this.currentPage.getId() : undefined);
-		this.savePreferences();
-
-		return this.currentPage !== undefined;
-	}
-
-	/**
-	 * Opens the project that is currently being selected to add, edit, or remove pages of. May be
-	 * undefined if none is selected is none. Opening a page automatically changes the selected
-	 * project.
-	 * @param project The ID of the project to open.
-	 */
-	@MobX.action
-	public openProject(id: string): void {
-		const project: Project | undefined = this.getProjectById(id);
-		this.currentProject = project;
-
-		if (this.currentPage && this.currentPage.getProject() === project) {
-			this.closePage();
-		}
-	}
-
-	/**
-	 * Closes any open page or styleguide, and opens and parses the given styleguide instead.
-	 * This triggers parsing of all contained patterns, and loading all projects and page refs
-	 * from the styleguide's alva folder.
-	 * @param styleguidePath The absolute and OS-dependent file-system path to the styleguide.
-	 */
-	@MobX.action
-	public openStyleguide(styleguidePath: string): void {
-		if (this.currentPage) {
-			this.save();
-		}
-
-		this.currentPage = undefined;
-
-		const alvaYamlPath = Path.join(styleguidePath, 'alva/alva.yaml');
-
-		// TODO: Converts old alva.yaml structure to new one.
-		// This should be removed after the next version.
-		const projectsPath = Path.join(styleguidePath, 'alva/projects.yaml');
-		try {
-			const oldFileStructure = Boolean(Fs.statSync(projectsPath));
-			if (oldFileStructure) {
-				const oldAlvaYaml = Persister.loadYamlOrJson(projectsPath);
-				const newAlvaYaml = {
-					analyzerName: 'typescript-react-analyzer',
-					...oldAlvaYaml
-				};
-				Fs.writeFileSync(alvaYamlPath, {});
-				Persister.saveYaml(alvaYamlPath, newAlvaYaml);
-				Fs.unlinkSync(projectsPath);
-			}
-		} catch (error) {
-			// ignore the correct setup with missing projects.yaml
-		}
-
-		let json: JsonObject = Persister.loadYamlOrJson(alvaYamlPath);
-
-		// TODO: Converts old alva.yaml structure to new one.
-		// This should be removed after the next version.
-		if (json.config) {
-			json = json.config as JsonObject;
-		}
-
-		json.styleguidePath = styleguidePath;
-		this.setStyleguideFromJsonInternal(json);
-
-		this.preferences.setLastStyleguidePath(styleguidePath);
-		this.savePreferences();
-	}
-
 	public pasteAfterElement(targetElement: PageElement): PageElement | undefined {
 		const clipboardElement = this.getClipboardItem(ClipBoardType.PageElement);
 
@@ -824,8 +491,15 @@ export class Store {
 			return this.pasteInsideElement(targetElement);
 		}
 
-		this.execute(ElementLocationCommand.addSibling(clipboardElement, targetElement));
+		this.execute(
+			ElementLocationCommand.addSibling({
+				newSibling: clipboardElement,
+				sibling: targetElement
+			})
+		);
+
 		this.setSelectedElement(clipboardElement);
+
 		return clipboardElement;
 	}
 
@@ -856,7 +530,21 @@ export class Store {
 			return;
 		}
 
-		this.execute(ElementLocationCommand.addChild(element, clipboardElement));
+		const contents = element.getContentById('default');
+
+		if (!contents) {
+			return;
+		}
+
+		this.execute(
+			ElementLocationCommand.addChild({
+				parent: element,
+				slotId: 'default',
+				child: clipboardElement,
+				index: contents.getElements().length - 1
+			})
+		);
+
 		this.setSelectedElement(clipboardElement);
 
 		return clipboardElement;
@@ -921,13 +609,18 @@ export class Store {
 			}
 
 			const nextIndex = index > 0 ? Math.max(index - 1, 0) : 1;
+			const container = element.getContainer();
 
-			return element.getParentSlotContents()[nextIndex];
+			if (!container) {
+				return;
+			}
+
+			return container.getElements()[nextIndex];
 		};
 
 		const elementBefore = getNextSelected();
 
-		this.execute(ElementLocationCommand.remove(element));
+		this.execute(new ElementRemoveCommand({ element }));
 		this.setSelectedElement(elementBefore);
 	}
 
@@ -935,61 +628,7 @@ export class Store {
 		const element = this.getElementById(id);
 
 		if (element) {
-			this.execute(ElementLocationCommand.remove(element));
-		}
-	}
-
-	/**
-	 * Removes a given page from the styleguide designs.
-	 * If the page is currently open, it is closed first.
-	 * Note: Changes to the page are saved only when calling save() first.
-	 * @param page The page to be removed.
-	 * @see save
-	 */
-	public removePage(page: PageRef): void {
-		if (!page) {
-			return;
-		}
-
-		const currentPage: Page | undefined = this.getCurrentPage();
-		if (currentPage && currentPage.getPageRef() === page) {
-			this.closePage();
-		}
-
-		page
-			.getProject()
-			.getPageRefsInternal()
-			.remove(page);
-
-		page.removeFile();
-		this.save();
-	}
-
-	/**
-	 * Removes a given project and its child pages from the styleguide designs.
-	 * If one of these pages is currently open, it is closed first.
-	 * Note: Changes to the projects and pages are saved only when calling save() first.
-	 * @param project The project to be removed.
-	 * @see save
-	 */
-	public removeProject(project: Project): void {
-		if (!project) {
-			return;
-		}
-
-		const currentPage: Page | undefined = this.getCurrentPage();
-		if (currentPage) {
-			project.getPageRefs().forEach(pageRef => {
-				if (currentPage.getPageRef() === pageRef) {
-					this.closePage();
-				}
-			});
-		}
-
-		(this.projects as IObservableArray<Project>).remove(project);
-
-		if (this.currentProject === project) {
-			this.closeProject();
+			this.execute(new ElementRemoveCommand({ element }));
 		}
 	}
 
@@ -1011,84 +650,51 @@ export class Store {
 	 * Remove the currently selected page from its project
 	 * Returns the deleted PageRef or undefined if nothing was deleted
 	 */
-	public removeSelectedPage(): PageRef | undefined {
-		const pageRef = this.getCurrentPageRef();
+	public removeSelectedPage(): Page | undefined {
+		const page = this.getCurrentPage();
 
-		if (!pageRef) {
+		if (!page) {
 			return;
 		}
 
-		this.removePage(pageRef);
-		return pageRef;
+		// this.removePage(page);
+		return page;
 	}
 
-	/**
-	 * Saves the entire store. This includes the project definitions and page references and
-	 * the currently opened page and its elements.
-	 * Call this method when the user click Save in the File menu.
-	 */
-	@MobX.action
-	public save(): void {
-		const styleguide = this.styleguide;
-		if (!styleguide) {
-			throw new Error('Cannot save: No styleguide open');
+	public setActivePage(page: Page): boolean {
+		const project = this.getCurrentProject();
+
+		if (!project) {
+			return false;
 		}
 
-		if (!this.styleguide) {
-			return;
+		const pages = project.getPages();
+		const index = pages.indexOf(page);
+
+		if (index === -1) {
+			return false;
 		}
 
-		// Move all page file to their new locations, if the path has changed
-
-		this.projects.forEach(project => {
-			project.getPageRefs().forEach(page => {
-				const lastPath = page.getLastPersistedPath();
-				if (lastPath && page.getPath() !== lastPath) {
-					try {
-						const lastFullPath = Path.join(this.getPagesPath(), lastPath);
-						const newFullPath = Path.join(this.getPagesPath(), page.getPath());
-						FsExtra.mkdirpSync(Path.dirname(newFullPath));
-						Fs.renameSync(lastFullPath, newFullPath);
-						page.updateLastPersistedPath();
-					} catch (error) {
-						// Fall back to original path to continue saving
-						page.setPath(lastPath);
-					}
-				}
-			});
-		});
-
-		// Then update the currently open page's file
-
-		const currentPage: Page | undefined = this.getCurrentPage();
-		if (currentPage) {
-			const pagePath: string = Path.join(
-				this.getPagesPath(),
-				currentPage.getPageRef().getPath()
-			);
-			Persister.saveYaml(pagePath, currentPage.toJsonObject());
-		}
-
-		// Finally, update the alva.yaml
-
-		const json: JsonObject = {
-			analyzerName: this.analyzerName,
-			patternsPath: this.relativePatternsPath,
-			projects: this.projects.map(project => project.toJsonObject())
-		};
-
-		const configPath = Path.join(this.getPagesPath(), 'alva.yaml');
-		Persister.saveYaml(configPath, json);
+		this.setActivePageByIndex(index);
+		return true;
 	}
 
-	/**
-	 * Saves the user preferences. Called automatically when preferences change.
-	 */
-	private savePreferences(): void {
-		Persister.saveYaml(this.getPreferencesPath(), this.preferences.toJsonObject());
+	public setActivePageById(id: string): boolean {
+		const project = this.getCurrentProject();
+		const page = this.getPageById(id);
+
+		if (!project || !page) {
+			return false;
+		}
+
+		return this.setActivePage(page);
 	}
 
-	public setActiveView(view: AlvaView): void {
+	public setActivePageByIndex(index: number): void {
+		this.activePage = index;
+	}
+
+	public setActiveView(view: Types.AlvaView): void {
 		this.activeView = view;
 	}
 
@@ -1097,7 +703,7 @@ export class Store {
 	 * Note: The element is cloned lazily, so you don't need to clone it when setting.
 	 * @see getClipboardElement
 	 */
-	public setClipboardItem(item: PageElement | PageRef): void {
+	public setClipboardItem(item: PageElement | Page): void {
 		if (item instanceof PageElement) {
 			if (item.isRoot()) {
 				return;
@@ -1109,20 +715,12 @@ export class Store {
 			};
 		}
 
-		if (item instanceof PageRef) {
+		if (item instanceof Page) {
 			this.clipboardItem = {
-				type: ClipBoardType.PageRef,
+				type: ClipBoardType.Page,
 				item
 			};
 		}
-	}
-
-	/**
-	 * Sets the element that is currently being dragged, or undefined if there is none.
-	 * @param draggedElement The dragged element or undefined.
-	 */
-	public setDraggedElement(draggedElement?: PageElement): void {
-		this.draggedElement = draggedElement;
 	}
 
 	public setNameEditableElement(editableElement?: PageElement): void {
@@ -1138,20 +736,6 @@ export class Store {
 	}
 
 	/**
-	 * Loads a given JSON object into the store as current page.
-	 * Used internally within the store, do not use from UI components.
-	 * Also unselects any selected element.
-	 * @param json The JSON object to set.
-	 */
-	@MobX.action
-	public setPageFromJsonInternal(json: JsonObject): void {
-		this.currentPage = json.page
-			? Page.fromJsonObject(json.page as JsonObject, json.pageId as string)
-			: undefined;
-		this.selectedElement = undefined;
-	}
-
-	/**
 	 * Sets the current search term in the patterns list, or an empty string if there is none.
 	 * @param patternSearchTerm The current pattern search term or an empty string.
 	 */
@@ -1159,11 +743,15 @@ export class Store {
 		this.patternSearchTerm = patternSearchTerm;
 	}
 
+	public setProject(project: Project): void {
+		this.currentProject = project;
+	}
+
 	/**
 	 * @return The content id to show in the right-hand sidebar
 	 * @see rightPane
 	 */
-	public setRightPane(pane: RightPane | null): void {
+	public setRightPane(pane: Types.RightPane | null): void {
 		this.rightPane = pane;
 	}
 
@@ -1205,14 +793,16 @@ export class Store {
 	 * Used internally within the store, do not use from UI components.
 	 * @param json The JSON object to load from.
 	 */
-	@MobX.action
-	public setStyleguideFromJsonInternal(json: JsonObject): void {
+	/*@MobX.action
+	// tslint:disable-next-line:no-any
+	 public setStyleguideFromJsonInternal(json: any): void {
 		this.analyzerName = json.analyzerName as string;
 		this.relativePatternsPath = (json.patternsPath as string) || 'lib/patterns';
 
 		(this.projects as IObservableArray<Project>).clear();
-		(json.projects as JsonArray).forEach((projectJson: JsonObject) => {
-			const project: Project = Project.fromJsonObject(projectJson);
+		// tslint:disable-next-line:no-any
+		(json.projects as any[]).forEach((projectJson: any) => {
+			const project: Project = Project.from(projectJson);
 			this.addProject(project);
 		});
 
@@ -1229,7 +819,7 @@ export class Store {
 		}
 
 		this.clearUndoRedoBuffers();
-	}
+	} */
 
 	/**
 	 * Undoes the last user operation, if available.

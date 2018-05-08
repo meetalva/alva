@@ -1,4 +1,5 @@
-import { Property } from './property';
+import { Property, PropertyType } from './property';
+import * as Types from '../../types';
 
 /**
  * A number array property is a property that supports a list of numbers only.
@@ -8,35 +9,32 @@ import { Property } from './property';
  * @see Property
  */
 export class NumberArrayProperty extends Property {
-	/**
-	 * Creates a new number array property.
-	 * @param id The technical ID of this property (e.g. the property name
-	 * in the TypeScript props interface).
-	 */
-	public constructor(id: string) {
-		super(id);
+	public readonly type = PropertyType.NumberArray;
+
+	public static from(serialized: Types.SerializedNumberArrayProperty): NumberArrayProperty {
+		return new NumberArrayProperty({
+			hidden: serialized.hidden,
+			defaultValue: serialized.defaultValue,
+			id: serialized.id,
+			name: serialized.name,
+			required: serialized.required
+		});
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	// tslint:disable-next-line:no-any
 	public coerceValue(value: any): any {
 		// tslint:disable-next-line:no-any
 		return this.coerceArrayValue(value, (element: any) => parseFloat(value));
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public getType(): string {
-		return 'number[]';
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public toString(): string {
-		return `NumberArrayProperty(${super.toString()})`;
+	public toJSON(): Types.SerializedNumberArrayProperty {
+		return {
+			hidden: this.hidden,
+			defaultValue: this.defaultValue,
+			id: this.id,
+			name: this.name,
+			required: this.required,
+			type: this.type
+		};
 	}
 }

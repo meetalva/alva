@@ -1,4 +1,5 @@
-import { Property } from './property';
+import { Property, PropertyType } from './property';
+import * as Types from '../../types';
 
 /**
  * A string property is a property that supports text only.
@@ -13,18 +14,18 @@ export class StringProperty extends Property {
 	 */
 	public static SYNTHETIC_TEXT_ID: string = 'text';
 
-	/**
-	 * Creates a new string property.
-	 * @param id The technical ID of this property (e.g. the property name
-	 * in the TypeScript props interface).
-	 */
-	public constructor(id: string) {
-		super(id);
+	public readonly type = PropertyType.String;
+
+	public static from(serialized: Types.SerializedStringProperty): StringProperty {
+		return new StringProperty({
+			hidden: serialized.hidden,
+			defaultValue: serialized.defaultValue,
+			id: serialized.id,
+			name: serialized.name,
+			required: serialized.required
+		});
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	// tslint:disable-next-line:no-any
 	public coerceValue(value: any): any {
 		if (value === null || value === undefined || value === '') {
@@ -34,17 +35,14 @@ export class StringProperty extends Property {
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public getType(): string {
-		return 'string';
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public toString(): string {
-		return `StringProperty(${super.toString()})`;
+	public toJSON(): Types.SerializedStringProperty {
+		return {
+			hidden: this.hidden,
+			defaultValue: this.defaultValue,
+			id: this.id,
+			name: this.name,
+			required: this.required,
+			type: this.type
+		};
 	}
 }

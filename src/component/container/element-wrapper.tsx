@@ -1,6 +1,6 @@
 import Element, { ElementAnchors } from '../../lsg/patterns/element';
 import * as React from 'react';
-import { Store } from '../../store/store';
+import { ViewStore } from '../../store';
 
 export interface ElementWrapperState {
 	highlight?: boolean;
@@ -33,7 +33,7 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 
 	private handleChange(e: React.FormEvent<HTMLInputElement>): void {
 		const target = e.target as HTMLInputElement;
-		const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 		const element = store.getNameEditableElement();
 
 		if (element) {

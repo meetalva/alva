@@ -52,12 +52,6 @@ export class PropertyValueCommand extends ElementCommand {
 		this.value = value;
 		this.path = path;
 		this.previousValue = element.getPropertyValue(propertyId, path);
-
-		if (!this.pageId) {
-			throw new Error(
-				'Property value commands require that the element is already added to a page'
-			);
-		}
 	}
 
 	/**

@@ -4,8 +4,8 @@ import * as express from 'express';
 import * as Http from 'http';
 import { ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
-import { Store } from '../store/store';
-import { Styleguide } from '../store/styleguide/styleguide';
+import { Styleguide } from '../store';
+import * as Types from '../store/types';
 import * as uuid from 'uuid';
 import { OPEN, Server as WebsocketServer } from 'ws';
 
@@ -16,11 +16,10 @@ export interface ServerOptions {
 interface State {
 	id: string;
 	payload: {
+		components?: Types.SerializedPattern[];
 		elementId?: string;
-		// tslint:disable-next-line:no-any
-		page?: any;
-		// tslint:disable-next-line:no-any
-		pages?: any[];
+		pageId?: string;
+		pages?: Types.SerializedPage[];
 	};
 	type: 'state';
 }
@@ -41,9 +40,6 @@ interface WebpackMessage {
 type Queue = WebpackMessage[];
 
 export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
-	const store = Store.getInstance();
-	store.openFromPreferences();
-
 	const emitter = new EventEmitter();
 	const app = express();
 
@@ -129,45 +125,46 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 		switch (message.type) {
 			case ServerMessageType.StyleGuideChange: {
 				const { payload } = message;
-				if (compilation.path !== payload.styleguidePath) {
-					if (compilation.compiler && typeof compilation.compiler.close === 'function') {
-						compilation.compiler.close();
-					}
+				state.payload.components = payload.patterns;
 
+				if (compilation.compiler && typeof compilation.compiler.close === 'function') {
+					compilation.compiler.close();
+				}
+
+				send({
+					type: 'reload',
+					id: uuid.v4(),
+					payload: {}
+				});
+
+				const next = await setup({
+					analyzerName: payload.analyzerName,
+					styleguidePath: payload.styleguidePath,
+					patternsPath: payload.patternsPath
+				});
+
+				compilation.path = payload.styleguidePath;
+				compilation.compiler = next.compiler;
+				compilation.queue = next.queue;
+				compilation.listeners = [];
+
+				next.compiler.hooks.watchRun.tap('alva', () => {
 					send({
-						type: 'reload',
+						type: 'update',
 						id: uuid.v4(),
 						payload: {}
 					});
+				});
 
-					state.id = uuid.v4();
-					state.payload = {};
-					const next = await setup({
-						analyzerName: payload.analyzerName,
-						styleguidePath: payload.styleguidePath,
-						patternsPath: payload.patternsPath
-					});
-					compilation.path = payload.styleguidePath;
-					compilation.compiler = next.compiler;
-					compilation.queue = next.queue;
-					compilation.listeners = [];
+				next.compiler.hooks.done.tap('alva', stats => {
+					compilation.listeners.forEach(l => l(compilation.compiler.outputFileSystem));
+				});
 
-					next.compiler.hooks.watchRun.tap('alva', () => {
-						send({
-							type: 'update',
-							id: uuid.v4(),
-							payload: {}
-						});
-					});
-
-					next.compiler.hooks.done.tap('alva', stats => {
-						compilation.listeners.forEach(l => l(compilation.compiler.outputFileSystem));
-					});
-				}
 				break;
 			}
 			case ServerMessageType.PageChange: {
-				state.payload = message.payload;
+				state.payload.pageId = message.payload.pageId;
+				state.payload.pages = message.payload.pages;
 				send(state);
 				break;
 			}
@@ -223,11 +220,7 @@ function startServer(options: ServerStartOptions): Promise<void> {
 async function setup(update: any): Promise<any> {
 	const queue: Queue = [];
 
-	const styleguide = new Styleguide(
-		update.styleguidePath,
-		update.patternsPath,
-		update.analyzerName
-	);
+	const styleguide = new Styleguide({});
 
 	const compiler = createCompiler(styleguide);
 

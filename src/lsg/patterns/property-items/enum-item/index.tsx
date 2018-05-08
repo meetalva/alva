@@ -21,10 +21,10 @@ export interface EnumItemProps {
 }
 
 const StyledEnumItem = styled.label`
+	display: flex;
+	align-items: center;
 	width: 100%;
 	margin-bottom: ${getSpace(SpaceSize.M)}px;
-	display: flex;
-	justify-content: space-between;
 `;
 
 const StyledSelectWrapper = styled.div`

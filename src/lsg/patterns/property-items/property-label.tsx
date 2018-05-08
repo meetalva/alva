@@ -14,12 +14,13 @@ const StyledLabel = styled.span`
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${colors.grey50.toString()};
 	width: 30%;
-	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px 0 0;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis
 	user-select: none;
 	cursor: default;
+	box-sizing: border-box;
+	padding-right: ${getSpace(SpaceSize.XS)}px;
 `;
 
 export const PropertyLabel: React.StatelessComponent<PropertyLabelProps> = props => {

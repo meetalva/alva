@@ -17,7 +17,7 @@ interface IndicatorProps {
 
 const StyledBooleanItem = styled.label`
 	display: flex;
-	align-content: center;
+	align-items: center;
 	width: 100%;
 	margin-bottom: ${getSpace(SpaceSize.M)}px;
 `;

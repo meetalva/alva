@@ -14,10 +14,9 @@ export interface StringItemProps {
 }
 
 const StyledStringItem = styled.label`
-	width: 100%;
 	display: flex;
-	align-content: center;
-	justify-content: space-between;
+	align-items: center;
+	width: 100%;
 	margin-bottom: ${getSpace(SpaceSize.M)}px;
 `;
 

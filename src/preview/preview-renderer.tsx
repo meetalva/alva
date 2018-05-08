@@ -42,6 +42,7 @@ export interface PreviewComponentProps {
 	pattern: string;
 	// tslint:disable-next-line:no-any
 	properties: { [key: string]: any };
+	reference?: React.Ref<HTMLElement>;
 	uuid: string;
 }
 
@@ -139,8 +140,9 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		});
 	}
 
-	public componentWillUpdate(): void {
+	public componentDidUpdate(): void {
 		const props = this.props as InjectedPreviewComponentProps;
+
 		if (props.uuid === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {

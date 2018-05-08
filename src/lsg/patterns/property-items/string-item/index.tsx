@@ -1,5 +1,6 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
+import { PropertyLabel } from '../property-label';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
@@ -18,20 +19,6 @@ const StyledStringItem = styled.label`
 	align-content: center;
 	justify-content: space-between;
 	margin-bottom: ${getSpace(SpaceSize.M)}px;
-`;
-
-const StyledLabel = styled.span`
-	display: inline-block;
-	font-size: 12px;
-	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey50.toString()};
-	width: 30%;
-	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px 0 0;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis
-	user-select: none;
-	cursor: default;
 `;
 
 const StyledInput = styled.input`
@@ -71,7 +58,7 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 
 	return (
 		<StyledStringItem className={className}>
-			<StyledLabel title={label}>{label}</StyledLabel>
+			<PropertyLabel label={label} />
 			<StyledInput
 				onChange={onChange}
 				onBlur={onBlur}

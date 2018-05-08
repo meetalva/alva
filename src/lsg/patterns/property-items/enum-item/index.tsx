@@ -1,6 +1,7 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
 import { Icon, IconName, IconSize } from '../../icons';
+import { PropertyLabel } from '../property-label';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
@@ -76,26 +77,12 @@ const StyledIcon = styled(Icon)`
 	pointer-events: none;
 `;
 
-const StyledLabel = styled.span`
-	display: inline-block;
-	font-size: 12px;
-	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey50.toString()};
-	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px 0 0;
-	width: 30%;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis
-	user-select: none;
-	cursor: default;
-`;
-
 export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 	const { className, values, selectedValue, onChange, label, required } = props;
 
 	return (
 		<StyledEnumItem className={className}>
-			<StyledLabel title={label}>{label}</StyledLabel>
+			<PropertyLabel label={label} />
 			<StyledSelectWrapper>
 				<StyledSelect
 					className={className}

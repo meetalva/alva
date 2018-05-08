@@ -1,5 +1,5 @@
 import { colors } from '../../colors';
-import { fonts } from '../../fonts';
+import { PropertyLabel } from '../property-label';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
@@ -74,20 +74,6 @@ const StyledIndicator = styled.span`
 			: ''};
 `;
 
-const StyledLabel = styled.span`
-	display: inline-block;
-	font-size: 12px;
-	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey50.toString()};
-	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px 0 0;
-	width: 30%;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis
-	user-select: none;
-	cursor: default;
-`;
-
 const StyledInput = styled.input`
 	display: none;
 `;
@@ -97,7 +83,7 @@ export const BooleanItem: React.StatelessComponent<BooleanItemProps> = props => 
 
 	return (
 		<StyledBooleanItem className={className}>
-			<StyledLabel title={label}>{label}</StyledLabel>
+			<PropertyLabel label={label} />
 			<StyledInput onChange={onChange} type="checkbox" />
 			<StyledIndicator checked={checked} />
 			{children}

@@ -181,7 +181,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		if (store.getSelectedElement() !== element) {
 			store.setSelectedElement(element);
-			store.setElementFocussed(true);
 		}
 	}
 

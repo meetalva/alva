@@ -67,6 +67,7 @@ async function createWindow(): Promise<void> {
 			return;
 		}
 
+		send(payload);
 		server.emit('message', payload);
 
 		switch (payload.type) {

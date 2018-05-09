@@ -69,6 +69,14 @@ const StyledIndicator = styled.span`
 		${StyledIndicatorKnob} {
 			border-color: ${colors.grey60.toString()};
 			box-shadow: 0.5px 0.5px 3px ${colors.grey60.toString()};
+
+			${(props: IndicatorProps) =>
+				props.checked
+					? `
+				border-color: ${colors.blue40.toString()};
+				box-shadow: 0.5px 0.5px 3px ${colors.blue40.toString()};
+			`
+					: ''};
 		}
 	}
 
@@ -81,7 +89,9 @@ const StyledIndicator = styled.span`
 			: ''};
 `;
 
-const StyledIcon = styled(Icon)``;
+const StyledIcon = styled(Icon)`
+	transform: translate(-0.5px, -0.5px); // fix to align icon properly
+`;
 
 const StyledInput = styled.input`
 	display: none;

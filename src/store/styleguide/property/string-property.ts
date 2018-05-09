@@ -16,9 +16,16 @@ export class StringProperty extends Property {
 
 	public readonly type = PropertyType.String;
 
-	/**
-	 * @inheritdoc
-	 */
+	public static from(serialized: Types.SerializedStringProperty): StringProperty {
+		return new StringProperty({
+			hidden: serialized.hidden,
+			defaultValue: serialized.defaultValue,
+			id: serialized.id,
+			name: serialized.name,
+			required: serialized.required
+		});
+	}
+
 	// tslint:disable-next-line:no-any
 	public coerceValue(value: any): any {
 		if (value === null || value === undefined || value === '') {
@@ -26,5 +33,16 @@ export class StringProperty extends Property {
 		} else {
 			return String(value);
 		}
+	}
+
+	public toJSON(): Types.SerializedStringProperty {
+		return {
+			hidden: this.hidden,
+			defaultValue: this.defaultValue,
+			id: this.id,
+			name: this.name,
+			required: this.required,
+			type: this.type
+		};
 	}
 }

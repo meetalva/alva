@@ -10,6 +10,16 @@ import * as Types from '../../types';
 export class BooleanProperty extends Property {
 	public readonly type = PropertyType.Boolean;
 
+	public static from(serialized: Types.SerializedBooleanProperty): BooleanProperty {
+		return new BooleanProperty({
+			hidden: serialized.hidden,
+			defaultValue: serialized.defaultValue,
+			id: serialized.id,
+			name: serialized.name,
+			required: serialized.required
+		});
+	}
+
 	/**
 	 * @inheritdoc
 	 */

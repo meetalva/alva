@@ -13,9 +13,11 @@ interface StringMap {
 export function alvaEntryLoader(this: loader.LoaderContext): string {
 	const options = getOptions(this);
 	const components: StringMap = JSON.parse(options.components);
-	const common = commondir(options.cwd, Object.values(components));
+	const componentDirs = Object.values(components);
 
-	this.addContextDependency(common);
+	if (componentDirs.length > 0) {
+		this.addContextDependency(commondir(options.cwd, componentDirs));
+	}
 
 	return Object.entries(components)
 		.map(([name, id]) => createExport(name, id))

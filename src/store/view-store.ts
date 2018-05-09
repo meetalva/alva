@@ -1,5 +1,4 @@
 import { Command } from './command/command';
-import { ElementLocationCommand } from '../store/command/element-location-command';
 import * as MobX from 'mobx';
 import * as Os from 'os';
 import { Page } from './page/page';
@@ -7,6 +6,7 @@ import { PageElement } from './page/page-element';
 import { PageRef } from './page/page-ref';
 import * as Path from 'path';
 import { Project } from './project';
+import { ElementLocationCommand, ElementRemoveCommand } from '../store';
 import { Styleguide } from './styleguide/styleguide';
 
 export enum AlvaView {
@@ -132,11 +132,6 @@ export class ViewStore {
 	@MobX.observable private serverPort: number = 1879;
 
 	/**
-	 * The currently opened styleguide or undefined, if no styleguide is open.
-	 */
-	@MobX.observable private styleguide?: Styleguide;
-
-	/**
 	 * The most recent user commands (user operations) to provide an undo feature.
 	 * Note that operations that close or open a page clear this buffer.
 	 * The last command in the list is the most recent executed one.
@@ -179,7 +174,6 @@ export class ViewStore {
 	 * Add a new project definition to the list of projects.
 	 * Note: Changes to the projects and page references are saved only when calling save().
 	 * @param project The new project.
-	 * @see save
 	 */
 	public addProject(project: Project): void {
 		this.projects.push(project);
@@ -228,7 +222,7 @@ export class ViewStore {
 		}
 
 		this.setClipboardItem(element);
-		this.execute(ElementLocationCommand.remove(element));
+		this.execute(new ElementRemoveCommand({ element }));
 	}
 
 	public cutElementById(id: string): void {
@@ -390,6 +384,16 @@ export class ViewStore {
 		return this.nameEditableElement;
 	}
 
+	public getPageById(id: string): Page | undefined {
+		const project = this.getCurrentProject();
+
+		if (!project) {
+			return;
+		}
+
+		return project.getPageById(id);
+	}
+
 	/**
 	 * Returns the current search term in the patterns list, or an empty string if there is none.
 	 * @return The current pattern search term or an empty string.
@@ -439,11 +443,14 @@ export class ViewStore {
 		return this.serverPort;
 	}
 
-	/**
-	 * Returns the specified styleguide by id.
-	 */
 	public getStyleguide(): Styleguide | undefined {
-		return this.styleguide;
+		const project = this.getCurrentProject();
+
+		if (!project) {
+			return;
+		}
+
+		return project.getStyleguide();
 	}
 
 	public hasApplicableClipboardItem(): boolean {
@@ -521,7 +528,21 @@ export class ViewStore {
 			return;
 		}
 
-		this.execute(ElementLocationCommand.addChild(element, clipboardElement));
+		const contents = element.getContentById('default');
+
+		if (!contents) {
+			return;
+		}
+
+		this.execute(
+			ElementLocationCommand.addChild({
+				parent: element,
+				slotId: 'default',
+				child: clipboardElement,
+				index: contents.getElements().length - 1
+			})
+		);
+
 		this.setSelectedElement(clipboardElement);
 
 		return clipboardElement;
@@ -586,13 +607,18 @@ export class ViewStore {
 			}
 
 			const nextIndex = index > 0 ? Math.max(index - 1, 0) : 1;
+			const container = element.getContainer();
 
-			return element.getParentSlotContents()[nextIndex];
+			if (!container) {
+				return;
+			}
+
+			return container.getElements()[nextIndex];
 		};
 
 		const elementBefore = getNextSelected();
 
-		this.execute(ElementLocationCommand.remove(element));
+		this.execute(new ElementRemoveCommand({ element }));
 		this.setSelectedElement(elementBefore);
 	}
 
@@ -600,7 +626,7 @@ export class ViewStore {
 		const element = this.getElementById(id);
 
 		if (element) {
-			this.execute(ElementLocationCommand.remove(element));
+			this.execute(new ElementRemoveCommand({ element }));
 		}
 	}
 
@@ -633,24 +659,36 @@ export class ViewStore {
 		return page;
 	}
 
-	/**
-	 * Saves the entire store. This includes the project definitions and page references and
-	 * the currently opened page and its elements.
-	 * Call this method when the user click Save in the File menu.
-	 */
-	@MobX.action
-	public save(): void {
-		const styleguide = this.styleguide;
-		if (!styleguide) {
-			throw new Error('Cannot save: No styleguide open');
+	public setActivePage(page: Page): boolean {
+		const project = this.getCurrentProject();
+
+		if (!project) {
+			return false;
 		}
 
-		if (!this.styleguide) {
-			return;
+		const pages = project.getPages();
+		const index = pages.indexOf(page);
+
+		if (index === -1) {
+			return false;
 		}
+
+		this.setActivePageByIndex(index);
+		return true;
 	}
 
-	public setActivePage(index: number): void {
+	public setActivePageById(id: string): boolean {
+		const project = this.getCurrentProject();
+		const page = this.getPageById(id);
+
+		if (!project || !page) {
+			return false;
+		}
+
+		return this.setActivePage(page);
+	}
+
+	public setActivePageByIndex(index: number): void {
 		this.activePage = index;
 	}
 

@@ -10,11 +10,13 @@ export interface ProjectProperties {
 	lastChangedDate?: Date;
 	name: string;
 	pages: Page[];
+	path: string;
 	styleguide: Styleguide;
 }
 
 export interface ProjectCreateInit {
 	name: string;
+	path: string;
 }
 
 /**
@@ -58,6 +60,8 @@ export class Project {
 	 */
 	@MobX.observable private pages: Page[] = [];
 
+	private path;
+
 	/**
 	 * The underlying styleguide for this project
 	 */
@@ -77,6 +81,7 @@ export class Project {
 		this.lastChangedDate = properties.lastChangedDate || new Date();
 
 		this.pages = properties.pages ? properties.pages : [];
+		this.path = properties.path;
 	}
 
 	public static create(init: ProjectCreateInit): Project {
@@ -90,6 +95,7 @@ export class Project {
 		return new Project({
 			name: init.name,
 			pages: [page],
+			path: init.path,
 			styleguide
 		});
 	}
@@ -109,6 +115,7 @@ export class Project {
 				? new Date(serializedProject.lastChangedDate)
 				: undefined,
 			name: serializedProject.name,
+			path: serializedProject.path,
 			pages: serializedProject.pages.map(page => Page.from(page, { styleguide })),
 			styleguide
 		});
@@ -144,33 +151,43 @@ export class Project {
 		return this.lastChangedDate;
 	}
 
-	/**
-	 * Returns the human-friendly name of the project.
-	 * In the frontend, to be displayed instead of the ID.
-	 * @return The human-friendly name of the project.
-	 */
 	public getName(): string {
 		return this.name;
 	}
 
-	/**
-	 * Returns fully resolved page objects
-	 */
+	public getPageById(id: string): Page | undefined {
+		return this.pages.find(page => page.getId() === id);
+	}
+
 	public getPages(): Page[] {
 		return this.pages;
+	}
+
+	public getPath(): string {
+		return this.path;
 	}
 
 	public getStyleguide(): Styleguide {
 		return this.styleguide;
 	}
 
-	/**
-	 * Sets the human-friendly name of the project.
-	 * In the frontend, to be displayed instead of the ID.
-	 * @param name The human-friendly name of the project.
-	 */
 	public setName(name: string): void {
 		this.name = name;
+	}
+
+	public setPath(path: string): void {
+		this.path = path;
+	}
+
+	public toDisk(): Types.SavedProject {
+		return {
+			uuid: this.id,
+			name: this.name,
+			lastChangedAuthor: this.lastChangedAuthor,
+			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
+			pages: this.pages.map(p => p.toJSON()),
+			styleguide: this.styleguide.toJSON()
+		};
 	}
 
 	/**
@@ -184,6 +201,7 @@ export class Project {
 			lastChangedAuthor: this.lastChangedAuthor,
 			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
 			pages: this.pages.map(p => p.toJSON()),
+			path: this.path,
 			styleguide: this.styleguide.toJSON()
 		};
 	}

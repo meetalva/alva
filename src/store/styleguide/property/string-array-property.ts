@@ -12,6 +12,16 @@ import * as Types from '../../types';
 export class StringArrayProperty extends Property {
 	public readonly type = PropertyType.StringArray;
 
+	public static from(serialized: Types.SerializedStringArrayProperty): StringArrayProperty {
+		return new StringArrayProperty({
+			hidden: serialized.hidden,
+			defaultValue: serialized.defaultValue,
+			id: serialized.id,
+			name: serialized.name,
+			required: serialized.required
+		});
+	}
+
 	/**
 	 * @inheritdoc
 	 */

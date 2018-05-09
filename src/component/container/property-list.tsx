@@ -1,18 +1,20 @@
 import { AssetItem } from '../../lsg/patterns/property-items/asset-item';
 // import { AssetProperty } from '../../store/styleguide/property/asset-property';
 import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item';
+import { ipcRenderer } from 'electron';
 import Element from '../../lsg/patterns/element';
 import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item';
 import { EnumProperty, Option } from '../../store/styleguide/property/enum-property';
+import { ServerMessageType } from '../../message';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
 import { ObjectProperty } from '../../store/styleguide/property/object-property';
 import { PageElement } from '../../store/page/page-element';
-import { PropertyValue } from '../../store/page/property-value';
-import { PropertyValueCommand } from '../../store/command/property-value-command';
 import * as React from 'react';
-import { ViewStore } from '../../store';
+import { PropertyValueCommand, ViewStore } from '../../store';
 import { StringItem } from '../../lsg/patterns/property-items/string-item';
+import * as Types from '../../store/types';
+import * as uuid from 'uuid';
 
 interface ObjectContext {
 	path: string;
@@ -36,7 +38,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 		}));
 	}
 
-	protected getValue(id: string, path?: string): PropertyValue {
+	protected getValue(id: string, path?: string): Types.PropertyValue {
 		const fullPath = path ? `${path}.${id}` : id;
 		const [rootId, ...propertyPath] = fullPath.split('.');
 		return this.props.element.getPropertyValue(rootId, propertyPath.join('.'));
@@ -62,18 +64,29 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 	}
 
 	protected handleChooseAsset(id: string, context?: ObjectContext): void {
-		/* remote.dialog.showOpenDialog(
-			{
-				title: 'Select an image',
-				properties: ['openFile']
-			},
-			filePaths => {
-				if (filePaths && filePaths.length) {
-					const dataUrl = AssetProperty.getValueFromFile(filePaths[0]);
-					this.handleChange(id, dataUrl, context);
-				}
+		const tid = uuid.v4();
+
+		// tslint:disable-next-line:no-any
+		ipcRenderer.on('message', (e: Electron.Event, message: any) => {
+			if (!message) {
+				return;
 			}
-		); */
+
+			if (message.type !== ServerMessageType.AssetReadResponse) {
+				return;
+			}
+
+			if (message.id !== tid) {
+				return;
+			}
+
+			this.handleChange(id, message.payload, context);
+		});
+
+		ipcRenderer.send('message', {
+			type: ServerMessageType.AssetReadRequest,
+			id: tid
+		});
 	}
 
 	protected handleClick(): void {

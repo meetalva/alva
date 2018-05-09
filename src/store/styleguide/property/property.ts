@@ -2,15 +2,6 @@ import * as AlvaUtil from '../../../alva-util';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
-/* import {AssetProperty} from './asset-property';
-import {BooleanProperty} from './boolean-property';
-import {EnumProperty} from './enum-property';
-import {NumberArrayProperty} from './number-array-property';
-import {NumberProperty} from './number-property';
-import {ObjectProperty} from './object-property';
-import {StringArrayProperty} from './string-array-property';
-import {StringProperty} from './string-property'; */
-
 export { PropertyType } from '../../types';
 
 export interface PropertyInit {
@@ -82,27 +73,6 @@ export abstract class Property {
 			this.required = init.required;
 		}
 	}
-
-	/* public static from(serializedProperty: Types.SerializedProperty): Property {
-		switch (serializedProperty.type) {
-			case Types.PropertyType.Asset:
-				return AssetProperty.from(serializedProperty);
-			case Types.PropertyType.Boolean:
-				return BooleanProperty.from(serializedProperty);
-			case Types.PropertyType.Enum:
-				return EnumProperty.from(serializedProperty);
-			case Types.PropertyType.Number:
-				return NumberProperty.from(serializedProperty);
-			case Types.PropertyType.NumberArray:
-				return NumberArrayProperty.from(serializedProperty);
-			case Types.PropertyType.Object:
-				return ObjectProperty.from(serializedProperty);
-			case Types.PropertyType.String:
-				return StringProperty.from(serializedProperty);
-			case Types.PropertyType.StringArray:
-				return StringArrayProperty.from(serializedProperty);
-		}
-	} */
 
 	/**
 	 * Returns whether two given values are arrays and their content is the same (shallow equal).

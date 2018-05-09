@@ -2,7 +2,7 @@ import { Command } from './command';
 import { ElementCommand } from './element-command';
 import { Page } from '../page/page';
 import { PageElement } from '../page/page-element';
-import { Store } from '../store';
+import { ViewStore } from '../view-store';
 
 /**
  * A user operation to add or remove a child to/from a parent, or to relocate it.
@@ -12,12 +12,12 @@ export class ElementLocationCommand extends ElementCommand {
 	 * The new position within the parent's children, if a parent is given.
 	 * Leaving out this value puts the child to the end of the parent's children.
 	 */
-	protected index?: number;
+	protected index: number = 0;
 
 	/**
 	 * The new parent for the child. undefined removes the child.
 	 */
-	protected parent?: PageElement;
+	protected parent: PageElement;
 
 	/**
 	 * The ID ofg the target parent of the child element.
@@ -27,7 +27,7 @@ export class ElementLocationCommand extends ElementCommand {
 	/**
 	 * The previous position, for undo.
 	 */
-	protected previousIndex?: number;
+	protected previousIndex: number;
 
 	/**
 	 * The previous parent, for undo.
@@ -47,44 +47,31 @@ export class ElementLocationCommand extends ElementCommand {
 	/**
 	 * The slot the element is attached to. undefined means default slot.
 	 */
-	protected slotId?: string;
+	protected slotId: string = 'default';
 
-	/**
-	 * Creates a new user operation to add or remove a child to/from a parent, or to relocate it.
-	 * @param element The element the user operation is performed on.
-	 * @param parent The new parent for the child. undefined removes the child.
-	 * @param index The new position within the parent's children, if a parent is given.
-	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
-	 * Leaving out this value puts the child to the end of the parent's children.
-	 */
-	public constructor(element: PageElement, parent?: PageElement, slotId?: string, index?: number) {
-		super(element);
+	public constructor(init: {
+		element: PageElement;
+		index: number;
+		parent: PageElement;
+		slotId: string;
+	}) {
+		super(init.element);
 
-		this.parent = parent;
-		this.slotId = slotId;
-		this.index = index;
+		this.parent = init.parent;
+		this.slotId = init.slotId;
+		this.index = init.index;
 
-		this.previousParent = element.getParent();
-		this.previousSlotId = element.getParentSlotId();
-		this.previousIndex = this.previousParent ? (element.getIndex() as number) : undefined;
+		this.previousParent = init.element.getParent();
+		this.previousSlotId = init.element.getContainerId();
+		this.previousIndex = this.previousParent ? (init.element.getIndex() as number) : 0;
 
-		// Memorize the page IDs of the new parent, if the element has no parent.
-		// This way, closing and opening a page does not break the command.
+		const parentPage = init.parent.getPage();
 
-		if (!this.pageId && parent) {
-			const parentPage = parent.getPage();
-			// If the element is not known to the page, memorize the page ID from the target parent.
-			if (parentPage) {
-				this.pageId = parentPage.getId();
-			}
+		if (!parentPage) {
+			return;
 		}
 
-		if (!this.pageId) {
-			throw new Error(
-				'Element location commands require either a child already added to a page,' +
-					' or a target parent for a new child'
-			);
-		}
+		this.pageId = parentPage.getId();
 	}
 
 	/**
@@ -97,13 +84,18 @@ export class ElementLocationCommand extends ElementCommand {
 	 * @return The new element command. To register and run the command it, call Store.execute().
 	 * @see Store.execute()
 	 */
-	public static addChild(
-		parent: PageElement,
-		child: PageElement,
-		slotId?: string,
-		index?: number
-	): ElementCommand {
-		return new ElementLocationCommand(child, parent, slotId, index);
+	public static addChild(init: {
+		child: PageElement;
+		index: number;
+		parent: PageElement;
+		slotId: string;
+	}): ElementCommand {
+		return new ElementLocationCommand({
+			element: init.child,
+			parent: init.parent,
+			slotId: init.slotId,
+			index: init.index
+		});
 	}
 
 	/**
@@ -116,26 +108,14 @@ export class ElementLocationCommand extends ElementCommand {
 	 * @see Store.execute()
 	 */
 	public static addSibling(newSibling: PageElement, location: PageElement): ElementCommand {
-		const parent: PageElement | undefined = location.getParent();
-		return new ElementLocationCommand(
-			newSibling,
-			parent,
-			location.getParentSlotId(),
-			parent ? (location.getIndex() as number) + 1 : undefined
-		);
-	}
+		const parent = location.getParent() as PageElement;
 
-	/**
-	 * Creates a command to remove a page element from its parent.
-	 * You may later re-add it using a command created with addChild() or setParent().
-	 * @param element The element to remove from its parent.
-	 * @return The new element command. To register and run the command it, call Store.execute().
-	 * @see addChild()
-	 * @see setParent()
-	 * @see Store.execute()
-	 */
-	public static remove(element: PageElement): ElementCommand {
-		return new ElementLocationCommand(element);
+		return new ElementLocationCommand({
+			element: newSibling,
+			parent,
+			slotId: location.getContainerId() || 'default',
+			index: parent ? (location.getIndex() as number) + 1 : 0
+		});
 	}
 
 	/**
@@ -152,10 +132,15 @@ export class ElementLocationCommand extends ElementCommand {
 	public static setParent(
 		child: PageElement,
 		parent: PageElement,
-		slotId?: string,
-		index?: number
+		slotId: string,
+		index: number
 	): ElementCommand {
-		return new ElementLocationCommand(child, parent, slotId, index);
+		return new ElementLocationCommand({
+			element: child,
+			parent,
+			slotId,
+			index
+		});
 	}
 
 	/**
@@ -164,7 +149,7 @@ export class ElementLocationCommand extends ElementCommand {
 	protected ensurePageAndElement(): boolean {
 		super.ensurePageAndElement();
 
-		const currentPage: Page | undefined = Store.getInstance().getCurrentPage() as Page;
+		const currentPage: Page | undefined = ViewStore.getInstance().getCurrentPage() as Page;
 		if (this.parentId) {
 			const parent: PageElement | undefined = currentPage.getElementById(this.parentId);
 			if (!parent) {
@@ -199,7 +184,12 @@ export class ElementLocationCommand extends ElementCommand {
 			return false;
 		}
 
-		this.element.setParent(this.parent, this.slotId, this.index);
+		this.element.setParent({
+			parent: this.parent,
+			slotId: this.slotId,
+			index: this.index
+		});
+
 		this.memorizeElementIds();
 
 		return true;
@@ -236,7 +226,24 @@ export class ElementLocationCommand extends ElementCommand {
 			return false;
 		}
 
-		this.element.setParent(this.previousParent, this.previousSlotId, this.previousIndex);
+		// Remove element from page
+		if (
+			typeof this.previousParent === 'undefined' ||
+			typeof this.previousSlotId === 'undefined' ||
+			typeof this.previousIndex === 'undefined'
+		) {
+			this.element.remove();
+			this.memorizeElementIds();
+			return true;
+		}
+
+		// Move element on page
+		this.element.setParent({
+			parent: this.previousParent,
+			slotId: this.previousSlotId,
+			index: this.previousIndex
+		});
+
 		this.memorizeElementIds();
 
 		return true;

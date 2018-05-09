@@ -1,6 +1,5 @@
 import * as MobX from 'mobx';
 import { PageElement } from './page-element';
-import { Project } from '../project';
 import { Styleguide, SyntheticPatternType } from '../styleguide';
 import * as Types from '../types';
 import * as uuid from 'uuid';
@@ -38,11 +37,6 @@ export class Page {
 	@MobX.observable public editedName: string = '';
 
 	/**
-	 * A lookup of all page elements by their ID.
-	 */
-	@MobX.observable private elementsById: Map<string, PageElement> = new Map();
-
-	/**
 	 * The technical unique identifier of this page
 	 */
 	@MobX.observable private id: string;
@@ -59,11 +53,6 @@ export class Page {
 	@MobX.observable public nameState: EditState = EditState.Editable;
 
 	/**
-	 * The project this page belongs to.
-	 */
-	@MobX.observable private project: Project;
-
-	/**
 	 * The root element of the page, the first pattern element of the content tree.
 	 */
 	private root: PageElement;
@@ -76,6 +65,7 @@ export class Page {
 	public constructor(init: PageInit) {
 		this.id = init.id;
 		this.root = init.root;
+		this.root.setPage(this);
 
 		if (typeof init.name !== 'undefined') {
 			this.name = init.name;
@@ -93,7 +83,8 @@ export class Page {
 				init.root ||
 				new PageElement({
 					name: init.name,
-					pattern: init.styleguide.getPatternByType(SyntheticPatternType.SyntheticPage)
+					pattern: init.styleguide.getPatternByType(SyntheticPatternType.SyntheticPage),
+					contents: []
 				})
 		});
 	}
@@ -124,7 +115,7 @@ export class Page {
 	 * @return The page element or undefined.
 	 */
 	public getElementById(id: string): PageElement | undefined {
-		return this.elementsById.get(id);
+		return this.root.getElementById(id);
 	}
 
 	/**
@@ -157,30 +148,11 @@ export class Page {
 	}
 
 	/**
-	 * Returns the project of this page.
-	 * @return The project of this page.
-	 */
-	public getProject(): Project {
-		return this.project;
-	}
-
-	/**
 	 * Returns the root element of the page, the first pattern element of the content tree.
 	 * @return The root element of the page.
 	 */
 	public getRoot(): PageElement | undefined {
 		return this.root;
-	}
-
-	/**
-	 * Adds a given element and all its descendents to the lookup of elements by ID.
-	 * @param element The element to start with.
-	 */
-	public registerElementAndChildren(element: PageElement): void {
-		this.elementsById.set(element.getId(), element);
-		element.getContents().forEach((slotContents, slotId) => {
-			slotContents.forEach(child => this.registerElementAndChildren(child));
-		});
 	}
 
 	/**
@@ -222,16 +194,5 @@ export class Page {
 			name: this.getName(),
 			root: this.root.toJSON(props)
 		};
-	}
-
-	/**
-	 * Removes a given element and all its descendents from the lookup of elements by ID.
-	 * @param element The element to start with.
-	 */
-	public unregisterElementAndChildren(element: PageElement): void {
-		this.elementsById.delete(element.getId());
-		element.getContents().forEach(slotContents => {
-			slotContents.forEach(child => this.unregisterElementAndChildren(child));
-		});
 	}
 }

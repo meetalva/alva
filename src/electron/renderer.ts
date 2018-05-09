@@ -26,6 +26,11 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.OpenFileResponse: {
+			const project = Project.from(message.payload.contents);
+			project.setPath(message.payload.path);
+
+			store.setProject(project);
+			store.setActiveView(AlvaView.PageDetail);
 			break;
 		}
 		case ServerMessageType.CreateNewFileResponse: {
@@ -129,7 +134,7 @@ MobX.autorun(() => {
 	if (styleguide) {
 		ipcRenderer.send('message', {
 			type: 'styleguide-change',
-			payload: {}
+			payload: styleguide.toJSON()
 		});
 	}
 });

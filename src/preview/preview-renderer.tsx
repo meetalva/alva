@@ -1,6 +1,5 @@
-import { ComponentGetter } from './get-component';
+// import { ComponentGetter } from './get-component';
 import { HighlightArea } from './highlight-area';
-import { omit } from 'lodash';
 import * as MobX from 'mobx';
 import * as MobXReact from 'mobx-react';
 import { PreviewStore } from './preview';
@@ -12,9 +11,10 @@ import * as ReactDom from 'react-dom';
 MobX.extras.shareGlobalState();
 
 export interface RenderInit {
-	getComponent: ComponentGetter<React.Component | React.SFC>;
 	highlight: HighlightArea;
 	store: PreviewStore;
+	// tslint:disable-next-line:no-any
+	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
 }
 
 export interface InjectedPreviewHighlightProps {
@@ -27,21 +27,25 @@ export interface InjectedPreviewApplicationProps {
 }
 
 interface InjectedPreviewComponentProps extends PreviewComponentProps {
-	getComponent: ComponentGetter<React.Component | React.SFC>;
 	highlight: HighlightArea;
 	store: PreviewStore;
+	// tslint:disable-next-line:no-any
+	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
+}
+
+export interface PreviewComponentContents {
+	elements: PreviewComponentProps[];
+	id: string;
 }
 
 export interface PreviewComponentProps {
-	contents: {
-		[slot: string]: PreviewComponentProps[];
-	};
+	contents: PreviewComponentContents[];
 	exportName: string;
+	id: string;
 	name: string;
 	pattern: string;
 	// tslint:disable-next-line:no-any
 	properties: { [key: string]: any };
-	uuid: string;
 }
 
 interface ErrorBoundaryProps {
@@ -51,6 +55,17 @@ interface ErrorBoundaryProps {
 interface ErrorBoundaryState {
 	errorMessage?: string;
 }
+
+interface ErrorMessageProps {
+	error: string;
+	patternName: string;
+}
+
+const SYNTHETICS = {
+	page: props => <>{props.children}</>,
+	placeholder: props => <img src={props.asset} style={{ width: '100%', height: 'auto' }} />,
+	text: props => props.text
+};
 
 export function render(init: RenderInit): void {
 	ReactDom.render(
@@ -63,11 +78,6 @@ export function render(init: RenderInit): void {
 		</MobXReact.Provider>,
 		document.getElementById('preview')
 	);
-}
-
-interface ErrorMessageProps {
-	error: string;
-	patternName: string;
 }
 
 @MobXReact.inject('store', 'highlight')
@@ -91,7 +101,7 @@ class PreviewApplication extends React.Component {
 					pattern={component.pattern}
 					properties={component.properties}
 					name={component.name}
-					uuid={component.uuid}
+					id={component.id}
 				/>
 				<PreviewHighlight />
 			</React.Fragment>
@@ -124,10 +134,10 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 	public componentWillUpdate(): void {
 		const props = this.props as InjectedPreviewComponentProps;
 
-		if (props.uuid === props.store.elementId) {
+		if (props.id === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {
-				props.highlight.show(node as Element, props.uuid);
+				props.highlight.show(node as Element, props.id);
 				setTimeout(() => {
 					props.store.elementId = '';
 				}, 500);
@@ -137,15 +147,13 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 	public render(): JSX.Element | null {
 		const props = this.props as InjectedPreviewComponentProps;
-		const contents = props.contents || {};
-		const children = typeof contents.default === 'undefined' ? [] : contents.default;
+		const defaultContent = props.contents.find(content => content.id === 'default');
+		const children = defaultContent ? defaultContent.elements : [];
 
-		const renderedSlots = Object.keys(omit(contents, ['default'])).reduce(
-			(previous, slotId) => ({
-				...previous,
-				[slotId]: contents[slotId].map(child => (
-					<PreviewComponent key={child.uuid} {...child} />
-				))
+		const slots = props.contents.filter(content => content.id !== 'default').reduce(
+			(acc, slot) => ({
+				...acc,
+				[slot.id]: slot.elements.map(child => <PreviewComponent key={child.id} {...child} />)
 			}),
 			{}
 		);
@@ -155,20 +163,7 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		props.store.elementId;
 
 		// tslint:disable-next-line:no-any
-		const Component = props.getComponent(props, {
-			// tslint:disable-next-line:no-any
-			asset: (p: any) => {
-				if (!p.asset || typeof p.asset !== 'string') {
-					return null;
-				}
-				return <img src={p.asset} style={{ width: '100%', height: 'auto' }} />;
-			},
-			// tslint:disable-next-line:no-any
-			page: (p: any) => <>{p.children}</>,
-			// tslint:disable-next-line:no-any
-			text: (p: any) => p.text
-			// tslint:disable-next-line:no-any
-		}) as any;
+		const Component = props.getComponent(props, SYNTHETICS) as any;
 
 		if (!Component) {
 			return null;
@@ -176,8 +171,8 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 		return (
 			<ErrorBoundary name={props.name}>
-				<Component {...props.properties} {...renderedSlots} data-sketch-name={props.name}>
-					{children.map(child => <PreviewComponent key={child.uuid} {...child} />)}
+				<Component {...props.properties} {...slots} data-sketch-name={props.name}>
+					{children.map(child => <PreviewComponent key={child.id} {...child} />)}
 				</Component>
 			</ErrorBoundary>
 		);

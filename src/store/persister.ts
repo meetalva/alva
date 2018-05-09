@@ -39,18 +39,21 @@ export class Persistence {
 	// tslint:disable-next-line:no-any
 	public static persist(path: string, model: any): Promise<PersistencePersistResult> {
 		return new Promise((resolve, reject) => {
-			const data = model.toJSON();
-			Fs.writeFile(path, Yaml.safeDump(data, { skipInvalid: true, noRefs: true }), error => {
-				if (error) {
-					return resolve({
-						state: PersistenceState.Error,
-						error
+			Fs.writeFile(
+				path,
+				Yaml.safeDump(model.toDisk(), { skipInvalid: true, noRefs: true }),
+				error => {
+					if (error) {
+						return resolve({
+							state: PersistenceState.Error,
+							error
+						});
+					}
+					resolve({
+						state: PersistenceState.Success
 					});
 				}
-				resolve({
-					state: PersistenceState.Success
-				});
-			});
+			);
 		});
 	}
 

@@ -1,5 +1,13 @@
-import * as MobX from 'mobx';
 import { Pattern } from './pattern';
+import * as Types from '../types';
+import * as uuid from 'uuid';
+
+export interface PatternFolderInit {
+	id?: string;
+	name: string;
+	parent?: PatternFolder;
+	patterns?: string[];
+}
 
 /**
  * A folder within the styleguide containing patterns.
@@ -7,33 +15,47 @@ import { Pattern } from './pattern';
  * it may also reflect a virtual pattern grouping, as parsed by the store and/or pattern parsers.
  */
 export class PatternFolder {
-	/**
-	 * The child folders of this folder.
-	 */
-	@MobX.observable private children: Map<string, PatternFolder> = new Map();
+	private children: PatternFolder[] = [];
 
-	/**
-	 * The name (and ID) of the folder, unique within its parent.
-	 * This usually is the file name of the physical pattern folder.
-	 */
+	private id: string;
+
 	private name: string;
 
-	/**
-	 * The parent folder, if this is not the root folder.
-	 */
 	private parent?: PatternFolder;
 
-	/**
-	 * The patterns directly contained by this folder.
-	 */
-	@MobX.observable private patterns: Map<string, Pattern> = new Map();
+	private patterns: string[] = [];
 
-	public constructor(name: string, parent?: PatternFolder) {
-		this.name = name;
-		this.parent = parent;
-		if (parent) {
-			parent.children.set(name, this);
+	public constructor(init: PatternFolderInit) {
+		this.id = init.id || uuid.v4();
+		this.name = init.name;
+		this.parent = init.parent;
+
+		if (init.patterns) {
+			this.patterns = init.patterns;
 		}
+
+		if (init.parent) {
+			init.parent.children.push(this);
+		}
+	}
+
+	public static from(serialized: Types.SerializedPatternFolder): PatternFolder {
+		const folder = new PatternFolder({
+			id: serialized.id,
+			name: serialized.name,
+			patterns: serialized.patterns
+		});
+
+		serialized.children.forEach(child => {
+			folder.addChild(PatternFolder.from(child));
+		});
+
+		return folder;
+	}
+
+	public addChild(child: PatternFolder): void {
+		this.children.push(child);
+		child.setParent(this);
 	}
 
 	/**
@@ -41,21 +63,7 @@ export class PatternFolder {
 	 * @param pattern The pattern to add.
 	 */
 	public addPattern(pattern: Pattern): void {
-		this.patterns.set(pattern.getId(), pattern);
-	}
-
-	/**
-	 * Writes information about this folder to the console (subfolders, patterns).
-	 * @param indentation The current indentation level, if invoked from a parent pattern folder.
-	 */
-	public dump(indentation: number = 0): void {
-		console.info(`${'  '.repeat(indentation)}Folder '${this.name}'`);
-		for (const child of this.children.values()) {
-			child.dump(indentation + 1);
-		}
-		for (const pattern of this.patterns.values()) {
-			pattern.dump(indentation + 1);
-		}
+		this.patterns.push(pattern.getId());
 	}
 
 	/**
@@ -63,7 +71,7 @@ export class PatternFolder {
 	 * @return The child folders of this folder.
 	 */
 	public getChildren(): PatternFolder[] {
-		return Array.from(this.children.values());
+		return this.children;
 	}
 
 	/**
@@ -72,11 +80,16 @@ export class PatternFolder {
 	 */
 	public getDescendants(): PatternFolder[] {
 		let result: PatternFolder[] = [this];
+
 		for (const child of this.children.values()) {
 			result = result.concat(child.getDescendants());
 		}
 
 		return result;
+	}
+
+	public getId(): string {
+		return this.id;
 	}
 
 	/**
@@ -100,7 +113,20 @@ export class PatternFolder {
 	 * Returns the patterns directly contained by this folder.
 	 * @return The patterns directly contained by this folder.
 	 */
-	public getPatterns(): Pattern[] {
-		return Array.from(this.patterns.values());
+	public getPatterns(): string[] {
+		return this.patterns;
+	}
+
+	public setParent(parent: PatternFolder): void {
+		this.parent = parent;
+	}
+
+	public toJSON(): Types.SerializedPatternFolder {
+		return {
+			id: this.id,
+			name: this.name,
+			children: this.children.map(child => child.toJSON()),
+			patterns: this.patterns
+		};
 	}
 }

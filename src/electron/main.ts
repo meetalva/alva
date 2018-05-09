@@ -5,11 +5,13 @@ import * as Fs from 'fs';
 import * as getPort from 'get-port';
 import * as stringEscape from 'js-string-escape';
 import { PreviewMessageType, ServerMessage, ServerMessageType } from '../message';
+import * as MimeTypes from 'mime-types';
 import * as Path from 'path';
 import { createServer } from './server';
 import { Persistence, PersistenceState, Project } from '../store';
-import { SerializedProject } from '../store/types';
+import * as Types from '../store/types';
 import * as Url from 'url';
+import * as Util from 'util';
 import * as uuid from 'uuid';
 
 const APP_ENTRY = require.resolve('./renderer');
@@ -29,6 +31,8 @@ const showOpenDialog = (options: Electron.OpenDialogOptions): Promise<string[]> 
 
 const showSaveDialog = (options: Electron.SaveDialogOptions): Promise<string | undefined> =>
 	new Promise(resolve => dialog.showSaveDialog(options, resolve));
+
+const readFile = Util.promisify(Fs.readFile);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -101,8 +105,10 @@ async function createWindow(): Promise<void> {
 
 				if (path) {
 					const project = Project.create({
-						name: 'Untitled'
+						name: 'Untitled',
+						path
 					});
+
 					await Persistence.persist(path, project);
 
 					send({
@@ -119,6 +125,7 @@ async function createWindow(): Promise<void> {
 			case ServerMessageType.OpenFileRequest: {
 				const paths = await showOpenDialog({
 					title: 'Open Alva File',
+					properties: ['openFile'],
 					filters: [
 						{
 							name: 'Alva File',
@@ -130,18 +137,55 @@ async function createWindow(): Promise<void> {
 				const path = Array.isArray(paths) ? paths[0] : undefined;
 
 				if (path) {
-					const result = await Persistence.read<SerializedProject>(path);
+					const result = await Persistence.read<Types.SavedProject>(path);
 
 					if (result.state === PersistenceState.Error) {
 						// TODO: Show user facing error here
 					} else {
+						const contents = result.contents as Types.SerializedProject;
+						contents.path = path;
+
 						send({
 							type: ServerMessageType.OpenFileResponse,
 							id: message.id,
-							payload: { path, contents: result.contents }
+							payload: { path, contents }
 						});
 					}
 				}
+				break;
+			}
+			case ServerMessageType.AssetReadRequest: {
+				const paths = await showOpenDialog({
+					title: 'Select an image',
+					properties: ['openFile']
+				});
+
+				if (!paths) {
+					return;
+				}
+
+				const path = paths[0];
+
+				if (!path) {
+					return;
+				}
+
+				// TODO: Handle errors
+				const content = await readFile(path);
+				const mimeType = MimeTypes.lookup(path) || 'application/octet-stream';
+
+				send({
+					type: ServerMessageType.AssetReadResponse,
+					id: message.id,
+					payload: `data:${mimeType};base64,${content.toString('base64')}`
+				});
+
+				break;
+			}
+			case ServerMessageType.Save: {
+				const project = Project.from(message.payload.project);
+				project.setPath(message.payload.path);
+				await Persistence.persist(project.getPath(), project);
 			}
 		}
 	});

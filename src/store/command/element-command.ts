@@ -1,7 +1,6 @@
+import { ViewStore } from '../';
 import { Command } from './command';
-import { Page } from '../page/page';
 import { PageElement } from '../page/page-element';
-import { Store } from '../store';
 
 /**
  * A user operation on a page element, ensuring that the page is loaded and references get
@@ -44,6 +43,7 @@ export abstract class ElementCommand extends Command {
 
 		this.elementId = element.getId();
 		const page = element.getPage();
+
 		if (page) {
 			this.pageId = page.getId();
 		}
@@ -55,16 +55,16 @@ export abstract class ElementCommand extends Command {
 	 * @return Whether the operation was successful. On failure, the execute/undo should abort.
 	 */
 	protected ensurePageAndElement(): boolean {
-		let currentPage: Page | undefined = Store.getInstance().getCurrentPage();
+		const store = ViewStore.getInstance();
+		const currentPage = store.getCurrentPage();
+
 		if (!currentPage || currentPage.getId() !== this.pageId) {
-			// if (!Store.getInstance().openPage(this.pageId)) {
-			// 	return false;
-			// }
-			currentPage = Store.getInstance().getCurrentPage() as Page;
+			store.setActivePageById(this.pageId);
+			return true;
 		}
 
 		if (this.elementId) {
-			const element: PageElement | undefined = currentPage.getElementById(this.elementId);
+			const element = store.getElementById(this.elementId);
 			if (!element) {
 				return false;
 			}
@@ -83,9 +83,9 @@ export abstract class ElementCommand extends Command {
 		}
 
 		const page = this.element.getPage();
+
 		if (page) {
-			page.getProject().touch();
-			Store.getInstance().setSelectedElement(this.element);
+			ViewStore.getInstance().setSelectedElement(this.element);
 		}
 
 		return true;
@@ -116,7 +116,7 @@ export abstract class ElementCommand extends Command {
 		}
 
 		if (this.element.getPage()) {
-			Store.getInstance().setSelectedElement(this.element);
+			ViewStore.getInstance().setSelectedElement(this.element);
 		}
 
 		return true;

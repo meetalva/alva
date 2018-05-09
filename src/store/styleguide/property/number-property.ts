@@ -11,9 +11,16 @@ import * as Types from '../../types';
 export class NumberProperty extends Property {
 	public readonly type = PropertyType.Number;
 
-	/**
-	 * @inheritdoc
-	 */
+	public static from(serialized: Types.SerializedNumberProperty): NumberProperty {
+		return new NumberProperty({
+			hidden: serialized.hidden,
+			defaultValue: serialized.defaultValue,
+			id: serialized.id,
+			name: serialized.name,
+			required: serialized.required
+		});
+	}
+
 	// tslint:disable-next-line:no-any
 	public coerceValue(value: any): any {
 		const result: number = parseFloat(value);

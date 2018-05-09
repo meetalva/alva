@@ -1,4 +1,4 @@
-import { camelCase, upperFirst } from 'lodash';
+/* import { camelCase, upperFirst } from 'lodash';
 import { patternIdToWebpackName } from './pattern-id-to-webpack-name';
 
 export interface PassedComponentProps {
@@ -26,12 +26,6 @@ export function getComponent<T>(
 	props: InputComponentProps,
 	synthetics: SyntheticComponents<T>
 ): T | undefined {
-	const fragments = props.pattern ? props.pattern.split(':') : [];
-
-	if (fragments[0] === 'synthetic') {
-		const syntheticType = fragments[1];
-		return synthetics[syntheticType];
-	}
 
 	// tslint:disable-next-line:no-any
 	const win: any = window;
@@ -62,4 +56,4 @@ function resolveExport<T>(candidate: any, exportName: string): T | undefined {
 	}
 
 	return candidate[exportName];
-}
+} */

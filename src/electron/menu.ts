@@ -6,17 +6,17 @@ import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
 import { Project } from '../store/project';
 import { SketchExporter } from '../export/sketch-exporter';
-import { Store } from '../store/store';
+import { ViewStore } from '../store';
 import * as uuid from 'uuid';
 
 const { Menu, shell, app, dialog } = remote;
 
 function getPageFileName(): string {
-	return (Store.getInstance().getCurrentPage() as Page).getName();
+	return (ViewStore.getInstance().getCurrentPage() as Page).getName();
 }
 
 function getProjectFileName(): string {
-	return (Store.getInstance().getCurrentProject() as Project).getName();
+	return (ViewStore.getInstance().getCurrentProject() as Project).getName();
 }
 
 interface PathQuery {
@@ -41,7 +41,7 @@ function queryPath(options: PathQuery): Promise<string> {
 }
 
 export function createMenu(): void {
-	const store = Store.getInstance();
+	const store = ViewStore.getInstance();
 	const isSplashscreen: boolean = !Boolean(store.getCurrentProject());
 	const template: MenuItemConstructorOptions[] = [
 		{
@@ -83,7 +83,22 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+S',
 					role: 'save',
-					click: () => store.save()
+					click: () => {
+						const project = store.getCurrentProject();
+
+						if (!project) {
+							return;
+						}
+
+						ipcRenderer.send('message', {
+							type: ServerMessageType.Save,
+							id: uuid.v4(),
+							payload: {
+								path: project.getPath(),
+								project: project.toJSON()
+							}
+						});
+					}
 				},
 				{
 					label: '&Rename',

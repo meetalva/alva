@@ -23,6 +23,21 @@ export class EnumProperty extends Property {
 
 	public readonly type = PropertyType.Enum;
 
+	public static from(serializedProperty: Types.SerializedEnumProperty): EnumProperty {
+		const property = new EnumProperty({
+			hidden: serializedProperty.hidden,
+			defaultValue: serializedProperty.defaultValue,
+			id: serializedProperty.id,
+			name: serializedProperty.name,
+			required: serializedProperty.required
+		});
+
+		property.setOptions(
+			serializedProperty.options.map(serializedOption => Option.from(serializedOption))
+		);
+		return property;
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -60,21 +75,6 @@ export class EnumProperty extends Property {
 	// tslint:disable-next-line:no-any
 	public convertToRender(value: any): any {
 		return this.ordinalById[value as string];
-	}
-
-	public from(serializedProperty: Types.SerializedEnumProperty): EnumProperty {
-		const property = new EnumProperty({
-			hidden: serializedProperty.hidden,
-			defaultValue: serializedProperty.defaultValue,
-			id: serializedProperty.id,
-			name: serializedProperty.name,
-			required: serializedProperty.required
-		});
-
-		property.setOptions(
-			serializedProperty.options.map(serializedOption => Option.from(serializedOption))
-		);
-		return property;
 	}
 
 	/**

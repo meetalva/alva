@@ -1,10 +1,14 @@
-export interface SerializedProject {
+export interface SavedProject {
 	lastChangedAuthor: string;
 	lastChangedDate?: string;
 	name: string;
 	pages: SerializedPage[];
 	styleguide: SerializedStyleguide;
 	uuid: string;
+}
+
+export interface SerializedProject extends SavedProject {
+	path: string;
 }
 
 export interface SerializedPage {
@@ -14,14 +18,40 @@ export interface SerializedPage {
 }
 
 export interface SerializedPageElement {
+	contents: SerializedPageElementContent[];
 	id: string;
 	name: string;
 	pattern: string;
+	properties: { [key: string]: PropertyValue };
+}
+
+export type PropertyValue =
+	| { [id: string]: PropertyValue }
+	| string
+	| string[]
+	| number
+	| number[]
+	| boolean
+	| undefined
+	| null;
+
+export interface SerializedPageElementContent {
+	elements: SerializedPageElement[];
+	id: string;
+	name: string;
 }
 
 export interface SerializedStyleguide {
 	id: string;
 	patterns: SerializedPattern[];
+	root: SerializedPatternFolder;
+}
+
+export interface SerializedPatternFolder {
+	children: SerializedPatternFolder[];
+	id: string;
+	name: string;
+	patterns: string[];
 }
 
 export interface SerializedPattern {

@@ -1,8 +1,7 @@
 import { colors } from '../../lsg/patterns/colors';
 import { elementMenu } from '../../electron/context-menus';
 import { ElementAnchors, ElementProps } from '../../lsg/patterns/element';
-import { ElementLocationCommand } from '../../store/command/element-location-command';
-import { ElementNameCommand } from '../../store/command/element-name-command';
+import {} from '../../store/command/element-location-command';
 import { ElementWrapper } from './element-wrapper';
 import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';
@@ -10,7 +9,14 @@ import { Page } from '../../store/page/page';
 import { PageElement } from '../../store/page/page-element';
 import { Pattern } from '../../store/styleguide/pattern';
 import * as React from 'react';
-import { Slot, ViewStore } from '../../store';
+import {
+	ElementLocationCommand,
+	ElementNameCommand,
+	PageElementContent,
+	Slot,
+	Styleguide,
+	ViewStore
+} from '../../store';
 import * as uuid from 'uuid';
 
 export interface ElementListState {
@@ -103,11 +109,12 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	): ElementNodeProps {
 		const store = ViewStore.getInstance();
 		const slotId = slot.getId();
-		const slotContents: PageElement[] = element.getSlotContents(slotId);
+		const slotContent = element.getContentById(slotId) as PageElementContent;
+
 		const childItems: ElementNodeProps[] = [];
 		const selectedSlot = store.getSelectedSlotId();
 
-		slotContents.forEach((value: PageElement, index: number) => {
+		slotContent.getElements().forEach((value: PageElement, index: number) => {
 			childItems.push(this.createItemFromElement(value, selectedElement));
 		});
 
@@ -134,6 +141,9 @@ export class ElementList extends React.Component<{}, ElementListState> {
 					}
 
 					draggedElement = new PageElement({
+						container: slotContent,
+						contents: [],
+						parent: element,
 						pattern: styleguide.getPattern(patternId) as Pattern,
 						setDefaults: true
 					});
@@ -143,7 +153,15 @@ export class ElementList extends React.Component<{}, ElementListState> {
 					return;
 				}
 
-				store.execute(ElementLocationCommand.addChild(element, draggedElement, slotId));
+				store.execute(
+					ElementLocationCommand.addChild({
+						parent: element,
+						child: draggedElement,
+						slotId,
+						index: 0
+					})
+				);
+
 				store.setSelectedElement(draggedElement);
 			},
 			active: element === selectedElement && selectedSlot === slotId
@@ -219,51 +237,63 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
-		/*this.handleDragEnd(e);
+		this.handleDragEnd(e);
+
+		const isPlaceholder =
+			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
 
 		const store = ViewStore.getInstance();
 		const styleguide = store.getStyleguide() as Styleguide;
 		const patternId = e.dataTransfer.getData('patternId');
 		const dropTargetElement = elementFromTarget(e.target);
+		const pattern = styleguide.getPattern(patternId) as Pattern;
+
 		const newParent = dropTargetElement
 			? dropTargetElement.getParent() || dropTargetElement
 			: undefined;
-		const isPlaceholder =
-			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
-
-		 const draggedElement =
-			store.getDraggedElement() ||
-			new PageElement({
-				pattern: styleguide.getPattern(patternId),
-				setDefaults: true
-			});
 
 		// TODO: The ancestor check should be performed for drag starts to show no drop
 		// indication for impossible drop operations
-		if (!dropTargetElement || !newParent || draggedElement.isAncestorOf(newParent)) {
+		if (!dropTargetElement || !newParent) {
 			return;
 		}
 
-		if (isPlaceholder) {
-			const dropIndex = calculateDropIndex(dropTargetElement, draggedElement);
+		const container = newParent.getContentById('default');
 
-			if (dropIndex === draggedElement.getIndex()) {
-				return;
-			}
-
-			store.execute(
-				ElementLocationCommand.addChild(
-					newParent,
-					draggedElement,
-					dropTargetElement.getParentSlotId(),
-					dropIndex
-				)
-			);
-		} else {
-			store.execute(ElementLocationCommand.addChild(dropTargetElement, draggedElement));
+		if (!container) {
+			return;
 		}
 
-		store.setSelectedElement(draggedElement); */
+		const draggedElement =
+			store.getDraggedElement() ||
+			new PageElement({
+				container,
+				contents: [],
+				parent: dropTargetElement,
+				pattern,
+				setDefaults: true
+			});
+
+		if (draggedElement.isAncestorOf(newParent)) {
+			return;
+		}
+
+		const command = isPlaceholder
+			? ElementLocationCommand.addChild({
+					parent: newParent,
+					child: draggedElement,
+					slotId: dropTargetElement.getContainerId() || 'default',
+					index: calculateDropIndex(dropTargetElement, draggedElement)
+			  })
+			: ElementLocationCommand.addChild({
+					parent: dropTargetElement,
+					child: draggedElement,
+					slotId: 'default',
+					index: 0
+			  });
+
+		store.execute(command);
+		store.setSelectedElement(draggedElement);
 	}
 
 	private handleKeyDown(e: KeyboardEvent): void {
@@ -407,13 +437,7 @@ function elementFromTarget(target: EventTarget): PageElement | undefined {
 	}
 
 	const store = ViewStore.getInstance();
-	const page = store.getCurrentPage();
-
-	if (!page) {
-		return;
-	}
-
-	return page.getElementById(id);
+	return store.getElementById(id);
 }
 
 function calculateDropIndex(target: PageElement, dragged: PageElement): number {

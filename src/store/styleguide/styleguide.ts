@@ -1,9 +1,7 @@
-// import { AssetProperty } from './property/asset-property';
-// import { Directory } from '../../styleguide/analyzer/directory';
-// import { PatternFolder } from './folder';
+import { AssetProperty } from './property/asset-property';
+import { PatternFolder } from './folder';
 import { Pattern, SyntheticPatternType } from './pattern';
-// import { StringProperty } from './property/string-property';
-// import { StyleguideAnalyzer } from '../../styleguide/analyzer/styleguide-analyzer';
+import { StringProperty } from './property/string-property';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
@@ -20,13 +18,15 @@ import * as uuid from 'uuid';
  */
 
 export interface StyleguideInit {
-	id: string;
+	id?: string;
 	patterns?: Pattern[];
+	root?: PatternFolder;
 }
 
 export class Styleguide {
 	private id: string;
 	private patterns: Pattern[] = [];
+	private root: PatternFolder;
 
 	/**
 	 * Creates a new styleguide. Then loads the styleguide's patterns using the configured
@@ -42,9 +42,17 @@ export class Styleguide {
 	public constructor(
 		init: StyleguideInit /* path: string, patternsPath: string, analyzerName: string*/
 	) {
+		this.id = init.id || uuid.v4();
+		this.root = init.root || new PatternFolder({ name: 'root' });
+
 		if (init.patterns) {
 			this.patterns = init.patterns;
 		} else {
+			const syntheticFolder = new PatternFolder({
+				name: 'synthetic',
+				parent: this.root
+			});
+
 			this.patterns = [
 				new Pattern({
 					name: 'page',
@@ -54,14 +62,29 @@ export class Styleguide {
 				new Pattern({
 					name: 'placeholder',
 					path: '',
-					type: SyntheticPatternType.SyntheticPlaceholder
+					type: SyntheticPatternType.SyntheticPlaceholder,
+					properties: [
+						new AssetProperty({
+							name: 'src',
+							id: AssetProperty.SYNTHETIC_ASSET_ID
+						})
+					]
 				}),
 				new Pattern({
 					name: 'text',
 					path: '',
-					type: SyntheticPatternType.SyntheticText
+					type: SyntheticPatternType.SyntheticText,
+					properties: [
+						new StringProperty({
+							name: 'text',
+							id: StringProperty.SYNTHETIC_TEXT_ID
+						})
+					]
 				})
 			];
+
+			syntheticFolder.addPattern(this.patterns[1]);
+			syntheticFolder.addPattern(this.patterns[2]);
 		}
 
 		/* this.path = path;
@@ -95,35 +118,21 @@ export class Styleguide {
 	}
 
 	public static create(): Styleguide {
-		return new Styleguide({
-			id: uuid.v4()
-		});
+		return new Styleguide({});
 	}
 
 	public static from(serializedStyleguide: Types.SerializedStyleguide): Styleguide {
 		return new Styleguide({
 			id: serializedStyleguide.id,
-			patterns: serializedStyleguide.patterns.map(pattern => Pattern.from(pattern))
+			patterns: serializedStyleguide.patterns.map(pattern => Pattern.from(pattern)),
+			root: PatternFolder.from(serializedStyleguide.root)
 		});
 	}
 
-	/**
-	 * Adds a new pattern to the styleguide. Call this method from the styleguide analyzer.
-	 * Note that you can optionally also call addPattern on one or more pattern folders to organize
-	 * patterns, but you always have to add it to the styleguide.
-	 * @param pattern The pattern to add.
-	 */
 	public addPattern(pattern: Pattern): void {
 		this.patterns.push(pattern);
 	}
 
-	/**
-	 * Returns a parsed pattern information object for a given pattern ID.
-	 * @param id The ID of the pattern. It's local to the styleguide analyzer that detected the
-	 * pattern. How this is generated is completely up to the styleguide analyzer that creates the
-	 * pattern.
-	 * @return The resolved pattern, or undefined, if no such ID exists.
-	 */
 	public getPattern(id: string): Pattern | undefined {
 		return this.patterns.find(pattern => pattern.getId() === id);
 	}
@@ -132,18 +141,19 @@ export class Styleguide {
 		return this.patterns.find(pattern => pattern.getType() === type) as Pattern;
 	}
 
-	/**
-	 * Returns all known (parsed) pattern informations.
-	 * @return All known (parsed) pattern informations.
-	 */
 	public getPatterns(): Pattern[] {
-		return Array.from(this.patterns.values());
+		return this.patterns;
+	}
+
+	public getRoot(): PatternFolder {
+		return this.root;
 	}
 
 	public toJSON(): Types.SerializedStyleguide {
 		return {
 			id: this.id,
-			patterns: this.patterns.map(p => p.toJSON())
+			patterns: this.patterns.map(p => p.toJSON()),
+			root: this.root.toJSON()
 		};
 	}
 }

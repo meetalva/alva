@@ -1,161 +1,104 @@
 import Input from '../../lsg/patterns/input/';
-import { ElementLocationCommand } from '../../store/command/element-location-command';
 import { observer } from 'mobx-react';
-import PatternList, {
-	PatternLabel,
-	PatternListItem,
-	PatternListItemProps
-} from '../../lsg/patterns/pattern-list';
+import { PatternAnchor, PatternFolderView, PatternListItem } from '../../lsg/patterns/pattern-list';
 import * as React from 'react';
 import Space, { SpaceSize } from '../../lsg/patterns/space';
-import { PageElement, Pattern, PatternFolder, ViewStore } from '../../store';
-
-export interface PatternListContainerItemProps {
-	items: NamedPatternListItemProps[];
-	name: string;
-}
-
-export interface NamedPatternListItemProps extends PatternListItemProps {
-	name: string;
-}
+import { Pattern, PatternFolder, Styleguide, ViewStore } from '../../store';
 
 @observer
 export class PatternListContainer extends React.Component {
-	public items: PatternListContainerItemProps[] = [];
+	public render(): JSX.Element | null {
+		const store = ViewStore.getInstance();
+		const styleguide = store.getStyleguide();
 
-	public createItemsFromFolder(parent: PatternFolder): PatternListContainerItemProps[] {
-		const result: PatternListContainerItemProps[] = [];
-
-		for (const folder of parent.getDescendants()) {
-			const containerItem: PatternListContainerItemProps = {
-				name: folder.getName(),
-				items: []
-			};
-
-			for (const pattern of folder.getPatterns()) {
-				containerItem.items.push({
-					name: pattern.getName(),
-					draggable: true,
-					icon: '',
-					onDragStart: (e: React.DragEvent<HTMLElement>) => {
-						this.handleDragStart(e, pattern);
-					},
-					onClick: () => {
-						this.handlePatternClick(pattern);
-					}
-				});
-			}
-
-			result.push(containerItem);
+		if (!styleguide) {
+			return null;
 		}
 
-		return result;
-	}
+		const patternRoot = styleguide.getRoot();
 
-	public createList(containers: PatternListContainerItemProps[]): JSX.Element {
 		return (
-			<PatternList>
-				{containers.map((container: PatternListContainerItemProps, index: number) => {
-					if (container.items.length) {
-						return (
-							<PatternList key={index}>
-								<PatternLabel>{container.name}</PatternLabel>
-								{container.items.map((item, itemIndex) => (
-									<PatternListItem
-										draggable={item.draggable}
-										onDragStart={item.onDragStart}
-										key={itemIndex}
-										icon={item.icon}
-										onClick={item.onClick}
-									>
-										{item.name}
-									</PatternListItem>
-								))}
-							</PatternList>
-						);
-					}
-
-					return;
-				})}
-			</PatternList>
+			<>
+				<Space sizeBottom={SpaceSize.XXS}>
+					<Input placeholder="Search patterns" />
+				</Space>
+				<Space size={[0, SpaceSize.L]}>
+					<PatternFolderContainer
+						isRoot
+						folder={patternRoot}
+						render={pattern => (
+							<PatternListemItemContainer key={pattern.getId()} pattern={pattern} />
+						)}
+						styleguide={styleguide}
+					/>
+				</Space>
+			</>
 		);
 	}
+}
 
-	protected handleDragStart(e: React.DragEvent<HTMLElement>, pattern: Pattern): void {
+interface PatternFolderContainerProps {
+	folder: PatternFolder;
+	isRoot: boolean;
+	styleguide: Styleguide;
+	render(item: Pattern): JSX.Element | null;
+}
+
+class PatternFolderContainer extends React.Component<PatternFolderContainerProps> {
+	public render(): JSX.Element {
+		const { props } = this;
+		const isPattern = (pattern): pattern is Pattern => typeof pattern !== 'undefined';
+
+		return (
+			<PatternFolderView name={props.isRoot ? '' : props.folder.getName()}>
+				{props.folder
+					.getPatterns()
+					.map(id => props.styleguide.getPattern(id))
+					.filter(isPattern)
+					.map(pattern => props.render(pattern))}
+				{props.folder
+					.getChildren()
+					.map(child => (
+						<PatternFolderContainer
+							folder={child}
+							isRoot={false}
+							key={child.getId()}
+							styleguide={props.styleguide}
+							render={props.render}
+						/>
+					))}
+			</PatternFolderView>
+		);
+	}
+}
+
+interface PatternListemItemContainerProps {
+	pattern: Pattern;
+}
+
+class PatternListemItemContainer extends React.Component<PatternListemItemContainerProps> {
+	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		e.dataTransfer.dropEffect = 'copy';
+
 		e.dataTransfer.setDragImage(
-			e.currentTarget.querySelector('.pattern__icon') as Element,
+			e.currentTarget.querySelector(`[${PatternAnchor.icon}]`) as Element,
 			12,
 			12
 		);
 
-		e.dataTransfer.setData('patternId', pattern.getId());
+		e.dataTransfer.setData('patternId', this.props.pattern.getId());
 	}
 
-	protected handlePatternClick(pattern: Pattern): void {
-		const store = ViewStore.getInstance();
-		const selectedElement: PageElement | undefined = store.getSelectedElement();
-		const selectedSlot = store.getSelectedSlotId();
-		if (selectedElement) {
-			const newPageElement = new PageElement({
-				pattern,
-				setDefaults: true
-			});
-			store.execute(
-				ElementLocationCommand.addChild(selectedElement, newPageElement, selectedSlot)
-			);
-			store.setSelectedElement(newPageElement);
-		}
-	}
-
-	protected handleSearchInputChange(evt: React.ChangeEvent<HTMLInputElement>): void {
-		ViewStore.getInstance().setPatternSearchTerm(evt.target.value);
-	}
-
-	public render(): JSX.Element {
-		const store = ViewStore.getInstance();
-		// const styleguide = store.getStyleguide();
-		// const patternRoot = styleguide && styleguide.getPatternRoot();
-		// this.items = patternRoot ? this.createItemsFromFolder(patternRoot) : [];
-
-		if (store.getPatternSearchTerm() !== '') {
-			this.items = this.search(this.items, store.getPatternSearchTerm());
-		}
-
-		const list = this.createList(this.items);
+	public render(): JSX.Element | null {
+		const { props } = this;
 		return (
-			<div>
-				<Space sizeBottom={SpaceSize.XXS}>
-					<Input
-						onChange={e => this.handleSearchInputChange(e)}
-						placeholder="Search patterns"
-					/>
-				</Space>
-				<Space size={[0, SpaceSize.L]}>{list}</Space>
-			</div>
+			<PatternListItem
+				key={props.pattern.getId()}
+				draggable
+				onDragStart={e => this.handleDragStart(e)}
+			>
+				{props.pattern.getName()}
+			</PatternListItem>
 		);
-	}
-
-	public search(
-		containers: PatternListContainerItemProps[],
-		term: string
-	): PatternListContainerItemProps[] {
-		const result: PatternListContainerItemProps[] = [];
-
-		for (const container of containers) {
-			if (!container.items.length) {
-				continue;
-			}
-
-			const matchingItems = container.items.filter(
-				item => item.name.toLowerCase().indexOf(term.toLowerCase()) !== -1
-			);
-			result.push({
-				name: container.name,
-				items: matchingItems
-			});
-		}
-
-		return result;
 	}
 }

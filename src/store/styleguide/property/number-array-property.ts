@@ -11,9 +11,16 @@ import * as Types from '../../types';
 export class NumberArrayProperty extends Property {
 	public readonly type = PropertyType.NumberArray;
 
-	/**
-	 * @inheritdoc
-	 */
+	public static from(serialized: Types.SerializedNumberArrayProperty): NumberArrayProperty {
+		return new NumberArrayProperty({
+			hidden: serialized.hidden,
+			defaultValue: serialized.defaultValue,
+			id: serialized.id,
+			name: serialized.name,
+			required: serialized.required
+		});
+	}
+
 	// tslint:disable-next-line:no-any
 	public coerceValue(value: any): any {
 		// tslint:disable-next-line:no-any

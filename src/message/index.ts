@@ -13,6 +13,8 @@ export enum PreviewMessageType {
 
 export enum ServerMessageType {
 	AppLoaded = 'app-loaded',
+	AssetReadRequest = 'asset-read-request',
+	AssetReadResponse = 'asset-read-response',
 	BundleChange = 'bundle-change',
 	ContentRequest = 'content-request',
 	ContentResponse = 'content-response',
@@ -34,6 +36,7 @@ export enum ServerMessageType {
 	PastePageElementBelow = 'paste-page-element-below',
 	PastePageElementInside = 'paste-page-element-inside',
 	Redo = 'redo',
+	Save = 'save',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
@@ -53,6 +56,7 @@ export interface ProjectFilePayload {
 }
 
 export type ServerMessage =
+	| AssetReadResponse
 	| CreateNewFileResponse
 	| ContentRequest
 	| ContentResponse
@@ -61,6 +65,7 @@ export type ServerMessage =
 	| SketchExportResponse
 	| StartAppMessage;
 
+export type AssetReadResponse = Envelope<ServerMessageType.AssetReadResponse, string>;
 export type StartAppMessage = Envelope<ServerMessageType.StartApp, string>;
 export type ContentRequest = Envelope<ServerMessageType.ContentRequest, undefined>;
 export type ContentResponse = Envelope<ServerMessageType.ContentResponse, string>;

@@ -33,7 +33,6 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 
 		this.props.page.setNameState(EditState.Editable);
 		this.props.page.setName(this.props.page.getEditedName());
-		ViewStore.getInstance().save();
 	}
 
 	protected handleChange(e: React.ChangeEvent<HTMLInputElement>): void {

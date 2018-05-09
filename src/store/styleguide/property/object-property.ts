@@ -20,6 +20,16 @@ export class ObjectProperty extends Property {
 
 	public readonly type = PropertyType.Object;
 
+	public static from(serialized: Types.SerializedObjectProperty): ObjectProperty {
+		return new ObjectProperty({
+			hidden: serialized.hidden,
+			defaultValue: serialized.defaultValue,
+			id: serialized.id,
+			name: serialized.name,
+			required: serialized.required
+		});
+	}
+
 	/**
 	 * @inheritdoc
 	 */

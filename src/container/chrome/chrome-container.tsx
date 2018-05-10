@@ -1,62 +1,61 @@
+import * as AlvaUtil from '../../alva-util';
 import { Chrome, CopySize, ViewSwitch, ViewTitle } from '../../components';
-import { observer } from 'mobx-react';
+import * as MobxReact from 'mobx-react';
 import { OverviewSwitchContainer } from './overview-switch-container';
 import * as React from 'react';
-import { Page, ViewStore } from '../../store';
+import { ViewStore } from '../../store';
 import * as Types from '../../store/types';
 
-@observer
-export class ChromeContainer extends React.Component {
-	protected store = ViewStore.getInstance();
+export const ChromeContainer = MobxReact.observer((props): JSX.Element | null => {
+	const store = ViewStore.getInstance();
+	const project = store.getCurrentProject();
 
-	protected getCurrentPage(): Page | undefined {
-		return this.store.getCurrentPage();
+	if (!project) {
+		return null;
 	}
 
-	public render(): JSX.Element {
-		let nextPage: Page | undefined;
-		let previousPage: Page | undefined;
+	const page = store.getCurrentPage();
 
-		const currentPage = this.getCurrentPage();
-		const project = this.store.getCurrentProject();
-		const pages = project ? project.getPages() : [];
-		const currentIndex = currentPage ? pages.indexOf(currentPage) : 0;
-
-		if (currentIndex > 0) {
-			previousPage = pages[currentIndex - 1];
-		}
-
-		if (currentIndex < pages.length - 1) {
-			nextPage = pages[currentIndex + 1];
-		}
-
-		return (
-			<Chrome>
-				{this.store.getActiveView() === Types.AlvaView.PageDetail ? (
-					<OverviewSwitchContainer />
-				) : (
-					<div />
-				)}
-				{this.store.getActiveView() === Types.AlvaView.PageDetail && (
-					<ViewSwitch
-						fontSize={CopySize.M}
-						justify="center"
-						leftVisible={Boolean(previousPage)}
-						rightVisible={Boolean(nextPage)}
-						// onLeftClick={() => /* this.openPage(previousPage) */}
-						// onRightClick={() => /* this.openPage(nextPage) */}
-						title={currentPage ? currentPage.getName() : ''}
-					/>
-				)}
-				{this.store.getActiveView() === Types.AlvaView.Pages && (
-					<ViewTitle
-						fontSize={CopySize.M}
-						justify="center"
-						title={project ? project.getName() : 'Alva'}
-					/>
-				)}
-				{this.props.children}
-			</Chrome>
-		);
+	if (!page) {
+		return null;
 	}
-}
+
+	const index = project.getPageIndex(page);
+	const pages = project.getPages();
+
+	if (typeof index !== 'number') {
+		return null;
+	}
+
+	const previous = index > 0 ? () => store.setActivePageByIndex(index - 1) : AlvaUtil.noop;
+	const next = index < pages.length ? () => store.setActivePageByIndex(index + 1) : AlvaUtil.noop;
+
+	return (
+		<Chrome>
+			{store.getActiveView() === Types.AlvaView.PageDetail ? (
+				<OverviewSwitchContainer />
+			) : (
+				<div />
+			)}
+			{store.getActiveView() === Types.AlvaView.PageDetail && (
+				<ViewSwitch
+					fontSize={CopySize.M}
+					justify="center"
+					leftVisible={index > 0}
+					rightVisible={index < pages.length - 1}
+					onLeftClick={previous}
+					onRightClick={next}
+					title={page ? page.getName() : ''}
+				/>
+			)}
+			{store.getActiveView() === Types.AlvaView.Pages && (
+				<ViewTitle
+					fontSize={CopySize.M}
+					justify="center"
+					title={project ? project.getName() : 'Alva'}
+				/>
+			)}
+			{props.children}
+		</Chrome>
+	);
+});

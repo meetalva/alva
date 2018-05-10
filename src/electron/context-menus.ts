@@ -1,7 +1,7 @@
+import * as Sender from '../message/client';
 import { MenuItemConstructorOptions, remote } from 'electron';
 import { ServerMessageType } from '../message';
 import { PageElement } from '../store/page/page-element';
-import * as Sender from '../message/sender';
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';
 

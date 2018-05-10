@@ -1,6 +1,6 @@
+import * as Sender from '../message/client';
 import { Exporter, ExportResult } from './exporter';
 import { ServerMessageType } from '../message';
-import * as Sender from '../message/sender';
 import { Page, ViewStore } from '../store';
 import * as uuid from 'uuid';
 

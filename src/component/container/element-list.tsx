@@ -257,17 +257,18 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		const container = dropParent.getContentById('default');
 
+		// prettier-ignore
 		const draggedElement = pattern
 			? // drag from pattern list, create new element
-			  new Store.PageElement({
+			new Store.PageElement({
 					container,
 					contents: [],
 					parent: dropParent,
 					pattern,
 					setDefaults: true
-			  })
+			})
 			: // drag from element list, obtain reference
-			  store.getElementById(elementId);
+			store.getElementById(elementId);
 
 		if (!draggedElement) {
 			return;

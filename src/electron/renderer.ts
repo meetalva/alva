@@ -1,11 +1,13 @@
 import { App } from '../component/container/app';
-import { ipcRenderer, webFrame } from 'electron';
+import { webFrame } from 'electron';
 import { ServerMessageType } from '../message';
 import * as MobX from 'mobx';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import * as Sender from '../message/sender';
 import { Project, ViewStore } from '../store';
 import * as Types from '../store/types';
+import * as uuid from 'uuid';
 
 // prevent app zooming
 webFrame.setVisualZoomLevelLimits(1, 1);
@@ -13,34 +15,60 @@ webFrame.setLayoutZoomLevelLimits(0, 0);
 
 const store = ViewStore.getInstance();
 
-ipcRenderer.send('message', { type: 'app-loaded' });
+Sender.send({
+	id: uuid.v4(),
+	type: ServerMessageType.AppLoaded,
+	payload: undefined
+});
 
-// tslint:disable-next-line
-ipcRenderer.on('message', (e: Electron.Event, message: any) => {
-	if (!message) {
-		return;
-	}
-
+Sender.receive(message => {
+	// Initilazing messages
 	switch (message.type) {
 		case ServerMessageType.StartApp: {
-			store.setServerPort(message.payload);
+			store.setServerPort(Number(message.payload));
 			break;
 		}
 		case ServerMessageType.OpenFileResponse: {
-			const project = Project.from(message.payload.contents);
-			project.setPath(message.payload.path);
+			const newProject = Project.from(message.payload.contents);
+			newProject.setPath(message.payload.path);
 
-			store.setProject(project);
+			store.setProject(newProject);
 			store.setActiveView(Types.AlvaView.PageDetail);
 			break;
 		}
 		case ServerMessageType.CreateNewFileResponse: {
-			const project = Project.from(message.payload.contents);
-			store.setProject(project);
+			const newProject = Project.from(message.payload.contents);
+			store.setProject(newProject);
 			store.setActiveView(Types.AlvaView.PageDetail);
 		}
 	}
+});
 
+Sender.receive(message => {
+	const project = store.getCurrentProject();
+
+	if (!project) {
+		return;
+	}
+
+	switch (message.type) {
+		case ServerMessageType.CreateNewPage: {
+			const page = store.addNewPage();
+			if (!page) {
+				return;
+			}
+
+			store.setActivePage(page);
+
+			if (store.getActiveView() === Types.AlvaView.Pages) {
+				page.setNameState(Types.EditState.Editing);
+			}
+		}
+	}
+});
+
+// tslint:disable-next-line:cyclomatic-complexity
+Sender.receive(message => {
 	// Do not perform custom operations
 	// if anything on the page has focus
 	if (document.activeElement !== document.body) {
@@ -133,9 +161,10 @@ MobX.autorun(() => {
 	const styleguide = store.getStyleguide();
 
 	if (styleguide) {
-		ipcRenderer.send('message', {
-			type: 'styleguide-change',
-			payload: styleguide.toJSON()
+		Sender.send({
+			id: uuid.v4(),
+			payload: styleguide.toJSON(),
+			type: ServerMessageType.StyleGuideChange
 		});
 	}
 });
@@ -145,21 +174,23 @@ MobX.autorun(() => {
 	const currentPage = store.getCurrentPage();
 
 	if (project && currentPage) {
-		ipcRenderer.send('message', {
-			type: 'page-change',
+		Sender.send({
+			id: uuid.v4(),
 			payload: {
 				pageId: currentPage.getId(),
 				pages: project.getPages().map(page => page.toJSON({ forRendering: true }))
-			}
+			},
+			type: ServerMessageType.PageChange
 		});
 	}
 });
 
 MobX.autorun(() => {
 	const selectedElement = store.getSelectedElement();
-	ipcRenderer.send('message', {
-		type: 'element-change',
-		payload: selectedElement ? selectedElement.getId() : undefined
+	Sender.send({
+		id: uuid.v4(),
+		payload: selectedElement ? selectedElement.getId() : undefined,
+		type: ServerMessageType.ElementChange
 	});
 });
 

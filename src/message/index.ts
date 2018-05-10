@@ -1,4 +1,4 @@
-import { SerializedProject } from '../store/types';
+import * as Types from '../store/types';
 
 export enum PreviewMessageType {
 	ContentRequest = 'content-request',
@@ -22,6 +22,7 @@ export enum ServerMessageType {
 	CopyPageElement = 'copy-page-element',
 	CreateNewFileRequest = 'create-new-file-request',
 	CreateNewFileResponse = 'create-new-file-response',
+	CreateNewPage = 'create-new-page',
 	Cut = 'cut',
 	CutPageElement = 'cut-page-element',
 	Delete = 'delete',
@@ -50,29 +51,93 @@ export interface Envelope<V, T> {
 	type: V;
 }
 
-export interface ProjectFilePayload {
-	contents: SerializedProject;
+export type EmptyEnvelope<V> = Envelope<V, undefined>;
+
+export interface ProjectPayload {
+	contents: Types.SerializedProject;
 	path: string;
 }
 
+export interface PageChangePayload {
+	pageId: string;
+	pages: Types.SerializedPage[];
+}
+
+export interface SavePayload {
+	path: string;
+	project: Types.SerializedProject;
+}
+
+export interface SketchExportPayload {
+	artboardName: string;
+	pageName: string;
+}
+
 export type ServerMessage =
+	| AppLoaded
+	| AssetReadRequest
 	| AssetReadResponse
-	| CreateNewFileResponse
 	| ContentRequest
 	| ContentResponse
+	| CopyPageElement
+	| CreateNewPage
+	| ElementChange
+	| NewFileRequest
+	| NewFileResponse
+	| Copy
+	| Cut
+	| CutPageElement
+	| Delete
+	| DeletePageElement
+	| Duplicate
+	| DuplicatePageElement
+	| OpenFileRequest
 	| OpenFileResponse
+	| PageChange
+	| Paste
+	| PastePageElementBelow
+	| PastePageElementInside
+	| Redo
+	| Save
 	| SketchExportRequest
 	| SketchExportResponse
-	| StartAppMessage;
+	| StartAppMessage
+	| StyleGuideChange
+	| Undo;
 
+export type AppLoaded = EmptyEnvelope<ServerMessageType.AppLoaded>;
+export type AssetReadRequest = EmptyEnvelope<ServerMessageType.AssetReadRequest>;
 export type AssetReadResponse = Envelope<ServerMessageType.AssetReadResponse, string>;
-export type StartAppMessage = Envelope<ServerMessageType.StartApp, string>;
-export type ContentRequest = Envelope<ServerMessageType.ContentRequest, undefined>;
+export type ContentRequest = EmptyEnvelope<ServerMessageType.ContentRequest>;
 export type ContentResponse = Envelope<ServerMessageType.ContentResponse, string>;
-export type SketchExportRequest = Envelope<ServerMessageType.SketchExportRequest, undefined>;
-export type SketchExportResponse = Envelope<ServerMessageType.SketchExportResponse, string>;
-export type CreateNewFileResponse = Envelope<
-	ServerMessageType.CreateNewFileResponse,
-	ProjectFilePayload
+export type Copy = EmptyEnvelope<ServerMessageType.Copy>;
+export type CopyPageElement = Envelope<ServerMessageType.CopyPageElement, string>;
+export type CreateNewPage = Envelope<ServerMessageType.CreateNewPage, undefined>;
+export type Cut = EmptyEnvelope<ServerMessageType.Cut>;
+export type Delete = EmptyEnvelope<ServerMessageType.Delete>;
+export type ElementChange = Envelope<ServerMessageType.ElementChange, string | undefined>;
+export type NewFileRequest = EmptyEnvelope<ServerMessageType.CreateNewFileRequest>;
+export type NewFileResponse = Envelope<ServerMessageType.CreateNewFileResponse, ProjectPayload>;
+export type CutPageElement = Envelope<ServerMessageType.CutPageElement, string>;
+export type DeletePageElement = Envelope<ServerMessageType.DeletePageElement, string>;
+export type Duplicate = EmptyEnvelope<ServerMessageType.Duplicate>;
+export type DuplicatePageElement = Envelope<ServerMessageType.DuplicatePageElement, string>;
+export type OpenFileRequest = EmptyEnvelope<ServerMessageType.OpenFileRequest>;
+export type OpenFileResponse = Envelope<ServerMessageType.OpenFileResponse, ProjectPayload>;
+export type PageChange = Envelope<ServerMessageType.PageChange, PageChangePayload>;
+export type Paste = EmptyEnvelope<ServerMessageType.Paste>;
+export type PastePageElementBelow = Envelope<ServerMessageType.PastePageElementBelow, string>;
+export type PastePageElementInside = Envelope<ServerMessageType.PastePageElementInside, string>;
+export type Redo = EmptyEnvelope<ServerMessageType.Redo>;
+export type Save = Envelope<ServerMessageType.Save, SavePayload>;
+export type SketchExportRequest = Envelope<
+	ServerMessageType.SketchExportRequest,
+	SketchExportPayload
 >;
-export type OpenFileResponse = Envelope<ServerMessageType.OpenFileResponse, ProjectFilePayload>;
+export type SketchExportResponse = Envelope<ServerMessageType.SketchExportResponse, string>;
+export type StartAppMessage = Envelope<ServerMessageType.StartApp, string>;
+export type StyleGuideChange = Envelope<
+	ServerMessageType.StyleGuideChange,
+	Types.SerializedStyleguide
+>;
+export type Undo = EmptyEnvelope<ServerMessageType.Undo>;

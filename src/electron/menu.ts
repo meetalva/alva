@@ -5,6 +5,7 @@ import { Page } from '../store/page/page';
 import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
 import { Project } from '../store/project';
+import * as Sender from '../message/sender';
 import { SketchExporter } from '../export/sketch-exporter';
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';
@@ -51,9 +52,10 @@ export function createMenu(): void {
 					label: '&New',
 					accelerator: 'CmdOrCtrl+N',
 					click: () => {
-						ipcRenderer.send('message', {
+						Sender.send({
 							type: ServerMessageType.CreateNewFileRequest,
-							id: uuid.v4()
+							id: uuid.v4(),
+							payload: undefined
 						});
 					}
 				},
@@ -61,9 +63,10 @@ export function createMenu(): void {
 					label: '&Open',
 					accelerator: 'CmdOrCtrl+O',
 					click: () => {
-						ipcRenderer.send('message', {
+						Sender.send({
 							type: ServerMessageType.OpenFileRequest,
-							id: uuid.v4()
+							id: uuid.v4(),
+							payload: undefined
 						});
 					}
 				},
@@ -73,7 +76,14 @@ export function createMenu(): void {
 				{
 					label: 'New &Page',
 					enabled: !isSplashscreen,
-					accelerator: 'CmdOrCtrl+Shift+N'
+					accelerator: 'CmdOrCtrl+Shift+N',
+					click: () => {
+						Sender.send({
+							type: ServerMessageType.CreateNewPage,
+							id: uuid.v4(),
+							payload: undefined
+						});
+					}
 				},
 				{
 					type: 'separator'
@@ -90,7 +100,7 @@ export function createMenu(): void {
 							return;
 						}
 
-						ipcRenderer.send('message', {
+						Sender.send({
 							type: ServerMessageType.Save,
 							id: uuid.v4(),
 							payload: {
@@ -217,12 +227,22 @@ export function createMenu(): void {
 				{
 					label: '&Undo',
 					accelerator: 'CmdOrCtrl+Z',
-					click: () => ipcRenderer.send('message', { type: ServerMessageType.Undo })
+					click: () =>
+						Sender.send({
+							id: uuid.v4(),
+							type: ServerMessageType.Undo,
+							payload: undefined
+						})
 				},
 				{
 					label: '&Redo',
 					accelerator: 'Shift+CmdOrCtrl+Z',
-					click: () => ipcRenderer.send('message', { type: ServerMessageType.Redo })
+					click: () =>
+						Sender.send({
+							id: uuid.v4(),
+							payload: undefined,
+							type: ServerMessageType.Redo
+						})
 				},
 				{
 					type: 'separator'
@@ -232,7 +252,11 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+X',
 					click: () => {
-						ipcRenderer.send('message', { type: ServerMessageType.Cut });
+						Sender.send({
+							id: uuid.v4(),
+							payload: undefined,
+							type: ServerMessageType.Cut
+						});
 						Menu.sendActionToFirstResponder('cut:');
 					}
 				},
@@ -241,7 +265,11 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+C',
 					click: () => {
-						ipcRenderer.send('message', { type: ServerMessageType.Copy });
+						Sender.send({
+							id: uuid.v4(),
+							payload: undefined,
+							type: ServerMessageType.Copy
+						});
 						Menu.sendActionToFirstResponder('copy:');
 					}
 				},
@@ -250,7 +278,11 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+V',
 					click: () => {
-						ipcRenderer.send('message', { type: ServerMessageType.Paste });
+						Sender.send({
+							id: uuid.v4(),
+							payload: undefined,
+							type: ServerMessageType.Paste
+						});
 						Menu.sendActionToFirstResponder('paste:');
 					}
 				},
@@ -262,7 +294,11 @@ export function createMenu(): void {
 					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+D',
 					click: () => {
-						ipcRenderer.send('message', { type: ServerMessageType.Duplicate });
+						Sender.send({
+							id: uuid.v4(),
+							payload: undefined,
+							type: ServerMessageType.Duplicate
+						});
 					}
 				},
 				{
@@ -287,7 +323,11 @@ export function createMenu(): void {
 						}
 					})(),
 					click: () => {
-						ipcRenderer.send('message', { type: ServerMessageType.Delete });
+						Sender.send({
+							id: uuid.v4(),
+							payload: undefined,
+							type: ServerMessageType.Delete
+						});
 						remote.Menu.sendActionToFirstResponder('delete:');
 					}
 				}

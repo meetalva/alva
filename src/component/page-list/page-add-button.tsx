@@ -10,8 +10,11 @@ export class PageAddButton extends React.Component {
 		e.preventDefault();
 		const store = ViewStore.getInstance();
 		const page = store.addNewPage();
-		// store.openPage(page.getId());
-		page.setNameState(EditState.Editing);
+
+		if (page) {
+			store.setActivePage(page);
+			page.setNameState(EditState.Editing);
+		}
 	}
 
 	public render(): JSX.Element {

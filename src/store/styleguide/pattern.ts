@@ -121,7 +121,7 @@ export class Pattern {
 	}
 
 	public static fromTypeString(type: string, context: PatternContext): Pattern {
-		return context.styleguide.getPattern(type) as Pattern;
+		return context.styleguide.getPatternById(type) as Pattern;
 	}
 
 	/**

@@ -24,7 +24,8 @@ import { PropertyList } from './property-list';
 import PropertyPane from '../../lsg/patterns/panes/property-pane';
 import * as React from 'react';
 import { SplashScreen } from './splash-screen';
-import { AlvaView, RightPane, ViewStore } from '../../store';
+import { ViewStore } from '../../store';
+import { AlvaView, RightPane } from '../../store/types';
 import * as uuid from 'uuid';
 
 globalStyles();

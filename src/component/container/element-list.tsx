@@ -1,22 +1,11 @@
 import { colors } from '../../lsg/patterns/colors';
 import { elementMenu } from '../../electron/context-menus';
 import { ElementAnchors, ElementProps } from '../../lsg/patterns/element';
-import {} from '../../store/command/element-location-command';
 import { ElementWrapper } from './element-wrapper';
 import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';
-import { Page } from '../../store/page/page';
-import { PageElement } from '../../store/page/page-element';
-import { Pattern } from '../../store/styleguide/pattern';
 import * as React from 'react';
-import {
-	ElementLocationCommand,
-	ElementNameCommand,
-	PageElementContent,
-	Slot,
-	Styleguide,
-	ViewStore
-} from '../../store';
+import * as Store from '../../store';
 import * as uuid from 'uuid';
 
 export interface ElementListState {
@@ -62,11 +51,11 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	public createItemFromElement(
-		element: PageElement,
-		selectedElement?: PageElement
+		element: Store.PageElement,
+		selectedElement?: Store.PageElement
 	): ElementNodeProps {
-		const store = ViewStore.getInstance();
-		const pattern: Pattern | undefined = element.getPattern();
+		const store = Store.ViewStore.getInstance();
+		const pattern: Store.Pattern | undefined = element.getPattern();
 
 		if (!pattern) {
 			return {
@@ -84,7 +73,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		pattern.getSlots().forEach(slot => {
 			const listItem = this.createItemFromSlot(slot, element, selectedElement);
 
-			if (slot.getId() === Pattern.DEFAULT_SLOT_PROPERTY_NAME) {
+			if (slot.getId() === Store.Pattern.DEFAULT_SLOT_PROPERTY_NAME) {
 				defaultSlotItems = listItem.children;
 			} else {
 				slots.push(listItem);
@@ -103,18 +92,18 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	public createItemFromSlot(
-		slot: Slot,
-		element: PageElement,
-		selectedElement?: PageElement
+		slot: Store.Slot,
+		element: Store.PageElement,
+		selectedElement?: Store.PageElement
 	): ElementNodeProps {
-		const store = ViewStore.getInstance();
+		const store = Store.ViewStore.getInstance();
 		const slotId = slot.getId();
-		const slotContent = element.getContentById(slotId) as PageElementContent;
+		const slotContent = element.getContentById(slotId) as Store.PageElementContent;
 
 		const childItems: ElementNodeProps[] = [];
 		const selectedSlot = store.getSelectedSlotId();
 
-		slotContent.getElements().forEach((value: PageElement, index: number) => {
+		slotContent.getElements().forEach((value: Store.PageElement, index: number) => {
 			childItems.push(this.createItemFromElement(value, selectedElement));
 		});
 
@@ -127,7 +116,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			children: childItems,
 			// TODO: Unify this with the event-delegation based drag/drop handling
 			onDragDrop: (e: React.DragEvent<HTMLElement>) => {
-				const patternId = e.dataTransfer.getData('patternId');
+				/* const patternId = e.dataTransfer.getData('patternId');
 
 				let draggedElement: PageElement | undefined;
 
@@ -162,7 +151,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 					})
 				);
 
-				store.setSelectedElement(draggedElement);
+				store.setSelectedElement(draggedElement); */
 			},
 			active: element === selectedElement && selectedSlot === slotId
 		};
@@ -171,18 +160,18 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	private handleBlur(e: React.FormEvent<HTMLElement>): void {
-		const store = ViewStore.getInstance();
+		const store = Store.ViewStore.getInstance();
 		const editableElement = store.getNameEditableElement();
 
 		if (editableElement) {
-			store.execute(new ElementNameCommand(editableElement, editableElement.getName()));
+			store.execute(new Store.ElementNameCommand(editableElement, editableElement.getName()));
 			store.setNameEditableElement();
 		}
 	}
 
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const element = elementFromTarget(e.target);
-		const store = ViewStore.getInstance();
+		const store = Store.ViewStore.getInstance();
 		const label = above(e.target, `[${ElementAnchors.label}]`);
 
 		if (!element) {
@@ -216,28 +205,85 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
-		this.setState({ dragging: true });
 		const element = elementFromTarget(e.target);
 
 		if (!element) {
+			e.preventDefault();
 			return;
 		}
 
 		if (element.isNameEditable()) {
+			e.preventDefault();
 			return;
 		}
 
-		ViewStore.getInstance().setDraggedElement(element);
+		this.setState({ dragging: true });
+
 		const dragImg = document.createElement('div');
 		dragImg.textContent = element.getName();
 		dragImg.setAttribute('style', DRAG_IMG_STYLE);
 		document.body.appendChild(dragImg);
 		e.dataTransfer.setDragImage(dragImg, 75, 15);
+		e.dataTransfer.setData('elementId', element.getId());
 		this.dragImg = dragImg;
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
 		this.handleDragEnd(e);
+
+		const store = Store.ViewStore.getInstance();
+		const patternId = e.dataTransfer.getData('patternId');
+		const elementId = e.dataTransfer.getData('elementId');
+
+		const pattern = store.getPatternById(patternId);
+		const element = store.getElementById(elementId);
+
+		if (!pattern && !element) {
+			return;
+		}
+
+		const isSiblingDrop =
+			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
+		const targetElement = elementFromTarget(e.target);
+
+		if (!targetElement) {
+			return;
+		}
+
+		const dropParent =
+			isSiblingDrop && !targetElement.isRoot()
+				? (targetElement.getParent() as Store.PageElement) // Non-root page element always has parent
+				: targetElement;
+
+		const container = dropParent.getContentById('default');
+
+		const draggedElement = pattern
+			? // drag from pattern list, create new element
+			  new Store.PageElement({
+					container,
+					contents: [],
+					parent: dropParent,
+					pattern,
+					setDefaults: true
+			  })
+			: // drag from element list, obtain reference
+			  store.getElementById(elementId);
+
+		if (!draggedElement) {
+			return;
+		}
+
+		const command = Store.ElementLocationCommand.addChild({
+			parent: dropParent,
+			child: draggedElement,
+			slotId: 'default',
+			index: calculateDropIndex({ target: dropParent, dragged: draggedElement })
+		});
+
+		store.execute(command);
+		store.setSelectedElement(draggedElement);
+
+		/* this.handleDragEnd(e);
 
 		const isPlaceholder =
 			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
@@ -264,8 +310,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
-		const draggedElement =
-			store.getDraggedElement() ||
+		const draggedElement = patternId ?
+			store.getDraggedElement() :
 			new PageElement({
 				container,
 				contents: [],
@@ -274,30 +320,32 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				setDefaults: true
 			});
 
+		if (!draggedElement) {
+			return;
+		}
+
 		if (draggedElement.isAncestorOf(newParent)) {
 			return;
 		}
 
-		const command = isPlaceholder
-			? ElementLocationCommand.addChild({
-					parent: newParent,
-					child: draggedElement,
-					slotId: dropTargetElement.getContainerId() || 'default',
-					index: calculateDropIndex(dropTargetElement, draggedElement)
-			  })
+		const command = isPlaceholder && !dropTargetElement.isRoot()
+			? ElementLocationCommand.addSibling({
+				newSibling: draggedElement,
+				sibling: dropTargetElement
+			})
 			: ElementLocationCommand.addChild({
-					parent: dropTargetElement,
-					child: draggedElement,
-					slotId: 'default',
-					index: 0
-			  });
+				parent: dropTargetElement,
+				child: draggedElement,
+				slotId: 'default',
+				index: 0
+			});
 
 		store.execute(command);
-		store.setSelectedElement(draggedElement);
+		store.setSelectedElement(draggedElement); */
 	}
 
 	private handleKeyDown(e: KeyboardEvent): void {
-		const store = ViewStore.getInstance();
+		const store = Store.ViewStore.getInstance();
 		const node = e.target as Node;
 		const contains = (target: Node) => (this.ref ? this.ref.contains(target) : false);
 
@@ -317,7 +365,9 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				const selectedElement = store.getSelectedElement();
 
 				if (editableElement) {
-					store.execute(new ElementNameCommand(editableElement, editableElement.getName()));
+					store.execute(
+						new Store.ElementNameCommand(editableElement, editableElement.getName())
+					);
 					store.setNameEditableElement();
 				} else {
 					store.setNameEditableElement(selectedElement);
@@ -348,8 +398,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	public render(): JSX.Element | null {
-		const store = ViewStore.getInstance();
-		const page: Page | undefined = store.getCurrentPage();
+		const store = Store.ViewStore.getInstance();
+		const page: Store.Page | undefined = store.getCurrentPage();
 
 		if (!page) {
 			return null;
@@ -423,7 +473,7 @@ function above(node: EventTarget, selector: string): HTMLElement | null {
 	return ended ? null : el;
 }
 
-function elementFromTarget(target: EventTarget): PageElement | undefined {
+function elementFromTarget(target: EventTarget): Store.PageElement | undefined {
 	const el = above(target, `[${ElementAnchors.element}]`);
 
 	if (!el) {
@@ -436,11 +486,16 @@ function elementFromTarget(target: EventTarget): PageElement | undefined {
 		return;
 	}
 
-	const store = ViewStore.getInstance();
+	const store = Store.ViewStore.getInstance();
 	return store.getElementById(id);
 }
 
-function calculateDropIndex(target: PageElement, dragged: PageElement): number {
+function calculateDropIndex(init: {
+	dragged: Store.PageElement;
+	target: Store.PageElement;
+}): number {
+	const { dragged, target } = init;
+
 	// We definitely know the drop target has a parent, thus an index
 	const newIndex = target.getIndex() as number;
 

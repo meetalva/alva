@@ -2,7 +2,8 @@ import { PreviewTile } from '../../lsg/patterns/preview-tile/index';
 import Space, { SpaceSize } from '../../lsg/patterns/space/index';
 import { observer } from 'mobx-react';
 import * as React from 'react';
-import { AlvaView, EditState, Page, ViewStore } from '../../store';
+import { EditState, Page, ViewStore } from '../../store';
+import * as Types from '../../store/types';
 
 export interface PageTileContainerProps {
 	focused: boolean;
@@ -59,7 +60,10 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		}
 
 		const store = ViewStore.getInstance();
-		const next = store.getActiveView() === AlvaView.Pages ? AlvaView.PageDetail : AlvaView.Pages;
+		const next =
+			store.getActiveView() === Types.AlvaView.Pages
+				? Types.AlvaView.PageDetail
+				: Types.AlvaView.Pages;
 
 		// store.openPage(this.props.page.getId());
 		store.setActiveView(next);

@@ -107,14 +107,17 @@ export class ElementLocationCommand extends ElementCommand {
 	 * @return The new element command. To register and run the command it, call Store.execute().
 	 * @see Store.execute()
 	 */
-	public static addSibling(newSibling: PageElement, location: PageElement): ElementCommand {
-		const parent = location.getParent() as PageElement;
+	public static addSibling(init: {
+		newSibling: PageElement;
+		sibling: PageElement;
+	}): ElementCommand {
+		const parent = init.sibling.getParent() as PageElement;
 
 		return new ElementLocationCommand({
-			element: newSibling,
+			element: init.newSibling,
 			parent,
-			slotId: location.getContainerId() || 'default',
-			index: parent ? (location.getIndex() as number) + 1 : 0
+			slotId: init.sibling.getContainerId() || 'default',
+			index: parent ? (init.sibling.getIndex() as number) + 1 : 0
 		});
 	}
 

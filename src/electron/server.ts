@@ -40,8 +40,6 @@ interface WebpackMessage {
 type Queue = WebpackMessage[];
 
 export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
-	// const store = Store.getInstance();
-
 	const emitter = new EventEmitter();
 	const app = express();
 

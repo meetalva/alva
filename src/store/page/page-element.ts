@@ -199,7 +199,7 @@ export class PageElement {
 		return new PageElement({
 			id: serializedPageElement.id,
 			name: serializedPageElement.name,
-			pattern: context.styleguide.getPattern(serializedPageElement.pattern) as Pattern,
+			pattern: context.styleguide.getPatternById(serializedPageElement.pattern) as Pattern,
 			contents: serializedPageElement.contents.map(content =>
 				PageElementContent.from(content, context)
 			),
@@ -277,13 +277,27 @@ export class PageElement {
 	}
 
 	public getElementById(id: string): PageElement | undefined {
+		let result;
+
 		if (this.id === id) {
 			return this;
 		}
 
-		return this.getContents()
-			.reduce<PageElement[]>((acc, content) => [...acc, ...content.getElements()], [])
-			.find(element => element.getId() === id);
+		for (const content of this.contents) {
+			for (const element of content.getElements()) {
+				result = element.getElementById(id);
+
+				if (result) {
+					break;
+				}
+			}
+
+			if (result) {
+				break;
+			}
+		}
+
+		return result;
 	}
 
 	/**

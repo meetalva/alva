@@ -3,7 +3,8 @@ import { CopySize as FontSize } from '../../lsg/patterns/copy';
 import { observer } from 'mobx-react';
 import { OverviewSwitchContainer } from './overview-switch-container';
 import * as React from 'react';
-import { AlvaView, Page, ViewStore } from '../../store';
+import { Page, ViewStore } from '../../store';
+import * as Types from '../../store/types';
 import { ViewSwitch, ViewTitle } from '../../lsg/patterns/view-switch';
 
 @observer
@@ -33,12 +34,12 @@ export class ChromeContainer extends React.Component {
 
 		return (
 			<Chrome>
-				{this.store.getActiveView() === AlvaView.PageDetail ? (
+				{this.store.getActiveView() === Types.AlvaView.PageDetail ? (
 					<OverviewSwitchContainer />
 				) : (
 					<div />
 				)}
-				{this.store.getActiveView() === AlvaView.PageDetail && (
+				{this.store.getActiveView() === Types.AlvaView.PageDetail && (
 					<ViewSwitch
 						fontSize={FontSize.M}
 						justify="center"
@@ -49,7 +50,7 @@ export class ChromeContainer extends React.Component {
 						title={currentPage ? currentPage.getName() : ''}
 					/>
 				)}
-				{this.store.getActiveView() === AlvaView.Pages && (
+				{this.store.getActiveView() === Types.AlvaView.Pages && (
 					<ViewTitle
 						fontSize={FontSize.M}
 						justify="center"

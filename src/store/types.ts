@@ -168,3 +168,14 @@ export interface SerializedStringProperty {
 	required: boolean;
 	type: PropertyType.String;
 }
+
+export enum AlvaView {
+	Pages = 'Pages',
+	PageDetail = 'PageDetail',
+	SplashScreen = 'SplashScreen'
+}
+
+export enum RightPane {
+	Patterns = 'Patterns',
+	Properties = 'Properties'
+}

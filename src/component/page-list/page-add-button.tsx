@@ -9,7 +9,7 @@ export class PageAddButton extends React.Component {
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		e.preventDefault();
 		const store = ViewStore.getInstance();
-		const page = store.addNewPageRef();
+		const page = store.addNewPage();
 		// store.openPage(page.getId());
 		page.setNameState(EditState.Editing);
 	}

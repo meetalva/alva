@@ -10,7 +10,7 @@ export enum EditState {
 }
 
 export interface PageInit {
-	id: string;
+	id?: string;
 	name?: string;
 	root: PageElement;
 }
@@ -31,10 +31,12 @@ export interface PageContext {
  * which in turn provide the properties data for the pattern components.
  */
 export class Page {
+	private context?: PageContext;
+
 	/**
 	 * Intermediary edited name
 	 */
-	@MobX.observable public editedName: string = '';
+	@MobX.observable private editedName: string = '';
 
 	/**
 	 * The technical unique identifier of this page
@@ -62,14 +64,16 @@ export class Page {
 	 * @param id The technical (internal) ID of the page.
 	 * @param store The global application store.
 	 */
-	public constructor(init: PageInit) {
-		this.id = init.id;
+	public constructor(init: PageInit, context?: PageContext) {
+		this.id = init.id || uuid.v4();
 		this.root = init.root;
 		this.root.setPage(this);
 
 		if (typeof init.name !== 'undefined') {
 			this.name = init.name;
 		}
+
+		this.context = context;
 	}
 
 	/**
@@ -96,11 +100,22 @@ export class Page {
 	 * @return A new page object containing the loaded data.
 	 */
 	public static from(serializedPage: Types.SerializedPage, context: PageContext): Page {
-		return new Page({
-			id: serializedPage.id,
-			name: serializedPage.name,
-			root: PageElement.from(serializedPage.root, context)
-		});
+		return new Page(
+			{
+				id: serializedPage.id,
+				name: serializedPage.name,
+				root: PageElement.from(serializedPage.root, context)
+			},
+			context
+		);
+	}
+
+	public clone(): Page {
+		if (this.context) {
+			return Page.from(this.toJSON(), this.context);
+		}
+
+		throw new Error(`Page ${this.getId()} needs to store context in order to be cloned`);
 	}
 
 	/**

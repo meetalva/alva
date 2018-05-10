@@ -181,16 +181,9 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 				});
 				break;
 			}
-			case ServerMessageType.AppLoaded: {
-				break;
-			}
 			case ServerMessageType.SketchExportRequest:
 			case ServerMessageType.ContentRequest: {
 				send(message);
-				break;
-			}
-			default: {
-				console.warn(`Unknown message type: ${message.type}`);
 			}
 		}
 	});

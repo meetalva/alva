@@ -1,5 +1,6 @@
 import AddButton from '../../lsg/patterns/add-button';
 import { ChromeContainer } from '../chrome/chrome-container';
+import * as Sender from '../../message/client';
 import { ElementList } from '../../component/container/element-list';
 import ElementPane from '../../lsg/patterns/panes/element-pane';
 import globalStyles from '../../lsg/patterns/global-styles';
@@ -22,7 +23,6 @@ import { PreviewPaneWrapper } from '../../component/container/preview-pane-wrapp
 import { PropertyList } from './property-list';
 import PropertyPane from '../../lsg/patterns/panes/property-pane';
 import * as React from 'react';
-import * as Sender from '../../message/sender';
 import { SplashScreen } from './splash-screen';
 import { ViewStore } from '../../store';
 import { AlvaView, RightPane } from '../../store/types';

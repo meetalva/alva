@@ -133,7 +133,7 @@ export class Styleguide {
 		this.patterns.push(pattern);
 	}
 
-	public getPattern(id: string): Pattern | undefined {
+	public getPatternById(id: string): Pattern | undefined {
 		return this.patterns.find(pattern => pattern.getId() === id);
 	}
 

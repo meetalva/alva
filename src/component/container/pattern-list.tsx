@@ -53,7 +53,7 @@ class PatternFolderContainer extends React.Component<PatternFolderContainerProps
 			<PatternFolderView name={props.isRoot ? '' : props.folder.getName()}>
 				{props.folder
 					.getPatterns()
-					.map(id => props.styleguide.getPattern(id))
+					.map(id => props.styleguide.getPatternById(id))
 					.filter(isPattern)
 					.map(pattern => props.render(pattern))}
 				{props.folder

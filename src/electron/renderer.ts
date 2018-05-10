@@ -4,7 +4,8 @@ import { ServerMessageType } from '../message';
 import * as MobX from 'mobx';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { AlvaView, Project, ViewStore } from '../store';
+import { Project, ViewStore } from '../store';
+import * as Types from '../store/types';
 
 // prevent app zooming
 webFrame.setVisualZoomLevelLimits(1, 1);
@@ -30,13 +31,13 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			project.setPath(message.payload.path);
 
 			store.setProject(project);
-			store.setActiveView(AlvaView.PageDetail);
+			store.setActiveView(Types.AlvaView.PageDetail);
 			break;
 		}
 		case ServerMessageType.CreateNewFileResponse: {
 			const project = Project.from(message.payload.contents);
 			store.setProject(project);
-			store.setActiveView(AlvaView.PageDetail);
+			store.setActiveView(Types.AlvaView.PageDetail);
 		}
 	}
 
@@ -56,11 +57,11 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.Cut: {
-			if (store.getActiveView() === AlvaView.Pages) {
+			if (store.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.cutSelectedPage();
 			}
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.cutSelectedElement();
 			}
 			break;
@@ -70,10 +71,10 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.Delete: {
-			if (store.getActiveView() === AlvaView.Pages) {
+			if (store.getActiveView() === Types.AlvaView.Pages) {
 				store.removeSelectedPage();
 			}
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.removeSelectedElement();
 			}
 			break;
@@ -83,11 +84,11 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.Copy: {
-			if (store.getActiveView() === AlvaView.Pages) {
+			if (store.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.copySelectedPage();
 			}
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.copySelectedElement();
 			}
 			break;
@@ -97,11 +98,11 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.Paste: {
-			if (store.getActiveView() === AlvaView.Pages) {
+			if (store.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.pasteAfterSelectedPage();
 			}
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.pasteAfterSelectedElement();
 			}
 			break;
@@ -115,13 +116,13 @@ ipcRenderer.on('message', (e: Electron.Event, message: any) => {
 			break;
 		}
 		case ServerMessageType.Duplicate: {
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.duplicateSelectedElement();
 			}
 			break;
 		}
 		case ServerMessageType.DuplicatePageElement: {
-			if (store.getActiveView() === AlvaView.PageDetail) {
+			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.duplicateElementById(message.payload);
 			}
 		}

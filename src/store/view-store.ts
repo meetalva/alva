@@ -1,35 +1,22 @@
-import { Command } from './command/command';
+import { Command, ElementLocationCommand, ElementRemoveCommand } from './command';
 import * as MobX from 'mobx';
 import * as Os from 'os';
-import { Page } from './page/page';
-import { PageElement } from './page/page-element';
-import { PageRef } from './page/page-ref';
+import { Page, PageElement } from './page';
 import * as Path from 'path';
 import { Project } from './project';
-import { ElementLocationCommand, ElementRemoveCommand } from '../store';
-import { Styleguide } from './styleguide/styleguide';
-
-export enum AlvaView {
-	Pages = 'Pages',
-	PageDetail = 'PageDetail',
-	SplashScreen = 'SplashScreen'
-}
-
-export enum RightPane {
-	Patterns = 'Patterns',
-	Properties = 'Properties'
-}
+import { Pattern, Styleguide } from './styleguide';
+import * as Types from './types';
 
 export enum ClipBoardType {
-	PageRef = 'PageRef',
+	Page = 'Page',
 	PageElement = 'PageElement'
 }
 
-export type ClipBoardItem = ClipboardPageRef | ClipboardPageElement;
+export type ClipBoardItem = ClipboardPage | ClipboardPageElement;
 
-export interface ClipboardPageRef {
-	item: PageRef;
-	type: ClipBoardType.PageRef;
+export interface ClipboardPage {
+	item: Page;
+	type: ClipBoardType.Page;
 }
 
 export interface ClipboardPageElement {
@@ -57,7 +44,7 @@ export class ViewStore {
 	/**
 	 * The current state of the Page Overview
 	 */
-	@MobX.observable private activeView: AlvaView = AlvaView.SplashScreen;
+	@MobX.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
 
 	/**
 	 * The name of the analyzer that should be used for the open styleguide.
@@ -77,11 +64,6 @@ export class ViewStore {
 	 * project.
 	 */
 	@MobX.observable private currentProject?: Project;
-
-	/**
-	 * The element that is currently being dragged, or undefined if there is none.
-	 */
-	@MobX.observable private draggedElement?: PageElement;
 
 	/**
 	 * The currently name-editable element in the element list.
@@ -110,7 +92,7 @@ export class ViewStore {
 	 * The well-known enum name of content that should be visible in
 	 * the right-hand sidebar/pane.
 	 */
-	@MobX.observable private rightPane: RightPane | null = null;
+	@MobX.observable private rightPane: Types.RightPane | null = null;
 
 	/**
 	 * The currently selected element in the element list.
@@ -155,14 +137,14 @@ export class ViewStore {
 		return ViewStore.INSTANCE;
 	}
 
-	public addNewPageRef(): PageRef {
+	public addNewPage(): Page {
 		const project = this.currentProject as Project;
 
 		// Page refs register with their project automatically
 		// via side effects
-		const pageRef = new PageRef({
-			name: 'New page',
-			project
+		const pageRef = Page.create({
+			name: 'New Page',
+			styleguide: project.getStyleguide()
 		});
 
 		// pageRef.createFile();
@@ -249,7 +231,12 @@ export class ViewStore {
 
 	public duplicateElement(element: PageElement): PageElement {
 		const duplicatedElement = element.clone();
-		this.execute(ElementLocationCommand.addSibling(duplicatedElement, element));
+		this.execute(
+			ElementLocationCommand.addSibling({
+				newSibling: duplicatedElement,
+				sibling: element
+			})
+		);
 		this.setSelectedElement(duplicatedElement);
 		return duplicatedElement;
 	}
@@ -306,7 +293,7 @@ export class ViewStore {
 		this.redoBuffer = [];
 	}
 
-	public getActiveView(): AlvaView {
+	public getActiveView(): Types.AlvaView {
 		return this.activeView;
 	}
 
@@ -326,8 +313,8 @@ export class ViewStore {
 	 */
 
 	public getClipboardItem(type: ClipBoardType.PageElement): PageElement | undefined;
-	public getClipboardItem(type: ClipBoardType.PageRef): PageRef | undefined;
-	public getClipboardItem(type: ClipBoardType): PageRef | PageElement | undefined {
+	public getClipboardItem(type: ClipBoardType.Page): Page | undefined;
+	public getClipboardItem(type: ClipBoardType): Page | PageElement | undefined {
 		const item = this.clipboardItem;
 
 		if (!item || item.type !== type) {
@@ -362,14 +349,6 @@ export class ViewStore {
 		return this.currentProject;
 	}
 
-	/**
-	 * Returns the element that is currently being dragged, or undefined if there is none.
-	 * @return The dragged element or undefined.
-	 */
-	public getDraggedElement(): PageElement | undefined {
-		return this.draggedElement;
-	}
-
 	public getElementById(id: string): PageElement | undefined {
 		const page = this.getCurrentPage();
 
@@ -394,6 +373,22 @@ export class ViewStore {
 		return project.getPageById(id);
 	}
 
+	public getPatternById(id: string): Pattern | undefined {
+		const project = this.getCurrentProject();
+
+		if (!project) {
+			return;
+		}
+
+		const styleguide = project.getStyleguide();
+
+		if (!styleguide) {
+			return;
+		}
+
+		return styleguide.getPatternById(id);
+	}
+
 	/**
 	 * Returns the current search term in the patterns list, or an empty string if there is none.
 	 * @return The current pattern search term or an empty string.
@@ -413,9 +408,9 @@ export class ViewStore {
 	/**
 	 * @return The content id to show in the right-hand sidebar
 	 */
-	public getRightPane(): RightPane {
+	public getRightPane(): Types.RightPane {
 		if (this.rightPane === null) {
-			return this.selectedElement ? RightPane.Properties : RightPane.Patterns;
+			return this.selectedElement ? Types.RightPane.Properties : Types.RightPane.Patterns;
 		}
 		return this.rightPane;
 	}
@@ -456,12 +451,12 @@ export class ViewStore {
 	public hasApplicableClipboardItem(): boolean {
 		const view = this.getActiveView();
 
-		if (view === AlvaView.PageDetail) {
+		if (view === Types.AlvaView.PageDetail) {
 			return Boolean(this.getClipboardItem(ClipBoardType.PageElement));
 		}
 
-		if (view === AlvaView.Pages) {
-			return Boolean(this.getClipboardItem(ClipBoardType.PageRef));
+		if (view === Types.AlvaView.Pages) {
+			return Boolean(this.getClipboardItem(ClipBoardType.Page));
 		}
 
 		return false;
@@ -496,8 +491,15 @@ export class ViewStore {
 			return this.pasteInsideElement(targetElement);
 		}
 
-		this.execute(ElementLocationCommand.addSibling(clipboardElement, targetElement));
+		this.execute(
+			ElementLocationCommand.addSibling({
+				newSibling: clipboardElement,
+				sibling: targetElement
+			})
+		);
+
 		this.setSelectedElement(clipboardElement);
+
 		return clipboardElement;
 	}
 
@@ -692,7 +694,7 @@ export class ViewStore {
 		this.activePage = index;
 	}
 
-	public setActiveView(view: AlvaView): void {
+	public setActiveView(view: Types.AlvaView): void {
 		this.activeView = view;
 	}
 
@@ -701,7 +703,7 @@ export class ViewStore {
 	 * Note: The element is cloned lazily, so you don't need to clone it when setting.
 	 * @see getClipboardElement
 	 */
-	public setClipboardItem(item: PageElement | PageRef): void {
+	public setClipboardItem(item: PageElement | Page): void {
 		if (item instanceof PageElement) {
 			if (item.isRoot()) {
 				return;
@@ -713,20 +715,12 @@ export class ViewStore {
 			};
 		}
 
-		if (item instanceof PageRef) {
+		if (item instanceof Page) {
 			this.clipboardItem = {
-				type: ClipBoardType.PageRef,
+				type: ClipBoardType.Page,
 				item
 			};
 		}
-	}
-
-	/**
-	 * Sets the element that is currently being dragged, or undefined if there is none.
-	 * @param draggedElement The dragged element or undefined.
-	 */
-	public setDraggedElement(draggedElement?: PageElement): void {
-		this.draggedElement = draggedElement;
 	}
 
 	public setNameEditableElement(editableElement?: PageElement): void {
@@ -757,7 +751,7 @@ export class ViewStore {
 	 * @return The content id to show in the right-hand sidebar
 	 * @see rightPane
 	 */
-	public setRightPane(pane: RightPane | null): void {
+	public setRightPane(pane: Types.RightPane | null): void {
 		this.rightPane = pane;
 	}
 

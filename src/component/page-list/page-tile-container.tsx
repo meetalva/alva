@@ -41,12 +41,12 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	}
 
 	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
-		// const store = Store.getInstance();
+		const store = ViewStore.getInstance();
 
 		const target = e.target as HTMLElement;
 
 		if (!this.props.focused) {
-			// store.openPage(this.props.page.getId());
+			store.setActivePage(this.props.page);
 		}
 
 		if (this.props.focused && target.matches('[data-title]')) {
@@ -65,7 +65,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 				? Types.AlvaView.PageDetail
 				: Types.AlvaView.Pages;
 
-		// store.openPage(this.props.page.getId());
+		store.setActivePage(this.props.page);
 		store.setActiveView(next);
 	}
 

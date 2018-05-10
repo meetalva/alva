@@ -94,7 +94,7 @@ async function createWindow(): Promise<void> {
 			case ServerMessageType.CreateNewFileRequest: {
 				const path = await showSaveDialog({
 					title: 'Create New Alva File',
-					defaultPath: 'Untitled.alva',
+					defaultPath: 'Untitled Project.alva',
 					filters: [
 						{
 							name: 'Alva File',
@@ -105,7 +105,7 @@ async function createWindow(): Promise<void> {
 
 				if (path) {
 					const project = Project.create({
-						name: 'Untitled',
+						name: 'Untitled Page',
 						path
 					});
 

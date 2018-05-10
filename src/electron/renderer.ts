@@ -25,6 +25,7 @@ Sender.receive(message => {
 	// Initilazing messages
 	switch (message.type) {
 		case ServerMessageType.StartApp: {
+			store.setAppState(Types.AppState.Started);
 			store.setServerPort(Number(message.payload));
 			break;
 		}

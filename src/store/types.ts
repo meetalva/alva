@@ -1,3 +1,8 @@
+export enum AppState {
+	Starting = 'starting',
+	Started = 'started'
+}
+
 export interface SavedProject {
 	lastChangedAuthor: string;
 	lastChangedDate?: string;

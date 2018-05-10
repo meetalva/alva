@@ -1,5 +1,5 @@
 import { checkForUpdates } from './auto-updater';
-import { colors } from '../lsg/patterns/colors';
+import { colors } from '../components';
 import { app, BrowserWindow, dialog, ipcMain, screen } from 'electron';
 import * as Fs from 'fs';
 import * as getPort from 'get-port';

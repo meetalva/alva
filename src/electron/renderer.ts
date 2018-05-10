@@ -1,4 +1,4 @@
-import { App } from '../component/container/app';
+import { App } from '../container/app';
 import * as Sender from '../message/client';
 import { webFrame } from 'electron';
 import { ServerMessageType } from '../message';

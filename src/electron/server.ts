@@ -15,6 +15,7 @@ export interface ServerOptions {
 
 interface State {
 	id: string;
+	path?: string;
 	payload: {
 		components?: Types.SerializedPattern[];
 		elementId?: string;

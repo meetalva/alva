@@ -1,6 +1,7 @@
 import { checkForUpdates } from './auto-updater';
 import { colors } from '../components';
 import { app, BrowserWindow, dialog, ipcMain, screen } from 'electron';
+import * as electronIsDev from 'electron-is-dev';
 import * as Fs from 'fs';
 import * as getPort from 'get-port';
 import * as stringEscape from 'js-string-escape';
@@ -39,6 +40,8 @@ const readFile = Util.promisify(Fs.readFile);
 // be closed automatically when the JavaScript object is garbage collected.
 let win: BrowserWindow | undefined;
 
+let projectPath: string | undefined;
+
 async function createWindow(): Promise<void> {
 	const { width = 1280, height = 800 } = screen.getPrimaryDisplay().workAreaSize;
 
@@ -67,7 +70,6 @@ async function createWindow(): Promise<void> {
 	const port = await (getPort({ port: 1879 }) as Promise<number>);
 	const server = await createServer({ port });
 
-	// tslint:disable-next-line:no-any
 	Sender.receive(async message => {
 		if (!message) {
 			return;
@@ -83,11 +85,30 @@ async function createWindow(): Promise<void> {
 		// access to system / fs
 		switch (message.type) {
 			case ServerMessageType.AppLoaded: {
+				// Load last known file automatically in development
+				if (electronIsDev && projectPath) {
+					const result = await Persistence.read<Types.SavedProject>(projectPath);
+
+					if (result.state === PersistenceState.Error) {
+						// TODO: Show user facing error here
+					} else {
+						const contents = result.contents as Types.SerializedProject;
+						contents.path = projectPath;
+
+						Sender.send({
+							type: ServerMessageType.OpenFileResponse,
+							id: message.id,
+							payload: { path: projectPath, contents }
+						});
+					}
+				}
+
 				Sender.send({
 					id: uuid.v4(),
 					type: ServerMessageType.StartApp,
 					payload: String(port)
 				});
+
 				break;
 			}
 			case ServerMessageType.CreateNewFileRequest: {
@@ -101,6 +122,10 @@ async function createWindow(): Promise<void> {
 						}
 					]
 				});
+
+				if (electronIsDev) {
+					projectPath = path;
+				}
 
 				if (path) {
 					const project = Project.create({
@@ -134,6 +159,10 @@ async function createWindow(): Promise<void> {
 				});
 
 				const path = Array.isArray(paths) ? paths[0] : undefined;
+
+				if (electronIsDev) {
+					projectPath = path;
+				}
 
 				if (path) {
 					const result = await Persistence.read<Types.SavedProject>(path);
@@ -184,6 +213,11 @@ async function createWindow(): Promise<void> {
 			case ServerMessageType.Save: {
 				const project = Project.from(message.payload.project);
 				project.setPath(message.payload.path);
+
+				if (process.env.NODE_ENV === 'development') {
+					projectPath = project.getPath();
+				}
+
 				await Persistence.persist(project.getPath(), project);
 			}
 		}

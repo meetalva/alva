@@ -10,6 +10,4 @@ install: npm ci
 script:
   - commitlint-travis
   - npm run lint
-  - npm run build:lsg
   - npm run build
-  - npm test

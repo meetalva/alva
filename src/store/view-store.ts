@@ -137,19 +137,25 @@ export class ViewStore {
 		return ViewStore.INSTANCE;
 	}
 
-	public addNewPage(): Page {
-		const project = this.currentProject as Project;
+	public addNewPage(): Page | undefined {
+		const project = this.currentProject;
 
-		// Page refs register with their project automatically
-		// via side effects
-		const pageRef = Page.create({
-			name: 'New Page',
+		if (!project) {
+			return;
+		}
+
+		const name = 'Untitled Page';
+
+		const count = project.getPages().filter(p => p.getName().startsWith(name)).length;
+
+		const page = Page.create({
+			name: `${name} ${count + 1}`,
 			styleguide: project.getStyleguide()
 		});
 
-		// pageRef.createFile();
+		project.addPage(page);
 
-		return pageRef;
+		return page;
 	}
 
 	/**

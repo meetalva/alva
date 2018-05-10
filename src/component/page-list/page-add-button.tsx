@@ -2,8 +2,9 @@ import { FloatingButton } from '../../lsg/patterns/floating-button';
 import { Icon, IconName } from '../../lsg/patterns/icons';
 import * as React from 'react';
 import Space, { SpaceSize } from '../../lsg/patterns/space';
-import { EditState, ViewStore } from '../../store';
+import { ViewStore } from '../../store';
 import styled from 'styled-components';
+import * as Types from '../../store/types';
 
 export class PageAddButton extends React.Component {
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
@@ -13,7 +14,7 @@ export class PageAddButton extends React.Component {
 
 		if (page) {
 			store.setActivePage(page);
-			page.setNameState(EditState.Editing);
+			page.setNameState(Types.EditState.Editing);
 		}
 	}
 

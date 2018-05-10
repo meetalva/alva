@@ -2,7 +2,7 @@ import { PreviewTile } from '../../lsg/patterns/preview-tile/index';
 import Space, { SpaceSize } from '../../lsg/patterns/space/index';
 import { observer } from 'mobx-react';
 import * as React from 'react';
-import { EditState, Page, ViewStore } from '../../store';
+import { Page, ViewStore } from '../../store';
 import * as Types from '../../store/types';
 
 export interface PageTileContainerProps {
@@ -28,11 +28,11 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	protected handleBlur(): void {
 		if (!this.props.page.getName()) {
 			this.props.page.setName(this.props.page.getName({ unedited: true }));
-			this.props.page.setNameState(EditState.Editable);
+			this.props.page.setNameState(Types.EditState.Editable);
 			return;
 		}
 
-		this.props.page.setNameState(EditState.Editable);
+		this.props.page.setNameState(Types.EditState.Editable);
 		this.props.page.setName(this.props.page.getEditedName());
 	}
 
@@ -50,12 +50,12 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		}
 
 		if (this.props.focused && target.matches('[data-title]')) {
-			this.props.page.setNameState(EditState.Editing);
+			this.props.page.setNameState(Types.EditState.Editing);
 		}
 	}
 
 	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
-		if (this.props.page.getNameState() === EditState.Editing) {
+		if (this.props.page.getNameState() === Types.EditState.Editing) {
 			return;
 		}
 
@@ -70,33 +70,33 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	}
 
 	protected handleFocus(): void {
-		this.props.page.setNameState(EditState.Editing);
+		this.props.page.setNameState(Types.EditState.Editing);
 	}
 
 	protected handleKeyDown(e: KeyboardEvent): void {
 		switch (e.key) {
 			case 'Escape':
-				this.props.page.setNameState(EditState.Editable);
+				this.props.page.setNameState(Types.EditState.Editable);
 				this.props.page.setName(this.props.page.getName({ unedited: true }));
 				return;
 			case 'Enter':
-				if (this.props.page.getNameState() === EditState.Editing) {
+				if (this.props.page.getNameState() === Types.EditState.Editing) {
 					if (!this.props.page.getName()) {
 						this.props.page.setName(this.props.page.getName({ unedited: true }));
-						this.props.page.setNameState(EditState.Editable);
+						this.props.page.setNameState(Types.EditState.Editable);
 						return;
 					}
 
-					this.props.page.setNameState(EditState.Editable);
+					this.props.page.setNameState(Types.EditState.Editable);
 					this.props.page.setName(this.props.page.getEditedName());
 					return;
 				}
 				if (
 					e.target === document.body &&
 					this.props.focused &&
-					this.props.page.getNameState() === EditState.Editable
+					this.props.page.getNameState() === Types.EditState.Editable
 				) {
-					this.props.page.setNameState(EditState.Editing);
+					this.props.page.setNameState(Types.EditState.Editing);
 					return;
 				}
 		}

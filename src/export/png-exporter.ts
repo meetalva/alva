@@ -1,6 +1,7 @@
-import { ipcRenderer, remote } from 'electron';
+import { remote } from 'electron';
 import { Exporter, ExportResult } from './exporter';
 import { ServerMessageType } from '../message';
+import * as Sender from '../message/sender';
 import { ViewStore } from '../store';
 import * as Url from 'url';
 import * as uuid from 'uuid';
@@ -34,15 +35,15 @@ export class PngExporter extends Exporter {
 
 			// (1) Request HTML contents from preview
 			const start = () => {
-				ipcRenderer.send('message', {
+				Sender.send({
 					type: ServerMessageType.ContentRequest,
-					id
+					id,
+					payload: undefined
 				});
 			};
 
 			// (2) Receive HTML response from preview and load into webview
-			// tslint:disable-next-line:no-any
-			const receive = (_, message: any) => {
+			const receive = message => {
 				if (message.type !== ServerMessageType.ContentResponse || message.id !== id) {
 					return;
 				}
@@ -101,7 +102,7 @@ export class PngExporter extends Exporter {
 				createPng();
 			});
 
-			ipcRenderer.on('message', receive);
+			Sender.receive(receive);
 
 			webview.addEventListener('dom-ready', () => {
 				if (started === id) {

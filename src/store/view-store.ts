@@ -58,6 +58,8 @@ export class ViewStore {
 	 */
 	@MobX.observable private analyzerName: string;
 
+	@MobX.observable private appState: Types.AppState = Types.AppState.Starting;
+
 	/**
 	 * The element currently in the clipboard, or undefined if there is none.
 	 * Note: The element is cloned lazily, so it may represent a still active element.
@@ -118,7 +120,7 @@ export class ViewStore {
 	/**
 	 * http port the preview server is listening on
 	 */
-	@MobX.observable private serverPort: number = 1879;
+	@MobX.observable private serverPort: number;
 
 	/**
 	 * The most recent user commands (user operations) to provide an undo feature.
@@ -315,6 +317,10 @@ export class ViewStore {
 	 */
 	public getAnalyzerName(): string {
 		return this.analyzerName;
+	}
+
+	public getAppState(): Types.AppState {
+		return this.appState;
 	}
 
 	/**
@@ -727,6 +733,10 @@ export class ViewStore {
 
 	public setActiveView(view: Types.AlvaView): void {
 		this.activeView = view;
+	}
+
+	public setAppState(state: Types.AppState): void {
+		this.appState = state;
 	}
 
 	/**

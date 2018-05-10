@@ -27,7 +27,7 @@ import { PropertyList } from './property-list';
 import * as React from 'react';
 import { SplashScreenContainer } from './splash-screen-container';
 import { ViewStore } from '../store';
-import { AlvaView, RightPane } from '../store/types';
+import * as Types from '../store/types';
 import * as uuid from 'uuid';
 
 globalStyles();
@@ -80,15 +80,24 @@ export class App extends React.Component {
 		};
 	}
 
-	public render(): JSX.Element {
+	public render(): JSX.Element | null {
 		const store = ViewStore.getInstance();
 		const DevTools = this.getDevTools();
+
+		// Using port as heuristic to determine
+		// if the backend has fully initialized
+		// might change to an explicit AppState
+		// in the future
+
+		if (store.getAppState() !== Types.AppState.Started) {
+			return null;
+		}
 
 		return (
 			<Layout direction={LayoutDirection.Column}>
 				<ChromeContainer />
 				<MainArea>
-					{store.getActiveView() === AlvaView.SplashScreen && (
+					{store.getActiveView() === Types.AlvaView.SplashScreen && (
 						<SplashScreenContainer
 							onPrimaryButtonClick={() => {
 								Sender.send({
@@ -106,12 +115,12 @@ export class App extends React.Component {
 							}}
 						/>
 					)}
-					{store.getActiveView() === AlvaView.Pages && (
+					{store.getActiveView() === Types.AlvaView.Pages && (
 						<PageListPreview>
 							<PageListContainer />
 						</PageListPreview>
 					)}
-					{store.getActiveView() === AlvaView.PageDetail && (
+					{store.getActiveView() === Types.AlvaView.PageDetail && (
 						<React.Fragment>
 							<SideBar
 								side={LayoutSide.Left}
@@ -123,11 +132,11 @@ export class App extends React.Component {
 									<ElementList />
 								</ElementPane>
 								<AddButton
-									active={store.getRightPane() === RightPane.Patterns}
+									active={store.getRightPane() === Types.RightPane.Patterns}
 									label="Add Elements"
 									onClick={e => {
 										e.stopPropagation();
-										store.setRightPane(RightPane.Patterns);
+										store.setRightPane(Types.RightPane.Patterns);
 										store.setSelectedElement();
 									}}
 								/>
@@ -142,12 +151,12 @@ export class App extends React.Component {
 								direction={LayoutDirection.Column}
 								border={LayoutBorder.Side}
 							>
-								{store.getRightPane() === RightPane.Properties && (
+								{store.getRightPane() === Types.RightPane.Properties && (
 									<PropertyPane>
 										<PropertyList />
 									</PropertyPane>
 								)}
-								{store.getRightPane() === RightPane.Patterns && (
+								{store.getRightPane() === Types.RightPane.Patterns && (
 									<PatternsPane>
 										<PatternListContainer />
 									</PatternsPane>

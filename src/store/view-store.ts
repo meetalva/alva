@@ -1,4 +1,11 @@
-import { Command, ElementLocationCommand, ElementRemoveCommand } from './command';
+import {
+	Command,
+	ElementLocationCommand,
+	ElementRemoveCommand,
+	PageAddCommand,
+	PageRemoveCommand
+} from './command';
+
 import * as MobX from 'mobx';
 import * as Os from 'os';
 import { Page, PageElement } from './page';
@@ -39,7 +46,7 @@ export class ViewStore {
 	 * The page that is currently being displayed in the preview, and edited in the elements
 	 * and properties panes. May be undefined if there is none.
 	 */
-	@MobX.observable private activePage: number = 0;
+	@MobX.observable private activePage?: number = 0;
 
 	/**
 	 * The current state of the Page Overview
@@ -153,8 +160,7 @@ export class ViewStore {
 			styleguide: project.getStyleguide()
 		});
 
-		project.addPage(page);
-
+		this.execute(PageAddCommand.create({ page, project }));
 		return page;
 	}
 
@@ -339,6 +345,10 @@ export class ViewStore {
 		const project = this.getCurrentProject();
 
 		if (!project) {
+			return;
+		}
+
+		if (typeof this.activePage === 'undefined') {
 			return;
 		}
 
@@ -638,6 +648,21 @@ export class ViewStore {
 		}
 	}
 
+	public removePage(page: Page): void {
+		const project = this.getCurrentProject();
+
+		if (!project) {
+			return;
+		}
+
+		this.execute(
+			PageRemoveCommand.create({
+				page,
+				project
+			})
+		);
+	}
+
 	/**
 	 * Remove the currently selected element from its page
 	 * Returns the deleted PageElement or undefined if nothing was deleted
@@ -663,7 +688,7 @@ export class ViewStore {
 			return;
 		}
 
-		// this.removePage(page);
+		this.removePage(page);
 		return page;
 	}
 
@@ -849,5 +874,9 @@ export class ViewStore {
 
 		this.redoBuffer.push(command);
 		return true;
+	}
+
+	public unsetActivePage(): void {
+		this.activePage = undefined;
 	}
 }

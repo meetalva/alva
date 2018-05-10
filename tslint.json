@@ -66,9 +66,6 @@
 		"no-non-null-assertion": true,
 		"no-parameter-reassignment": false,
 		"no-reference": false,
-		"no-unnecessary-type-assertion": [
-			true
-		],
 		"no-var-requires": false,
 		"only-arrow-functions": [
 			true,
@@ -76,7 +73,6 @@
 			"allow-named-functions"
 		],
 		"prefer-for-of": true,
-		"promise-function-async": true,
 		"typedef": [
 			true,
 			"call-signature",
@@ -94,9 +90,6 @@
 			}
 		],
 		"unified-signatures": true,
-		"await-promise": [
-			true
-		],
 		"ban": false,
 		"curly": [
 			true
@@ -120,15 +113,10 @@
 		],
 		"no-empty": true,
 		"no-eval": true,
-		"no-floating-promises": [
-			true
-		],
-		"no-for-in-array": true,
 		"no-implicit-dependencies": [
 			true,
 			"dev"
 		],
-		"no-inferred-empty-object-type": true,
 		"no-invalid-template-strings": true,
 		"no-invalid-this": [
 			true,
@@ -165,18 +153,12 @@
 		"no-unused-variable": [
 			false
 		],
-		"no-use-before-declare": true,
 		"no-var-keyword": true,
-		"no-void-expression": [
-			true,
-			"ignore-arrow-function-shorthand"
-		],
 		"prefer-conditional-expression": [
 			false
 		],
 		"prefer-object-spread": true,
 		"radix": true,
-		"restrict-plus-operands": true,
 		"strict-boolean-expressions": [
 			false,
 			"allow-null-union",
@@ -190,12 +172,10 @@
 			true,
 			"allow-null-check"
 		],
-		"use-default-type-parameter": true,
 		"use-isnan": true,
 		"cyclomatic-complexity": [
 			true
 		],
-		"deprecation": true,
 		"eofline": true,
 		"indent": [
 			true,
@@ -215,7 +195,6 @@
 			false,
 			100
 		],
-		"no-default-export": true,
 		"no-duplicate-imports": true,
 		"no-mergeable-namespace": true,
 		"no-require-imports": false,
@@ -275,10 +254,8 @@
 		],
 		"interface-over-type-literal": true,
 		"jsdoc-format": true,
-		"match-default-export-name": true,
 		"new-parens": true,
 		"no-angle-bracket-type-assertion": true,
-		"no-boolean-literal-compare": true,
 		"no-consecutive-blank-lines": [
 			true
 		],
@@ -291,7 +268,6 @@
 		],
 		"no-unnecessary-callback-wrapper": true,
 		"no-unnecessary-initializer": true,
-		"no-unnecessary-qualifier": true,
 		"number-literal-format": true,
 		"object-literal-key-quotes": [
 			true,

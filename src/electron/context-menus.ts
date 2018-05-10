@@ -1,7 +1,9 @@
-import { ipcRenderer, MenuItemConstructorOptions, remote } from 'electron';
+import { MenuItemConstructorOptions, remote } from 'electron';
 import { ServerMessageType } from '../message';
 import { PageElement } from '../store/page/page-element';
+import * as Sender from '../message/sender';
 import { ViewStore } from '../store';
+import * as uuid from 'uuid';
 
 const store = ViewStore.getInstance();
 
@@ -11,7 +13,8 @@ export function elementMenu(element: PageElement): void {
 			label: 'Paste Below',
 			enabled: store.hasApplicableClipboardItem() && !element.isRoot(),
 			click: () => {
-				ipcRenderer.send('message', {
+				Sender.send({
+					id: uuid.v4(),
 					type: ServerMessageType.PastePageElementBelow,
 					payload: element.getId()
 				});
@@ -21,7 +24,8 @@ export function elementMenu(element: PageElement): void {
 			label: 'Paste Inside',
 			enabled: store.hasApplicableClipboardItem(),
 			click: () => {
-				ipcRenderer.send('message', {
+				Sender.send({
+					id: uuid.v4(),
 					type: ServerMessageType.PastePageElementInside,
 					payload: element.getId()
 				});
@@ -31,7 +35,8 @@ export function elementMenu(element: PageElement): void {
 			label: 'Duplicate',
 			enabled: !element.isRoot(),
 			click: () => {
-				ipcRenderer.send('message', {
+				Sender.send({
+					id: uuid.v4(),
 					type: ServerMessageType.DuplicatePageElement,
 					payload: element.getId()
 				});
@@ -44,7 +49,8 @@ export function elementMenu(element: PageElement): void {
 			label: 'Cut',
 			enabled: !element.isRoot(),
 			click: () => {
-				ipcRenderer.send('message', {
+				Sender.send({
+					id: uuid.v4(),
 					type: ServerMessageType.CutPageElement,
 					payload: element.getId()
 				});
@@ -55,7 +61,8 @@ export function elementMenu(element: PageElement): void {
 			label: 'Copy',
 			enabled: !element.isRoot(),
 			click: () => {
-				ipcRenderer.send('message', {
+				Sender.send({
+					id: uuid.v4(),
 					type: ServerMessageType.CopyPageElement,
 					payload: element.getId()
 				});
@@ -66,7 +73,8 @@ export function elementMenu(element: PageElement): void {
 			label: 'Delete',
 			enabled: !element.isRoot(),
 			click: () => {
-				ipcRenderer.send('message', {
+				Sender.send({
+					id: uuid.v4(),
 					type: ServerMessageType.DeletePageElement,
 					payload: element.getId()
 				});

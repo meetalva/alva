@@ -1,7 +1,6 @@
 import { AssetItem } from '../../lsg/patterns/property-items/asset-item';
 // import { AssetProperty } from '../../store/styleguide/property/asset-property';
 import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item';
-import { ipcRenderer } from 'electron';
 import Element from '../../lsg/patterns/element';
 import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item';
 import { EnumProperty, Option } from '../../store/styleguide/property/enum-property';
@@ -11,6 +10,7 @@ import { observer } from 'mobx-react';
 import { ObjectProperty } from '../../store/styleguide/property/object-property';
 import { PageElement } from '../../store/page/page-element';
 import * as React from 'react';
+import * as Sender from '../../message/sender';
 import { PropertyValueCommand, ViewStore } from '../../store';
 import { StringItem } from '../../lsg/patterns/property-items/string-item';
 import * as Types from '../../store/types';
@@ -66,16 +66,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 	protected handleChooseAsset(id: string, context?: ObjectContext): void {
 		const tid = uuid.v4();
 
-		// tslint:disable-next-line:no-any
-		ipcRenderer.on('message', (e: Electron.Event, message: any) => {
-			if (!message) {
-				return;
-			}
-
-			if (message.type !== ServerMessageType.AssetReadResponse) {
-				return;
-			}
-
+		Sender.receive(message => {
 			if (message.id !== tid) {
 				return;
 			}
@@ -83,9 +74,10 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 			this.handleChange(id, message.payload, context);
 		});
 
-		ipcRenderer.send('message', {
+		Sender.send({
 			type: ServerMessageType.AssetReadRequest,
-			id: tid
+			id: tid,
+			payload: undefined
 		});
 	}
 

@@ -4,11 +4,6 @@ import { Styleguide, SyntheticPatternType } from '../styleguide';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
-export enum EditState {
-	Editable = 'Editable',
-	Editing = 'Editing'
-}
-
 export interface PageInit {
 	id?: string;
 	name?: string;
@@ -52,7 +47,7 @@ export class Page {
 	/**
 	 * Wether the name may be edited
 	 */
-	@MobX.observable public nameState: EditState = EditState.Editable;
+	@MobX.observable public nameState: Types.EditState = Types.EditState.Editable;
 
 	/**
 	 * The root element of the page, the first pattern element of the content tree.
@@ -147,7 +142,7 @@ export class Page {
 	 * @return The human-friendly name of the page.
 	 */
 	public getName(options?: { unedited: boolean }): string {
-		if ((!options || !options.unedited) && this.nameState === EditState.Editing) {
+		if ((!options || !options.unedited) && this.nameState === Types.EditState.Editing) {
 			return this.editedName;
 		}
 
@@ -158,7 +153,7 @@ export class Page {
 	 * Get the editable state of the page name
 	 * @param state
 	 */
-	public getNameState(): EditState {
+	public getNameState(): Types.EditState {
 		return this.nameState;
 	}
 
@@ -176,7 +171,7 @@ export class Page {
 	 */
 	@MobX.action
 	public setName(name: string): void {
-		if (this.nameState === EditState.Editing) {
+		if (this.nameState === Types.EditState.Editing) {
 			this.editedName = name;
 			return;
 		}
@@ -188,8 +183,8 @@ export class Page {
 	 * Sets the editable state of the page name
 	 * @param state
 	 */
-	public setNameState(state: EditState): void {
-		if (state === EditState.Editing) {
+	public setNameState(state: Types.EditState): void {
+		if (state === Types.EditState.Editing) {
 			this.editedName = this.name;
 		}
 

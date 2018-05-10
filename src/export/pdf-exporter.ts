@@ -1,6 +1,6 @@
-import { ipcRenderer } from 'electron';
 import { Exporter, ExportResult } from './exporter';
 import { ServerMessageType } from '../message';
+import * as Sender from '../message/sender';
 import { ViewStore } from '../store';
 import * as Url from 'url';
 import * as uuid from 'uuid';
@@ -23,7 +23,8 @@ export class PdfExporter extends Exporter {
 
 			// (1) Request HTML contents from preview
 			const start = () => {
-				ipcRenderer.send('message', {
+				Sender.send({
+					payload: undefined,
 					type: ServerMessageType.ContentRequest,
 					id
 				});
@@ -31,7 +32,7 @@ export class PdfExporter extends Exporter {
 
 			// (2) Receive HTML response from preview and load into webview
 			// tslint:disable-next-line:no-any
-			const receive = (_, message: any) => {
+			const receive = message => {
 				if (message.type !== ServerMessageType.ContentResponse || message.id !== id) {
 					return;
 				}
@@ -92,7 +93,7 @@ export class PdfExporter extends Exporter {
 				createPdf();
 			});
 
-			ipcRenderer.on('message', receive);
+			Sender.receive(receive);
 
 			webview.addEventListener('dom-ready', () => {
 				if (started === id) {

@@ -159,6 +159,10 @@ export class Project {
 		return this.pages.find(page => page.getId() === id);
 	}
 
+	public getPageIndex(page: Page): number {
+		return this.pages.indexOf(page);
+	}
+
 	public getPages(): Page[] {
 		return this.pages;
 	}
@@ -169,6 +173,18 @@ export class Project {
 
 	public getStyleguide(): Styleguide {
 		return this.styleguide;
+	}
+
+	public removePage(page: Page): boolean {
+		const index = this.pages.indexOf(page);
+
+		if (index === -1) {
+			return false;
+		}
+
+		this.pages.splice(index, 1);
+
+		return true;
 	}
 
 	public setName(name: string): void {

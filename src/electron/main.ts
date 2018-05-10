@@ -104,7 +104,7 @@ async function createWindow(): Promise<void> {
 
 				if (path) {
 					const project = Project.create({
-						name: 'Untitled Page',
+						name: 'Untitled Project',
 						path
 					});
 

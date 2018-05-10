@@ -4,9 +4,10 @@ import { app, BrowserWindow, dialog, ipcMain, screen } from 'electron';
 import * as Fs from 'fs';
 import * as getPort from 'get-port';
 import * as stringEscape from 'js-string-escape';
-import { PreviewMessageType, ServerMessage, ServerMessageType } from '../message';
+import { PreviewMessageType, ServerMessageType } from '../message';
 import * as MimeTypes from 'mime-types';
 import * as Path from 'path';
+import * as Sender from '../message/server';
 import { createServer } from './server';
 import { Persistence, PersistenceState, Project } from '../store';
 import * as Types from '../store/types';
@@ -67,24 +68,22 @@ async function createWindow(): Promise<void> {
 	const server = await createServer({ port });
 
 	// tslint:disable-next-line:no-any
-	const send = (message: ServerMessage) => {
-		if (win) {
-			win.webContents.send('message', message);
-		}
-	};
-
-	// tslint:disable-next-line:no-any
-	ipcMain.on('message', async (e: Electron.Event, message: any) => {
+	Sender.receive(async message => {
 		if (!message) {
 			return;
 		}
 
-		send(message);
+		// Reflect messages to client
+		Sender.send(message);
+
+		// Emit messages to preview
 		server.emit('message', message);
 
+		// Handle messages that require
+		// access to system / fs
 		switch (message.type) {
 			case ServerMessageType.AppLoaded: {
-				send({
+				Sender.send({
 					id: uuid.v4(),
 					type: ServerMessageType.StartApp,
 					payload: String(port)
@@ -111,7 +110,7 @@ async function createWindow(): Promise<void> {
 
 					await Persistence.persist(path, project);
 
-					send({
+					Sender.send({
 						type: ServerMessageType.CreateNewFileResponse,
 						id: message.id,
 						payload: {
@@ -145,7 +144,7 @@ async function createWindow(): Promise<void> {
 						const contents = result.contents as Types.SerializedProject;
 						contents.path = path;
 
-						send({
+						Sender.send({
 							type: ServerMessageType.OpenFileResponse,
 							id: message.id,
 							payload: { path, contents }
@@ -174,7 +173,7 @@ async function createWindow(): Promise<void> {
 				const content = await readFile(path);
 				const mimeType = MimeTypes.lookup(path) || 'application/octet-stream';
 
-				send({
+				Sender.send({
 					type: ServerMessageType.AssetReadResponse,
 					id: message.id,
 					payload: `data:${mimeType};base64,${content.toString('base64')}`
@@ -190,13 +189,14 @@ async function createWindow(): Promise<void> {
 		}
 	});
 
+	// Handle messages from preview
 	server.on('client-message', (envelope: string) => {
 		try {
 			const message = JSON.parse(envelope);
 
 			switch (message.type) {
 				case PreviewMessageType.ContentResponse: {
-					send({
+					Sender.send({
 						id: message.id,
 						payload: message.payload,
 						type: ServerMessageType.ContentResponse
@@ -204,7 +204,7 @@ async function createWindow(): Promise<void> {
 					break;
 				}
 				case PreviewMessageType.SketchExportResponse: {
-					send({
+					Sender.send({
 						id: message.id,
 						payload: message.payload,
 						type: ServerMessageType.SketchExportResponse

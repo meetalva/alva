@@ -1,6 +1,7 @@
 import { AssetItem } from '../../lsg/patterns/property-items/asset-item';
 // import { AssetProperty } from '../../store/styleguide/property/asset-property';
 import { BooleanItem } from '../../lsg/patterns/property-items/boolean-item';
+import * as Sender from '../../message/client';
 import Element from '../../lsg/patterns/element';
 import { EnumItem, Values } from '../../lsg/patterns/property-items/enum-item';
 import { EnumProperty, Option } from '../../store/styleguide/property/enum-property';
@@ -10,7 +11,6 @@ import { observer } from 'mobx-react';
 import { ObjectProperty } from '../../store/styleguide/property/object-property';
 import { PageElement } from '../../store/page/page-element';
 import * as React from 'react';
-import * as Sender from '../../message/sender';
 import { PropertyValueCommand, ViewStore } from '../../store';
 import { StringItem } from '../../lsg/patterns/property-items/string-item';
 import * as Types from '../../store/types';

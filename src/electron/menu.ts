@@ -1,3 +1,4 @@
+import * as Sender from '../message/client';
 import { BrowserWindow, ipcRenderer, MenuItem, MenuItemConstructorOptions, remote } from 'electron';
 import { HtmlExporter } from '../export/html-exporter';
 import { ServerMessageType } from '../message';
@@ -5,7 +6,6 @@ import { Page } from '../store/page/page';
 import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
 import { Project } from '../store/project';
-import * as Sender from '../message/sender';
 import { SketchExporter } from '../export/sketch-exporter';
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';

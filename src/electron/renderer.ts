@@ -1,10 +1,10 @@
 import { App } from '../component/container/app';
+import * as Sender from '../message/client';
 import { webFrame } from 'electron';
 import { ServerMessageType } from '../message';
 import * as MobX from 'mobx';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import * as Sender from '../message/sender';
 import { Project, ViewStore } from '../store';
 import * as Types from '../store/types';
 import * as uuid from 'uuid';
@@ -54,6 +54,7 @@ Sender.receive(message => {
 	switch (message.type) {
 		case ServerMessageType.CreateNewPage: {
 			const page = store.addNewPage();
+
 			if (!page) {
 				return;
 			}

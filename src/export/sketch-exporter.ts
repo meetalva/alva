@@ -1,6 +1,6 @@
-import { ipcRenderer } from 'electron';
 import { Exporter, ExportResult } from './exporter';
 import { ServerMessageType } from '../message';
+import * as Sender from '../message/sender';
 import { Page, ViewStore } from '../store';
 import * as uuid from 'uuid';
 
@@ -14,7 +14,7 @@ export class SketchExporter extends Exporter {
 
 			// (1) request asketch.json from preview
 			const start = () => {
-				ipcRenderer.send('message', {
+				Sender.send({
 					type: ServerMessageType.SketchExportRequest,
 					id,
 					payload: {
@@ -24,8 +24,7 @@ export class SketchExporter extends Exporter {
 				});
 			};
 
-			// tslint:disable-next-line:no-any
-			const receive = (_, message: any) => {
+			const receive = message => {
 				if (message.type !== ServerMessageType.SketchExportResponse || message.id !== id) {
 					return;
 				}
@@ -35,7 +34,7 @@ export class SketchExporter extends Exporter {
 				return;
 			};
 
-			ipcRenderer.on('message', receive);
+			Sender.receive(receive);
 			start();
 		});
 	}

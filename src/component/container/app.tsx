@@ -1,6 +1,5 @@
 import AddButton from '../../lsg/patterns/add-button';
 import { ChromeContainer } from '../chrome/chrome-container';
-import { ipcRenderer } from 'electron';
 import { ElementList } from '../../component/container/element-list';
 import ElementPane from '../../lsg/patterns/panes/element-pane';
 import globalStyles from '../../lsg/patterns/global-styles';
@@ -23,6 +22,7 @@ import { PreviewPaneWrapper } from '../../component/container/preview-pane-wrapp
 import { PropertyList } from './property-list';
 import PropertyPane from '../../lsg/patterns/panes/property-pane';
 import * as React from 'react';
+import * as Sender from '../../message/sender';
 import { SplashScreen } from './splash-screen';
 import { ViewStore } from '../../store';
 import { AlvaView, RightPane } from '../../store/types';
@@ -89,15 +89,17 @@ export class App extends React.Component {
 					{store.getActiveView() === AlvaView.SplashScreen && (
 						<SplashScreen
 							onPrimaryButtonClick={() => {
-								ipcRenderer.send('message', {
+								Sender.send({
 									type: ServerMessageType.CreateNewFileRequest,
-									id: uuid.v4()
+									id: uuid.v4(),
+									payload: undefined
 								});
 							}}
 							onSecondaryButtonClick={() => {
-								ipcRenderer.send('message', {
+								Sender.send({
 									type: ServerMessageType.OpenFileRequest,
-									id: uuid.v4()
+									id: uuid.v4(),
+									payload: undefined
 								});
 							}}
 						/>

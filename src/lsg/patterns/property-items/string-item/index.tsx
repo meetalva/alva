@@ -61,7 +61,7 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 			<StyledInput
 				onChange={onChange}
 				onBlur={onBlur}
-				type="textarea"
+				type="text"
 				value={value}
 				placeholder="…"
 			/>

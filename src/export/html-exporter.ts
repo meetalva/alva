@@ -1,11 +1,14 @@
-import { createCompiler } from '../preview/create-compiler';
-import { Exporter, ExportResult } from './exporter';
 import * as Fs from 'fs';
 import * as Path from 'path';
-import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
-import { ViewStore } from '../store';
 import * as Util from 'util';
 import * as uuid from 'uuid';
+
+import * as Sender from '../message/client';
+import { createCompiler } from '../preview/create-compiler';
+import { Exporter } from './exporter';
+import { ServerMessageType } from '../message';
+import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
+import { ViewStore } from '../store';
 
 const SCRIPTS = ['vendor', 'renderer', 'components', 'preview'];
 
@@ -13,7 +16,7 @@ const createScript = (name: string, content: string) =>
 	`<script data-script="${name}">${content}<\/script>`;
 
 export class HtmlExporter extends Exporter {
-	public async createExport(): Promise<ExportResult> {
+	public async execute(path: string): Promise<void> {
 		const store = ViewStore.getInstance();
 		const project = store.getCurrentProject();
 		const currentPage = store.getCurrentPage();
@@ -21,7 +24,8 @@ export class HtmlExporter extends Exporter {
 
 		// TODO: Come up with good user-facing errors
 		if (!project || !currentPage || !styleguide) {
-			return {};
+			// Todo: Implement error message
+			return;
 		}
 
 		const data = {
@@ -54,8 +58,10 @@ export class HtmlExporter extends Exporter {
 
 		this.contents = Buffer.from(document);
 
-		return {
-			result: this.contents
-		};
+		Sender.send({
+			id: uuid.v4(),
+			type: ServerMessageType.ExportHTML,
+			payload: { path, content: this.contents }
+		});
 	}
 }

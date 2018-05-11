@@ -134,8 +134,7 @@ export function createMenu(): void {
 
 								if (path) {
 									const sketchExporter = new SketchExporter();
-									await sketchExporter.createExport();
-									await sketchExporter.writeToDisk(path);
+									sketchExporter.execute(path);
 								}
 							}
 						},
@@ -152,8 +151,7 @@ export function createMenu(): void {
 
 								if (path) {
 									const pdfExporter = new PdfExporter();
-									await pdfExporter.createExport();
-									await pdfExporter.writeToDisk(path);
+									pdfExporter.execute(path);
 								}
 							}
 						},
@@ -170,8 +168,7 @@ export function createMenu(): void {
 
 								if (path) {
 									const pngExporter = new PngExporter();
-									await pngExporter.createExport();
-									await pngExporter.writeToDisk(path);
+									pngExporter.execute(path);
 								}
 							}
 						},
@@ -191,8 +188,7 @@ export function createMenu(): void {
 
 								if (path) {
 									const htmlExporter = new HtmlExporter();
-									await htmlExporter.createExport();
-									await htmlExporter.writeToDisk(path);
+									htmlExporter.execute(path);
 								}
 							}
 						}

@@ -10,9 +10,15 @@ import {
 import { ServerMessageType } from '../message';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
-import { PageElement } from '../store/page/page-element';
 import * as React from 'react';
-import { EnumProperty, ObjectProperty, Option, PropertyValueCommand, ViewStore } from '../store';
+import {
+	EnumProperty,
+	ObjectProperty,
+	Option,
+	PageElement,
+	PropertyValueCommand,
+	ViewStore
+} from '../store';
 import * as Types from '../store/types';
 import * as uuid from 'uuid';
 

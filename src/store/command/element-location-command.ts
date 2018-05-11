@@ -1,7 +1,7 @@
 import { Command } from './command';
 import { ElementCommand } from './element-command';
 import { Page } from '../page/page';
-import { PageElement } from '../page/page-element';
+import { PageElement } from '../page-element';
 import { ViewStore } from '../view-store';
 
 /**

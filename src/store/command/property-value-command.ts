@@ -1,6 +1,6 @@
 import { Command } from './command';
 import { ElementCommand } from './element-command';
-import { PageElement } from '../page/page-element';
+import { PageElement } from '../page-element';
 
 /**
  * A user operation to set the value of a page element property.

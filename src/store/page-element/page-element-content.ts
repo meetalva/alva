@@ -44,8 +44,25 @@ export class PageElementContent {
 		});
 	}
 
+	public clone(): PageElementContent {
+		const clone = new PageElementContent({
+			elementId: this.elementId,
+			elements: this.elements.map(element => element.clone()),
+			id: this.id,
+			name: this.name
+		});
+
+		clone.getElements().forEach(element => element.setContainer(clone));
+
+		return clone;
+	}
+
 	public getElementId(): string {
 		return this.elementId;
+	}
+
+	public getElementIndex(element: PageElement): number {
+		return this.elements.indexOf(element);
 	}
 
 	public getElements(): PageElement[] {

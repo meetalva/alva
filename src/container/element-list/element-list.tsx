@@ -247,7 +247,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			slotId: 'default',
 			index: isSiblingDrop
 				? calculateDropIndex({ target: targetElement, dragged: draggedElement })
-				: Math.max(dropContainer.getElements().length - 1, 0)
+				: dropContainer.getElements().length
 		});
 
 		store.execute(command);

@@ -43,11 +43,6 @@ export interface PatternContext {
  */
 export class Pattern {
 	/**
-	 * The ID of the default slot.
-	 */
-	public static DEFAULT_SLOT_PROPERTY_NAME: string = 'default';
-
-	/**
 	 * The name of the export in the JavaScript implementation of the pattern.
 	 * For default export, the value is 'default'.
 	 */
@@ -105,7 +100,14 @@ export class Pattern {
 		this.exportName = init.exportName || 'default';
 		this.type = init.type;
 		this.properties = init.properties || [];
-		this.slots = init.slots || [new Slot({ id: 'default', name: AlvaUtil.guessName('default') })];
+		this.slots = init.slots || [
+			new Slot({
+				displayName: 'Children',
+				propertyName: 'children',
+				id: uuid.v4(),
+				type: Types.SlotType.Children
+			})
+		];
 	}
 
 	public static from(serializedPattern: Types.SerializedPattern): Pattern {

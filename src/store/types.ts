@@ -44,6 +44,8 @@ export interface SerializedPageElementContent {
 	elements: SerializedPageElement[];
 	id: string;
 	name: string;
+	slotId: string;
+	slotType: string;
 }
 
 export interface SerializedStyleguide {
@@ -70,8 +72,10 @@ export interface SerializedPattern {
 }
 
 export interface SerializedPatternSlot {
+	displayName: string;
 	id: string;
-	name: string;
+	propertyName: string;
+	type: string;
 }
 
 export enum PropertyType {
@@ -188,4 +192,9 @@ export enum RightPane {
 export enum EditState {
 	Editable = 'Editable',
 	Editing = 'Editing'
+}
+
+export enum SlotType {
+	Children = 'children',
+	Property = 'property'
 }

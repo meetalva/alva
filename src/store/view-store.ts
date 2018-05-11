@@ -75,6 +75,10 @@ export class ViewStore {
 	 */
 	@MobX.observable private currentProject?: Project;
 
+	@MobX.observable private highlightedElement?: PageElement;
+
+	@MobX.observable private highlightedPlaceholderElement?: PageElement;
+
 	/**
 	 * The currently name-editable element in the element list.
 	 */
@@ -112,11 +116,6 @@ export class ViewStore {
 	 * @see isElementFocussed
 	 */
 	@MobX.observable private selectedElement?: PageElement;
-
-	/**
-	 * The currently selected slot of the currently selected element.
-	 */
-	@MobX.observable private selectedSlotId?: string;
 
 	/**
 	 * http port the preview server is listening on
@@ -382,6 +381,14 @@ export class ViewStore {
 		return page.getElementById(id);
 	}
 
+	public getHighlightedElement(): PageElement | undefined {
+		return this.highlightedElement;
+	}
+
+	public getHighlightedPlaceholderElement(): PageElement | undefined {
+		return this.highlightedPlaceholderElement;
+	}
+
 	public getNameEditableElement(): PageElement | undefined {
 		return this.nameEditableElement;
 	}
@@ -449,14 +456,6 @@ export class ViewStore {
 		return this.selectedElement;
 	}
 
-	/**
-	 * Returns the id of the currently selected slot of the currently selected element if any.
-	 * @return The id of the currently selected slot of the currently selected element if any.
-	 */
-	public getSelectedSlotId(): string | undefined {
-		return this.selectedSlotId;
-	}
-
 	public getServerPort(): number {
 		return this.serverPort;
 	}
@@ -501,6 +500,36 @@ export class ViewStore {
 	 */
 	public hasUndoCommand(): boolean {
 		return this.undoBuffer.length > 0;
+	}
+
+	public isElementHighlightedById(id: string): boolean {
+		const highlightedElement = this.getHighlightedElement();
+
+		if (highlightedElement) {
+			return highlightedElement.getId() === id;
+		}
+
+		return false;
+	}
+
+	public isElementSelectedById(id: string): boolean {
+		const selectedElement = this.getSelectedElement();
+
+		if (selectedElement) {
+			return selectedElement.getId() === id;
+		}
+
+		return false;
+	}
+
+	public isPlaceholderHiglightedById(id: string): boolean {
+		const highlightedElement = this.getHighlightedPlaceholderElement();
+
+		if (highlightedElement) {
+			return highlightedElement.getId() === id;
+		}
+
+		return false;
 	}
 
 	public pasteAfterElement(targetElement: PageElement): PageElement | undefined {
@@ -553,7 +582,7 @@ export class ViewStore {
 			return;
 		}
 
-		const contents = element.getContainerById('default');
+		const contents = element.getContentBySlotType(Types.SlotType.Children);
 
 		if (!contents) {
 			return;
@@ -562,7 +591,7 @@ export class ViewStore {
 		this.execute(
 			ElementLocationCommand.addChild({
 				parent: element,
-				slotId: 'default',
+				slotId: contents.getSlotId(),
 				child: clipboardElement,
 				index: contents.getElements().length - 1
 			})
@@ -765,6 +794,14 @@ export class ViewStore {
 		}
 	}
 
+	public setHighlightedElementById(id: string): void {
+		this.highlightedElement = this.getElementById(id);
+	}
+
+	public setHighlightedPlaceholderElementById(id: string): void {
+		this.highlightedPlaceholderElement = this.getElementById(id);
+	}
+
 	public setNameEditableElement(editableElement?: PageElement): void {
 		if (this.nameEditableElement && this.nameEditableElement !== editableElement) {
 			this.nameEditableElement.setNameEditable(false);
@@ -818,15 +855,6 @@ export class ViewStore {
 		}
 		this.rightPane = null;
 		this.selectedElement = selectedElement;
-		this.selectedSlotId = undefined;
-	}
-
-	/**
-	 * Sets the currently selected slot of the currently selected element.
-	 * @param slotId The id of the slot to select.
-	 */
-	public setSelectedSlot(slotId?: string): void {
-		this.selectedSlotId = slotId;
 	}
 
 	/**
@@ -836,39 +864,6 @@ export class ViewStore {
 	public setServerPort(port: number): void {
 		this.serverPort = port;
 	}
-
-	/**
-	 * Loads a styleguide from a JSON object into the store.
-	 * Used internally within the store, do not use from UI components.
-	 * @param json The JSON object to load from.
-	 */
-	/*@MobX.action
-	// tslint:disable-next-line:no-any
-	 public setStyleguideFromJsonInternal(json: any): void {
-		this.analyzerName = json.analyzerName as string;
-		this.relativePatternsPath = (json.patternsPath as string) || 'lib/patterns';
-
-		(this.projects as IObservableArray<Project>).clear();
-		// tslint:disable-next-line:no-any
-		(json.projects as any[]).forEach((projectJson: any) => {
-			const project: Project = Project.from(projectJson);
-			this.addProject(project);
-		});
-
-		if (json.styleguidePath && this.analyzerName) {
-			const styleguidePath = json.styleguidePath as string;
-			const patternsPath = Path.join(
-				styleguidePath,
-				this.relativePatternsPath.split('/').join(Path.sep)
-			);
-
-			this.styleguide = new Styleguide(styleguidePath, patternsPath, this.analyzerName);
-		} else {
-			this.styleguide = undefined;
-		}
-
-		this.clearUndoRedoBuffers();
-	} */
 
 	/**
 	 * Undoes the last user operation, if available.
@@ -896,5 +891,13 @@ export class ViewStore {
 
 	public unsetActivePage(): void {
 		this.activePage = undefined;
+	}
+
+	public unsetHighlightedElementById(): void {
+		this.highlightedElement = undefined;
+	}
+
+	public unsetHighlightedPlaceholderElementById(): void {
+		this.highlightedPlaceholderElement = undefined;
 	}
 }

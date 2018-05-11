@@ -103,8 +103,6 @@ export class ElementRemoveCommand extends ElementCommand {
 	 * @inheritDoc
 	 */
 	public undo(): boolean {
-		console.log(this);
-
 		if (!super.undo()) {
 			return false;
 		}

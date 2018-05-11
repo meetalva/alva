@@ -1,3 +1,4 @@
+import { Styleguide } from '../store/styleguide';
 import * as Types from '../store/types';
 
 export enum PreviewMessageType {
@@ -23,6 +24,8 @@ export enum ServerMessageType {
 	CreateNewFileRequest = 'create-new-file-request',
 	CreateNewFileResponse = 'create-new-file-response',
 	CreateNewPage = 'create-new-page',
+	CreateScriptBundleRequest = 'create-script-bundle-request',
+	CreateScriptBundleResponse = 'create-script-bundle-response',
 	Cut = 'cut',
 	CutPageElement = 'cut-page-element',
 	Delete = 'delete',
@@ -90,6 +93,8 @@ export type ServerMessage =
 	| ContentResponse
 	| CopyPageElement
 	| CreateNewPage
+	| CreateScriptBundleRequest
+	| CreateScriptBundleResponse
 	| ElementChange
 	| NewFileRequest
 	| NewFileResponse
@@ -126,6 +131,14 @@ export type ContentResponse = Envelope<ServerMessageType.ContentResponse, string
 export type Copy = EmptyEnvelope<ServerMessageType.Copy>;
 export type CopyPageElement = Envelope<ServerMessageType.CopyPageElement, string>;
 export type CreateNewPage = Envelope<ServerMessageType.CreateNewPage, undefined>;
+export type CreateScriptBundleRequest = Envelope<
+	ServerMessageType.CreateScriptBundleRequest,
+	Styleguide
+>;
+export type CreateScriptBundleResponse = Envelope<
+	ServerMessageType.CreateScriptBundleResponse,
+	string
+>;
 export type Cut = EmptyEnvelope<ServerMessageType.Cut>;
 export type Delete = EmptyEnvelope<ServerMessageType.Delete>;
 export type ElementChange = Envelope<ServerMessageType.ElementChange, string | undefined>;

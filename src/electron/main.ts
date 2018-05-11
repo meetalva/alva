@@ -1,5 +1,6 @@
 import { checkForUpdates } from './auto-updater';
 import { colors } from '../components';
+import { createCompiler } from '../preview/create-compiler';
 import { app, BrowserWindow, dialog, ipcMain, screen } from 'electron';
 import * as electronIsDev from 'electron-is-dev';
 import * as Fs from 'fs';
@@ -221,6 +222,31 @@ async function createWindow(): Promise<void> {
 				}
 
 				await Persistence.persist(project.getPath(), project);
+				break;
+			}
+			case ServerMessageType.CreateScriptBundleRequest: {
+				const compiler = createCompiler(message.payload);
+				await Util.promisify(compiler.run).bind(compiler)();
+
+				const createScript = (name: string, content: string) =>
+					`<script data-script="${name}">${content}<\/script>`;
+				const SCRIPTS = ['vendor', 'renderer', 'components', 'preview'];
+
+				const compilerFileSystem = (await compiler.outputFileSystem) as typeof Fs;
+
+				const scripts = SCRIPTS.map(name => [
+					name,
+					compilerFileSystem.readFileSync(Path.posix.join('/', `${name}.js`)).toString()
+				])
+					.map(([name, content]) => createScript(name, content))
+					.join('\n');
+
+				Sender.send({
+					type: ServerMessageType.CreateScriptBundleResponse,
+					id: message.id,
+					payload: scripts
+				});
+
 				break;
 			}
 			case ServerMessageType.ExportHTML:

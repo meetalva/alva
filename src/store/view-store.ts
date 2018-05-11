@@ -786,6 +786,13 @@ export class ViewStore {
 
 	public setProject(project: Project): void {
 		this.currentProject = project;
+		const pages = this.currentProject.getPages();
+
+		if (pages.length > 0) {
+			this.setActivePageByIndex(0);
+		} else {
+			this.unsetActivePage();
+		}
 	}
 
 	/**

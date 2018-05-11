@@ -32,7 +32,6 @@ Sender.receive(message => {
 		case ServerMessageType.OpenFileResponse: {
 			const newProject = Project.from(message.payload.contents);
 			newProject.setPath(message.payload.path);
-
 			store.setProject(newProject);
 			store.setActiveView(Types.AlvaView.PageDetail);
 			break;

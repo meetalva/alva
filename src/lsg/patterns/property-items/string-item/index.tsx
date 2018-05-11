@@ -17,7 +17,7 @@ const StyledStringItem = styled.label`
 	display: flex;
 	align-items: center;
 	width: 100%;
-	margin-bottom: ${getSpace(SpaceSize.M)}px;
+	margin-bottom: ${getSpace(SpaceSize.S)}px;
 `;
 
 const StyledInput = styled.input`

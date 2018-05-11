@@ -35,6 +35,7 @@ const showSaveDialog = (options: Electron.SaveDialogOptions): Promise<string | u
 	new Promise(resolve => dialog.showSaveDialog(options, resolve));
 
 const readFile = Util.promisify(Fs.readFile);
+const writeFile = Util.promisify(Fs.writeFile);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -83,6 +84,7 @@ async function createWindow(): Promise<void> {
 
 		// Handle messages that require
 		// access to system / fs
+		// tslint:disable-next-line:cyclomatic-complexity
 		switch (message.type) {
 			case ServerMessageType.AppLoaded: {
 				// Load last known file automatically in development
@@ -219,6 +221,14 @@ async function createWindow(): Promise<void> {
 				}
 
 				await Persistence.persist(project.getPath(), project);
+				break;
+			}
+			case ServerMessageType.ExportHTML:
+			case ServerMessageType.ExportPDF:
+			case ServerMessageType.ExportPNG:
+			case ServerMessageType.ExportSketch: {
+				const { path, content } = message.payload;
+				writeFile(path, content);
 			}
 		}
 	});

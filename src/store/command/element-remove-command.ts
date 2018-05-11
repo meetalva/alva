@@ -1,76 +1,27 @@
 import { Command } from './command';
 import { ElementCommand } from './element-command';
 import { Page } from '../page/page';
-import { PageElement } from '../page-element';
+import { PageElement, PageElementContent } from '../page-element';
 import { ViewStore } from '../view-store';
 
-/**
- * A user operation to add or remove a child to/from a parent, or to relocate it.
- */
 export class ElementRemoveCommand extends ElementCommand {
-	/**
-	 * The new position within the parent's children, if a parent is given.
-	 * Leaving out this value puts the child to the end of the parent's children.
-	 */
-	protected index?: number;
-
-	/**
-	 * The new parent for the child. undefined removes the child.
-	 */
-	protected parent?: PageElement;
-
-	/**
-	 * The ID ofg the target parent of the child element.
-	 */
-	protected parentId?: string;
-
-	/**
-	 * The slot the element is attached to. undefined means default slot.
-	 */
-	protected slotId?: string;
+	protected container: PageElementContent;
+	protected index: number;
+	protected page: Page;
 
 	public constructor(init: { element: PageElement }) {
 		super(init.element);
 
-		const page = this.element.getPage();
-		const parent = this.element.getParent();
-		const container = this.element.getContainer();
-
-		if (!page || !parent || !container) {
-			return;
-		}
-
-		this.parent = parent;
-		this.parentId = parent.getId();
-		this.slotId = container.getSlotId();
+		this.container = this.element.getContainer() as PageElementContent;
 		this.index = this.element.getIndex();
-		this.pageId = page.getId();
+		this.page = this.element.getPage() as Page;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	protected ensurePageAndElement(): boolean {
-		super.ensurePageAndElement();
-
-		const currentPage: Page | undefined = ViewStore.getInstance().getCurrentPage() as Page;
-		if (this.parentId) {
-			const parent: PageElement | undefined = currentPage.getElementById(this.parentId);
-			if (!parent) {
-				return false;
-			}
-			this.parent = parent;
-		}
-
-		if (this.parentId) {
-			const parent: PageElement | undefined = currentPage.getElementById(this.parentId);
-			if (!parent) {
-				return false;
-			}
-			this.parent = parent;
-		}
-
-		return true;
+		return super.ensurePageAndElement();
 	}
 
 	/**
@@ -81,7 +32,7 @@ export class ElementRemoveCommand extends ElementCommand {
 			return false;
 		}
 
-		this.element.remove();
+		this.container.remove({ element: this.element });
 
 		return true;
 	}
@@ -107,6 +58,15 @@ export class ElementRemoveCommand extends ElementCommand {
 		if (!super.undo()) {
 			return false;
 		}
+
+		const store = ViewStore.getInstance();
+
+		this.container.insert({
+			element: this.element,
+			at: this.index
+		});
+
+		store.setSelectedElement(this.element);
 
 		return true;
 	}

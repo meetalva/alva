@@ -552,7 +552,7 @@ export class ViewStore {
 			return;
 		}
 
-		const contents = element.getContentById('default');
+		const contents = element.getContainerById('default');
 
 		if (!contents) {
 			return;

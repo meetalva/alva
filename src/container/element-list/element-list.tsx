@@ -97,7 +97,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	): ElementNodeProps {
 		const store = Store.ViewStore.getInstance();
 		const slotId = slot.getId();
-		const slotContent = element.getContentById(slotId) as Store.PageElementContent;
+		const slotContent = element.getContainerById(slotId) as Store.PageElementContent;
 
 		const childItems: ElementNodeProps[] = [];
 		const selectedSlot = store.getSelectedSlotId();
@@ -249,12 +249,21 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
-		const dropParent =
-			isSiblingDrop && !targetElement.isRoot()
-				? (targetElement.getParent() as Store.PageElement) // Non-root page element always has parent
-				: targetElement;
+		const getDropParent = (el: Store.PageElement): Store.PageElement => {
+			if (!isSiblingDrop) {
+				return el;
+			}
 
-		const container = dropParent.getContentById('default');
+			if (el.isRoot()) {
+				return el;
+			}
+
+			return el.getParent() as Store.PageElement;
+		};
+
+		const dropParent = getDropParent(targetElement);
+
+		const container = dropParent.getContainerById('default');
 
 		// prettier-ignore
 		const draggedElement = pattern
@@ -262,7 +271,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			new Store.PageElement({
 					container,
 					contents: [],
-					parent: dropParent,
 					pattern,
 					setDefaults: true
 			})
@@ -282,66 +290,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		store.execute(command);
 		store.setSelectedElement(draggedElement);
-
-		/* this.handleDragEnd(e);
-
-		const isPlaceholder =
-			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
-
-		const store = ViewStore.getInstance();
-		const styleguide = store.getStyleguide() as Styleguide;
-		const patternId = e.dataTransfer.getData('patternId');
-		const dropTargetElement = elementFromTarget(e.target);
-		const pattern = styleguide.getPattern(patternId) as Pattern;
-
-		const newParent = dropTargetElement
-			? dropTargetElement.getParent() || dropTargetElement
-			: undefined;
-
-		// TODO: The ancestor check should be performed for drag starts to show no drop
-		// indication for impossible drop operations
-		if (!dropTargetElement || !newParent) {
-			return;
-		}
-
-		const container = newParent.getContentById('default');
-
-		if (!container) {
-			return;
-		}
-
-		const draggedElement = patternId ?
-			store.getDraggedElement() :
-			new PageElement({
-				container,
-				contents: [],
-				parent: dropTargetElement,
-				pattern,
-				setDefaults: true
-			});
-
-		if (!draggedElement) {
-			return;
-		}
-
-		if (draggedElement.isAncestorOf(newParent)) {
-			return;
-		}
-
-		const command = isPlaceholder && !dropTargetElement.isRoot()
-			? ElementLocationCommand.addSibling({
-				newSibling: draggedElement,
-				sibling: dropTargetElement
-			})
-			: ElementLocationCommand.addChild({
-				parent: dropTargetElement,
-				child: draggedElement,
-				slotId: 'default',
-				index: 0
-			});
-
-		store.execute(command);
-		store.setSelectedElement(draggedElement); */
 	}
 
 	private handleKeyDown(e: KeyboardEvent): void {

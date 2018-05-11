@@ -30,6 +30,10 @@ export enum ServerMessageType {
 	Duplicate = 'duplicate',
 	DuplicatePageElement = 'duplicate-page-element',
 	ElementChange = 'element-change',
+	ExportHTML = 'export-html',
+	ExportPDF = 'export-pdf',
+	ExportPNG = 'export-png',
+	ExportSketch = 'export-sketch',
 	OpenFileRequest = 'open-file-request',
 	OpenFileResponse = 'open-file-response',
 	PageChange = 'page-change',
@@ -73,6 +77,11 @@ export interface SketchExportPayload {
 	pageName: string;
 }
 
+export interface ExportPayload {
+	content: Buffer;
+	path: string;
+}
+
 export type ServerMessage =
 	| AppLoaded
 	| AssetReadRequest
@@ -91,6 +100,10 @@ export type ServerMessage =
 	| DeletePageElement
 	| Duplicate
 	| DuplicatePageElement
+	| ExportHTML
+	| ExportPDF
+	| ExportPNG
+	| ExportSketch
 	| OpenFileRequest
 	| OpenFileResponse
 	| PageChange
@@ -116,6 +129,10 @@ export type CreateNewPage = Envelope<ServerMessageType.CreateNewPage, undefined>
 export type Cut = EmptyEnvelope<ServerMessageType.Cut>;
 export type Delete = EmptyEnvelope<ServerMessageType.Delete>;
 export type ElementChange = Envelope<ServerMessageType.ElementChange, string | undefined>;
+export type ExportHTML = Envelope<ServerMessageType.ExportHTML, ExportPayload>;
+export type ExportPDF = Envelope<ServerMessageType.ExportPDF, ExportPayload>;
+export type ExportPNG = Envelope<ServerMessageType.ExportPNG, ExportPayload>;
+export type ExportSketch = Envelope<ServerMessageType.ExportSketch, ExportPayload>;
 export type NewFileRequest = EmptyEnvelope<ServerMessageType.CreateNewFileRequest>;
 export type NewFileResponse = Envelope<ServerMessageType.CreateNewFileResponse, ProjectPayload>;
 export type CutPageElement = Envelope<ServerMessageType.CutPageElement, string>;

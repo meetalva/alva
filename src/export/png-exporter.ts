@@ -79,7 +79,7 @@ export class PngExporter extends Exporter {
 					capture => {
 						// resize the capture to the original screen size
 						const resizedCapture = capture.resize({
-							width: config.width
+							width: capture.getSize().width / scaleFactor
 						});
 
 						const pngBuffer: Buffer = resizedCapture.toPNG();

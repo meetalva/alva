@@ -183,7 +183,8 @@ export class ElementLocationCommand extends ElementCommand {
 		}
 
 		// Do not try to add an element to itself
-		if (this.element === this.parent) {
+		// or one of its children
+		if (this.element.isAncestorOf(this.parent)) {
 			return false;
 		}
 

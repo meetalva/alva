@@ -113,45 +113,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			draggable: false,
 			dragging: this.state.dragging,
 			children: childItems,
-			// TODO: Unify this with the event-delegation based drag/drop handling
-			onDragDrop: (e: React.DragEvent<HTMLElement>) => {
-				/* const patternId = e.dataTransfer.getData('patternId');
-
-				let draggedElement: PageElement | undefined;
-
-				if (!patternId) {
-					draggedElement = store.getDraggedElement();
-				} else {
-					const styleguide = store.getStyleguide();
-
-					if (!styleguide) {
-						return;
-					}
-
-					draggedElement = new PageElement({
-						container: slotContent,
-						contents: [],
-						parent: element,
-						pattern: styleguide.getPattern(patternId) as Pattern,
-						setDefaults: true
-					});
-				}
-
-				if (!draggedElement) {
-					return;
-				}
-
-				store.execute(
-					ElementLocationCommand.addChild({
-						parent: element,
-						child: draggedElement,
-						slotId,
-						index: 0
-					})
-				);
-
-				store.setSelectedElement(draggedElement); */
-			},
 			active: element === selectedElement && selectedSlot === slotId
 		};
 
@@ -263,13 +224,10 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		const dropParent = getDropParent(targetElement);
 
-		const container = dropParent.getContainerById('default');
-
 		// prettier-ignore
 		const draggedElement = pattern
 			? // drag from pattern list, create new element
 			new Store.PageElement({
-					container,
 					contents: [],
 					pattern,
 					setDefaults: true
@@ -281,11 +239,15 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
+		const dropContainer = dropParent.getContainerById('default') as Store.PageElementContent;
+
 		const command = Store.ElementLocationCommand.addChild({
 			parent: dropParent,
 			child: draggedElement,
 			slotId: 'default',
-			index: calculateDropIndex({ target: dropParent, dragged: draggedElement })
+			index: isSiblingDrop
+				? calculateDropIndex({ target: targetElement, dragged: draggedElement })
+				: Math.max(dropContainer.getElements().length - 1, 0)
 		});
 
 		store.execute(command);
@@ -450,12 +412,12 @@ function calculateDropIndex(init: {
 	// The dragged element is dropped into another
 	// leaf list than it was dragged from.
 	// True for (1) new elements, (2) elements dragged to other parents
-	if (dragged.getParent() !== target.getParent()) {
+	if (dragged.getContainer() !== target.getContainer()) {
 		return newIndex;
 	}
 
 	// If the dragged element has a parent, it has an index
-	const currentIndex = dragged.getParent() ? (dragged.getIndex() as number) : -1;
+	const currentIndex = dragged.getIndex();
 
 	// The dragged element is dropped in the same leaf
 	// list as it was dragged from.

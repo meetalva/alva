@@ -155,11 +155,11 @@ export class PageElement {
 	 * @param index The 0-based new position within the children. Leaving out the position adds it at the end of the list.
 	 */
 	public addChild(child: PageElement, slotId: string, index: number): void {
-		const container = this.getContainerById(slotId);
-
-		if (container) {
-			container.insert({ element: child, at: index });
-		}
+		child.setParent({
+			parent: this,
+			slotId,
+			index
+		});
 	}
 
 	/**
@@ -172,21 +172,15 @@ export class PageElement {
 		delete payload.id;
 
 		const clone = new PageElement({
-			pattern: this.pattern,
-			contents: this.contents
-		});
-
-		this.contents.forEach(content => {
-			content.getElements().forEach((child, index) => {
-				clone.addChild(child.clone(), content.getId(), index);
-			});
+			container: undefined,
+			contents: this.contents.map(content => content.clone()),
+			name: this.name,
+			pattern: this.pattern
 		});
 
 		this.properties.forEach((value: Types.PropertyValue, id: string) => {
 			clone.setPropertyValue(id, value);
 		});
-
-		clone.setName(this.name);
 
 		return clone;
 	}
@@ -246,21 +240,17 @@ export class PageElement {
 	 * Returns the 0-based position of this element within its parent slot.
 	 * @return The 0-based position of this element.
 	 */
-	public getIndex(): number | undefined {
-		if (!this.parent || !this.container) {
-			return;
+	public getIndex(): number {
+		const container = this.getContainer();
+
+		if (!container) {
+			return -1;
 		}
 
-		const content = this.parent.getContainerById(this.container.getId());
-
-		if (!content) {
-			return;
-		}
-
-		return content.getElements().indexOf(this);
+		return container.getElementIndex(this);
 	}
 
-	/**
+	/**x
 	 * Returns the assigned name of the page element, initially the pattern's human-friendly name.
 	 * @return The assigned name of the page element.
 	 */
@@ -298,7 +288,6 @@ export class PageElement {
 		}
 
 		const store = ViewStore.getInstance();
-		console.log(this.container);
 		return store.getElementById(this.container.getElementId());
 	}
 
@@ -338,14 +327,16 @@ export class PageElement {
 	 * @param child The child to test.
 	 * @return Whether this element is an ancestor of the given child.
 	 */
-	public isAncestorOf(child?: PageElement): boolean {
-		if (!child) {
-			return false;
-		} else if (child === this) {
+	public isAncestorOf(child: PageElement): boolean {
+		if (child === this) {
 			return true;
-		} else {
-			return this.isAncestorOf(child.getParent());
 		}
+
+		if (child.isRoot()) {
+			return false;
+		}
+
+		return this.isAncestorOf(child.getParent() as PageElement);
 	}
 
 	/**

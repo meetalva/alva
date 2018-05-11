@@ -1,4 +1,4 @@
-import { PageElement } from '../page/page-element';
+import { PageElement } from '../page-element';
 
 /**
  * A user operation on a page or project, with the ability to undo and redo.

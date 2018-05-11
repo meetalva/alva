@@ -1,6 +1,6 @@
 import { ViewStore } from '../';
 import { Command } from './command';
-import { PageElement } from '../page/page-element';
+import { PageElement } from '../page-element';
 
 /**
  * A user operation on a page element, ensuring that the page is loaded and references get

@@ -8,7 +8,8 @@ import {
 
 import * as MobX from 'mobx';
 import * as Os from 'os';
-import { Page, PageElement } from './page';
+import { Page } from './page';
+import { PageElement } from './page-element';
 import * as Path from 'path';
 import { Project } from './project';
 import { Pattern, Styleguide } from './styleguide';

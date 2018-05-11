@@ -57,16 +57,14 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 
 	return (
 		<StyledStringItem className={className}>
-			<label>
-				<PropertyLabel label={label} />
-				<StyledInput
-					onChange={onChange}
-					onBlur={onBlur}
-					type="text"
-					value={value || ''}
-					placeholder="Type in"
-				/>
-			</label>
+			<PropertyLabel label={label} />
+			<StyledInput
+				onChange={onChange}
+				onBlur={onBlur}
+				type="text"
+				value={value || ''}
+				placeholder="…"
+			/>
 		</StyledStringItem>
 	);
 };

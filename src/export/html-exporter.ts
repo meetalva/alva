@@ -1,19 +1,10 @@
-import * as Fs from 'fs';
-import * as Path from 'path';
-import * as Util from 'util';
 import * as uuid from 'uuid';
 
 import * as Sender from '../message/client';
-import { createCompiler } from '../preview/create-compiler';
 import { Exporter } from './exporter';
 import { ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
 import { ViewStore } from '../store';
-
-const SCRIPTS = ['vendor', 'renderer', 'components', 'preview'];
-
-const createScript = (name: string, content: string) =>
-	`<script data-script="${name}">${content}<\/script>`;
 
 export class HtmlExporter extends Exporter {
 	public async execute(path: string): Promise<void> {
@@ -21,6 +12,7 @@ export class HtmlExporter extends Exporter {
 		const project = store.getCurrentProject();
 		const currentPage = store.getCurrentPage();
 		const styleguide = store.getStyleguide();
+		const id = uuid.v4();
 
 		// TODO: Come up with good user-facing errors
 		if (!project || !currentPage || !styleguide) {
@@ -28,40 +20,48 @@ export class HtmlExporter extends Exporter {
 			return;
 		}
 
-		const data = {
-			id: uuid.v4(),
-			type: 'state',
-			payload: {
-				mode: PreviewDocumentMode.Static,
-				pageId: currentPage.getId(),
-				pages: project.getPages().map(page => page.toJSON({ forRendering: true }))
-			}
+		// (1) request bundled scripts
+		const start = () => {
+			Sender.send({
+				type: ServerMessageType.CreateScriptBundleRequest,
+				id,
+				payload: styleguide
+			});
 		};
 
-		const compiler = createCompiler(styleguide);
-		await Util.promisify(compiler.run).bind(compiler)();
+		const receive = async message => {
+			if (message.type !== ServerMessageType.CreateScriptBundleResponse || message.id !== id) {
+				return;
+			}
 
-		const fs = (await compiler.outputFileSystem) as typeof Fs;
+			const data = {
+				id: uuid.v4(),
+				type: 'state',
+				payload: {
+					mode: PreviewDocumentMode.Static,
+					pageId: currentPage.getId(),
+					pages: project.getPages().map(page => page.toJSON({ forRendering: true }))
+				}
+			};
 
-		const scripts = SCRIPTS.map(name => [
-			name,
-			fs.readFileSync(Path.posix.join('/', `${name}.js`)).toString()
-		])
-			.map(([name, content]) => createScript(name, content))
-			.join('\n');
+			const scripts = message.payload;
 
-		const document = previewDocument({
-			data,
-			mode: PreviewDocumentMode.Static,
-			scripts
-		});
+			const document = previewDocument({
+				data,
+				mode: PreviewDocumentMode.Static,
+				scripts
+			});
 
-		this.contents = Buffer.from(document);
+			this.contents = Buffer.from(document);
 
-		Sender.send({
-			id: uuid.v4(),
-			type: ServerMessageType.ExportHTML,
-			payload: { path, content: this.contents }
-		});
+			Sender.send({
+				id: uuid.v4(),
+				type: ServerMessageType.ExportHTML,
+				payload: { path, content: this.contents }
+			});
+		};
+
+		Sender.receive(receive);
+		start();
 	}
 }

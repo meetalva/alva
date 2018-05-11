@@ -27,21 +27,22 @@ export class ElementRemoveCommand extends ElementCommand {
 	/**
 	 * The slot the element is attached to. undefined means default slot.
 	 */
-	protected slotId?: string = 'default';
+	protected slotId?: string;
 
 	public constructor(init: { element: PageElement }) {
 		super(init.element);
 
 		const page = this.element.getPage();
 		const parent = this.element.getParent();
+		const container = this.element.getContainer();
 
-		if (!page || !parent) {
+		if (!page || !parent || !container) {
 			return;
 		}
 
 		this.parent = parent;
 		this.parentId = parent.getId();
-		this.slotId = this.element.getContainerId();
+		this.slotId = container.getSlotId();
 		this.index = this.element.getIndex();
 		this.pageId = page.getId();
 	}

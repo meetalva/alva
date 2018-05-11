@@ -5,6 +5,7 @@ import * as MobXReact from 'mobx-react';
 import { PreviewStore } from './preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import * as Types from '../store/types';
 
 // TODO: Produces a deprecation warning, find a way
 // to dedupe MobX when upgrading to 4.x
@@ -26,26 +27,11 @@ export interface InjectedPreviewApplicationProps {
 	store: PreviewStore;
 }
 
-interface InjectedPreviewComponentProps extends PreviewComponentProps {
+interface InjectedPreviewComponentProps extends Types.SerializedPageElement {
 	highlight: HighlightArea;
 	store: PreviewStore;
 	// tslint:disable-next-line:no-any
 	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
-}
-
-export interface PreviewComponentContents {
-	elements: PreviewComponentProps[];
-	id: string;
-}
-
-export interface PreviewComponentProps {
-	contents: PreviewComponentContents[];
-	exportName: string;
-	id: string;
-	name: string;
-	pattern: string;
-	// tslint:disable-next-line:no-any
-	properties: { [key: string]: any };
 }
 
 interface ErrorBoundaryProps {
@@ -64,7 +50,7 @@ interface ErrorMessageProps {
 const SYNTHETICS = {
 	page: props => <>{props.children}</>,
 	placeholder: props => <img src={props.asset} style={{ width: '100%', height: 'auto' }} />,
-	text: props => props.text
+	text: props => <span>{props.text}</span>
 };
 
 export function render(init: RenderInit): void {
@@ -97,7 +83,6 @@ class PreviewApplication extends React.Component {
 			<React.Fragment>
 				<PreviewComponent
 					contents={component.contents}
-					exportName={component.exportName}
 					pattern={component.pattern}
 					properties={component.properties}
 					name={component.name}
@@ -130,7 +115,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 @MobXReact.inject('getComponent', 'store', 'highlight')
 @MobXReact.observer
-class PreviewComponent extends React.Component<PreviewComponentProps> {
+class PreviewComponent extends React.Component<Types.SerializedPageElement> {
 	public componentWillUpdate(): void {
 		const props = this.props as InjectedPreviewComponentProps;
 
@@ -147,10 +132,11 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 	public render(): JSX.Element | null {
 		const props = this.props as InjectedPreviewComponentProps;
-		const defaultContent = props.contents.find(content => content.id === 'default');
+
+		const defaultContent = props.contents.find(content => content.slotType === 'children');
 		const children = defaultContent ? defaultContent.elements : [];
 
-		const slots = props.contents.filter(content => content.id !== 'default').reduce(
+		const slots = props.contents.filter(content => content.slotType !== 'children').reduce(
 			(acc, slot) => ({
 				...acc,
 				[slot.id]: slot.elements.map(child => <PreviewComponent key={child.id} {...child} />)

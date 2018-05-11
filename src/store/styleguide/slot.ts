@@ -1,46 +1,66 @@
 import * as Types from '../types';
 
 export interface SlotInit {
+	displayName: string;
 	id: string;
-	name: string;
+	propertyName: string;
+	type: Types.SlotType;
 }
 
 export class Slot {
+	private displayName: string;
 	private id: string;
-
-	private name: string;
+	private propertyName: string;
+	private type: Types.SlotType;
 
 	public constructor(init: SlotInit) {
+		this.type = init.type;
 		this.id = init.id;
-		this.name = init.name;
+		this.displayName = init.displayName;
+		this.type = init.type;
 	}
 
 	public static from(serialized: Types.SerializedPatternSlot): Slot {
-		return new Slot(serialized);
+		return new Slot({
+			displayName: serialized.displayName,
+			id: serialized.id,
+			propertyName: serialized.propertyName,
+			type: toSlotType(serialized.type)
+		});
 	}
 
-	/**
-	 * Returns the technical ID of this slot (e.g. the property name in the TypeScript props
-	 * interface).
-	 * @return The technical ID.
-	 */
 	public getId(): string {
 		return this.id;
 	}
 
-	/**
-	 * Returns the human-friendly name of the slot.
-	 * In the frontend, to be displayed instead of the ID.
-	 * @return The human-friendly name of the slot.
-	 */
 	public getName(): string {
-		return this.name;
+		return this.displayName;
+	}
+
+	public getPropertyName(): string {
+		return this.propertyName;
+	}
+
+	public getType(): Types.SlotType {
+		return this.type;
 	}
 
 	public toJSON(): Types.SerializedPatternSlot {
 		return {
+			displayName: this.displayName,
+			propertyName: this.propertyName,
 			id: this.id,
-			name: this.name
+			type: this.type
 		};
+	}
+}
+
+function toSlotType(type: string): Types.SlotType {
+	switch (type) {
+		case 'property':
+			return Types.SlotType.Property;
+		case 'children':
+		default:
+			return Types.SlotType.Children;
 	}
 }

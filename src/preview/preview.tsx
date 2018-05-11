@@ -10,33 +10,10 @@ import * as Types from '../store/types';
 // to dedupe MobX when upgrading to 4.x
 MobX.extras.shareGlobalState();
 
-export interface PageComponentContents {
-	elements: PageElement[];
-	id: string;
-}
-
-export interface PageElement {
-	contents: PageComponentContents[];
-	exportName: string;
-	id: string;
-	name: string;
-	pattern: string;
-	properties: {
-		// tslint:disable-next-line:no-any
-		[propName: string]: any;
-	};
-}
-
-export interface Page {
-	id: string;
-	name: string;
-	root: PageElement;
-}
-
 interface InitialData {
 	data: {
 		pageId: string;
-		pages: Page[];
+		pages: Types.SerializedPage[];
 	};
 	mode: 'static' | 'live';
 }
@@ -46,7 +23,7 @@ export class PreviewStore {
 	@MobX.observable public elementId: string = '';
 	@MobX.observable public mode: PreviewDocumentMode = PreviewDocumentMode.Live;
 	@MobX.observable public pageId: string = '';
-	@MobX.observable public pages: Page[] = [];
+	@MobX.observable public pages: Types.SerializedPage[] = [];
 
 	private constructor() {}
 

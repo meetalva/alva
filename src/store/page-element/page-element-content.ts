@@ -13,14 +13,17 @@ export interface PageElementContentInit {
 	elements: PageElement[];
 	id: string;
 	name: string;
+	slotId: string;
+	slotType: Types.SlotType;
 }
 
-// TODO: Distinguish between content id and slot id
 export class PageElementContent {
 	@MobX.observable private elementId: string;
 	@MobX.observable private elements: PageElement[] = [];
 	@MobX.observable private id: string;
 	@MobX.observable private name: string;
+	@MobX.observable private slotId: string;
+	@MobX.observable private slotType: Types.SlotType;
 
 	public constructor(init: PageElementContentInit) {
 		this.id = init.id;
@@ -28,6 +31,8 @@ export class PageElementContent {
 		this.name = init.name;
 		this.elements = init.elements;
 		this.elements.forEach((element, index) => this.insert({ element, at: index }));
+		this.slotId = init.slotId;
+		this.slotType = init.slotType;
 	}
 
 	public static from(
@@ -40,7 +45,9 @@ export class PageElementContent {
 			name: serialized.name,
 			elements: serialized.elements.map(element =>
 				PageElement.from(element, { styleguide: context.styleguide })
-			)
+			),
+			slotId: serialized.slotId,
+			slotType: toSlotType(serialized.slotType)
 		});
 	}
 
@@ -49,7 +56,9 @@ export class PageElementContent {
 			elementId: this.elementId,
 			elements: this.elements.map(element => element.clone()),
 			id: this.id,
-			name: this.name
+			name: this.name,
+			slotId: this.slotId,
+			slotType: this.slotType
 		});
 
 		clone.getElements().forEach(element => element.setContainer(clone));
@@ -69,8 +78,12 @@ export class PageElementContent {
 		return this.elements;
 	}
 
-	public getId(): string {
-		return this.id;
+	public getSlotId(): string {
+		return this.slotId;
+	}
+
+	public getSlotType(): Types.SlotType {
+		return this.slotType;
 	}
 
 	@MobX.action
@@ -101,7 +114,19 @@ export class PageElementContent {
 		return {
 			id: this.id,
 			name: this.name,
-			elements: this.elements.map(element => element.toJSON())
+			elements: this.elements.map(element => element.toJSON()),
+			slotId: this.slotId,
+			slotType: this.slotType
 		};
+	}
+}
+
+function toSlotType(type: string): Types.SlotType {
+	switch (type) {
+		case 'property':
+			return Types.SlotType.Property;
+		case 'children':
+		default:
+			return Types.SlotType.Children;
 	}
 }

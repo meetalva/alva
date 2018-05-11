@@ -1,5 +1,5 @@
 import * as MobX from 'mobx';
-import { PageElement } from './page-element';
+import { PageElement } from '../page-element';
 import { Styleguide, SyntheticPatternType } from '../styleguide';
 import * as Types from '../types';
 import * as uuid from 'uuid';

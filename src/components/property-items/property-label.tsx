@@ -16,7 +16,7 @@ const StyledLabel = styled.span`
 	width: 30%;
 	white-space: nowrap;
 	overflow: hidden;
-	text-overflow: ellipsis
+	text-overflow: ellipsis;
 	user-select: none;
 	cursor: default;
 	box-sizing: border-box;

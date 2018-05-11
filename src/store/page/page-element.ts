@@ -6,13 +6,13 @@ import { Page } from './page';
 import { Pattern, Property, Styleguide } from '../styleguide';
 import * as Types from '../types';
 import * as Uuid from 'uuid';
+import { ViewStore } from '../view-store';
 
 export interface PageElementProperties {
 	container?: PageElementContent;
 	contents: PageElementContent[];
 	id?: string;
 	name?: string;
-	parent?: PageElement;
 	pattern: Pattern;
 	properties?: Map<string, Types.PropertyValue>;
 	setDefaults?: boolean;
@@ -22,7 +22,13 @@ export interface PageElementContext {
 	styleguide: Styleguide;
 }
 
+export interface PageElementContentContext {
+	elementId: string;
+	styleguide: Styleguide;
+}
+
 export interface PageElementContentInit {
+	elementId: string;
 	elements: PageElement[];
 	id: string;
 	name: string;
@@ -30,26 +36,35 @@ export interface PageElementContentInit {
 
 // TODO: Distinguish between content id and slot id
 export class PageElementContent {
+	@MobX.observable private elementId: string;
 	@MobX.observable private elements: PageElement[] = [];
 	@MobX.observable private id: string;
 	@MobX.observable private name: string;
 
 	public constructor(init: PageElementContentInit) {
 		this.id = init.id;
+		this.elementId = init.elementId;
 		this.name = init.name;
 		this.elements = init.elements;
-		this.elements.forEach(element => element.setContainer(this));
+		this.elements.forEach((element, index) => this.insert({ element, at: index }));
 	}
 
 	public static from(
 		serialized: Types.SerializedPageElementContent,
-		context: PageElementContext
+		context: PageElementContentContext
 	): PageElementContent {
 		return new PageElementContent({
+			elementId: context.elementId,
 			id: serialized.id,
 			name: serialized.name,
-			elements: serialized.elements.map(element => PageElement.from(element, context))
+			elements: serialized.elements.map(element =>
+				PageElement.from(element, { styleguide: context.styleguide })
+			)
 		});
+	}
+
+	public getElementId(): string {
+		return this.elementId;
 	}
 
 	public getElements(): PageElement[] {
@@ -161,6 +176,7 @@ export class PageElement {
 
 			this.contents.push(
 				new PageElementContent({
+					elementId: this.id,
 					id: slot.getId(),
 					name: slot.getName(),
 					elements: hydratedSlot ? hydratedSlot.getElements() : []
@@ -201,7 +217,10 @@ export class PageElement {
 			name: serializedPageElement.name,
 			pattern: context.styleguide.getPatternById(serializedPageElement.pattern) as Pattern,
 			contents: serializedPageElement.contents.map(content =>
-				PageElementContent.from(content, context)
+				PageElementContent.from(content, {
+					styleguide: context.styleguide,
+					elementId: serializedPageElement.id
+				})
 			),
 			properties: toMap(serializedPageElement.properties)
 		});
@@ -214,11 +233,11 @@ export class PageElement {
 	 * @param index The 0-based new position within the children. Leaving out the position adds it at the end of the list.
 	 */
 	public addChild(child: PageElement, slotId: string, index: number): void {
-		child.setParent({
-			index,
-			parent: this,
-			slotId
-		});
+		const container = this.getContainerById(slotId);
+
+		if (container) {
+			container.insert({ element: child, at: index });
+		}
 	}
 
 	/**
@@ -254,6 +273,10 @@ export class PageElement {
 		return this.container;
 	}
 
+	public getContainerById(slotId: string): PageElementContent | undefined {
+		return this.contents.find(content => content.getId() === slotId);
+	}
+
 	/**
 	 * Returns the id of the slot this element is attached to.
 	 * @return The slotId of the parent element.
@@ -263,17 +286,6 @@ export class PageElement {
 			return;
 		}
 		return this.container.getId();
-	}
-
-	public getContentById(slotId: string): PageElementContent | undefined {
-		return this.contents.find(content => content.getId() === slotId);
-	}
-
-	/**
-	 * Returns all child elements contained by this element, mapped to their containing slots.
-	 */
-	public getContents(): PageElementContent[] {
-		return this.contents;
 	}
 
 	public getElementById(id: string): PageElement | undefined {
@@ -317,7 +329,7 @@ export class PageElement {
 			return;
 		}
 
-		const content = this.parent.getContentById(this.container.getId());
+		const content = this.parent.getContainerById(this.container.getId());
 
 		if (!content) {
 			return;
@@ -359,7 +371,12 @@ export class PageElement {
 	 * @return The parent page element or undefined.
 	 */
 	public getParent(): PageElement | undefined {
-		return this.parent;
+		if (!this.container) {
+			return;
+		}
+
+		const store = ViewStore.getInstance();
+		return store.getElementById(this.container.getElementId());
 	}
 
 	/**
@@ -433,26 +450,8 @@ export class PageElement {
 	 * @return Whether this page element is the root element.
 	 */
 	public isRoot(): boolean {
-		return this.parent === undefined;
+		return this.container === null;
 	}
-
-	/**
-	 * Returns a JSON value (serializable JavaScript object) for a given property value.
-	 * @return value The property value to serialize.
-	 * @return The JSON value.
-	 */
-	/* protected propertyToJsonValue(value: Types.PropertyValue): any {
-		if (value instanceof Object) {
-			const jsonObject: any = {};
-			Object.keys(value).forEach((propertyId: string) => {
-				// tslint:disable-next-line:no-any
-				jsonObject[propertyId] = this.propertyToJsonValue((value as any)[propertyId]);
-			});
-			return jsonObject;
-		} else {
-			return value as any;
-		}
-	} */
 
 	/**
 	 * Removes this page element from its parent. You may later re-add it using setParent().
@@ -462,10 +461,6 @@ export class PageElement {
 		if (this.container) {
 			this.container.remove({ element: this });
 		}
-	}
-
-	public setContainer(container: PageElementContent): void {
-		this.container = container;
 	}
 
 	/**
@@ -518,14 +513,12 @@ export class PageElement {
 	 * Sets a new parent for this element (and removes it from its previous parent).
 	 * If no parent is provided, only removes it from its parent.
 	 * @param parent The (optional) new parent for this element.
-	 * @param index The 0-based new position within the children of the new parent.
+	 * @param index The 0-based new position within the container.
 	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
 	 * Leaving out the position adds it at the end of the list.
 	 */
 	public setParent(init: { index: number; parent: PageElement; slotId: string }): void {
-		this.parent = init.parent;
-
-		const container = init.parent.getContentById(init.slotId);
+		const container = init.parent.getContainerById(init.slotId);
 
 		if (this.container) {
 			this.container.remove({ element: this });
@@ -534,6 +527,8 @@ export class PageElement {
 		if (container) {
 			container.insert({ element: this, at: init.index });
 		}
+
+		this.container = container;
 	}
 
 	/**

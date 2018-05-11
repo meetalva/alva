@@ -1,21 +1,13 @@
-import * as Sender from '../message/client';
 import { remote } from 'electron';
-import { Exporter, ExportResult } from './exporter';
-import { ServerMessageType } from '../message';
-import { ViewStore } from '../store';
 import * as Url from 'url';
 import * as uuid from 'uuid';
 
-export class PngExporter extends Exporter {
-	public async createExport(): Promise<ExportResult> {
-		try {
-			this.contents = await this.createPngExport();
-			return { result: this.contents };
-		} catch (error) {
-			return { error };
-		}
-	}
+import * as Sender from '../message/client';
+import { Exporter } from './exporter';
+import { ServerMessageType } from '../message';
+import { ViewStore } from '../store';
 
+export class PngExporter extends Exporter {
 	private async createPngExport(): Promise<Buffer> {
 		return new Promise<Buffer>(resolve => {
 			const id = uuid.v4();
@@ -118,5 +110,20 @@ export class PngExporter extends Exporter {
 				start();
 			});
 		});
+	}
+
+	public async execute(path: string): Promise<void> {
+		try {
+			this.contents = await this.createPngExport();
+
+			Sender.send({
+				id: uuid.v4(),
+				type: ServerMessageType.ExportPNG,
+				payload: { path, content: this.contents }
+			});
+		} catch (error) {
+			// Todo: Implement error message
+			return;
+		}
 	}
 }

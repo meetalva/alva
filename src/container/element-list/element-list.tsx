@@ -1,10 +1,12 @@
 import { colors, ElementAnchors, ElementProps } from '../../components';
 import { elementMenu } from '../../electron/context-menus';
 import { ElementWrapper } from './element-wrapper';
+import { partition } from 'lodash';
 import { createMenu } from '../../electron/menu';
 import { observer } from 'mobx-react';
 import * as React from 'react';
 import * as Store from '../../store';
+import * as Types from '../../store/types';
 import * as uuid from 'uuid';
 
 export interface ElementListState {
@@ -49,10 +51,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		createMenu();
 	}
 
-	public createItemFromElement(
-		element: Store.PageElement,
-		selectedElement?: Store.PageElement
-	): ElementNodeProps {
+	public createItemFromElement(element: Store.PageElement): ElementNodeProps {
 		const store = Store.ViewStore.getInstance();
 		const pattern: Store.Pattern | undefined = element.getPattern();
 
@@ -66,18 +65,14 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			};
 		}
 
-		let defaultSlotItems: ElementNodeProps[] | undefined = [];
-		const slots: ElementNodeProps[] = [];
+		const createSlot = slot => this.createItemFromSlot(slot, element);
+		const [[defaultSlotData], slotsData] = partition(
+			pattern.getSlots(),
+			slot => slot.getType() === Types.SlotType.Children
+		);
 
-		pattern.getSlots().forEach(slot => {
-			const listItem = this.createItemFromSlot(slot, element, selectedElement);
-
-			if (slot.getId() === Store.Pattern.DEFAULT_SLOT_PROPERTY_NAME) {
-				defaultSlotItems = listItem.children;
-			} else {
-				slots.push(listItem);
-			}
-		});
+		const children = createSlot(defaultSlotData).children as ElementNodeProps[];
+		const slots = slotsData.map(createSlot);
 
 		return {
 			title: element.getName(),
@@ -85,26 +80,13 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			dragging: this.state.dragging,
 			editable: element.isNameEditable(),
 			id: element.getId(),
-			children: [...slots, ...defaultSlotItems],
-			active: element === selectedElement && !store.getSelectedSlotId()
+			children: [...slots, ...children],
+			active: store.getSelectedElement() === element
 		};
 	}
 
-	public createItemFromSlot(
-		slot: Store.Slot,
-		element: Store.PageElement,
-		selectedElement?: Store.PageElement
-	): ElementNodeProps {
-		const store = Store.ViewStore.getInstance();
-		const slotId = slot.getId();
-		const slotContent = element.getContainerById(slotId) as Store.PageElementContent;
-
-		const childItems: ElementNodeProps[] = [];
-		const selectedSlot = store.getSelectedSlotId();
-
-		slotContent.getElements().forEach((value: Store.PageElement, index: number) => {
-			childItems.push(this.createItemFromElement(value, selectedElement));
-		});
+	public createItemFromSlot(slot: Store.Slot, element: Store.PageElement): ElementNodeProps {
+		const slotContent = element.getContentBySlot(slot) as Store.PageElementContent;
 
 		const slotListItem: ElementNodeProps = {
 			id: slot.getId(),
@@ -112,8 +94,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			editable: false,
 			draggable: false,
 			dragging: this.state.dragging,
-			children: childItems,
-			active: element === selectedElement && selectedSlot === slotId
+			children: slotContent.getElements().map(value => this.createItemFromElement(value)),
+			active: false
 		};
 
 		return slotListItem;
@@ -239,12 +221,14 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
-		const dropContainer = dropParent.getContainerById('default') as Store.PageElementContent;
+		const dropContainer = dropParent.getContentBySlotType(
+			Types.SlotType.Children
+		) as Store.PageElementContent;
 
 		const command = Store.ElementLocationCommand.addChild({
 			parent: dropParent,
 			child: draggedElement,
-			slotId: 'default',
+			slotId: dropContainer.getSlotId(),
 			index: isSiblingDrop
 				? calculateDropIndex({ target: targetElement, dragged: draggedElement })
 				: dropContainer.getElements().length
@@ -321,8 +305,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return null;
 		}
 
-		const selectedElement = store.getSelectedElement();
-		const item = this.createItemFromElement(rootElement, selectedElement);
+		const item = this.createItemFromElement(rootElement);
 
 		return (
 			<div

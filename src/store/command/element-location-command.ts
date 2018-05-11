@@ -1,7 +1,7 @@
 import { Command } from './command';
 import { ElementCommand } from './element-command';
 import { Page } from '../page/page';
-import { PageElement } from '../page-element';
+import { PageElement, PageElementContent } from '../page-element';
 import { ViewStore } from '../view-store';
 
 /**
@@ -47,7 +47,7 @@ export class ElementLocationCommand extends ElementCommand {
 	/**
 	 * The slot the element is attached to. undefined means default slot.
 	 */
-	protected slotId: string = 'default';
+	protected slotId: string;
 
 	public constructor(init: {
 		element: PageElement;
@@ -61,8 +61,10 @@ export class ElementLocationCommand extends ElementCommand {
 		this.slotId = init.slotId;
 		this.index = init.index;
 
+		const container = init.element.getContainer();
+
 		this.previousParent = init.element.getParent();
-		this.previousSlotId = init.element.getContainerId();
+		this.previousSlotId = container ? container.getSlotId() : undefined;
 		this.previousIndex = this.previousParent ? (init.element.getIndex() as number) : 0;
 
 		const parentPage = init.parent.getPage();
@@ -98,40 +100,21 @@ export class ElementLocationCommand extends ElementCommand {
 		});
 	}
 
-	/**
-	 * Creates a command to add a page element as another child of an element's parent,
-	 * directly after that element. On execution, also removes the element from any previous parent.
-	 * @param newSibling The element to add at a given location.
-	 * @param location The element to add the new sibling after.
-	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
-	 * @return The new element command. To register and run the command it, call Store.execute().
-	 * @see Store.execute()
-	 */
 	public static addSibling(init: {
 		newSibling: PageElement;
 		sibling: PageElement;
 	}): ElementCommand {
 		const parent = init.sibling.getParent() as PageElement;
+		const container = init.sibling.getContainer() as PageElementContent;
 
 		return new ElementLocationCommand({
 			element: init.newSibling,
 			parent,
-			slotId: init.sibling.getContainerId() || 'default',
+			slotId: container.getSlotId(),
 			index: parent ? (init.sibling.getIndex() as number) + 1 : 0
 		});
 	}
 
-	/**
-	 * Creates a command to set a new parent for this element (and remove it
-	 * from its previous parent). If no parent is provided, only removes it from its parent.
-	 * @param child The element to set the new parent of.
-	 * @param parent The (optional) new parent for the element.
-	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
-	 * @param index The 0-based new position within the children of the new parent.
-	 * Leaving out the position adds it at the end of the list.
-	 * @return The new element command. To register and run the command it, call Store.execute().
-	 * @see Store.execute()
-	 */
 	public static setParent(
 		child: PageElement,
 		parent: PageElement,

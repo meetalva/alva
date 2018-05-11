@@ -3,7 +3,7 @@ import * as MobX from 'mobx';
 import * as ObjectPath from 'object-path';
 import { Page } from '../page';
 import { PageElementContent } from './page-element-content';
-import { Pattern, Property, Styleguide } from '../styleguide';
+import { Pattern, Property, Slot, Styleguide } from '../styleguide';
 import * as Types from '../types';
 import * as Uuid from 'uuid';
 import { ViewStore } from '../view-store';
@@ -94,14 +94,18 @@ export class PageElement {
 		this.container = properties.container;
 
 		this.pattern.getSlots().forEach(slot => {
-			const hydratedSlot = properties.contents.find(content => content.getId() === slot.getId());
+			const hydratedSlot = properties.contents.find(
+				content => content.getSlotId() === slot.getId()
+			);
 
 			this.contents.push(
 				new PageElementContent({
 					elementId: this.id,
-					id: slot.getId(),
+					id: Uuid.v4(),
 					name: slot.getName(),
-					elements: hydratedSlot ? hydratedSlot.getElements() : []
+					elements: hydratedSlot ? hydratedSlot.getElements() : [],
+					slotId: slot.getId(),
+					slotType: slot.getType()
 				})
 			);
 		});
@@ -148,12 +152,6 @@ export class PageElement {
 		});
 	}
 
-	/**
-	 * Adds a child element to is element (and removes it from any other parent).
-	 * @param child The child element to add.
-	 * @param slotId This indicates the slot, that the element will be attached to. When undefined, the default slot will be used instead.
-	 * @param index The 0-based new position within the children. Leaving out the position adds it at the end of the list.
-	 */
 	public addChild(child: PageElement, slotId: string, index: number): void {
 		child.setParent({
 			parent: this,
@@ -162,11 +160,6 @@ export class PageElement {
 		});
 	}
 
-	/**
-	 * Returns a deep clone of this page element (i.e. cloning all values and children as well).
-	 * The new clone has neither a parent, nor a slotId.
-	 * @return The new clone.
-	 */
 	public clone(): PageElement {
 		const payload = this.toJSON();
 		delete payload.id;
@@ -189,19 +182,23 @@ export class PageElement {
 		return this.container;
 	}
 
-	public getContainerById(slotId: string): PageElementContent | undefined {
-		return this.contents.find(content => content.getId() === slotId);
-	}
-
-	/**
-	 * Returns the id of the slot this element is attached to.
-	 * @return The slotId of the parent element.
-	 */
-	public getContainerId(): string | undefined {
+	public getContainerType(): undefined | Types.SlotType {
 		if (!this.container) {
 			return;
 		}
-		return this.container.getId();
+		return this.container.getSlotType();
+	}
+
+	public getContentBySlot(slot: Slot): PageElementContent | undefined {
+		return this.getContentBySlotId(slot.getId());
+	}
+
+	public getContentBySlotId(slotId: string): PageElementContent | undefined {
+		return this.contents.find(content => content.getSlotId() === slotId);
+	}
+
+	public getContentBySlotType(slotType: Types.SlotType): PageElementContent | undefined {
+		return this.contents.find(content => content.getSlotType() === slotType);
 	}
 
 	public getElementById(id: string): PageElement | undefined {
@@ -392,7 +389,7 @@ export class PageElement {
 
 		this.setParent({
 			parent: this.parent,
-			slotId: this.container.getId(),
+			slotId: this.container.getSlotId(),
 			index
 		});
 	}
@@ -427,20 +424,12 @@ export class PageElement {
 		this.page = page;
 	}
 
-	/**
-	 * Sets a new parent for this element (and removes it from its previous parent).
-	 * If no parent is provided, only removes it from its parent.
-	 * @param parent The (optional) new parent for this element.
-	 * @param index The 0-based new position within the container.
-	 * @param slotId The slot to attach the element to. When undefined the default slot is used.
-	 * Leaving out the position adds it at the end of the list.
-	 */
 	public setParent(init: { index: number; parent: PageElement; slotId: string }): void {
-		const container = init.parent.getContainerById(init.slotId);
-
 		if (this.container) {
 			this.container.remove({ element: this });
 		}
+
+		const container = init.parent.getContentBySlotId(init.slotId);
 
 		if (container) {
 			container.insert({ element: this, at: init.index });
@@ -449,16 +438,6 @@ export class PageElement {
 		this.container = container;
 	}
 
-	/**
-	 * Sets a property value (designer content) for this page element.
-	 * Any given value is automatically converted to be compatible to the property type.
-	 * For instance, the string "true" is converted to true if the property is boolean.
-	 * @param id The ID of the property to set the value for.
-	 * @param path A dot ('.') separated optional path within an object property to point to a deep
-	 * property. E.g., setting propertyId to 'image' and path to 'src.srcSet.xs',
-	 * the operation edits 'image.src.srcSet.xs' on the element.
-	 * @param value The value to set (which is automatically converted, see above).
-	 */
 	// tslint:disable-next-line:no-any
 	public setPropertyValue(id: string, value: any, path?: string): void {
 		let property: Property | undefined;

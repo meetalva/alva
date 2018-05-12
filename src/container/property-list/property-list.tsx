@@ -32,7 +32,8 @@ interface PropertyViewContainerProps {
 @MobxReact.observer
 class PropertyViewContainer extends React.Component<PropertyViewContainerProps> {
 	private handleCheckboxChange(e: React.ChangeEvent<HTMLElement>): void {
-		console.log(e);
+		const target = e.target as HTMLInputElement;
+		this.props.property.setValue(target.checked);
 	}
 
 	private handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void {
@@ -68,10 +69,11 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 				);
 			}
 			case P.Boolean: {
+				const value = property.getValue() as boolean;
 				return (
 					<Component.BooleanItem
 						{...base}
-						checked={false}
+						checked={value}
 						onChange={e => this.handleCheckboxChange(e)}
 					/>
 				);

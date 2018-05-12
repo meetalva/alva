@@ -8,11 +8,11 @@ import * as Types from '../types';
  * but everything is converted into a proper string (never undefined or null).
  * @see Property
  */
-export class StringPatternProperty extends PatternProperty {
+export class PatternStringProperty extends PatternProperty {
 	public readonly type = PatternPropertyType.String;
 
-	public static from(serialized: Types.SerializedStringProperty): StringPatternProperty {
-		return new StringPatternProperty({
+	public static from(serialized: Types.SerializedStringProperty): PatternStringProperty {
+		return new PatternStringProperty({
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,

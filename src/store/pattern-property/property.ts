@@ -213,18 +213,6 @@ export abstract class PatternProperty {
 	}
 
 	/**
-	 * Sets the default value of the property when creating a new page element.
-	 * This is the Alva default (such as "Lorem Ipsum"), not the default for production component
-	 * instantiation (where such defaults sometimes do not make sense).<br>
-	 * <b>Note:</b> This method should only be called from the pattern parsers.
-	 * @param defaultValue The default value.
-	 */
-	// tslint:disable-next-line:no-any
-	public setDefaultValue(defaultValue: any): void {
-		this.defaultValue = defaultValue;
-	}
-
-	/**
 	 * Sets whether this property is marked as hidden in Alva (exists in the pattern, but the designer
 	 * should not provide content for it).<br>
 	 * <b>Note:</b> This method should only be called from the pattern parsers.

@@ -67,7 +67,30 @@ const Page: React.SFC = (props: any) => (
 	</>
 );
 
+// tslint:disable-next-line:no-any
+const Box: React.SFC = (props: any) => {
+	const style = {
+		alignItems: props.alignItems,
+		display: props.flex ? 'flex' : 'block',
+		flexBasis: props.flexBasis,
+		// tslint:disable-next-line:no-any
+		flexDirection: props.column ? 'column' : (null as any),
+		// tslint:disable-next-line:no-any
+		flexWrap: props.wrap ? 'wrap' : ('nowrap' as any),
+		flexGrow: props.flexGrow,
+		flexShrink: props.flexShrink,
+		justifyContent: props.justifyContent,
+		order: props.order,
+		width: props.width,
+		height: props.height,
+		backgroundColor: props.backgroundColor
+	};
+
+	return <div style={style}>{props.children}</div>;
+};
+
 const SYNTHETICS = {
+	box: Box,
 	page: Page,
 	placeholder: props => <img src={props.src} style={{ width: '100%', height: 'auto' }} />,
 	text: props => <span>{props.text}</span>

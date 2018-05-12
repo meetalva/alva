@@ -6,7 +6,8 @@ import styled from 'styled-components';
 import { tag } from '../tag';
 
 export const ElementAnchors = {
-	element: 'data-element-id',
+	element: 'data-id',
+	content: 'data-id',
 	icon: 'data-icon',
 	label: 'data-element-label',
 	placeholder: 'data-element-placeholder'

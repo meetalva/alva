@@ -190,6 +190,31 @@ export class Element {
 		return this.container.getSlotType();
 	}
 
+	public getContentById(contentId: string): ElementContent | undefined {
+		let result;
+
+		for (const content of this.contents) {
+			if (content.getId() === contentId) {
+				result = content;
+				break;
+			}
+
+			for (const element of content.getElements()) {
+				result = element.getContentById(contentId);
+
+				if (result) {
+					break;
+				}
+			}
+
+			if (result) {
+				break;
+			}
+		}
+
+		return result;
+	}
+
 	public getContentBySlot(slot: PatternSlot): ElementContent | undefined {
 		return this.getContentBySlotId(slot.getId());
 	}

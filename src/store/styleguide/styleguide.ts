@@ -1,6 +1,8 @@
-import { Pattern, PatternFolder, SyntheticPatternType } from './pattern';
-import * as PatternProperty from './pattern-property';
-import * as Types from './types';
+import { Page } from './page';
+import { Pattern, PatternFolder, SyntheticPatternType } from '../pattern';
+import { Placeholder } from './placeholder';
+import { Text } from './text';
+import * as Types from '../types';
 import * as uuid from 'uuid';
 
 /**
@@ -26,20 +28,7 @@ export class Styleguide {
 	private patterns: Pattern[] = [];
 	private root: PatternFolder;
 
-	/**
-	 * Creates a new styleguide. Then loads the styleguide's patterns using the configured
-	 * styleguide analyzer.
-	 * @param path The absolute and OS-specific path to the styleguide top-level folders.
-	 * This is where all pattern implementations are located.
-	 * @param patternsPath The path of the root folder of the built patterns (like atoms,
-	 * modules etc.) in the currently opened styleguide.
-	 * @param analyzerName The name of the analyzer active in this styleguide. The actual one
-	 * depends on the type of styleguide. The analyzers detects patterns (and pattern folders)
-	 * it finds to the list of styleguide patterns.
-	 */
-	public constructor(
-		init: StyleguideInit /* path: string, patternsPath: string, analyzerName: string*/
-	) {
+	public constructor(init: StyleguideInit) {
 		this.id = init.id || uuid.v4();
 		this.root = init.root || new PatternFolder({ name: 'root' });
 
@@ -51,37 +40,10 @@ export class Styleguide {
 				parent: this.root
 			});
 
-			const page = new Pattern({
-				name: 'Page',
-				path: '',
-				type: SyntheticPatternType.SyntheticPage
-			});
+			const placeholder = Placeholder();
+			const text = Text();
 
-			const placeholder = new Pattern({
-				name: 'Placeholder',
-				path: '',
-				type: SyntheticPatternType.SyntheticPlaceholder,
-				properties: [
-					new PatternProperty.PatternAssetProperty({
-						label: 'Source',
-						propertyName: 'src'
-					})
-				]
-			});
-
-			const text = new Pattern({
-				name: 'Text',
-				path: '',
-				type: SyntheticPatternType.SyntheticText,
-				properties: [
-					new PatternProperty.StringPatternProperty({
-						label: 'Text',
-						propertyName: 'text'
-					})
-				]
-			});
-
-			this.patterns = [page, placeholder, text];
+			this.patterns = [Page(), placeholder, text];
 
 			syntheticFolder.addPattern(placeholder);
 			syntheticFolder.addPattern(text);

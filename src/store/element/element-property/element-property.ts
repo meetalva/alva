@@ -52,6 +52,10 @@ export class ElementProperty {
 		return this.patternProperty.getLabel();
 	}
 
+	public getPatternProperty(): PatternProperty {
+		return this.patternProperty;
+	}
+
 	public getType(): PatternPropertyType {
 		return this.patternProperty.getType();
 	}

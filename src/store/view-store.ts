@@ -6,7 +6,7 @@ import {
 	PageRemoveCommand
 } from './command';
 
-import { Element } from './element';
+import { Element, ElementContent } from './element';
 import * as Mobx from 'mobx';
 import * as Os from 'os';
 import { Page } from './page';
@@ -343,6 +343,19 @@ export class ViewStore {
 		return item.item.clone();
 	}
 
+	public getContentById(id: string): ElementContent | undefined {
+		const project = this.getCurrentProject();
+
+		let result;
+
+		project.getPages().some(page => {
+			result = page.getContentById(id);
+			return result;
+		});
+
+		return result;
+	}
+
 	/**
 	 * Returns the page content that is currently being displayed in the preview,
 	 * and edited in the elements and properties panes. May be undefined if there is none.
@@ -373,13 +386,16 @@ export class ViewStore {
 	}
 
 	public getElementById(id: string): Element | undefined {
-		const page = this.getCurrentPage();
+		const project = this.getCurrentProject();
 
-		if (!page) {
-			return;
-		}
+		let result;
 
-		return page.getElementById(id);
+		project.getPages().some(page => {
+			result = page.getElementById(id);
+			return result;
+		});
+
+		return result;
 	}
 
 	public getHighlightedElement(): Element | undefined {

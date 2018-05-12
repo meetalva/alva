@@ -7,7 +7,6 @@ import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import * as Store from '../../store';
 import * as Types from '../../store/types';
-import * as uuid from 'uuid';
 
 export interface ElementListState {
 	dragging: boolean;
@@ -57,31 +56,37 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		if (!pattern) {
 			return {
-				title: '(invalid)',
-				id: uuid.v4(),
+				active: store.getSelectedElement() === element,
 				children: [],
 				draggable: false,
-				dragging: this.state.dragging
+				dragging: this.state.dragging,
+				editable: false,
+				id: element.getId(),
+				title: `Invalid: ${element.getName()}`
 			};
 		}
 
 		const createSlot = slot => this.createItemFromSlot(slot, element);
+
 		const [[defaultSlotData], slotsData] = partition(
 			pattern.getSlots(),
 			slot => slot.getType() === Types.SlotType.Children
 		);
 
-		const children = createSlot(defaultSlotData).children as ElementNodeProps[];
+		const children = defaultSlotData
+			? (createSlot(defaultSlotData).children as ElementNodeProps[])
+			: [];
+
 		const slots = slotsData.map(createSlot);
 
 		return {
-			title: element.getName(),
+			active: store.getSelectedElement() === element,
+			children: [...slots, ...children],
 			draggable: !element.isNameEditable(),
 			dragging: this.state.dragging,
 			editable: element.isNameEditable(),
 			id: element.getId(),
-			children: [...slots, ...children],
-			active: store.getSelectedElement() === element
+			title: element.getName()
 		};
 	}
 
@@ -89,8 +94,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		const slotContent = element.getContentBySlot(slot) as Store.ElementContent;
 
 		const slotListItem: ElementNodeProps = {
-			id: slot.getId(),
-			title: `\uD83D\uDD18 ${slot.getName()}`,
+			id: slotContent.getId(),
+			title: slot.getName(),
 			editable: false,
 			draggable: false,
 			dragging: this.state.dragging,
@@ -186,25 +191,13 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		const isSiblingDrop =
 			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
-		const targetElement = elementFromTarget(e.target);
 
-		if (!targetElement) {
+		const targetElement = elementFromTarget(e.target);
+		const targetContent = contentFromTarget(e.target);
+
+		if (!targetElement && !targetContent) {
 			return;
 		}
-
-		const getDropParent = (el: Store.Element): Store.Element => {
-			if (!isSiblingDrop) {
-				return el;
-			}
-
-			if (el.isRoot()) {
-				return el;
-			}
-
-			return el.getParent() as Store.Element;
-		};
-
-		const dropParent = getDropParent(targetElement);
 
 		// prettier-ignore
 		const draggedElement = pattern
@@ -222,16 +215,43 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
-		const dropContainer = dropParent.getContentBySlotType(
-			Types.SlotType.Children
-		) as Store.ElementContent;
+		const getDropParent = (el?: Store.Element): Store.Element | undefined => {
+			if (!el && targetContent) {
+				return store.getElementById(targetContent.getElementId()) as Store.Element;
+			}
+
+			if (!el) {
+				return;
+			}
+
+			if (!isSiblingDrop) {
+				return el;
+			}
+
+			if (el.isRoot()) {
+				return el;
+			}
+
+			return el.getParent() as Store.Element;
+		};
+
+		const dropParent = getDropParent(targetElement) as Store.Element;
+		const dropContainer =
+			targetContent || dropParent.getContentBySlotType(Types.SlotType.Children);
+
+		if (!dropContainer) {
+			return;
+		}
 
 		const command = Store.ElementLocationCommand.addChild({
 			parent: dropParent,
 			child: draggedElement,
 			slotId: dropContainer.getSlotId(),
 			index: isSiblingDrop
-				? calculateDropIndex({ target: targetElement, dragged: draggedElement })
+				? calculateDropIndex({
+						target: targetElement as Store.Element,
+						dragged: draggedElement
+				  })
 				: dropContainer.getElements().length
 		});
 
@@ -365,6 +385,23 @@ function above(node: EventTarget, selector: string): HTMLElement | null {
 	}
 
 	return ended ? null : el;
+}
+
+function contentFromTarget(target: EventTarget): Store.ElementContent | undefined {
+	const el = above(target, `[${ElementAnchors.content}]`);
+
+	if (!el) {
+		return;
+	}
+
+	const id = el.getAttribute(ElementAnchors.element);
+
+	if (typeof id !== 'string') {
+		return;
+	}
+
+	const store = Store.ViewStore.getInstance();
+	return store.getContentById(id);
 }
 
 function elementFromTarget(target: EventTarget): Store.Element | undefined {

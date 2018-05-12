@@ -19,6 +19,8 @@ export interface RenderInit {
 	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
 	// tslint:disable-next-line:no-any
 	getProperties(props: any): any;
+	// tslint:disable-next-line:no-any
+	getSlots(slots: any, render: (props: any) => any): any;
 }
 
 export interface InjectedPreviewHighlightProps {
@@ -33,6 +35,7 @@ export interface InjectedPreviewApplicationProps {
 interface InjectedPreviewComponentProps extends Types.SerializedElement {
 	getComponent: RenderInit['getComponent'];
 	getProperties: RenderInit['getProperties'];
+	getSlots: RenderInit['getSlots'];
 	highlight: HighlightArea;
 	store: PreviewStore;
 	// tslint:disable-next-line:no-any
@@ -59,6 +62,7 @@ const Page: React.SFC = (props: any) => (
 			{props.viewport && <meta name="viewport" content="width=device-width, initial-scale=1" />}
 			{props.head}
 		</Helmet>
+		{props.content}
 		{props.children}
 	</>
 );
@@ -74,6 +78,7 @@ export function render(init: RenderInit): void {
 		<MobXReact.Provider
 			getComponent={init.getComponent}
 			getProperties={init.getProperties}
+			getSlots={init.getSlots}
 			store={init.store}
 			highlight={init.highlight}
 		>
@@ -130,7 +135,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 	}
 }
 
-@MobXReact.inject('getComponent', 'getProperties', 'store', 'highlight')
+@MobXReact.inject('getComponent', 'getProperties', 'getSlots', 'store', 'highlight')
 @MobXReact.observer
 class PreviewComponent extends React.Component<Types.SerializedElement> {
 	public componentWillUpdate(): void {
@@ -153,14 +158,10 @@ class PreviewComponent extends React.Component<Types.SerializedElement> {
 		const defaultContent = props.contents.find(content => content.slotType === 'children');
 		const children = defaultContent ? defaultContent.elements : [];
 
-		const slots = props.contents.filter(content => content.slotType !== 'children').reduce(
-			(acc, slot) => ({
-				...acc,
-				[slot.id]: slot.elements.map(child => <PreviewComponent key={child.id} {...child} />)
-			}),
-			{}
-		);
-
+		const slotsContents = props.contents.filter(content => content.slotType !== 'children');
+		const slots = props.getSlots(slotsContents, child => (
+			<PreviewComponent key={child.id} {...child} />
+		));
 		const properties = props.getProperties(props.properties);
 
 		// tslint:disable-next-line:no-any

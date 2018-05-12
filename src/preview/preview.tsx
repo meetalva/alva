@@ -75,6 +75,7 @@ function main(): void {
 			// tslint:disable-next-line:no-any
 			getComponent: createComponentGetter(store),
 			getProperties: createPropertiesGetter(store),
+			getSlots: createSlotGetter(store),
 			highlight,
 			store
 		});
@@ -312,6 +313,25 @@ function createPropertiesGetter(
 
 			return acc;
 		}, {});
+}
+
+// tslint:disable:no-any
+function createSlotGetter(
+	store: PreviewStore
+): (contents: Types.SerializedPageElementContent[], render: any) => any {
+	return (contents, render) => {
+		const slots = store.components.reduce((acc, component) => [...acc, ...component.slots], []);
+
+		return contents.reduce((acc, content) => {
+			const slot = slots.find(s => s.id === content.slotId);
+
+			if (slot) {
+				acc[slot.propertyName] = content.elements.map(render);
+			}
+
+			return acc;
+		}, {});
+	};
 }
 
 main();

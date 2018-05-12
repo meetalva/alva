@@ -18,12 +18,12 @@ import {
 import { ElementList } from './element-list';
 import { createMenu } from '../electron/menu';
 import { ServerMessageType } from '../message';
-import { observer } from 'mobx-react';
+import * as MobxReact from 'mobx-react';
 import { PageListContainer } from './page-list/page-list-container';
 import { PageListPreview } from './page-list/page-list-preview';
 import { PatternListContainer } from './pattern-list';
 import { PreviewPaneWrapper } from './preview-pane-wrapper';
-import { PropertyList } from './property-list';
+import { PropertyListContainer } from './property-list';
 import * as React from 'react';
 import { SplashScreenContainer } from './splash-screen-container';
 import { ViewStore } from '../store';
@@ -32,7 +32,7 @@ import * as uuid from 'uuid';
 
 globalStyles();
 
-@observer
+@MobxReact.observer
 export class App extends React.Component {
 	private ctrlDown: boolean = false;
 	private shiftDown: boolean = false;
@@ -153,7 +153,7 @@ export class App extends React.Component {
 							>
 								{store.getRightPane() === Types.RightPane.Properties && (
 									<PropertyPane>
-										<PropertyList />
+										<PropertyListContainer />
 									</PropertyPane>
 								)}
 								{store.getRightPane() === Types.RightPane.Patterns && (

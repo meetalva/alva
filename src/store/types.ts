@@ -19,29 +19,19 @@ export interface SerializedProject extends SavedProject {
 export interface SerializedPage {
 	id: string;
 	name: string;
-	root: SerializedPageElement;
+	root: SerializedElement;
 }
 
-export interface SerializedPageElement {
+export interface SerializedElement {
 	contents: SerializedPageElementContent[];
 	id: string;
 	name: string;
 	pattern: string;
-	properties: { [key: string]: PropertyValue };
+	properties: SerializedElementProperty[];
 }
 
-export type PropertyValue =
-	| { [id: string]: PropertyValue }
-	| string
-	| string[]
-	| number
-	| number[]
-	| boolean
-	| undefined
-	| null;
-
 export interface SerializedPageElementContent {
-	elements: SerializedPageElement[];
+	elements: SerializedElement[];
 	id: string;
 	name: string;
 	slotId: string;
@@ -66,7 +56,7 @@ export interface SerializedPattern {
 	id: string;
 	name: string;
 	path: string;
-	properties: SerializedProperty[];
+	properties: SerializedPatternProperty[];
 	slots: SerializedPatternSlot[];
 	type: string;
 }
@@ -78,7 +68,7 @@ export interface SerializedPatternSlot {
 	type: string;
 }
 
-export enum PropertyType {
+export enum PatternPropertyType {
 	Asset = 'asset',
 	Boolean = 'boolean',
 	Enum = 'enum',
@@ -89,42 +79,47 @@ export enum PropertyType {
 	String = 'string'
 }
 
-export type SerializedProperty =
-	| SerializedAssetProperty
-	| SerializedBooleanProperty
-	| SerializedEnumProperty
-	| SerializedNumberArrayProperty
-	| SerializedNumberProperty
-	| SerializedObjectProperty
-	| SerializedStringArrayProperty
+export type ElementPropertyValue =
+	| undefined
+	| boolean
+	| number
+	| number[]
+	| object
+	| string
+	| string[];
+
+export type SerializedPatternProperty =
+	| SerializedPatternAssetProperty
+	| SerializedPatternBooleanProperty
+	| SerializedPatternEnumProperty
+	| SerializedPatternNumberArrayProperty
+	| SerializedPatternNumberProperty
+	| SerializedPatternObjectProperty
+	| SerializedPatternStringArrayProperty
 	| SerializedStringProperty;
 
-export interface SerializedAssetProperty {
+export interface SerializedPropertyBase {
+	hidden: boolean;
+	id: string;
+	label: string;
+	propertyName: string;
+	required: boolean;
+}
+
+export interface SerializedPatternAssetProperty extends SerializedPropertyBase {
 	defaultValue: string;
-	hidden: boolean;
-	id: string;
-	name: string;
-	required: boolean;
-	type: PropertyType.Asset;
+	type: PatternPropertyType.Asset;
 }
 
-export interface SerializedBooleanProperty {
+export interface SerializedPatternBooleanProperty extends SerializedPropertyBase {
 	defaultValue: boolean;
-	hidden: boolean;
-	id: string;
-	name: string;
-	required: boolean;
-	type: PropertyType.Boolean;
+	type: PatternPropertyType.Boolean;
 }
 
-export interface SerializedEnumProperty {
+export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
 	defaultValue: boolean;
-	hidden: boolean;
-	id: string;
-	name: string;
 	options: SerializedEnumOption[];
-	required: boolean;
-	type: PropertyType.Enum;
+	type: PatternPropertyType.Enum;
 }
 
 export interface SerializedEnumOption {
@@ -133,49 +128,29 @@ export interface SerializedEnumOption {
 	ordinal: number;
 }
 
-export interface SerializedNumberArrayProperty {
+export interface SerializedPatternNumberArrayProperty extends SerializedPropertyBase {
 	defaultValue: number[];
-	hidden: boolean;
-	id: string;
-	name: string;
-	required: boolean;
-	type: PropertyType.NumberArray;
+	type: PatternPropertyType.NumberArray;
 }
 
-export interface SerializedNumberProperty {
+export interface SerializedPatternNumberProperty extends SerializedPropertyBase {
 	defaultValue: number;
-	hidden: boolean;
-	id: string;
-	name: string;
-	required: boolean;
-	type: PropertyType.Number;
+	type: PatternPropertyType.Number;
 }
 
-export interface SerializedObjectProperty {
+export interface SerializedPatternObjectProperty extends SerializedPropertyBase {
 	defaultValue: number;
-	hidden: boolean;
-	id: string;
-	name: string;
-	required: boolean;
-	type: PropertyType.Object;
+	type: PatternPropertyType.Object;
 }
 
-export interface SerializedStringArrayProperty {
+export interface SerializedPatternStringArrayProperty extends SerializedPropertyBase {
 	defaultValue: string[];
-	hidden: boolean;
-	id: string;
-	name: string;
-	required: boolean;
-	type: PropertyType.StringArray;
+	type: PatternPropertyType.StringArray;
 }
 
-export interface SerializedStringProperty {
+export interface SerializedStringProperty extends SerializedPropertyBase {
 	defaultValue: string;
-	hidden: boolean;
-	id: string;
-	name: string;
-	required: boolean;
-	type: PropertyType.String;
+	type: PatternPropertyType.String;
 }
 
 export enum AlvaView {
@@ -197,4 +172,16 @@ export enum EditState {
 export enum SlotType {
 	Children = 'children',
 	Property = 'property'
+}
+
+export interface SerializedElementProperty {
+	id: string;
+	patternProperty: SerializedPatternProperty;
+	setDefault: boolean;
+	value: ElementPropertyValue;
+}
+
+export interface RenderPage {
+	id: string;
+	name: string;
 }

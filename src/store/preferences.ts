@@ -1,4 +1,4 @@
-import * as MobX from 'mobx';
+import * as Mobx from 'mobx';
 
 /**
  * The internal data storage for preferences, i.e. personal settings
@@ -8,17 +8,17 @@ export class Preferences {
 	/**
 	 * The last opened page's ID.
 	 */
-	@MobX.observable private lastPageId?: string;
+	@Mobx.observable private lastPageId?: string;
 
 	/**
 	 * The last selected project's ID.
 	 */
-	@MobX.observable private lastProjectId?: string;
+	@Mobx.observable private lastProjectId?: string;
 
 	/**
 	 * The last opened styleguide's absolute path.
 	 */
-	@MobX.observable private lastStyleguidePath?: string;
+	@Mobx.observable private lastStyleguidePath?: string;
 
 	/**
 	 * Loads and returns preferences from a given JSON object.

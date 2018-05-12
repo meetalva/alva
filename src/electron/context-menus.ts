@@ -1,12 +1,12 @@
 import * as Sender from '../message/client';
 import { MenuItemConstructorOptions, remote } from 'electron';
 import { ServerMessageType } from '../message';
-import { PageElement, ViewStore } from '../store';
+import { Element, ViewStore } from '../store';
 import * as uuid from 'uuid';
 
 const store = ViewStore.getInstance();
 
-export function elementMenu(element: PageElement): void {
+export function elementMenu(element: Element): void {
 	const defaultPasteItems = [
 		{
 			label: 'Paste Below',

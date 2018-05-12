@@ -1,19 +1,20 @@
-import * as MobX from 'mobx';
-import { PageElement } from '../page-element';
-import { Styleguide, SyntheticPatternType } from '../styleguide';
+import { Element } from '../element';
+import * as Mobx from 'mobx';
+import { SyntheticPatternType } from '../pattern';
+import { Styleguide } from '../styleguide';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
 export interface PageInit {
 	id?: string;
 	name?: string;
-	root: PageElement;
+	root: Element;
 }
 
 export interface PageCreateInit {
 	id?: string;
 	name: string;
-	root?: PageElement;
+	root?: Element;
 	styleguide: Styleguide;
 }
 
@@ -31,28 +32,28 @@ export class Page {
 	/**
 	 * Intermediary edited name
 	 */
-	@MobX.observable private editedName: string = '';
+	@Mobx.observable private editedName: string = '';
 
 	/**
 	 * The technical unique identifier of this page
 	 */
-	@MobX.observable private id: string;
+	@Mobx.observable private id: string;
 
 	/**
 	 * The human-friendly name of the page.
 	 * In the frontend, to be displayed instead of the ID.
 	 */
-	@MobX.observable private name: string = 'Page';
+	@Mobx.observable private name: string = 'Page';
 
 	/**
 	 * Wether the name may be edited
 	 */
-	@MobX.observable public nameState: Types.EditState = Types.EditState.Editable;
+	@Mobx.observable public nameState: Types.EditState = Types.EditState.Editable;
 
 	/**
 	 * The root element of the page, the first pattern element of the content tree.
 	 */
-	private root: PageElement;
+	private root: Element;
 
 	/**
 	 * Creates a new page.
@@ -80,10 +81,11 @@ export class Page {
 			name: init.name,
 			root:
 				init.root ||
-				new PageElement({
+				new Element({
 					name: init.name,
 					pattern: init.styleguide.getPatternByType(SyntheticPatternType.SyntheticPage),
-					contents: []
+					contents: [],
+					properties: []
 				})
 		});
 	}
@@ -99,7 +101,7 @@ export class Page {
 			{
 				id: serializedPage.id,
 				name: serializedPage.name,
-				root: PageElement.from(serializedPage.root, context)
+				root: Element.from(serializedPage.root, context)
 			},
 			context
 		);
@@ -124,7 +126,7 @@ export class Page {
 	 * Returns the page element for a given Id or undefined, if no such ID exists.
 	 * @return The page element or undefined.
 	 */
-	public getElementById(id: string): PageElement | undefined {
+	public getElementById(id: string): Element | undefined {
 		return this.root.getElementById(id);
 	}
 
@@ -161,7 +163,7 @@ export class Page {
 	 * Returns the root element of the page, the first pattern element of the content tree.
 	 * @return The root element of the page.
 	 */
-	public getRoot(): PageElement | undefined {
+	public getRoot(): Element | undefined {
 		return this.root;
 	}
 
@@ -169,7 +171,7 @@ export class Page {
 	 * Sets the human-friendly name of the page.
 	 * @param name The human-friendly name of the page.
 	 */
-	@MobX.action
+	@Mobx.action
 	public setName(name: string): void {
 		if (this.nameState === Types.EditState.Editing) {
 			this.editedName = name;
@@ -198,11 +200,11 @@ export class Page {
 	 * @return The JSON object to be persisted.
 	 * @see Property.convertToRender()
 	 */
-	public toJSON(props?: { forRendering?: boolean }): Types.SerializedPage {
+	public toJSON(): Types.SerializedPage {
 		return {
 			id: this.getId(),
 			name: this.getName(),
-			root: this.root.toJSON(props)
+			root: this.root.toJSON()
 		};
 	}
 }

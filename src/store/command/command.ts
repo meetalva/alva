@@ -1,4 +1,4 @@
-import { PageElement } from '../page-element';
+import { Element } from '../element';
 
 /**
  * A user operation on a page or project, with the ability to undo and redo.
@@ -21,7 +21,7 @@ export abstract class Command {
 	 * @param element The element to analyze. May be undefined.
 	 * @return The ID or undefined, if the element is not set or not part of a page.
 	 */
-	protected getElementIdIfPartOfPage(element?: PageElement): string | undefined {
+	protected getElementIdIfPartOfPage(element?: Element): string | undefined {
 		return element && element.getPage() ? element.getId() : undefined;
 	}
 

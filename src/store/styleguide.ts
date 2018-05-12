@@ -1,8 +1,6 @@
-import { AssetProperty } from './property/asset-property';
-import { PatternFolder } from './folder';
-import { Pattern, SyntheticPatternType } from './pattern';
-import { StringProperty } from './property/string-property';
-import * as Types from '../types';
+import { Pattern, PatternFolder, SyntheticPatternType } from './pattern';
+import * as PatternProperty from './pattern-property';
+import * as Types from './types';
 import * as uuid from 'uuid';
 
 /**
@@ -49,72 +47,45 @@ export class Styleguide {
 			this.patterns = init.patterns;
 		} else {
 			const syntheticFolder = new PatternFolder({
-				name: 'synthetic',
+				name: 'Synthetic',
 				parent: this.root
 			});
 
-			this.patterns = [
-				new Pattern({
-					name: 'page',
-					path: '',
-					type: SyntheticPatternType.SyntheticPage
-				}),
-				new Pattern({
-					name: 'placeholder',
-					path: '',
-					type: SyntheticPatternType.SyntheticPlaceholder,
-					properties: [
-						new AssetProperty({
-							name: 'src',
-							id: AssetProperty.SYNTHETIC_ASSET_ID
-						})
-					]
-				}),
-				new Pattern({
-					name: 'text',
-					path: '',
-					type: SyntheticPatternType.SyntheticText,
-					properties: [
-						new StringProperty({
-							name: 'text',
-							id: StringProperty.SYNTHETIC_TEXT_ID
-						})
-					]
-				})
-			];
+			const page = new Pattern({
+				name: 'Page',
+				path: '',
+				type: SyntheticPatternType.SyntheticPage
+			});
 
-			syntheticFolder.addPattern(this.patterns[1]);
-			syntheticFolder.addPattern(this.patterns[2]);
+			const placeholder = new Pattern({
+				name: 'Placeholder',
+				path: '',
+				type: SyntheticPatternType.SyntheticPlaceholder,
+				properties: [
+					new PatternProperty.PatternAssetProperty({
+						label: 'Source',
+						propertyName: 'src'
+					})
+				]
+			});
+
+			const text = new Pattern({
+				name: 'Text',
+				path: '',
+				type: SyntheticPatternType.SyntheticText,
+				properties: [
+					new PatternProperty.StringPatternProperty({
+						label: 'Text',
+						propertyName: 'text'
+					})
+				]
+			});
+
+			this.patterns = [page, placeholder, text];
+
+			syntheticFolder.addPattern(placeholder);
+			syntheticFolder.addPattern(text);
 		}
-
-		/* this.path = path;
-		this.patternsPath = patternsPath;
-
-		const Analyzer = require(`../../styleguide/analyzer/${analyzerName}/${analyzerName}`)
-			.Analyzer;
-		this.analyzer = new Analyzer();
-
-		const patternsDir = new Directory(this.getPatternsPath());
-		this.patternRoot = new PatternFolder(patternsDir.getName());
-
-		const folder = new PatternFolder('synthetic', this.patternRoot);
-
-		const pagePattern = new Pattern(SyntheticPatternType.Page, 'Page', '');
-		this.addPattern(pagePattern);
-
-		const textPattern = new Pattern(SyntheticPatternType.Text, 'Text', '');
-		textPattern.addProperty(new StringProperty(StringProperty.SYNTHETIC_TEXT_ID));
-		folder.addPattern(textPattern);
-		this.addPattern(textPattern);
-
-		const assetPattern = new Pattern(SyntheticPatternType.Placeholder, 'Placeholder', '');
-		assetPattern.addProperty(new AssetProperty(AssetProperty.SYNTHETIC_ASSET_ID));
-		folder.addPattern(assetPattern);
-		this.addPattern(assetPattern);
-
-		if (this.analyzer) {
-			this.analyzer.analyze(this);
-		} */
 	}
 
 	public static create(): Styleguide {

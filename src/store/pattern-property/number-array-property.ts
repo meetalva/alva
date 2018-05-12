@@ -1,5 +1,5 @@
-import { Property, PropertyType } from './property';
-import * as Types from '../../types';
+import { PatternProperty, PatternPropertyType } from './property';
+import * as Types from '../types';
 
 /**
  * A number array property is a property that supports a list of numbers only.
@@ -8,15 +8,18 @@ import * as Types from '../../types';
  * See coerceValue(). But everything is converted into a proper array of numbers.
  * @see Property
  */
-export class NumberArrayProperty extends Property {
-	public readonly type = PropertyType.NumberArray;
+export class PatternNumberArrayProperty extends PatternProperty {
+	public readonly type = PatternPropertyType.NumberArray;
 
-	public static from(serialized: Types.SerializedNumberArrayProperty): NumberArrayProperty {
-		return new NumberArrayProperty({
+	public static from(
+		serialized: Types.SerializedPatternNumberArrayProperty
+	): PatternNumberArrayProperty {
+		return new PatternNumberArrayProperty({
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,
-			name: serialized.name,
+			label: serialized.label,
+			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
 	}
@@ -27,12 +30,13 @@ export class NumberArrayProperty extends Property {
 		return this.coerceArrayValue(value, (element: any) => parseFloat(value));
 	}
 
-	public toJSON(): Types.SerializedNumberArrayProperty {
+	public toJSON(): Types.SerializedPatternNumberArrayProperty {
 		return {
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,
-			name: this.name,
+			label: this.label,
+			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type
 		};

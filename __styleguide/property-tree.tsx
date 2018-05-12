@@ -1,54 +1,21 @@
-import * as Sender from '../message/client';
-import {
-	AssetItem,
-	BooleanItem,
-	Element,
-	EnumItem,
-	EnumItemValues,
-	StringItem
-} from '../components';
-import { ServerMessageType } from '../message';
+import * as Sender from '../../message/client';
+import * as Components from '../../components';
+import { ServerMessageType } from '../../message';
 import * as MobX from 'mobx';
 import { observer } from 'mobx-react';
+import * as PropertyItems from '../../components/property-items';
 import * as React from 'react';
-import {
-	EnumProperty,
-	ObjectProperty,
-	Option,
-	PageElement,
-	PropertyValueCommand,
-	ViewStore
-} from '../store';
-import * as Types from '../store/types';
+import { Element, Option, PropertyValueCommand, ViewStore } from '../../store';
 import * as uuid from 'uuid';
 
-interface ObjectContext {
-	path: string;
-	property: ObjectProperty;
-}
-
-interface PropertyTreeProps {
-	context?: ObjectContext;
-	element: PageElement;
+export interface PropertyTreeProps {
+	element: Element;
 }
 
 @observer
-class PropertyTree extends React.Component<PropertyTreeProps> {
+export class PropertyTree extends React.Component<PropertyTreeProps> {
 	@MobX.observable protected isOpen = false;
 	protected lastCommand: PropertyValueCommand;
-
-	protected convertOptionsToValues(options: Option[]): EnumItemValues[] {
-		return options.map(option => ({
-			id: option.getId(),
-			name: option.getName()
-		}));
-	}
-
-	protected getValue(id: string, path?: string): Types.PropertyValue {
-		const fullPath = path ? `${path}.${id}` : id;
-		const [rootId, ...propertyPath] = fullPath.split('.');
-		return this.props.element.getPropertyValue(rootId, propertyPath.join('.'));
-	}
 
 	protected handleBlur(): void {
 		if (this.lastCommand) {
@@ -57,7 +24,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 	}
 
 	// tslint:disable-next-line:no-any
-	protected handleChange(id: string, value: any, context?: ObjectContext): void {
+	/* protected handleChange(id: string, value: any, context?: ObjectContext): void {
 		const fullPath: string = context ? `${context.path}.${id}` : id;
 		const [rootId, ...propertyPath] = fullPath.split('.');
 		this.lastCommand = new PropertyValueCommand(
@@ -89,30 +56,21 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 
 	protected handleClick(): void {
 		this.isOpen = !this.isOpen;
-	}
+	} */
 
-	public render(): React.ReactNode {
-		const { context } = this.props;
-
-		if (!context) {
-			return this.renderItems();
-		}
-
-		const { property } = context;
-
+	/* public render(): React.ReactNode {
 		return (
-			<Element
+			<Components.Element
 				dragging={false}
-				title={property.getName()}
+				title={property.getLabel()}
 				open={this.isOpen}
-				onClick={this.handleClick}
 			>
 				{this.isOpen ? this.renderItems() : 'hidden'}
-			</Element>
+			</Components.Element>
 		);
-	}
+	} */
 
-	protected renderItems(): React.ReactNode {
+	/* protected renderItems(): React.ReactNode {
 		const { context, element } = this.props;
 		const pattern = element.getPattern();
 
@@ -128,15 +86,25 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 			<>
 				{properties.map(property => {
 					const id = property.getId();
-					const name = property.getName();
-					const value = this.getValue(id, context && context.path);
+					const label = property.getLabel();
+
+					return null;
+
+					/* const value = element.getPropertyValue();
+
+					/*
+					 	protected getValue(id: string, path?: string): Types.PropertyValue {
+		const fullPath = path ? `${path}.${id}` : id;
+		const [rootId, ...propertyPath] = fullPath.split('.');
+		return this.props.element.getPropertyValue(rootId, propertyPath.join('.'));
+	}
 
 					switch (property.type) {
 						case 'boolean':
 							return (
-								<BooleanItem
+								<PropertyItems.BooleanItem
 									key={id}
-									label={name}
+									label={label}
 									checked={value as boolean}
 									onChange={event => this.handleChange(id, !value, context)}
 								/>
@@ -144,7 +112,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 
 						case 'string':
 							return (
-								<StringItem
+								<PropertyItems.StringItem
 									key={id}
 									label={name}
 									value={value as string}
@@ -162,7 +130,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 							);
 
 							return (
-								<EnumItem
+								<PropertyItems.EnumItem
 									key={id}
 									label={name}
 									selectedValue={option && option.getId()}
@@ -176,7 +144,7 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 						case 'asset':
 							const src = value as string | undefined;
 							return (
-								<AssetItem
+								<PropertyItems.AssetItem
 									key={id}
 									label={name}
 									inputValue={src && !src.startsWith('data:') ? src : ''}
@@ -206,18 +174,5 @@ class PropertyTree extends React.Component<PropertyTreeProps> {
 				})}
 			</>
 		);
-	}
-}
-
-@observer
-export class PropertyList extends React.Component {
-	public render(): React.ReactNode {
-		const selectedElement = ViewStore.getInstance().getSelectedElement();
-
-		if (!selectedElement) {
-			return <div>No Element selected</div>;
-		}
-
-		return <PropertyTree element={selectedElement} />;
-	}
+	}*/
 }

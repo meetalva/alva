@@ -1,20 +1,20 @@
-import * as deepAssign from 'deep-assign';
-import * as MobX from 'mobx';
-import * as ObjectPath from 'object-path';
+import { ElementContent } from './element-content';
+import { ElementProperty } from './element-property';
+import * as Mobx from 'mobx';
 import { Page } from '../page';
-import { PageElementContent } from './page-element-content';
-import { Pattern, Property, Slot, Styleguide } from '../styleguide';
+import { Pattern, PatternSlot } from '../pattern';
+import { Styleguide } from '../styleguide';
 import * as Types from '../types';
 import * as Uuid from 'uuid';
 import { ViewStore } from '../view-store';
 
-export interface PageElementProperties {
-	container?: PageElementContent;
-	contents: PageElementContent[];
+export interface ElementInit {
+	container?: ElementContent;
+	contents: ElementContent[];
 	id?: string;
 	name?: string;
 	pattern: Pattern;
-	properties?: Map<string, Types.PropertyValue>;
+	properties: ElementProperty[];
 	setDefaults?: boolean;
 }
 
@@ -27,34 +27,34 @@ export interface PageElementContext {
  * It represents the pattern component instance from a designer's point-of-view.
  * Page elements are nested within a page.
  */
-export class PageElement {
-	private container?: PageElementContent;
+export class Element {
+	private container?: ElementContent;
 
 	/**
 	 * The content page elements of this element.
-	 * Key = Slot ID, Value = Slot contents.
+	 * Key = PatternSlot ID, Value = PatternSlot contents.
 	 */
-	@MobX.observable private contents: PageElementContent[] = [];
+	@Mobx.observable private contents: ElementContent[] = [];
 
 	/**
 	 * The currently edited name of the page element, to be commited
 	 */
-	@MobX.observable private editedName: string;
+	@Mobx.observable private editedName: string;
 
 	/**
 	 * The technical (internal) ID of the page element.
 	 */
-	@MobX.observable private id: string;
+	@Mobx.observable private id: string;
 
 	/**
 	 * The assigned name of the page element, initially the pattern's human-friendly name.
 	 */
-	@MobX.observable private name: string;
+	@Mobx.observable private name: string;
 
 	/**
 	 * Wether the element name is editable
 	 */
-	@MobX.observable private nameEditable: boolean;
+	@Mobx.observable private nameEditable: boolean;
 
 	/**
 	 * The page this element belongs to.
@@ -64,7 +64,7 @@ export class PageElement {
 	/**
 	 * The parent page element if this is not the root element.
 	 */
-	private parent: PageElement;
+	private parent: Element;
 
 	/**
 	 * The pattern this page element reflects. Usually set, may only the undefined if the pattern
@@ -77,7 +77,9 @@ export class PageElement {
 	 * Each key represents the property ID of the pattern, while the value holds the content
 	 * as provided by the designer.
 	 */
-	@MobX.observable private properties: Map<string, Types.PropertyValue> = new Map();
+	// @MobX.observable private properties: Map<string, Types.PropertyValue> = new Map();
+
+	private properties: ElementProperty[];
 
 	/**
 	 * Creates a new page element.
@@ -87,19 +89,17 @@ export class PageElement {
 	 * @param parent The (optional) parent for this element. When set, the element is
 	 * automatically added to this parent (and thus maybe to the entire page).
 	 */
-	public constructor(properties: PageElementProperties) {
-		this.id = properties.id ? properties.id : Uuid.v4();
-		this.pattern = properties.pattern;
+	public constructor(init: ElementInit) {
+		this.id = init.id ? init.id : Uuid.v4();
+		this.pattern = init.pattern;
 		this.nameEditable = false;
-		this.container = properties.container;
+		this.container = init.container;
 
 		this.pattern.getSlots().forEach(slot => {
-			const hydratedSlot = properties.contents.find(
-				content => content.getSlotId() === slot.getId()
-			);
+			const hydratedSlot = init.contents.find(content => content.getSlotId() === slot.getId());
 
 			this.contents.push(
-				new PageElementContent({
+				new ElementContent({
 					elementId: this.id,
 					id: Uuid.v4(),
 					name: slot.getName(),
@@ -110,23 +110,30 @@ export class PageElement {
 			);
 		});
 
-		if (typeof properties.name !== 'undefined') {
-			this.name = properties.name;
+		if (typeof init.name !== 'undefined') {
+			this.name = init.name;
 		}
 
 		if (this.name === undefined && this.pattern) {
 			this.name = this.pattern.getName();
 		}
 
-		if (properties.setDefaults && this.pattern) {
-			this.pattern.getProperties().forEach(property => {
-				this.setPropertyValue(property.getId(), property.getDefaultValue());
-			});
-		}
+		this.properties = this.pattern.getProperties().map(patternProperty => {
+			const hydratedProperty = init.properties.find(elementProperty =>
+				elementProperty.hasPatternProperty(patternProperty)
+			);
 
-		if (properties.properties) {
-			this.properties = properties.properties;
-		}
+			if (hydratedProperty) {
+				return hydratedProperty;
+			}
+
+			return new ElementProperty({
+				id: Uuid.v4(),
+				patternProperty,
+				setDefault: Boolean(init.setDefaults),
+				value: undefined
+			});
+		});
 	}
 
 	/**
@@ -134,25 +141,22 @@ export class PageElement {
 	 * @param jsonObject The JSON object to load from.
 	 * @return A new page element object containing the loaded data.
 	 */
-	public static from(
-		serializedPageElement: Types.SerializedPageElement,
-		context: PageElementContext
-	): PageElement {
-		return new PageElement({
-			id: serializedPageElement.id,
-			name: serializedPageElement.name,
-			pattern: context.styleguide.getPatternById(serializedPageElement.pattern) as Pattern,
-			contents: serializedPageElement.contents.map(content =>
-				PageElementContent.from(content, {
+	public static from(serialized: Types.SerializedElement, context: PageElementContext): Element {
+		return new Element({
+			id: serialized.id,
+			name: serialized.name,
+			pattern: context.styleguide.getPatternById(serialized.pattern) as Pattern,
+			contents: serialized.contents.map(content =>
+				ElementContent.from(content, {
 					styleguide: context.styleguide,
-					elementId: serializedPageElement.id
+					elementId: serialized.id
 				})
 			),
-			properties: toMap(serializedPageElement.properties)
+			properties: serialized.properties.map(p => ElementProperty.from(p))
 		});
 	}
 
-	public addChild(child: PageElement, slotId: string, index: number): void {
+	public addChild(child: Element, slotId: string, index: number): void {
 		child.setParent({
 			parent: this,
 			slotId,
@@ -160,25 +164,22 @@ export class PageElement {
 		});
 	}
 
-	public clone(): PageElement {
+	public clone(): Element {
 		const payload = this.toJSON();
 		delete payload.id;
 
-		const clone = new PageElement({
+		const clone = new Element({
 			container: undefined,
 			contents: this.contents.map(content => content.clone()),
 			name: this.name,
-			pattern: this.pattern
-		});
-
-		this.properties.forEach((value: Types.PropertyValue, id: string) => {
-			clone.setPropertyValue(id, value);
+			pattern: this.pattern,
+			properties: this.properties.map(propertyValue => propertyValue.clone())
 		});
 
 		return clone;
 	}
 
-	public getContainer(): PageElementContent | undefined {
+	public getContainer(): ElementContent | undefined {
 		return this.container;
 	}
 
@@ -189,19 +190,19 @@ export class PageElement {
 		return this.container.getSlotType();
 	}
 
-	public getContentBySlot(slot: Slot): PageElementContent | undefined {
+	public getContentBySlot(slot: PatternSlot): ElementContent | undefined {
 		return this.getContentBySlotId(slot.getId());
 	}
 
-	public getContentBySlotId(slotId: string): PageElementContent | undefined {
+	public getContentBySlotId(slotId: string): ElementContent | undefined {
 		return this.contents.find(content => content.getSlotId() === slotId);
 	}
 
-	public getContentBySlotType(slotType: Types.SlotType): PageElementContent | undefined {
+	public getContentBySlotType(slotType: Types.SlotType): ElementContent | undefined {
 		return this.contents.find(content => content.getSlotType() === slotType);
 	}
 
-	public getElementById(id: string): PageElement | undefined {
+	public getElementById(id: string): Element | undefined {
 		let result;
 
 		if (this.id === id) {
@@ -279,7 +280,7 @@ export class PageElement {
 	 * Returns the parent page element if this is not the root element.
 	 * @return The parent page element or undefined.
 	 */
-	public getParent(): PageElement | undefined {
+	public getParent(): Element | undefined {
 		if (!this.container) {
 			return;
 		}
@@ -298,22 +299,8 @@ export class PageElement {
 		return this.pattern;
 	}
 
-	/**
-	 * The content of a property of this page element.
-	 * @param id The ID of the property to return the value of.
-	 * @param path A dot ('.') separated optional path within an object property to point to a deep
-	 * property. E.g., setting propertyId to 'image' and path to 'src.srcSet.xs',
-	 * the operation edits 'image.src.srcSet.xs' on the element.
-	 * @return The content value (as provided by the designer).
-	 */
-	public getPropertyValue(id: string, path?: string): Types.PropertyValue {
-		const value: Types.PropertyValue = this.properties.get(id);
-
-		if (!path) {
-			return value;
-		}
-
-		return ObjectPath.get(value as {}, path);
+	public getProperties(): ElementProperty[] {
+		return this.properties;
 	}
 
 	/**
@@ -324,7 +311,7 @@ export class PageElement {
 	 * @param child The child to test.
 	 * @return Whether this element is an ancestor of the given child.
 	 */
-	public isAncestorOf(child: PageElement): boolean {
+	public isAncestorOf(child: Element): boolean {
 		if (child === this) {
 			return true;
 		}
@@ -333,7 +320,7 @@ export class PageElement {
 			return false;
 		}
 
-		return this.isAncestorOf(child.getParent() as PageElement);
+		return this.isAncestorOf(child.getParent() as Element);
 	}
 
 	/**
@@ -344,7 +331,7 @@ export class PageElement {
 	 * @param parent The parent to test.
 	 * @return Whether this element is a descendent of the given parent.
 	 */
-	public isDescendentOf(parent?: PageElement): boolean {
+	public isDescendentOf(parent?: Element): boolean {
 		return parent ? parent.isAncestorOf(this) : false;
 	}
 
@@ -374,7 +361,7 @@ export class PageElement {
 		}
 	}
 
-	public setContainer(container: PageElementContent): void {
+	public setContainer(container: ElementContent): void {
 		this.container = container;
 	}
 
@@ -424,7 +411,7 @@ export class PageElement {
 		this.page = page;
 	}
 
-	public setParent(init: { index: number; parent: PageElement; slotId: string }): void {
+	public setParent(init: { index: number; parent: Element; slotId: string }): void {
 		if (this.container) {
 			this.container.remove({ element: this });
 		}
@@ -438,59 +425,19 @@ export class PageElement {
 		this.container = container;
 	}
 
-	// tslint:disable-next-line:no-any
-	public setPropertyValue(id: string, value: any, path?: string): void {
-		let property: Property | undefined;
-		if (this.pattern) {
-			property = this.pattern.getProperty(id, path);
-			if (!property) {
-				console.warn(`Unknown property '${id}' in pattern '${this.pattern.getId()}'`);
-			}
-		}
-
-		const coercedValue = property ? property.coerceValue(value) : value;
-		if (path) {
-			const rootPropertyValue = this.properties.get(id) || {};
-			ObjectPath.set<{}, Types.PropertyValue>(rootPropertyValue, path, coercedValue);
-			this.properties.set(id, deepAssign({}, rootPropertyValue));
-		} else {
-			this.properties.set(id, coercedValue);
-		}
-	}
-
 	/**
 	 * Serializes the page element into a JSON object for persistence.
 	 * @param forRendering Whether all property values should be converted using
 	 * Property.convertToRender (for the preview app instead of file persistence).
 	 * @return The JSON object to be persisted.
 	 */
-	public toJSON(props?: { forRendering?: boolean }): Types.SerializedPageElement {
+	public toJSON(): Types.SerializedElement {
 		return {
 			contents: this.contents.map(content => content.toJSON()),
 			id: this.id,
 			name: this.name,
 			pattern: this.pattern.getId(),
-			properties: toObject(this.properties)
+			properties: this.properties.map(elementProperty => elementProperty.toJSON())
 		};
 	}
-}
-
-function toObject<T>(map: Map<string, T>): { [key: string]: T } {
-	const mapLike = {};
-
-	map.forEach((value: T, key) => {
-		mapLike[key] = value;
-	});
-
-	return mapLike;
-}
-
-function toMap<T>(o: { [key: string]: T }): Map<string, T> {
-	const map = new Map();
-
-	Object.keys(o).forEach(key => {
-		map.set(key, o[key]);
-	});
-
-	return map;
 }

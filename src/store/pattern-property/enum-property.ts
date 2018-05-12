@@ -1,5 +1,5 @@
-import { Property, PropertyType } from './property';
-import * as Types from '../../types';
+import { PatternProperty, PatternPropertyType } from './property';
+import * as Types from '../types';
 
 /**
  * An enum property is a property that supports the elements of a given enum only, and undefined.
@@ -10,7 +10,7 @@ import * as Types from '../../types';
  * as this is the runtime equivalent.
  * @see Property
  */
-export class EnumProperty extends Property {
+export class PatternEnumProperty extends PatternProperty {
 	/**
 	 * The options supported by this enum.
 	 */
@@ -21,14 +21,17 @@ export class EnumProperty extends Property {
 	 */
 	private ordinalById: { [id: string]: number } = {};
 
-	public readonly type = PropertyType.Enum;
+	public readonly type = PatternPropertyType.Enum;
 
-	public static from(serializedProperty: Types.SerializedEnumProperty): EnumProperty {
-		const property = new EnumProperty({
+	public static from(
+		serializedProperty: Types.SerializedPatternEnumProperty
+	): PatternEnumProperty {
+		const property = new PatternEnumProperty({
 			hidden: serializedProperty.hidden,
 			defaultValue: serializedProperty.defaultValue,
 			id: serializedProperty.id,
-			name: serializedProperty.name,
+			label: serializedProperty.label,
+			propertyName: serializedProperty.propertyName,
 			required: serializedProperty.required
 		});
 
@@ -112,12 +115,13 @@ export class EnumProperty extends Property {
 		});
 	}
 
-	public toJSON(): Types.SerializedEnumProperty {
+	public toJSON(): Types.SerializedPatternEnumProperty {
 		return {
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,
-			name: this.name,
+			label: this.label,
+			propertyName: this.propertyName,
 			options: this.options.map(option => option.toJSON()),
 			required: this.required,
 			type: this.type

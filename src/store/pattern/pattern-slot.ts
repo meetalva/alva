@@ -1,27 +1,27 @@
 import * as Types from '../types';
 
-export interface SlotInit {
+export interface PatternSlotInit {
 	displayName: string;
 	id: string;
 	propertyName: string;
 	type: Types.SlotType;
 }
 
-export class Slot {
+export class PatternSlot {
 	private displayName: string;
 	private id: string;
 	private propertyName: string;
 	private type: Types.SlotType;
 
-	public constructor(init: SlotInit) {
+	public constructor(init: PatternSlotInit) {
 		this.type = init.type;
 		this.id = init.id;
 		this.displayName = init.displayName;
 		this.type = init.type;
 	}
 
-	public static from(serialized: Types.SerializedPatternSlot): Slot {
-		return new Slot({
+	public static from(serialized: Types.SerializedPatternSlot): PatternSlot {
+		return new PatternSlot({
 			displayName: serialized.displayName,
 			id: serialized.id,
 			propertyName: serialized.propertyName,

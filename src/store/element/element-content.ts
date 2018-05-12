@@ -1,31 +1,31 @@
-import * as MobX from 'mobx';
-import { PageElement } from './page-element';
+import { Element } from './element';
+import * as Mobx from 'mobx';
 import { Styleguide } from '../styleguide';
 import * as Types from '../types';
 
-export interface PageElementContentContext {
+export interface ElementContentContext {
 	elementId: string;
 	styleguide: Styleguide;
 }
 
-export interface PageElementContentInit {
+export interface ElementContentInit {
 	elementId: string;
-	elements: PageElement[];
+	elements: Element[];
 	id: string;
 	name: string;
 	slotId: string;
 	slotType: Types.SlotType;
 }
 
-export class PageElementContent {
-	@MobX.observable private elementId: string;
-	@MobX.observable private elements: PageElement[] = [];
-	@MobX.observable private id: string;
-	@MobX.observable private name: string;
-	@MobX.observable private slotId: string;
-	@MobX.observable private slotType: Types.SlotType;
+export class ElementContent {
+	@Mobx.observable private elementId: string;
+	@Mobx.observable private elements: Element[] = [];
+	@Mobx.observable private id: string;
+	@Mobx.observable private name: string;
+	@Mobx.observable private slotId: string;
+	@Mobx.observable private slotType: Types.SlotType;
 
-	public constructor(init: PageElementContentInit) {
+	public constructor(init: ElementContentInit) {
 		this.id = init.id;
 		this.elementId = init.elementId;
 		this.name = init.name;
@@ -37,22 +37,22 @@ export class PageElementContent {
 
 	public static from(
 		serialized: Types.SerializedPageElementContent,
-		context: PageElementContentContext
-	): PageElementContent {
-		return new PageElementContent({
+		context: ElementContentContext
+	): ElementContent {
+		return new ElementContent({
 			elementId: context.elementId,
 			id: serialized.id,
 			name: serialized.name,
 			elements: serialized.elements.map(element =>
-				PageElement.from(element, { styleguide: context.styleguide })
+				Element.from(element, { styleguide: context.styleguide })
 			),
 			slotId: serialized.slotId,
 			slotType: toSlotType(serialized.slotType)
 		});
 	}
 
-	public clone(): PageElementContent {
-		const clone = new PageElementContent({
+	public clone(): ElementContent {
+		const clone = new ElementContent({
 			elementId: this.elementId,
 			elements: this.elements.map(element => element.clone()),
 			id: this.id,
@@ -70,11 +70,11 @@ export class PageElementContent {
 		return this.elementId;
 	}
 
-	public getElementIndex(element: PageElement): number {
+	public getElementIndex(element: Element): number {
 		return this.elements.indexOf(element);
 	}
 
-	public getElements(): PageElement[] {
+	public getElements(): Element[] {
 		return this.elements;
 	}
 
@@ -86,8 +86,8 @@ export class PageElementContent {
 		return this.slotType;
 	}
 
-	@MobX.action
-	public insert(options: { at: number; element: PageElement }): void {
+	@Mobx.action
+	public insert(options: { at: number; element: Element }): void {
 		const id = options.element.getId();
 
 		options.element.setContainer(this);
@@ -99,8 +99,8 @@ export class PageElementContent {
 		this.elements.splice(options.at, 0, options.element);
 	}
 
-	@MobX.action
-	public remove(options: { element: PageElement }): void {
+	@Mobx.action
+	public remove(options: { element: Element }): void {
 		const index = this.elements.indexOf(options.element);
 
 		if (index === -1) {

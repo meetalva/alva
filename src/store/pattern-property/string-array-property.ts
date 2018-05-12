@@ -1,5 +1,5 @@
-import { Property, PropertyType } from './property';
-import * as Types from '../../types';
+import { PatternProperty, PatternPropertyType } from './property';
+import * as Types from '../types';
 
 /**
  * A string array property is a property that supports a list of text only.
@@ -9,15 +9,18 @@ import * as Types from '../../types';
  * (where all elements are never undefined or null).
  * @see Property
  */
-export class StringArrayProperty extends Property {
-	public readonly type = PropertyType.StringArray;
+export class StringPatternArrayProperty extends PatternProperty {
+	public readonly type = PatternPropertyType.StringArray;
 
-	public static from(serialized: Types.SerializedStringArrayProperty): StringArrayProperty {
-		return new StringArrayProperty({
+	public static from(
+		serialized: Types.SerializedPatternStringArrayProperty
+	): StringPatternArrayProperty {
+		return new StringPatternArrayProperty({
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,
-			name: serialized.name,
+			label: serialized.label,
+			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
 	}
@@ -31,12 +34,13 @@ export class StringArrayProperty extends Property {
 		return this.coerceArrayValue(value, (element: any) => String(value));
 	}
 
-	public toJSON(): Types.SerializedStringArrayProperty {
+	public toJSON(): Types.SerializedPatternStringArrayProperty {
 		return {
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,
-			name: this.name,
+			label: this.label,
+			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type
 		};

@@ -1,7 +1,7 @@
 import { Command } from './command';
+import { Element, ElementContent } from '../element';
 import { ElementCommand } from './element-command';
 import { Page } from '../page/page';
-import { PageElement, PageElementContent } from '../page-element';
 import { ViewStore } from '../view-store';
 
 /**
@@ -17,7 +17,7 @@ export class ElementLocationCommand extends ElementCommand {
 	/**
 	 * The new parent for the child. undefined removes the child.
 	 */
-	protected parent: PageElement;
+	protected parent: Element;
 
 	/**
 	 * The ID ofg the target parent of the child element.
@@ -32,7 +32,7 @@ export class ElementLocationCommand extends ElementCommand {
 	/**
 	 * The previous parent, for undo.
 	 */
-	protected previousParent?: PageElement;
+	protected previousParent?: Element;
 
 	/**
 	 * The ID of the previous parent, for undo.
@@ -49,12 +49,7 @@ export class ElementLocationCommand extends ElementCommand {
 	 */
 	protected slotId: string;
 
-	public constructor(init: {
-		element: PageElement;
-		index: number;
-		parent: PageElement;
-		slotId: string;
-	}) {
+	public constructor(init: { element: Element; index: number; parent: Element; slotId: string }) {
 		super(init.element);
 
 		this.parent = init.parent;
@@ -87,9 +82,9 @@ export class ElementLocationCommand extends ElementCommand {
 	 * @see Store.execute()
 	 */
 	public static addChild(init: {
-		child: PageElement;
+		child: Element;
 		index: number;
-		parent: PageElement;
+		parent: Element;
 		slotId: string;
 	}): ElementCommand {
 		return new ElementLocationCommand({
@@ -100,12 +95,9 @@ export class ElementLocationCommand extends ElementCommand {
 		});
 	}
 
-	public static addSibling(init: {
-		newSibling: PageElement;
-		sibling: PageElement;
-	}): ElementCommand {
-		const parent = init.sibling.getParent() as PageElement;
-		const container = init.sibling.getContainer() as PageElementContent;
+	public static addSibling(init: { newSibling: Element; sibling: Element }): ElementCommand {
+		const parent = init.sibling.getParent() as Element;
+		const container = init.sibling.getContainer() as ElementContent;
 
 		return new ElementLocationCommand({
 			element: init.newSibling,
@@ -116,8 +108,8 @@ export class ElementLocationCommand extends ElementCommand {
 	}
 
 	public static setParent(
-		child: PageElement,
-		parent: PageElement,
+		child: Element,
+		parent: Element,
 		slotId: string,
 		index: number
 	): ElementCommand {
@@ -137,7 +129,7 @@ export class ElementLocationCommand extends ElementCommand {
 
 		const currentPage: Page | undefined = ViewStore.getInstance().getCurrentPage() as Page;
 		if (this.parentId) {
-			const parent: PageElement | undefined = currentPage.getElementById(this.parentId);
+			const parent: Element | undefined = currentPage.getElementById(this.parentId);
 			if (!parent) {
 				return false;
 			}
@@ -145,7 +137,7 @@ export class ElementLocationCommand extends ElementCommand {
 		}
 
 		if (this.previousParentId) {
-			const previousParent: PageElement | undefined = currentPage.getElementById(
+			const previousParent: Element | undefined = currentPage.getElementById(
 				this.previousParentId
 			);
 			if (!previousParent) {

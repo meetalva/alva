@@ -1,15 +1,15 @@
-import * as AlvaUtil from '../../../alva-util';
-import * as Types from '../../types';
+import * as Types from '../types';
 import * as uuid from 'uuid';
 
-export { PropertyType } from '../../types';
+export { PatternPropertyType } from '../types';
 
-export interface PropertyInit {
+export interface PatternPropertyInit {
 	// tslint:disable-next-line:no-any
 	defaultValue?: any;
 	hidden?: boolean;
 	id?: string;
-	name: string;
+	label: string;
+	propertyName: string;
 	required?: boolean;
 }
 
@@ -21,7 +21,7 @@ export interface PropertyInit {
  * @see PageElement
  * @see PatternParser
  */
-export abstract class Property {
+export abstract class PatternProperty {
 	/**
 	 * The default value of the property when creating a new page element.
 	 * This is the Alva default (such as "Lorem Ipsum"), not the default for production component
@@ -45,7 +45,9 @@ export abstract class Property {
 	 * The human-friendly name of the property, usually provided by an annotation.
 	 * In the frontend, to be displayed instead of the ID.
 	 */
-	protected name: string;
+	protected label: string;
+
+	protected propertyName: string;
 
 	/**
 	 * Whether the designer, when editing a page element, is required to enter a value
@@ -53,16 +55,17 @@ export abstract class Property {
 	 */
 	protected required: boolean = false;
 
-	public readonly type: Types.PropertyType;
+	public readonly type: Types.PatternPropertyType;
 
 	/**
 	 * Creates a new property.
 	 * @param id The technical ID of this property (e.g. the property name in the TypeScript
 	 * props interface). Initially, the name is guessed automatically.
 	 */
-	public constructor(init: PropertyInit) {
+	public constructor(init: PatternPropertyInit) {
 		this.id = init.id || uuid.v4();
-		this.name = AlvaUtil.guessName(init.name);
+		this.label = init.label;
+		this.propertyName = init.propertyName;
 		this.defaultValue = init.defaultValue;
 
 		if (typeof init.hidden !== 'undefined') {
@@ -183,8 +186,12 @@ export abstract class Property {
 	 * In the frontend, to be displayed instead of the ID.
 	 * @return The human-friendly name of the property.
 	 */
-	public getName(): string {
-		return this.name;
+	public getLabel(): string {
+		return this.label;
+	}
+
+	public getType(): Types.PatternPropertyType {
+		return this.type;
 	}
 
 	/**
@@ -233,8 +240,8 @@ export abstract class Property {
 	 * <b>Note:</b> This method should only be called from the pattern parsers.
 	 * @param name The human-friendly name of the property.
 	 */
-	public setName(name: string): void {
-		this.name = name;
+	public setLabel(label: string): void {
+		this.label = label;
 	}
 
 	/**
@@ -247,5 +254,5 @@ export abstract class Property {
 		this.required = required;
 	}
 
-	public abstract toJSON(): Types.SerializedProperty;
+	public abstract toJSON(): Types.SerializedPatternProperty;
 }

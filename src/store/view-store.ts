@@ -6,30 +6,31 @@ import {
 	PageRemoveCommand
 } from './command';
 
-import * as MobX from 'mobx';
+import { Element } from './element';
+import * as Mobx from 'mobx';
 import * as Os from 'os';
 import { Page } from './page';
-import { PageElement } from './page-element';
 import * as Path from 'path';
+import { Pattern } from './pattern';
 import { Project } from './project';
-import { Pattern, Styleguide } from './styleguide';
+import { Styleguide } from './styleguide';
 import * as Types from './types';
 
 export enum ClipBoardType {
 	Page = 'Page',
-	PageElement = 'PageElement'
+	Element = 'Element'
 }
 
-export type ClipBoardItem = ClipboardPage | ClipboardPageElement;
+export type ClipBoardItem = ClipboardPage | ClipboardElement;
 
 export interface ClipboardPage {
 	item: Page;
 	type: ClipBoardType.Page;
 }
 
-export interface ClipboardPageElement {
-	item: PageElement;
-	type: ClipBoardType.PageElement;
+export interface ClipboardElement {
+	item: Element;
+	type: ClipBoardType.Element;
 }
 
 /**
@@ -47,66 +48,66 @@ export class ViewStore {
 	 * The page that is currently being displayed in the preview, and edited in the elements
 	 * and properties panes. May be undefined if there is none.
 	 */
-	@MobX.observable private activePage?: number = 0;
+	@Mobx.observable private activePage?: number = 0;
 
 	/**
 	 * The current state of the Page Overview
 	 */
-	@MobX.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
+	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
 
 	/**
 	 * The name of the analyzer that should be used for the open styleguide.
 	 */
-	@MobX.observable private analyzerName: string;
+	@Mobx.observable private analyzerName: string;
 
-	@MobX.observable private appState: Types.AppState = Types.AppState.Starting;
+	@Mobx.observable private appState: Types.AppState = Types.AppState.Starting;
 
 	/**
 	 * The element currently in the clipboard, or undefined if there is none.
 	 * Note: The element is cloned lazily, so it may represent a still active element.
 	 * When adding the clipboard element to paste it, clone it first.
 	 */
-	@MobX.observable private clipboardItem?: ClipBoardItem;
+	@Mobx.observable private clipboardItem?: ClipBoardItem;
 
 	/**
 	 * The project that is currently being selected to add, edit, or remove pages of. May be
 	 * undefined if none is selected is none. Opening a page automatically changes the selected
 	 * project.
 	 */
-	@MobX.observable private currentProject?: Project;
+	@Mobx.observable private currentProject?: Project;
 
-	@MobX.observable private highlightedElement?: PageElement;
+	@Mobx.observable private highlightedElement?: Element;
 
-	@MobX.observable private highlightedPlaceholderElement?: PageElement;
+	@Mobx.observable private highlightedPlaceholderElement?: Element;
 
 	/**
 	 * The currently name-editable element in the element list.
 	 */
-	@MobX.observable private nameEditableElement?: PageElement;
+	@Mobx.observable private nameEditableElement?: Element;
 
 	/**
 	 * The current search term in the patterns list, or an empty string if there is none.
 	 */
-	@MobX.observable private patternSearchTerm: string = '';
+	@Mobx.observable private patternSearchTerm: string = '';
 
 	/**
 	 * All projects (references) of this styleguide. Projects point to page references,
 	 * and both do not contain the actual page data (element), but only their IDs.
 	 */
-	@MobX.observable private projects: Project[] = [];
+	@Mobx.observable private projects: Project[] = [];
 
 	/**
 	 * The most recent undone user commands (user operations) to provide a redo feature.
 	 * Note that operations that close or open a page clear this buffer.
 	 * The last command in the list is the most recent undone.
 	 */
-	@MobX.observable private redoBuffer: Command[] = [];
+	@Mobx.observable private redoBuffer: Command[] = [];
 
 	/**
 	 * The well-known enum name of content that should be visible in
 	 * the right-hand sidebar/pane.
 	 */
-	@MobX.observable private rightPane: Types.RightPane | null = null;
+	@Mobx.observable private rightPane: Types.RightPane | null = null;
 
 	/**
 	 * The currently selected element in the element list.
@@ -115,19 +116,19 @@ export class ViewStore {
 	 * May be empty if no element is selected.
 	 * @see isElementFocussed
 	 */
-	@MobX.observable private selectedElement?: PageElement;
+	@Mobx.observable private selectedElement?: Element;
 
 	/**
 	 * http port the preview server is listening on
 	 */
-	@MobX.observable private serverPort: number;
+	@Mobx.observable private serverPort: number;
 
 	/**
 	 * The most recent user commands (user operations) to provide an undo feature.
 	 * Note that operations that close or open a page clear this buffer.
 	 * The last command in the list is the most recent executed one.
 	 */
-	@MobX.observable private undoBuffer: Command[] = [];
+	@Mobx.observable private undoBuffer: Command[] = [];
 
 	/**
 	 * Creates a new store.
@@ -184,7 +185,7 @@ export class ViewStore {
 		this.redoBuffer = [];
 	}
 
-	public copyElementById(id: string): PageElement | undefined {
+	public copyElementById(id: string): Element | undefined {
 		const element = this.getElementById(id);
 
 		if (!element) {
@@ -198,7 +199,7 @@ export class ViewStore {
 	/**
 	 * Copy the currently selected element to clip
 	 */
-	public copySelectedElement(): PageElement | undefined {
+	public copySelectedElement(): Element | undefined {
 		if (!this.selectedElement) {
 			return;
 		}
@@ -212,7 +213,7 @@ export class ViewStore {
 	 * Remove the given element from its page and add it to clipboard
 	 * @param element
 	 */
-	public cutElement(element: PageElement): void {
+	public cutElement(element: Element): void {
 		if (element.isRoot()) {
 			return;
 		}
@@ -233,7 +234,7 @@ export class ViewStore {
 	/**
 	 * Remove the currently selected element and add it to clipboard
 	 */
-	public cutSelectedElement(): PageElement | undefined {
+	public cutSelectedElement(): Element | undefined {
 		if (!this.selectedElement) {
 			return;
 		}
@@ -243,7 +244,7 @@ export class ViewStore {
 		return element;
 	}
 
-	public duplicateElement(element: PageElement): PageElement {
+	public duplicateElement(element: Element): Element {
 		const duplicatedElement = element.clone();
 		this.execute(
 			ElementLocationCommand.addSibling({
@@ -255,7 +256,7 @@ export class ViewStore {
 		return duplicatedElement;
 	}
 
-	public duplicateElementById(id: string): PageElement | undefined {
+	public duplicateElementById(id: string): Element | undefined {
 		const element = this.getElementById(id);
 
 		if (!element) {
@@ -265,7 +266,7 @@ export class ViewStore {
 		return this.duplicateElement(element);
 	}
 
-	public duplicateSelectedElement(): PageElement | undefined {
+	public duplicateSelectedElement(): Element | undefined {
 		if (!this.selectedElement) {
 			return;
 		}
@@ -330,9 +331,9 @@ export class ViewStore {
 	 * @return The element currently in the clipboard, or undefined if there is none.
 	 */
 
-	public getClipboardItem(type: ClipBoardType.PageElement): PageElement | undefined;
+	public getClipboardItem(type: ClipBoardType.Element): Element | undefined;
 	public getClipboardItem(type: ClipBoardType.Page): Page | undefined;
-	public getClipboardItem(type: ClipBoardType): Page | PageElement | undefined {
+	public getClipboardItem(type: ClipBoardType): Page | Element | undefined {
 		const item = this.clipboardItem;
 
 		if (!item || item.type !== type) {
@@ -367,11 +368,11 @@ export class ViewStore {
 	 * project.
 	 * @return The currently selected project or undefined.
 	 */
-	public getCurrentProject(): Project | undefined {
-		return this.currentProject;
+	public getCurrentProject(): Project {
+		return this.currentProject as Project;
 	}
 
-	public getElementById(id: string): PageElement | undefined {
+	public getElementById(id: string): Element | undefined {
 		const page = this.getCurrentPage();
 
 		if (!page) {
@@ -381,15 +382,15 @@ export class ViewStore {
 		return page.getElementById(id);
 	}
 
-	public getHighlightedElement(): PageElement | undefined {
+	public getHighlightedElement(): Element | undefined {
 		return this.highlightedElement;
 	}
 
-	public getHighlightedPlaceholderElement(): PageElement | undefined {
+	public getHighlightedPlaceholderElement(): Element | undefined {
 		return this.highlightedPlaceholderElement;
 	}
 
-	public getNameEditableElement(): PageElement | undefined {
+	public getNameEditableElement(): Element | undefined {
 		return this.nameEditableElement;
 	}
 
@@ -452,7 +453,7 @@ export class ViewStore {
 	 * May be empty if no element is selected.
 	 * @return The selected element or undefined.
 	 */
-	public getSelectedElement(): PageElement | undefined {
+	public getSelectedElement(): Element | undefined {
 		return this.selectedElement;
 	}
 
@@ -474,7 +475,7 @@ export class ViewStore {
 		const view = this.getActiveView();
 
 		if (view === Types.AlvaView.PageDetail) {
-			return Boolean(this.getClipboardItem(ClipBoardType.PageElement));
+			return Boolean(this.getClipboardItem(ClipBoardType.Element));
 		}
 
 		if (view === Types.AlvaView.Pages) {
@@ -532,8 +533,8 @@ export class ViewStore {
 		return false;
 	}
 
-	public pasteAfterElement(targetElement: PageElement): PageElement | undefined {
-		const clipboardElement = this.getClipboardItem(ClipBoardType.PageElement);
+	public pasteAfterElement(targetElement: Element): Element | undefined {
+		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
 
 		if (!clipboardElement) {
 			return;
@@ -555,7 +556,7 @@ export class ViewStore {
 		return clipboardElement;
 	}
 
-	public pasteAfterElementById(id: string): PageElement | undefined {
+	public pasteAfterElementById(id: string): Element | undefined {
 		const element = this.getElementById(id);
 
 		if (!element) {
@@ -565,7 +566,7 @@ export class ViewStore {
 		return this.pasteAfterElement(element);
 	}
 
-	public pasteAfterSelectedElement(): PageElement | undefined {
+	public pasteAfterSelectedElement(): Element | undefined {
 		const selectedElement = this.getSelectedElement();
 
 		if (!selectedElement) {
@@ -575,8 +576,8 @@ export class ViewStore {
 		return this.pasteAfterElement(selectedElement);
 	}
 
-	public pasteInsideElement(element: PageElement): PageElement | undefined {
-		const clipboardElement = this.getClipboardItem(ClipBoardType.PageElement);
+	public pasteInsideElement(element: Element): Element | undefined {
+		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
 
 		if (!clipboardElement) {
 			return;
@@ -602,7 +603,7 @@ export class ViewStore {
 		return clipboardElement;
 	}
 
-	public pasteInsideElementById(id: string): PageElement | undefined {
+	public pasteInsideElementById(id: string): Element | undefined {
 		const element = this.getElementById(id);
 
 		if (!element) {
@@ -612,7 +613,7 @@ export class ViewStore {
 		return this.pasteInsideElement(element);
 	}
 
-	public pasteInsideSelectedElement(): PageElement | undefined {
+	public pasteInsideSelectedElement(): Element | undefined {
 		if (!this.selectedElement) {
 			return;
 		}
@@ -646,16 +647,16 @@ export class ViewStore {
 
 	/**
 	 * Removes the given element from its page
-	 * @param element The PageElement to remove
+	 * @param element The Element to remove
 	 */
-	public removeElement(element: PageElement): void {
+	public removeElement(element: Element): void {
 		if (element.isRoot()) {
 			return;
 		}
 
 		const index = element.getIndex();
 
-		const getNextSelected = (): PageElement | undefined => {
+		const getNextSelected = (): Element | undefined => {
 			if (typeof index !== 'number') {
 				return;
 			}
@@ -701,9 +702,9 @@ export class ViewStore {
 
 	/**
 	 * Remove the currently selected element from its page
-	 * Returns the deleted PageElement or undefined if nothing was deleted
+	 * Returns the deleted Element or undefined if nothing was deleted
 	 */
-	public removeSelectedElement(): PageElement | undefined {
+	public removeSelectedElement(): Element | undefined {
 		if (!this.selectedElement) {
 			return;
 		}
@@ -774,14 +775,14 @@ export class ViewStore {
 	 * Note: The element is cloned lazily, so you don't need to clone it when setting.
 	 * @see getClipboardElement
 	 */
-	public setClipboardItem(item: PageElement | Page): void {
-		if (item instanceof PageElement) {
+	public setClipboardItem(item: Element | Page): void {
+		if (item instanceof Element) {
 			if (item.isRoot()) {
 				return;
 			}
 
 			this.clipboardItem = {
-				type: ClipBoardType.PageElement,
+				type: ClipBoardType.Element,
 				item
 			};
 		}
@@ -802,7 +803,7 @@ export class ViewStore {
 		this.highlightedPlaceholderElement = this.getElementById(id);
 	}
 
-	public setNameEditableElement(editableElement?: PageElement): void {
+	public setNameEditableElement(editableElement?: Element): void {
 		if (this.nameEditableElement && this.nameEditableElement !== editableElement) {
 			this.nameEditableElement.setNameEditable(false);
 		}
@@ -849,7 +850,7 @@ export class ViewStore {
 	 * @param selectedElement The selected element or undefined.
 	 * @see setElementFocussed
 	 */
-	public setSelectedElement(selectedElement?: PageElement): void {
+	public setSelectedElement(selectedElement?: Element): void {
 		if (this.selectedElement && this.selectedElement !== selectedElement) {
 			this.setNameEditableElement();
 		}

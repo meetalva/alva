@@ -1,4 +1,4 @@
-import * as MobX from 'mobx';
+import * as Mobx from 'mobx';
 import * as Types from './types';
 import * as username from 'username';
 import * as Uuid from 'uuid';
@@ -31,41 +31,41 @@ export class Project {
 	/**
 	 * The technical (internal) ID of the project.
 	 */
-	@MobX.observable private id: string;
+	@Mobx.observable private id: string;
 
 	/**
 	 * The last author who edited this project or one of its pages (including elements,
 	 * properties etc.). Updated when calling the touch method.
 	 * @see touch()
 	 */
-	@MobX.observable private lastChangedAuthor: string;
+	@Mobx.observable private lastChangedAuthor: string;
 
 	/**
 	 * The last change date when this project or one of its pages was edited (including elements,
 	 * properties etc.). Updated when calling the touch method.
 	 * @see touch()
 	 */
-	@MobX.observable private lastChangedDate: Date = new Date();
+	@Mobx.observable private lastChangedDate: Date = new Date();
 
 	/**
 	 * The human-friendly name of the project.
 	 * In the frontend, to be displayed instead of the ID.
 	 */
-	@MobX.observable private name: string;
+	@Mobx.observable private name: string;
 
 	/**
 	 * The page references of the project. Projects do not contain the page elements directly.
 	 * Instead, they know what pages exist (page references),
 	 * and the store can load them from YAML files when required (open page).
 	 */
-	@MobX.observable private pages: Page[] = [];
+	@Mobx.observable private pages: Page[] = [];
 
 	private path;
 
 	/**
 	 * The underlying styleguide for this project
 	 */
-	@MobX.observable private styleguide: Styleguide;
+	@Mobx.observable private styleguide: Styleguide;
 
 	/**
 	 * Creates a new project.

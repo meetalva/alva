@@ -1,7 +1,7 @@
-import { Property, PropertyType } from './property';
-import * as Types from '../../types';
+import { PatternProperty, PatternPropertyType } from './property';
+import * as Types from '../types';
 
-export type PropertyResolver = () => Property[];
+export type PropertyResolver = () => PatternProperty[];
 
 /**
  * An object property is a property that supports objects with nested property values.
@@ -10,22 +10,23 @@ export type PropertyResolver = () => Property[];
  * @see Property
  * @see PatternProperty
  */
-export class ObjectProperty extends Property {
+export class PatternObjectProperty extends PatternProperty {
 	/**
 	 * The nested properties this property supports in its object values.
 	 */
-	private properties?: Map<string, Property>;
+	private properties?: Map<string, PatternProperty>;
 
 	private propertyResolver?: PropertyResolver;
 
-	public readonly type = PropertyType.Object;
+	public readonly type = PatternPropertyType.Object;
 
-	public static from(serialized: Types.SerializedObjectProperty): ObjectProperty {
-		return new ObjectProperty({
+	public static from(serialized: Types.SerializedPatternObjectProperty): PatternObjectProperty {
+		return new PatternObjectProperty({
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,
-			name: serialized.name,
+			label: serialized.label,
+			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
 	}
@@ -46,7 +47,7 @@ export class ObjectProperty extends Property {
 	 * Returns the nested properties this property supports in its object values.
 	 * @return The nested properties this property supports.
 	 */
-	public getProperties(): Property[] {
+	public getProperties(): PatternProperty[] {
 		return Array.from(this.resolveProperties().values());
 	}
 
@@ -55,11 +56,11 @@ export class ObjectProperty extends Property {
 	 * @param id The ID of the property to return.
 	 * @return The nested property if the ID was found.
 	 */
-	public getProperty(id: string): Property | undefined {
+	public getProperty(id: string): PatternProperty | undefined {
 		return this.resolveProperties().get(id);
 	}
 
-	private resolveProperties(): Map<string, Property> {
+	private resolveProperties(): Map<string, PatternProperty> {
 		if (!this.properties) {
 			if (!this.propertyResolver) {
 				throw new Error('property resolver is not set');
@@ -85,12 +86,13 @@ export class ObjectProperty extends Property {
 		this.propertyResolver = propertyResolver;
 	}
 
-	public toJSON(): Types.SerializedObjectProperty {
+	public toJSON(): Types.SerializedPatternObjectProperty {
 		return {
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,
-			name: this.name,
+			label: this.label,
+			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type
 		};

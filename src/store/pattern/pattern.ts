@@ -1,14 +1,18 @@
 import * as AlvaUtil from '../../alva-util';
-import { PatternFolder } from './folder';
-import * as Property from './property';
-import { Slot } from './slot';
-import { Styleguide } from './styleguide';
+import { PatternFolder } from './pattern-folder';
+import * as PatternProperty from '../pattern-property';
+import { PatternSlot } from './pattern-slot';
+import { Styleguide } from '../styleguide';
 import * as Types from '../types';
 import * as uuid from 'uuid';
+
+// tslint:disable-next-line:no-duplicate-imports
+import { PatternPropertyType } from '../types';
 
 export type PatternType = SyntheticPatternType | ConcretePatternType;
 
 export enum SyntheticPatternType {
+	SyntheticBox = 'synthetic:box',
 	SyntheticPage = 'synthetic:page',
 	SyntheticPlaceholder = 'synthetic:placeholder',
 	SyntheticText = 'synthetic:text'
@@ -23,8 +27,8 @@ export interface PatternInit {
 	id?: string;
 	name: string;
 	path: string;
-	properties?: Property.Property[];
-	slots?: Slot[];
+	properties?: PatternProperty.PatternProperty[];
+	slots?: PatternSlot[];
 	type: PatternType;
 }
 
@@ -74,12 +78,12 @@ export class Pattern {
 	/**
 	 * The properties this pattern supports.
 	 */
-	private properties: Property.Property[];
+	private properties: PatternProperty.PatternProperty[];
 
 	/**
 	 * The slots this pattern supports
 	 */
-	private slots: Slot[];
+	private slots: PatternSlot[];
 
 	private type: PatternType;
 
@@ -101,7 +105,7 @@ export class Pattern {
 		this.type = init.type;
 		this.properties = init.properties || [];
 		this.slots = init.slots || [
-			new Slot({
+			new PatternSlot({
 				displayName: 'Children',
 				propertyName: 'children',
 				id: uuid.v4(),
@@ -117,7 +121,7 @@ export class Pattern {
 			name: serializedPattern.name,
 			path: serializedPattern.path,
 			properties: serializedPattern.properties.map(unserializeProperty),
-			slots: serializedPattern.slots.map(slot => Slot.from(slot)),
+			slots: serializedPattern.slots.map(slot => PatternSlot.from(slot)),
 			type: stringToType(serializedPattern.type)
 		});
 	}
@@ -130,7 +134,7 @@ export class Pattern {
 	 * Adds a property to this pattern. This method is called by the pattern parser only.
 	 * @param property The new property to add.
 	 */
-	public addProperty(property: Property.Property): void {
+	public addProperty(property: PatternProperty.PatternProperty): void {
 		this.properties.push(property);
 	}
 
@@ -138,7 +142,7 @@ export class Pattern {
 	 * Adds a slot to this pattern. This method is called by the analyzer only.
 	 * @param name The slot to add.
 	 */
-	public addSlot(slot: Slot): void {
+	public addSlot(slot: PatternSlot): void {
 		this.slots.push(slot);
 	}
 
@@ -182,7 +186,7 @@ export class Pattern {
 	 * Returns the properties this pattern supports.
 	 * @return The properties this pattern supports.
 	 */
-	public getProperties(): Property.Property[] {
+	public getProperties(): PatternProperty.PatternProperty[] {
 		return this.properties;
 	}
 
@@ -193,7 +197,7 @@ export class Pattern {
 	 * eg: `getProperty('image', 'src.srcSet')`.
 	 * @return The property for the given ID, if it exists.
 	 */
-	public getProperty(id: string, path?: string): Property.Property | undefined {
+	public getProperty(id: string, path?: string): PatternProperty.PatternProperty | undefined {
 		let property = this.properties.find(p => p.getId() === id);
 
 		if (!property || !path) {
@@ -201,8 +205,8 @@ export class Pattern {
 		}
 
 		for (const part of path.split('.')) {
-			if (property && property.type === Property.PropertyType.Object) {
-				property = (property as Property.ObjectProperty).getProperty(part);
+			if (property && property.type === PatternProperty.PatternPropertyType.Object) {
+				property = (property as PatternProperty.PatternObjectProperty).getProperty(part);
 			} else {
 				return;
 			}
@@ -215,7 +219,7 @@ export class Pattern {
 	 * Returns the slots this pattern supports.
 	 * @return The slots this pattern supports.
 	 */
-	public getSlots(): Slot[] {
+	public getSlots(): PatternSlot[] {
 		return this.slots;
 	}
 
@@ -250,23 +254,27 @@ const stringToType = (input: string): PatternType => {
 	}
 };
 
-const unserializeProperty = (serialized: Types.SerializedProperty): Property.Property => {
+const P = PatternProperty;
+
+const unserializeProperty = (
+	serialized: Types.SerializedPatternProperty
+): PatternProperty.PatternProperty => {
 	switch (serialized.type) {
-		case Types.PropertyType.Asset:
-			return Property.AssetProperty.from(serialized);
-		case Types.PropertyType.Boolean:
-			return Property.BooleanProperty.from(serialized);
-		case Types.PropertyType.Enum:
-			return Property.EnumProperty.from(serialized);
-		case Types.PropertyType.Number:
-			return Property.NumberProperty.from(serialized);
-		case Types.PropertyType.NumberArray:
-			return Property.NumberArrayProperty.from(serialized);
-		case Types.PropertyType.Object:
-			return Property.ObjectProperty.from(serialized);
-		case Types.PropertyType.String:
-			return Property.StringProperty.from(serialized);
-		case Types.PropertyType.StringArray:
-			return Property.StringArrayProperty.from(serialized);
+		case PatternPropertyType.Asset:
+			return P.PatternAssetProperty.from(serialized);
+		case PatternPropertyType.Boolean:
+			return P.PatternBooleanProperty.from(serialized);
+		case PatternPropertyType.Enum:
+			return P.PatternEnumProperty.from(serialized);
+		case PatternPropertyType.Number:
+			return P.PatternNumberProperty.from(serialized);
+		case PatternPropertyType.NumberArray:
+			return P.PatternNumberArrayProperty.from(serialized);
+		case PatternPropertyType.Object:
+			return P.PatternObjectProperty.from(serialized);
+		case PatternPropertyType.String:
+			return P.StringPatternProperty.from(serialized);
+		case PatternPropertyType.StringArray:
+			return P.StringPatternArrayProperty.from(serialized);
 	}
 };

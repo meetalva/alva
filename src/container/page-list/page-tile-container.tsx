@@ -1,5 +1,5 @@
 import { PreviewTile, Space, SpaceSize } from '../../components';
-import { observer } from 'mobx-react';
+import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { Page, ViewStore } from '../../store';
 import * as Types from '../../store/types';
@@ -9,7 +9,7 @@ export interface PageTileContainerProps {
 	page: Page;
 }
 
-@observer
+@MobxReact.observer
 export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	private onKeyDown: (e: KeyboardEvent) => void;
 

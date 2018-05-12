@@ -16,6 +16,8 @@ export interface RenderInit {
 	store: PreviewStore;
 	// tslint:disable-next-line:no-any
 	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
+	// tslint:disable-next-line:no-any
+	getProperties(props: any): any;
 }
 
 export interface InjectedPreviewHighlightProps {
@@ -27,11 +29,12 @@ export interface InjectedPreviewApplicationProps {
 	store: PreviewStore;
 }
 
-interface InjectedPreviewComponentProps extends Types.SerializedPageElement {
+interface InjectedPreviewComponentProps extends Types.SerializedElement {
+	getComponent: RenderInit['getComponent'];
+	getProperties: RenderInit['getProperties'];
 	highlight: HighlightArea;
 	store: PreviewStore;
 	// tslint:disable-next-line:no-any
-	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
 }
 
 interface ErrorBoundaryProps {
@@ -49,7 +52,7 @@ interface ErrorMessageProps {
 
 const SYNTHETICS = {
 	page: props => <>{props.children}</>,
-	placeholder: props => <img src={props.asset} style={{ width: '100%', height: 'auto' }} />,
+	placeholder: props => <img src={props.src} style={{ width: '100%', height: 'auto' }} />,
 	text: props => <span>{props.text}</span>
 };
 
@@ -57,6 +60,7 @@ export function render(init: RenderInit): void {
 	ReactDom.render(
 		<MobXReact.Provider
 			getComponent={init.getComponent}
+			getProperties={init.getProperties}
 			store={init.store}
 			highlight={init.highlight}
 		>
@@ -113,9 +117,9 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 	}
 }
 
-@MobXReact.inject('getComponent', 'store', 'highlight')
+@MobXReact.inject('getComponent', 'getProperties', 'store', 'highlight')
 @MobXReact.observer
-class PreviewComponent extends React.Component<Types.SerializedPageElement> {
+class PreviewComponent extends React.Component<Types.SerializedElement> {
 	public componentWillUpdate(): void {
 		const props = this.props as InjectedPreviewComponentProps;
 
@@ -144,9 +148,7 @@ class PreviewComponent extends React.Component<Types.SerializedPageElement> {
 			{}
 		);
 
-		// Access elementId in render method to trigger MobX subscription
-		// tslint:disable-next-line:no-unused-expression
-		props.store.elementId;
+		const properties = props.getProperties(props.properties);
 
 		// tslint:disable-next-line:no-any
 		const Component = props.getComponent(props, SYNTHETICS) as any;
@@ -157,7 +159,7 @@ class PreviewComponent extends React.Component<Types.SerializedPageElement> {
 
 		return (
 			<ErrorBoundary name={props.name}>
-				<Component {...props.properties} {...slots} data-sketch-name={props.name}>
+				<Component {...properties} {...slots}>
 					{children.map(child => <PreviewComponent key={child.id} {...child} />)}
 				</Component>
 			</ErrorBoundary>

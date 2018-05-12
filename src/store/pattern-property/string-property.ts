@@ -1,5 +1,5 @@
-import { Property, PropertyType } from './property';
-import * as Types from '../../types';
+import { PatternProperty, PatternPropertyType } from './property';
+import * as Types from '../types';
 
 /**
  * A string property is a property that supports text only.
@@ -8,20 +8,16 @@ import * as Types from '../../types';
  * but everything is converted into a proper string (never undefined or null).
  * @see Property
  */
-export class StringProperty extends Property {
-	/**
-	 * The ID of the synthetic string property in the synthetic text content pattern.
-	 */
-	public static SYNTHETIC_TEXT_ID: string = 'text';
+export class StringPatternProperty extends PatternProperty {
+	public readonly type = PatternPropertyType.String;
 
-	public readonly type = PropertyType.String;
-
-	public static from(serialized: Types.SerializedStringProperty): StringProperty {
-		return new StringProperty({
+	public static from(serialized: Types.SerializedStringProperty): StringPatternProperty {
+		return new StringPatternProperty({
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,
-			name: serialized.name,
+			label: serialized.label,
+			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
 	}
@@ -40,7 +36,8 @@ export class StringProperty extends Property {
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,
-			name: this.name,
+			label: this.label,
+			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type
 		};

@@ -1,5 +1,5 @@
-import { Property, PropertyType } from './property';
-import * as Types from '../../types';
+import { PatternProperty, PatternPropertyType } from './property';
+import * as Types from '../types';
 
 /**
  * A number property is a property that supports numbers only, and undefined.
@@ -8,15 +8,16 @@ import * as Types from '../../types';
  * but everything is converted into a proper number, or undefined.
  * @see Property
  */
-export class NumberProperty extends Property {
-	public readonly type = PropertyType.Number;
+export class PatternNumberProperty extends PatternProperty {
+	public readonly type = PatternPropertyType.Number;
 
-	public static from(serialized: Types.SerializedNumberProperty): NumberProperty {
-		return new NumberProperty({
+	public static from(serialized: Types.SerializedPatternNumberProperty): PatternNumberProperty {
+		return new PatternNumberProperty({
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,
-			name: serialized.name,
+			label: serialized.label,
+			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
 	}
@@ -27,12 +28,13 @@ export class NumberProperty extends Property {
 		return isNaN(result) ? undefined : result;
 	}
 
-	public toJSON(): Types.SerializedNumberProperty {
+	public toJSON(): Types.SerializedPatternNumberProperty {
 		return {
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,
-			name: this.name,
+			label: this.label,
+			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type
 		};

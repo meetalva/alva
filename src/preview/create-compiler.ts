@@ -1,7 +1,7 @@
 // import * as Path from 'path';
 // import { patternIdToWebpackName } from './pattern-id-to-webpack-name';
 import * as QueryString from 'query-string';
-import { Styleguide } from '../store/styleguide/styleguide';
+import { Styleguide } from '../store';
 import * as webpack from 'webpack';
 
 // memory-fs typings on @types are faulty

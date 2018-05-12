@@ -1,6 +1,6 @@
 import { ViewStore } from '../';
 import { Command } from './command';
-import { PageElement } from '../page-element';
+import { Element } from '../element';
 
 /**
  * A user operation on a page element, ensuring that the page is loaded and references get
@@ -10,7 +10,7 @@ export abstract class ElementCommand extends Command {
 	/**
 	 * The element the user operation is performed on.
 	 */
-	protected element: PageElement;
+	protected element: Element;
 
 	/**
 	 * The ID of the element the user operation is performed on,
@@ -33,7 +33,7 @@ export abstract class ElementCommand extends Command {
 	 * the operation edits 'image.src.srcSet.xs' on the element.
 	 */
 	// tslint:disable-next-line:no-any
-	public constructor(element: PageElement) {
+	public constructor(element: Element) {
 		super();
 
 		this.element = element;

@@ -179,7 +179,7 @@ MobX.autorun(() => {
 			id: uuid.v4(),
 			payload: {
 				pageId: currentPage.getId(),
-				pages: project.getPages().map(page => page.toJSON({ forRendering: true }))
+				pages: project.getPages().map(page => page.toJSON())
 			},
 			type: ServerMessageType.PageChange
 		});

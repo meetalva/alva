@@ -74,6 +74,7 @@ function main(): void {
 		(window as any).renderer.render({
 			// tslint:disable-next-line:no-any
 			getComponent: createComponentGetter(store),
+			getProperties: createPropertiesGetter(store),
 			highlight,
 			store
 		});
@@ -288,6 +289,17 @@ function createComponentGetter(store: PreviewStore): (props: any, synthetics: an
 				return synthetics.text;
 		}
 	};
+}
+
+// tslint:disable:no-any
+function createPropertiesGetter(
+	store: PreviewStore
+): (properties: Types.SerializedElementProperty[]) => any {
+	return properties =>
+		properties.reduce((acc, property) => {
+			acc[property.patternProperty.propertyName] = property.value;
+			return acc;
+		}, {});
 }
 
 main();

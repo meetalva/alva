@@ -1,18 +1,18 @@
 import { Command } from './command';
+import { Element, ElementContent } from '../element';
 import { ElementCommand } from './element-command';
 import { Page } from '../page/page';
-import { PageElement, PageElementContent } from '../page-element';
 import { ViewStore } from '../view-store';
 
 export class ElementRemoveCommand extends ElementCommand {
-	protected container: PageElementContent;
+	protected container: ElementContent;
 	protected index: number;
 	protected page: Page;
 
-	public constructor(init: { element: PageElement }) {
+	public constructor(init: { element: Element }) {
 		super(init.element);
 
-		this.container = this.element.getContainer() as PageElementContent;
+		this.container = this.element.getContainer() as ElementContent;
 		this.index = this.element.getIndex();
 		this.page = this.element.getPage() as Page;
 	}

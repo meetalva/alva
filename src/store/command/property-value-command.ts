@@ -1,6 +1,6 @@
 import { Command } from './command';
+import { Element } from '../element';
 import { ElementCommand } from './element-command';
-import { PageElement } from '../page-element';
 
 /**
  * A user operation to set the value of a page element property.
@@ -45,13 +45,13 @@ export class PropertyValueCommand extends ElementCommand {
 	 * the operation edits 'image.src.srcSet.xs' on the element.
 	 */
 	// tslint:disable-next-line:no-any
-	public constructor(element: PageElement, propertyId: string, value: any, path?: string) {
+	public constructor(element: Element, propertyId: string, value: any, path?: string) {
 		super(element);
 
 		this.propertyId = propertyId;
 		this.value = value;
 		this.path = path;
-		this.previousValue = element.getPropertyValue(propertyId, path);
+		// 		this.previousValue = element.getPropertyValue(propertyId, path);
 	}
 
 	/**
@@ -62,7 +62,7 @@ export class PropertyValueCommand extends ElementCommand {
 			return false;
 		}
 
-		this.element.setPropertyValue(this.propertyId, this.value, this.path);
+		// this.element.setPropertyValue(this.propertyId, this.value, this.path);
 
 		return true;
 	}
@@ -113,7 +113,7 @@ export class PropertyValueCommand extends ElementCommand {
 			return false;
 		}
 
-		this.element.setPropertyValue(this.propertyId, this.previousValue, this.path);
+		// this.element.setPropertyValue(this.propertyId, this.previousValue, this.path);
 
 		return true;
 	}

@@ -1,10 +1,10 @@
 import { ViewButton } from '../../components';
-import { observer } from 'mobx-react';
+import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as Types from '../../store/types';
 
-@observer
+@MobxReact.observer
 export class OverviewSwitchContainer extends React.Component {
 	public render(): JSX.Element | null {
 		const store = ViewStore.getInstance();

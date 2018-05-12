@@ -1,11 +1,11 @@
 import { Input, Space, SpaceSize } from '../../components';
-import { observer } from 'mobx-react';
+import * as MobxReact from 'mobx-react';
 import { PatternFolderContainer } from './pattern-folder-container';
 import { PatternItemContainer } from './pattern-item-container';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 
-@observer
+@MobxReact.observer
 export class PatternListContainer extends React.Component {
 	public render(): JSX.Element | null {
 		const store = ViewStore.getInstance();

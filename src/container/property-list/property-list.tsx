@@ -1,7 +1,7 @@
 import * as Component from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
-import { ElementProperty, ViewStore } from '../../store';
+import { ElementProperty, PatternEnumProperty, ViewStore } from '../../store';
 import { PatternPropertyType as P } from '../../store/types';
 
 @MobxReact.observer
@@ -79,10 +79,19 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 				);
 			}
 			case P.Enum: {
+				const value = property.getValue() as string;
+				const patternProperty = property.getPatternProperty() as PatternEnumProperty;
+				const selectedOption = patternProperty.getOptionById(value);
+				const selectedValue = selectedOption ? selectedOption.getId() : undefined;
+
 				return (
 					<Component.EnumItem
 						{...base}
-						values={[]}
+						selectedValue={selectedValue}
+						values={patternProperty.getOptions().map(option => ({
+							id: option.getId(),
+							name: option.getName()
+						}))}
 						onChange={e => this.handleInputChange(e)}
 					/>
 				);

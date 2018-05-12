@@ -126,6 +126,7 @@ export interface SerializedEnumOption {
 	id: string;
 	name: string;
 	ordinal: number;
+	value: string;
 }
 
 export interface SerializedPatternNumberArrayProperty extends SerializedPropertyBase {

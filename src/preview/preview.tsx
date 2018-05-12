@@ -297,7 +297,19 @@ function createPropertiesGetter(
 ): (properties: Types.SerializedElementProperty[]) => any {
 	return properties =>
 		properties.reduce((acc, property) => {
-			acc[property.patternProperty.propertyName] = property.value;
+			const { patternProperty } = property;
+			const { propertyName } = patternProperty;
+
+			switch (patternProperty.type) {
+				case 'enum': {
+					const option = patternProperty.options.find(o => o.id === property.value);
+					acc[propertyName] = option ? option.value : undefined;
+					break;
+				}
+				default:
+					acc[propertyName] = property.value;
+			}
+
 			return acc;
 		}, {});
 }

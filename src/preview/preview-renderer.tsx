@@ -56,7 +56,7 @@ const Page: React.SFC = (props: any) => (
 	<>
 		<Helmet>
 			<html lang={props.lang} />
-			{props.viewport && <meta name="viewport" content="width=device-width, initical-scale=1" />}
+			{props.viewport && <meta name="viewport" content="width=device-width, initial-scale=1" />}
 			{props.head}
 		</Helmet>
 		{props.children}

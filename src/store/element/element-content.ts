@@ -78,6 +78,10 @@ export class ElementContent {
 		return this.elements;
 	}
 
+	public getId(): string {
+		return this.id;
+	}
+
 	public getSlotId(): string {
 		return this.slotId;
 	}

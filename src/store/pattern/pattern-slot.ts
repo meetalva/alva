@@ -18,6 +18,7 @@ export class PatternSlot {
 		this.id = init.id;
 		this.displayName = init.displayName;
 		this.type = init.type;
+		this.propertyName = init.propertyName;
 	}
 
 	public static from(serialized: Types.SerializedPatternSlot): PatternSlot {

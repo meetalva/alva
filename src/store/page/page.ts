@@ -1,4 +1,4 @@
-import { Element } from '../element';
+import { Element, ElementContent } from '../element';
 import * as Mobx from 'mobx';
 import { SyntheticPatternType } from '../pattern';
 import { Styleguide } from '../styleguide';
@@ -113,6 +113,10 @@ export class Page {
 		}
 
 		throw new Error(`Page ${this.getId()} needs to store context in order to be cloned`);
+	}
+
+	public getContentById(id: string): ElementContent | undefined {
+		return this.root.getContentById(id);
 	}
 
 	/**

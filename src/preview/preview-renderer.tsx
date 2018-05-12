@@ -5,6 +5,7 @@ import * as MobXReact from 'mobx-react';
 import { PreviewStore } from './preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import { Helmet } from 'react-helmet';
 import * as Types from '../store/types';
 
 // TODO: Produces a deprecation warning, find a way
@@ -50,8 +51,20 @@ interface ErrorMessageProps {
 	patternName: string;
 }
 
+// tslint:disable-next-line:no-any
+const Page: React.SFC = (props: any) => (
+	<>
+		<Helmet>
+			<html lang={props.lang} />
+			{props.viewport && <meta name="viewport" content="width=device-width, initical-scale=1" />}
+			{props.head}
+		</Helmet>
+		{props.children}
+	</>
+);
+
 const SYNTHETICS = {
-	page: props => <>{props.children}</>,
+	page: Page,
 	placeholder: props => <img src={props.src} style={{ width: '100%', height: 'auto' }} />,
 	text: props => <span>{props.text}</span>
 };

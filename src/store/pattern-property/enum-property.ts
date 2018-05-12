@@ -1,5 +1,9 @@
-import { PatternProperty, PatternPropertyType } from './property';
+import { PatternProperty, PatternPropertyInit, PatternPropertyType } from './property';
 import * as Types from '../types';
+
+export interface PatternEnumPropertyInit extends PatternPropertyInit {
+	options: PatternEnumPropertyOption[];
+}
 
 /**
  * An enum property is a property that supports the elements of a given enum only, and undefined.
@@ -11,34 +15,29 @@ import * as Types from '../types';
  * @see Property
  */
 export class PatternEnumProperty extends PatternProperty {
-	/**
-	 * The options supported by this enum.
-	 */
-	private options: Option[];
-
-	/**
-	 * A lookup to get the option ordinal (assigned number value) from an option ID.
-	 */
-	private ordinalById: { [id: string]: number } = {};
+	private options: PatternEnumPropertyOption[];
 
 	public readonly type = PatternPropertyType.Enum;
+
+	public constructor(init: PatternEnumPropertyInit) {
+		super(init);
+		this.options = init.options;
+	}
 
 	public static from(
 		serializedProperty: Types.SerializedPatternEnumProperty
 	): PatternEnumProperty {
-		const property = new PatternEnumProperty({
+		return new PatternEnumProperty({
 			hidden: serializedProperty.hidden,
 			defaultValue: serializedProperty.defaultValue,
 			id: serializedProperty.id,
 			label: serializedProperty.label,
+			options: serializedProperty.options.map(serializedOption =>
+				PatternEnumPropertyOption.from(serializedOption)
+			),
 			propertyName: serializedProperty.propertyName,
 			required: serializedProperty.required
 		});
-
-		property.setOptions(
-			serializedProperty.options.map(serializedOption => Option.from(serializedOption))
-		);
-		return property;
 	}
 
 	/**
@@ -73,46 +72,20 @@ export class PatternEnumProperty extends PatternProperty {
 	}
 
 	/**
-	 * @inheritdoc
-	 */
-	// tslint:disable-next-line:no-any
-	public convertToRender(value: any): any {
-		return this.ordinalById[value as string];
-	}
-
-	/**
 	 * Returns the option ordinal (assigned number value) for a given option ID.
 	 * @param id The option ID.
 	 * @return The ordinal if an option with this ID exists.
 	 */
-	public getOptionById(id: string): Option | undefined {
-		for (const option of this.options) {
-			if (option.getId() === id) {
-				return option;
-			}
-		}
-
-		return;
+	public getOptionById(id: string): PatternEnumPropertyOption | undefined {
+		return this.options.find(option => option.getId() === id);
 	}
 
 	/**
 	 * Returns the options supported by this enum.
 	 * @return The options supported by this enum.
 	 */
-	public getOptions(): Option[] {
+	public getOptions(): PatternEnumPropertyOption[] {
 		return this.options;
-	}
-
-	/**
-	 * Sets the options supported by this enum.<br>
-	 * <b>Note:</b> This method should only be called from the pattern parsers.
-	 * @param options The options supported by this enum.
-	 */
-	public setOptions(options: Option[]): void {
-		this.options = options;
-		this.options.forEach((option: Option) => {
-			this.ordinalById[option.getId()] = option.getOrdinal();
-		});
 	}
 
 	public toJSON(): Types.SerializedPatternEnumProperty {
@@ -129,19 +102,28 @@ export class PatternEnumProperty extends PatternProperty {
 	}
 }
 
-export class Option {
+export interface PatternEnumPropertyOptionInit {
+	id: string;
+	name: string;
+	ordinal: number;
+	value: string;
+}
+
+export class PatternEnumPropertyOption {
 	private id: string;
 	private name: string;
 	private ordinal: number;
+	private value: string;
 
-	public constructor(id: string, name?: string, ordinal?: number) {
-		this.id = id;
-		this.name = name !== undefined ? name : id;
-		this.ordinal = ordinal !== undefined ? ordinal : 0;
+	public constructor(init: PatternEnumPropertyOptionInit) {
+		this.id = init.id;
+		this.name = init.name;
+		this.ordinal = init.ordinal;
+		this.value = init.value;
 	}
 
-	public static from(serializedOption: Types.SerializedEnumOption): Option {
-		return new Option(serializedOption.id, serializedOption.name, serializedOption.ordinal);
+	public static from(serialized: Types.SerializedEnumOption): PatternEnumPropertyOption {
+		return new PatternEnumPropertyOption(serialized);
 	}
 
 	public getId(): string {
@@ -156,11 +138,16 @@ export class Option {
 		return this.ordinal;
 	}
 
+	public getValue(): string {
+		return this.value;
+	}
+
 	public toJSON(): Types.SerializedEnumOption {
 		return {
 			id: this.id,
 			name: this.name,
-			ordinal: this.ordinal
+			ordinal: this.ordinal,
+			value: this.value
 		};
 	}
 }

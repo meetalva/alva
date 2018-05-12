@@ -248,9 +248,12 @@ const stringToType = (input: string): PatternType => {
 			return SyntheticPatternType.SyntheticPlaceholder;
 		case 'synthetic:text':
 			return SyntheticPatternType.SyntheticText;
+		case 'synthetic:box':
+			return SyntheticPatternType.SyntheticBox;
 		case 'pattern':
-		default:
 			return ConcretePatternType.Pattern;
+		default:
+			throw new Error(`Unknown pattern type ${input}`);
 	}
 };
 
@@ -273,7 +276,7 @@ const unserializeProperty = (
 		case PatternPropertyType.Object:
 			return P.PatternObjectProperty.from(serialized);
 		case PatternPropertyType.String:
-			return P.StringPatternProperty.from(serialized);
+			return P.PatternStringProperty.from(serialized);
 		case PatternPropertyType.StringArray:
 			return P.StringPatternArrayProperty.from(serialized);
 	}

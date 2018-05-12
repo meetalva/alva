@@ -7,7 +7,7 @@ export const Text = () =>
 		path: '',
 		type: SyntheticPatternType.SyntheticText,
 		properties: [
-			new PatternProperty.StringPatternProperty({
+			new PatternProperty.PatternStringProperty({
 				label: 'Text',
 				propertyName: 'text'
 			})

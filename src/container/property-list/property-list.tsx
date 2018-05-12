@@ -109,10 +109,9 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 			default: {
 				return (
 					<div key={id}>
-						Unknown type: {type}
 						<Component.StringItem
 							{...base}
-							value={''}
+							value={property.getValue() as string}
 							onChange={e => this.handleInputChange(e)}
 						/>
 					</div>

@@ -1,3 +1,4 @@
+import { Box } from './box';
 import { Page } from './page';
 import { Pattern, PatternFolder, SyntheticPatternType } from '../pattern';
 import { Placeholder } from './placeholder';
@@ -42,11 +43,13 @@ export class Styleguide {
 
 			const placeholder = Placeholder();
 			const text = Text();
+			const box = Box();
 
-			this.patterns = [Page(), placeholder, text];
+			this.patterns = [Page(), text, box, placeholder];
 
-			syntheticFolder.addPattern(placeholder);
 			syntheticFolder.addPattern(text);
+			syntheticFolder.addPattern(box);
+			syntheticFolder.addPattern(placeholder);
 		}
 	}
 

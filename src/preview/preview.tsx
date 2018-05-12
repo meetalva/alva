@@ -288,6 +288,8 @@ function createComponentGetter(store: PreviewStore): (props: any, synthetics: an
 				return synthetics.placeholder;
 			case 'synthetic:text':
 				return synthetics.text;
+			case 'synthetic:box':
+				return synthetics.box;
 		}
 	};
 }

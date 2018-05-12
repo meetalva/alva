@@ -85,7 +85,8 @@ export class Page {
 					name: init.name,
 					pattern: init.styleguide.getPatternByType(SyntheticPatternType.SyntheticPage),
 					contents: [],
-					properties: []
+					properties: [],
+					setDefaults: true
 				})
 		});
 	}

@@ -24,6 +24,10 @@ export class ElementProperty {
 		this.patternProperty = init.patternProperty;
 		this.setDefault = init.setDefault;
 		this.value = init.value;
+
+		if (typeof this.value === 'undefined' && this.setDefault) {
+			this.value = this.patternProperty.getDefaultValue();
+		}
 	}
 
 	public static from(serialized: Types.SerializedElementProperty): ElementProperty {
@@ -98,11 +102,11 @@ function deserializeProperty(input: Types.SerializedPatternProperty): PatternPro
 		case PatternPropertyType.Object:
 			return P.PatternObjectProperty.from(input);
 		case PatternPropertyType.String:
-			return P.StringPatternProperty.from(input);
+			return P.PatternStringProperty.from(input);
 		case PatternPropertyType.StringArray:
 			return P.StringPatternArrayProperty.from(input);
 		default:
 			console.warn(`Tried to deserialize unknown property: ${JSON.stringify(input)}`);
-			return P.StringPatternProperty.from(input);
+			return P.PatternStringProperty.from(input);
 	}
 }

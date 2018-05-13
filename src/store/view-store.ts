@@ -142,6 +142,8 @@ export class ViewStore {
 	public static getInstance(): ViewStore {
 		if (!ViewStore.INSTANCE) {
 			ViewStore.INSTANCE = new ViewStore();
+			// tslint:disable-next-line:no-any
+			(global as any).viewStore = ViewStore.INSTANCE;
 		}
 
 		return ViewStore.INSTANCE;

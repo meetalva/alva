@@ -129,7 +129,7 @@ export class Element {
 
 			return new ElementProperty({
 				id: Uuid.v4(),
-				patternProperty,
+				patternPropertyId: patternProperty.getId(),
 				setDefault: Boolean(init.setDefaults),
 				value: undefined
 			});

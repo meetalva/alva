@@ -11,7 +11,7 @@ import * as MimeTypes from 'mime-types';
 import * as Path from 'path';
 import * as Sender from '../message/server';
 import { createServer } from './server';
-import { Persistence, PersistenceState, Project } from '../store';
+import { Page, Persistence, PersistenceState, Project } from '../store';
 import * as Types from '../store/types';
 import * as Url from 'url';
 import * as Util from 'util';
@@ -136,6 +136,13 @@ async function createWindow(): Promise<void> {
 						path
 					});
 
+					project.addPage(
+						Page.create({
+							name: 'Untitled Page',
+							patternLibrary: project.getPatternLibrary()
+						})
+					);
+
 					await Persistence.persist(path, project);
 
 					Sender.send({
@@ -225,7 +232,7 @@ async function createWindow(): Promise<void> {
 				break;
 			}
 			case ServerMessageType.CreateScriptBundleRequest: {
-				const compiler = createCompiler(message.payload);
+				const compiler = createCompiler();
 				await Util.promisify(compiler.run).bind(compiler)();
 
 				const createScript = (name: string, content: string) =>

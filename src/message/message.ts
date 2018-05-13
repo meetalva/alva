@@ -1,4 +1,4 @@
-import { Styleguide } from '../store/styleguide';
+import { PatternLibrary } from '../store';
 import * as Types from '../store/types';
 
 export enum PreviewMessageType {
@@ -135,7 +135,7 @@ export type CopyPageElement = Envelope<ServerMessageType.CopyPageElement, string
 export type CreateNewPage = Envelope<ServerMessageType.CreateNewPage, undefined>;
 export type CreateScriptBundleRequest = Envelope<
 	ServerMessageType.CreateScriptBundleRequest,
-	Styleguide
+	PatternLibrary
 >;
 export type CreateScriptBundleResponse = Envelope<
 	ServerMessageType.CreateScriptBundleResponse,

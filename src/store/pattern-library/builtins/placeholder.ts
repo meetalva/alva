@@ -1,5 +1,5 @@
-import { Pattern, SyntheticPatternType } from '../pattern';
-import * as PatternProperty from '../pattern-property';
+import { Pattern, SyntheticPatternType } from '../../pattern';
+import * as PatternProperty from '../../pattern-property';
 
 export const Placeholder = () =>
 	new Pattern({

@@ -3,7 +3,7 @@ import { ElementProperty } from './element-property';
 import * as Mobx from 'mobx';
 import { Page } from '../page';
 import { Pattern, PatternSlot } from '../pattern';
-import { Styleguide } from '../styleguide';
+import { PatternLibrary } from '../pattern-library';
 import * as Types from '../types';
 import * as Uuid from 'uuid';
 import { ViewStore } from '../view-store';
@@ -19,7 +19,7 @@ export interface ElementInit {
 }
 
 export interface PageElementContext {
-	styleguide: Styleguide;
+	styleguide: PatternLibrary;
 }
 
 /**

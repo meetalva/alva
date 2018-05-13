@@ -5,5 +5,5 @@ export * from './pattern-property';
 export * from './pattern';
 export * from './persister';
 export * from './project';
-export * from './styleguide';
+export * from './pattern-library';
 export * from './view-store';

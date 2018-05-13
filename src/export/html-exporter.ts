@@ -11,7 +11,7 @@ export class HtmlExporter extends Exporter {
 		const store = ViewStore.getInstance();
 		const project = store.getCurrentProject();
 		const currentPage = store.getCurrentPage();
-		const styleguide = store.getStyleguide();
+		const styleguide = store.getPatternLibrary();
 		const id = uuid.v4();
 
 		// TODO: Come up with good user-facing errors

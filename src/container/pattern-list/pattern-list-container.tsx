@@ -9,27 +9,32 @@ import { ViewStore } from '../../store';
 export class PatternListContainer extends React.Component {
 	public render(): JSX.Element | null {
 		const store = ViewStore.getInstance();
-		const styleguide = store.getStyleguide();
+		const patternLibrary = store.getPatternLibrary();
 
-		if (!styleguide) {
+		if (!patternLibrary) {
 			return null;
 		}
 
-		const patternRoot = styleguide.getRoot();
+		const patternRoot = patternLibrary.getRoot();
+		const matches = patternLibrary.query(store.getPatternSearchTerm());
 
 		return (
 			<>
 				<Space sizeBottom={SpaceSize.XXS}>
-					<Input placeholder="Search patterns" />
+					<Input
+						placeholder="Search patterns"
+						onChange={e => store.setPatternSearchTerm(e.target.value)}
+						value={store.getPatternSearchTerm()}
+					/>
 				</Space>
 				<Space size={[0, SpaceSize.L]}>
 					<PatternFolderContainer
 						isRoot
 						folder={patternRoot}
+						matches={matches}
 						render={pattern => (
 							<PatternItemContainer key={pattern.getId()} pattern={pattern} />
 						)}
-						styleguide={styleguide}
 					/>
 				</Space>
 			</>

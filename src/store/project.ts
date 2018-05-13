@@ -11,7 +11,7 @@ export interface ProjectProperties {
 	name: string;
 	pages: Page[];
 	path: string;
-	styleguide: PatternLibrary;
+	patternLibrary: PatternLibrary;
 }
 
 export interface ProjectCreateInit {
@@ -65,7 +65,7 @@ export class Project {
 	/**
 	 * The underlying styleguide for this project
 	 */
-	@Mobx.observable private styleguide: PatternLibrary;
+	@Mobx.observable private patternLibrary: PatternLibrary;
 
 	/**
 	 * Creates a new project.
@@ -73,7 +73,7 @@ export class Project {
 	 * @param name The human-friendly name of the project.
 	 */
 	public constructor(properties: ProjectProperties) {
-		this.styleguide = properties.styleguide;
+		this.patternLibrary = properties.patternLibrary;
 		this.name = properties.name;
 
 		this.id = properties.id ? properties.id : Uuid.v4();
@@ -85,10 +85,10 @@ export class Project {
 	}
 
 	public static create(init: ProjectCreateInit): Project {
-		const styleguide = PatternLibrary.create();
+		const patternLibrary = PatternLibrary.create();
 
 		const page = Page.create({
-			styleguide,
+			patternLibrary,
 			name: init.name
 		});
 
@@ -96,7 +96,7 @@ export class Project {
 			name: init.name,
 			pages: [page],
 			path: init.path,
-			styleguide
+			patternLibrary
 		});
 	}
 
@@ -106,7 +106,7 @@ export class Project {
 	 * @return A new project object containing the loaded data.
 	 */
 	public static from(serializedProject: Types.SerializedProject): Project {
-		const styleguide = PatternLibrary.from(serializedProject.styleguide);
+		const patternLibrary = PatternLibrary.from(serializedProject.patternLibrary);
 
 		return new Project({
 			id: serializedProject.uuid,
@@ -116,8 +116,8 @@ export class Project {
 				: undefined,
 			name: serializedProject.name,
 			path: serializedProject.path,
-			pages: serializedProject.pages.map(page => Page.from(page, { styleguide })),
-			styleguide
+			pages: serializedProject.pages.map(page => Page.from(page, { patternLibrary })),
+			patternLibrary
 		});
 	}
 
@@ -171,8 +171,8 @@ export class Project {
 		return this.path;
 	}
 
-	public getStyleguide(): PatternLibrary {
-		return this.styleguide;
+	public getPatternLibrary(): PatternLibrary {
+		return this.patternLibrary;
 	}
 
 	public removePage(page: Page): boolean {
@@ -202,7 +202,7 @@ export class Project {
 			lastChangedAuthor: this.lastChangedAuthor,
 			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
 			pages: this.pages.map(p => p.toJSON()),
-			styleguide: this.styleguide.toJSON()
+			patternLibrary: this.patternLibrary.toJSON()
 		};
 	}
 
@@ -218,7 +218,7 @@ export class Project {
 			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
 			pages: this.pages.map(p => p.toJSON()),
 			path: this.path,
-			styleguide: this.styleguide.toJSON()
+			patternLibrary: this.patternLibrary.toJSON()
 		};
 	}
 

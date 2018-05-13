@@ -14,12 +14,12 @@ export interface PageInit {
 export interface PageCreateInit {
 	id?: string;
 	name: string;
+	patternLibrary: PatternLibrary;
 	root?: Element;
-	styleguide: PatternLibrary;
 }
 
 export interface PageContext {
-	styleguide: PatternLibrary;
+	patternLibrary: PatternLibrary;
 }
 
 /**
@@ -83,7 +83,7 @@ export class Page {
 				init.root ||
 				new Element({
 					name: init.name,
-					pattern: init.styleguide.getPatternByType(SyntheticPatternType.SyntheticPage),
+					pattern: init.patternLibrary.getPatternByType(SyntheticPatternType.SyntheticPage),
 					contents: [],
 					properties: [],
 					setDefaults: true

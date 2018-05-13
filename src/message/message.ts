@@ -171,6 +171,6 @@ export type SketchExportResponse = Envelope<ServerMessageType.SketchExportRespon
 export type StartAppMessage = Envelope<ServerMessageType.StartApp, string>;
 export type StyleGuideChange = Envelope<
 	ServerMessageType.StyleGuideChange,
-	Types.SerializedStyleguide
+	Types.SerializedPatternLibrary
 >;
 export type Undo = EmptyEnvelope<ServerMessageType.Undo>;

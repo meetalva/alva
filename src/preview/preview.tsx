@@ -19,11 +19,12 @@ interface InitialData {
 }
 
 export class PreviewStore {
-	@MobX.observable public components: Types.SerializedPattern[] = [];
 	@MobX.observable public elementId: string = '';
 	@MobX.observable public mode: PreviewDocumentMode = PreviewDocumentMode.Live;
 	@MobX.observable public pageId: string = '';
 	@MobX.observable public pages: Types.SerializedPage[] = [];
+	@MobX.observable public patternProperties: Types.SerializedPatternProperty[] = [];
+	@MobX.observable public patterns: Types.SerializedPattern[] = [];
 
 	private constructor() {}
 
@@ -55,6 +56,14 @@ export class PreviewStore {
 
 		if (payload.pages) {
 			store.pages = payload.pages;
+		}
+
+		if (payload.patternProperties) {
+			store.patternProperties = payload.patternProperties;
+		}
+
+		if (payload.patterns) {
+			store.patterns = payload.patterns;
 		}
 
 		return store;
@@ -187,8 +196,8 @@ function listen(store: PreviewStore, handlers: { onReplacement(): void }): void 
 					store.pages = payload.pages;
 				}
 
-				if (Array.isArray(payload.components)) {
-					store.components = payload.components;
+				if (Array.isArray(payload.patterns)) {
+					store.patterns = payload.patterns;
 				}
 
 				break;
@@ -273,7 +282,7 @@ function startRouter(store: PreviewStore): void {
 // tslint:disable-next-line:no-any
 function createComponentGetter(store: PreviewStore): (props: any, synthetics: any) => any {
 	return (props, synthetics) => {
-		const pattern = store.components.find(component => component.id === props.pattern);
+		const pattern = store.patterns.find(component => component.id === props.pattern);
 
 		if (!pattern) {
 			return;
@@ -298,19 +307,26 @@ function createComponentGetter(store: PreviewStore): (props: any, synthetics: an
 function createPropertiesGetter(
 	store: PreviewStore
 ): (properties: Types.SerializedElementProperty[]) => any {
-	return properties =>
-		properties.reduce((acc, property) => {
-			const { patternProperty } = property;
+	return elementProperties =>
+		elementProperties.reduce((acc, elementProperty) => {
+			const patternProperty = store.patternProperties.find(
+				p => p.id === elementProperty.patternPropertyId
+			);
+
+			if (!patternProperty) {
+				return acc;
+			}
+
 			const { propertyName } = patternProperty;
 
 			switch (patternProperty.type) {
 				case 'enum': {
-					const option = patternProperty.options.find(o => o.id === property.value);
+					const option = patternProperty.options.find(o => o.id === elementProperty.value);
 					acc[propertyName] = option ? option.value : undefined;
 					break;
 				}
 				default:
-					acc[propertyName] = property.value;
+					acc[propertyName] = elementProperty.value;
 			}
 
 			return acc;
@@ -322,7 +338,7 @@ function createSlotGetter(
 	store: PreviewStore
 ): (contents: Types.SerializedPageElementContent[], render: any) => any {
 	return (contents, render) => {
-		const slots = store.components.reduce((acc, component) => [...acc, ...component.slots], []);
+		const slots = store.patterns.reduce((acc, component) => [...acc, ...component.slots], []);
 
 		return contents.reduce((acc, content) => {
 			const slot = slots.find(s => s.id === content.slotId);

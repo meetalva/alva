@@ -49,7 +49,7 @@ export enum ServerMessageType {
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
-	StyleGuideChange = 'styleguide-change',
+	PatternLibraryChange = 'pattern-library-change',
 	Undo = 'undo'
 }
 
@@ -170,7 +170,7 @@ export type SketchExportRequest = Envelope<
 export type SketchExportResponse = Envelope<ServerMessageType.SketchExportResponse, string>;
 export type StartAppMessage = Envelope<ServerMessageType.StartApp, string>;
 export type StyleGuideChange = Envelope<
-	ServerMessageType.StyleGuideChange,
+	ServerMessageType.PatternLibraryChange,
 	Types.SerializedPatternLibrary
 >;
 export type Undo = EmptyEnvelope<ServerMessageType.Undo>;

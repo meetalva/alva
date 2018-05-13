@@ -4,7 +4,7 @@ import * as express from 'express';
 import * as Http from 'http';
 import { ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
-import { PatternLibrary } from '../store';
+// import { PatternLibrary } from '../store';
 import * as Types from '../store/types';
 import * as uuid from 'uuid';
 import { OPEN, Server as WebsocketServer } from 'ws';
@@ -17,10 +17,11 @@ interface State {
 	id: string;
 	path?: string;
 	payload: {
-		components?: Types.SerializedPattern[];
 		elementId?: string;
 		pageId?: string;
 		pages?: Types.SerializedPage[];
+		patternProperties?: Types.SerializedPatternProperty[];
+		patterns?: Types.SerializedPattern[];
 	};
 	type: 'state';
 }
@@ -124,9 +125,10 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 	// tslint:disable-next-line:no-any
 	emitter.on('message', async (message: any) => {
 		switch (message.type) {
-			case ServerMessageType.StyleGuideChange: {
+			case ServerMessageType.PatternLibraryChange: {
+				Object.assign(state.payload, message.payload);
+
 				const { payload } = message;
-				state.payload.components = payload.patterns;
 
 				if (compilation.compiler && typeof compilation.compiler.close === 'function') {
 					compilation.compiler.close();
@@ -214,9 +216,8 @@ function startServer(options: ServerStartOptions): Promise<void> {
 async function setup(update: any): Promise<any> {
 	const queue: Queue = [];
 
-	const styleguide = new PatternLibrary({});
-
-	const compiler = createCompiler(styleguide);
+	// const styleguide = new PatternLibrary({});
+	const compiler = createCompiler(/*styleguide*/);
 
 	compiler.hooks.compile.tap('alva', () => {
 		queue.unshift({ type: WebpackMessageType.Start, id: uuid.v4() });

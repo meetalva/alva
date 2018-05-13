@@ -159,13 +159,13 @@ Sender.receive(message => {
 });
 
 MobX.autorun(() => {
-	const styleguide = store.getPatternLibrary();
+	const patternLibrary = store.getPatternLibrary();
 
-	if (styleguide) {
+	if (patternLibrary) {
 		Sender.send({
 			id: uuid.v4(),
-			payload: styleguide.toJSON(),
-			type: ServerMessageType.StyleGuideChange
+			payload: patternLibrary.toJSON(),
+			type: ServerMessageType.PatternLibraryChange
 		});
 	}
 });

@@ -47,6 +47,11 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 		const id = property.getId();
 		const label = property.getLabel();
 		const type = property.getType();
+
+		if (!label || !type) {
+			return null;
+		}
+
 		const base = { key: id, label };
 
 		// TODO: Split ElementProperty into type-specific classes for better type safety

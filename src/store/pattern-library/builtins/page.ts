@@ -7,7 +7,7 @@ import {
 } from '../../pattern-property';
 import * as uuid from 'uuid';
 
-export const Page = () => {
+export const Page = context => {
 	const options = languages.map(
 		(language, index) =>
 			new PatternEnumPropertyOption({
@@ -20,22 +20,32 @@ export const Page = () => {
 
 	const defaultLanguage = options.find(option => option.getValue() === 'en');
 
-	return new Pattern({
-		name: 'Page',
-		path: '',
-		type: SyntheticPatternType.SyntheticPage,
-		properties: [
-			new PatternBooleanProperty({
-				label: 'Mobile Viewport',
-				propertyName: 'viewport',
-				defaultValue: true
-			}),
-			new PatternEnumProperty({
-				label: 'Language',
-				propertyName: 'lang',
-				options,
-				defaultValue: defaultLanguage ? defaultLanguage.getId() : undefined
-			})
-		]
-	});
+	const pageProperties = [
+		new PatternBooleanProperty({
+			label: 'Mobile Viewport',
+			propertyName: 'viewport',
+			defaultValue: true
+		}),
+		new PatternEnumProperty({
+			label: 'Language',
+			propertyName: 'lang',
+			options,
+			defaultValue: defaultLanguage ? defaultLanguage.getId() : undefined
+		})
+	];
+
+	const pagePattern = new Pattern(
+		{
+			name: 'Page',
+			path: '',
+			type: SyntheticPatternType.SyntheticPage,
+			propertyIds: pageProperties.map(p => p.getId())
+		},
+		context
+	);
+
+	return {
+		pagePattern,
+		pageProperties
+	};
 };

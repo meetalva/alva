@@ -20,6 +20,7 @@ interface InitialData {
 
 export class PreviewStore {
 	@MobX.observable public elementId: string = '';
+	@MobX.observable public elements: Types.SerializedElement[] = [];
 	@MobX.observable public mode: PreviewDocumentMode = PreviewDocumentMode.Live;
 	@MobX.observable public pageId: string = '';
 	@MobX.observable public pages: Types.SerializedPage[] = [];
@@ -48,6 +49,10 @@ export class PreviewStore {
 			case 'live':
 			default:
 				store.mode = PreviewDocumentMode.Live;
+		}
+
+		if (payload.elements) {
+			store.elements = payload.elements;
 		}
 
 		if (payload.pageId) {
@@ -186,6 +191,10 @@ function listen(store: PreviewStore, handlers: { onReplacement(): void }): void 
 			case PreviewMessageType.State: {
 				if (window.location.hash && store.pageId !== payload.pageId) {
 					window.location.hash = '';
+				}
+
+				if (Array.isArray(payload.elements)) {
+					store.elements = payload.elements;
 				}
 
 				if (typeof payload.pageId === 'string') {

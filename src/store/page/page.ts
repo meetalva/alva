@@ -2,24 +2,23 @@ import { Element, ElementContent } from '../element';
 import * as Mobx from 'mobx';
 import { SyntheticPatternType } from '../pattern';
 import { PatternLibrary } from '../pattern-library';
+import { Project } from '../project';
 import * as Types from '../types';
-import * as uuid from 'uuid';
 
 export interface PageInit {
-	id?: string;
-	name?: string;
-	root: Element;
+	id: string;
+	name: string;
+	rootId: string;
 }
 
 export interface PageCreateInit {
-	id?: string;
+	id: string;
 	name: string;
 	patternLibrary: PatternLibrary;
-	root?: Element;
 }
 
 export interface PageContext {
-	patternLibrary: PatternLibrary;
+	project: Project;
 }
 
 /**
@@ -27,8 +26,6 @@ export interface PageContext {
  * which in turn provide the properties data for the pattern components.
  */
 export class Page {
-	private context?: PageContext;
-
 	/**
 	 * Intermediary edited name
 	 */
@@ -50,45 +47,53 @@ export class Page {
 	 */
 	@Mobx.observable public nameState: Types.EditState = Types.EditState.Editable;
 
+	private project: Project;
+
 	/**
 	 * The root element of the page, the first pattern element of the content tree.
 	 */
-	private root: Element;
+	private rootId: string;
 
 	/**
 	 * Creates a new page.
 	 * @param id The technical (internal) ID of the page.
 	 * @param store The global application store.
 	 */
-	public constructor(init: PageInit, context?: PageContext) {
-		this.id = init.id || uuid.v4();
-		this.root = init.root;
-		this.root.setPage(this);
+	public constructor(init: PageInit, context: PageContext) {
+		this.id = init.id;
+		this.rootId = init.rootId;
+		this.name = init.name;
+		this.project = context.project;
 
-		if (typeof init.name !== 'undefined') {
-			this.name = init.name;
+		const rootElement = this.getRoot();
+
+		if (rootElement) {
+			rootElement.setPage(this);
 		}
-
-		this.context = context;
 	}
 
 	/**
 	 * Create a new empty page
 	 */
-	public static create(init: PageCreateInit): Page {
-		return new Page({
-			id: init.id || uuid.v4(),
+	public static create(init: PageCreateInit, context: PageContext): Page {
+		const rootElement = new Element({
 			name: init.name,
-			root:
-				init.root ||
-				new Element({
-					name: init.name,
-					pattern: init.patternLibrary.getPatternByType(SyntheticPatternType.SyntheticPage),
-					contents: [],
-					properties: [],
-					setDefaults: true
-				})
+			pattern: init.patternLibrary.getPatternByType(SyntheticPatternType.SyntheticPage),
+			contents: [],
+			properties: [],
+			setDefaults: true
 		});
+
+		context.project.addElement(rootElement);
+
+		return new Page(
+			{
+				id: init.id,
+				name: init.name,
+				rootId: rootElement.getId()
+			},
+			context
+		);
 	}
 
 	/**
@@ -102,22 +107,24 @@ export class Page {
 			{
 				id: serializedPage.id,
 				name: serializedPage.name,
-				root: Element.from(serializedPage.root, context)
+				rootId: serializedPage.rootId
 			},
 			context
 		);
 	}
 
 	public clone(): Page {
-		if (this.context) {
-			return Page.from(this.toJSON(), this.context);
-		}
-
-		throw new Error(`Page ${this.getId()} needs to store context in order to be cloned`);
+		return Page.from(this.toJSON(), { project: this.project });
 	}
 
 	public getContentById(id: string): ElementContent | undefined {
-		return this.root.getContentById(id);
+		const rootElement = this.getRoot();
+
+		if (!rootElement) {
+			return;
+		}
+
+		return rootElement.getContentById(id);
 	}
 
 	/**
@@ -132,7 +139,13 @@ export class Page {
 	 * @return The page element or undefined.
 	 */
 	public getElementById(id: string): Element | undefined {
-		return this.root.getElementById(id);
+		const rootElement = this.getRoot();
+
+		if (!rootElement) {
+			return;
+		}
+
+		return rootElement.getElementById(id);
 	}
 
 	/**
@@ -169,7 +182,7 @@ export class Page {
 	 * @return The root element of the page.
 	 */
 	public getRoot(): Element | undefined {
-		return this.root;
+		return this.project.getElementById(this.rootId);
 	}
 
 	/**
@@ -209,7 +222,7 @@ export class Page {
 		return {
 			id: this.getId(),
 			name: this.getName(),
-			root: this.root.toJSON()
+			rootId: this.rootId
 		};
 	}
 }

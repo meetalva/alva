@@ -1,4 +1,5 @@
 import { Box, Page, Placeholder, Text } from './builtins';
+import * as Fuse from 'fuse.js';
 import { Pattern, PatternFolder, SyntheticPatternType } from '../pattern';
 import * as Types from '../types';
 import * as uuid from 'uuid';
@@ -10,6 +11,7 @@ export interface PatternLibraryInit {
 }
 
 export class PatternLibrary {
+	private fuse: Fuse;
 	private id: string;
 	private patterns: Pattern[] = [];
 	private root: PatternFolder;
@@ -36,13 +38,15 @@ export class PatternLibrary {
 			syntheticFolder.addPattern(box);
 			syntheticFolder.addPattern(placeholder);
 		}
+
+		this.updateSearch();
 	}
 
 	public static create(): PatternLibrary {
 		return new PatternLibrary({});
 	}
 
-	public static from(serializedStyleguide: Types.SerializedStyleguide): PatternLibrary {
+	public static from(serializedStyleguide: Types.SerializedPatternLibrary): PatternLibrary {
 		return new PatternLibrary({
 			id: serializedStyleguide.id,
 			patterns: serializedStyleguide.patterns.map(pattern => Pattern.from(pattern)),
@@ -52,6 +56,7 @@ export class PatternLibrary {
 
 	public addPattern(pattern: Pattern): void {
 		this.patterns.push(pattern);
+		this.updateSearch();
 	}
 
 	public getPatternById(id: string): Pattern | undefined {
@@ -70,11 +75,29 @@ export class PatternLibrary {
 		return this.root;
 	}
 
-	public toJSON(): Types.SerializedStyleguide {
+	public query(term: string): string[] {
+		if (term.trim().length === 0) {
+			return this.root.getDescendants().map(item => item.getId());
+		}
+
+		return this.fuse
+			.search<Types.SerializedPattern | Types.SerializedPatternFolder>(term)
+			.map(match => match.id);
+	}
+
+	public toJSON(): Types.SerializedPatternLibrary {
 		return {
 			id: this.id,
 			patterns: this.patterns.map(p => p.toJSON()),
 			root: this.root.toJSON()
 		};
+	}
+
+	public updateSearch(): void {
+		const registry = this.root.getDescendants().map(item => item.toJSON());
+
+		this.fuse = new Fuse(registry, {
+			keys: ['name']
+		});
 	}
 }

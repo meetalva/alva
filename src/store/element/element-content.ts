@@ -5,7 +5,7 @@ import * as Types from '../types';
 
 export interface ElementContentContext {
 	elementId: string;
-	styleguide: PatternLibrary;
+	patternLibrary: PatternLibrary;
 }
 
 export interface ElementContentInit {
@@ -44,7 +44,7 @@ export class ElementContent {
 			id: serialized.id,
 			name: serialized.name,
 			elements: serialized.elements.map(element =>
-				Element.from(element, { styleguide: context.styleguide })
+				Element.from(element, { patternLibrary: context.patternLibrary })
 			),
 			slotId: serialized.slotId,
 			slotType: toSlotType(serialized.slotType)

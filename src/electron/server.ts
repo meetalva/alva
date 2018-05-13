@@ -4,7 +4,7 @@ import * as express from 'express';
 import * as Http from 'http';
 import { ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
-import { Styleguide } from '../store';
+import { PatternLibrary } from '../store';
 import * as Types from '../store/types';
 import * as uuid from 'uuid';
 import { OPEN, Server as WebsocketServer } from 'ws';
@@ -214,7 +214,7 @@ function startServer(options: ServerStartOptions): Promise<void> {
 async function setup(update: any): Promise<any> {
 	const queue: Queue = [];
 
-	const styleguide = new Styleguide({});
+	const styleguide = new PatternLibrary({});
 
 	const compiler = createCompiler(styleguide);
 

@@ -1,11 +1,11 @@
-import { Pattern, SyntheticPatternType } from '../pattern';
+import { Pattern, SyntheticPatternType } from '../../pattern';
 import {
 	PatternBooleanProperty,
 	PatternEnumProperty,
 	PatternEnumPropertyOption,
 	PatternNumberProperty,
 	PatternStringProperty
-} from '../pattern-property';
+} from '../../pattern-property';
 import * as uuid from 'uuid';
 
 export const Box = () => {

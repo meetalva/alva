@@ -1,7 +1,7 @@
 // import * as Path from 'path';
 // import { patternIdToWebpackName } from './pattern-id-to-webpack-name';
 import * as QueryString from 'query-string';
-import { Styleguide } from '../store';
+import { PatternLibrary } from '../store';
 import * as webpack from 'webpack';
 
 // memory-fs typings on @types are faulty
@@ -15,7 +15,7 @@ interface StyleguidePattern {
 	[key: string]: string;
 }
 
-export function createCompiler(styleguide: Styleguide): webpack.Compiler {
+export function createCompiler(styleguide: PatternLibrary): webpack.Compiler {
 	// const context = styleguide.getPath();
 	const context = process.cwd();
 

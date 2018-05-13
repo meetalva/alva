@@ -1,7 +1,7 @@
 import { Element, ElementContent } from '../element';
 import * as Mobx from 'mobx';
 import { SyntheticPatternType } from '../pattern';
-import { Styleguide } from '../styleguide';
+import { PatternLibrary } from '../pattern-library';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
@@ -15,11 +15,11 @@ export interface PageCreateInit {
 	id?: string;
 	name: string;
 	root?: Element;
-	styleguide: Styleguide;
+	styleguide: PatternLibrary;
 }
 
 export interface PageContext {
-	styleguide: Styleguide;
+	styleguide: PatternLibrary;
 }
 
 /**

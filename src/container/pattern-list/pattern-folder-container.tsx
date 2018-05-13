@@ -1,11 +1,11 @@
 import { PatternFolderView } from '../../components';
 import * as React from 'react';
-import { Pattern, PatternFolder, Styleguide } from '../../store';
+import { Pattern, PatternFolder, PatternLibrary } from '../../store';
 
 export interface PatternFolderContainerProps {
 	folder: PatternFolder;
 	isRoot: boolean;
-	styleguide: Styleguide;
+	styleguide: PatternLibrary;
 	render(item: Pattern): JSX.Element | null;
 }
 

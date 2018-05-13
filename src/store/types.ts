@@ -4,12 +4,13 @@ export enum AppState {
 }
 
 export interface SavedProject {
+	elements: SerializedElement[];
+	id: string;
 	lastChangedAuthor: string;
 	lastChangedDate?: string;
 	name: string;
 	pages: SerializedPage[];
 	patternLibrary: SerializedPatternLibrary;
-	uuid: string;
 }
 
 export interface SerializedProject extends SavedProject {
@@ -19,7 +20,7 @@ export interface SerializedProject extends SavedProject {
 export interface SerializedPage {
 	id: string;
 	name: string;
-	root: SerializedElement;
+	rootId: string;
 }
 
 export interface SerializedElement {

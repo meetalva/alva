@@ -137,10 +137,14 @@ async function createWindow(): Promise<void> {
 					});
 
 					project.addPage(
-						Page.create({
-							name: 'Untitled Page',
-							patternLibrary: project.getPatternLibrary()
-						})
+						Page.create(
+							{
+								id: uuid.v4(),
+								name: 'Untitled Page',
+								patternLibrary: project.getPatternLibrary()
+							},
+							{ project }
+						)
 					);
 
 					await Persistence.persist(path, project);

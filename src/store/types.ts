@@ -8,7 +8,7 @@ export interface SavedProject {
 	lastChangedDate?: string;
 	name: string;
 	pages: SerializedPage[];
-	styleguide: SerializedStyleguide;
+	patternLibrary: SerializedPatternLibrary;
 	uuid: string;
 }
 
@@ -38,7 +38,7 @@ export interface SerializedPageElementContent {
 	slotType: string;
 }
 
-export interface SerializedStyleguide {
+export interface SerializedPatternLibrary {
 	id: string;
 	patterns: SerializedPattern[];
 	root: SerializedPatternFolder;

@@ -159,7 +159,7 @@ Sender.receive(message => {
 });
 
 MobX.autorun(() => {
-	const styleguide = store.getStyleguide();
+	const styleguide = store.getPatternLibrary();
 
 	if (styleguide) {
 		Sender.send({

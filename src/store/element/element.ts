@@ -19,7 +19,7 @@ export interface ElementInit {
 }
 
 export interface PageElementContext {
-	styleguide: PatternLibrary;
+	patternLibrary: PatternLibrary;
 }
 
 /**
@@ -145,10 +145,10 @@ export class Element {
 		return new Element({
 			id: serialized.id,
 			name: serialized.name,
-			pattern: context.styleguide.getPatternById(serialized.pattern) as Pattern,
+			pattern: context.patternLibrary.getPatternById(serialized.pattern) as Pattern,
 			contents: serialized.contents.map(content =>
 				ElementContent.from(content, {
-					styleguide: context.styleguide,
+					patternLibrary: context.patternLibrary,
 					elementId: serialized.id
 				})
 			),

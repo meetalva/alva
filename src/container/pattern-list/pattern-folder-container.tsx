@@ -1,37 +1,38 @@
 import { PatternFolderView } from '../../components';
 import * as React from 'react';
-import { Pattern, PatternFolder, PatternLibrary } from '../../store';
+import { Pattern, PatternFolder } from '../../store';
 
 export interface PatternFolderContainerProps {
 	folder: PatternFolder;
 	isRoot: boolean;
-	styleguide: PatternLibrary;
+	matches: string[];
 	render(item: Pattern): JSX.Element | null;
 }
 
 export class PatternFolderContainer extends React.Component<PatternFolderContainerProps> {
-	public render(): JSX.Element {
+	public render(): React.ReactNode {
 		const { props } = this;
-		const isPattern = (pattern): pattern is Pattern => typeof pattern !== 'undefined';
+
+		const folderMatches = props.isRoot ? true : props.matches.includes(props.folder.getId());
+		const filter = folderMatches
+			? () => true
+			: pattern => props.matches.includes(pattern.getId());
+
+		const patterns = props.folder.getPatterns().filter(filter);
+		const children = props.folder.getChildren().filter(filter);
 
 		return (
 			<PatternFolderView name={props.isRoot ? '' : props.folder.getName()}>
-				{props.folder
-					.getPatterns()
-					.map(id => props.styleguide.getPatternById(id))
-					.filter(isPattern)
-					.map(pattern => props.render(pattern))}
-				{props.folder
-					.getChildren()
-					.map(child => (
-						<PatternFolderContainer
-							folder={child}
-							isRoot={false}
-							key={child.getId()}
-							styleguide={props.styleguide}
-							render={props.render}
-						/>
-					))}
+				{patterns.map(pattern => props.render(pattern))}
+				{children.map(child => (
+					<PatternFolderContainer
+						folder={child}
+						isRoot={false}
+						key={child.getId()}
+						matches={props.matches}
+						render={props.render}
+					/>
+				))}
 			</PatternFolderView>
 		);
 	}

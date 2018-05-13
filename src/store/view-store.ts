@@ -160,7 +160,7 @@ export class ViewStore {
 
 		const page = Page.create({
 			name: `${name} ${count + 1}`,
-			styleguide: project.getStyleguide()
+			patternLibrary: project.getPatternLibrary()
 		});
 
 		this.execute(PageAddCommand.create({ page, project }));
@@ -427,19 +427,25 @@ export class ViewStore {
 			return;
 		}
 
-		const styleguide = project.getStyleguide();
+		const patternLibrary = project.getPatternLibrary();
 
-		if (!styleguide) {
+		if (!patternLibrary) {
 			return;
 		}
 
-		return styleguide.getPatternById(id);
+		return patternLibrary.getPatternById(id);
 	}
 
-	/**
-	 * Returns the current search term in the patterns list, or an empty string if there is none.
-	 * @return The current pattern search term or an empty string.
-	 */
+	public getPatternLibrary(): PatternLibrary | undefined {
+		const project = this.getCurrentProject();
+
+		if (!project) {
+			return;
+		}
+
+		return project.getPatternLibrary();
+	}
+
 	public getPatternSearchTerm(): string {
 		return this.patternSearchTerm;
 	}
@@ -462,29 +468,12 @@ export class ViewStore {
 		return this.rightPane;
 	}
 
-	/**
-	 * Returns the currently selected element in the element list.
-	 * The properties pane shows the properties of this element,
-	 * and keyboard commands like cut, copy, or delete operate on this element.
-	 * May be empty if no element is selected.
-	 * @return The selected element or undefined.
-	 */
 	public getSelectedElement(): Element | undefined {
 		return this.selectedElement;
 	}
 
 	public getServerPort(): number {
 		return this.serverPort;
-	}
-
-	public getStyleguide(): PatternLibrary | undefined {
-		const project = this.getCurrentProject();
-
-		if (!project) {
-			return;
-		}
-
-		return project.getStyleguide();
 	}
 
 	public hasApplicableClipboardItem(): boolean {
@@ -847,6 +836,12 @@ export class ViewStore {
 			this.setActivePageByIndex(0);
 		} else {
 			this.unsetActivePage();
+		}
+
+		const patternLibrary = project.getPatternLibrary();
+
+		if (patternLibrary) {
+			patternLibrary.updateSearch();
 		}
 	}
 

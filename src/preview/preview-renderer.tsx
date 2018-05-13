@@ -122,16 +122,20 @@ class PreviewApplication extends React.Component {
 			return null;
 		}
 
-		const component = currentPage.root;
+		const element = props.store.elements.find(e => e.id === currentPage.rootId);
+
+		if (!element) {
+			return null;
+		}
 
 		return (
 			<React.Fragment>
 				<PreviewComponent
-					contents={component.contents}
-					pattern={component.pattern}
-					properties={component.properties}
-					name={component.name}
-					id={component.id}
+					contents={element.contents}
+					pattern={element.pattern}
+					properties={element.properties}
+					name={element.name}
+					id={element.id}
 				/>
 				<PreviewHighlight />
 			</React.Fragment>

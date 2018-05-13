@@ -2,7 +2,7 @@ import * as Mobx from 'mobx';
 import * as Types from './types';
 import * as username from 'username';
 import * as Uuid from 'uuid';
-import { Page, PatternLibrary } from '.';
+import { Element, Page, PatternLibrary } from '.';
 
 export interface ProjectProperties {
 	id?: string;
@@ -28,6 +28,8 @@ export interface ProjectCreateInit {
  * and the store can load them from YAML files when required (open page).
  */
 export class Project {
+	@Mobx.observable private elements: Element[] = [];
+
 	/**
 	 * The technical (internal) ID of the project.
 	 */
@@ -100,30 +102,45 @@ export class Project {
 	 * @param jsonObject The JSON object to load from.
 	 * @return A new project object containing the loaded data.
 	 */
-	public static from(serializedProject: Types.SerializedProject): Project {
-		const patternLibrary = PatternLibrary.from(serializedProject.patternLibrary);
+	public static from(serialized: Types.SerializedProject): Project {
+		const patternLibrary = PatternLibrary.from(serialized.patternLibrary);
 
-		return new Project({
-			id: serializedProject.uuid,
-			lastChangedAuthor: serializedProject.lastChangedAuthor,
-			lastChangedDate: serializedProject.lastChangedDate
-				? new Date(serializedProject.lastChangedDate)
+		const project = new Project({
+			id: serialized.id,
+			lastChangedAuthor: serialized.lastChangedAuthor,
+			lastChangedDate: serialized.lastChangedDate
+				? new Date(serialized.lastChangedDate)
 				: undefined,
-			name: serializedProject.name,
-			path: serializedProject.path,
-			pages: serializedProject.pages.map(page => Page.from(page, { patternLibrary })),
+			name: serialized.name,
+			path: serialized.path,
+			pages: [],
 			patternLibrary
 		});
+
+		serialized.pages.forEach(page => project.addPage(Page.from(page, { project })));
+		serialized.elements.forEach(element =>
+			project.addElement(Element.from(element, { patternLibrary }))
+		);
+
+		return project;
+	}
+
+	public addElement(element: Element): void {
+		this.elements.push(element);
 	}
 
 	public addPage(page: Page): void {
 		this.pages.push(page);
 	}
 
-	/**
-	 * Returns the technical (internal) ID of the project.
-	 * @return The technical (internal) ID of the project.
-	 */
+	public getElementById(id: string): undefined | Element {
+		return this.elements.find(e => e.getId() === id);
+	}
+
+	public getElements(): Element[] {
+		return this.elements;
+	}
+
 	public getId(): string {
 		return this.id;
 	}
@@ -192,7 +209,8 @@ export class Project {
 
 	public toDisk(): Types.SavedProject {
 		return {
-			uuid: this.id,
+			elements: this.elements.map(e => e.toJSON()),
+			id: this.id,
 			name: this.name,
 			lastChangedAuthor: this.lastChangedAuthor,
 			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
@@ -207,7 +225,8 @@ export class Project {
 	 */
 	public toJSON(): Types.SerializedProject {
 		return {
-			uuid: this.id,
+			elements: this.elements.map(e => e.toJSON()),
+			id: this.id,
 			name: this.name,
 			lastChangedAuthor: this.lastChangedAuthor,
 			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,

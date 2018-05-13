@@ -15,6 +15,7 @@ import { Pattern } from './pattern';
 import { PatternLibrary } from './pattern-library';
 import { Project } from './project';
 import * as Types from './types';
+import * as uuid from 'uuid';
 
 export enum ClipBoardType {
 	Page = 'Page',
@@ -160,10 +161,14 @@ export class ViewStore {
 
 		const count = project.getPages().filter(p => p.getName().startsWith(name)).length;
 
-		const page = Page.create({
-			name: `${name} ${count + 1}`,
-			patternLibrary: project.getPatternLibrary()
-		});
+		const page = Page.create(
+			{
+				id: uuid.v4(),
+				name: `${name} ${count + 1}`,
+				patternLibrary: project.getPatternLibrary()
+			},
+			{ project }
+		);
 
 		this.execute(PageAddCommand.create({ page, project }));
 		return page;

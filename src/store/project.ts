@@ -85,19 +85,14 @@ export class Project {
 	}
 
 	public static create(init: ProjectCreateInit): Project {
-		const patternLibrary = PatternLibrary.create();
-
-		const page = Page.create({
-			patternLibrary,
-			name: init.name
-		});
-
-		return new Project({
+		const project = new Project({
 			name: init.name,
-			pages: [page],
+			pages: [],
 			path: init.path,
-			patternLibrary
+			patternLibrary: PatternLibrary.create()
 		});
+
+		return project;
 	}
 
 	/**

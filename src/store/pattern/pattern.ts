@@ -7,7 +7,7 @@ import * as Types from '../types';
 import * as uuid from 'uuid';
 
 // tslint:disable-next-line:no-duplicate-imports
-import { PatternPropertyType } from '../types';
+// import { PatternPropertyType } from '../types';
 
 export type PatternType = SyntheticPatternType | ConcretePatternType;
 
@@ -27,13 +27,13 @@ export interface PatternInit {
 	id?: string;
 	name: string;
 	path: string;
-	properties?: PatternProperty.PatternProperty[];
+	propertyIds?: string[];
 	slots?: PatternSlot[];
 	type: PatternType;
 }
 
 export interface PatternContext {
-	styleguide: PatternLibrary;
+	patternLibrary: PatternLibrary;
 }
 
 /**
@@ -75,10 +75,12 @@ export class Pattern {
 	 */
 	private path: string;
 
+	private patternLibrary: PatternLibrary;
+
 	/**
 	 * The properties this pattern supports.
 	 */
-	private properties: PatternProperty.PatternProperty[];
+	private propertyIds: string[];
 
 	/**
 	 * The slots this pattern supports
@@ -97,13 +99,14 @@ export class Pattern {
 	 * @param exportName The name of the export in the JavaScript implementation of the pattern.
 	 * For default export, the value is 'default'.
 	 */
-	public constructor(init: PatternInit) {
+	public constructor(init: PatternInit, context: PatternContext) {
+		this.exportName = init.exportName || 'default';
 		this.id = init.id || uuid.v4();
 		this.name = AlvaUtil.guessName(init.name);
 		this.path = init.path || '';
-		this.exportName = init.exportName || 'default';
+		this.patternLibrary = context.patternLibrary;
+		this.propertyIds = init.propertyIds || [];
 		this.type = init.type;
-		this.properties = init.properties || [];
 		this.slots = init.slots || [
 			new PatternSlot({
 				displayName: 'Children',
@@ -114,28 +117,19 @@ export class Pattern {
 		];
 	}
 
-	public static from(serializedPattern: Types.SerializedPattern): Pattern {
-		return new Pattern({
-			exportName: serializedPattern.exportName,
-			id: serializedPattern.id,
-			name: serializedPattern.name,
-			path: serializedPattern.path,
-			properties: serializedPattern.properties.map(unserializeProperty),
-			slots: serializedPattern.slots.map(slot => PatternSlot.from(slot)),
-			type: stringToType(serializedPattern.type)
-		});
-	}
-
-	public static fromTypeString(type: string, context: PatternContext): Pattern {
-		return context.styleguide.getPatternById(type) as Pattern;
-	}
-
-	/**
-	 * Adds a property to this pattern. This method is called by the pattern parser only.
-	 * @param property The new property to add.
-	 */
-	public addProperty(property: PatternProperty.PatternProperty): void {
-		this.properties.push(property);
+	public static from(serialized: Types.SerializedPattern, context: PatternContext): Pattern {
+		return new Pattern(
+			{
+				exportName: serialized.exportName,
+				id: serialized.id,
+				name: serialized.name,
+				path: serialized.path,
+				propertyIds: serialized.propertyIds,
+				slots: serialized.slots.map(slot => PatternSlot.from(slot)),
+				type: stringToType(serialized.type)
+			},
+			context
+		);
 	}
 
 	/**
@@ -187,32 +181,9 @@ export class Pattern {
 	 * @return The properties this pattern supports.
 	 */
 	public getProperties(): PatternProperty.PatternProperty[] {
-		return this.properties;
-	}
-
-	/**
-	 * Returns a property this pattern supports, by its ID.
-	 * @param id The ID of the property.
-	 * @param path If the property you are trying to find is buried inside an object property use the path paremeter to find it.
-	 * eg: `getProperty('image', 'src.srcSet')`.
-	 * @return The property for the given ID, if it exists.
-	 */
-	public getProperty(id: string, path?: string): PatternProperty.PatternProperty | undefined {
-		let property = this.properties.find(p => p.getId() === id);
-
-		if (!property || !path) {
-			return property;
-		}
-
-		for (const part of path.split('.')) {
-			if (property && property.type === PatternProperty.PatternPropertyType.Object) {
-				property = (property as PatternProperty.PatternObjectProperty).getProperty(part);
-			} else {
-				return;
-			}
-		}
-
-		return property;
+		return this.propertyIds
+			.map(propertyId => this.patternLibrary.getPatternPropertyById(propertyId))
+			.filter((p): p is PatternProperty.PatternProperty => typeof p !== 'undefined');
 	}
 
 	/**
@@ -233,9 +204,9 @@ export class Pattern {
 			id: this.id,
 			name: this.name,
 			path: this.path,
+			propertyIds: this.propertyIds,
 			slots: this.slots.map(slot => slot.toJSON()),
-			type: this.type,
-			properties: this.properties.map(property => property.toJSON())
+			type: this.type
 		};
 	}
 }
@@ -257,9 +228,9 @@ const stringToType = (input: string): PatternType => {
 	}
 };
 
-const P = PatternProperty;
+// const P = PatternProperty;
 
-const unserializeProperty = (
+/* const unserializeProperty = (
 	serialized: Types.SerializedPatternProperty
 ): PatternProperty.PatternProperty => {
 	switch (serialized.type) {
@@ -280,4 +251,4 @@ const unserializeProperty = (
 		case PatternPropertyType.StringArray:
 			return P.StringPatternArrayProperty.from(serialized);
 	}
-};
+}; */

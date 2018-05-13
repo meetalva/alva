@@ -1,13 +1,17 @@
 import { Pattern } from './pattern';
+import { PatternLibrary } from '../pattern-library';
 import * as Types from '../types';
 import * as uuid from 'uuid';
-import { ViewStore } from '../view-store';
 
 export interface PatternFolderInit {
 	id?: string;
 	name: string;
 	parent?: PatternFolder;
 	patterns?: string[];
+}
+
+export interface PatternFolderContext {
+	patternLibrary: PatternLibrary;
 }
 
 /**
@@ -24,12 +28,15 @@ export class PatternFolder {
 
 	private parent?: PatternFolder;
 
+	private patternLibrary: PatternLibrary;
+
 	private patterns: string[] = [];
 
-	public constructor(init: PatternFolderInit) {
+	public constructor(init: PatternFolderInit, context: PatternFolderContext) {
 		this.id = init.id || uuid.v4();
 		this.name = init.name;
 		this.parent = init.parent;
+		this.patternLibrary = context.patternLibrary;
 
 		if (init.patterns) {
 			this.patterns = init.patterns;
@@ -40,15 +47,21 @@ export class PatternFolder {
 		}
 	}
 
-	public static from(serialized: Types.SerializedPatternFolder): PatternFolder {
-		const folder = new PatternFolder({
-			id: serialized.id,
-			name: serialized.name,
-			patterns: serialized.patterns
-		});
+	public static from(
+		serialized: Types.SerializedPatternFolder,
+		context: PatternFolderContext
+	): PatternFolder {
+		const folder = new PatternFolder(
+			{
+				id: serialized.id,
+				name: serialized.name,
+				patterns: serialized.patterns
+			},
+			context
+		);
 
 		serialized.children.forEach(child => {
-			folder.addChild(PatternFolder.from(child));
+			folder.addChild(PatternFolder.from(child, context));
 		});
 
 		return folder;
@@ -91,11 +104,10 @@ export class PatternFolder {
 	}
 
 	public getPatterns(): Pattern[] {
-		const store = ViewStore.getInstance();
 		const isPattern = (p): p is Pattern => typeof p !== 'undefined';
 
 		return this.getPatternIds()
-			.map(id => store.getPatternById(id))
+			.map(id => this.patternLibrary.getPatternById(id))
 			.filter(isPattern);
 	}
 

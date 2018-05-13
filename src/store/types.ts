@@ -40,6 +40,7 @@ export interface SerializedPageElementContent {
 
 export interface SerializedPatternLibrary {
 	id: string;
+	patternProperties: SerializedPatternProperty[];
 	patterns: SerializedPattern[];
 	root: SerializedPatternFolder;
 }
@@ -56,7 +57,7 @@ export interface SerializedPattern {
 	id: string;
 	name: string;
 	path: string;
-	properties: SerializedPatternProperty[];
+	propertyIds: string[];
 	slots: SerializedPatternSlot[];
 	type: string;
 }
@@ -177,7 +178,7 @@ export enum SlotType {
 
 export interface SerializedElementProperty {
 	id: string;
-	patternProperty: SerializedPatternProperty;
+	patternPropertyId: string;
 	setDefault: boolean;
 	value: ElementPropertyValue;
 }

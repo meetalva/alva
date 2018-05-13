@@ -2,38 +2,42 @@ import * as Mobx from 'mobx';
 import { PatternProperty, PatternPropertyType } from '../../pattern-property';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
-
-// tslint:disable-next-line:no-duplicate-imports
-import * as P from '../../pattern-property';
+import { ViewStore } from '../../view-store';
 
 export interface ElementPropertyInit {
 	id: string;
-	patternProperty: PatternProperty;
+	patternPropertyId: string;
 	setDefault: boolean;
 	value: Types.ElementPropertyValue;
 }
 
 export class ElementProperty {
 	private id: string;
-	private patternProperty: PatternProperty;
+	private patternPropertyId: string;
 	private setDefault: boolean;
 	@Mobx.observable private value: Types.ElementPropertyValue;
 
 	public constructor(init: ElementPropertyInit) {
 		this.id = init.id;
-		this.patternProperty = init.patternProperty;
+		this.patternPropertyId = init.patternPropertyId;
 		this.setDefault = init.setDefault;
 		this.value = init.value;
 
-		if (typeof this.value === 'undefined' && this.setDefault) {
-			this.value = this.patternProperty.getDefaultValue();
+		const store = ViewStore.getInstance();
+		const patternLibrary = store.getPatternLibrary();
+		const patternProperty = patternLibrary
+			? patternLibrary.getPatternPropertyById(this.patternPropertyId)
+			: undefined;
+
+		if (typeof this.value === 'undefined' && this.setDefault && patternProperty) {
+			this.value = patternProperty.getDefaultValue();
 		}
 	}
 
 	public static from(serialized: Types.SerializedElementProperty): ElementProperty {
 		return new ElementProperty({
 			id: serialized.id,
-			patternProperty: deserializeProperty(serialized.patternProperty),
+			patternPropertyId: serialized.patternPropertyId,
 			setDefault: serialized.setDefault,
 			value: serialized.value
 		});
@@ -42,7 +46,7 @@ export class ElementProperty {
 	public clone(): ElementProperty {
 		return new ElementProperty({
 			id: uuid.v4(),
-			patternProperty: this.patternProperty,
+			patternPropertyId: this.patternPropertyId,
 			setDefault: this.setDefault,
 			value: this.value
 		});
@@ -52,16 +56,35 @@ export class ElementProperty {
 		return this.id;
 	}
 
-	public getLabel(): string {
-		return this.patternProperty.getLabel();
+	public getLabel(): string | undefined {
+		const patternProperty = this.getPatternProperty();
+
+		if (!patternProperty) {
+			return;
+		}
+
+		return patternProperty.getLabel();
 	}
 
-	public getPatternProperty(): PatternProperty {
-		return this.patternProperty;
+	public getPatternProperty(): PatternProperty | undefined {
+		const store = ViewStore.getInstance();
+		const patternLibrary = store.getPatternLibrary();
+
+		if (!patternLibrary) {
+			return undefined;
+		}
+
+		return patternLibrary.getPatternPropertyById(this.patternPropertyId);
 	}
 
-	public getType(): PatternPropertyType {
-		return this.patternProperty.getType();
+	public getType(): PatternPropertyType | undefined {
+		const patternProperty = this.getPatternProperty();
+
+		if (!patternProperty) {
+			return;
+		}
+
+		return patternProperty.getType();
 	}
 
 	public getValue(): Types.ElementPropertyValue {
@@ -69,7 +92,7 @@ export class ElementProperty {
 	}
 
 	public hasPatternProperty(patternProperty: PatternProperty): boolean {
-		return this.patternProperty.getId() === patternProperty.getId();
+		return this.patternPropertyId === patternProperty.getId();
 	}
 
 	@Mobx.action
@@ -80,33 +103,9 @@ export class ElementProperty {
 	public toJSON(): Types.SerializedElementProperty {
 		return {
 			id: this.id,
-			patternProperty: this.patternProperty.toJSON(),
+			patternPropertyId: this.patternPropertyId,
 			setDefault: this.setDefault,
 			value: this.value
 		};
-	}
-}
-
-function deserializeProperty(input: Types.SerializedPatternProperty): PatternProperty {
-	switch (input.type) {
-		case PatternPropertyType.Asset:
-			return P.PatternAssetProperty.from(input);
-		case PatternPropertyType.Boolean:
-			return P.PatternBooleanProperty.from(input);
-		case PatternPropertyType.Enum:
-			return P.PatternEnumProperty.from(input);
-		case PatternPropertyType.Number:
-			return P.PatternNumberProperty.from(input);
-		case PatternPropertyType.NumberArray:
-			return P.PatternNumberArrayProperty.from(input);
-		case PatternPropertyType.Object:
-			return P.PatternObjectProperty.from(input);
-		case PatternPropertyType.String:
-			return P.PatternStringProperty.from(input);
-		case PatternPropertyType.StringArray:
-			return P.StringPatternArrayProperty.from(input);
-		default:
-			console.warn(`Tried to deserialize unknown property: ${JSON.stringify(input)}`);
-			return P.PatternStringProperty.from(input);
 	}
 }

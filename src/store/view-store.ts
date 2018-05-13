@@ -12,8 +12,8 @@ import * as Os from 'os';
 import { Page } from './page';
 import * as Path from 'path';
 import { Pattern } from './pattern';
+import { PatternLibrary } from './pattern-library';
 import { Project } from './project';
-import { Styleguide } from './styleguide';
 import * as Types from './types';
 
 export enum ClipBoardType {
@@ -477,7 +477,7 @@ export class ViewStore {
 		return this.serverPort;
 	}
 
-	public getStyleguide(): Styleguide | undefined {
+	public getStyleguide(): PatternLibrary | undefined {
 		const project = this.getCurrentProject();
 
 		if (!project) {

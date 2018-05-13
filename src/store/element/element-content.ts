@@ -1,11 +1,11 @@
 import { Element } from './element';
 import * as Mobx from 'mobx';
-import { Styleguide } from '../styleguide';
+import { PatternLibrary } from '../pattern-library';
 import * as Types from '../types';
 
 export interface ElementContentContext {
 	elementId: string;
-	styleguide: Styleguide;
+	styleguide: PatternLibrary;
 }
 
 export interface ElementContentInit {

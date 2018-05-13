@@ -2,7 +2,7 @@ import * as Mobx from 'mobx';
 import * as Types from './types';
 import * as username from 'username';
 import * as Uuid from 'uuid';
-import { Page, Styleguide } from '.';
+import { Page, PatternLibrary } from '.';
 
 export interface ProjectProperties {
 	id?: string;
@@ -11,7 +11,7 @@ export interface ProjectProperties {
 	name: string;
 	pages: Page[];
 	path: string;
-	styleguide: Styleguide;
+	styleguide: PatternLibrary;
 }
 
 export interface ProjectCreateInit {
@@ -65,7 +65,7 @@ export class Project {
 	/**
 	 * The underlying styleguide for this project
 	 */
-	@Mobx.observable private styleguide: Styleguide;
+	@Mobx.observable private styleguide: PatternLibrary;
 
 	/**
 	 * Creates a new project.
@@ -85,7 +85,7 @@ export class Project {
 	}
 
 	public static create(init: ProjectCreateInit): Project {
-		const styleguide = Styleguide.create();
+		const styleguide = PatternLibrary.create();
 
 		const page = Page.create({
 			styleguide,
@@ -106,7 +106,7 @@ export class Project {
 	 * @return A new project object containing the loaded data.
 	 */
 	public static from(serializedProject: Types.SerializedProject): Project {
-		const styleguide = Styleguide.from(serializedProject.styleguide);
+		const styleguide = PatternLibrary.from(serializedProject.styleguide);
 
 		return new Project({
 			id: serializedProject.uuid,
@@ -171,7 +171,7 @@ export class Project {
 		return this.path;
 	}
 
-	public getStyleguide(): Styleguide {
+	public getStyleguide(): PatternLibrary {
 		return this.styleguide;
 	}
 

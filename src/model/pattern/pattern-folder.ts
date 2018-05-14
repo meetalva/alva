@@ -14,11 +14,6 @@ export interface PatternFolderContext {
 	patternLibrary: PatternLibrary;
 }
 
-/**
- * A folder within the styleguide containing patterns.
- * This usually is a physical folder inside the styleguide (as it is with Patternplate), but
- * it may also reflect a virtual pattern grouping, as parsed by the store and/or pattern parsers.
- */
 export class PatternFolder {
 	private children: PatternFolder[] = [];
 

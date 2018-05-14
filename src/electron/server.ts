@@ -4,8 +4,7 @@ import * as express from 'express';
 import * as Http from 'http';
 import { ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
-// import { PatternLibrary } from '../store';
-import * as Types from '../store/types';
+import * as Types from '../model/types';
 import * as uuid from 'uuid';
 import { OPEN, Server as WebsocketServer } from 'ws';
 

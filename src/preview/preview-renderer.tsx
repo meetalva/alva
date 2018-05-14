@@ -6,7 +6,7 @@ import { PreviewStore } from './preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Helmet } from 'react-helmet';
-import * as Types from '../store/types';
+import * as Types from '../model/types';
 
 // TODO: Produces a deprecation warning, find a way
 // to dedupe MobX when upgrading to 4.x

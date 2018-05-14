@@ -4,9 +4,10 @@ import { ElementWrapper } from './element-wrapper';
 import { partition } from 'lodash';
 import { createMenu } from '../../electron/menu';
 import * as MobxReact from 'mobx-react';
+import * as Model from '../../model';
 import * as React from 'react';
 import * as Store from '../../store';
-import * as Types from '../../store/types';
+import * as Types from '../../model/types';
 
 export interface ElementListState {
 	dragging: boolean;
@@ -50,9 +51,9 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		createMenu();
 	}
 
-	public createItemFromElement(element: Store.Element): ElementNodeProps {
+	public createItemFromElement(element: Model.Element): ElementNodeProps {
 		const store = Store.ViewStore.getInstance();
-		const pattern: Store.Pattern | undefined = element.getPattern();
+		const pattern: Model.Pattern | undefined = element.getPattern();
 
 		if (!pattern) {
 			return {
@@ -90,8 +91,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		};
 	}
 
-	public createItemFromSlot(slot: Store.PatternSlot, element: Store.Element): ElementNodeProps {
-		const slotContent = element.getContentBySlot(slot) as Store.ElementContent;
+	public createItemFromSlot(slot: Model.PatternSlot, element: Model.Element): ElementNodeProps {
+		const slotContent = element.getContentBySlot(slot) as Model.ElementContent;
 
 		const slotListItem: ElementNodeProps = {
 			id: slotContent.getId(),
@@ -111,7 +112,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		const editableElement = store.getNameEditableElement();
 
 		if (editableElement) {
-			store.execute(new Store.ElementNameCommand(editableElement, editableElement.getName()));
+			store.execute(new Model.ElementNameCommand(editableElement, editableElement.getName()));
 			store.setNameEditableElement();
 		}
 	}
@@ -202,7 +203,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		// prettier-ignore
 		const draggedElement = pattern
 			? // drag from pattern list, create new element
-			new Store.Element({
+			new Model.Element({
 				contents: [],
 				pattern,
 				properties: [],
@@ -215,9 +216,9 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
-		const getDropParent = (el?: Store.Element): Store.Element | undefined => {
+		const getDropParent = (el?: Model.Element): Model.Element | undefined => {
 			if (!el && targetContent) {
-				return store.getElementById(targetContent.getElementId()) as Store.Element;
+				return store.getElementById(targetContent.getElementId()) as Model.Element;
 			}
 
 			if (!el) {
@@ -232,10 +233,10 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				return el;
 			}
 
-			return el.getParent() as Store.Element;
+			return el.getParent() as Model.Element;
 		};
 
-		const dropParent = getDropParent(targetElement) as Store.Element;
+		const dropParent = getDropParent(targetElement) as Model.Element;
 		const dropContainer =
 			targetContent || dropParent.getContentBySlotType(Types.SlotType.Children);
 
@@ -243,13 +244,13 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
-		const command = Store.ElementLocationCommand.addChild({
+		const command = Model.ElementLocationCommand.addChild({
 			parent: dropParent,
 			child: draggedElement,
 			slotId: dropContainer.getSlotId(),
 			index: isSiblingDrop
 				? calculateDropIndex({
-						target: targetElement as Store.Element,
+						target: targetElement as Model.Element,
 						dragged: draggedElement
 				  })
 				: dropContainer.getElements().length
@@ -281,7 +282,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 				if (editableElement) {
 					store.execute(
-						new Store.ElementNameCommand(editableElement, editableElement.getName())
+						new Model.ElementNameCommand(editableElement, editableElement.getName())
 					);
 					store.setNameEditableElement();
 				} else {
@@ -314,7 +315,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 	public render(): JSX.Element | null {
 		const store = Store.ViewStore.getInstance();
-		const page: Store.Page | undefined = store.getCurrentPage();
+		const page: Model.Page | undefined = store.getCurrentPage();
 
 		if (!page) {
 			return null;
@@ -387,7 +388,7 @@ function above(node: EventTarget, selector: string): HTMLElement | null {
 	return ended ? null : el;
 }
 
-function contentFromTarget(target: EventTarget): Store.ElementContent | undefined {
+function contentFromTarget(target: EventTarget): Model.ElementContent | undefined {
 	const el = above(target, `[${ElementAnchors.content}]`);
 
 	if (!el) {
@@ -404,7 +405,7 @@ function contentFromTarget(target: EventTarget): Store.ElementContent | undefine
 	return store.getContentById(id);
 }
 
-function elementFromTarget(target: EventTarget): Store.Element | undefined {
+function elementFromTarget(target: EventTarget): Model.Element | undefined {
 	const el = above(target, `[${ElementAnchors.element}]`);
 
 	if (!el) {
@@ -421,7 +422,7 @@ function elementFromTarget(target: EventTarget): Store.Element | undefined {
 	return store.getElementById(id);
 }
 
-function calculateDropIndex(init: { dragged: Store.Element; target: Store.Element }): number {
+function calculateDropIndex(init: { dragged: Model.Element; target: Model.Element }): number {
 	const { dragged, target } = init;
 
 	// We definitely know the drop target has a parent, thus an index

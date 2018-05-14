@@ -1,6 +1,6 @@
 import { PatternAnchor, PatternListItem } from '../../components';
+import { Pattern } from '../../model';
 import * as React from 'react';
-import { Pattern } from '../../store';
 
 export interface PatternItemContainerContainerProps {
 	pattern: Pattern;

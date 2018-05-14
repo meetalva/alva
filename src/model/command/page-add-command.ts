@@ -1,8 +1,8 @@
 import { Command } from './command';
 import { Page } from '../page';
 import { Project } from '../project';
+import { ViewStore } from '../../store'; // TODO: Remove dependency on store
 import * as Types from '../types';
-import { ViewStore } from '../view-store';
 
 export class PageAddCommand extends Command {
 	private page: Page;

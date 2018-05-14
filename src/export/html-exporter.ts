@@ -9,7 +9,7 @@ import { ViewStore } from '../store';
 export class HtmlExporter extends Exporter {
 	public async execute(path: string): Promise<void> {
 		const store = ViewStore.getInstance();
-		const project = store.getCurrentProject();
+		const project = store.getProject();
 		const currentPage = store.getCurrentPage();
 		const styleguide = store.getPatternLibrary();
 		const id = uuid.v4();

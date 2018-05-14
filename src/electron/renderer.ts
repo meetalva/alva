@@ -46,7 +46,7 @@ Sender.receive(message => {
 });
 
 Sender.receive(message => {
-	const project = store.getCurrentProject();
+	const project = store.getProject();
 
 	if (!project) {
 		return;
@@ -172,7 +172,7 @@ MobX.autorun(() => {
 });
 
 MobX.autorun(() => {
-	const project = store.getCurrentProject();
+	const project = store.getProject();
 	const currentPage = store.getCurrentPage();
 
 	if (project && currentPage) {
@@ -181,6 +181,9 @@ MobX.autorun(() => {
 			payload: {
 				pageId: currentPage.getId(),
 				pages: project.getPages().map(page => page.toJSON()),
+				elementContents: project
+					.getElementContents()
+					.map(elementContent => elementContent.toJSON()),
 				elements: project.getElements().map(element => element.toJSON())
 			},
 			type: ServerMessageType.PageChange

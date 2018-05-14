@@ -8,7 +8,7 @@ import * as getPort from 'get-port';
 import * as stringEscape from 'js-string-escape';
 import { PreviewMessageType, ServerMessageType } from '../message';
 import * as MimeTypes from 'mime-types';
-import { Page, Project } from '../model';
+import { Project } from '../model';
 import * as Path from 'path';
 import { Persistence, PersistenceState } from '../persistence';
 import * as Sender from '../message/server';
@@ -136,17 +136,6 @@ async function createWindow(): Promise<void> {
 						name: 'Untitled Project',
 						path
 					});
-
-					project.addPage(
-						Page.create(
-							{
-								id: uuid.v4(),
-								name: 'Untitled Page',
-								patternLibrary: project.getPatternLibrary()
-							},
-							{ project, patternLibrary: project.getPatternLibrary() }
-						)
-					);
 
 					await Persistence.persist(path, project);
 

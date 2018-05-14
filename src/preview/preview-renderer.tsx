@@ -16,6 +16,8 @@ export interface RenderInit {
 	highlight: HighlightArea;
 	store: PreviewStore;
 	// tslint:disable-next-line:no-any
+	getChildren(props: any, render: (props: any) => any): any;
+	// tslint:disable-next-line:no-any
 	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
 	// tslint:disable-next-line:no-any
 	getProperties(props: any): any;
@@ -33,6 +35,7 @@ export interface InjectedPreviewApplicationProps {
 }
 
 interface InjectedPreviewComponentProps extends Types.SerializedElement {
+	getChildren: RenderInit['getChildren'];
 	getComponent: RenderInit['getComponent'];
 	getProperties: RenderInit['getProperties'];
 	getSlots: RenderInit['getSlots'];
@@ -99,6 +102,7 @@ const SYNTHETICS = {
 export function render(init: RenderInit): void {
 	ReactDom.render(
 		<MobXReact.Provider
+			getChildren={init.getChildren}
 			getComponent={init.getComponent}
 			getProperties={init.getProperties}
 			getSlots={init.getSlots}
@@ -131,8 +135,8 @@ class PreviewApplication extends React.Component {
 		return (
 			<React.Fragment>
 				<PreviewComponent
-					contents={element.contents}
-					pattern={element.pattern}
+					contentIds={element.contentIds}
+					patternId={element.patternId}
 					properties={element.properties}
 					name={element.name}
 					id={element.id}
@@ -162,7 +166,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 	}
 }
 
-@MobXReact.inject('getComponent', 'getProperties', 'getSlots', 'store', 'highlight')
+@MobXReact.inject('getChildren', 'getComponent', 'getProperties', 'getSlots', 'store', 'highlight')
 @MobXReact.observer
 class PreviewComponent extends React.Component<Types.SerializedElement> {
 	public componentWillUpdate(): void {
@@ -182,13 +186,12 @@ class PreviewComponent extends React.Component<Types.SerializedElement> {
 	public render(): JSX.Element | null {
 		const props = this.props as InjectedPreviewComponentProps;
 
-		const defaultContent = props.contents.find(content => content.slotType === 'children');
-		const children = defaultContent ? defaultContent.elements : [];
-
-		const slotsContents = props.contents.filter(content => content.slotType !== 'children');
-		const slots = props.getSlots(slotsContents, child => (
+		const children = props.getChildren(props, child => (
 			<PreviewComponent key={child.id} {...child} />
 		));
+
+		const slots = props.getSlots(props, child => <PreviewComponent key={child.id} {...child} />);
+
 		const properties = props.getProperties(props.properties);
 
 		// tslint:disable-next-line:no-any
@@ -201,7 +204,7 @@ class PreviewComponent extends React.Component<Types.SerializedElement> {
 		return (
 			<ErrorBoundary name={props.name}>
 				<Component {...properties} {...slots}>
-					{children.map(child => <PreviewComponent key={child.id} {...child} />)}
+					{children}
 				</Component>
 			</ErrorBoundary>
 		);

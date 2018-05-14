@@ -4,6 +4,7 @@ export enum AppState {
 }
 
 export interface SavedProject {
+	elementContents: SerializedElementContent[];
 	elements: SerializedElement[];
 	id: string;
 	lastChangedAuthor: string;
@@ -24,19 +25,20 @@ export interface SerializedPage {
 }
 
 export interface SerializedElement {
-	contents: SerializedPageElementContent[];
+	containerId?: string;
+	contentIds: string[];
 	id: string;
 	name: string;
-	pattern: string;
+	patternId: string;
 	properties: SerializedElementProperty[];
 }
 
-export interface SerializedPageElementContent {
-	elements: SerializedElement[];
+export interface SerializedElementContent {
+	elementIds: string[];
 	id: string;
 	name: string;
+	parentElementId?: string;
 	slotId: string;
-	slotType: string;
 }
 
 export interface SerializedPatternLibrary {

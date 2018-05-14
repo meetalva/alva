@@ -15,6 +15,7 @@ import {
 	PropertyPane,
 	SideBar
 } from '../components';
+import { ConnectPaneContainer } from './connect-pane-container';
 import { ElementList } from './element-list';
 import { createMenu } from '../electron/menu';
 import { ServerMessageType } from '../message';
@@ -151,6 +152,7 @@ export class App extends React.Component {
 								direction={LayoutDirection.Column}
 								border={LayoutBorder.Side}
 							>
+								<ConnectPaneContainer />
 								{store.getRightPane() === Types.RightPane.Properties && (
 									<PropertyPane>
 										<PropertyListContainer />

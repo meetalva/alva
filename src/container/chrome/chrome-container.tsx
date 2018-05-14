@@ -8,7 +8,7 @@ import * as Types from '../../model/types';
 
 export const ChromeContainer = MobxReact.observer((props): JSX.Element | null => {
 	const store = ViewStore.getInstance();
-	const project = store.getCurrentProject();
+	const project = store.getProject();
 
 	if (!project) {
 		return null;

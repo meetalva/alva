@@ -8,7 +8,7 @@ import * as Types from '../../model/types';
 export class OverviewSwitchContainer extends React.Component {
 	public render(): JSX.Element | null {
 		const store = ViewStore.getInstance();
-		const project = store.getCurrentProject();
+		const project = store.getProject();
 		const page = store.getCurrentPage();
 
 		if (!project || !page) {

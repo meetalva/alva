@@ -1,74 +1,30 @@
 import { Command } from './command';
-import { Element, ElementContent } from '../element';
+import { Element } from '../element';
 import { ElementCommand } from './element-command';
-import { Page } from '../page/page';
+import { Project } from '../project';
+// import { Page } from '../page/page';
 import { ViewStore } from '../../store'; // TODO: Remove dependency on store
 
 /**
  * A user operation to add or remove a child to/from a parent, or to relocate it.
  */
 export class ElementLocationCommand extends ElementCommand {
-	/**
-	 * The new position within the parent's children, if a parent is given.
-	 * Leaving out this value puts the child to the end of the parent's children.
-	 */
+	protected contentId: string;
 	protected index: number = 0;
-
-	/**
-	 * The new parent for the child. undefined removes the child.
-	 */
-	protected parent: Element;
-
-	/**
-	 * The ID ofg the target parent of the child element.
-	 */
-	protected parentId?: string;
-
-	/**
-	 * The previous position, for undo.
-	 */
+	// protected parentId?: string;
+	// protected previousIndex: number;
+	// protected previousParentId?: string | undefined;
+	// protected previousSlotId?: string;
+	// protected slotId: string;
+	protected previousContentId: string;
 	protected previousIndex: number;
 
-	/**
-	 * The previous parent, for undo.
-	 */
-	protected previousParent?: Element;
-
-	/**
-	 * The ID of the previous parent, for undo.
-	 */
-	protected previousParentId?: string | undefined;
-
-	/**
-	 * The slot the element was attached to at creation time of the command. undefined means default slot.
-	 */
-	protected previousSlotId?: string;
-
-	/**
-	 * The slot the element is attached to. undefined means default slot.
-	 */
-	protected slotId: string;
-
-	public constructor(init: { element: Element; index: number; parent: Element; slotId: string }) {
-		super(init.element);
-
-		this.parent = init.parent;
-		this.slotId = init.slotId;
+	public constructor(init: { contentId: string; elementId: string; index: number }) {
+		super((ViewStore.getInstance().getProject() as Project).getElementById(
+			init.elementId
+		) as Element);
 		this.index = init.index;
-
-		const container = init.element.getContainer();
-
-		this.previousParent = init.element.getParent();
-		this.previousSlotId = container ? container.getSlotId() : undefined;
-		this.previousIndex = this.previousParent ? (init.element.getIndex() as number) : 0;
-
-		const parentPage = init.parent.getPage();
-
-		if (!parentPage) {
-			return;
-		}
-
-		this.pageId = parentPage.getId();
+		this.contentId = init.contentId;
 	}
 
 	/**
@@ -82,71 +38,23 @@ export class ElementLocationCommand extends ElementCommand {
 	 * @see Store.execute()
 	 */
 	public static addChild(init: {
-		child: Element;
+		childId: string;
+		contentId: string;
 		index: number;
-		parent: Element;
-		slotId: string;
 	}): ElementCommand {
 		return new ElementLocationCommand({
-			element: init.child,
-			parent: init.parent,
-			slotId: init.slotId,
+			elementId: init.childId,
+			contentId: init.contentId,
 			index: init.index
 		});
 	}
 
-	public static addSibling(init: { newSibling: Element; sibling: Element }): ElementCommand {
-		const parent = init.sibling.getParent() as Element;
-		const container = init.sibling.getContainer() as ElementContent;
-
+	public static setParent(childId: string, contentId: string, index: number): ElementCommand {
 		return new ElementLocationCommand({
-			element: init.newSibling,
-			parent,
-			slotId: container.getSlotId(),
-			index: parent ? (init.sibling.getIndex() as number) + 1 : 0
-		});
-	}
-
-	public static setParent(
-		child: Element,
-		parent: Element,
-		slotId: string,
-		index: number
-	): ElementCommand {
-		return new ElementLocationCommand({
-			element: child,
-			parent,
-			slotId,
+			elementId: childId,
+			contentId,
 			index
 		});
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	protected ensurePageAndElement(): boolean {
-		super.ensurePageAndElement();
-
-		const currentPage: Page | undefined = ViewStore.getInstance().getCurrentPage() as Page;
-		if (this.parentId) {
-			const parent: Element | undefined = currentPage.getElementById(this.parentId);
-			if (!parent) {
-				return false;
-			}
-			this.parent = parent;
-		}
-
-		if (this.previousParentId) {
-			const previousParent: Element | undefined = currentPage.getElementById(
-				this.previousParentId
-			);
-			if (!previousParent) {
-				return false;
-			}
-			this.previousParent = previousParent;
-		}
-
-		return true;
 	}
 
 	/**
@@ -157,19 +65,29 @@ export class ElementLocationCommand extends ElementCommand {
 			return false;
 		}
 
-		// Do not try to add an element to itself
-		// or one of its children
-		if (this.element.isAncestorOf(this.parent)) {
+		const store = ViewStore.getInstance();
+		const project = store.getProject();
+
+		if (!project || !this.contentId) {
 			return false;
 		}
 
-		this.element.setParent({
-			parent: this.parent,
-			slotId: this.slotId,
-			index: this.index
-		});
+		const container = project.getElementContentById(this.contentId);
 
-		this.memorizeElementIds();
+		if (!container) {
+			return false;
+		}
+
+		const previousContainer = this.element.getContainer();
+
+		if (previousContainer) {
+			this.previousIndex = previousContainer.getElementIndexById(this.element.getId());
+			this.previousContentId = previousContainer.getId();
+			previousContainer.remove({ element: this.element });
+		}
+
+		container.insert({ element: this.element, at: this.index });
+		this.element.setContainer(container);
 
 		return true;
 	}
@@ -189,15 +107,6 @@ export class ElementLocationCommand extends ElementCommand {
 	}
 
 	/**
-	 * Stores the ID of the page elements if they are currently added to the page,
-	 * to prevent issues with undo/redo when pages are closed and reopened.
-	 */
-	private memorizeElementIds(): void {
-		this.parentId = this.getElementIdIfPartOfPage(this.parent);
-		this.previousParentId = this.getElementIdIfPartOfPage(this.previousParent);
-	}
-
-	/**
 	 * @inheritDoc
 	 */
 	public undo(): boolean {
@@ -205,25 +114,34 @@ export class ElementLocationCommand extends ElementCommand {
 			return false;
 		}
 
-		// Remove element from page
+		const store = ViewStore.getInstance();
+		const project = store.getProject();
+
+		if (!project) {
+			return false;
+		}
+
+		// Previously not on page, remove
 		if (
-			typeof this.previousParent === 'undefined' ||
-			typeof this.previousSlotId === 'undefined' ||
+			typeof this.previousContentId === 'undefined' ||
 			typeof this.previousIndex === 'undefined'
 		) {
 			this.element.remove();
-			this.memorizeElementIds();
-			return true;
 		}
 
-		// Move element on page
-		this.element.setParent({
-			parent: this.previousParent,
-			slotId: this.previousSlotId,
-			index: this.previousIndex
-		});
+		// Move to previous position
+		const previousContainer = project.getElementContentById(this.previousContentId);
 
-		this.memorizeElementIds();
+		if (previousContainer) {
+			const currentContainer = this.element.getContainer();
+
+			if (currentContainer) {
+				currentContainer.remove({ element: this.element });
+			}
+
+			previousContainer.insert({ element: this.element, at: this.previousIndex });
+			this.element.setContainer(previousContainer);
+		}
 
 		return true;
 	}

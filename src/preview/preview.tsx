@@ -19,6 +19,8 @@ interface InitialData {
 }
 
 export class PreviewStore {
+	@MobX.observable public elementContents: Types.SerializedElementContent[] = [];
+
 	@MobX.observable public elementId: string = '';
 	@MobX.observable public elements: Types.SerializedElement[] = [];
 	@MobX.observable public mode: PreviewDocumentMode = PreviewDocumentMode.Live;
@@ -49,6 +51,10 @@ export class PreviewStore {
 			case 'live':
 			default:
 				store.mode = PreviewDocumentMode.Live;
+		}
+
+		if (payload.elementContents) {
+			store.elementContents = payload.elementContents;
 		}
 
 		if (payload.elements) {
@@ -86,7 +92,7 @@ function main(): void {
 	const render = () => {
 		// tslint:disable-next-line:no-any
 		(window as any).renderer.render({
-			// tslint:disable-next-line:no-any
+			getChildren: createChildrenGetter(store),
 			getComponent: createComponentGetter(store),
 			getProperties: createPropertiesGetter(store),
 			getSlots: createSlotGetter(store),
@@ -197,6 +203,10 @@ function listen(store: PreviewStore, handlers: { onReplacement(): void }): void 
 					store.elements = payload.elements;
 				}
 
+				if (Array.isArray(payload.elementContents)) {
+					store.elementContents = payload.elementContents;
+				}
+
 				if (typeof payload.pageId === 'string') {
 					store.pageId = payload.pageId;
 				}
@@ -291,7 +301,7 @@ function startRouter(store: PreviewStore): void {
 // tslint:disable-next-line:no-any
 function createComponentGetter(store: PreviewStore): (props: any, synthetics: any) => any {
 	return (props, synthetics) => {
-		const pattern = store.patterns.find(component => component.id === props.pattern);
+		const pattern = store.patterns.find(component => component.id === props.patternId);
 
 		if (!pattern) {
 			return;
@@ -309,6 +319,32 @@ function createComponentGetter(store: PreviewStore): (props: any, synthetics: an
 			case 'synthetic:box':
 				return synthetics.box;
 		}
+	};
+}
+
+// tslint:disable:no-any
+function createChildrenGetter(store: PreviewStore): (contents: any, render: any) => any {
+	return (props, render) => {
+		const slots = store.patterns.reduce((acc, component) => [...acc, ...component.slots], []);
+
+		const [childContent] = props.contentIds
+			.map(contentId => store.elementContents.find(e => e.id === contentId))
+			.filter(content => typeof content !== 'undefined')
+			.filter(content => {
+				const slot = slots.find(s => s.id === content.slotId);
+				if (!slot) {
+					return false;
+				}
+				return slot.type === Types.SlotType.Children;
+			});
+
+		if (!childContent) {
+			return [];
+		}
+
+		return childContent.elementIds
+			.map(elementId => store.elements.find(e => e.id === elementId))
+			.map(render);
 	};
 }
 
@@ -343,17 +379,28 @@ function createPropertiesGetter(
 }
 
 // tslint:disable:no-any
-function createSlotGetter(
-	store: PreviewStore
-): (contents: Types.SerializedPageElementContent[], render: any) => any {
-	return (contents, render) => {
+function createSlotGetter(store: PreviewStore): (contents: any, render: any) => any {
+	return (props, render) => {
 		const slots = store.patterns.reduce((acc, component) => [...acc, ...component.slots], []);
 
-		return contents.reduce((acc, content) => {
+		const slotsContents = props.contentIds
+			.map(contentId => store.elementContents.find(e => e.id === contentId))
+			.filter(content => typeof content !== 'undefined')
+			.filter(content => {
+				const slot = slots.find(s => s.id === content.slotId);
+				if (!slot) {
+					return false;
+				}
+				return slot.type !== Types.SlotType.Children;
+			});
+
+		return slotsContents.reduce((acc, content) => {
 			const slot = slots.find(s => s.id === content.slotId);
 
 			if (slot) {
-				acc[slot.propertyName] = content.elements.map(render);
+				acc[slot.propertyName] = content.elementIds
+					.map(elementId => store.elements.find(e => e.id === elementId))
+					.map(render);
 			}
 
 			return acc;

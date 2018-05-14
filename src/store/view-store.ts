@@ -57,13 +57,6 @@ export class ViewStore {
 	 */
 	@Mobx.observable private clipboardItem?: ClipBoardItem;
 
-	/**
-	 * The project that is currently being selected to add, edit, or remove pages of. May be
-	 * undefined if none is selected is none. Opening a page automatically changes the selected
-	 * project.
-	 */
-	@Mobx.observable private currentProject?: Model.Project;
-
 	@Mobx.observable private highlightedElement?: Model.Element;
 
 	@Mobx.observable private highlightedPlaceholderElement?: Model.Element;
@@ -78,11 +71,7 @@ export class ViewStore {
 	 */
 	@Mobx.observable private patternSearchTerm: string = '';
 
-	/**
-	 * All projects (references) of this styleguide. Projects point to page references,
-	 * and both do not contain the actual page data (element), but only their IDs.
-	 */
-	@Mobx.observable private projects: Model.Project[] = [];
+	@Mobx.observable private project: Model.Project;
 
 	/**
 	 * The most recent undone user commands (user operations) to provide a redo feature.
@@ -138,13 +127,26 @@ export class ViewStore {
 	}
 
 	public addNewElement(init: { pattern: Model.Pattern }): Model.Element | undefined {
-		const project = this.getCurrentProject();
+		const project = this.getProject();
 		const patternLibrary = project.getPatternLibrary();
 
-		return new Model.Element(
+		const elementContents = init.pattern.getSlots().map(
+			slot =>
+				new Model.ElementContent(
+					{
+						elementIds: [],
+						id: uuid.v4(),
+						name: slot.getName(),
+						slotId: slot.getId()
+					},
+					{ project, patternLibrary }
+				)
+		);
+
+		const element = new Model.Element(
 			{
-				contents: [],
-				pattern: init.pattern,
+				contentIds: elementContents.map(e => e.getId()),
+				patternId: init.pattern.getId(),
 				properties: [],
 				setDefaults: true
 			},
@@ -153,40 +155,34 @@ export class ViewStore {
 				project
 			}
 		);
+
+		elementContents.forEach(elementContent => {
+			elementContent.setParentElement(element);
+			project.addElementContent(elementContent);
+		});
+
+		project.addElement(element);
+
+		return element;
 	}
 
 	public addNewPage(): Model.Page | undefined {
-		const project = this.currentProject;
-
-		if (!project) {
-			return;
-		}
-
-		const patternLibrary = project.getPatternLibrary();
+		const patternLibrary = this.project.getPatternLibrary();
 		const name = 'Untitled Page';
 
-		const count = project.getPages().filter(p => p.getName().startsWith(name)).length;
+		const count = this.project.getPages().filter(p => p.getName().startsWith(name)).length;
 
 		const page = Model.Page.create(
 			{
 				id: uuid.v4(),
 				name: `${name} ${count + 1}`,
-				patternLibrary: project.getPatternLibrary()
+				patternLibrary: this.project.getPatternLibrary()
 			},
-			{ project, patternLibrary }
+			{ project: this.project, patternLibrary }
 		);
 
-		this.execute(Model.PageAddCommand.create({ page, project }));
+		this.execute(Model.PageAddCommand.create({ page, project: this.project }));
 		return page;
-	}
-
-	/**
-	 * Add a new project definition to the list of projects.
-	 * Note: Changes to the projects and page references are saved only when calling save().
-	 * @param project The new project.
-	 */
-	public addProject(project: Model.Project): void {
-		this.projects.push(project);
 	}
 
 	/**
@@ -259,13 +255,13 @@ export class ViewStore {
 
 	public duplicateElement(element: Model.Element): Model.Element {
 		const duplicatedElement = element.clone();
-		this.execute(
+		/* this.execute(
 			Model.ElementLocationCommand.addSibling({
 				newSibling: duplicatedElement,
 				sibling: element
 			})
 		);
-		this.setSelectedElement(duplicatedElement);
+		this.setSelectedElement(duplicatedElement); */
 		return duplicatedElement;
 	}
 
@@ -337,13 +333,6 @@ export class ViewStore {
 		return this.appState;
 	}
 
-	/**
-	 * Returns the element currently in the clipboard, or undefined if there is none.
-	 * Note: The element is cloned lazily, so it may represent a still active element.
-	 * When adding the clipboard element to paste it, clone it first.
-	 * @return The element currently in the clipboard, or undefined if there is none.
-	 */
-
 	public getClipboardItem(type: ClipBoardType.Element): Model.Element | undefined;
 	public getClipboardItem(type: ClipBoardType.Page): Model.Page | undefined;
 	public getClipboardItem(type: ClipBoardType): Model.Page | Model.Element | undefined {
@@ -357,7 +346,7 @@ export class ViewStore {
 	}
 
 	public getContentById(id: string): Model.ElementContent | undefined {
-		const project = this.getCurrentProject();
+		const project = this.getProject();
 
 		let result;
 
@@ -375,9 +364,7 @@ export class ViewStore {
 	 * @return The page content that is currently being displayed in the preview, or undefined.
 	 */
 	public getCurrentPage(): Model.Page | undefined {
-		const project = this.getCurrentProject();
-
-		if (!project) {
+		if (!this.project) {
 			return;
 		}
 
@@ -385,21 +372,11 @@ export class ViewStore {
 			return;
 		}
 
-		return project.getPages()[this.activePage];
-	}
-
-	/**
-	 * Returns the project that is currently being selected to add, edit, or remove pages of. May be
-	 * undefined if none is selected is none. Opening a page automatically changes the selected
-	 * project.
-	 * @return The currently selected project or undefined.
-	 */
-	public getCurrentProject(): Model.Project {
-		return this.currentProject as Model.Project;
+		return this.project.getPages()[this.activePage];
 	}
 
 	public getElementById(id: string): Model.Element | undefined {
-		const project = this.getCurrentProject();
+		const project = this.getProject();
 
 		let result;
 
@@ -424,7 +401,7 @@ export class ViewStore {
 	}
 
 	public getPageById(id: string): Model.Page | undefined {
-		const project = this.getCurrentProject();
+		const project = this.getProject();
 
 		if (!project) {
 			return;
@@ -434,7 +411,7 @@ export class ViewStore {
 	}
 
 	public getPatternById(id: string): Model.Pattern | undefined {
-		const project = this.getCurrentProject();
+		const project = this.getProject();
 
 		if (!project) {
 			return;
@@ -450,7 +427,7 @@ export class ViewStore {
 	}
 
 	public getPatternLibrary(): Model.PatternLibrary | undefined {
-		const project = this.getCurrentProject();
+		const project = this.getProject();
 
 		if (!project) {
 			return;
@@ -461,6 +438,10 @@ export class ViewStore {
 
 	public getPatternSearchTerm(): string {
 		return this.patternSearchTerm;
+	}
+
+	public getProject(): Model.Project {
+		return this.project;
 	}
 
 	/**
@@ -545,8 +526,9 @@ export class ViewStore {
 
 	public pasteAfterElement(targetElement: Model.Element): Model.Element | undefined {
 		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
+		const container = targetElement.getContainer();
 
-		if (!clipboardElement) {
+		if (!clipboardElement || !container) {
 			return;
 		}
 
@@ -555,9 +537,10 @@ export class ViewStore {
 		}
 
 		this.execute(
-			Model.ElementLocationCommand.addSibling({
-				newSibling: clipboardElement,
-				sibling: targetElement
+			Model.ElementLocationCommand.addChild({
+				index: targetElement.getIndex() + 1,
+				contentId: container.getId(),
+				childId: clipboardElement.getId()
 			})
 		);
 
@@ -601,9 +584,8 @@ export class ViewStore {
 
 		this.execute(
 			Model.ElementLocationCommand.addChild({
-				parent: element,
-				slotId: contents.getSlotId(),
-				child: clipboardElement,
+				contentId: contents.getId(),
+				childId: clipboardElement.getId(),
 				index: contents.getElements().length - 1
 			})
 		);
@@ -696,7 +678,7 @@ export class ViewStore {
 	}
 
 	public removePage(page: Model.Page): void {
-		const project = this.getCurrentProject();
+		const project = this.getProject();
 
 		if (!project) {
 			return;
@@ -740,13 +722,11 @@ export class ViewStore {
 	}
 
 	public setActivePage(page: Model.Page): boolean {
-		const project = this.getCurrentProject();
-
-		if (!project) {
+		if (!this.project) {
 			return false;
 		}
 
-		const pages = project.getPages();
+		const pages = this.project.getPages();
 		const index = pages.indexOf(page);
 
 		if (index === -1) {
@@ -758,10 +738,9 @@ export class ViewStore {
 	}
 
 	public setActivePageById(id: string): boolean {
-		const project = this.getCurrentProject();
 		const page = this.getPageById(id);
 
-		if (!project || !page) {
+		if (!this.project || !page) {
 			return false;
 		}
 
@@ -834,8 +813,8 @@ export class ViewStore {
 	}
 
 	public setProject(project: Model.Project): void {
-		this.currentProject = project;
-		const pages = this.currentProject.getPages();
+		this.project = project;
+		const pages = this.project.getPages();
 
 		if (pages.length > 0) {
 			this.setActivePageByIndex(0);

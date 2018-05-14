@@ -1,6 +1,6 @@
 import { Box, Page, Placeholder, Text } from './builtins';
 import * as Fuse from 'fuse.js';
-import { Pattern, PatternFolder, SyntheticPatternType } from '../pattern';
+import { Pattern, PatternFolder, PatternSlot, SyntheticPatternType } from '../pattern';
 import { PatternProperty, PatternPropertyType } from '../pattern-property';
 import * as Types from '../types';
 import * as uuid from 'uuid';
@@ -116,6 +116,10 @@ export class PatternLibrary {
 
 	public getRoot(): PatternFolder {
 		return this.root;
+	}
+
+	public getSlots(): PatternSlot[] {
+		return this.patterns.reduce((acc, pattern) => [...acc, ...pattern.getSlots()], []);
 	}
 
 	public query(term: string): string[] {

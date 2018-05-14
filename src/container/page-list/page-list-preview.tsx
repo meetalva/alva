@@ -4,7 +4,7 @@ import { ViewStore } from '../../store';
 import styled from 'styled-components';
 
 export const PageListPreview: React.StatelessComponent = props => {
-	const project = ViewStore.getInstance().getCurrentProject();
+	const project = ViewStore.getInstance().getProject();
 	if (!project) {
 		return <>props.children</>;
 	}

@@ -62,6 +62,7 @@ export interface Envelope<V, T> {
 export type EmptyEnvelope<V> = Envelope<V, undefined>;
 
 export interface PageChangePaylod {
+	elementContents: Types.SerializedElementContent[];
 	elements: Types.SerializedElement[];
 	pageId: string;
 	pages: Types.SerializedPage[];

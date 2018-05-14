@@ -8,7 +8,7 @@ import { ViewStore } from '../../store';
 export const PageListContainer: React.StatelessComponent = MobxReact.observer(
 	(): JSX.Element | null => {
 		const store = ViewStore.getInstance();
-		const project = store.getCurrentProject();
+		const project = store.getProject();
 		const currentPage = store.getCurrentPage();
 		const currentPageId = currentPage ? currentPage.getId() : undefined;
 

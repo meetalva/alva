@@ -2,18 +2,18 @@ import { ElementContent } from './element-content';
 import { ElementProperty } from './element-property';
 import * as Mobx from 'mobx';
 import { Page } from '../page';
-import { Pattern, PatternSlot } from '../pattern';
+import { Pattern } from '../pattern';
 import { PatternLibrary } from '../pattern-library';
 import { Project } from '../project';
 import * as Types from '../types';
-import * as Uuid from 'uuid';
+import * as uuid from 'uuid';
 
 export interface ElementInit {
-	container?: ElementContent;
-	contents: ElementContent[];
+	containerId?: string;
+	contentIds: string[];
 	id?: string;
 	name?: string;
-	pattern: Pattern;
+	patternId: string;
 	properties: ElementProperty[];
 	setDefaults?: boolean;
 }
@@ -23,15 +23,10 @@ export interface ElementContext {
 	project: Project;
 }
 
-/**
- * A page element provides the properties data of a pattern.
- * It represents the pattern component instance from a designer's point-of-view.
- * Page elements are nested within a page.
- */
 export class Element {
-	private container?: ElementContent;
+	private containerId?: string;
 
-	@Mobx.observable private contents: ElementContent[] = [];
+	@Mobx.observable private contentIds: string[] = [];
 
 	@Mobx.observable private editedName: string;
 
@@ -45,7 +40,7 @@ export class Element {
 
 	private parent: Element;
 
-	private pattern: Pattern;
+	private patternId: string;
 
 	private patternLibrary: PatternLibrary;
 
@@ -54,57 +49,52 @@ export class Element {
 	private properties: ElementProperty[];
 
 	public constructor(init: ElementInit, context: ElementContext) {
-		this.id = init.id ? init.id : Uuid.v4();
-		this.pattern = init.pattern;
-		this.container = init.container;
-
+		this.id = init.id ? init.id : uuid.v4();
+		this.patternId = init.patternId;
+		this.containerId = init.containerId;
 		this.patternLibrary = context.patternLibrary;
 		this.project = context.project;
 
-		this.pattern.getSlots().forEach(slot => {
-			const hydratedSlot = init.contents.find(content => content.getSlotId() === slot.getId());
+		const pattern = this.patternLibrary.getPatternById(this.patternId);
 
-			this.contents.push(
-				new ElementContent({
-					elementId: this.id,
-					id: Uuid.v4(),
-					name: slot.getName(),
-					elements: hydratedSlot ? hydratedSlot.getElements() : [],
-					slotId: slot.getId(),
-					slotType: slot.getType()
-				})
-			);
-		});
+		this.contentIds = init.contentIds;
 
 		if (typeof init.name !== 'undefined') {
 			this.name = init.name;
 		}
 
-		if (this.name === undefined && this.pattern) {
-			this.name = this.pattern.getName();
+		if (this.name === undefined && pattern) {
+			this.name = pattern.getName();
 		}
 
-		this.properties = this.pattern.getProperties().map(patternProperty => {
-			const hydratedProperty = init.properties.find(elementProperty =>
-				elementProperty.hasPatternProperty(patternProperty)
-			);
-
-			if (hydratedProperty) {
-				return hydratedProperty;
+		const getProperties = () => {
+			if (!pattern) {
+				return [];
 			}
+			return pattern.getProperties().map(patternProperty => {
+				const hydratedProperty = init.properties.find(elementProperty =>
+					elementProperty.hasPatternProperty(patternProperty)
+				);
 
-			return new ElementProperty(
-				{
-					id: Uuid.v4(),
-					patternPropertyId: patternProperty.getId(),
-					setDefault: Boolean(init.setDefaults),
-					value: undefined
-				},
-				{
-					patternLibrary: this.patternLibrary
+				if (hydratedProperty) {
+					return hydratedProperty;
 				}
-			);
-		});
+
+				return new ElementProperty(
+					{
+						id: uuid.v4(),
+						patternPropertyId: patternProperty.getId(),
+						setDefault: Boolean(init.setDefaults),
+						value: undefined
+					},
+					{
+						patternLibrary: this.patternLibrary
+					}
+				);
+			});
+		};
+
+		this.properties = getProperties();
 	}
 
 	public static from(serialized: Types.SerializedElement, context: ElementContext): Element {
@@ -112,14 +102,9 @@ export class Element {
 			{
 				id: serialized.id,
 				name: serialized.name,
-				pattern: context.patternLibrary.getPatternById(serialized.pattern) as Pattern,
-				contents: serialized.contents.map(content =>
-					ElementContent.from(content, {
-						elementId: serialized.id,
-						patternLibrary: context.patternLibrary,
-						project: context.project
-					})
-				),
+				patternId: serialized.patternId,
+				containerId: serialized.containerId,
+				contentIds: serialized.contentIds,
 				properties: serialized.properties.map(p =>
 					ElementProperty.from(p, { patternLibrary: context.patternLibrary })
 				)
@@ -137,15 +122,18 @@ export class Element {
 	}
 
 	public clone(): Element {
-		const payload = this.toJSON();
-		delete payload.id;
+		const clonedContents = this.contentIds
+			.map(contentId => this.project.getElementContentById(contentId))
+			.filter((content): content is ElementContent => typeof content !== 'undefined')
+			.map(content => content.clone());
 
 		const clone = new Element(
 			{
-				container: undefined,
-				contents: this.contents.map(content => content.clone()),
+				id: uuid.v4(),
+				containerId: undefined,
+				contentIds: clonedContents.map(content => content.getId()),
 				name: this.name,
-				pattern: this.pattern,
+				patternId: this.patternId,
 				properties: this.properties.map(propertyValue => propertyValue.clone())
 			},
 			{
@@ -154,24 +142,36 @@ export class Element {
 			}
 		);
 
+		clonedContents.forEach(clonedContent => {
+			clonedContent.setParentElement(clone);
+			this.project.addElementContent(clonedContent);
+		});
+
+		this.project.addElement(clone);
 		return clone;
 	}
 
 	public getContainer(): ElementContent | undefined {
-		return this.container;
+		if (!this.containerId) {
+			return;
+		}
+		return this.project.getElementContentById(this.containerId);
 	}
 
 	public getContainerType(): undefined | Types.SlotType {
-		if (!this.container) {
+		const container = this.getContainer();
+
+		if (!container) {
 			return;
 		}
-		return this.container.getSlotType();
+
+		return container.getSlotType();
 	}
 
 	public getContentById(contentId: string): ElementContent | undefined {
 		let result;
 
-		for (const content of this.contents) {
+		for (const content of this.getContents()) {
 			if (content.getId() === contentId) {
 				result = content;
 				break;
@@ -193,16 +193,21 @@ export class Element {
 		return result;
 	}
 
-	public getContentBySlot(slot: PatternSlot): ElementContent | undefined {
-		return this.getContentBySlotId(slot.getId());
-	}
-
 	public getContentBySlotId(slotId: string): ElementContent | undefined {
-		return this.contents.find(content => content.getSlotId() === slotId);
+		return this.getContents().find(content => content.getSlotId() === slotId);
 	}
 
 	public getContentBySlotType(slotType: Types.SlotType): ElementContent | undefined {
-		return this.contents.find(content => content.getSlotType() === slotType);
+		return this.getContents().find(content => content.getSlotType() === slotType);
+	}
+
+	public getContents(): ElementContent[] {
+		return this.contentIds
+			.map(contentId => this.project.getElementContentById(contentId))
+			.filter(
+				(elementContent): elementContent is ElementContent =>
+					typeof elementContent !== 'undefined'
+			);
 	}
 
 	public getElementById(id: string): Element | undefined {
@@ -212,7 +217,7 @@ export class Element {
 			return this;
 		}
 
-		for (const content of this.contents) {
+		for (const content of this.getContents()) {
 			for (const element of content.getElements()) {
 				result = element.getElementById(id);
 
@@ -240,7 +245,7 @@ export class Element {
 			return -1;
 		}
 
-		return container.getElementIndex(this);
+		return container.getElementIndexById(this.getId());
 	}
 
 	public getName(opts?: { unedited: boolean }): string {
@@ -264,35 +269,32 @@ export class Element {
 	}
 
 	public getParent(): Element | undefined {
-		if (!this.container) {
+		const container = this.getContainer();
+
+		if (!container) {
 			return;
 		}
 
-		return this.project.getElementById(this.container.getElementId());
+		const containerParentId = container.getParentElementId();
+
+		if (!containerParentId) {
+			return;
+		}
+
+		return this.project.getElementById(containerParentId);
 	}
 
 	public getPattern(): Pattern | undefined {
-		return this.pattern;
+		return this.patternLibrary.getPatternById(this.patternId);
 	}
 
 	public getProperties(): ElementProperty[] {
 		return this.properties;
 	}
 
-	public isAncestorOf(child: Element): boolean {
-		if (child === this) {
-			return true;
-		}
-
-		if (child.isRoot()) {
-			return false;
-		}
-
-		return this.isAncestorOf(child.getParent() as Element);
-	}
-
-	public isDescendentOf(parent?: Element): boolean {
-		return parent ? parent.isAncestorOf(this) : false;
+	public isAncestorOfById(id: string): boolean {
+		const match = this.getElementById(id);
+		return Boolean(match);
 	}
 
 	public isNameEditable(): boolean {
@@ -300,27 +302,31 @@ export class Element {
 	}
 
 	public isRoot(): boolean {
-		return !Boolean(this.container);
+		return !Boolean(this.getContainer());
 	}
 
 	public remove(): void {
-		if (this.container) {
-			this.container.remove({ element: this });
+		const container = this.getContainer();
+
+		if (container) {
+			container.remove({ element: this });
 		}
 	}
 
 	public setContainer(container: ElementContent): void {
-		this.container = container;
+		this.containerId = container.getId();
 	}
 
 	public setIndex(index: number): void {
-		if (!this.container) {
+		const container = this.getContainer();
+
+		if (!container) {
 			return;
 		}
 
 		this.setParent({
 			parent: this.parent,
-			slotId: this.container.getSlotId(),
+			slotId: container.getSlotId(),
 			index
 		});
 	}
@@ -348,26 +354,32 @@ export class Element {
 	}
 
 	public setParent(init: { index: number; parent: Element; slotId: string }): void {
-		if (this.container) {
-			this.container.remove({ element: this });
+		const previousContainer = this.getContainer();
+
+		if (previousContainer) {
+			previousContainer.remove({ element: this });
 		}
 
 		const container = init.parent.getContentBySlotId(init.slotId);
 
 		if (container) {
 			container.insert({ element: this, at: init.index });
+			this.setContainer(container);
 		}
-
-		this.container = container;
 	}
 
 	public toJSON(): Types.SerializedElement {
 		return {
-			contents: this.contents.map(content => content.toJSON()),
+			containerId: this.containerId,
+			contentIds: Array.from(this.contentIds),
 			id: this.id,
 			name: this.name,
-			pattern: this.pattern.getId(),
+			patternId: this.patternId,
 			properties: this.properties.map(elementProperty => elementProperty.toJSON())
 		};
+	}
+
+	public unsetContainer(): void {
+		this.containerId = undefined;
 	}
 }

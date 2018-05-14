@@ -7,6 +7,7 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
 import * as Store from '../../store';
+import styled from 'styled-components';
 import * as Types from '../../model/types';
 
 export interface ElementListState {
@@ -74,11 +75,15 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			slot => slot.getType() === Types.SlotType.Children
 		);
 
+		const defaultSlot = createSlot(defaultSlotData);
+
 		const children = defaultSlotData
-			? (createSlot(defaultSlotData).children as ElementNodeProps[])
+			? Array.from(defaultSlot ? defaultSlot.children || [] : [])
 			: [];
 
-		const slots = slotsData.map(createSlot);
+		const slots = slotsData
+			.map(createSlot)
+			.filter((s): s is ElementNodeProps => typeof s !== 'undefined');
 
 		return {
 			active: store.getSelectedElement() === element,
@@ -91,8 +96,15 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		};
 	}
 
-	public createItemFromSlot(slot: Model.PatternSlot, element: Model.Element): ElementNodeProps {
-		const slotContent = element.getContentBySlot(slot) as Model.ElementContent;
+	public createItemFromSlot(
+		slot: Model.PatternSlot,
+		element: Model.Element
+	): ElementNodeProps | undefined {
+		const slotContent = element.getContentBySlotId(slot.getId());
+
+		if (!slotContent) {
+			return;
+		}
 
 		const slotListItem: ElementNodeProps = {
 			id: slotContent.getId(),
@@ -100,7 +112,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			editable: false,
 			draggable: false,
 			dragging: this.state.dragging,
-			children: slotContent.getElements().map(value => this.createItemFromElement(value)),
+			children: slotContent.getElements().map(e => this.createItemFromElement(e)),
 			active: false
 		};
 
@@ -118,7 +130,14 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
-		const element = elementFromTarget(e.target);
+		const target = e.target as HTMLElement;
+
+		// Skip and deselect elements if the root itself is clicked
+		if (target.getAttribute('data-drag-root')) {
+			return;
+		}
+
+		const element = elementFromTarget(e.target, { sibling: false });
 		const store = Store.ViewStore.getInstance();
 		const label = above(e.target, `[${ElementAnchors.label}]`);
 
@@ -138,7 +157,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
-		const element = elementFromTarget(e.target);
+		const element = elementFromTarget(e.target, { sibling: false });
 		if (element) {
 			elementMenu(element);
 		}
@@ -153,7 +172,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
-		const element = elementFromTarget(e.target);
+		const element = elementFromTarget(e.target, { sibling: false });
 
 		if (!element) {
 			e.preventDefault();
@@ -179,24 +198,24 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
 		this.handleDragEnd(e);
 
-		const store = Store.ViewStore.getInstance();
+		const target = e.target as HTMLElement;
 		const patternId = e.dataTransfer.getData('patternId');
 		const elementId = e.dataTransfer.getData('elementId');
+		const isSiblingDrop = target.getAttribute(ElementAnchors.placeholder) === 'true';
 
+		const store = Store.ViewStore.getInstance();
 		const pattern = store.getPatternById(patternId);
 		const element = store.getElementById(elementId);
 
-		if (!pattern && !element) {
+		if (!element && !pattern) {
 			return;
 		}
 
-		const isSiblingDrop =
-			(e.target as HTMLElement).getAttribute(ElementAnchors.placeholder) === 'true';
+		const rawTargetElement = elementFromTarget(e.target, { sibling: false });
+		const dropTargetElement = elementFromTarget(e.target, { sibling: isSiblingDrop });
+		const dropTargetContent = contentFromTarget(e.target, { sibling: isSiblingDrop });
 
-		const targetElement = elementFromTarget(e.target);
-		const targetContent = contentFromTarget(e.target);
-
-		if (!targetElement && !targetContent) {
+		if (!rawTargetElement || !dropTargetElement || !dropTargetContent) {
 			return;
 		}
 
@@ -211,49 +230,30 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
-		const getDropParent = (el?: Model.Element): Model.Element | undefined => {
-			if (!el && targetContent) {
-				return store.getElementById(targetContent.getElementId()) as Model.Element;
-			}
-
-			if (!el) {
-				return;
-			}
-
-			if (!isSiblingDrop) {
-				return el;
-			}
-
-			if (el.isRoot()) {
-				return el;
-			}
-
-			return el.getParent() as Model.Element;
-		};
-
-		const dropParent = getDropParent(targetElement) as Model.Element;
-		const dropContainer =
-			targetContent || dropParent.getContentBySlotType(Types.SlotType.Children);
-
-		if (!dropContainer) {
+		if (draggedElement.isAncestorOfById(dropTargetElement.getId())) {
 			return;
 		}
 
 		const getDropIndex = () => {
 			if (!isSiblingDrop) {
-				return dropContainer.getElements().length;
+				return dropTargetContent.getElements().length;
 			}
 			return calculateDropIndex({
-				target: targetElement as Model.Element,
+				target: rawTargetElement,
 				dragged: draggedElement
 			});
 		};
 
+		const index = getDropIndex();
+
+		if (index === -1) {
+			return;
+		}
+
 		const command = Model.ElementLocationCommand.addChild({
-			parent: dropParent,
-			child: draggedElement,
-			slotId: dropContainer.getSlotId(),
-			index: getDropIndex()
+			childId: draggedElement.getId(),
+			contentId: dropTargetContent.getId(),
+			index
 		});
 
 		store.execute(command);
@@ -330,8 +330,9 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		const item = this.createItemFromElement(rootElement);
 
 		return (
-			<div
+			<StyledDragRoot
 				data-drag-root
+				{...{ [ElementAnchors.element]: rootElement.getId() }}
 				onBlur={e => this.handleBlur(e)}
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
@@ -341,13 +342,18 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				onKeyDown={e => this.handleKeyDown(e.nativeEvent)}
 				onMouseLeave={e => this.handleMouseLeave(e)}
 				onMouseOver={e => this.handleMouseOver(e)}
-				ref={ref => (this.ref = ref)}
+				innerRef={ref => (this.ref = ref)}
 			>
 				<ElementTree {...item} dragging={this.state.dragging} />
-			</div>
+			</StyledDragRoot>
 		);
 	}
 }
+
+const StyledDragRoot = styled.div`
+	height: 100%;
+	width: 100%;
+`;
 
 export interface ElementNodeProps extends ElementProps {
 	children?: ElementNodeProps[];
@@ -388,7 +394,10 @@ function above(node: EventTarget, selector: string): HTMLElement | null {
 	return ended ? null : el;
 }
 
-function contentFromTarget(target: EventTarget): Model.ElementContent | undefined {
+function contentFromTarget(
+	target: EventTarget,
+	options: { sibling: boolean }
+): Model.ElementContent | undefined {
 	const el = above(target, `[${ElementAnchors.content}]`);
 
 	if (!el) {
@@ -402,10 +411,30 @@ function contentFromTarget(target: EventTarget): Model.ElementContent | undefine
 	}
 
 	const store = Store.ViewStore.getInstance();
-	return store.getContentById(id);
+	const content = store.getContentById(id);
+	const element = store.getElementById(id);
+
+	if (content) {
+		return content;
+	}
+
+	if (!element) {
+		return;
+	}
+
+	const base = options.sibling ? element.getParent() : element;
+
+	if (!base) {
+		return;
+	}
+
+	return base.getContentBySlotType(Types.SlotType.Children);
 }
 
-function elementFromTarget(target: EventTarget): Model.Element | undefined {
+function elementFromTarget(
+	target: EventTarget,
+	options: { sibling: boolean }
+): Model.Element | undefined {
 	const el = above(target, `[${ElementAnchors.element}]`);
 
 	if (!el) {
@@ -419,7 +448,13 @@ function elementFromTarget(target: EventTarget): Model.Element | undefined {
 	}
 
 	const store = Store.ViewStore.getInstance();
-	return store.getElementById(id);
+	const element = store.getElementById(id);
+
+	if (!element) {
+		return;
+	}
+
+	return options.sibling ? element.getParent() : element;
 }
 
 function calculateDropIndex(init: { dragged: Model.Element; target: Model.Element }): number {

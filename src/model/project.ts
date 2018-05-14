@@ -49,11 +49,6 @@ export class Project {
 	 */
 	@Mobx.observable private name: string;
 
-	/**
-	 * The page references of the project. Projects do not contain the page elements directly.
-	 * Instead, they know what pages exist (page references),
-	 * and the store can load them from YAML files when required (open page).
-	 */
 	@Mobx.observable private pages: Page[] = [];
 
 	private path;
@@ -111,9 +106,11 @@ export class Project {
 			patternLibrary
 		});
 
-		serialized.pages.forEach(page => project.addPage(Page.from(page, { project })));
+		serialized.pages.forEach(page =>
+			project.addPage(Page.from(page, { patternLibrary, project }))
+		);
 		serialized.elements.forEach(element =>
-			project.addElement(Element.from(element, { patternLibrary }))
+			project.addElement(Element.from(element, { patternLibrary, project }))
 		);
 
 		return project;

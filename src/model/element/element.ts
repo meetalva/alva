@@ -4,7 +4,7 @@ import * as Mobx from 'mobx';
 import { Page } from '../page';
 import { Pattern, PatternSlot } from '../pattern';
 import { PatternLibrary } from '../pattern-library';
-import { ViewStore } from '../../store'; // TODO: Remove dependency on store
+import { Project } from '../project';
 import * as Types from '../types';
 import * as Uuid from 'uuid';
 
@@ -18,8 +18,9 @@ export interface ElementInit {
 	setDefaults?: boolean;
 }
 
-export interface PageElementContext {
+export interface ElementContext {
 	patternLibrary: PatternLibrary;
+	project: Project;
 }
 
 /**
@@ -30,70 +31,35 @@ export interface PageElementContext {
 export class Element {
 	private container?: ElementContent;
 
-	/**
-	 * The content page elements of this element.
-	 * Key = PatternSlot ID, Value = PatternSlot contents.
-	 */
 	@Mobx.observable private contents: ElementContent[] = [];
 
-	/**
-	 * The currently edited name of the page element, to be commited
-	 */
 	@Mobx.observable private editedName: string;
 
-	/**
-	 * The technical (internal) ID of the page element.
-	 */
 	@Mobx.observable private id: string;
 
-	/**
-	 * The assigned name of the page element, initially the pattern's human-friendly name.
-	 */
 	@Mobx.observable private name: string;
 
-	/**
-	 * Wether the element name is editable
-	 */
-	@Mobx.observable private nameEditable: boolean;
+	@Mobx.observable private nameEditable: boolean = false;
 
-	/**
-	 * The page this element belongs to.
-	 */
 	private page?: Page;
 
-	/**
-	 * The parent page element if this is not the root element.
-	 */
 	private parent: Element;
 
-	/**
-	 * The pattern this page element reflects. Usually set, may only the undefined if the pattern
-	 * has disappeared or got invalid in the mean-time.
-	 */
 	private pattern: Pattern;
 
-	/**
-	 * The pattern property values of this element's component instance.
-	 * Each key represents the property ID of the pattern, while the value holds the content
-	 * as provided by the designer.
-	 */
-	// @MobX.observable private properties: Map<string, Types.PropertyValue> = new Map();
+	private patternLibrary: PatternLibrary;
+
+	private project: Project;
 
 	private properties: ElementProperty[];
 
-	/**
-	 * Creates a new page element.
-	 * @param pattern The pattern to create the element for.
-	 * @param setDefaults Whether to initialize the property values with the defaults defined by
-	 * the pattern implementation.
-	 * @param parent The (optional) parent for this element. When set, the element is
-	 * automatically added to this parent (and thus maybe to the entire page).
-	 */
-	public constructor(init: ElementInit) {
+	public constructor(init: ElementInit, context: ElementContext) {
 		this.id = init.id ? init.id : Uuid.v4();
 		this.pattern = init.pattern;
-		this.nameEditable = false;
 		this.container = init.container;
+
+		this.patternLibrary = context.patternLibrary;
+		this.project = context.project;
 
 		this.pattern.getSlots().forEach(slot => {
 			const hydratedSlot = init.contents.find(content => content.getSlotId() === slot.getId());
@@ -127,33 +93,39 @@ export class Element {
 				return hydratedProperty;
 			}
 
-			return new ElementProperty({
-				id: Uuid.v4(),
-				patternPropertyId: patternProperty.getId(),
-				setDefault: Boolean(init.setDefaults),
-				value: undefined
-			});
+			return new ElementProperty(
+				{
+					id: Uuid.v4(),
+					patternPropertyId: patternProperty.getId(),
+					setDefault: Boolean(init.setDefaults),
+					value: undefined
+				},
+				{
+					patternLibrary: this.patternLibrary
+				}
+			);
 		});
 	}
 
-	/**
-	 * Loads and returns a page element from a given JSON object.
-	 * @param jsonObject The JSON object to load from.
-	 * @return A new page element object containing the loaded data.
-	 */
-	public static from(serialized: Types.SerializedElement, context: PageElementContext): Element {
-		return new Element({
-			id: serialized.id,
-			name: serialized.name,
-			pattern: context.patternLibrary.getPatternById(serialized.pattern) as Pattern,
-			contents: serialized.contents.map(content =>
-				ElementContent.from(content, {
-					patternLibrary: context.patternLibrary,
-					elementId: serialized.id
-				})
-			),
-			properties: serialized.properties.map(p => ElementProperty.from(p))
-		});
+	public static from(serialized: Types.SerializedElement, context: ElementContext): Element {
+		return new Element(
+			{
+				id: serialized.id,
+				name: serialized.name,
+				pattern: context.patternLibrary.getPatternById(serialized.pattern) as Pattern,
+				contents: serialized.contents.map(content =>
+					ElementContent.from(content, {
+						elementId: serialized.id,
+						patternLibrary: context.patternLibrary,
+						project: context.project
+					})
+				),
+				properties: serialized.properties.map(p =>
+					ElementProperty.from(p, { patternLibrary: context.patternLibrary })
+				)
+			},
+			context
+		);
 	}
 
 	public addChild(child: Element, slotId: string, index: number): void {
@@ -168,13 +140,19 @@ export class Element {
 		const payload = this.toJSON();
 		delete payload.id;
 
-		const clone = new Element({
-			container: undefined,
-			contents: this.contents.map(content => content.clone()),
-			name: this.name,
-			pattern: this.pattern,
-			properties: this.properties.map(propertyValue => propertyValue.clone())
-		});
+		const clone = new Element(
+			{
+				container: undefined,
+				contents: this.contents.map(content => content.clone()),
+				name: this.name,
+				pattern: this.pattern,
+				properties: this.properties.map(propertyValue => propertyValue.clone())
+			},
+			{
+				patternLibrary: this.patternLibrary,
+				project: this.project
+			}
+		);
 
 		return clone;
 	}
@@ -251,18 +229,10 @@ export class Element {
 		return result;
 	}
 
-	/**
-	 * Returns the technical (internal) ID of the page.
-	 * @return The technical (internal) ID of the page.
-	 */
 	public getId(): string {
 		return this.id;
 	}
 
-	/**
-	 * Returns the 0-based position of this element within its parent slot.
-	 * @return The 0-based position of this element.
-	 */
 	public getIndex(): number {
 		const container = this.getContainer();
 
@@ -273,10 +243,6 @@ export class Element {
 		return container.getElementIndex(this);
 	}
 
-	/**x
-	 * Returns the assigned name of the page element, initially the pattern's human-friendly name.
-	 * @return The assigned name of the page element.
-	 */
 	public getName(opts?: { unedited: boolean }): string {
 		if ((!opts || !opts.unedited) && this.nameEditable) {
 			return this.editedName;
@@ -285,10 +251,6 @@ export class Element {
 		return this.name;
 	}
 
-	/**
-	 * Returns the page this element belongs to.
-	 * @return The page this element belongs to.
-	 */
 	public getPage(): Page | undefined {
 		if (this.page) {
 			return this.page;
@@ -301,25 +263,14 @@ export class Element {
 		return;
 	}
 
-	/**
-	 * Returns the parent page element if this is not the root element.
-	 * @return The parent page element or undefined.
-	 */
 	public getParent(): Element | undefined {
 		if (!this.container) {
 			return;
 		}
 
-		const store = ViewStore.getInstance();
-		return store.getElementById(this.container.getElementId());
+		return this.project.getElementById(this.container.getElementId());
 	}
 
-	/**
-	 * Returns the pattern this page element reflects.
-	 * Usually set, may only the undefined if the pattern has disappeared
-	 * or got invalid in the mean-time.
-	 * @return The pattern this page element reflects, or undefined.
-	 */
 	public getPattern(): Pattern | undefined {
 		return this.pattern;
 	}
@@ -328,14 +279,6 @@ export class Element {
 		return this.properties;
 	}
 
-	/**
-	 * Returns whether this element is an ancestor of a given child.
-	 * Ancestors of a given element are the element itself,
-	 * the parents of the element, and the parents of ancestors of the element.
-	 * If the given child is empty, this method returns false.
-	 * @param child The child to test.
-	 * @return Whether this element is an ancestor of the given child.
-	 */
 	public isAncestorOf(child: Element): boolean {
 		if (child === this) {
 			return true;
@@ -348,38 +291,18 @@ export class Element {
 		return this.isAncestorOf(child.getParent() as Element);
 	}
 
-	/**
-	 * Returns whether this element is a descendent of a given parent.
-	 * Descendents of a given parent are the element itself,
-	 * the children of the element, and the children of descendants of the element.
-	 * If the given parent is empty, this method returns false.
-	 * @param parent The parent to test.
-	 * @return Whether this element is a descendent of the given parent.
-	 */
 	public isDescendentOf(parent?: Element): boolean {
 		return parent ? parent.isAncestorOf(this) : false;
 	}
 
-	/**
-	 * Returns the editable state of the element's name
-	 * @return The editable state
-	 */
 	public isNameEditable(): boolean {
 		return this.nameEditable;
 	}
 
-	/**
-	 * Returns whether this page element is the page's root element (i.e. it has no parent).
-	 * @return Whether this page element is the root element.
-	 */
 	public isRoot(): boolean {
 		return !Boolean(this.container);
 	}
 
-	/**
-	 * Removes this page element from its parent. You may later re-add it using setParent().
-	 * @see setParent()
-	 */
 	public remove(): void {
 		if (this.container) {
 			this.container.remove({ element: this });
@@ -390,10 +313,6 @@ export class Element {
 		this.container = container;
 	}
 
-	/**
-	 * Moves this page element to a new position within its parent
-	 * @param index The new 0-based position within the parent's children.
-	 */
 	public setIndex(index: number): void {
 		if (!this.container) {
 			return;
@@ -406,10 +325,6 @@ export class Element {
 		});
 	}
 
-	/**
-	 * Sets the assigned name of the page element, initially the pattern's human-friendly name.
-	 * @param name The assigned name of the page element.
-	 */
 	public setName(name: string): void {
 		if (this.nameEditable) {
 			this.editedName = name;
@@ -418,10 +333,6 @@ export class Element {
 		}
 	}
 
-	/**
-	 * Sets the editable state of the element's name
-	 * @param nameEditable Wether the name is editable
-	 */
 	public setNameEditable(nameEditable: boolean): void {
 		if (nameEditable) {
 			this.editedName = this.name;
@@ -450,12 +361,6 @@ export class Element {
 		this.container = container;
 	}
 
-	/**
-	 * Serializes the page element into a JSON object for persistence.
-	 * @param forRendering Whether all property values should be converted using
-	 * Property.convertToRender (for the preview app instead of file persistence).
-	 * @return The JSON object to be persisted.
-	 */
 	public toJSON(): Types.SerializedElement {
 		return {
 			contents: this.contents.map(content => content.toJSON()),

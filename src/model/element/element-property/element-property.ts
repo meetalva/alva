@@ -1,8 +1,8 @@
 import * as Mobx from 'mobx';
 import { PatternProperty, PatternPropertyType } from '../../pattern-property';
+import { ViewStore } from '../../../store'; // TODO: Remove dependency on store
 import * as Types from '../../types';
 import * as uuid from 'uuid';
-import { ViewStore } from '../../view-store';
 
 export interface ElementPropertyInit {
 	id: string;

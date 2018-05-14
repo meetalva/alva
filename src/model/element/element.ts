@@ -4,9 +4,9 @@ import * as Mobx from 'mobx';
 import { Page } from '../page';
 import { Pattern, PatternSlot } from '../pattern';
 import { PatternLibrary } from '../pattern-library';
+import { ViewStore } from '../../store'; // TODO: Remove dependency on store
 import * as Types from '../types';
 import * as Uuid from 'uuid';
-import { ViewStore } from '../view-store';
 
 export interface ElementInit {
 	container?: ElementContent;

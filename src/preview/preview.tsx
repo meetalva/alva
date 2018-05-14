@@ -4,7 +4,7 @@ import { PreviewMessageType } from '../message';
 import * as MobX from 'mobx';
 import { PreviewDocumentMode } from './preview-document';
 import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
-import * as Types from '../store/types';
+import * as Types from '../model/types';
 
 // TODO: Produces a deprecation warning, find a way
 // to dedupe MobX when upgrading to 4.x

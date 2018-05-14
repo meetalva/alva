@@ -1,8 +1,10 @@
+import { Element } from './element';
 import * as Mobx from 'mobx';
+import { Page } from './page';
+import { PatternLibrary } from './pattern-library';
 import * as Types from './types';
 import * as username from 'username';
 import * as Uuid from 'uuid';
-import { Element, Page, PatternLibrary } from '.';
 
 export interface ProjectProperties {
 	id?: string;
@@ -19,14 +21,6 @@ export interface ProjectCreateInit {
 	path: string;
 }
 
-/**
- * A project is the grouping unit for pages, and directly located below the styleguide designs
- * (styleguide Alva folder > projects > pages). Each page belongs to exactly one project,
- * and each project belongs to exactly one styleguide.
- * Projects do not contain the page elements directly.
- * Instead, they know what pages exist (page references),
- * and the store can load them from YAML files when required (open page).
- */
 export class Project {
 	@Mobx.observable private elements: Element[] = [];
 

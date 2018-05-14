@@ -1,5 +1,5 @@
-import { PatternLibrary } from '../store';
-import * as Types from '../store/types';
+import { PatternLibrary } from '../model';
+import * as Types from '../model/types';
 
 export enum PreviewMessageType {
 	ContentRequest = 'content-request',

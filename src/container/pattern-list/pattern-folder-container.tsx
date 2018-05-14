@@ -1,6 +1,6 @@
 import { PatternFolderView } from '../../components';
+import { Pattern, PatternFolder } from '../../model';
 import * as React from 'react';
-import { Pattern, PatternFolder } from '../../store';
 
 export interface PatternFolderContainerProps {
 	folder: PatternFolder;

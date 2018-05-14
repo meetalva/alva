@@ -1,10 +1,10 @@
-import { Element } from './element';
+import { Element, ElementContent } from './element';
 import * as Mobx from 'mobx';
 import { Page } from './page';
 import { PatternLibrary } from './pattern-library';
 import * as Types from './types';
 import * as username from 'username';
-import * as Uuid from 'uuid';
+import * as uuid from 'uuid';
 
 export interface ProjectProperties {
 	id?: string;
@@ -22,40 +22,22 @@ export interface ProjectCreateInit {
 }
 
 export class Project {
+	@Mobx.observable private elementContents: ElementContent[] = [];
+
 	@Mobx.observable private elements: Element[] = [];
 
-	/**
-	 * The technical (internal) ID of the project.
-	 */
 	@Mobx.observable private id: string;
 
-	/**
-	 * The last author who edited this project or one of its pages (including elements,
-	 * properties etc.). Updated when calling the touch method.
-	 * @see touch()
-	 */
 	@Mobx.observable private lastChangedAuthor: string;
 
-	/**
-	 * The last change date when this project or one of its pages was edited (including elements,
-	 * properties etc.). Updated when calling the touch method.
-	 * @see touch()
-	 */
 	@Mobx.observable private lastChangedDate: Date = new Date();
 
-	/**
-	 * The human-friendly name of the project.
-	 * In the frontend, to be displayed instead of the ID.
-	 */
 	@Mobx.observable private name: string;
 
 	@Mobx.observable private pages: Page[] = [];
 
 	private path;
 
-	/**
-	 * The underlying styleguide for this project
-	 */
 	@Mobx.observable private patternLibrary: PatternLibrary;
 
 	/**
@@ -67,7 +49,7 @@ export class Project {
 		this.patternLibrary = properties.patternLibrary;
 		this.name = properties.name;
 
-		this.id = properties.id ? properties.id : Uuid.v4();
+		this.id = properties.id ? properties.id : uuid.v4();
 		this.lastChangedAuthor = properties.lastChangedAuthor || 'unknown';
 		this.lastChangedDate = properties.lastChangedDate || new Date();
 
@@ -76,12 +58,25 @@ export class Project {
 	}
 
 	public static create(init: ProjectCreateInit): Project {
+		const patternLibrary = PatternLibrary.create();
+
 		const project = new Project({
 			name: init.name,
 			pages: [],
 			path: init.path,
-			patternLibrary: PatternLibrary.create()
+			patternLibrary
 		});
+
+		project.addPage(
+			Page.create(
+				{
+					id: uuid.v4(),
+					name: 'Untitled Page',
+					patternLibrary
+				},
+				{ project, patternLibrary }
+			)
+		);
 
 		return project;
 	}
@@ -109,8 +104,13 @@ export class Project {
 		serialized.pages.forEach(page =>
 			project.addPage(Page.from(page, { patternLibrary, project }))
 		);
+
 		serialized.elements.forEach(element =>
 			project.addElement(Element.from(element, { patternLibrary, project }))
+		);
+
+		serialized.elementContents.forEach(elementContent =>
+			project.addElementContent(ElementContent.from(elementContent, { patternLibrary, project }))
 		);
 
 		return project;
@@ -120,12 +120,24 @@ export class Project {
 		this.elements.push(element);
 	}
 
+	public addElementContent(elementContent: ElementContent): void {
+		this.elementContents.push(elementContent);
+	}
+
 	public addPage(page: Page): void {
 		this.pages.push(page);
 	}
 
 	public getElementById(id: string): undefined | Element {
 		return this.elements.find(e => e.getId() === id);
+	}
+
+	public getElementContentById(id: string): undefined | ElementContent {
+		return this.elementContents.find(e => e.getId() === id);
+	}
+
+	public getElementContents(): ElementContent[] {
+		return this.elementContents;
 	}
 
 	public getElements(): Element[] {
@@ -200,6 +212,7 @@ export class Project {
 
 	public toDisk(): Types.SavedProject {
 		return {
+			elementContents: this.elementContents.map(e => e.toJSON()),
 			elements: this.elements.map(e => e.toJSON()),
 			id: this.id,
 			name: this.name,
@@ -217,6 +230,7 @@ export class Project {
 	public toJSON(): Types.SerializedProject {
 		return {
 			elements: this.elements.map(e => e.toJSON()),
+			elementContents: this.elementContents.map(e => e.toJSON()),
 			id: this.id,
 			name: this.name,
 			lastChangedAuthor: this.lastChangedAuthor,

@@ -4,6 +4,7 @@ import { SyntheticPatternType } from '../pattern';
 import { PatternLibrary } from '../pattern-library';
 import { Project } from '../project';
 import * as Types from '../types';
+import * as uuid from 'uuid';
 
 export interface PageInit {
 	id: string;
@@ -22,10 +23,6 @@ export interface PageContext {
 	project: Project;
 }
 
-/**
- * The current actually loaded page of a project. It consists of a tree of page elements,
- * which in turn provide the properties data for the pattern components.
- */
 export class Page {
 	/**
 	 * Intermediary edited name
@@ -74,11 +71,30 @@ export class Page {
 	 * Create a new empty page
 	 */
 	public static create(init: PageCreateInit, context: PageContext): Page {
+		const rootPattern = context.patternLibrary.getPatternByType(
+			SyntheticPatternType.SyntheticPage
+		);
+
+		const rootContents = rootPattern.getSlots().map(
+			slot =>
+				new ElementContent(
+					{
+						elementIds: [],
+						id: uuid.v4(),
+						name: slot.getName(),
+						slotId: slot.getId()
+					},
+					context
+				)
+		);
+
+		rootContents.forEach(rootContent => context.project.addElementContent(rootContent));
+
 		const rootElement = new Element(
 			{
 				name: init.name,
-				pattern: init.patternLibrary.getPatternByType(SyntheticPatternType.SyntheticPage),
-				contents: [],
+				contentIds: rootContents.map(c => c.getId()),
+				patternId: rootPattern.getId(),
 				properties: [],
 				setDefaults: true
 			},
@@ -88,6 +104,7 @@ export class Page {
 			}
 		);
 
+		rootContents.forEach(rootContent => rootContent.setParentElement(rootElement));
 		context.project.addElement(rootElement);
 
 		return new Page(
@@ -107,7 +124,7 @@ export class Page {
 	 * @return A new page object containing the loaded data.
 	 */
 	public static from(serializedPage: Types.SerializedPage, context: PageContext): Page {
-		return new Page(
+		const page = new Page(
 			{
 				id: serializedPage.id,
 				name: serializedPage.name,
@@ -115,6 +132,8 @@ export class Page {
 			},
 			context
 		);
+
+		return page;
 	}
 
 	public clone(): Page {

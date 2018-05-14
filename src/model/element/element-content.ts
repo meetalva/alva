@@ -1,90 +1,121 @@
 import { Element } from './element';
 import * as Mobx from 'mobx';
+import { PatternSlot } from '../pattern';
 import { PatternLibrary } from '../pattern-library';
 import { Project } from '../project';
 import * as Types from '../types';
+import * as uuid from 'uuid';
 
 export interface ElementContentContext {
-	elementId: string;
 	patternLibrary: PatternLibrary;
 	project: Project;
 }
 
 export interface ElementContentInit {
-	elementId: string;
-	elements: Element[];
+	elementIds: string[];
 	id: string;
 	name: string;
+	parentElementId?: string;
 	slotId: string;
-	slotType: Types.SlotType;
 }
 
 export class ElementContent {
-	@Mobx.observable private elementId: string;
-	@Mobx.observable private elements: Element[] = [];
+	@Mobx.observable private elementIds: string[] = [];
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
-	@Mobx.observable private slotId: string;
-	@Mobx.observable private slotType: Types.SlotType;
+	@Mobx.observable private parentElementId?: string;
+	private patternLibrary: PatternLibrary;
+	private project: Project;
 
-	public constructor(init: ElementContentInit) {
+	@Mobx.observable private slotId: string;
+
+	public constructor(init: ElementContentInit, context: ElementContentContext) {
 		this.id = init.id;
-		this.elementId = init.elementId;
 		this.name = init.name;
-		this.elements = init.elements;
-		this.elements.forEach((element, index) => this.insert({ element, at: index }));
+		this.elementIds = init.elementIds;
 		this.slotId = init.slotId;
-		this.slotType = init.slotType;
+
+		this.patternLibrary = context.patternLibrary;
+		this.project = context.project;
+
+		if (init.parentElementId) {
+			this.parentElementId = init.parentElementId;
+		}
 	}
 
 	public static from(
-		serialized: Types.SerializedPageElementContent,
+		serialized: Types.SerializedElementContent,
 		context: ElementContentContext
 	): ElementContent {
-		return new ElementContent({
-			elementId: context.elementId,
-			id: serialized.id,
-			name: serialized.name,
-			elements: serialized.elements.map(element =>
-				Element.from(element, {
-					patternLibrary: context.patternLibrary,
-					project: context.project
-				})
-			),
-			slotId: serialized.slotId,
-			slotType: toSlotType(serialized.slotType)
-		});
+		return new ElementContent(
+			{
+				elementIds: serialized.elementIds,
+				id: serialized.id,
+				name: serialized.name,
+				parentElementId: serialized.parentElementId,
+				slotId: serialized.slotId
+			},
+			context
+		);
 	}
 
 	public clone(): ElementContent {
-		const clone = new ElementContent({
-			elementId: this.elementId,
-			elements: this.elements.map(element => element.clone()),
-			id: this.id,
-			name: this.name,
-			slotId: this.slotId,
-			slotType: this.slotType
-		});
+		const clonedElements = this.elementIds
+			.map(elementId => this.project.getElementById(elementId))
+			.filter((e): e is Element => typeof e !== 'undefined')
+			.map(e => e.clone());
 
-		clone.getElements().forEach(element => element.setContainer(clone));
+		const clone = new ElementContent(
+			{
+				elementIds: clonedElements.map(e => e.getId()),
+				id: uuid.v4(),
+				name: this.name,
+				slotId: this.slotId
+			},
+			{
+				patternLibrary: this.patternLibrary,
+				project: this.project
+			}
+		);
+
+		clonedElements.forEach(clonedElement => {
+			this.project.addElement(clonedElement);
+			clonedElement.setContainer(clone);
+		});
 
 		return clone;
 	}
 
-	public getElementId(): string {
-		return this.elementId;
-	}
-
-	public getElementIndex(element: Element): number {
-		return this.elements.indexOf(element);
+	public getElementIndexById(id: string): number {
+		return this.elementIds.indexOf(id);
 	}
 
 	public getElements(): Element[] {
-		return this.elements;
+		return this.elementIds
+			.map(id => this.project.getElementById(id))
+			.filter((element): element is Element => typeof element !== 'undefined');
 	}
 
 	public getId(): string {
 		return this.id;
+	}
+
+	public getParentElement(): Element | undefined {
+		if (!this.parentElementId) {
+			return;
+		}
+
+		return this.project.getElementById(this.parentElementId);
+	}
+
+	public getParentElementId(): string | undefined {
+		return this.parentElementId;
+	}
+
+	public getSlot(): PatternSlot {
+		return this.patternLibrary
+			.getSlots()
+			.find(slot => slot.getId() === this.slotId) as PatternSlot;
 	}
 
 	public getSlotId(): string {
@@ -92,50 +123,46 @@ export class ElementContent {
 	}
 
 	public getSlotType(): Types.SlotType {
-		return this.slotType;
+		return this.getSlot().getType();
 	}
 
 	@Mobx.action
 	public insert(options: { at: number; element: Element }): void {
-		const id = options.element.getId();
-
 		options.element.setContainer(this);
 
-		if (this.elements.find(e => e.getId() === id)) {
+		const id = options.element.getId();
+
+		if (this.elementIds.find(eid => eid === id)) {
 			return;
 		}
 
-		this.elements.splice(options.at, 0, options.element);
+		this.elementIds.splice(options.at, 0, id);
 	}
 
 	@Mobx.action
 	public remove(options: { element: Element }): void {
-		const index = this.elements.indexOf(options.element);
+		const index = this.elementIds.indexOf(options.element.getId());
 
 		if (index === -1) {
 			return;
 		}
 
-		this.elements.splice(index, 1);
+		options.element.unsetContainer();
+		this.elementIds.splice(index, 1);
 	}
 
-	public toJSON(): Types.SerializedPageElementContent {
+	@Mobx.action
+	public setParentElement(element: Element): void {
+		this.parentElementId = element.getId();
+	}
+
+	public toJSON(): Types.SerializedElementContent {
 		return {
+			elementIds: Array.from(this.elementIds),
 			id: this.id,
 			name: this.name,
-			elements: this.elements.map(element => element.toJSON()),
-			slotId: this.slotId,
-			slotType: this.slotType
+			parentElementId: this.parentElementId,
+			slotId: this.slotId
 		};
-	}
-}
-
-function toSlotType(type: string): Types.SlotType {
-	switch (type) {
-		case 'property':
-			return Types.SlotType.Property;
-		case 'children':
-		default:
-			return Types.SlotType.Children;
 	}
 }

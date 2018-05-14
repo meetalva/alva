@@ -16,7 +16,7 @@ function getPageFileName(): string {
 }
 
 function getProjectFileName(): string {
-	return (ViewStore.getInstance().getCurrentProject() as Project).getName();
+	return (ViewStore.getInstance().getProject() as Project).getName();
 }
 
 interface PathQuery {
@@ -42,7 +42,7 @@ function queryPath(options: PathQuery): Promise<string> {
 
 export function createMenu(): void {
 	const store = ViewStore.getInstance();
-	const isSplashscreen: boolean = !Boolean(store.getCurrentProject());
+	const isSplashscreen: boolean = !Boolean(store.getProject());
 	const template: MenuItemConstructorOptions[] = [
 		{
 			label: '&File',
@@ -93,7 +93,7 @@ export function createMenu(): void {
 					accelerator: 'CmdOrCtrl+S',
 					role: 'save',
 					click: () => {
-						const project = store.getCurrentProject();
+						const project = store.getProject();
 
 						if (!project) {
 							return;

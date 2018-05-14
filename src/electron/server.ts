@@ -16,6 +16,7 @@ interface State {
 	id: string;
 	path?: string;
 	payload: {
+		elementContents?: Types.SerializedElementContent[];
 		elementId?: string;
 		elements?: Types.SerializedElement[];
 		pageId?: string;
@@ -166,6 +167,7 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 				break;
 			}
 			case ServerMessageType.PageChange: {
+				state.payload.elementContents = message.payload.elementContents;
 				state.payload.elements = message.payload.elements;
 				state.payload.pageId = message.payload.pageId;
 				state.payload.pages = message.payload.pages;

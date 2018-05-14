@@ -18,6 +18,7 @@ export interface PageCreateInit {
 }
 
 export interface PageContext {
+	patternLibrary: PatternLibrary;
 	project: Project;
 }
 
@@ -47,6 +48,8 @@ export class Page {
 	 */
 	@Mobx.observable public nameState: Types.EditState = Types.EditState.Editable;
 
+	private patternLibrary: PatternLibrary;
+
 	private project: Project;
 
 	/**
@@ -71,13 +74,19 @@ export class Page {
 	 * Create a new empty page
 	 */
 	public static create(init: PageCreateInit, context: PageContext): Page {
-		const rootElement = new Element({
-			name: init.name,
-			pattern: init.patternLibrary.getPatternByType(SyntheticPatternType.SyntheticPage),
-			contents: [],
-			properties: [],
-			setDefaults: true
-		});
+		const rootElement = new Element(
+			{
+				name: init.name,
+				pattern: init.patternLibrary.getPatternByType(SyntheticPatternType.SyntheticPage),
+				contents: [],
+				properties: [],
+				setDefaults: true
+			},
+			{
+				patternLibrary: context.patternLibrary,
+				project: context.project
+			}
+		);
 
 		context.project.addElement(rootElement);
 
@@ -109,7 +118,10 @@ export class Page {
 	}
 
 	public clone(): Page {
-		return Page.from(this.toJSON(), { project: this.project });
+		return Page.from(this.toJSON(), {
+			project: this.project,
+			patternLibrary: this.patternLibrary
+		});
 	}
 
 	public getContentById(id: string): ElementContent | undefined {

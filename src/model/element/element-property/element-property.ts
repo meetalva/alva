@@ -1,6 +1,6 @@
 import * as Mobx from 'mobx';
+import { PatternLibrary } from '../../pattern-library';
 import { PatternProperty, PatternPropertyType } from '../../pattern-property';
-import { ViewStore } from '../../../store'; // TODO: Remove dependency on store
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
@@ -11,45 +11,60 @@ export interface ElementPropertyInit {
 	value: Types.ElementPropertyValue;
 }
 
+export interface ElementPropertyContext {
+	patternLibrary: PatternLibrary;
+}
+
 export class ElementProperty {
 	private id: string;
+	private patternLibrary: PatternLibrary;
 	private patternPropertyId: string;
 	private setDefault: boolean;
+
 	@Mobx.observable private value: Types.ElementPropertyValue;
 
-	public constructor(init: ElementPropertyInit) {
+	public constructor(init: ElementPropertyInit, context: ElementPropertyContext) {
 		this.id = init.id;
 		this.patternPropertyId = init.patternPropertyId;
 		this.setDefault = init.setDefault;
 		this.value = init.value;
 
-		const store = ViewStore.getInstance();
-		const patternLibrary = store.getPatternLibrary();
-		const patternProperty = patternLibrary
-			? patternLibrary.getPatternPropertyById(this.patternPropertyId)
-			: undefined;
+		this.patternLibrary = context.patternLibrary;
+
+		const patternProperty = this.patternLibrary.getPatternPropertyById(this.patternPropertyId);
 
 		if (typeof this.value === 'undefined' && this.setDefault && patternProperty) {
 			this.value = patternProperty.getDefaultValue();
 		}
 	}
 
-	public static from(serialized: Types.SerializedElementProperty): ElementProperty {
-		return new ElementProperty({
-			id: serialized.id,
-			patternPropertyId: serialized.patternPropertyId,
-			setDefault: serialized.setDefault,
-			value: serialized.value
-		});
+	public static from(
+		serialized: Types.SerializedElementProperty,
+		context: ElementPropertyContext
+	): ElementProperty {
+		return new ElementProperty(
+			{
+				id: serialized.id,
+				patternPropertyId: serialized.patternPropertyId,
+				setDefault: serialized.setDefault,
+				value: serialized.value
+			},
+			context
+		);
 	}
 
 	public clone(): ElementProperty {
-		return new ElementProperty({
-			id: uuid.v4(),
-			patternPropertyId: this.patternPropertyId,
-			setDefault: this.setDefault,
-			value: this.value
-		});
+		return new ElementProperty(
+			{
+				id: uuid.v4(),
+				patternPropertyId: this.patternPropertyId,
+				setDefault: this.setDefault,
+				value: this.value
+			},
+			{
+				patternLibrary: this.patternLibrary
+			}
+		);
 	}
 
 	public getId(): string {
@@ -67,14 +82,7 @@ export class ElementProperty {
 	}
 
 	public getPatternProperty(): PatternProperty | undefined {
-		const store = ViewStore.getInstance();
-		const patternLibrary = store.getPatternLibrary();
-
-		if (!patternLibrary) {
-			return undefined;
-		}
-
-		return patternLibrary.getPatternPropertyById(this.patternPropertyId);
+		return this.patternLibrary.getPatternPropertyById(this.patternPropertyId);
 	}
 
 	public getType(): PatternPropertyType | undefined {

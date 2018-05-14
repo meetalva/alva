@@ -203,12 +203,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		// prettier-ignore
 		const draggedElement = pattern
 			? // drag from pattern list, create new element
-			new Model.Element({
-				contents: [],
-				pattern,
-				properties: [],
-				setDefaults: true
-			})
+			store.addNewElement({pattern})
 			: // drag from element list, obtain reference
 			store.getElementById(elementId);
 
@@ -244,16 +239,21 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			return;
 		}
 
+		const getDropIndex = () => {
+			if (!isSiblingDrop) {
+				return dropContainer.getElements().length;
+			}
+			return calculateDropIndex({
+				target: targetElement as Model.Element,
+				dragged: draggedElement
+			});
+		};
+
 		const command = Model.ElementLocationCommand.addChild({
 			parent: dropParent,
 			child: draggedElement,
 			slotId: dropContainer.getSlotId(),
-			index: isSiblingDrop
-				? calculateDropIndex({
-						target: targetElement as Model.Element,
-						dragged: draggedElement
-				  })
-				: dropContainer.getElements().length
+			index: getDropIndex()
 		});
 
 		store.execute(command);

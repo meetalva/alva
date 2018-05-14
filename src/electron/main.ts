@@ -144,7 +144,7 @@ async function createWindow(): Promise<void> {
 								name: 'Untitled Page',
 								patternLibrary: project.getPatternLibrary()
 							},
-							{ project }
+							{ project, patternLibrary: project.getPatternLibrary() }
 						)
 					);
 

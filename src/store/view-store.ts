@@ -137,6 +137,24 @@ export class ViewStore {
 		return ViewStore.INSTANCE;
 	}
 
+	public addNewElement(init: { pattern: Model.Pattern }): Model.Element | undefined {
+		const project = this.getCurrentProject();
+		const patternLibrary = project.getPatternLibrary();
+
+		return new Model.Element(
+			{
+				contents: [],
+				pattern: init.pattern,
+				properties: [],
+				setDefaults: true
+			},
+			{
+				patternLibrary,
+				project
+			}
+		);
+	}
+
 	public addNewPage(): Model.Page | undefined {
 		const project = this.currentProject;
 
@@ -144,6 +162,7 @@ export class ViewStore {
 			return;
 		}
 
+		const patternLibrary = project.getPatternLibrary();
 		const name = 'Untitled Page';
 
 		const count = project.getPages().filter(p => p.getName().startsWith(name)).length;
@@ -154,7 +173,7 @@ export class ViewStore {
 				name: `${name} ${count + 1}`,
 				patternLibrary: project.getPatternLibrary()
 			},
-			{ project }
+			{ project, patternLibrary }
 		);
 
 		this.execute(Model.PageAddCommand.create({ page, project }));

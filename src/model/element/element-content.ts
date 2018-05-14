@@ -1,11 +1,13 @@
 import { Element } from './element';
 import * as Mobx from 'mobx';
 import { PatternLibrary } from '../pattern-library';
+import { Project } from '../project';
 import * as Types from '../types';
 
 export interface ElementContentContext {
 	elementId: string;
 	patternLibrary: PatternLibrary;
+	project: Project;
 }
 
 export interface ElementContentInit {
@@ -44,7 +46,10 @@ export class ElementContent {
 			id: serialized.id,
 			name: serialized.name,
 			elements: serialized.elements.map(element =>
-				Element.from(element, { patternLibrary: context.patternLibrary })
+				Element.from(element, {
+					patternLibrary: context.patternLibrary,
+					project: context.project
+				})
 			),
 			slotId: serialized.slotId,
 			slotType: toSlotType(serialized.slotType)

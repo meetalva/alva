@@ -3,10 +3,11 @@ import * as Sender from '../message/client';
 import { webFrame } from 'electron';
 import { ServerMessageType } from '../message';
 import * as MobX from 'mobx';
+import { Project } from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Project, ViewStore } from '../store';
-import * as Types from '../store/types';
+import { ViewStore } from '../store';
+import * as Types from '../model/types';
 import * as uuid from 'uuid';
 
 // prevent app zooming

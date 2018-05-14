@@ -1,20 +1,7 @@
-import {
-	Command,
-	ElementLocationCommand,
-	ElementRemoveCommand,
-	PageAddCommand,
-	PageRemoveCommand
-} from './command';
-
-import { Element, ElementContent } from './element';
 import * as Mobx from 'mobx';
-import * as Os from 'os';
-import { Page } from './page';
-import * as Path from 'path';
-import { Pattern } from './pattern';
-import { PatternLibrary } from './pattern-library';
-import { Project } from './project';
-import * as Types from './types';
+import * as Model from '../model';
+import * as Types from '../model/types';
+
 import * as uuid from 'uuid';
 
 export enum ClipBoardType {
@@ -25,12 +12,12 @@ export enum ClipBoardType {
 export type ClipBoardItem = ClipboardPage | ClipboardElement;
 
 export interface ClipboardPage {
-	item: Page;
+	item: Model.Page;
 	type: ClipBoardType.Page;
 }
 
 export interface ClipboardElement {
-	item: Element;
+	item: Model.Element;
 	type: ClipBoardType.Element;
 }
 
@@ -75,16 +62,16 @@ export class ViewStore {
 	 * undefined if none is selected is none. Opening a page automatically changes the selected
 	 * project.
 	 */
-	@Mobx.observable private currentProject?: Project;
+	@Mobx.observable private currentProject?: Model.Project;
 
-	@Mobx.observable private highlightedElement?: Element;
+	@Mobx.observable private highlightedElement?: Model.Element;
 
-	@Mobx.observable private highlightedPlaceholderElement?: Element;
+	@Mobx.observable private highlightedPlaceholderElement?: Model.Element;
 
 	/**
 	 * The currently name-editable element in the element list.
 	 */
-	@Mobx.observable private nameEditableElement?: Element;
+	@Mobx.observable private nameEditableElement?: Model.Element;
 
 	/**
 	 * The current search term in the patterns list, or an empty string if there is none.
@@ -95,14 +82,14 @@ export class ViewStore {
 	 * All projects (references) of this styleguide. Projects point to page references,
 	 * and both do not contain the actual page data (element), but only their IDs.
 	 */
-	@Mobx.observable private projects: Project[] = [];
+	@Mobx.observable private projects: Model.Project[] = [];
 
 	/**
 	 * The most recent undone user commands (user operations) to provide a redo feature.
 	 * Note that operations that close or open a page clear this buffer.
 	 * The last command in the list is the most recent undone.
 	 */
-	@Mobx.observable private redoBuffer: Command[] = [];
+	@Mobx.observable private redoBuffer: Model.Command[] = [];
 
 	/**
 	 * The well-known enum name of content that should be visible in
@@ -117,7 +104,7 @@ export class ViewStore {
 	 * May be empty if no element is selected.
 	 * @see isElementFocussed
 	 */
-	@Mobx.observable private selectedElement?: Element;
+	@Mobx.observable private selectedElement?: Model.Element;
 
 	/**
 	 * http port the preview server is listening on
@@ -129,7 +116,7 @@ export class ViewStore {
 	 * Note that operations that close or open a page clear this buffer.
 	 * The last command in the list is the most recent executed one.
 	 */
-	@Mobx.observable private undoBuffer: Command[] = [];
+	@Mobx.observable private undoBuffer: Model.Command[] = [];
 
 	/**
 	 * Creates a new store.
@@ -150,7 +137,7 @@ export class ViewStore {
 		return ViewStore.INSTANCE;
 	}
 
-	public addNewPage(): Page | undefined {
+	public addNewPage(): Model.Page | undefined {
 		const project = this.currentProject;
 
 		if (!project) {
@@ -161,7 +148,7 @@ export class ViewStore {
 
 		const count = project.getPages().filter(p => p.getName().startsWith(name)).length;
 
-		const page = Page.create(
+		const page = Model.Page.create(
 			{
 				id: uuid.v4(),
 				name: `${name} ${count + 1}`,
@@ -170,7 +157,7 @@ export class ViewStore {
 			{ project }
 		);
 
-		this.execute(PageAddCommand.create({ page, project }));
+		this.execute(Model.PageAddCommand.create({ page, project }));
 		return page;
 	}
 
@@ -179,7 +166,7 @@ export class ViewStore {
 	 * Note: Changes to the projects and page references are saved only when calling save().
 	 * @param project The new project.
 	 */
-	public addProject(project: Project): void {
+	public addProject(project: Model.Project): void {
 		this.projects.push(project);
 	}
 
@@ -192,7 +179,7 @@ export class ViewStore {
 		this.redoBuffer = [];
 	}
 
-	public copyElementById(id: string): Element | undefined {
+	public copyElementById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
 		if (!element) {
@@ -206,7 +193,7 @@ export class ViewStore {
 	/**
 	 * Copy the currently selected element to clip
 	 */
-	public copySelectedElement(): Element | undefined {
+	public copySelectedElement(): Model.Element | undefined {
 		if (!this.selectedElement) {
 			return;
 		}
@@ -220,13 +207,13 @@ export class ViewStore {
 	 * Remove the given element from its page and add it to clipboard
 	 * @param element
 	 */
-	public cutElement(element: Element): void {
+	public cutElement(element: Model.Element): void {
 		if (element.isRoot()) {
 			return;
 		}
 
 		this.setClipboardItem(element);
-		this.execute(new ElementRemoveCommand({ element }));
+		this.execute(new Model.ElementRemoveCommand({ element }));
 	}
 
 	public cutElementById(id: string): void {
@@ -241,7 +228,7 @@ export class ViewStore {
 	/**
 	 * Remove the currently selected element and add it to clipboard
 	 */
-	public cutSelectedElement(): Element | undefined {
+	public cutSelectedElement(): Model.Element | undefined {
 		if (!this.selectedElement) {
 			return;
 		}
@@ -251,10 +238,10 @@ export class ViewStore {
 		return element;
 	}
 
-	public duplicateElement(element: Element): Element {
+	public duplicateElement(element: Model.Element): Model.Element {
 		const duplicatedElement = element.clone();
 		this.execute(
-			ElementLocationCommand.addSibling({
+			Model.ElementLocationCommand.addSibling({
 				newSibling: duplicatedElement,
 				sibling: element
 			})
@@ -263,7 +250,7 @@ export class ViewStore {
 		return duplicatedElement;
 	}
 
-	public duplicateElementById(id: string): Element | undefined {
+	public duplicateElementById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
 		if (!element) {
@@ -273,7 +260,7 @@ export class ViewStore {
 		return this.duplicateElement(element);
 	}
 
-	public duplicateSelectedElement(): Element | undefined {
+	public duplicateSelectedElement(): Model.Element | undefined {
 		if (!this.selectedElement) {
 			return;
 		}
@@ -284,7 +271,7 @@ export class ViewStore {
 	 * Executes a user command (user operation) and registers it as undoable command.
 	 * @param command The command to execute and register.
 	 */
-	public execute(command: Command): void {
+	public execute(command: Model.Command): void {
 		const successful: boolean = command.execute();
 		if (!successful) {
 			// The state and the undo/redo buffers are out of sync.
@@ -338,9 +325,9 @@ export class ViewStore {
 	 * @return The element currently in the clipboard, or undefined if there is none.
 	 */
 
-	public getClipboardItem(type: ClipBoardType.Element): Element | undefined;
-	public getClipboardItem(type: ClipBoardType.Page): Page | undefined;
-	public getClipboardItem(type: ClipBoardType): Page | Element | undefined {
+	public getClipboardItem(type: ClipBoardType.Element): Model.Element | undefined;
+	public getClipboardItem(type: ClipBoardType.Page): Model.Page | undefined;
+	public getClipboardItem(type: ClipBoardType): Model.Page | Model.Element | undefined {
 		const item = this.clipboardItem;
 
 		if (!item || item.type !== type) {
@@ -350,7 +337,7 @@ export class ViewStore {
 		return item.item.clone();
 	}
 
-	public getContentById(id: string): ElementContent | undefined {
+	public getContentById(id: string): Model.ElementContent | undefined {
 		const project = this.getCurrentProject();
 
 		let result;
@@ -368,7 +355,7 @@ export class ViewStore {
 	 * and edited in the elements and properties panes. May be undefined if there is none.
 	 * @return The page content that is currently being displayed in the preview, or undefined.
 	 */
-	public getCurrentPage(): Page | undefined {
+	public getCurrentPage(): Model.Page | undefined {
 		const project = this.getCurrentProject();
 
 		if (!project) {
@@ -388,11 +375,11 @@ export class ViewStore {
 	 * project.
 	 * @return The currently selected project or undefined.
 	 */
-	public getCurrentProject(): Project {
-		return this.currentProject as Project;
+	public getCurrentProject(): Model.Project {
+		return this.currentProject as Model.Project;
 	}
 
-	public getElementById(id: string): Element | undefined {
+	public getElementById(id: string): Model.Element | undefined {
 		const project = this.getCurrentProject();
 
 		let result;
@@ -405,19 +392,19 @@ export class ViewStore {
 		return result;
 	}
 
-	public getHighlightedElement(): Element | undefined {
+	public getHighlightedElement(): Model.Element | undefined {
 		return this.highlightedElement;
 	}
 
-	public getHighlightedPlaceholderElement(): Element | undefined {
+	public getHighlightedPlaceholderElement(): Model.Element | undefined {
 		return this.highlightedPlaceholderElement;
 	}
 
-	public getNameEditableElement(): Element | undefined {
+	public getNameEditableElement(): Model.Element | undefined {
 		return this.nameEditableElement;
 	}
 
-	public getPageById(id: string): Page | undefined {
+	public getPageById(id: string): Model.Page | undefined {
 		const project = this.getCurrentProject();
 
 		if (!project) {
@@ -427,7 +414,7 @@ export class ViewStore {
 		return project.getPageById(id);
 	}
 
-	public getPatternById(id: string): Pattern | undefined {
+	public getPatternById(id: string): Model.Pattern | undefined {
 		const project = this.getCurrentProject();
 
 		if (!project) {
@@ -443,7 +430,7 @@ export class ViewStore {
 		return patternLibrary.getPatternById(id);
 	}
 
-	public getPatternLibrary(): PatternLibrary | undefined {
+	public getPatternLibrary(): Model.PatternLibrary | undefined {
 		const project = this.getCurrentProject();
 
 		if (!project) {
@@ -458,14 +445,6 @@ export class ViewStore {
 	}
 
 	/**
-	 * Returns the path to the user preferences YAML file.
-	 * @return The path to the user preferences YAML file.
-	 */
-	public getPreferencesPath(basePreferencePath?: string): string {
-		return Path.join(basePreferencePath || Os.homedir(), '.alva-prefs.yaml');
-	}
-
-	/**
 	 * @return The content id to show in the right-hand sidebar
 	 */
 	public getRightPane(): Types.RightPane {
@@ -475,7 +454,7 @@ export class ViewStore {
 		return this.rightPane;
 	}
 
-	public getSelectedElement(): Element | undefined {
+	public getSelectedElement(): Model.Element | undefined {
 		return this.selectedElement;
 	}
 
@@ -545,7 +524,7 @@ export class ViewStore {
 		return false;
 	}
 
-	public pasteAfterElement(targetElement: Element): Element | undefined {
+	public pasteAfterElement(targetElement: Model.Element): Model.Element | undefined {
 		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
 
 		if (!clipboardElement) {
@@ -557,7 +536,7 @@ export class ViewStore {
 		}
 
 		this.execute(
-			ElementLocationCommand.addSibling({
+			Model.ElementLocationCommand.addSibling({
 				newSibling: clipboardElement,
 				sibling: targetElement
 			})
@@ -568,7 +547,7 @@ export class ViewStore {
 		return clipboardElement;
 	}
 
-	public pasteAfterElementById(id: string): Element | undefined {
+	public pasteAfterElementById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
 		if (!element) {
@@ -578,7 +557,7 @@ export class ViewStore {
 		return this.pasteAfterElement(element);
 	}
 
-	public pasteAfterSelectedElement(): Element | undefined {
+	public pasteAfterSelectedElement(): Model.Element | undefined {
 		const selectedElement = this.getSelectedElement();
 
 		if (!selectedElement) {
@@ -588,7 +567,7 @@ export class ViewStore {
 		return this.pasteAfterElement(selectedElement);
 	}
 
-	public pasteInsideElement(element: Element): Element | undefined {
+	public pasteInsideElement(element: Model.Element): Model.Element | undefined {
 		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
 
 		if (!clipboardElement) {
@@ -602,7 +581,7 @@ export class ViewStore {
 		}
 
 		this.execute(
-			ElementLocationCommand.addChild({
+			Model.ElementLocationCommand.addChild({
 				parent: element,
 				slotId: contents.getSlotId(),
 				child: clipboardElement,
@@ -615,7 +594,7 @@ export class ViewStore {
 		return clipboardElement;
 	}
 
-	public pasteInsideElementById(id: string): Element | undefined {
+	public pasteInsideElementById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
 		if (!element) {
@@ -625,7 +604,7 @@ export class ViewStore {
 		return this.pasteInsideElement(element);
 	}
 
-	public pasteInsideSelectedElement(): Element | undefined {
+	public pasteInsideSelectedElement(): Model.Element | undefined {
 		if (!this.selectedElement) {
 			return;
 		}
@@ -639,7 +618,7 @@ export class ViewStore {
 	 * @see hasRedoCommand
 	 */
 	public redo(): boolean {
-		const command: Command | undefined = this.redoBuffer.pop();
+		const command = this.redoBuffer.pop();
 		if (!command) {
 			return false;
 		}
@@ -661,14 +640,14 @@ export class ViewStore {
 	 * Removes the given element from its page
 	 * @param element The Element to remove
 	 */
-	public removeElement(element: Element): void {
+	public removeElement(element: Model.Element): void {
 		if (element.isRoot()) {
 			return;
 		}
 
 		const index = element.getIndex();
 
-		const getNextSelected = (): Element | undefined => {
+		const getNextSelected = (): Model.Element | undefined => {
 			if (typeof index !== 'number') {
 				return;
 			}
@@ -685,7 +664,7 @@ export class ViewStore {
 
 		const elementBefore = getNextSelected();
 
-		this.execute(new ElementRemoveCommand({ element }));
+		this.execute(new Model.ElementRemoveCommand({ element }));
 		this.setSelectedElement(elementBefore);
 	}
 
@@ -693,11 +672,11 @@ export class ViewStore {
 		const element = this.getElementById(id);
 
 		if (element) {
-			this.execute(new ElementRemoveCommand({ element }));
+			this.execute(new Model.ElementRemoveCommand({ element }));
 		}
 	}
 
-	public removePage(page: Page): void {
+	public removePage(page: Model.Page): void {
 		const project = this.getCurrentProject();
 
 		if (!project) {
@@ -705,7 +684,7 @@ export class ViewStore {
 		}
 
 		this.execute(
-			PageRemoveCommand.create({
+			Model.PageRemoveCommand.create({
 				page,
 				project
 			})
@@ -716,7 +695,7 @@ export class ViewStore {
 	 * Remove the currently selected element from its page
 	 * Returns the deleted Element or undefined if nothing was deleted
 	 */
-	public removeSelectedElement(): Element | undefined {
+	public removeSelectedElement(): Model.Element | undefined {
 		if (!this.selectedElement) {
 			return;
 		}
@@ -730,7 +709,7 @@ export class ViewStore {
 	 * Remove the currently selected page from its project
 	 * Returns the deleted PageRef or undefined if nothing was deleted
 	 */
-	public removeSelectedPage(): Page | undefined {
+	public removeSelectedPage(): Model.Page | undefined {
 		const page = this.getCurrentPage();
 
 		if (!page) {
@@ -741,7 +720,7 @@ export class ViewStore {
 		return page;
 	}
 
-	public setActivePage(page: Page): boolean {
+	public setActivePage(page: Model.Page): boolean {
 		const project = this.getCurrentProject();
 
 		if (!project) {
@@ -787,8 +766,8 @@ export class ViewStore {
 	 * Note: The element is cloned lazily, so you don't need to clone it when setting.
 	 * @see getClipboardElement
 	 */
-	public setClipboardItem(item: Element | Page): void {
-		if (item instanceof Element) {
+	public setClipboardItem(item: Model.Element | Model.Page): void {
+		if (item instanceof Model.Element) {
 			if (item.isRoot()) {
 				return;
 			}
@@ -799,7 +778,7 @@ export class ViewStore {
 			};
 		}
 
-		if (item instanceof Page) {
+		if (item instanceof Model.Page) {
 			this.clipboardItem = {
 				type: ClipBoardType.Page,
 				item
@@ -815,7 +794,7 @@ export class ViewStore {
 		this.highlightedPlaceholderElement = this.getElementById(id);
 	}
 
-	public setNameEditableElement(editableElement?: Element): void {
+	public setNameEditableElement(editableElement?: Model.Element): void {
 		if (this.nameEditableElement && this.nameEditableElement !== editableElement) {
 			this.nameEditableElement.setNameEditable(false);
 		}
@@ -835,7 +814,7 @@ export class ViewStore {
 		this.patternSearchTerm = patternSearchTerm;
 	}
 
-	public setProject(project: Project): void {
+	public setProject(project: Model.Project): void {
 		this.currentProject = project;
 		const pages = this.currentProject.getPages();
 
@@ -868,7 +847,7 @@ export class ViewStore {
 	 * @param selectedElement The selected element or undefined.
 	 * @see setElementFocussed
 	 */
-	public setSelectedElement(selectedElement?: Element): void {
+	public setSelectedElement(selectedElement?: Model.Element): void {
 		if (this.selectedElement && this.selectedElement !== selectedElement) {
 			this.setNameEditableElement();
 		}
@@ -890,7 +869,7 @@ export class ViewStore {
 	 * @see hasUndoCommand
 	 */
 	public undo(): boolean {
-		const command: Command | undefined = this.undoBuffer.pop();
+		const command = this.undoBuffer.pop();
 		if (!command) {
 			return false;
 		}

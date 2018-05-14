@@ -2,7 +2,7 @@ import { ViewButton } from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewStore } from '../../store';
-import * as Types from '../../store/types';
+import * as Types from '../../model/types';
 
 @MobxReact.observer
 export class OverviewSwitchContainer extends React.Component {

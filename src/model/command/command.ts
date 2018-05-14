@@ -1,11 +1,5 @@
 import { Element } from '../element';
 
-/**
- * A user operation on a page or project, with the ability to undo and redo.
- * @see Store.execute()
- * @see Store.undo()
- * @see Store.redo()
- */
 export abstract class Command {
 	/**
 	 * Performs this user operation (forward execute or redo).

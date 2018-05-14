@@ -2,10 +2,9 @@ import * as Sender from '../message/client';
 import { BrowserWindow, ipcRenderer, MenuItem, MenuItemConstructorOptions, remote } from 'electron';
 import { HtmlExporter } from '../export/html-exporter';
 import { ServerMessageType } from '../message';
-import { Page } from '../store/page/page';
+import { Page, Project } from '../model';
 import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
-import { Project } from '../store/project';
 import { SketchExporter } from '../export/sketch-exporter';
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';
@@ -197,14 +196,6 @@ export function createMenu(): void {
 				{
 					type: 'separator',
 					visible: process.platform !== 'darwin'
-				},
-				{
-					label: 'Se&ttings',
-					visible: process.platform !== 'darwin',
-					accelerator: 'Cmd+,',
-					click: () => {
-						shell.openItem(store.getPreferencesPath());
-					}
 				},
 				{
 					type: 'separator',
@@ -424,13 +415,6 @@ export function createMenu(): void {
 				},
 				{
 					type: 'separator'
-				},
-				{
-					label: 'Settings',
-					accelerator: 'Cmd+,',
-					click: () => {
-						shell.openItem(store.getPreferencesPath());
-					}
 				},
 				{
 					label: 'Services',

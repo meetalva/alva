@@ -3,7 +3,8 @@ import * as uuid from 'uuid';
 import * as Sender from '../message/client';
 import { Exporter } from './exporter';
 import { ServerMessageType } from '../message';
-import { Page, ViewStore } from '../store';
+import { Page } from '../model';
+import { ViewStore } from '../store';
 
 export class SketchExporter extends Exporter {
 	public execute(path: string): void {

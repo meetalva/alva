@@ -1,8 +1,9 @@
 import * as Component from '../../components';
 import * as MobxReact from 'mobx-react';
+import { ElementProperty, PatternEnumProperty } from '../../model';
 import * as React from 'react';
-import { ElementProperty, PatternEnumProperty, ViewStore } from '../../store';
-import { PatternPropertyType as P } from '../../store/types';
+import { ViewStore } from '../../store';
+import { PatternPropertyType as P } from '../../model/types';
 
 @MobxReact.observer
 export class PropertyListContainer extends React.Component {

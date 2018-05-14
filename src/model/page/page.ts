@@ -54,11 +54,6 @@ export class Page {
 	 */
 	private rootId: string;
 
-	/**
-	 * Creates a new page.
-	 * @param id The technical (internal) ID of the page.
-	 * @param store The global application store.
-	 */
 	public constructor(init: PageInit, context: PageContext) {
 		this.id = init.id;
 		this.rootId = init.rootId;

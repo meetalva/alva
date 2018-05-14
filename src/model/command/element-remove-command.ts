@@ -2,7 +2,7 @@ import { Command } from './command';
 import { Element, ElementContent } from '../element';
 import { ElementCommand } from './element-command';
 import { Page } from '../page/page';
-import { ViewStore } from '../view-store';
+import { ViewStore } from '../../store'; // TODO: Remove dependency on store
 
 export class ElementRemoveCommand extends ElementCommand {
 	protected container: ElementContent;

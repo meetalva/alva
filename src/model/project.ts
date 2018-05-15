@@ -128,6 +128,16 @@ export class Project {
 		this.pages.push(page);
 	}
 
+	// TODO: Implement
+	public connectDefaultPatternLibrary(): void {
+		console.log('connectDefaultPatternLibrary');
+	}
+
+	// TODO: Implement
+	public connectPatternLibrary(): void {
+		console.log('connectPatternLibrary');
+	}
+
 	public getElementById(id: string): undefined | Element {
 		return this.elements.find(e => e.getId() === id);
 	}

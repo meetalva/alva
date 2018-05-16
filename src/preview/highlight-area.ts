@@ -19,9 +19,9 @@ export class HighlightArea {
 		const clientRect: ClientRect = element.getBoundingClientRect();
 		this.bottom = clientRect.bottom;
 		this.height = clientRect.height;
-		this.left = clientRect.left;
+		this.left = clientRect.left + window.scrollX;
 		this.right = clientRect.right;
-		this.top = clientRect.bottom;
+		this.top = clientRect.top + window.scrollY;
 		this.width = clientRect.width;
 	}
 

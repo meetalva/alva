@@ -21,7 +21,6 @@ test('HighlightArea sets bounding client values', () => {
 	// tslint:disable:no-any
 	const node: any = {
 		getBoundingClientRect: jest.fn(() => ({
-			type: null,
 			top: 100,
 			right: 100,
 			bottom: 100,
@@ -32,7 +31,6 @@ test('HighlightArea sets bounding client values', () => {
 			y: 100
 		}))
 	};
-
 	highlightArea.setSize(node);
 	expect(highlightArea).toEqual(
 		expect.objectContaining({

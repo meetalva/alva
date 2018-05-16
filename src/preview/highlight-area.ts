@@ -3,6 +3,7 @@ import * as MobX from 'mobx';
 export class HighlightArea {
 	@MobX.observable public bottom: number = 0;
 	@MobX.observable public height: number = 0;
+	@MobX.observable public isVisible: boolean = false;
 	@MobX.observable public left: number = 0;
 	@MobX.observable public opacity: number = 0;
 	@MobX.observable public right: number = 0;
@@ -12,6 +13,7 @@ export class HighlightArea {
 	@MobX.action
 	public hide(): void {
 		this.opacity = 0;
+		this.isVisible = false;
 	}
 
 	@MobX.action
@@ -28,5 +30,6 @@ export class HighlightArea {
 	@MobX.action
 	public show(): void {
 		this.opacity = 1;
+		this.isVisible = true;
 	}
 }

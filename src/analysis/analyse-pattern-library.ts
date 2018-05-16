@@ -10,6 +10,7 @@ export async function analysePatternLibrary(path: string): Promise<PatternLibrar
 	await analyse(path, {
 		fileMappers: [mapFile.mapReactDocgen, mapFile.mapReactDocgenTypeScript],
 		fs: Fs,
+		ignore: ['node_modules/**/*', '.git/**/*'],
 		projectMappers: []
 	});
 

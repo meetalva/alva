@@ -6,6 +6,7 @@ import * as MobXReact from 'mobx-react';
 import { PreviewStore } from './preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import { ResizeFactory } from './resize';
 
 // TODO: Produces a deprecation warning, find a way
 // to dedupe MobX when upgrading to 4.x
@@ -128,20 +129,24 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 @MobXReact.inject('getComponent', 'store', 'highlight')
 @MobXReact.observer
 class PreviewComponent extends React.Component<PreviewComponentProps> {
-	// public componentDidMount(): void {
-	// 	const props = this.props as InjectedPreviewComponentProps;
-	// 	if (props.uuid === props.store.elementId) {
-	// 		const node = ReactDom.findDOMNode(this);
-	// 		props.highlight.setSize(node as Element);
-	// 	}
-	// }
+	public componentDidMount(): void {
+		const props = this.props as InjectedPreviewComponentProps;
+		const resize = ResizeFactory();
+		const setSize = () => {
+			if (props.uuid === props.store.elementId) {
+				const node = ReactDom.findDOMNode(this);
+				props.highlight.setSize(node as Element);
+			}
+		};
+
+		resize.register(setSize);
+	}
 	public componentDidUpdate(): void {
 		const props = this.props as InjectedPreviewComponentProps;
 
 		if (props.uuid === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {
-				console.log('size has been set !!!!');
 				props.highlight.setSize(node as Element);
 			}
 		}

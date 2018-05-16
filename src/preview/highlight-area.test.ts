@@ -1,23 +1,6 @@
-class HighlightArea {
-	public bottom: number = 0;
-	public height: number = 0;
-	public left: number = 0;
-	public opacity: number = 0;
-	public right: number = 0;
-	public top: number = 0;
-	public width: number = 0;
-	public show(element: Element): void {
-		const clientRect: ClientRect = element.getBoundingClientRect();
-		this.bottom = clientRect.bottom;
-		this.height = clientRect.height;
-		this.left = clientRect.left;
-		this.right = clientRect.right;
-		this.top = clientRect.bottom;
-		this.width = clientRect.width;
-	}
-}
+import { HighlightArea } from './highlight-area';
 
-test('highlightArea has expected properties', () => {
+test('HighlightArea has expected properties', () => {
 	const highlightArea = new HighlightArea();
 
 	expect(highlightArea).toEqual(
@@ -33,9 +16,10 @@ test('highlightArea has expected properties', () => {
 	);
 });
 
-test('highlightArea gets Bounding Client values', () => {
+test('HighlightArea sets bounding client values', () => {
 	const highlightArea = new HighlightArea();
-	const div: HTMLElement = {
+	// tslint:disable:no-any
+	const node: any = {
 		getBoundingClientRect: jest.fn(() => ({
 			top: 100,
 			right: 100,
@@ -47,8 +31,7 @@ test('highlightArea gets Bounding Client values', () => {
 			y: 100
 		}))
 	};
-
-	highlightArea.show(div);
+	highlightArea.setSize(node);
 	expect(highlightArea).toEqual(
 		expect.objectContaining({
 			top: 100,
@@ -57,6 +40,28 @@ test('highlightArea gets Bounding Client values', () => {
 			left: 100,
 			width: 100,
 			height: 100
+		})
+	);
+});
+
+test('HighlightArea hides element', () => {
+	const highlightArea = new HighlightArea();
+	highlightArea.hide();
+
+	expect(highlightArea).toEqual(
+		expect.objectContaining({
+			opacity: 0
+		})
+	);
+});
+
+test('HighlightAria shows element', () => {
+	const highlightArea = new HighlightArea();
+	highlightArea.show();
+
+	expect(highlightArea).toEqual(
+		expect.objectContaining({
+			opacity: 1
 		})
 	);
 });

@@ -1,13 +1,12 @@
+import * as Fs from 'fs';
 import { mapReactDocgenTypeScript } from './map-react-docgen-typescript';
-import { createFileSystem } from '../test-utils';
+import * as Path from 'path';
+import * as TestUtils from '../test-utils';
 
-// TODO: enable this test
-/* test('attaches meta data to file with TypeScript React component', async () => {
+test('attaches meta data to file with TypeScript React component', async () => {
 	const analysis = { attach: jest.fn(), get: jest.fn() };
-
-	await mapReactDocgenTypeScript('/component.tsx', {
-		analysis,
-		fs: createFileSystem({ '/component.tsx': `
+	const fs = TestUtils.createFileSystem({
+		'/component.tsx': `
 			import * as React from 'react';
 
 			export interface Props {
@@ -18,23 +17,33 @@ import { createFileSystem } from '../test-utils';
 			export const Component = (props: Props) => {
 				return <div>Grid</div>;
 			};
-			`
-		})
+		`
+	});
+
+	const base = await TestUtils.dumpFileSystem(fs);
+
+	await mapReactDocgenTypeScript(Path.join(base, 'component.tsx'), {
+		analysis,
+		fs: Fs
 	});
 
 	expect(analysis.attach).toHaveBeenCalled();
-}); */
+});
 
 test('attaches no meta data for arbitrary TypeScript file', async () => {
 	const analysis = { attach: jest.fn(), get: jest.fn() };
 
-	await mapReactDocgenTypeScript('/script.js', {
+	const fs = TestUtils.createFileSystem({
+		'/script.ts': `
+		export const helloWorld = (): void => console.log("Hello World");
+	`
+	});
+
+	const base = await TestUtils.dumpFileSystem(fs);
+
+	await mapReactDocgenTypeScript(Path.join(base, 'script.ts'), {
 		analysis,
-		fs: createFileSystem({
-			'/script.js': `
-			export const helloWorld = (): void => console.log("Hello World");
-		`
-		})
+		fs: Fs
 	});
 
 	expect(analysis.attach).not.toHaveBeenCalled();

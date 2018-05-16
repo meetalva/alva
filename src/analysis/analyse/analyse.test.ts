@@ -123,3 +123,17 @@ test('returns analysis augmented by file mapper calls', async () => {
 	expect(await result.analysis.get('/file-a.js')).toEqual([{ type: 'type', payload: id }]);
 	expect(await result.analysis.get('/file-b.js')).toBeUndefined();
 });
+
+test('respects ignore globs', async () => {
+	const mapper = jest.fn();
+
+	await analyse('/', {
+		fileMappers: [mapper],
+		fs: createFileSystem({ '/file-a.js': '', '/file-b.js': '', 'b/file-a.js': '' }),
+		ignore: ['*-b.js', 'b/**/*'],
+		projectMappers: []
+	});
+
+	expect(mapper).toHaveBeenCalledTimes(1);
+	expect(mapper).toHaveBeenLastCalledWith('/file-a.js', jasmine.any(Object));
+});

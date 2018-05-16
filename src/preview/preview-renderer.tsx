@@ -2,8 +2,11 @@ import { HighlightArea } from './highlight-area';
 import { PreviewStore } from './preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Helmet } from 'react-helmet';
-import * as Types from '../model/types';
+import { ResizeFactory } from './resize';
+
+// TODO: Produces a deprecation warning, find a way
+// to dedupe MobX when upgrading to 4.x
+MobX.extras.shareGlobalState();
 
 export interface RenderInit {
 	highlight: HighlightArea;
@@ -172,16 +175,25 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 }
 
 class PreviewComponent extends React.Component<PreviewComponentProps> {
-	public componentWillUpdate(): void {
-		const props = this.props;
+	public componentDidMount(): void {
+		const props = this.props as InjectedPreviewComponentProps;
+		const resize = ResizeFactory();
+		const setSize = () => {
+			if (props.uuid === props.store.elementId) {
+				const node = ReactDom.findDOMNode(this);
+				props.highlight.setSize(node as Element);
+			}
+		};
 
-		if (props.id === props.store.elementId) {
+		resize.register(setSize);
+	}
+	public componentDidUpdate(): void {
+		const props = this.props as InjectedPreviewComponentProps;
+
+		if (props.uuid === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {
-				props.highlight.show(node as Element, props.id);
-				setTimeout(() => {
-					props.store.elementId = '';
-				}, 500);
+				props.highlight.setSize(node as Element);
 			}
 		}
 	}

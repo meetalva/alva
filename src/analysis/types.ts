@@ -10,6 +10,7 @@ export interface Analysis {
 export interface AnalysisContext {
 	fileMappers: AnalysisMapper[];
 	fs: typeof Fs;
+	ignore?: string[];
 	projectMappers: AnalysisMapper[];
 }
 

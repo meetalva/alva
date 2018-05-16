@@ -9,7 +9,6 @@ export const mapReactDocgenTypeScript: T.AnalysisMapper = async (
 	ctx: T.AnalysisMapperContext
 ): Promise<void> => {
 	try {
-		// TODO: Pass an apropriate
 		const info = reactDocgenTypescript.parse(path);
 		if (info.length > 0) {
 			ctx.analysis.attach(path, { type: label, payload: info });

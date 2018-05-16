@@ -1,5 +1,8 @@
 import * as Fs from 'fs';
+import * as FsExtra from 'fs-extra';
 import * as Path from 'path';
+import * as readdir from 'readdir-enhanced';
+import * as tempy from 'tempy';
 
 export const createFileSystem = (data?: { [path: string]: string }): typeof Fs => {
 	const MemoryFs = require('memory-fs');
@@ -26,4 +29,33 @@ export const createFileSystem = (data?: { [path: string]: string }): typeof Fs =
 	});
 
 	return fs;
+};
+
+export const dumpFileSystem = async (fs: typeof Fs): Promise<string> => {
+	const target = tempy.directory();
+
+	const files = await readdir('/', {
+		deep: true,
+		filter: stat => stat.isFile(),
+		fs: {
+			lstat: (fs.lstat || fs.stat).bind(fs),
+			readdir: fs.readdir.bind(fs),
+			stat: fs.stat.bind(fs)
+		}
+	});
+
+	await Promise.all(
+		files.map(async file => {
+			const filePath = Path.join(target, file);
+			const dirname = Path.dirname(filePath);
+
+			if (!Fs.existsSync(dirname)) {
+				FsExtra.mkdirpSync(dirname);
+			}
+
+			await FsExtra.writeFile(filePath, fs.readFileSync(`/${file}`));
+		})
+	);
+
+	return target;
 };

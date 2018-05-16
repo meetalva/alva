@@ -50,7 +50,8 @@ test('HighlightArea hides element', () => {
 
 	expect(highlightArea).toEqual(
 		expect.objectContaining({
-			opacity: 0
+			opacity: 0,
+			isVisible: false
 		})
 	);
 });
@@ -61,7 +62,8 @@ test('HighlightAria shows element', () => {
 
 	expect(highlightArea).toEqual(
 		expect.objectContaining({
-			opacity: 1
+			opacity: 1,
+			isVisible: true
 		})
 	);
 });

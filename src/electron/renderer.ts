@@ -41,6 +41,15 @@ Sender.receive(message => {
 			const newProject = Project.from(message.payload.contents);
 			store.setProject(newProject);
 			store.setActiveView(Types.AlvaView.PageDetail);
+			break;
+		}
+		case ServerMessageType.ConnectPatternLibraryResponse: {
+			const project = store.getProject();
+			if (!project) {
+				return;
+			}
+
+			project.import(message.payload);
 		}
 	}
 });

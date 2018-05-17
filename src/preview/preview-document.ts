@@ -98,6 +98,9 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 		body {
 			margin: 0;
 		}
+		#preview {
+			background: white;
+		}
 	</style>
 </head>
 <body>

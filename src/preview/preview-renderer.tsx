@@ -73,6 +73,11 @@ interface ErrorMessageProps {
 @MobXReact.inject('store', 'highlight')
 @MobXReact.observer
 class PreviewApplication extends React.Component {
+	public componentDidUpdate(): void {
+		const props = this.props as InjectedPreviewApplicationProps;
+		props.highlight.update();
+	}
+
 	public render(): JSX.Element | null {
 		const props = this.props as InjectedPreviewApplicationProps;
 		const currentPage = props.store.pages.find(page => page.id === props.store.pageId);
@@ -130,9 +135,17 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 	public constructor(props: InjectedPreviewComponentProps) {
 		super(props);
 		this.handleResize = this.handleResize.bind(this);
+		window.requestAnimationFrame(this.handleResize);
 	}
 
 	public componentDidMount(): void {
+		const props = this.props as InjectedPreviewComponentProps;
+		if (props.uuid === props.store.elementId) {
+			const node = ReactDom.findDOMNode(this);
+			if (node) {
+				props.highlight.setSize(node as Element);
+			}
+		}
 		window.addEventListener('resize', this.handleResize);
 	}
 
@@ -157,7 +170,7 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		} else {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {
-				props.highlight.setSize(node as Element);
+				props.highlight.update();
 				window.requestAnimationFrame(this.handleResize);
 			}
 		}
@@ -181,7 +194,6 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		// Access elementId in render method to trigger MobX subscription
 		// tslint:disable-next-line:no-unused-expression
 		props.store.elementId;
-
 		// tslint:disable-next-line:no-any
 		const Component = props.getComponent(props, {
 			// tslint:disable-next-line:no-any
@@ -225,8 +237,6 @@ class PreviewHighlight extends React.Component {
 					position: 'absolute',
 					boxSizing: 'border-box',
 					border: '1px solid rgba(255, 255, 255, 0.5)',
-					transition: '.1s ease-in-out',
-					transitionProperty: 'top, bottom, opacity',
 					bottom: highlight.bottom,
 					height: highlight.height,
 					left: highlight.left,

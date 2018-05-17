@@ -17,6 +17,8 @@ export enum ServerMessageType {
 	AssetReadRequest = 'asset-read-request',
 	AssetReadResponse = 'asset-read-response',
 	BundleChange = 'bundle-change',
+	ConnectPatternLibraryRequest = 'connect-pattern-library-request',
+	ConnectPatternLibraryResponse = 'connect-pattern-library-response',
 	ContentRequest = 'content-request',
 	ContentResponse = 'content-response',
 	Copy = 'copy',
@@ -88,10 +90,14 @@ export interface ExportPayload {
 	path: string;
 }
 
+export type LibraryPayload = Types.PatternAnalysis[];
+
 export type ServerMessage =
 	| AppLoaded
 	| AssetReadRequest
 	| AssetReadResponse
+	| ConnectPatternLibraryRequest
+	| ConnectPatternLibraryResponse
 	| ContentRequest
 	| ContentResponse
 	| CopyPageElement
@@ -130,6 +136,13 @@ export type ServerMessage =
 export type AppLoaded = EmptyEnvelope<ServerMessageType.AppLoaded>;
 export type AssetReadRequest = EmptyEnvelope<ServerMessageType.AssetReadRequest>;
 export type AssetReadResponse = Envelope<ServerMessageType.AssetReadResponse, string>;
+export type ConnectPatternLibraryRequest = EmptyEnvelope<
+	ServerMessageType.ConnectPatternLibraryRequest
+>;
+export type ConnectPatternLibraryResponse = Envelope<
+	ServerMessageType.ConnectPatternLibraryResponse,
+	LibraryPayload
+>;
 export type ContentRequest = EmptyEnvelope<ServerMessageType.ContentRequest>;
 export type ContentResponse = Envelope<ServerMessageType.ContentResponse, string>;
 export type Copy = EmptyEnvelope<ServerMessageType.Copy>;

@@ -1,3 +1,4 @@
+import * as Analyzer from '../analyzer';
 import { checkForUpdates } from './auto-updater';
 import { colors } from '../components';
 import { createCompiler } from '../preview/create-compiler';
@@ -256,6 +257,25 @@ async function createWindow(): Promise<void> {
 			case ServerMessageType.ExportSketch: {
 				const { path, content } = message.payload;
 				writeFile(path, content);
+				break;
+			}
+			case ServerMessageType.ConnectPatternLibraryRequest: {
+				const paths = await showOpenDialog({
+					title: 'Connnect Pattern Library',
+					properties: ['openDirectory']
+				});
+
+				const path = Array.isArray(paths) ? paths[0] : undefined;
+
+				if (path) {
+					const analysis = await Analyzer.analyze(path);
+
+					Sender.send({
+						type: ServerMessageType.ConnectPatternLibraryResponse,
+						id: message.id,
+						payload: analysis
+					});
+				}
 			}
 		}
 	});

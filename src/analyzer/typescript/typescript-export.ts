@@ -1,12 +1,12 @@
 // tslint:disable:no-bitwise
 
-import { Type } from './type';
 import * as ts from 'typescript';
+import { TypeScriptType } from './typescript-type';
 
 /**
  * A JavaScript export declaration.
  */
-export interface Export {
+export interface TypescriptExport {
 	/**
 	 * The name of the export, or undefined if this is the default export.
 	 */
@@ -20,5 +20,5 @@ export interface Export {
 	/**
 	 * The type of the object exported.
 	 */
-	type: Type;
+	type: TypeScriptType;
 }

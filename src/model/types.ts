@@ -41,11 +41,18 @@ export interface SerializedElementContent {
 	slotId: string;
 }
 
+export enum PatternLibraryState {
+	Pristine = 'pristine',
+	Imported = 'imported'
+}
+
 export interface SerializedPatternLibrary {
+	bundle: string;
 	id: string;
 	patternProperties: SerializedPatternProperty[];
 	patterns: SerializedPattern[];
 	root: SerializedPatternFolder;
+	state: PatternLibraryState;
 }
 
 export interface SerializedPatternFolder {
@@ -194,6 +201,12 @@ export interface SerializedElementProperty {
 export interface RenderPage {
 	id: string;
 	name: string;
+}
+
+export interface LibraryAnalysis {
+	bundle: string;
+	path: string;
+	patterns: PatternAnalysis[];
 }
 
 export interface PatternAnalysis {

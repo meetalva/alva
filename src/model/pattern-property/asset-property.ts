@@ -1,4 +1,4 @@
-import { PatternProperty, PatternPropertyType } from './property';
+import { PatternPropertyBase, PatternPropertyType } from './property-base';
 import * as Types from '../types';
 
 /**
@@ -10,7 +10,7 @@ import * as Types from '../types';
  * use getValueFromFile, getValueFromBuffer, or getValueFromUrl.
  * @see Property
  */
-export class PatternAssetProperty extends PatternProperty {
+export class PatternAssetProperty extends PatternPropertyBase {
 	public readonly type = PatternPropertyType.Asset;
 
 	public static from(serialized: Types.SerializedPatternAssetProperty): PatternAssetProperty {

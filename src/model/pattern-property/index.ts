@@ -4,6 +4,7 @@ export * from './enum-property';
 export * from './number-array-property';
 export * from './number-property';
 export * from './object-property';
+export * from './property-base';
 export * from './property';
 export * from './string-array-property';
 export * from './string-property';

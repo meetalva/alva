@@ -1,7 +1,7 @@
 import * as Analyzer from '../analyzer';
 import { checkForUpdates } from './auto-updater';
 import { colors } from '../components';
-import { createCompiler } from '../preview/create-compiler';
+import { createCompiler } from '../compiler/create-compiler';
 import { app, BrowserWindow, dialog, ipcMain, screen } from 'electron';
 import * as electronIsDev from 'electron-is-dev';
 import * as Fs from 'fs';
@@ -227,12 +227,12 @@ async function createWindow(): Promise<void> {
 				break;
 			}
 			case ServerMessageType.CreateScriptBundleRequest: {
-				const compiler = createCompiler();
+				const compiler = createCompiler([], { cwd: process.cwd() });
 				await Util.promisify(compiler.run).bind(compiler)();
 
 				const createScript = (name: string, content: string) =>
 					`<script data-script="${name}">${content}<\/script>`;
-				const SCRIPTS = ['vendor', 'renderer', 'components', 'preview'];
+				const SCRIPTS = ['renderer', 'components', 'preview'];
 
 				const compilerFileSystem = (await compiler.outputFileSystem) as typeof Fs;
 

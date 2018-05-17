@@ -436,6 +436,16 @@ export class ViewStore {
 		return project.getPatternLibrary();
 	}
 
+	public getPatternLibraryState(): Types.PatternLibraryState | undefined {
+		const patternLibrary = this.getPatternLibrary();
+
+		if (!patternLibrary) {
+			return;
+		}
+
+		return patternLibrary.getState();
+	}
+
 	public getPatternSearchTerm(): string {
 		return this.patternSearchTerm;
 	}

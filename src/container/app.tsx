@@ -152,15 +152,17 @@ export class App extends React.Component {
 								direction={LayoutDirection.Column}
 								border={LayoutBorder.Side}
 							>
-								<ConnectPaneContainer
-									onPrimaryButtonClick={() => {
-										Sender.send({
-											type: ServerMessageType.ConnectPatternLibraryRequest,
-											id: uuid.v4(),
-											payload: undefined
-										});
-									}}
-								/>
+								{store.getPatternLibraryState() === Types.PatternLibraryState.Pristine && (
+									<ConnectPaneContainer
+										onPrimaryButtonClick={() => {
+											Sender.send({
+												type: ServerMessageType.ConnectPatternLibraryRequest,
+												id: uuid.v4(),
+												payload: undefined
+											});
+										}}
+									/>
+								)}
 								{store.getRightPane() === Types.RightPane.Properties && (
 									<PropertyPane>
 										<PropertyListContainer />

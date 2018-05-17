@@ -1,3 +1,4 @@
+import { createCompiler } from '../../compiler';
 import { Directory } from '../directory';
 import * as Fs from 'fs';
 import * as Path from 'path';
@@ -9,6 +10,7 @@ import * as ts from 'typescript';
 import * as TypeScript from '../typescript';
 import { TypeScriptType } from '../typescript/typescript-type';
 import * as TypescriptUtils from '../typescript/typescript-utils';
+import * as Util from 'util';
 import * as uuid from 'uuid';
 
 export interface PatternInfo {
@@ -23,13 +25,21 @@ interface AggregatedPatternInfo {
 	patternInfo: PatternInfo;
 }
 
-export function analyze(path: string): Types.PatternAnalysis[] {
+export async function analyze(path: string): Promise<Types.LibraryAnalysis> {
 	const directory = new Directory(path);
 	const allPatternInfos: PatternInfo[] = findPatterns(directory, directory, true);
 	const declarationPaths: string[] = allPatternInfos.map(info => info.declarationPath);
 	const program: ts.Program = ts.createProgram(declarationPaths, {});
+	const patterns = analyzeFolder(path, program);
 
-	return analyzeFolder(path, program);
+	const compiler = createCompiler(patterns.map(item => item.pattern), { cwd: path });
+	await Util.promisify(compiler.run).bind(compiler)();
+
+	return {
+		patterns,
+		path,
+		bundle: (compiler.outputFileSystem as typeof Fs).readFileSync('/components.js').toString()
+	};
 }
 
 /**

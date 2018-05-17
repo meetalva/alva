@@ -309,7 +309,9 @@ function createComponentGetter(store: PreviewStore): (props: any, synthetics: an
 
 		switch (pattern.type) {
 			case 'pattern':
-			// TODO: Restore window[pattern] access here
+				// tslint:disable-next-line:no-any
+				const component = ((window as any).components || {})[pattern.id];
+				return component[pattern.exportName];
 			case 'synthetic:page':
 				return synthetics.page;
 			case 'synthetic:placeholder':

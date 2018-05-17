@@ -1,4 +1,4 @@
-import { PatternProperty, PatternPropertyType } from './property';
+import { PatternPropertyBase, PatternPropertyType } from './property-base';
 import * as Types from '../types';
 
 /**
@@ -9,13 +9,13 @@ import * as Types from '../types';
  * (where all elements are never undefined or null).
  * @see Property
  */
-export class StringPatternArrayProperty extends PatternProperty {
+export class PatternStringArrayProperty extends PatternPropertyBase {
 	public readonly type = PatternPropertyType.StringArray;
 
 	public static from(
 		serialized: Types.SerializedPatternStringArrayProperty
-	): StringPatternArrayProperty {
-		return new StringPatternArrayProperty({
+	): PatternStringArrayProperty {
+		return new PatternStringArrayProperty({
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,

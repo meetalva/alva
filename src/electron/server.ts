@@ -1,4 +1,4 @@
-import { createCompiler } from '../preview/create-compiler';
+import { createCompiler } from '../compiler/create-compiler';
 import { EventEmitter } from 'events';
 import * as express from 'express';
 import * as Http from 'http';
@@ -16,6 +16,7 @@ interface State {
 	id: string;
 	path?: string;
 	payload: {
+		bundle?: string;
 		elementContents?: Types.SerializedElementContent[];
 		elementId?: string;
 		elements?: Types.SerializedElement[];
@@ -84,6 +85,12 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 	});
 
 	app.use('/scripts', (req, res, next) => {
+		if (req.url === '/components.js') {
+			res.type('js');
+			res.send(state.payload.bundle || '');
+			return;
+		}
+
 		const [current] = compilation.queue;
 
 		if (!current) {
@@ -220,7 +227,7 @@ async function setup(update: any): Promise<any> {
 	const queue: Queue = [];
 
 	// const styleguide = new PatternLibrary({});
-	const compiler = createCompiler(/*styleguide*/);
+	const compiler = createCompiler([], { cwd: process.cwd() });
 
 	compiler.hooks.compile.tap('alva', () => {
 		queue.unshift({ type: WebpackMessageType.Start, id: uuid.v4() });

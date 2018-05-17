@@ -1,4 +1,4 @@
-export function patternIdToWebpackName(id: string): string {
+export function compilerSafeName(id: string): string {
 	return encodeURIComponent(
 		id
 			.split('@')[0]

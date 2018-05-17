@@ -1,3 +1,4 @@
+import * as Mobx from 'mobx';
 import { Pattern } from './pattern';
 import { PatternLibrary } from '../pattern-library';
 import * as Types from '../types';
@@ -15,17 +16,17 @@ export interface PatternFolderContext {
 }
 
 export class PatternFolder {
-	private children: PatternFolder[] = [];
+	@Mobx.observable private children: PatternFolder[] = [];
 
-	private id: string;
+	@Mobx.observable private id: string;
 
-	private name: string;
+	@Mobx.observable private name: string;
 
-	private parent?: PatternFolder;
+	@Mobx.observable private parent?: PatternFolder;
 
 	private patternLibrary: PatternLibrary;
 
-	private patterns: string[] = [];
+	@Mobx.observable private patterns: string[] = [];
 
 	public constructor(init: PatternFolderInit, context: PatternFolderContext) {
 		this.id = init.id || uuid.v4();
@@ -62,11 +63,13 @@ export class PatternFolder {
 		return folder;
 	}
 
+	@Mobx.action
 	public addChild(child: PatternFolder): void {
 		this.children.push(child);
 		child.setParent(this);
 	}
 
+	@Mobx.action
 	public addPattern(pattern: Pattern): void {
 		this.patterns.push(pattern.getId());
 	}
@@ -100,12 +103,26 @@ export class PatternFolder {
 
 	public getPatterns(): Pattern[] {
 		const isPattern = (p): p is Pattern => typeof p !== 'undefined';
-
 		return this.getPatternIds()
 			.map(id => this.patternLibrary.getPatternById(id))
 			.filter(isPattern);
 	}
 
+	public remove(): void {
+		if (this.parent) {
+			this.parent.removeChild(this);
+			this.parent = undefined;
+		}
+	}
+
+	public removeChild(child: PatternFolder): void {
+		const index = this.children.indexOf(child);
+		if (index > -1) {
+			this.children.splice(index, 1);
+		}
+	}
+
+	@Mobx.action
 	public setParent(parent: PatternFolder): void {
 		this.parent = parent;
 	}
@@ -115,7 +132,7 @@ export class PatternFolder {
 			id: this.id,
 			name: this.name,
 			children: this.children.map(child => child.toJSON()),
-			patterns: this.patterns
+			patterns: Array.from(this.patterns)
 		};
 	}
 }

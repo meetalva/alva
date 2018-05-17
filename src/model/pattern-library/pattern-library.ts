@@ -1,7 +1,7 @@
 import { Box, Page, Placeholder, Text } from './builtins';
 import * as Fuse from 'fuse.js';
 import { Pattern, PatternFolder, PatternSlot, SyntheticPatternType } from '../pattern';
-import { PatternProperty, PatternPropertyType } from '../pattern-property';
+import { PatternPropertyBase, PatternPropertyType } from '../pattern-property';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
@@ -9,23 +9,29 @@ import * as uuid from 'uuid';
 import * as P from '../pattern-property';
 
 export interface PatternLibraryInit {
+	bundle: string;
 	id: string;
-	patternProperties: PatternProperty[];
+	patternProperties: PatternPropertyBase[];
 	patterns: Pattern[];
 	root?: PatternFolder;
+	state: Types.PatternLibraryState;
 }
 
 export class PatternLibrary {
+	private bundle: string;
 	private fuse: Fuse;
 	private id: string;
-	private patternProperties: PatternProperty[] = [];
+	private patternProperties: PatternPropertyBase[] = [];
 	private patterns: Pattern[] = [];
 	private root: PatternFolder;
+	private state: Types.PatternLibraryState;
 
 	public constructor(init: PatternLibraryInit) {
+		this.bundle = init.bundle;
 		this.id = init.id || uuid.v4();
 		this.patterns = init.patterns;
 		this.patternProperties = init.patternProperties;
+		this.state = init.state;
 
 		if (init.root) {
 			this.root = init.root;
@@ -35,9 +41,11 @@ export class PatternLibrary {
 
 	public static create(): PatternLibrary {
 		const patternLibrary = new PatternLibrary({
+			bundle: '',
 			id: uuid.v4(),
 			patterns: [],
-			patternProperties: []
+			patternProperties: [],
+			state: Types.PatternLibraryState.Pristine
 		});
 
 		const root = new PatternFolder({ name: 'root' }, { patternLibrary });
@@ -75,9 +83,14 @@ export class PatternLibrary {
 
 	public static from(serialized: Types.SerializedPatternLibrary): PatternLibrary {
 		const patternLibrary = new PatternLibrary({
+			bundle: serialized.bundle,
 			id: serialized.id,
 			patterns: [],
-			patternProperties: serialized.patternProperties.map(deserializeProperty)
+			patternProperties: serialized.patternProperties.map(deserializeProperty),
+			state:
+				serialized.state === 'pristine'
+					? Types.PatternLibraryState.Pristine
+					: Types.PatternLibraryState.Imported
 		});
 
 		patternLibrary.setRootFolder(PatternFolder.from(serialized.root, { patternLibrary }));
@@ -94,8 +107,12 @@ export class PatternLibrary {
 		this.updateSearch();
 	}
 
-	public addProperty(property: PatternProperty): void {
+	public addProperty(property: PatternPropertyBase): void {
 		this.patternProperties.push(property);
+	}
+
+	public getBundle(): string {
+		return this.bundle;
 	}
 
 	public getPatternById(id: string): Pattern | undefined {
@@ -106,7 +123,7 @@ export class PatternLibrary {
 		return this.patterns.find(pattern => pattern.getType() === type) as Pattern;
 	}
 
-	public getPatternPropertyById(id: string): PatternProperty | undefined {
+	public getPatternPropertyById(id: string): PatternPropertyBase | undefined {
 		return this.patternProperties.find(patternProperty => patternProperty.getId() === id);
 	}
 
@@ -122,6 +139,10 @@ export class PatternLibrary {
 		return this.patterns.reduce((acc, pattern) => [...acc, ...pattern.getSlots()], []);
 	}
 
+	public getState(): Types.PatternLibraryState {
+		return this.state;
+	}
+
 	public query(term: string): string[] {
 		if (term.trim().length === 0) {
 			return this.root.getDescendants().map(item => item.getId());
@@ -132,16 +153,26 @@ export class PatternLibrary {
 			.map(match => match.id);
 	}
 
+	public setBundle(bundle: string): void {
+		this.bundle = bundle;
+	}
+
 	public setRootFolder(root: PatternFolder): void {
 		this.root = root;
 	}
 
+	public setState(state: Types.PatternLibraryState): void {
+		this.state = state;
+	}
+
 	public toJSON(): Types.SerializedPatternLibrary {
 		return {
+			bundle: this.bundle,
 			id: this.id,
 			patterns: this.patterns.map(p => p.toJSON()),
 			patternProperties: this.patternProperties.map(p => p.toJSON()),
-			root: this.root.toJSON()
+			root: this.root.toJSON(),
+			state: this.state
 		};
 	}
 
@@ -154,7 +185,7 @@ export class PatternLibrary {
 	}
 }
 
-function deserializeProperty(input: Types.SerializedPatternProperty): PatternProperty {
+function deserializeProperty(input: Types.SerializedPatternProperty): PatternPropertyBase {
 	switch (input.type) {
 		case PatternPropertyType.Asset:
 			return P.PatternAssetProperty.from(input);
@@ -171,7 +202,7 @@ function deserializeProperty(input: Types.SerializedPatternProperty): PatternPro
 		case PatternPropertyType.String:
 			return P.PatternStringProperty.from(input);
 		case PatternPropertyType.StringArray:
-			return P.StringPatternArrayProperty.from(input);
+			return P.PatternStringArrayProperty.from(input);
 		default:
 			console.warn(`Tried to deserialize unknown property: ${JSON.stringify(input)}`);
 			return P.PatternStringProperty.from(input);

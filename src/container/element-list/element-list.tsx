@@ -75,11 +75,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			slot => slot.getType() === Types.SlotType.Children
 		);
 
-		const defaultSlot = createSlot(defaultSlotData);
-
-		const children = defaultSlotData
-			? Array.from(defaultSlot ? defaultSlot.children || [] : [])
-			: [];
+		const defaultSlot = defaultSlotData ? createSlot(defaultSlotData) : { children: [] };
+		const children = defaultSlot && defaultSlot.children ? Array.from(defaultSlot.children) : [];
 
 		const slots = slotsData
 			.map(createSlot)

@@ -186,10 +186,12 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		const props = this.props as InjectedPreviewComponentProps;
 		if (props.uuid === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
+			console.log('&&&&&&&&&&&&', props.store.elementId);
 			if (node) {
 				props.highlight.setSize(node as Element);
 			}
 		}
+		console.log('&&&&&&&&&', props.highlight.node);
 	}
 
 	public componentWillUnmount(): void {
@@ -203,7 +205,7 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		} else {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {
-				props.highlight.setSize(node as Element);
+				props.highlight.update();
 				window.requestAnimationFrame(this.handleResize);
 			}
 		}

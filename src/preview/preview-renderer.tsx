@@ -2,7 +2,6 @@ import { HighlightArea } from './highlight-area';
 import { PreviewStore } from './preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { ResizeFactory } from './resize';
 
 // TODO: Produces a deprecation warning, find a way
 // to dedupe MobX when upgrading to 4.x
@@ -119,7 +118,6 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 
 		if (props.store.elementId) {
 			props.highlight.show();
-			console.log('@@@@@@it goes inhere too', props.store.elementId);
 		} else {
 			props.highlight.hide();
 		}
@@ -175,25 +173,38 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 }
 
 class PreviewComponent extends React.Component<PreviewComponentProps> {
-	public componentDidMount(): void {
-		const props = this.props as InjectedPreviewComponentProps;
-		const resize = ResizeFactory();
-		const setSize = () => {
-			if (props.uuid === props.store.elementId) {
-				const node = ReactDom.findDOMNode(this);
-				props.highlight.setSize(node as Element);
-			}
-		};
-
-		resize.register(setSize);
+	public constructor(props: InjectedPreviewComponentProps) {
+		super(props);
+		this.handleResize = this.handleResize.bind(this);
 	}
+
+	public componentDidMount(): void {
+		window.addEventListener('resize', this.handleResize);
+	}
+
 	public componentDidUpdate(): void {
 		const props = this.props as InjectedPreviewComponentProps;
-
 		if (props.uuid === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {
 				props.highlight.setSize(node as Element);
+			}
+		}
+	}
+
+	public componentWillUnmount(): void {
+		window.removeEventListener('resize', this.handleResize);
+	}
+
+	private handleResize(): void {
+		const props = this.props as InjectedPreviewComponentProps;
+		if (props.uuid !== props.store.elementId) {
+			return;
+		} else {
+			const node = ReactDom.findDOMNode(this);
+			if (node) {
+				props.highlight.setSize(node as Element);
+				window.requestAnimationFrame(this.handleResize);
 			}
 		}
 	}

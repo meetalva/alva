@@ -1,4 +1,4 @@
-import { PatternProperty, PatternPropertyInit, PatternPropertyType } from './property';
+import { PatternPropertyBase, PatternPropertyInit, PatternPropertyType } from './property-base';
 import * as Types from '../types';
 
 export interface PatternEnumPropertyInit extends PatternPropertyInit {
@@ -14,7 +14,7 @@ export interface PatternEnumPropertyInit extends PatternPropertyInit {
  * as this is the runtime equivalent.
  * @see Property
  */
-export class PatternEnumProperty extends PatternProperty {
+export class PatternEnumProperty extends PatternPropertyBase {
 	private options: PatternEnumPropertyOption[];
 
 	public readonly type = PatternPropertyType.Enum;

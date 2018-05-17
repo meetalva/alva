@@ -1,7 +1,7 @@
-import { PatternProperty, PatternPropertyType } from './property';
+import { PatternPropertyBase, PatternPropertyType } from './property-base';
 import * as Types from '../types';
 
-export type PropertyResolver = () => PatternProperty[];
+export type PropertyResolver = () => PatternPropertyBase[];
 
 /**
  * An object property is a property that supports objects with nested property values.
@@ -10,11 +10,11 @@ export type PropertyResolver = () => PatternProperty[];
  * @see Property
  * @see PatternProperty
  */
-export class PatternObjectProperty extends PatternProperty {
+export class PatternObjectProperty extends PatternPropertyBase {
 	/**
 	 * The nested properties this property supports in its object values.
 	 */
-	private properties?: Map<string, PatternProperty>;
+	private properties?: Map<string, PatternPropertyBase>;
 
 	private propertyResolver?: PropertyResolver;
 
@@ -47,7 +47,7 @@ export class PatternObjectProperty extends PatternProperty {
 	 * Returns the nested properties this property supports in its object values.
 	 * @return The nested properties this property supports.
 	 */
-	public getProperties(): PatternProperty[] {
+	public getProperties(): PatternPropertyBase[] {
 		return Array.from(this.resolveProperties().values());
 	}
 
@@ -56,11 +56,11 @@ export class PatternObjectProperty extends PatternProperty {
 	 * @param id The ID of the property to return.
 	 * @return The nested property if the ID was found.
 	 */
-	public getProperty(id: string): PatternProperty | undefined {
+	public getProperty(id: string): PatternPropertyBase | undefined {
 		return this.resolveProperties().get(id);
 	}
 
-	private resolveProperties(): Map<string, PatternProperty> {
+	private resolveProperties(): Map<string, PatternPropertyBase> {
 		if (!this.properties) {
 			if (!this.propertyResolver) {
 				throw new Error('property resolver is not set');

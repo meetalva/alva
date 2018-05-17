@@ -1,4 +1,4 @@
-import { PatternProperty, PatternPropertyType } from './property';
+import { PatternPropertyBase, PatternPropertyType } from './property-base';
 import * as Types from '../types';
 
 /**
@@ -8,7 +8,7 @@ import * as Types from '../types';
  * but everything is converted into a proper string (never undefined or null).
  * @see Property
  */
-export class PatternStringProperty extends PatternProperty {
+export class PatternStringProperty extends PatternPropertyBase {
 	public readonly type = PatternPropertyType.String;
 
 	public static from(serialized: Types.SerializedStringProperty): PatternStringProperty {

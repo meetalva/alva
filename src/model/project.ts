@@ -1,7 +1,9 @@
 import { Element, ElementContent } from './element';
 import * as Mobx from 'mobx';
 import { Page } from './page';
+import { Pattern, PatternFolder } from './pattern';
 import { PatternLibrary } from './pattern-library';
+import { PatternProperty } from './pattern-property';
 import * as Types from './types';
 import * as username from 'username';
 import * as uuid from 'uuid';
@@ -190,8 +192,38 @@ export class Project {
 		return this.patternLibrary;
 	}
 
-	public import(analysis: Types.PatternAnalysis[]): void {
-		console.log(analysis);
+	@Mobx.action
+	public import(analysis: Types.LibraryAnalysis): void {
+		const context = { patternLibrary: this.patternLibrary };
+
+		const existing = this.patternLibrary
+			.getRoot()
+			.getChildren()
+			.find(f => f.getName() === 'Patterns');
+
+		if (existing) {
+			existing.remove();
+		}
+
+		const folder = new PatternFolder(
+			{ name: 'Patterns' },
+			{ patternLibrary: this.patternLibrary }
+		);
+		this.patternLibrary.getRoot().addChild(folder);
+
+		analysis.patterns.forEach(item => {
+			const pattern = Pattern.from(item.pattern, context);
+			this.patternLibrary.addPattern(pattern);
+
+			item.properties
+				.map(property => PatternProperty.from(property))
+				.forEach(property => this.patternLibrary.addProperty(property));
+
+			folder.addPattern(pattern);
+		});
+
+		this.patternLibrary.setState(Types.PatternLibraryState.Imported);
+		this.patternLibrary.setBundle(analysis.bundle);
 	}
 
 	public removePage(page: Page): boolean {

@@ -90,7 +90,11 @@ export interface ExportPayload {
 	path: string;
 }
 
-export type LibraryPayload = Types.PatternAnalysis[];
+export interface ImportPayload {
+	bundle: string;
+	path: string;
+	patterns: Types.PatternAnalysis[];
+}
 
 export type ServerMessage =
 	| AppLoaded
@@ -141,7 +145,7 @@ export type ConnectPatternLibraryRequest = EmptyEnvelope<
 >;
 export type ConnectPatternLibraryResponse = Envelope<
 	ServerMessageType.ConnectPatternLibraryResponse,
-	LibraryPayload
+	ImportPayload
 >;
 export type ContentRequest = EmptyEnvelope<ServerMessageType.ContentRequest>;
 export type ContentResponse = Envelope<ServerMessageType.ContentResponse, string>;

@@ -1,22 +1,6 @@
 import { HighlightArea } from './highlight-area';
 
-test('HighlightArea has expected properties', () => {
-	const highlightArea = new HighlightArea();
-
-	expect(highlightArea).toEqual(
-		expect.objectContaining({
-			top: 0,
-			right: 0,
-			bottom: 0,
-			left: 0,
-			width: 0,
-			height: 0,
-			opacity: 0
-		})
-	);
-});
-
-test('HighlightArea sets bounding client values', () => {
+describe('HighlightArea', () => {
 	const highlightArea = new HighlightArea();
 	// tslint:disable:no-any
 	const node: any = {
@@ -29,41 +13,60 @@ test('HighlightArea sets bounding client values', () => {
 			height: 100,
 			x: 100,
 			y: 100
-		}))
+		})),
+		parentElement: true
 	};
-	highlightArea.setSize(node);
-	expect(highlightArea).toEqual(
-		expect.objectContaining({
-			top: 100,
-			right: 100,
-			bottom: 100,
-			left: 100,
-			width: 100,
-			height: 100
-		})
-	);
-});
 
-test('HighlightArea hides element', () => {
-	const highlightArea = new HighlightArea();
-	highlightArea.hide();
+	test('HighlightArea sets bounding client values', () => {
+		highlightArea.setSize(node);
+		expect(highlightArea).toEqual(
+			expect.objectContaining({
+				top: 100,
+				right: 100,
+				bottom: 100,
+				left: 100,
+				width: 100,
+				height: 100
+			})
+		);
+	});
 
-	expect(highlightArea).toEqual(
-		expect.objectContaining({
-			opacity: 0,
-			isVisible: false
-		})
-	);
-});
+	test('HighlightArea updates values', () => {
+		highlightArea.setSize(node);
 
-test('HighlightAria shows element', () => {
-	const highlightArea = new HighlightArea();
-	highlightArea.show();
+		expect(highlightArea.node).toEqual(node);
+		highlightArea.update();
 
-	expect(highlightArea).toEqual(
-		expect.objectContaining({
-			opacity: 1,
-			isVisible: true
-		})
-	);
+		expect(highlightArea).toEqual(
+			expect.objectContaining({
+				top: 100,
+				right: 100,
+				bottom: 100,
+				left: 100,
+				width: 100,
+				height: 100
+			})
+		);
+	});
+
+	test('HighlightArea hides element', () => {
+		highlightArea.hide();
+		expect(highlightArea.isVisible).toBe(false);
+		expect(highlightArea).toEqual(
+			expect.objectContaining({
+				opacity: 0
+			})
+		);
+	});
+
+	test('HighlightAria shows element', () => {
+		highlightArea.show();
+
+		expect(highlightArea.isVisible).toBe(true);
+		expect(highlightArea).toEqual(
+			expect.objectContaining({
+				opacity: 1
+			})
+		);
+	});
 });

@@ -55,6 +55,11 @@ export interface SerializedPatternFolder {
 	patterns: string[];
 }
 
+export enum SerializedPatternType {
+	Pattern = 'pattern',
+	Synthetic = 'synthetic'
+}
+
 export interface SerializedPattern {
 	exportName: string;
 	id: string;
@@ -62,7 +67,7 @@ export interface SerializedPattern {
 	path: string;
 	propertyIds: string[];
 	slots: SerializedPatternSlot[];
-	type: string;
+	type: SerializedPatternType | string;
 }
 
 export interface SerializedPatternSlot {
@@ -111,17 +116,17 @@ export interface SerializedPropertyBase {
 }
 
 export interface SerializedPatternAssetProperty extends SerializedPropertyBase {
-	defaultValue: string;
+	defaultValue?: string;
 	type: PatternPropertyType.Asset;
 }
 
 export interface SerializedPatternBooleanProperty extends SerializedPropertyBase {
-	defaultValue: boolean;
+	defaultValue?: boolean;
 	type: PatternPropertyType.Boolean;
 }
 
 export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
-	defaultValue: boolean;
+	defaultValue?: boolean;
 	options: SerializedEnumOption[];
 	type: PatternPropertyType.Enum;
 }
@@ -139,12 +144,12 @@ export interface SerializedPatternNumberArrayProperty extends SerializedProperty
 }
 
 export interface SerializedPatternNumberProperty extends SerializedPropertyBase {
-	defaultValue: number;
+	defaultValue?: number;
 	type: PatternPropertyType.Number;
 }
 
 export interface SerializedPatternObjectProperty extends SerializedPropertyBase {
-	defaultValue: number;
+	defaultValue?: number;
 	type: PatternPropertyType.Object;
 }
 
@@ -154,7 +159,7 @@ export interface SerializedPatternStringArrayProperty extends SerializedProperty
 }
 
 export interface SerializedStringProperty extends SerializedPropertyBase {
-	defaultValue: string;
+	defaultValue?: string;
 	type: PatternPropertyType.String;
 }
 
@@ -189,4 +194,9 @@ export interface SerializedElementProperty {
 export interface RenderPage {
 	id: string;
 	name: string;
+}
+
+export interface PatternAnalysis {
+	pattern: SerializedPattern;
+	properties: SerializedPatternProperty[];
 }

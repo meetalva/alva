@@ -5,7 +5,7 @@ import * as ts from 'typescript';
 /**
  * A TypeScript type abstraction to enrich the API for the TypeScript styleguide analyzers.
  */
-export class Type {
+export class TypeScriptType {
 	/**
 	 * The base TypeScript type.
 	 */
@@ -30,7 +30,7 @@ export class Type {
 	 * Returns all base types of this type, considering the type's original type, as well.
 	 * @return The base types of this type.
 	 */
-	public getBaseTypes(): Type[] {
+	public getBaseTypes(): TypeScriptType[] {
 		// TODO: Propagate type arguments to base types
 
 		let baseTypes = this.type.getBaseTypes();
@@ -46,7 +46,7 @@ export class Type {
 			return [];
 		}
 
-		return baseTypes.map(baseType => new Type(baseType, this.typeChecker));
+		return baseTypes.map(baseType => new TypeScriptType(baseType, this.typeChecker));
 	}
 
 	/**
@@ -75,7 +75,7 @@ export class Type {
 	 * Returns the type arguments of the type.
 	 * @return The type arguments.
 	 */
-	public getTypeArguments(): Type[] {
+	public getTypeArguments(): TypeScriptType[] {
 		if (!(this.type.flags & ts.TypeFlags.Object)) {
 			return [];
 		}
@@ -85,7 +85,9 @@ export class Type {
 			return [];
 		}
 
-		return typeReferenceType.typeArguments.map(typeArg => new Type(typeArg, this.typeChecker));
+		return typeReferenceType.typeArguments.map(
+			typeArg => new TypeScriptType(typeArg, this.typeChecker)
+		);
 	}
 
 	/**

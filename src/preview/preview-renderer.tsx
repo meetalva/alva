@@ -73,6 +73,15 @@ interface ErrorMessageProps {
 @MobXReact.inject('store', 'highlight')
 @MobXReact.observer
 class PreviewApplication extends React.Component {
+	public componentDidUpdate(): void {
+		const props = this.props as InjectedPreviewApplicationProps;
+		// const node = ReactDom.findDOMNode(this);
+		// if (node) {
+		// 	props.highlight.setSize(node as Element);
+		// }
+		// props.highlight.update();
+		console.log('**************', props.highlight.isVisible, props.highlight.node);
+	}
 	public render(): JSX.Element | null {
 		const props = this.props as InjectedPreviewApplicationProps;
 		const currentPage = props.store.pages.find(page => page.id === props.store.pageId);
@@ -140,10 +149,12 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		const props = this.props as InjectedPreviewComponentProps;
 		if (props.uuid === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
+			console.log('&&&&&&&&&&&&', props.store.elementId);
 			if (node) {
 				props.highlight.setSize(node as Element);
 			}
 		}
+		console.log('&&&&&&&&&', props.highlight.node);
 	}
 
 	public componentWillUnmount(): void {
@@ -157,7 +168,7 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		} else {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {
-				props.highlight.setSize(node as Element);
+				props.highlight.update();
 				window.requestAnimationFrame(this.handleResize);
 			}
 		}

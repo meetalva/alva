@@ -66,7 +66,6 @@ export abstract class PatternPropertyBase {
 		this.id = init.id || uuid.v4();
 		this.label = init.label;
 		this.propertyName = init.propertyName;
-		this.defaultValue = init.defaultValue;
 
 		if (typeof init.hidden !== 'undefined') {
 			this.hidden = init.hidden;
@@ -75,6 +74,8 @@ export abstract class PatternPropertyBase {
 		if (typeof init.required !== 'undefined') {
 			this.required = init.required;
 		}
+
+		this.defaultValue = this.coerceValue(init.defaultValue);
 	}
 
 	/**
@@ -147,7 +148,7 @@ export abstract class PatternPropertyBase {
 	 * @param callback A callback to be called with the resulting, property-compatible value.
 	 */
 	// tslint:disable-next-line:no-any
-	public abstract coerceValue(value: any): any;
+	public abstract coerceValue(value: any): any; // TODO: Make this a static, strongly typed method on
 
 	/**
 	 * Converts a given value into the form required by the component's props' property.

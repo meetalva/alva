@@ -1,5 +1,6 @@
 import { Box, Page, Placeholder, Text } from './builtins';
 import * as Fuse from 'fuse.js';
+import * as Mobx from 'mobx';
 import { Pattern, PatternFolder, PatternSlot, SyntheticPatternType } from '../pattern';
 import { PatternPropertyBase, PatternPropertyType } from '../pattern-property';
 import * as Types from '../types';
@@ -24,7 +25,7 @@ export class PatternLibrary {
 	private patternProperties: PatternPropertyBase[] = [];
 	private patterns: Pattern[] = [];
 	private root: PatternFolder;
-	private state: Types.PatternLibraryState;
+	@Mobx.observable private state: Types.PatternLibraryState;
 
 	public constructor(init: PatternLibraryInit) {
 		this.bundle = init.bundle;

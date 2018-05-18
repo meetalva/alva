@@ -1,13 +1,14 @@
 // tslint:disable:no-bitwise
+import * as ReactUtils from '../../typescript/react-utils';
 import * as Types from '../../../model/types';
-import * as ts from 'typescript';
+import * as Ts from 'typescript';
 import * as TypescriptUtils from '../../typescript/typescript-utils';
 import * as uuid from 'uuid';
 
 export interface PropertyFactoryArgs {
-	symbol: ts.Symbol;
-	type: ts.Type;
-	typechecker: ts.TypeChecker;
+	symbol: Ts.Symbol;
+	type: Ts.Type;
+	typechecker: Ts.TypeChecker;
 }
 
 export type PropertyFactory = (
@@ -28,25 +29,29 @@ const PROPERTY_FACTORIES: PropertyFactory[] = [
  * @param typechecker The type checker used when creating the type.
  * @return The Alva-supported properties.
  */
-export function analyze(
-	type: ts.Type,
-	typechecker: ts.TypeChecker
-): Types.SerializedPatternProperty[] {
-	const properties: Types.SerializedPatternProperty[] = [];
-	const members = type.getApparentProperties();
+export function analyze(type: Ts.Type, program: Ts.Program): Types.SerializedPatternProperty[] {
+	const typechecker = program.getTypeChecker();
 
-	members.forEach(memberSymbol => {
-		if ((memberSymbol.flags & ts.SymbolFlags.Property) !== ts.SymbolFlags.Property) {
-			return;
-		}
+	return type
+		.getApparentProperties()
+		.map(memberSymbol => {
+			if ((memberSymbol.flags & Ts.SymbolFlags.Property) !== Ts.SymbolFlags.Property) {
+				return;
+			}
 
-		const property = analyzeProperty(memberSymbol, typechecker);
-		if (property) {
-			properties.push(property);
-		}
-	});
+			const declaration = TypescriptUtils.findTypeDeclaration(memberSymbol) as Ts.Declaration;
 
-	return properties;
+			const memberType = memberSymbol.type
+				? memberSymbol.type
+				: declaration && typechecker.getTypeAtLocation(declaration);
+
+			if (ReactUtils.isSlotType(program, memberType)) {
+				return;
+			}
+
+			return analyzeProperty(memberSymbol, typechecker);
+		})
+		.filter((p): p is Types.SerializedPatternProperty => typeof p !== 'undefined');
 }
 
 /**
@@ -57,34 +62,52 @@ export function analyze(
  * @return The Alva-supported property or undefined, if the symbol is not supported.
  */
 function analyzeProperty(
-	symbol: ts.Symbol,
-	typechecker: ts.TypeChecker
+	symbol: Ts.Symbol,
+	typechecker: Ts.TypeChecker
 ): Types.SerializedPatternProperty | undefined {
-	const declaration = TypescriptUtils.findTypeDeclaration(symbol) as ts.Declaration;
-
-	let type = symbol.type ? symbol.type : declaration && typechecker.getTypeAtLocation(declaration);
+	const type = getSymbolType(symbol, { typechecker });
 
 	if (!type) {
 		return;
 	}
 
-	if (type.flags & ts.TypeFlags.Union) {
-		type = (type as ts.UnionType).types[0];
-	}
+	const property = PROPERTY_FACTORIES.reduce((result, propertyFactory) => {
+		if (result) {
+			return result;
+		}
 
-	for (const propertyFactory of PROPERTY_FACTORIES) {
-		const property: Types.SerializedPatternProperty | undefined = propertyFactory({
+		return propertyFactory({
 			symbol,
 			type,
 			typechecker
 		});
-		if (property) {
-			setPropertyMetaData(property, symbol);
-			return property;
-		}
+	}, undefined);
+
+	if (property) {
+		setPropertyMetaData(property, symbol);
 	}
 
-	return;
+	return property;
+}
+
+function getSymbolType(
+	symbol: Ts.Symbol,
+	ctx: { typechecker: Ts.TypeChecker }
+): Ts.Type | undefined {
+	const declaration = TypescriptUtils.findTypeDeclaration(symbol) as Ts.Declaration;
+	const type = symbol.type
+		? symbol.type
+		: declaration && ctx.typechecker.getTypeAtLocation(declaration);
+
+	if (!type) {
+		return;
+	}
+
+	if (type.flags & Ts.TypeFlags.Union) {
+		return (type as Ts.UnionType).types[0];
+	}
+
+	return type;
 }
 
 /**
@@ -104,7 +127,7 @@ function createArrayProperty(
 		return;
 	}
 
-	const arrayType: ts.GenericType = args.type as ts.GenericType;
+	const arrayType: Ts.GenericType = args.type as Ts.GenericType;
 
 	if (!arrayType.typeArguments) {
 		return;
@@ -112,7 +135,7 @@ function createArrayProperty(
 
 	const [itemType] = arrayType.typeArguments;
 
-	if ((itemType.flags & ts.TypeFlags.String) === ts.TypeFlags.String) {
+	if ((itemType.flags & Ts.TypeFlags.String) === Ts.TypeFlags.String) {
 		return {
 			defaultValue: [],
 			hidden: false,
@@ -124,7 +147,7 @@ function createArrayProperty(
 		};
 	}
 
-	if ((itemType.flags & ts.TypeFlags.Number) === ts.TypeFlags.Number) {
+	if ((itemType.flags & Ts.TypeFlags.Number) === Ts.TypeFlags.Number) {
 		return {
 			defaultValue: [],
 			hidden: false,
@@ -150,7 +173,7 @@ function createBooleanProperty(
 	args: PropertyFactoryArgs
 ): Types.SerializedPatternBooleanProperty | undefined {
 	if (
-		(args.type.flags & ts.TypeFlags.BooleanLiteral) === ts.TypeFlags.BooleanLiteral ||
+		(args.type.flags & Ts.TypeFlags.BooleanLiteral) === Ts.TypeFlags.BooleanLiteral ||
 		(args.type.symbol && args.type.symbol.name === 'Boolean')
 	) {
 		return {
@@ -176,8 +199,8 @@ function createBooleanProperty(
 function createEnumProperty(
 	args: PropertyFactoryArgs
 ): Types.SerializedPatternEnumProperty | undefined {
-	if (args.type.flags & ts.TypeFlags.EnumLiteral) {
-		if (!(args.type.symbol && args.type.symbol.flags & ts.SymbolFlags.EnumMember)) {
+	if (args.type.flags & Ts.TypeFlags.EnumLiteral) {
+		if (!(args.type.symbol && args.type.symbol.flags & Ts.SymbolFlags.EnumMember)) {
 			return;
 		}
 
@@ -187,7 +210,7 @@ function createEnumProperty(
 		}
 
 		const enumDeclaration = enumMemberDeclaration.parent;
-		if (!ts.isEnumDeclaration(enumDeclaration)) {
+		if (!Ts.isEnumDeclaration(enumDeclaration)) {
 			return;
 		}
 
@@ -228,7 +251,7 @@ function createEnumProperty(
 function createNumberProperty(
 	args: PropertyFactoryArgs
 ): Types.SerializedPatternNumberProperty | undefined {
-	if ((args.type.flags & ts.TypeFlags.Number) === ts.TypeFlags.Number) {
+	if ((args.type.flags & Ts.TypeFlags.Number) === Ts.TypeFlags.Number) {
 		return {
 			hidden: false,
 			id: uuid.v4(),
@@ -275,7 +298,7 @@ function createNumberProperty(
 function createStringProperty(
 	args: PropertyFactoryArgs
 ): Types.SerializedPatternAssetProperty | Types.SerializedStringProperty | undefined {
-	if ((args.type.flags & ts.TypeFlags.String) === ts.TypeFlags.String) {
+	if ((args.type.flags & Ts.TypeFlags.String) === Ts.TypeFlags.String) {
 		if (getJsDocValueFromSymbol(args.symbol, 'asset') !== undefined) {
 			// return new AssetProperty(args.symbol.name);
 			return {
@@ -307,8 +330,8 @@ function createStringProperty(
  * @param node The node to scan.
  * @param tagName The JsDoc tag name, or undefined if the tag has not been found.
  */
-function getJsDocValue(node: ts.Node, tagName: string): string | undefined {
-	const jsDocTags: ReadonlyArray<ts.JSDocTag> | undefined = ts.getJSDocTags(node);
+function getJsDocValue(node: Ts.Node, tagName: string): string | undefined {
+	const jsDocTags: ReadonlyArray<Ts.JSDocTag> | undefined = Ts.getJSDocTags(node);
 	let result: string | undefined;
 	if (jsDocTags) {
 		jsDocTags.forEach(jsDocTag => {
@@ -330,7 +353,7 @@ function getJsDocValue(node: ts.Node, tagName: string): string | undefined {
  * @param node The node to scan.
  * @param tagName The JsDoc tag name, or undefined if the tag has not been found.
  */
-function getJsDocValueFromSymbol(symbol: ts.Symbol, tagName: string): string | undefined {
+function getJsDocValueFromSymbol(symbol: Ts.Symbol, tagName: string): string | undefined {
 	const jsDocTags = symbol.getJsDocTags();
 	let result: string | undefined;
 	if (jsDocTags) {
@@ -355,9 +378,9 @@ function getJsDocValueFromSymbol(symbol: ts.Symbol, tagName: string): string | u
  */
 function setPropertyMetaData(
 	property: Types.SerializedPatternProperty,
-	symbol: ts.Symbol
+	symbol: Ts.Symbol
 ): Types.SerializedPatternProperty {
-	property.required = (symbol.flags & ts.SymbolFlags.Optional) !== ts.SymbolFlags.Optional;
+	property.required = (symbol.flags & Ts.SymbolFlags.Optional) !== Ts.SymbolFlags.Optional;
 	property.label = getJsDocValueFromSymbol(symbol, 'name') || property.label;
 	property.defaultValue = getJsDocValueFromSymbol(symbol, 'default') || property.defaultValue;
 	return property;

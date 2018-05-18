@@ -5,10 +5,10 @@ import * as TypescriptUtils from '../typescript/typescript-utils';
 import * as uuid from 'uuid';
 
 export function analyzeSlots(type: Ts.Type, program: Ts.Program): Types.SerializedPatternSlot[] {
-	const members = type.getApparentProperties();
 	const typechecker = program.getTypeChecker();
 
-	return members
+	return type
+		.getApparentProperties()
 		.map(memberSymbol => {
 			const declaration = TypescriptUtils.findTypeDeclaration(memberSymbol) as Ts.Declaration;
 
@@ -24,7 +24,7 @@ export function analyzeSlots(type: Ts.Type, program: Ts.Program): Types.Serializ
 				displayName: memberSymbol.getName(),
 				id: uuid.v4(),
 				propertyName: memberSymbol.getName(),
-				type: 'property'
+				type: memberSymbol.getName() === 'children' ? 'children' : 'property'
 			};
 		})
 		.filter((slot): slot is Types.SerializedPatternSlot => typeof slot !== 'undefined');

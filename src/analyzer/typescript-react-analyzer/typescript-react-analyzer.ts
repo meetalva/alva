@@ -90,7 +90,7 @@ function analyzeFolder(
 			}
 
 			const [propTypes] = reactTypeArguments;
-			const properties = PropertyAnalyzer.analyze(propTypes.type, propTypes.typeChecker);
+			const properties = PropertyAnalyzer.analyze(propTypes.type, program);
 			const slots = SlotAnalyzer.analyzeSlots(propTypes.type, program);
 
 			return {

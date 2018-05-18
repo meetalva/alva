@@ -21,6 +21,11 @@ export class PatternFolderContainer extends React.Component<PatternFolderContain
 		const patterns = props.folder.getPatterns().filter(filter);
 		const children = props.folder.getChildren().filter(filter);
 
+		// TODO: make this capable of aborting for nested folders
+		if (!props.isRoot && patterns.length === 0 && children.length === 0) {
+			return null;
+		}
+
 		return (
 			<PatternFolderView name={props.isRoot ? '' : props.folder.getName()}>
 				{patterns.map(pattern => props.render(pattern))}

@@ -232,6 +232,24 @@ async function createWindow(): Promise<void> {
 
 				break;
 			}
+			case ServerMessageType.DroppedFile: {
+				const { isSiblingDrop, path, targetContentId, targetElementId } = message.payload;
+				const content = await readFile(path);
+				const mimeType = MimeTypes.lookup(path) || 'application/octet-stream';
+
+				Sender.send({
+					type: ServerMessageType.CreateNewPlaceholder,
+					id: message.id,
+					payload: {
+						data: `data:${mimeType};base64,${content.toString('base64')}`,
+						isSiblingDrop,
+						targetContentId,
+						targetElementId
+					}
+				});
+
+				break;
+			}
 			case ServerMessageType.Save: {
 				const project = Project.from(message.payload.project);
 				project.setPath(message.payload.path);

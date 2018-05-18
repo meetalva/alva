@@ -39,6 +39,8 @@ export enum ServerMessageType {
 	DeleteElement = 'delete-page-element',
 	Duplicate = 'duplicate',
 	DuplicateElement = 'duplicate-page-element',
+	DroppedFile = 'dropped-file',
+	CreateNewPlaceholder = 'create-new-placeholder',
 	ElementChange = 'element-change',
 	ExportHTML = 'export-html',
 	ExportPDF = 'export-pdf',
@@ -97,6 +99,8 @@ export type ServerMessage =
 	| DeletePageElement
 	| Duplicate
 	| DuplicatePageElement
+	| DroppedFile
+	| CreateNewPlaceholder
 	| ExportHTML
 	| ExportPDF
 	| ExportPNG
@@ -172,6 +176,24 @@ export type CutPageElement = Envelope<ServerMessageType.CutElement, string>;
 export type DeletePageElement = Envelope<ServerMessageType.DeleteElement, string>;
 export type Duplicate = EmptyEnvelope<ServerMessageType.Duplicate>;
 export type DuplicatePageElement = Envelope<ServerMessageType.DuplicateElement, string>;
+export type DroppedFile = Envelope<
+	ServerMessageType.DroppedFile,
+	{
+		isSiblingDrop: boolean;
+		path: string;
+		targetContentId: string;
+		targetElementId: string;
+	}
+>;
+export type CreateNewPlaceholder = Envelope<
+	ServerMessageType.CreateNewPlaceholder,
+	{
+		data: string;
+		isSiblingDrop: boolean;
+		targetContentId: string;
+		targetElementId: string;
+	}
+>;
 export type OpenFileRequest = EmptyEnvelope<ServerMessageType.OpenFileRequest>;
 export type OpenFileResponse = Envelope<ServerMessageType.OpenFileResponse, Types.ProjectPayload>;
 export type PageChange = Envelope<ServerMessageType.PageChange, Types.PageChangePayload>;

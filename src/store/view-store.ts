@@ -205,7 +205,11 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public createElement(init: { dragged?: boolean; pattern: Model.Pattern }): Model.Element {
+	public createElement(init: {
+		dragged?: boolean;
+		pattern: Model.Pattern;
+		properties?: Model.ElementProperty[];
+	}): Model.Element {
 		const project = this.getProject();
 		const patternLibrary = project.getPatternLibrary();
 
@@ -230,7 +234,7 @@ export class ViewStore {
 				open: false,
 				patternId: init.pattern.getId(),
 				placeholderHighlighted: false,
-				properties: [],
+				properties: init.properties || [],
 				setDefaults: true,
 				selected: false
 			},

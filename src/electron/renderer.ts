@@ -1,15 +1,22 @@
-import { App } from '../container/app';
-import * as Sender from '../message/client';
-import { createMenu } from './create-menu';
 import { webFrame } from 'electron';
-import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
-import { Project } from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { ViewStore } from '../store';
 import * as Types from '../model/types';
 import * as uuid from 'uuid';
+
+import { App } from '../container/app';
+import * as Sender from '../message/client';
+import { ElementAnchors } from '../components';
+import { createMenu } from './create-menu';
+import {
+	contentFromTarget,
+	elementFromTarget,
+	handleDragDrop
+} from '../container/element-list/element-list';
+import { ServerMessageType } from '../message';
+import { ElementProperty, Project, SyntheticPatternType } from '../model';
+import { ViewStore } from '../store';
 
 // prevent app zooming
 webFrame.setVisualZoomLevelLimits(1, 1);
@@ -212,6 +219,46 @@ Sender.receive(message => {
 			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.duplicateElementById(message.payload);
 			}
+			break;
+		}
+		case ServerMessageType.CreateNewPlaceholder: {
+			const patternLibrary = store.getPatternLibrary();
+			const targetElement = store.getElementById(message.payload.targetElementId);
+			const targetContent = store.getContentById(message.payload.targetContentId);
+
+			if (!patternLibrary || !targetContent) {
+				return;
+			}
+
+			const pattern = patternLibrary.getPatternByType(SyntheticPatternType.SyntheticPlaceholder);
+			const property = pattern.getPropertyByName('src');
+
+			if (!property) {
+				return;
+			}
+
+			const element = store.createElement({
+				pattern,
+				properties: [
+					new ElementProperty(
+						{
+							id: uuid.v4(),
+							patternPropertyId: property.getId(),
+							setDefault: false,
+							value: message.payload.data
+						},
+						{ patternLibrary }
+					)
+				]
+			});
+
+			store.addElement(element);
+
+			if (!targetElement) {
+				return;
+			}
+
+			handleDragDrop(message.payload.isSiblingDrop, targetContent, targetElement, element);
 		}
 	}
 });
@@ -288,15 +335,52 @@ document.addEventListener(
 document.addEventListener(
 	'dragover',
 	event => {
-		event.dataTransfer.dropEffect = 'none';
 		event.preventDefault();
+		if (!event.target) {
+			event.dataTransfer.dropEffect = 'none';
+		}
 	},
 	false
 );
+
 document.addEventListener(
 	'drop',
 	event => {
 		event.preventDefault();
+		if (event.target) {
+			const sourcePath = event.dataTransfer.files[0].path;
+
+			if (
+				!sourcePath ||
+				!event.target ||
+				(!sourcePath.endsWith('.png') &&
+					!sourcePath.endsWith('.jpg') &&
+					!sourcePath.endsWith('.svg') &&
+					!sourcePath.endsWith('.gif'))
+			) {
+				return;
+			}
+
+			const target = event.target as HTMLElement;
+			const isSiblingDrop = target.getAttribute(ElementAnchors.placeholder) === 'true';
+			const targetContent = contentFromTarget(target, { sibling: isSiblingDrop });
+			const targetElement = elementFromTarget(target, { sibling: false });
+
+			if (!targetContent || !targetElement) {
+				return;
+			}
+
+			Sender.send({
+				id: uuid.v4(),
+				payload: {
+					isSiblingDrop,
+					path: sourcePath,
+					targetContentId: targetContent.getId(),
+					targetElementId: targetElement.getId()
+				},
+				type: ServerMessageType.DroppedFile
+			});
+		}
 	},
 	false
 );

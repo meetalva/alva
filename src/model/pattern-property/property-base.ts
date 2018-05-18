@@ -149,9 +149,7 @@ export abstract class PatternPropertyBase<T> {
 	}
 
 	/**
-	 * Returns the technical ID of this property (e.g. the property name in the TypeScript props
-	 * interface).
-	 * @return The technical ID.
+	 * @return The UUID of this property.
 	 */
 	public getId(): string {
 		return this.id;
@@ -164,6 +162,15 @@ export abstract class PatternPropertyBase<T> {
 	 */
 	public getLabel(): string {
 		return this.label;
+	}
+
+	/**
+	 * Returns the technical name of this property (e.g. the property name in the TypeScript props
+	 * interface).
+	 * @return The technical name.
+	 */
+	public getName(): string {
+		return this.propertyName;
 	}
 
 	public getType(): Types.PatternPropertyType {

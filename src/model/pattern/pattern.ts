@@ -3,6 +3,7 @@ import { PatternFolder } from '../pattern-folder';
 import { PatternLibrary } from '../pattern-library';
 import * as PatternProperty from '../pattern-property';
 import { PatternSlot } from './pattern-slot';
+import { PatternPropertyBase } from '../pattern-property/property-base';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
@@ -34,7 +35,6 @@ export interface PatternContext {
 }
 
 export class Pattern {
-
 	private contextId: string;
 
 	private exportName: string;
@@ -109,6 +109,20 @@ export class Pattern {
 			.filter((p): p is PatternProperty.AnyPatternProperty => typeof p !== 'undefined');
 	}
 
+	/**
+	 * Returns a specific property based on it's technical name.
+	 * @return The property with the given name.
+	 */
+	public getPropertyByName(
+		propertyName: string
+	): PatternPropertyBase<PatternProperty.PatternPropertyValueType> | undefined {
+		return this.getProperties().find(property => property.getName() === propertyName);
+	}
+
+	/**
+	 * Returns the slots this pattern supports.
+	 * @return The slots this pattern supports.
+	 */
 	public getSlots(): PatternSlot[] {
 		return this.slots;
 	}

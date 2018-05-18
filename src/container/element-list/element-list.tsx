@@ -212,39 +212,7 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		const getDropIndex = () => {
-			if (!isSiblingDrop) {
-				return dropTargetContent.getElements().length;
-			}
-			return calculateDropIndex({
-				target: rawTargetElement,
-				dragged: draggedElement
-			});
-		};
-
-		const index = getDropIndex();
-
-		if (index === -1) {
-			return;
-		}
-
-		if (
-			store
-				.getProject()
-				.getElements()
-				.some(el => el.getId() === draggedElement.getId())
-		) {
-			store.addElement(draggedElement);
-		}
-
-		const command = Model.ElementLocationCommand.addChild({
-			childId: draggedElement.getId(),
-			contentId: dropTargetContent.getId(),
-			index
-		});
-
-		store.execute(command);
-		store.setSelectedElement(draggedElement);
+		handleDragDrop(isSiblingDrop, dropTargetContent, rawTargetElement, draggedElement);
 	}
 
 	private handleKeyDown(e: KeyboardEvent): void {
@@ -381,7 +349,50 @@ function above(node: EventTarget, selector: string): HTMLElement | null {
 	return ended ? null : el;
 }
 
-function contentFromTarget(
+export function handleDragDrop(
+	isSiblingDrop: boolean,
+	dropTargetContent: Model.ElementContent,
+	rawTargetElement: Model.Element,
+	draggedElement: Model.Element
+): void {
+	const store = Store.ViewStore.getInstance();
+
+	const getDropIndex = () => {
+		if (!isSiblingDrop) {
+			return dropTargetContent.getElements().length;
+		}
+		return calculateDropIndex({
+			target: rawTargetElement,
+			dragged: draggedElement
+		});
+	};
+
+	const index = getDropIndex();
+
+	if (index === -1) {
+		return;
+	}
+
+	if (
+		store
+			.getProject()
+			.getElements()
+			.some(el => el.getId() === draggedElement.getId())
+	) {
+		store.addElement(draggedElement);
+	}
+
+	const command = Model.ElementLocationCommand.addChild({
+		childId: draggedElement.getId(),
+		contentId: dropTargetContent.getId(),
+		index
+	});
+
+	store.execute(command);
+	store.setSelectedElement(draggedElement);
+}
+
+export function contentFromTarget(
 	target: EventTarget,
 	options: { sibling: boolean }
 ): Model.ElementContent | undefined {
@@ -418,7 +429,7 @@ function contentFromTarget(
 	return base.getContentBySlotType(Types.SlotType.Children);
 }
 
-function elementFromTarget(
+export function elementFromTarget(
 	target: EventTarget,
 	options: { sibling: boolean }
 ): Model.Element | undefined {

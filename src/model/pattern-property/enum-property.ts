@@ -15,7 +15,7 @@ export interface PatternEnumPropertyInit extends PatternPropertyInit {
  * @see Property
  */
 export class PatternEnumProperty extends PatternPropertyBase {
-	private options: PatternEnumPropertyOption[];
+	private options: PatternEnumPropertyOption[] = [];
 
 	public readonly type = PatternPropertyType.Enum;
 
@@ -40,32 +40,10 @@ export class PatternEnumProperty extends PatternPropertyBase {
 		});
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
+	public coerceValue(value: any): string | undefined {
 		if (value === null || value === undefined || value === '') {
 			return;
-		}
-
-		for (const option of this.options) {
-			if (option.getId() === value.toString()) {
-				return option.getId();
-			}
-		}
-
-		const valueNumber = parseInt(value, 10);
-		for (const option of this.options) {
-			if (option.getOrdinal() === valueNumber) {
-				return option.getId();
-			}
-		}
-
-		for (const option of this.options) {
-			if (option.getName() === value.toString()) {
-				return option.getId();
-			}
 		}
 
 		return String(value);
@@ -106,14 +84,14 @@ export interface PatternEnumPropertyOptionInit {
 	id: string;
 	name: string;
 	ordinal: number;
-	value: string;
+	value: string | number;
 }
 
 export class PatternEnumPropertyOption {
 	private id: string;
 	private name: string;
 	private ordinal: number;
-	private value: string;
+	private value: string | number;
 
 	public constructor(init: PatternEnumPropertyOptionInit) {
 		this.id = init.id;
@@ -138,7 +116,7 @@ export class PatternEnumPropertyOption {
 		return this.ordinal;
 	}
 
-	public getValue(): string {
+	public getValue(): string | number {
 		return this.value;
 	}
 

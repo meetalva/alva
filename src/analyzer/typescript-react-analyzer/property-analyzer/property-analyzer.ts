@@ -206,7 +206,7 @@ function createEnumProperty(
 					id: uuid.v4(),
 					name: enumMemberName,
 					ordinal: enumMemberOrdinal,
-					value: String(enumMemberOrdinal)
+					value: enumMemberOrdinal
 				};
 			}),
 			propertyName: args.symbol.name,

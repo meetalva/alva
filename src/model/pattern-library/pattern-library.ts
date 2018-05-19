@@ -2,7 +2,7 @@ import { Box, Page, Placeholder, Text } from './builtins';
 import * as Fuse from 'fuse.js';
 import * as Mobx from 'mobx';
 import { Pattern, PatternFolder, PatternSlot, SyntheticPatternType } from '../pattern';
-import { PatternPropertyBase, PatternPropertyType } from '../pattern-property';
+import { AnyProperty, PatternPropertyType } from '../pattern-property';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
@@ -12,7 +12,7 @@ import * as P from '../pattern-property';
 export interface PatternLibraryInit {
 	bundle: string;
 	id: string;
-	patternProperties: PatternPropertyBase[];
+	patternProperties: AnyProperty[];
 	patterns: Pattern[];
 	root?: PatternFolder;
 	state: Types.PatternLibraryState;
@@ -22,7 +22,7 @@ export class PatternLibrary {
 	private bundle: string;
 	private fuse: Fuse;
 	private id: string;
-	private patternProperties: PatternPropertyBase[] = [];
+	private patternProperties: AnyProperty[] = [];
 	private patterns: Pattern[] = [];
 	private root: PatternFolder;
 	@Mobx.observable private state: Types.PatternLibraryState;
@@ -108,7 +108,7 @@ export class PatternLibrary {
 		this.updateSearch();
 	}
 
-	public addProperty(property: PatternPropertyBase): void {
+	public addProperty(property: AnyProperty): void {
 		this.patternProperties.push(property);
 	}
 
@@ -124,7 +124,7 @@ export class PatternLibrary {
 		return this.patterns.find(pattern => pattern.getType() === type) as Pattern;
 	}
 
-	public getPatternPropertyById(id: string): PatternPropertyBase | undefined {
+	public getPatternPropertyById(id: string): AnyProperty | undefined {
 		return this.patternProperties.find(patternProperty => patternProperty.getId() === id);
 	}
 
@@ -186,7 +186,7 @@ export class PatternLibrary {
 	}
 }
 
-function deserializeProperty(input: Types.SerializedPatternProperty): PatternPropertyBase {
+function deserializeProperty(input: Types.SerializedPatternProperty): AnyProperty {
 	switch (input.type) {
 		case PatternPropertyType.Asset:
 			return P.PatternAssetProperty.from(input);
@@ -198,8 +198,6 @@ function deserializeProperty(input: Types.SerializedPatternProperty): PatternPro
 			return P.PatternNumberProperty.from(input);
 		case PatternPropertyType.NumberArray:
 			return P.PatternNumberArrayProperty.from(input);
-		case PatternPropertyType.Object:
-			return P.PatternObjectProperty.from(input);
 		case PatternPropertyType.String:
 			return P.PatternStringProperty.from(input);
 		case PatternPropertyType.StringArray:

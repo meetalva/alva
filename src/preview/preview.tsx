@@ -368,7 +368,7 @@ function createPropertiesGetter(
 
 			switch (patternProperty.type) {
 				case 'enum': {
-					const option = patternProperty.options.find(o => o.id === elementProperty.value);
+					const option = patternProperty.options.find(o => o.value === elementProperty.value);
 					acc[propertyName] = option ? option.value : undefined;
 					break;
 				}

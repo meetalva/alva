@@ -10,7 +10,7 @@ import * as Types from '../types';
  * use getValueFromFile, getValueFromBuffer, or getValueFromUrl.
  * @see Property
  */
-export class PatternAssetProperty extends PatternPropertyBase {
+export class PatternAssetProperty extends PatternPropertyBase<string | undefined> {
 	public readonly type = PatternPropertyType.Asset;
 
 	public static from(serialized: Types.SerializedPatternAssetProperty): PatternAssetProperty {

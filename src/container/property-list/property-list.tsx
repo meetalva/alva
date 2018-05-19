@@ -87,7 +87,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 			case P.Enum: {
 				const value = property.getValue() as string;
 				const patternProperty = property.getPatternProperty() as PatternEnumProperty;
-				const selectedOption = patternProperty.getOptionById(value);
+				const selectedOption = patternProperty.getOptionByValue(value);
 				const selectedValue = selectedOption ? selectedOption.getId() : undefined;
 
 				return (

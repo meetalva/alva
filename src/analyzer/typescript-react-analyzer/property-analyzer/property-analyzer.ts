@@ -382,6 +382,16 @@ function setPropertyMetaData(
 ): Types.SerializedPatternProperty {
 	property.required = (symbol.flags & Ts.SymbolFlags.Optional) !== Ts.SymbolFlags.Optional;
 	property.label = getJsDocValueFromSymbol(symbol, 'name') || property.label;
-	property.defaultValue = getJsDocValueFromSymbol(symbol, 'default') || property.defaultValue;
+
+	switch (property.type) {
+		case Types.PatternPropertyType.Enum:
+			const defaultOption = property.options.find(option => option.name === getJsDocValueFromSymbol(symbol, 'default'));
+			property.defaultOptionId = defaultOption ? defaultOption.id : undefined;
+			break;
+		default:
+			const defaultValue = getJsDocValueFromSymbol(symbol, 'default') || property.defaultValue;
+			property.defaultValue = defaultValue;
+	}
+
 	return property;
 }

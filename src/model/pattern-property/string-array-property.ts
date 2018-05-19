@@ -9,7 +9,7 @@ import * as Types from '../types';
  * (where all elements are never undefined or null).
  * @see Property
  */
-export class PatternStringArrayProperty extends PatternPropertyBase {
+export class PatternStringArrayProperty extends PatternPropertyBase<string[]> {
 	public readonly type = PatternPropertyType.StringArray;
 
 	public static from(

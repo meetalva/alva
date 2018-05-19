@@ -90,7 +90,6 @@ export enum PatternPropertyType {
 	Enum = 'enum',
 	NumberArray = 'number[]',
 	Number = 'number',
-	Object = 'object',
 	StringArray = 'string[]',
 	String = 'string'
 }
@@ -110,7 +109,6 @@ export type SerializedPatternProperty =
 	| SerializedPatternEnumProperty
 	| SerializedPatternNumberArrayProperty
 	| SerializedPatternNumberProperty
-	| SerializedPatternObjectProperty
 	| SerializedPatternStringArrayProperty
 	| SerializedStringProperty;
 
@@ -133,7 +131,7 @@ export interface SerializedPatternBooleanProperty extends SerializedPropertyBase
 }
 
 export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
-	defaultValue?: boolean;
+	defaultOptionId?: string;
 	options: SerializedEnumOption[];
 	type: PatternPropertyType.Enum;
 }
@@ -153,11 +151,6 @@ export interface SerializedPatternNumberArrayProperty extends SerializedProperty
 export interface SerializedPatternNumberProperty extends SerializedPropertyBase {
 	defaultValue?: number;
 	type: PatternPropertyType.Number;
-}
-
-export interface SerializedPatternObjectProperty extends SerializedPropertyBase {
-	defaultValue?: number;
-	type: PatternPropertyType.Object;
 }
 
 export interface SerializedPatternStringArrayProperty extends SerializedPropertyBase {

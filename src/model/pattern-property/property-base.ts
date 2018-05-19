@@ -1,11 +1,13 @@
+// TODO: Disband this file in favor of a pure interface
+// that can be implemented by properties. Also consider
+// splitting array vs enum vs object vs primitive properties
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
 export { PatternPropertyType } from '../types';
 
-export interface PatternPropertyInit {
-	// tslint:disable-next-line:no-any
-	defaultValue?: any;
+export interface PatternPropertyInit<T> {
+	defaultValue?: T;
 	hidden?: boolean;
 	id?: string;
 	label: string;
@@ -21,48 +23,22 @@ export interface PatternPropertyInit {
  * @see PageElement
  * @see PatternParser
  */
-export abstract class PatternPropertyBase {
-	/**
-	 * The default value of the property when creating a new page element.
-	 * This is the Alva default (such as "Lorem Ipsum"), not the default for production component
-	 * instantiation (where such defaults sometimes do not make sense).
-	 */
-	// tslint:disable-next-line:no-any
-	protected defaultValue: any;
+export abstract class PatternPropertyBase<T> {
+	protected defaultValue: T;
 
-	/**
-	 * Whether this property is marked as hidden in Alva (exists in the pattern, but the designer
-	 * should not provide content for it).
-	 */
 	protected hidden: boolean = false;
 
-	/**
-	 * The technical ID of this property (e.g. the property name in the TypeScript props interface).
-	 */
 	protected id: string;
 
-	/**
-	 * The human-friendly name of the property, usually provided by an annotation.
-	 * In the frontend, to be displayed instead of the ID.
-	 */
 	protected label: string;
 
 	protected propertyName: string;
 
-	/**
-	 * Whether the designer, when editing a page element, is required to enter a value
-	 * for this property.
-	 */
 	protected required: boolean = false;
 
 	public readonly type: Types.PatternPropertyType;
 
-	/**
-	 * Creates a new property.
-	 * @param id The technical ID of this property (e.g. the property name in the TypeScript
-	 * props interface). Initially, the name is guessed automatically.
-	 */
-	public constructor(init: PatternPropertyInit) {
+	public constructor(init: PatternPropertyInit<T>) {
 		this.id = init.id || uuid.v4();
 		this.label = init.label;
 		this.propertyName = init.propertyName;
@@ -148,7 +124,7 @@ export abstract class PatternPropertyBase {
 	 * @param callback A callback to be called with the resulting, property-compatible value.
 	 */
 	// tslint:disable-next-line:no-any
-	public abstract coerceValue(value: any): any; // TODO: Make this a static, strongly typed method on
+	public abstract coerceValue(value: any): T;
 
 	/**
 	 * Converts a given value into the form required by the component's props' property.
@@ -158,7 +134,7 @@ export abstract class PatternPropertyBase {
 	 * @return The value compatible to the component's props' property.
 	 */
 	// tslint:disable-next-line:no-any
-	public convertToRender(value: any): any {
+	public convertToRender(value: any): T {
 		return value;
 	}
 
@@ -168,8 +144,7 @@ export abstract class PatternPropertyBase {
 	 * instantiation (where such defaults sometimes do not make sense).
 	 * @return The default value.
 	 */
-	// tslint:disable-next-line:no-any
-	public getDefaultValue(): any {
+	public getDefaultValue(): T | undefined {
 		return this.defaultValue;
 	}
 

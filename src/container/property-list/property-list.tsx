@@ -37,6 +37,13 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 		this.props.property.setValue(target.checked);
 	}
 
+	private handleEnumChange(e: React.ChangeEvent<HTMLSelectElement>): void {
+		const patternProperty = this.props.property.getPatternProperty() as PatternEnumProperty;
+		const selectedOption = patternProperty.getOptionById(e.target.value);
+		const selectedValue = selectedOption ? selectedOption.getValue() : undefined;
+		this.props.property.setValue(selectedValue);
+	}
+
 	private handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void {
 		this.props.property.setValue(e.target.value);
 	}
@@ -98,7 +105,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 							id: option.getId(),
 							name: option.getName()
 						}))}
-						onChange={e => this.handleInputChange(e)}
+						onChange={e => this.handleEnumChange(e)}
 					/>
 				);
 			}

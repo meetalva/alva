@@ -180,10 +180,10 @@ export class Pattern {
 	 * Returns the properties this pattern supports.
 	 * @return The properties this pattern supports.
 	 */
-	public getProperties(): PatternProperty.PatternPropertyBase[] {
+	public getProperties(): PatternProperty.AnyProperty[] {
 		return this.propertyIds
 			.map(propertyId => this.patternLibrary.getPatternPropertyById(propertyId))
-			.filter((p): p is PatternProperty.PatternPropertyBase => typeof p !== 'undefined');
+			.filter((p): p is PatternProperty.AnyProperty => typeof p !== 'undefined');
 	}
 
 	/**

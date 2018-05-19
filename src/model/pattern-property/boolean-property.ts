@@ -7,7 +7,7 @@ import * as Types from '../types';
  * "true" and "false", and the numbers 1 and 0, as well (see coerceValue()).
  * @see Property
  */
-export class PatternBooleanProperty extends PatternPropertyBase {
+export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefined> {
 	public readonly type = PatternPropertyType.Boolean;
 
 	public static from(serialized: Types.SerializedPatternBooleanProperty): PatternBooleanProperty {

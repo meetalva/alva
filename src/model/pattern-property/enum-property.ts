@@ -1,20 +1,20 @@
-import { PatternPropertyBase, PatternPropertyInit, PatternPropertyType } from './property-base';
+import { PatternPropertyBase, PatternPropertyType } from './property-base';
 import * as Types from '../types';
 
-export interface PatternEnumPropertyInit extends PatternPropertyInit {
+export interface PatternEnumPropertyInit {
+	defaultOptionId?: string;
+	hidden: boolean;
+	id: string;
+	label: string;
 	options: PatternEnumPropertyOption[];
+	propertyName: string;
+	required: boolean;
 }
 
-/**
- * An enum property is a property that supports the elements of a given enum only, and undefined.
- * As designer content value (raw value), the property accepts the option ID (JavaScript name),
- * option name (human-friendly name), and option ordinal (assigned number value),
- * but everything is converted into the option ID.
- * When rendering however, the value is converted into the ordinal,
- * as this is the runtime equivalent.
- * @see Property
- */
-export class PatternEnumProperty extends PatternPropertyBase {
+export type EnumValue = string | number;
+
+export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefined> {
+	private defaultOptionId?: string;
 	private options: PatternEnumPropertyOption[] = [];
 
 	public readonly type = PatternPropertyType.Enum;
@@ -22,6 +22,7 @@ export class PatternEnumProperty extends PatternPropertyBase {
 	public constructor(init: PatternEnumPropertyInit) {
 		super(init);
 		this.options = init.options;
+		this.defaultOptionId = init.defaultOptionId;
 	}
 
 	public static from(
@@ -29,7 +30,7 @@ export class PatternEnumProperty extends PatternPropertyBase {
 	): PatternEnumProperty {
 		return new PatternEnumProperty({
 			hidden: serializedProperty.hidden,
-			defaultValue: serializedProperty.defaultValue,
+			defaultOptionId: serializedProperty.defaultOptionId,
 			id: serializedProperty.id,
 			label: serializedProperty.label,
 			options: serializedProperty.options.map(serializedOption =>
@@ -41,35 +42,44 @@ export class PatternEnumProperty extends PatternPropertyBase {
 	}
 
 	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): string | undefined {
-		if (value === null || value === undefined || value === '') {
+	public coerceValue(value: any): EnumValue | undefined {
+		if (typeof value !== 'string' && typeof value !== 'number') {
 			return;
 		}
 
-		return String(value);
+		if (typeof value === 'number' && Number.isNaN(value)) {
+			return;
+		}
+
+		return value;
 	}
 
-	/**
-	 * Returns the option ordinal (assigned number value) for a given option ID.
-	 * @param id The option ID.
-	 * @return The ordinal if an option with this ID exists.
-	 */
+	public getDefaultValue(): EnumValue | undefined {
+		const option = this.options.find(o => o.getId() === this.defaultOptionId);
+
+		if (!option) {
+			return;
+		}
+
+		return option.getValue();
+	}
+
 	public getOptionById(id: string): PatternEnumPropertyOption | undefined {
 		return this.options.find(option => option.getId() === id);
 	}
 
-	/**
-	 * Returns the options supported by this enum.
-	 * @return The options supported by this enum.
-	 */
+	public getOptionByValue(value: EnumValue): PatternEnumPropertyOption | undefined {
+		return this.options.find(option => option.getValue() === value);
+	}
+
 	public getOptions(): PatternEnumPropertyOption[] {
 		return this.options;
 	}
 
 	public toJSON(): Types.SerializedPatternEnumProperty {
 		return {
+			defaultOptionId: this.defaultOptionId,
 			hidden: this.hidden,
-			defaultValue: this.defaultValue,
 			id: this.id,
 			label: this.label,
 			propertyName: this.propertyName,

@@ -27,10 +27,13 @@ export const Page = context => {
 			defaultValue: true
 		}),
 		new PatternEnumProperty({
+			defaultOptionId: defaultLanguage ? defaultLanguage.getId() : undefined,
+			hidden: false,
+			id: uuid.v4(),
 			label: 'Language',
-			propertyName: 'lang',
 			options,
-			defaultValue: defaultLanguage ? defaultLanguage.getId() : undefined
+			propertyName: 'lang',
+			required: false
 		})
 	];
 

@@ -8,7 +8,7 @@ import * as Types from '../types';
  * See coerceValue(). But everything is converted into a proper array of numbers.
  * @see Property
  */
-export class PatternNumberArrayProperty extends PatternPropertyBase {
+export class PatternNumberArrayProperty extends PatternPropertyBase<number[]> {
 	public readonly type = PatternPropertyType.NumberArray;
 
 	public static from(

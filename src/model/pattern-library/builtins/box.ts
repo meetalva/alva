@@ -46,7 +46,10 @@ export const Box = context => {
 		new PatternEnumProperty({
 			label: 'Align',
 			propertyName: 'alignItems',
-			defaultValue: defaultAlign,
+			defaultOptionId: defaultAlign,
+			required: false,
+			hidden: false,
+			id: uuid.v4(),
 			options: [
 				new PatternEnumPropertyOption({
 					id: uuid.v4(),
@@ -83,7 +86,10 @@ export const Box = context => {
 		new PatternEnumProperty({
 			label: 'Justify',
 			propertyName: 'justifyContent',
-			defaultValue: defaultJustify,
+			defaultOptionId: defaultJustify,
+			hidden: false,
+			required: false,
+			id: uuid.v4(),
 			options: [
 				new PatternEnumPropertyOption({
 					id: uuid.v4(),

@@ -206,3 +206,12 @@ export interface PatternAnalysis {
 	pattern: SerializedPattern;
 	properties: SerializedPatternProperty[];
 }
+
+export interface ExportWriteResult {
+	error?: Error;
+}
+
+export interface Exporter {
+	contents: Buffer;
+	execute(path: string): void;
+}

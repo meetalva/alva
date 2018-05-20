@@ -1,12 +1,14 @@
 import * as uuid from 'uuid';
 
 import * as Sender from '../message/client';
-import { Exporter } from './exporter';
 import { ServerMessageType } from '../message';
 import { Page } from '../model';
 import { ViewStore } from '../store';
+import * as Types from '../model/types';
 
-export class SketchExporter extends Exporter {
+export class SketchExporter implements Types.Exporter {
+	public contents: Buffer;
+
 	public execute(path: string): void {
 		const id = uuid.v4();
 		const page = ViewStore.getInstance().getCurrentPage() as Page;

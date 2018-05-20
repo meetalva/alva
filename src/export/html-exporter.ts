@@ -1,12 +1,14 @@
 import * as uuid from 'uuid';
 
 import * as Sender from '../message/client';
-import { Exporter } from './exporter';
 import { ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
 import { ViewStore } from '../store';
+import * as Types from '../model/types';
 
-export class HtmlExporter extends Exporter {
+export class HtmlExporter implements Types.Exporter {
+	public contents: Buffer;
+
 	public async execute(path: string): Promise<void> {
 		const store = ViewStore.getInstance();
 		const project = store.getProject();

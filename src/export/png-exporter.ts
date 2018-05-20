@@ -3,11 +3,13 @@ import * as Url from 'url';
 import * as uuid from 'uuid';
 
 import * as Sender from '../message/client';
-import { Exporter } from './exporter';
 import { ServerMessageType } from '../message';
 import { ViewStore } from '../store';
+import * as Types from '../model/types';
 
-export class PngExporter extends Exporter {
+export class PngExporter implements Types.Exporter {
+	public contents: Buffer;
+
 	private async createPngExport(): Promise<Buffer> {
 		return new Promise<Buffer>(resolve => {
 			const id = uuid.v4();

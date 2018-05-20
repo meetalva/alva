@@ -68,10 +68,10 @@ export enum SerializedPatternType {
 }
 
 export interface SerializedPattern {
+	contextId: string;
 	exportName: string;
 	id: string;
 	name: string;
-	path: string;
 	propertyIds: string[];
 	slots: SerializedPatternSlot[];
 	type: SerializedPatternType | string;
@@ -203,6 +203,7 @@ export interface LibraryAnalysis {
 }
 
 export interface PatternAnalysis {
+	path: string;
 	pattern: SerializedPattern;
 	properties: SerializedPatternProperty[];
 }

@@ -1,7 +1,6 @@
 import { compilerSafeName } from './compiler-safe-name';
 import * as Path from 'path';
 import * as QueryString from 'query-string';
-import * as Types from '../model/types';
 import * as webpack from 'webpack';
 
 // memory-fs typings on @types are faulty
@@ -11,14 +10,17 @@ const PREVIEW_PATH = require.resolve('../preview/preview');
 const LOADER_PATH = require.resolve('../preview/preview-loader');
 const RENDERER_PATH = require.resolve('../preview/preview-renderer');
 
+export interface CompilerPattern {
+	id: string;
+	path: string;
+}
+
 export function createCompiler(
-	patterns: Types.SerializedPattern[],
+	patterns: CompilerPattern[],
 	options: { cwd: string }
 ): webpack.Compiler {
-	const context = options.cwd || process.cwd();
-
 	const components = patterns.reduce((acc, pattern) => {
-		acc[compilerSafeName(pattern.id)] = `./${Path.relative(context, pattern.path)
+		acc[compilerSafeName(pattern.id)] = `./${Path.relative(options.cwd, pattern.path)
 			.split(Path.sep)
 			.join('/')}`;
 
@@ -27,10 +29,10 @@ export function createCompiler(
 
 	const compiler = webpack({
 		mode: 'development',
-		context,
+		context: options.cwd,
 		entry: {
 			components: `${LOADER_PATH}?${QueryString.stringify({
-				cwd: context,
+				cwd: options.cwd,
 				components: JSON.stringify(components)
 			})}!`,
 			renderer: RENDERER_PATH,

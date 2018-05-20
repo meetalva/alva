@@ -16,10 +16,10 @@ export type PatternPropertyValueType =
 	| string[]
 	| undefined;
 
-export type AnyProperty = PatternPropertyBase<PatternPropertyValueType>;
+export type AnyPatternProperty = PatternPropertyBase<PatternPropertyValueType>;
 
 export class PatternProperty {
-	public static from(serialized: Types.SerializedPatternProperty): AnyProperty {
+	public static from(serialized: Types.SerializedPatternProperty): AnyPatternProperty {
 		switch (serialized.type) {
 			case Types.PatternPropertyType.Asset:
 				return PatternAssetProperty.from(serialized);

@@ -12,6 +12,8 @@ export interface ServerOptions {
 	port: number;
 }
 
+// TODO: Divvy up server state from preview state to
+// e.g. not send the bundle over the wire
 interface State {
 	id: string;
 	path?: string;
@@ -226,7 +228,6 @@ function startServer(options: ServerStartOptions): Promise<void> {
 async function setup(update: any): Promise<any> {
 	const queue: Queue = [];
 
-	// const styleguide = new PatternLibrary({});
 	const compiler = createCompiler([], { cwd: process.cwd() });
 
 	compiler.hooks.compile.tap('alva', () => {

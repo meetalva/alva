@@ -1,7 +1,7 @@
 import * as uuid from 'uuid';
 
 import * as Sender from '../message/client';
-import { ServerMessageType } from '../message';
+import { CreateScriptBundleResponse, ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
 import { ViewStore } from '../store';
 import * as Types from '../model/types';
@@ -12,12 +12,18 @@ export class HtmlExporter implements Types.Exporter {
 	public async execute(path: string): Promise<void> {
 		const store = ViewStore.getInstance();
 		const project = store.getProject();
+		const patternLibrary = project.getPatternLibrary();
 		const currentPage = store.getCurrentPage();
-		const styleguide = store.getPatternLibrary();
 		const id = uuid.v4();
 
+		const componentScript = {
+			name: 'components',
+			path: '',
+			contents: Buffer.from(project.getPatternLibrary().getBundle())
+		};
+
 		// TODO: Come up with good user-facing errors
-		if (!project || !currentPage || !styleguide) {
+		if (!project || !currentPage) {
 			// Todo: Implement error message
 			return;
 		}
@@ -27,7 +33,7 @@ export class HtmlExporter implements Types.Exporter {
 			Sender.send({
 				type: ServerMessageType.CreateScriptBundleRequest,
 				id,
-				payload: styleguide
+				payload: project.toJSON()
 			});
 		};
 
@@ -36,17 +42,25 @@ export class HtmlExporter implements Types.Exporter {
 				return;
 			}
 
+			const msg = message as CreateScriptBundleResponse;
+
+			const scripts = [componentScript, ...msg.payload]
+				.map(file => `<script data-script="${file.name}">${file.contents}<\/script>`)
+				.join('\n');
+
 			const data = {
 				id: uuid.v4(),
 				type: 'state',
 				payload: {
+					elementContents: project.getElementContents().map(e => e.toJSON()),
+					elements: project.getElements().map(e => e.toJSON()),
 					mode: PreviewDocumentMode.Static,
 					pageId: currentPage.getId(),
-					pages: project.getPages().map(page => page.toJSON())
+					pages: project.getPages().map(page => page.toJSON()),
+					patternProperties: patternLibrary.getPatternProperties().map(p => p.toJSON()),
+					patterns: patternLibrary.getPatterns().map(p => p.toJSON())
 				}
 			};
-
-			const scripts = message.payload;
 
 			const document = previewDocument({
 				data,

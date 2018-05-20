@@ -19,14 +19,14 @@ export enum CopySize {
 
 const StyledCopy = styled.p`
 	margin: 0;
+	line-height: 1.5;
 	${(props: StyledCopyProps) =>
-		typeof props.size !== 'undefined' ? `font-size: ${props.size}px;` : ''};
+		typeof props.size !== 'undefined' ? `font-size: ${props.size}px;` : `font-size: 12px`};
 	${(props: StyledCopyProps) =>
 		typeof props.textColor !== 'undefined' ? `color: ${props.textColor.toString()};` : ''};
-	line-height: 22px;
 `;
 
-export const Copy: React.SFC<CopyProps> = props => (
+export const Copy: React.StatelessComponent<CopyProps> = props => (
 	<StyledCopy textColor={props.textColor} size={props.size}>
 		{props.children}
 	</StyledCopy>

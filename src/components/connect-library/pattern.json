@@ -1,0 +1,7 @@
+{
+	"name": "connect-library",
+	"displayName": "Connect Library",
+	"version": "1.0.0",
+	"tags": ["molecule", "connect", "library", "status"],
+	"flag": "alpha"
+}

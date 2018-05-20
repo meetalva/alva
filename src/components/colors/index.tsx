@@ -103,6 +103,14 @@ export const colors = {
 		displayName: 'Grey 97',
 		rgb: [247, 247, 247]
 	}),
+	orange: new Color({
+		displayName: 'Orange',
+		rgb: [255, 127, 115]
+	}),
+	red: new Color({
+		displayName: 'Red',
+		rgb: [187, 50, 94]
+	}),
 	white: new Color({
 		displayName: 'White',
 		rgb: [255, 255, 255]

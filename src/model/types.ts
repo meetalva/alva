@@ -215,3 +215,42 @@ export interface Exporter {
 	contents: Buffer;
 	execute(path: string): void;
 }
+
+export interface FilePayload {
+	contents: Buffer;
+	name: string;
+	path: string;
+}
+
+export interface PageChangePaylod {
+	elementContents: SerializedElementContent[];
+	elements: SerializedElement[];
+	pageId: string;
+	pages: SerializedPage[];
+}
+
+export interface ProjectPayload {
+	contents: SerializedProject;
+	path: string;
+}
+
+export interface SavePayload {
+	path: string;
+	project: SerializedProject;
+}
+
+export interface SketchExportPayload {
+	artboardName: string;
+	pageName: string;
+}
+
+export interface ExportPayload {
+	content: Buffer;
+	path: string;
+}
+
+export interface ImportPayload {
+	bundle: string;
+	path: string;
+	patterns: PatternAnalysis[];
+}

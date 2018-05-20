@@ -1,6 +1,6 @@
 import * as Mobx from 'mobx';
 import { PatternLibrary } from '../../pattern-library';
-import { AnyProperty, PatternPropertyType } from '../../pattern-property';
+import { AnyPatternProperty, PatternPropertyType } from '../../pattern-property';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
@@ -81,7 +81,7 @@ export class ElementProperty {
 		return patternProperty.getLabel();
 	}
 
-	public getPatternProperty(): AnyProperty | undefined {
+	public getPatternProperty(): AnyPatternProperty | undefined {
 		return this.patternLibrary.getPatternPropertyById(this.patternPropertyId);
 	}
 
@@ -99,7 +99,7 @@ export class ElementProperty {
 		return this.value;
 	}
 
-	public hasPatternProperty(patternProperty: AnyProperty): boolean {
+	public hasPatternProperty(patternProperty: AnyPatternProperty): boolean {
 		return this.patternPropertyId === patternProperty.getId();
 	}
 

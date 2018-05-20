@@ -2,17 +2,14 @@ import { Box, Page, Placeholder, Text } from './builtins';
 import * as Fuse from 'fuse.js';
 import * as Mobx from 'mobx';
 import { Pattern, PatternFolder, PatternSlot, SyntheticPatternType } from '../pattern';
-import { AnyProperty, PatternPropertyType } from '../pattern-property';
+import { AnyPatternProperty, PatternProperty } from '../pattern-property';
 import * as Types from '../types';
 import * as uuid from 'uuid';
-
-// tslint:disable-next-line:no-duplicate-imports
-import * as P from '../pattern-property';
 
 export interface PatternLibraryInit {
 	bundle: string;
 	id: string;
-	patternProperties: AnyProperty[];
+	patternProperties: AnyPatternProperty[];
 	patterns: Pattern[];
 	root?: PatternFolder;
 	state: Types.PatternLibraryState;
@@ -22,7 +19,7 @@ export class PatternLibrary {
 	private bundle: string;
 	private fuse: Fuse;
 	private id: string;
-	private patternProperties: AnyProperty[] = [];
+	private patternProperties: AnyPatternProperty[] = [];
 	private patterns: Pattern[] = [];
 	private root: PatternFolder;
 	@Mobx.observable private state: Types.PatternLibraryState;
@@ -87,7 +84,7 @@ export class PatternLibrary {
 			bundle: serialized.bundle,
 			id: serialized.id,
 			patterns: [],
-			patternProperties: serialized.patternProperties.map(deserializeProperty),
+			patternProperties: serialized.patternProperties.map(p => PatternProperty.from(p)),
 			state:
 				serialized.state === 'pristine'
 					? Types.PatternLibraryState.Pristine
@@ -108,7 +105,7 @@ export class PatternLibrary {
 		this.updateSearch();
 	}
 
-	public addProperty(property: AnyProperty): void {
+	public addProperty(property: AnyPatternProperty): void {
 		this.patternProperties.push(property);
 	}
 
@@ -124,7 +121,11 @@ export class PatternLibrary {
 		return this.patterns.find(pattern => pattern.getType() === type) as Pattern;
 	}
 
-	public getPatternPropertyById(id: string): AnyProperty | undefined {
+	public getPatternProperties(): AnyPatternProperty[] {
+		return this.patternProperties;
+	}
+
+	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
 		return this.patternProperties.find(patternProperty => patternProperty.getId() === id);
 	}
 
@@ -183,27 +184,5 @@ export class PatternLibrary {
 		this.fuse = new Fuse(registry, {
 			keys: ['name']
 		});
-	}
-}
-
-function deserializeProperty(input: Types.SerializedPatternProperty): AnyProperty {
-	switch (input.type) {
-		case PatternPropertyType.Asset:
-			return P.PatternAssetProperty.from(input);
-		case PatternPropertyType.Boolean:
-			return P.PatternBooleanProperty.from(input);
-		case PatternPropertyType.Enum:
-			return P.PatternEnumProperty.from(input);
-		case PatternPropertyType.Number:
-			return P.PatternNumberProperty.from(input);
-		case PatternPropertyType.NumberArray:
-			return P.PatternNumberArrayProperty.from(input);
-		case PatternPropertyType.String:
-			return P.PatternStringProperty.from(input);
-		case PatternPropertyType.StringArray:
-			return P.PatternStringArrayProperty.from(input);
-		default:
-			console.warn(`Tried to deserialize unknown property: ${JSON.stringify(input)}`);
-			return P.PatternStringProperty.from(input);
 	}
 }

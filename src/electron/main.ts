@@ -228,25 +228,26 @@ async function createWindow(): Promise<void> {
 			}
 			case ServerMessageType.CreateScriptBundleRequest: {
 				const compiler = createCompiler([], { cwd: process.cwd() });
-				await Util.promisify(compiler.run).bind(compiler)();
 
-				const createScript = (name: string, content: string) =>
-					`<script data-script="${name}">${content}<\/script>`;
-				const SCRIPTS = ['renderer', 'components', 'preview'];
+				compiler.run(err => {
+					if (err) {
+						// TODO: Handle errrors
+						return;
+					}
 
-				const compilerFileSystem = (await compiler.outputFileSystem) as typeof Fs;
+					const outputFileSystem = compiler.outputFileSystem;
 
-				const scripts = SCRIPTS.map(name => [
-					name,
-					compilerFileSystem.readFileSync(Path.posix.join('/', `${name}.js`)).toString()
-				])
-					.map(([name, content]) => createScript(name, content))
-					.join('\n');
-
-				Sender.send({
-					type: ServerMessageType.CreateScriptBundleResponse,
-					id: message.id,
-					payload: scripts
+					Sender.send({
+						type: ServerMessageType.CreateScriptBundleResponse,
+						id: message.id,
+						payload: ['renderer', 'preview']
+							.map(name => ({name, path: Path.posix.join('/', `${name}.js`)}))
+							.map(({name, path}) => ({
+								name,
+								path,
+								contents: outputFileSystem.readFileSync(path)
+							}))
+					});
 				});
 
 				break;

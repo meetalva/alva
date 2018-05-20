@@ -1,4 +1,4 @@
-import * as Components from '../components';
+import { ConnectLibrary } from '../components/connect-library';
 import * as React from 'react';
 
 export interface ConnectPaneProps {
@@ -7,28 +7,14 @@ export interface ConnectPaneProps {
 }
 
 export const ConnectPaneContainer: React.SFC<ConnectPaneProps> = props => (
-	<div>
-		<Components.Space sizeBottom={Components.SpaceSize.L}>
-			<Components.Headline textColor={Components.colors.grey20} order={2}>
-				Connect to a Library
-			</Components.Headline>
-		</Components.Space>
-		<Components.Space sizeBottom={Components.SpaceSize.XXXL}>
-			<Components.Copy size={Components.CopySize.M} textColor={Components.colors.grey20}>
-				To build prototypes with already existing components, connect to your React component
-				library first.
-			</Components.Copy>
-		</Components.Space>
-		<Components.Space sizeBottom={Components.SpaceSize.S}>
-			<Components.Button
-				onClick={props.onPrimaryButtonClick}
-				order={Components.ButtonOrder.Primary}
-			>
-				Connect
-			</Components.Button>
-		</Components.Space>
-		<Components.Link color={Components.colors.grey50} onClick={props.onSecondaryButtonClick}>
-			<Components.Copy size={Components.CopySize.S}>Open Alva Example</Components.Copy>
-		</Components.Link>
-	</div>
+	<ConnectLibrary
+		headline={'Connect to a Library'}
+		description={
+			'To build prototypes with already existing components, connect to your React component	library first.'
+		}
+		primaryButton={'Connect'}
+		secondaryButton={'Download Alva Example'}
+		onPrimaryButtonClick={props.onPrimaryButtonClick}
+		onSecondaryButtonClick={props.onSecondaryButtonClick}
+	/>
 );

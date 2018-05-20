@@ -29,6 +29,8 @@ const StyledHeadline = styled.div`
 				return css`
 					font-size: 24px;
 					line-height: 30px;
+					font-weight: 700;
+					margin-bottom: 0.2em;
 				`;
 			case 2:
 				return css`

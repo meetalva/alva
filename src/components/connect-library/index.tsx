@@ -1,9 +1,10 @@
 import Button, { ButtonOrder, ButtonSize } from '../button';
 import { colors } from '../colors';
-import { getSpace, SpaceSize } from '../space';
-import { Headline } from '../headline';
 import { Copy } from '../copy';
+import { Headline } from '../headline';
+import Link from '../link';
 import * as React from 'react';
+import Space, { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface ConnectLibraryProps {
@@ -27,27 +28,27 @@ const StyledConnectLibrary = styled.div`
 	color: ${colors.white.toString()};
 `;
 
-const StyledHeadline = styled(Headline)`
-	margin-bottom: ${getSpace(SpaceSize.M)}px;
-`;
-
-const StyledButton = styled(Button)`
-	margin: ${getSpace(SpaceSize.M)}px 0;
-`;
-
 export const ConnectLibrary: React.SFC<ConnectLibraryProps> = props => (
 	<StyledConnectLibrary>
-		<StyledHeadline order={3}>{props.headline}</StyledHeadline>
-		<Copy>{props.description}</Copy>
-		<StyledButton
-			textColor={colors.red}
-			order={ButtonOrder.Primary}
-			size={ButtonSize.Small}
-			onClick={props.onPrimaryButtonClick}
-			inverted={true}
-		>
-			{props.primaryButton}
-		</StyledButton>
-		<Copy>{props.secondaryButton}</Copy>
+		<Space sizeBottom={SpaceSize.S}>
+			<Headline order={3}>{props.headline}</Headline>
+		</Space>
+		<Space sizeBottom={SpaceSize.L}>
+			<Copy>{props.description}</Copy>
+		</Space>
+		<Space sizeBottom={SpaceSize.XS}>
+			<Button
+				textColor={colors.red}
+				order={ButtonOrder.Primary}
+				size={ButtonSize.Small}
+				onClick={props.onPrimaryButtonClick}
+				inverted={true}
+			>
+				{props.primaryButton}
+			</Button>
+		</Space>
+		<Link onClick={props.onSecondaryButtonClick}>
+			<Copy>{props.secondaryButton}</Copy>
+		</Link>
 	</StyledConnectLibrary>
 );

@@ -16,6 +16,7 @@ export enum ServerMessageType {
 	AssetReadRequest = 'asset-read-request',
 	AssetReadResponse = 'asset-read-response',
 	BundleChange = 'bundle-change',
+	CheckForUpdatesRequest = 'check-for-updates-request',
 	ConnectPatternLibraryRequest = 'connect-pattern-library-request',
 	ConnectPatternLibraryResponse = 'connect-pattern-library-response',
 	ContentRequest = 'content-request',
@@ -66,6 +67,7 @@ export type ServerMessage =
 	| AppLoaded
 	| AssetReadRequest
 	| AssetReadResponse
+	| CheckForUpdatesRequest
 	| ConnectPatternLibraryRequest
 	| ConnectPatternLibraryResponse
 	| ContentRequest
@@ -106,8 +108,10 @@ export type ServerMessage =
 export type AppLoaded = EmptyEnvelope<ServerMessageType.AppLoaded>;
 export type AssetReadRequest = EmptyEnvelope<ServerMessageType.AssetReadRequest>;
 export type AssetReadResponse = Envelope<ServerMessageType.AssetReadResponse, string>;
-export type ConnectPatternLibraryRequest = EmptyEnvelope<
-	ServerMessageType.ConnectPatternLibraryRequest
+export type CheckForUpdatesRequest = EmptyEnvelope<ServerMessageType.CheckForUpdatesRequest>;
+export type ConnectPatternLibraryRequest = Envelope<
+	ServerMessageType.ConnectPatternLibraryRequest,
+	Types.SerializedPatternLibrary
 >;
 export type ConnectPatternLibraryResponse = Envelope<
 	ServerMessageType.ConnectPatternLibraryResponse,

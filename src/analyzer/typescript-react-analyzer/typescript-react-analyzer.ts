@@ -1,6 +1,7 @@
 import { createCompiler } from '../../compiler';
 import * as Fs from 'fs';
 import * as Path from 'path';
+import { PatternLibrary } from '../../model/pattern-library';
 import * as PropertyAnalyzer from './property-analyzer';
 import * as ReactUtils from '../typescript/react-utils';
 import * as SlotAnalyzer from './slot-analzyer';
@@ -29,13 +30,25 @@ interface AnalyzeContext {
 type PatternAnalyzer = (candidate: PatternCandidate, predicate: PatternAnalyzerPredicate) => Types.PatternAnalysis[];
 type PatternAnalyzerPredicate = (ex: TypeScript.TypescriptExport, ctx: AnalyzeContext) => Types.PatternAnalysis | undefined;
 
-export async function analyze(path: string): Promise<Types.LibraryAnalysis> {
+export async function analyze(path: string, previousLibrary: Types.SerializedPatternLibrary): Promise<Types.LibraryAnalysis> {
+	const library = PatternLibrary.from(previousLibrary);
+
 	const patternCandidates = await findPatternCandidates(path);
 	const sourcePaths = patternCandidates.map(p => p.sourcePath);
 	const analyzePattern = getPatternAnalyzer(ts.createProgram(sourcePaths, {}));
 
 	const patterns = patternCandidates
-		.reduce((acc, candidate) => [...acc, ...analyzePattern(candidate, analyzePatternExport)], []);
+		.reduce((acc, candidate) => [...acc, ...analyzePattern(candidate, analyzePatternExport)], [])
+		.map(item => {
+			const previousPattern = library.getPatternByContextId(item.pattern.contextId);
+
+			// Reuse pattern id if it has been in the library previously
+			if (previousPattern) {
+				item.pattern.id = previousPattern.getId();
+			}
+
+			return item;
+		});
 
 	const compilerPatterns = patterns.map(({path: patternPath, pattern}) => ({
 		id: pattern.id,

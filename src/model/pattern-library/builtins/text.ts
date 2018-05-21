@@ -13,10 +13,12 @@ export const Text = context => {
 		textProperties,
 		textPattern: new Pattern(
 			{
+				contextId: 'synthetic:text',
+				exportName: 'default',
 				name: 'Text',
-				path: '',
-				type: SyntheticPatternType.SyntheticText,
-				propertyIds: textProperties.map(p => p.getId())
+				propertyIds: textProperties.map(p => p.getId()),
+				slots: [],
+				type: SyntheticPatternType.SyntheticText
 			},
 			context
 		)

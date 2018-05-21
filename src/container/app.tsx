@@ -155,10 +155,16 @@ export class App extends React.Component {
 								{store.getPatternLibraryState() === Types.PatternLibraryState.Pristine && (
 									<ConnectPaneContainer
 										onPrimaryButtonClick={() => {
+											const project = store.getProject();
+
+											if (!project) {
+												return;
+											}
+
 											Sender.send({
 												type: ServerMessageType.ConnectPatternLibraryRequest,
 												id: uuid.v4(),
-												payload: undefined
+												payload: project.getPatternLibrary().toJSON()
 											});
 										}}
 									/>

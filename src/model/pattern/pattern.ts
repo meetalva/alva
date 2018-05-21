@@ -20,11 +20,12 @@ export enum ConcretePatternType {
 }
 
 export interface PatternInit {
-	exportName?: string;
+	contextId: string;
+	exportName: string;
 	id?: string;
 	name: string;
-	propertyIds?: string[];
-	slots?: PatternSlot[];
+	propertyIds: string[];
+	slots: PatternSlot[];
 	type: PatternType;
 }
 
@@ -53,25 +54,20 @@ export class Pattern {
 	private type: PatternType;
 
 	public constructor(init: PatternInit, context: PatternContext) {
-		this.exportName = init.exportName || 'default';
+		this.contextId = init.contextId;
+		this.exportName = init.exportName;
 		this.id = init.id || uuid.v4();
 		this.name = AlvaUtil.guessName(init.name);
 		this.patternLibrary = context.patternLibrary;
-		this.propertyIds = init.propertyIds || [];
+		this.propertyIds = init.propertyIds;
+		this.slots = init.slots;
 		this.type = init.type;
-		this.slots = init.slots || [
-			new PatternSlot({
-				displayName: 'Children',
-				propertyName: 'children',
-				id: uuid.v4(),
-				type: Types.SlotType.Children
-			})
-		];
 	}
 
 	public static from(serialized: Types.SerializedPattern, context: PatternContext): Pattern {
 		return new Pattern(
 			{
+				contextId: serialized.contextId,
 				exportName: serialized.exportName,
 				id: serialized.id,
 				name: serialized.name,
@@ -85,6 +81,10 @@ export class Pattern {
 
 	public addSlot(slot: PatternSlot): void {
 		this.slots.push(slot);
+	}
+
+	public getContextId(): string {
+		return this.contextId;
 	}
 
 	public getExportName(): string {

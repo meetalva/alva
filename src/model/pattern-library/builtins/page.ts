@@ -1,10 +1,11 @@
 import { languages } from './languages';
-import { Pattern, SyntheticPatternType } from '../../pattern';
+import { Pattern, PatternSlot, SyntheticPatternType } from '../../pattern';
 import {
 	PatternBooleanProperty,
 	PatternEnumProperty,
 	PatternEnumPropertyOption
 } from '../../pattern-property';
+import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export const Page = context => {
@@ -39,10 +40,19 @@ export const Page = context => {
 
 	const pagePattern = new Pattern(
 		{
+			contextId: 'synthetic:page',
+			exportName: 'default',
 			name: 'Page',
-			path: '',
-			type: SyntheticPatternType.SyntheticPage,
-			propertyIds: pageProperties.map(p => p.getId())
+			propertyIds: pageProperties.map(p => p.getId()),
+			slots: [
+				new PatternSlot({
+					displayName: 'Children',
+					propertyName: 'children',
+					id: uuid.v4(),
+					type: Types.SlotType.Children
+				})
+			],
+			type: SyntheticPatternType.SyntheticPage
 		},
 		context
 	);

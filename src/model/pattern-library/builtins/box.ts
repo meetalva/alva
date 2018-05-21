@@ -1,4 +1,4 @@
-import { Pattern, SyntheticPatternType } from '../../pattern';
+import { Pattern, PatternSlot, SyntheticPatternType } from '../../pattern';
 import {
 	PatternBooleanProperty,
 	PatternEnumProperty,
@@ -6,6 +6,7 @@ import {
 	PatternNumberProperty,
 	PatternStringProperty
 } from '../../pattern-property';
+import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export const Box = context => {
@@ -152,10 +153,19 @@ export const Box = context => {
 	return {
 		boxPattern: new Pattern(
 			{
+				contextId: 'synthetic:box',
+				exportName: 'default',
 				name: 'Box',
-				path: '',
-				type: SyntheticPatternType.SyntheticBox,
-				propertyIds: boxProperties.map(p => p.getId())
+				propertyIds: boxProperties.map(p => p.getId()),
+				slots: [
+					new PatternSlot({
+						displayName: 'Children',
+						propertyName: 'children',
+						id: uuid.v4(),
+						type: Types.SlotType.Children
+					})
+				],
+				type: SyntheticPatternType.SyntheticBox
 			},
 			context
 		),

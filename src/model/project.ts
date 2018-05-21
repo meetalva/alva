@@ -209,18 +209,20 @@ export class Project {
 			{ name: 'Patterns' },
 			{ patternLibrary: this.patternLibrary }
 		);
+
 		this.patternLibrary.getRoot().addChild(folder);
 
-		analysis.patterns.forEach(item => {
-			const pattern = Pattern.from(item.pattern, context);
-			this.patternLibrary.addPattern(pattern);
+		analysis.patterns
+			.forEach(item => {
+				const pattern = Pattern.from(item.pattern, context);
+				this.patternLibrary.addPattern(pattern);
 
-			item.properties
-				.map(property => PatternProperty.from(property))
-				.forEach(property => this.patternLibrary.addProperty(property));
+				item.properties
+					.map(property => PatternProperty.from(property))
+					.forEach(property => this.patternLibrary.addProperty(property));
 
-			folder.addPattern(pattern);
-		});
+				folder.addPattern(pattern);
+			});
 
 		this.patternLibrary.setState(Types.PatternLibraryState.Imported);
 		this.patternLibrary.setBundle(analysis.bundle);

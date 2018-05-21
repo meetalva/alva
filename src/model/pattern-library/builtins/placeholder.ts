@@ -11,10 +11,12 @@ export const Placeholder = context => {
 
 	const placeholderPattern = new Pattern(
 		{
+			contextId: 'synthetic:placeholder',
+			exportName: 'default',
 			name: 'Placeholder',
-			path: '',
-			type: SyntheticPatternType.SyntheticPlaceholder,
-			propertyIds: placeholderProperties.map(p => p.getId())
+			propertyIds: placeholderProperties.map(p => p.getId()),
+			slots: [],
+			type: SyntheticPatternType.SyntheticPlaceholder
 		},
 		context
 	);

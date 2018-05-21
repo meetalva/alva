@@ -2,7 +2,7 @@ import * as Analyzer from '../analyzer';
 import { checkForUpdates } from './auto-updater';
 import { colors } from '../components';
 import { createCompiler } from '../compiler/create-compiler';
-import { app, BrowserWindow, dialog, ipcMain, screen } from 'electron';
+import { app, BrowserWindow, dialog, screen } from 'electron';
 import * as electronIsDev from 'electron-is-dev';
 import * as Fs from 'fs';
 import * as getPort from 'get-port';
@@ -89,6 +89,12 @@ async function createWindow(): Promise<void> {
 		// access to system / fs
 		// tslint:disable-next-line:cyclomatic-complexity
 		switch (message.type) {
+			case ServerMessageType.CheckForUpdatesRequest: {
+				if (win) {
+					checkForUpdates(win, true);
+				}
+				break;
+			}
 			case ServerMessageType.AppLoaded: {
 				// Load last known file automatically in development
 				if (electronIsDev && projectPath) {
@@ -269,7 +275,7 @@ async function createWindow(): Promise<void> {
 				const path = Array.isArray(paths) ? paths[0] : undefined;
 
 				if (path) {
-					const analysis = await Analyzer.analyze(path);
+					const analysis = await Analyzer.analyze(path, message.payload);
 
 					Sender.send({
 						type: ServerMessageType.ConnectPatternLibraryResponse,
@@ -367,12 +373,6 @@ app.on('activate', async () => {
 	// dock icon is clicked and there are no other windows open.
 	if (!win) {
 		await createWindow();
-	}
-});
-
-ipcMain.on('request-check-for-updates', () => {
-	if (win) {
-		checkForUpdates(win, true);
 	}
 });
 

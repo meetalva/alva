@@ -113,6 +113,10 @@ export class PatternLibrary {
 		return this.bundle;
 	}
 
+	public getPatternByContextId(contextId: string): Pattern | undefined {
+		return this.patterns.find(pattern => pattern.getContextId() === contextId);
+	}
+
 	public getPatternById(id: string): Pattern | undefined {
 		return this.patterns.find(pattern => pattern.getId() === id);
 	}
@@ -153,6 +157,16 @@ export class PatternLibrary {
 		return this.fuse
 			.search<Types.SerializedPattern | Types.SerializedPatternFolder>(term)
 			.map(match => match.id);
+	}
+
+	public removePattern(pattern: Pattern): void {
+		const index = this.patterns.indexOf(pattern);
+
+		if (index === -1) {
+			return;
+		}
+
+		this.patterns.splice(index, 1);
 	}
 
 	public setBundle(bundle: string): void {

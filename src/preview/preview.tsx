@@ -311,6 +311,11 @@ function createComponentGetter(store: PreviewStore): (props: any, synthetics: an
 			case 'pattern':
 				// tslint:disable-next-line:no-any
 				const component = ((window as any).components || {})[pattern.id];
+
+				if (!component) {
+					throw new Error(`Could not find component with id "${pattern.id}" for pattern "${pattern.name}".`);
+				}
+
 				return component[pattern.exportName];
 			case 'synthetic:page':
 				return synthetics.page;

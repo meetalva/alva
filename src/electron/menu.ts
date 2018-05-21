@@ -1,5 +1,5 @@
 import * as Sender from '../message/client';
-import { BrowserWindow, ipcRenderer, MenuItem, MenuItemConstructorOptions, remote } from 'electron';
+import { BrowserWindow, MenuItem, MenuItemConstructorOptions, remote } from 'electron';
 import { HtmlExporter } from '../export/html-exporter';
 import { ServerMessageType } from '../message';
 import { Page, Project } from '../model';
@@ -321,6 +321,28 @@ export function createMenu(): void {
 			]
 		},
 		{
+			label: '&Library',
+			submenu: [
+				{
+					label: '&Connect',
+					accelerator: 'CmdOrCtrl+Shift+C',
+					click: () => {
+						const project = store.getProject();
+
+						if (!project) {
+							return;
+						}
+
+						Sender.send({
+							type: ServerMessageType.ConnectPatternLibraryRequest,
+							id: uuid.v4(),
+							payload: project.getPatternLibrary().toJSON()
+						});
+					}
+				}
+			]
+		},
+		{
 			label: '&View',
 			submenu: [
 				{
@@ -410,7 +432,11 @@ export function createMenu(): void {
 				{
 					label: 'Check for Updates',
 					click: () => {
-						ipcRenderer.send('request-check-for-updates');
+						Sender.send({
+							id: uuid.v4(),
+							payload: undefined,
+							type: ServerMessageType.CheckForUpdatesRequest
+						});
 					}
 				},
 				{

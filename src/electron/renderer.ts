@@ -37,11 +37,15 @@ Sender.receive(message => {
 			store.setProject(newProject);
 			store.setActiveView(Types.AlvaView.PageDetail);
 
-			Sender.send({
-				id: uuid.v4(),
-				payload: newProject.toJSON(),
-				type: ServerMessageType.CheckLibraryRequest
-			});
+			const patternLibrary = newProject.getPatternLibrary();
+
+			if (patternLibrary.getState() !== Types.PatternLibraryState.Pristine) {
+				Sender.send({
+					id: uuid.v4(),
+					payload: newProject.toJSON(),
+					type: ServerMessageType.CheckLibraryRequest
+				});
+			}
 
 			break;
 		}

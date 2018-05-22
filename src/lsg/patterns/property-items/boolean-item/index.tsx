@@ -1,5 +1,6 @@
 import { colors } from '../../colors';
-import { fonts } from '../../fonts';
+import { Icon, IconName, IconSize } from '../../icons';
+import { PropertyLabel } from '../property-label';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
@@ -15,62 +16,81 @@ interface IndicatorProps {
 	checked?: boolean;
 }
 
-const StyledBooleanItem = styled.div`
+const StyledBooleanItem = styled.label`
+	display: flex;
+	align-items: center;
 	width: 100%;
+	margin-bottom: ${getSpace(SpaceSize.S)}px;
 `;
 
-const StyledLabelWrapper = styled.label`
-	display: block;
-	margin-bottom: ${getSpace(SpaceSize.L)}px;
-`;
+const indicatorWidth = 48;
+const indicatorHeight = 30;
 
-const indicatorWidth = 42;
-const indicatorHeight = 24;
-const indicatorBorderWidth = 1;
-
-const StyledIndicator = styled.span`
-	position: relative;
-	display: block;
-	width: ${indicatorWidth}px;
+const StyledIndicatorKnob = styled.div`
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: ${indicatorHeight}px;
 	height: ${indicatorHeight}px;
-	border-radius: ${indicatorHeight / 2}px;
-	background: ${colors.grey90.toString()};
+	margin: -1px 0 0 -1px;
+	transform: translateX(0);
+	border-radius: 100%;
+	background: ${colors.white.toString()};
+	transition: transform 0.1s, border-color 0.1s, box-shadow 0.1s;
 	box-sizing: border-box;
-	box-shadow: inset 0 0 0 ${indicatorBorderWidth}px ${colors.grey60.toString()};
-
-	&:after {
-		content: '';
-		display: block;
-		width: ${indicatorHeight}px;
-		height: ${indicatorHeight}px;
-		border: ${indicatorBorderWidth}px solid ${colors.grey60.toString()};
-		transform: translateX(0px);
-		border-radius: 100%;
-		background: ${colors.white.toString()};
-		transition: all ease-in-out 0.25s;
-		box-sizing: border-box;
+	border: 1px solid ${colors.grey60.toString()};
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-width: 0.5px;
 	}
+
 	${(props: IndicatorProps) =>
 		props.checked
 			? `
-			background: ${colors.blue40.toString()};
-			box-shadow: inset 0 0 0 ${indicatorBorderWidth}px ${colors.blue40.toString()};
-
-			&:after {
-				transform: translateX(${indicatorWidth - indicatorHeight}px);
-				background: ${colors.white.toString()};
-				border-color: ${colors.blue40.toString()};
-			}
-		`
+		transform: translateX(${indicatorWidth - indicatorHeight}px);
+		background: ${colors.white.toString()};
+		border-color: ${colors.blue40.toString()};
+	`
 			: ''};
 `;
 
-const StyledLabel = styled.span`
-	display: block;
-	font-size: 12px;
-	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey36.toString()};
-	margin-bottom: ${getSpace(SpaceSize.XS)}px;
+const StyledIndicator = styled.span`
+	position: relative;
+	display: inline-block;
+	width: ${indicatorWidth}px;
+	height: ${indicatorHeight}px;
+	border-radius: ${indicatorHeight / 2}px;
+	box-sizing: border-box;
+	border: 1px solid ${colors.grey80.toString()};
+	transition: background 0.1s, box-shadow 0.1s;
+	user-select: none;
+
+	&:hover {
+		${StyledIndicatorKnob} {
+			border-color: ${colors.grey60.toString()};
+			box-shadow: 0.5px 0.5px 3px ${colors.grey60.toString()};
+
+			${(props: IndicatorProps) =>
+				props.checked
+					? `
+				border-color: ${colors.blue40.toString()};
+				box-shadow: 0.5px 0.5px 3px ${colors.blue40.toString()};
+			`
+					: ''};
+		}
+	}
+
+	${(props: IndicatorProps) =>
+		props.checked
+			? `
+		background: ${colors.blue80.toString()};
+		border-color: ${colors.blue40.toString()};
+	`
+			: ''};
+`;
+
+const StyledIcon = styled(Icon)`
+	transform: translate(-0.5px, -0.5px); // fix to align icon properly
 `;
 
 const StyledInput = styled.input`
@@ -79,14 +99,18 @@ const StyledInput = styled.input`
 
 export const BooleanItem: React.StatelessComponent<BooleanItemProps> = props => {
 	const { className, label, children, checked, onChange } = props;
+	const icon = checked ? IconName.Check : IconName.Uncheck;
+	const color = checked ? colors.blue40 : colors.grey60;
 
 	return (
 		<StyledBooleanItem className={className}>
-			<StyledLabelWrapper>
-				<StyledLabel>{label}</StyledLabel>
-				<StyledInput onChange={onChange} type="checkbox" />
-				<StyledIndicator checked={checked} />
-			</StyledLabelWrapper>
+			<PropertyLabel label={label} />
+			<StyledInput onChange={onChange} checked={checked} type="checkbox" />
+			<StyledIndicator checked={checked}>
+				<StyledIndicatorKnob checked={checked}>
+					<StyledIcon name={icon} size={IconSize.XS} color={color} />
+				</StyledIndicatorKnob>
+			</StyledIndicator>
 			{children}
 		</StyledBooleanItem>
 	);

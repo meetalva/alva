@@ -1,12 +1,26 @@
 import { PatternAnchor, PatternListItem } from '../../components';
 import { Pattern } from '../../model';
 import * as React from 'react';
+import { ViewStore } from '../../store';
 
 export interface PatternItemContainerContainerProps {
 	pattern: Pattern;
 }
 
 export class PatternItemContainer extends React.Component<PatternItemContainerContainerProps> {
+	private handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
+		const store = ViewStore.getInstance();
+		const element = store.addNewElement({ pattern: this.props.pattern });
+		const selectedElement = store.getSelectedElement();
+		const page = store.getCurrentPage();
+
+		const targetElement = selectedElement ? selectedElement : page ? page.getRoot() : null;
+
+		if (element && targetElement) {
+			store.insertAfterElement({ element, targetElement });
+		}
+	}
+
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		e.dataTransfer.dropEffect = 'copy';
 
@@ -25,6 +39,7 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 			<PatternListItem
 				key={props.pattern.getId()}
 				draggable
+				onDoubleClick={e => this.handleDoubleClick(e)}
 				onDragStart={e => this.handleDragStart(e)}
 			>
 				{props.pattern.getName()}

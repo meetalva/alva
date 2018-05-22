@@ -516,9 +516,9 @@ function getLibraryLabel(project: Project | undefined): string {
 	switch (library.getState()) {
 		case Types.PatternLibraryState.Pristine:
 			return '&Connect';
+		case Types.PatternLibraryState.Connected:
+			return '&Change';
 		case Types.PatternLibraryState.Disconnected:
 			return 'Re&connect';
 	}
-
-	return '&Connect';
 }

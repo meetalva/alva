@@ -1,14 +1,10 @@
 import * as HtmlSketchApp from '@brainly/html-sketchapp';
 import { HighlightArea } from './highlight-area';
 import { PreviewMessageType } from '../message';
-import * as MobX from 'mobx';
+import * as Mobx from 'mobx';
 import { PreviewDocumentMode } from './preview-document';
 import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
 import * as Types from '../model/types';
-
-// TODO: Produces a deprecation warning, find a way
-// to dedupe MobX when upgrading to 4.x
-MobX.extras.shareGlobalState();
 
 interface InitialData {
 	data: {
@@ -19,15 +15,15 @@ interface InitialData {
 }
 
 export class PreviewStore {
-	@MobX.observable public elementContents: Types.SerializedElementContent[] = [];
+	@Mobx.observable public elementContents: Types.SerializedElementContent[] = [];
 
-	@MobX.observable public elementId: string = '';
-	@MobX.observable public elements: Types.SerializedElement[] = [];
-	@MobX.observable public mode: PreviewDocumentMode = PreviewDocumentMode.Live;
-	@MobX.observable public pageId: string = '';
-	@MobX.observable public pages: Types.SerializedPage[] = [];
-	@MobX.observable public patternProperties: Types.SerializedPatternProperty[] = [];
-	@MobX.observable public patterns: Types.SerializedPattern[] = [];
+	@Mobx.observable public elementId: string = '';
+	@Mobx.observable public elements: Types.SerializedElement[] = [];
+	@Mobx.observable public mode: PreviewDocumentMode = PreviewDocumentMode.Live;
+	@Mobx.observable public pageId: string = '';
+	@Mobx.observable public pages: Types.SerializedPage[] = [];
+	@Mobx.observable public patternProperties: Types.SerializedPatternProperty[] = [];
+	@Mobx.observable public patterns: Types.SerializedPattern[] = [];
 
 	private constructor() {}
 
@@ -110,7 +106,11 @@ function main(): void {
 	}
 
 	startRouter(store);
-	render();
+
+	Mobx.autorun(() => {
+		Object.keys(store).forEach(key => store[key]);
+		render();
+	});
 }
 
 function getInitialData(): InitialData | undefined {

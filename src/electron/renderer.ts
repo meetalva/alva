@@ -1,8 +1,9 @@
 import { App } from '../container/app';
 import * as Sender from '../message/client';
+import { createMenu } from './create-menu';
 import { webFrame } from 'electron';
 import { ServerMessageType } from '../message';
-import * as MobX from 'mobx';
+import * as Mobx from 'mobx';
 import { Project } from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
@@ -196,7 +197,7 @@ Sender.receive(message => {
 	}
 });
 
-MobX.autorun(() => {
+Mobx.autorun(() => {
 	const patternLibrary = store.getPatternLibrary();
 
 	if (patternLibrary) {
@@ -208,7 +209,7 @@ MobX.autorun(() => {
 	}
 });
 
-MobX.autorun(() => {
+Mobx.autorun(() => {
 	const project = store.getProject();
 	const currentPage = store.getCurrentPage();
 
@@ -228,12 +229,23 @@ MobX.autorun(() => {
 	}
 });
 
-MobX.autorun(() => {
+Mobx.autorun(() => {
 	const selectedElement = store.getSelectedElement();
 	Sender.send({
 		id: uuid.v4(),
 		payload: selectedElement ? selectedElement.getId() : undefined,
 		type: ServerMessageType.ElementChange
+	});
+});
+
+Mobx.autorun(() => {
+	const project = store.getProject();
+	const patternLibrary = store.getPatternLibrary();
+
+	createMenu({
+		project,
+		patternLibrary,
+		store
 	});
 });
 

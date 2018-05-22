@@ -2,7 +2,6 @@ import { colors, ElementAnchors, ElementProps } from '../../components';
 import { elementMenu } from '../../electron/context-menus';
 import { ElementWrapper } from './element-wrapper';
 import { partition } from 'lodash';
-import { createMenu } from '../../electron/menu';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
@@ -36,8 +35,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	};
 
 	public componentDidMount(): void {
-		createMenu();
-
 		this.globalKeyDownListener = e => this.handleKeyDown(e);
 		window.addEventListener('keydown', this.globalKeyDownListener);
 	}
@@ -46,10 +43,6 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		if (this.globalKeyDownListener) {
 			window.removeEventListener('keydown', this.globalKeyDownListener);
 		}
-	}
-
-	public componentWillUpdate(): void {
-		createMenu();
 	}
 
 	public createItemFromElement(element: Model.Element): ElementNodeProps {

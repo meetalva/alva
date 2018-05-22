@@ -184,10 +184,6 @@ function listen(store: PreviewStore, handlers: { onReplacement(): void }): void 
 
 		// TODO: Do type refinements on message here
 		switch (type) {
-			case PreviewMessageType.Reload: {
-				window.location.reload();
-				break;
-			}
 			case PreviewMessageType.Update: {
 				Promise.all([refetch('renderer'), refetch('components')]).then(() => {
 					handlers.onReplacement();
@@ -313,7 +309,9 @@ function createComponentGetter(store: PreviewStore): (props: any, synthetics: an
 				const component = ((window as any).components || {})[pattern.id];
 
 				if (!component) {
-					throw new Error(`Could not find component with id "${pattern.id}" for pattern "${pattern.name}".`);
+					throw new Error(
+						`Could not find component with id "${pattern.id}" for pattern "${pattern.name}".`
+					);
 				}
 
 				return component[pattern.exportName];

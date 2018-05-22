@@ -66,7 +66,7 @@ export async function analyze(
 		path: patternPath
 	}));
 
-	const compiler = createCompiler(compilerPatterns, { cwd: path });
+	const compiler = createCompiler(compilerPatterns, { cwd: path, infrastructure: false });
 	await Util.promisify(compiler.run).bind(compiler)();
 
 	return {
@@ -122,7 +122,7 @@ function analyzePatternExport(
 			contextId: `${ctx.candidate.id}:${exportName}`,
 			exportName,
 			id: uuid.v4(),
-			name: ctx.candidate.displayName,
+			name: exportName !== 'default' ? exportName : ctx.candidate.displayName,
 			propertyIds: properties.map(p => p.id),
 			slots,
 			type: 'pattern'

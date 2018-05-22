@@ -28,10 +28,19 @@ interface AnalyzeContext {
 	program: ts.Program;
 }
 
-type PatternAnalyzer = (candidate: PatternCandidate, predicate: PatternAnalyzerPredicate) => Types.PatternAnalysis[];
-type PatternAnalyzerPredicate = (ex: TypeScript.TypescriptExport, ctx: AnalyzeContext) => Types.PatternAnalysis | undefined;
+type PatternAnalyzer = (
+	candidate: PatternCandidate,
+	predicate: PatternAnalyzerPredicate
+) => Types.PatternAnalysis[];
+type PatternAnalyzerPredicate = (
+	ex: TypeScript.TypescriptExport,
+	ctx: AnalyzeContext
+) => Types.PatternAnalysis | undefined;
 
-export async function analyze(path: string, previousLibrary: Types.SerializedPatternLibrary): Promise<Types.LibraryAnalysis> {
+export async function analyze(
+	path: string,
+	previousLibrary: Types.SerializedPatternLibrary
+): Promise<Types.LibraryAnalysis> {
 	const pkg = await readPkg(path);
 	const library = PatternLibrary.from(previousLibrary);
 
@@ -52,7 +61,7 @@ export async function analyze(path: string, previousLibrary: Types.SerializedPat
 			return item;
 		});
 
-	const compilerPatterns = patterns.map(({path: patternPath, pattern}) => ({
+	const compilerPatterns = patterns.map(({ path: patternPath, pattern }) => ({
 		id: pattern.id,
 		path: patternPath
 	}));
@@ -70,7 +79,10 @@ export async function analyze(path: string, previousLibrary: Types.SerializedPat
 }
 
 function getPatternAnalyzer(program: ts.Program): PatternAnalyzer {
-	return (candidate: PatternCandidate, predicate: PatternAnalyzerPredicate): Types.PatternAnalysis[] => {
+	return (
+		candidate: PatternCandidate,
+		predicate: PatternAnalyzerPredicate
+	): Types.PatternAnalysis[] => {
 		const sourceFile = program.getSourceFile(candidate.sourcePath);
 
 		if (!sourceFile) {
@@ -83,11 +95,11 @@ function getPatternAnalyzer(program: ts.Program): PatternAnalyzer {
 	};
 }
 
-function analyzePatternExport(ex: TypeScript.TypescriptExport, ctx: AnalyzeContext): Types.PatternAnalysis | undefined {
-	const reactType = ReactUtils.findReactComponentType(
-		ctx.program,
-		ex.type
-	);
+function analyzePatternExport(
+	ex: TypeScript.TypescriptExport,
+	ctx: AnalyzeContext
+): Types.PatternAnalysis | undefined {
+	const reactType = ReactUtils.findReactComponentType(ctx.program, ex.type);
 
 	if (!reactType) {
 		return;
@@ -102,12 +114,13 @@ function analyzePatternExport(ex: TypeScript.TypescriptExport, ctx: AnalyzeConte
 	const [propTypes] = reactTypeArguments;
 	const properties = PropertyAnalyzer.analyze(propTypes.type, ctx.program);
 	const slots = SlotAnalyzer.analyzeSlots(propTypes.type, ctx.program);
+	const exportName = ex.name || 'default';
 
 	return {
 		path: ctx.candidate.artifactPath,
 		pattern: {
-			contextId: ctx.candidate.id,
-			exportName: ex.name || 'default',
+			contextId: `${ctx.candidate.id}:${exportName}`,
+			exportName,
 			id: uuid.v4(),
 			name: ctx.candidate.displayName,
 			propertyIds: properties.map(p => p.id),
@@ -123,7 +136,7 @@ async function findPatternCandidates(path: string): Promise<PatternCandidate[]> 
 	const { config, filePath } = patternplateConfig;
 	const cwd = filePath ? Path.dirname(filePath) : path;
 
-	const {patterns} = await loadPatternplateMeta({ entry: config.entry, cwd });
+	const { patterns } = await loadPatternplateMeta({ entry: config.entry, cwd });
 
 	return patterns.map(pattern => {
 		const sourceDirname = Path.dirname(pattern.source);

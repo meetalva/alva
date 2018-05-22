@@ -1,5 +1,5 @@
 import * as AlvaUtil from '../../alva-util';
-import { PatternFolder } from './pattern-folder';
+import { PatternFolder } from '../pattern-folder';
 import { PatternLibrary } from '../pattern-library';
 import * as PatternProperty from '../pattern-property';
 import { PatternSlot } from './pattern-slot';

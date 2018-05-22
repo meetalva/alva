@@ -19,6 +19,8 @@ import * as Url from 'url';
 import * as Util from 'util';
 import * as uuid from 'uuid';
 
+const ElectronStore = require('electron-store');
+
 const APP_ENTRY = require.resolve('./renderer');
 
 const RENDERER_DOCUMENT = `<!doctype html>
@@ -45,6 +47,8 @@ const writeFile = Util.promisify(Fs.writeFile);
 let win: BrowserWindow | undefined;
 
 let projectPath: string | undefined;
+
+const userStore = new ElectronStore();
 
 async function createWindow(): Promise<void> {
 	const { width = 1280, height = 800 } = screen.getPrimaryDisplay().workAreaSize;
@@ -273,16 +277,81 @@ async function createWindow(): Promise<void> {
 				});
 
 				const path = Array.isArray(paths) ? paths[0] : undefined;
+				const project = Project.from(message.payload);
 
-				if (path) {
-					const analysis = await Analyzer.analyze(path, message.payload);
-
-					Sender.send({
-						type: ServerMessageType.ConnectPatternLibraryResponse,
-						id: message.id,
-						payload: analysis
-					});
+				if (!path) {
+					return;
 				}
+
+				const analysis = await Analyzer.analyze(path, project.getPatternLibrary().toJSON());
+
+				Sender.send({
+					type: ServerMessageType.ConnectPatternLibraryResponse,
+					id: message.id,
+					payload: analysis
+				});
+
+				break;
+			}
+			case ServerMessageType.UpdatePatternLibraryRequest: {
+				const project = Project.from(message.payload);
+				const library = project.getPatternLibrary();
+				const id = library.getId();
+
+				const connections = userStore.get('connections') || [];
+
+				const connection = connections
+					.filter(c => typeof c === 'object' && typeof c.path === 'string' && typeof c.id === 'string')
+					.find(c => c.id === id);
+
+				if (!connection) {
+					return;
+				}
+
+				const analysis = await Analyzer.analyze(connection.path, library.toJSON());
+
+				Sender.send({
+					type: ServerMessageType.ConnectPatternLibraryResponse,
+					id: message.id,
+					payload: analysis
+				});
+
+				break;
+			}
+			case ServerMessageType.ConnectedPatternLibraryNotification: {
+				// Save connections between Alva files and pattern library folders
+				// in user-specific persistence
+				const previous = userStore.get('connections') || [];
+				const previousConnections = (Array.isArray(previous) ? previous : [previous])
+					.filter(p => typeof p === 'object' && typeof p.path === 'string' && typeof p.id === 'string');
+
+				userStore.set('connections', [...new Set([
+					...previousConnections,
+					message.payload
+				])]);
+
+				break;
+			}
+			case ServerMessageType.CheckLibraryRequest: {
+				const id = Project.from(message.payload).getPatternLibrary().getId();
+				const connections = userStore.get('connections') || [];
+
+				connections
+					.filter(c => typeof c === 'object' && typeof c.path === 'string' && typeof c.id === 'string')
+					.filter(c => c.id === id)
+					.forEach(connection => {
+						Fs.exists(connection.path, exists => {
+							Sender.send({
+								id,
+								type: ServerMessageType.CheckLibraryResponse,
+								payload: [{
+									id: connection.id,
+									path: connection.path,
+									connected: exists
+								}]
+							});
+						});
+					});
 			}
 		}
 	});

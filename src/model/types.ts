@@ -277,3 +277,9 @@ export enum PatternFolderType {
 	Builtin = 'builtin',
 	UserProvided = 'user-provided'
 }
+
+export interface Watcher {
+	getPath(): string;
+	isActive(): boolean;
+	stop(): void;
+}

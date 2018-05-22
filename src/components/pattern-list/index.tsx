@@ -12,6 +12,7 @@ export interface PatternListItemProps {
 	draggable?: boolean;
 	icon?: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 	onDragStart?: React.DragEventHandler<HTMLElement>;
 }
 
@@ -91,7 +92,12 @@ export const PatternFolderView: React.SFC<PatternFolderViewProps> = props => (
 export const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
 	const { draggable, onDragStart, icon, onClick } = props;
 	return (
-		<StyledPatternListItem onDragStart={onDragStart} draggable={draggable} onClick={onClick}>
+		<StyledPatternListItem
+			onDoubleClick={props.onDoubleClick}
+			onDragStart={onDragStart}
+			draggable={draggable}
+			onClick={onClick}
+		>
 			{icon ? (
 				<StyledImg {...{ [PatternAnchor.icon]: 'true' }} src={icon} />
 			) : (

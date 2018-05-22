@@ -520,6 +520,55 @@ export class ViewStore {
 		return this.undoBuffer.length > 0;
 	}
 
+	public insertAfterElement(init: {
+		element: Model.Element;
+		targetElement: Model.Element;
+	}): Model.Element | undefined {
+		if (init.targetElement.isRoot()) {
+			return this.insertInsideElement(init);
+		}
+
+		const container = init.targetElement.getContainer();
+
+		if (!container) {
+			return;
+		}
+
+		this.execute(
+			Model.ElementLocationCommand.addChild({
+				index: init.targetElement.getIndex() + 1,
+				contentId: container.getId(),
+				childId: init.element.getId()
+			})
+		);
+
+		this.setSelectedElement(init.element);
+		return init.element;
+	}
+
+	public insertInsideElement(init: {
+		element: Model.Element;
+		targetElement: Model.Element;
+	}): Model.Element | undefined {
+		const contents = init.targetElement.getContentBySlotType(Types.SlotType.Children);
+
+		if (!contents) {
+			return;
+		}
+
+		this.execute(
+			Model.ElementLocationCommand.addChild({
+				contentId: contents.getId(),
+				childId: init.element.getId(),
+				index: contents.getElements().length
+			})
+		);
+
+		this.setSelectedElement(init.element);
+
+		return init.element;
+	}
+
 	public isElementHighlightedById(id: string): boolean {
 		const highlightedElement = this.getHighlightedElement();
 
@@ -552,27 +601,12 @@ export class ViewStore {
 
 	public pasteAfterElement(targetElement: Model.Element): Model.Element | undefined {
 		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
-		const container = targetElement.getContainer();
 
-		if (!clipboardElement || !container) {
+		if (!clipboardElement) {
 			return;
 		}
 
-		if (targetElement.isRoot()) {
-			return this.pasteInsideElement(targetElement);
-		}
-
-		this.execute(
-			Model.ElementLocationCommand.addChild({
-				index: targetElement.getIndex() + 1,
-				contentId: container.getId(),
-				childId: clipboardElement.getId()
-			})
-		);
-
-		this.setSelectedElement(clipboardElement);
-
-		return clipboardElement;
+		return this.insertAfterElement({ element: clipboardElement, targetElement });
 	}
 
 	public pasteAfterElementById(id: string): Model.Element | undefined {
@@ -602,21 +636,7 @@ export class ViewStore {
 			return;
 		}
 
-		const contents = element.getContentBySlotType(Types.SlotType.Children);
-
-		if (!contents) {
-			return;
-		}
-
-		this.execute(
-			Model.ElementLocationCommand.addChild({
-				contentId: contents.getId(),
-				childId: clipboardElement.getId(),
-				index: contents.getElements().length - 1
-			})
-		);
-
-		this.setSelectedElement(clipboardElement);
+		this.insertInsideElement({ element: clipboardElement, targetElement: element });
 
 		return clipboardElement;
 	}

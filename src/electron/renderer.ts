@@ -35,21 +35,19 @@ Sender.receive(message => {
 			newProject.setPath(message.payload.path);
 			store.setProject(newProject);
 			store.setActiveView(Types.AlvaView.PageDetail);
+
+			Sender.send({
+				id: uuid.v4(),
+				payload: newProject.toJSON(),
+				type: ServerMessageType.CheckLibraryRequest
+			});
+
 			break;
 		}
 		case ServerMessageType.CreateNewFileResponse: {
 			const newProject = Project.from(message.payload.contents);
 			store.setProject(newProject);
 			store.setActiveView(Types.AlvaView.PageDetail);
-			break;
-		}
-		case ServerMessageType.ConnectPatternLibraryResponse: {
-			const project = store.getProject();
-			if (!project) {
-				return;
-			}
-
-			project.import(message.payload);
 		}
 	}
 });
@@ -74,6 +72,36 @@ Sender.receive(message => {
 			if (store.getActiveView() === Types.AlvaView.Pages) {
 				page.setNameState(Types.EditState.Editing);
 			}
+			break;
+		}
+		case ServerMessageType.ConnectPatternLibraryResponse: {
+			const patternLibrary = project.import(message.payload);
+
+			Sender.send({
+				id: uuid.v4(),
+				payload: {
+					id: patternLibrary.getId(),
+					path: message.payload.path
+				},
+				type: ServerMessageType.ConnectedPatternLibraryNotification
+			});
+
+			break;
+		}
+		case ServerMessageType.CheckLibraryResponse: {
+			const library = project.getPatternLibrary();
+
+			message.payload.forEach(check => {
+				if (check.id !== library.getId()) {
+					return;
+				}
+
+				const state = check.connected
+					? Types.PatternLibraryState.Connected
+					: Types.PatternLibraryState.Disconnected;
+
+				library.setState(state);
+			});
 		}
 	}
 });

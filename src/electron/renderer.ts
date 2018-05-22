@@ -246,10 +246,12 @@ Mobx.autorun(() => {
 Mobx.autorun(() => {
 	const project = store.getProject();
 	const patternLibrary = store.getPatternLibrary();
+	const page = store.getCurrentPage();
 
 	createMenu({
-		project,
+		page,
 		patternLibrary,
+		project,
 		store
 	});
 });

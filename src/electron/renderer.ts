@@ -80,12 +80,13 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.ConnectPatternLibraryResponse: {
-			const patternLibrary = project.import(message.payload);
+			const library = project.getPatternLibrary();
+			library.import(message.payload);
 
 			Sender.send({
 				id: uuid.v4(),
 				payload: {
-					id: patternLibrary.getId(),
+					id: library.getId(),
 					path: message.payload.path
 				},
 				type: ServerMessageType.ConnectedPatternLibraryNotification

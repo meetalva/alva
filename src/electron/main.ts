@@ -7,6 +7,7 @@ import * as electronIsDev from 'electron-is-dev';
 import * as Fs from 'fs';
 import * as getPort from 'get-port';
 import * as stringEscape from 'js-string-escape';
+import { isEqual, uniqWith } from 'lodash';
 import { PreviewMessageType, ServerMessage, ServerMessageType } from '../message';
 import * as MimeTypes from 'mime-types';
 import { Project } from '../model';
@@ -49,6 +50,8 @@ let win: BrowserWindow | undefined;
 let projectPath: string | undefined;
 
 const userStore = new ElectronStore();
+
+const watchers: Types.Watcher[] = [];
 
 async function createWindow(): Promise<void> {
 	const { width = 1280, height = 800 } = screen.getPrimaryDisplay().workAreaSize;
@@ -278,13 +281,17 @@ async function createWindow(): Promise<void> {
 				});
 
 				const path = Array.isArray(paths) ? paths[0] : undefined;
-				const project = Project.from(message.payload);
 
 				if (!path) {
 					return;
 				}
 
-				const analysis = await Analyzer.analyze(path, project.getPatternLibrary().toJSON());
+				const project = Project.from(message.payload);
+				const library = project.getPatternLibrary();
+
+				const analysis = await Analyzer.analyze(path, {
+					getGlobalId: contextId => library.assignId(contextId)
+				});
 
 				send({
 					type: ServerMessageType.ConnectPatternLibraryResponse,
@@ -312,7 +319,9 @@ async function createWindow(): Promise<void> {
 					return;
 				}
 
-				const analysis = await Analyzer.analyze(connection.path, library.toJSON());
+				const analysis = await Analyzer.analyze(connection.path, {
+					getGlobalId: contextId => library.assignId(contextId)
+				});
 
 				send({
 					type: ServerMessageType.ConnectPatternLibraryResponse,
@@ -330,37 +339,59 @@ async function createWindow(): Promise<void> {
 					p => typeof p === 'object' && typeof p.path === 'string' && typeof p.id === 'string'
 				);
 
-				userStore.set('connections', [...new Set([...previousConnections, message.payload])]);
+				const connections = uniqWith([...previousConnections, message.payload], isEqual);
+				userStore.set('connections', connections);
 
 				break;
 			}
 			case ServerMessageType.CheckLibraryRequest: {
-				const id = Project.from(message.payload)
-					.getPatternLibrary()
-					.getId();
+				const library = Project.from(message.payload).getPatternLibrary();
+
+				const id = library.getId();
 				const connections = userStore.get('connections') || [];
 
-				connections
-					.filter(
-						c =>
-							typeof c === 'object' && typeof c.path === 'string' && typeof c.id === 'string'
-					)
-					.filter(c => c.id === id)
-					.forEach(connection => {
-						Fs.exists(connection.path, exists => {
-							send({
-								id,
-								type: ServerMessageType.CheckLibraryResponse,
-								payload: [
-									{
-										id: connection.id,
-										path: connection.path,
-										connected: exists
-									}
-								]
-							});
+				connections.filter(c => c.id === id).forEach(connection => {
+					Fs.exists(connection.path, async exists => {
+						const watcher = watchers.find(
+							w => w.isActive() && w.getPath() === connection.path
+						);
+
+						if (exists && !watcher) {
+							const newWatcher = await Analyzer.watch(
+								connection.path,
+								{
+									getGlobalId: contextId => library.assignId(contextId)
+								},
+								analysis => {
+									library.import(analysis);
+
+									send({
+										type: ServerMessageType.ConnectPatternLibraryResponse,
+										id: message.id,
+										payload: analysis
+									});
+								}
+							);
+							watchers.push(newWatcher);
+						}
+
+						if (!exists && watcher) {
+							watcher.stop();
+						}
+
+						send({
+							id,
+							type: ServerMessageType.CheckLibraryResponse,
+							payload: [
+								{
+									id: connection.id,
+									path: connection.path,
+									connected: exists
+								}
+							]
 						});
 					});
+				});
 			}
 		}
 	});

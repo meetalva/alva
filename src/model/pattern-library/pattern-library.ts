@@ -47,10 +47,13 @@ export class PatternLibrary {
 			state: Types.PatternLibraryState.Pristine
 		});
 
-		const root = new PatternFolder({
-			name: 'root',
-			type: Types.PatternFolderType.Builtin
-		}, { patternLibrary });
+		const root = new PatternFolder(
+			{
+				name: 'root',
+				type: Types.PatternFolderType.Builtin
+			},
+			{ patternLibrary }
+		);
 
 		patternLibrary.setRootFolder(root);
 
@@ -115,6 +118,11 @@ export class PatternLibrary {
 		this.patternProperties.push(property);
 	}
 
+	public assignId(contextId: string): string {
+		const pattern = this.getPatternByContextId(contextId);
+		return pattern ? pattern.getId() : uuid.v4();
+	}
+
 	public getBundle(): string {
 		return this.bundle;
 	}
@@ -157,6 +165,38 @@ export class PatternLibrary {
 
 	public getState(): Types.PatternLibraryState {
 		return this.state;
+	}
+
+	@Mobx.action
+	public import(analysis: Types.LibraryAnalysis): void {
+		// Remove all previously existing
+		// user-provided folders.
+		// TODO: Only remove affected folders
+		this.getRoot()
+			.getChildren()
+			.filter(f => f.getType() !== Types.PatternFolderType.Builtin)
+			.forEach(f => f.remove());
+
+		const folder = new PatternFolder(
+			{ name: analysis.name, type: Types.PatternFolderType.UserProvided },
+			{ patternLibrary: this }
+		);
+
+		this.getRoot().addChild(folder);
+
+		analysis.patterns.forEach(item => {
+			const pattern = Pattern.from(item.pattern, { patternLibrary: this });
+			this.addPattern(pattern);
+
+			item.properties
+				.map(property => PatternProperty.from(property))
+				.forEach(property => this.addProperty(property));
+
+			folder.addPattern(pattern);
+		});
+
+		this.setState(Types.PatternLibraryState.Connected);
+		this.setBundle(analysis.bundle);
 	}
 
 	public query(term: string): string[] {
@@ -211,7 +251,9 @@ export class PatternLibrary {
 	}
 }
 
-function deserializeState(input: 'pristine' | 'connected' | 'disconnected'): Types.PatternLibraryState {
+function deserializeState(
+	input: 'pristine' | 'connected' | 'disconnected'
+): Types.PatternLibraryState {
 	switch (input) {
 		case 'pristine':
 			return Types.PatternLibraryState.Pristine;

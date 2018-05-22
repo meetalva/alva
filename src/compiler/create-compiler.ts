@@ -1,4 +1,5 @@
 import { compilerSafeName } from './compiler-safe-name';
+import * as Fs from 'fs';
 import * as Path from 'path';
 import * as QueryString from 'query-string';
 import * as webpack from 'webpack';
@@ -17,37 +18,42 @@ export interface CompilerPattern {
 
 export function createCompiler(
 	patterns: CompilerPattern[],
-	options: { cwd: string }
+	options: { cwd: string; infrastructure: boolean }
 ): webpack.Compiler {
-	const components = patterns.reduce((acc, pattern) => {
-		acc[compilerSafeName(pattern.id)] = `./${Path.relative(options.cwd, pattern.path)
-			.split(Path.sep)
-			.join('/')}`;
+	const entry: { [name: string]: string } = {};
 
-		return acc;
-	}, {});
+	if (options.infrastructure) {
+		entry.renderer = RENDERER_PATH;
+		entry.preview = PREVIEW_PATH;
+	}
+
+	if (patterns.length > 0) {
+		const components = patterns.reduce((acc, pattern) => {
+			acc[compilerSafeName(pattern.id)] = `./${Path.relative(options.cwd, pattern.path)
+				.split(Path.sep)
+				.join('/')}`;
+
+			return acc;
+		}, {});
+
+		entry.components = `${LOADER_PATH}?${QueryString.stringify({
+			cwd: options.cwd,
+			components: JSON.stringify(components)
+		})}!`;
+	}
 
 	const compiler = webpack({
 		mode: 'development',
 		context: options.cwd,
-		entry: {
-			components: `${LOADER_PATH}?${QueryString.stringify({
-				cwd: options.cwd,
-				components: JSON.stringify(components)
-			})}!`,
-			renderer: RENDERER_PATH,
-			preview: PREVIEW_PATH
-		},
+		entry,
 		output: {
 			filename: '[name].js',
 			library: '[name]',
 			libraryTarget: 'window',
 			path: '/'
-		},
-		plugins: [new webpack.HotModuleReplacementPlugin()]
+		}
 	});
 
-	compiler.outputFileSystem = new MemoryFs();
-
+	compiler.outputFileSystem = new MemoryFs() as typeof Fs;
 	return compiler;
 }

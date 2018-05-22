@@ -7,7 +7,7 @@ import * as electronIsDev from 'electron-is-dev';
 import * as Fs from 'fs';
 import * as getPort from 'get-port';
 import * as stringEscape from 'js-string-escape';
-import { PreviewMessageType, ServerMessageType } from '../message';
+import { PreviewMessageType, ServerMessage, ServerMessageType } from '../message';
 import * as MimeTypes from 'mime-types';
 import { Project } from '../model';
 import * as Path from 'path';
@@ -78,16 +78,17 @@ async function createWindow(): Promise<void> {
 	const port = await (getPort({ port: 1879 }) as Promise<number>);
 	const server = await createServer({ port });
 
+	const send = (message: ServerMessage): void => {
+		Sender.send(message);
+		server.emit('message', message);
+	};
+
 	Sender.receive(async message => {
 		if (!message) {
 			return;
 		}
 
-		// Reflect messages to client
-		Sender.send(message);
-
-		// Emit messages to preview
-		server.emit('message', message);
+		send(message);
 
 		// Handle messages that require
 		// access to system / fs
@@ -110,7 +111,7 @@ async function createWindow(): Promise<void> {
 						const contents = result.contents as Types.SerializedProject;
 						contents.path = projectPath;
 
-						Sender.send({
+						send({
 							type: ServerMessageType.OpenFileResponse,
 							id: message.id,
 							payload: { path: projectPath, contents }
@@ -118,7 +119,7 @@ async function createWindow(): Promise<void> {
 					}
 				}
 
-				Sender.send({
+				send({
 					id: uuid.v4(),
 					type: ServerMessageType.StartApp,
 					payload: String(port)
@@ -150,7 +151,7 @@ async function createWindow(): Promise<void> {
 
 					await Persistence.persist(path, project);
 
-					Sender.send({
+					send({
 						type: ServerMessageType.CreateNewFileResponse,
 						id: message.id,
 						payload: {
@@ -188,7 +189,7 @@ async function createWindow(): Promise<void> {
 						const contents = result.contents as Types.SerializedProject;
 						contents.path = path;
 
-						Sender.send({
+						send({
 							type: ServerMessageType.OpenFileResponse,
 							id: message.id,
 							payload: { path, contents }
@@ -217,7 +218,7 @@ async function createWindow(): Promise<void> {
 				const content = await readFile(path);
 				const mimeType = MimeTypes.lookup(path) || 'application/octet-stream';
 
-				Sender.send({
+				send({
 					type: ServerMessageType.AssetReadResponse,
 					id: message.id,
 					payload: `data:${mimeType};base64,${content.toString('base64')}`
@@ -237,7 +238,7 @@ async function createWindow(): Promise<void> {
 				break;
 			}
 			case ServerMessageType.CreateScriptBundleRequest: {
-				const compiler = createCompiler([], { cwd: process.cwd() });
+				const compiler = createCompiler([], { cwd: process.cwd(), infrastructure: true });
 
 				compiler.run(err => {
 					if (err) {
@@ -247,12 +248,12 @@ async function createWindow(): Promise<void> {
 
 					const outputFileSystem = compiler.outputFileSystem;
 
-					Sender.send({
+					send({
 						type: ServerMessageType.CreateScriptBundleResponse,
 						id: message.id,
 						payload: ['renderer', 'preview']
-							.map(name => ({name, path: Path.posix.join('/', `${name}.js`)}))
-							.map(({name, path}) => ({
+							.map(name => ({ name, path: Path.posix.join('/', `${name}.js`) }))
+							.map(({ name, path }) => ({
 								name,
 								path,
 								contents: outputFileSystem.readFileSync(path)
@@ -285,7 +286,7 @@ async function createWindow(): Promise<void> {
 
 				const analysis = await Analyzer.analyze(path, project.getPatternLibrary().toJSON());
 
-				Sender.send({
+				send({
 					type: ServerMessageType.ConnectPatternLibraryResponse,
 					id: message.id,
 					payload: analysis
@@ -301,7 +302,10 @@ async function createWindow(): Promise<void> {
 				const connections = userStore.get('connections') || [];
 
 				const connection = connections
-					.filter(c => typeof c === 'object' && typeof c.path === 'string' && typeof c.id === 'string')
+					.filter(
+						c =>
+							typeof c === 'object' && typeof c.path === 'string' && typeof c.id === 'string'
+					)
 					.find(c => c.id === id);
 
 				if (!connection) {
@@ -310,7 +314,7 @@ async function createWindow(): Promise<void> {
 
 				const analysis = await Analyzer.analyze(connection.path, library.toJSON());
 
-				Sender.send({
+				send({
 					type: ServerMessageType.ConnectPatternLibraryResponse,
 					id: message.id,
 					payload: analysis
@@ -322,33 +326,38 @@ async function createWindow(): Promise<void> {
 				// Save connections between Alva files and pattern library folders
 				// in user-specific persistence
 				const previous = userStore.get('connections') || [];
-				const previousConnections = (Array.isArray(previous) ? previous : [previous])
-					.filter(p => typeof p === 'object' && typeof p.path === 'string' && typeof p.id === 'string');
+				const previousConnections = (Array.isArray(previous) ? previous : [previous]).filter(
+					p => typeof p === 'object' && typeof p.path === 'string' && typeof p.id === 'string'
+				);
 
-				userStore.set('connections', [...new Set([
-					...previousConnections,
-					message.payload
-				])]);
+				userStore.set('connections', [...new Set([...previousConnections, message.payload])]);
 
 				break;
 			}
 			case ServerMessageType.CheckLibraryRequest: {
-				const id = Project.from(message.payload).getPatternLibrary().getId();
+				const id = Project.from(message.payload)
+					.getPatternLibrary()
+					.getId();
 				const connections = userStore.get('connections') || [];
 
 				connections
-					.filter(c => typeof c === 'object' && typeof c.path === 'string' && typeof c.id === 'string')
+					.filter(
+						c =>
+							typeof c === 'object' && typeof c.path === 'string' && typeof c.id === 'string'
+					)
 					.filter(c => c.id === id)
 					.forEach(connection => {
 						Fs.exists(connection.path, exists => {
-							Sender.send({
+							send({
 								id,
 								type: ServerMessageType.CheckLibraryResponse,
-								payload: [{
-									id: connection.id,
-									path: connection.path,
-									connected: exists
-								}]
+								payload: [
+									{
+										id: connection.id,
+										path: connection.path,
+										connected: exists
+									}
+								]
 							});
 						});
 					});

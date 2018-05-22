@@ -2,10 +2,11 @@ import { createCompiler } from '../compiler/create-compiler';
 import { EventEmitter } from 'events';
 import * as express from 'express';
 import * as Http from 'http';
-import { ServerMessageType } from '../message';
+import { ServerMessage, ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
 import * as Types from '../model/types';
 import * as uuid from 'uuid';
+import { Compiler } from 'webpack';
 import { OPEN, Server as WebsocketServer } from 'ws';
 
 export interface ServerOptions {
@@ -87,7 +88,7 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 	});
 
 	app.use('/scripts', (req, res, next) => {
-		if (req.url === '/components.js') {
+		if (req.path === '/components.js') {
 			res.type('js');
 			res.send(state.payload.bundle || '');
 			return;
@@ -132,31 +133,17 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 		});
 	};
 
-	// tslint:disable-next-line:no-any
-	emitter.on('message', async (message: any) => {
+	emitter.on('message', async (message: ServerMessage) => {
 		switch (message.type) {
 			case ServerMessageType.PatternLibraryChange: {
 				Object.assign(state.payload, message.payload);
-
-				const { payload } = message;
 
 				if (compilation.compiler && typeof compilation.compiler.close === 'function') {
 					compilation.compiler.close();
 				}
 
-				send({
-					type: 'reload',
-					id: uuid.v4(),
-					payload: {}
-				});
+				const next = await setup();
 
-				const next = await setup({
-					analyzerName: payload.analyzerName,
-					styleguidePath: payload.styleguidePath,
-					patternsPath: payload.patternsPath
-				});
-
-				compilation.path = payload.styleguidePath;
 				compilation.compiler = next.compiler;
 				compilation.queue = next.queue;
 				compilation.listeners = [];
@@ -173,6 +160,12 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 					compilation.listeners.forEach(l => l(compilation.compiler.outputFileSystem));
 				});
 
+				send({
+					type: 'update',
+					id: uuid.v4(),
+					payload: {}
+				});
+
 				break;
 			}
 			case ServerMessageType.PageChange: {
@@ -186,14 +179,6 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 			case ServerMessageType.ElementChange: {
 				state.payload.elementId = message.payload;
 				send(message);
-				break;
-			}
-			case ServerMessageType.BundleChange: {
-				send({
-					type: 'reload',
-					id: uuid.v4(),
-					payload: {}
-				});
 				break;
 			}
 			case ServerMessageType.SketchExportRequest:
@@ -224,11 +209,10 @@ function startServer(options: ServerStartOptions): Promise<void> {
 	});
 }
 
-// tslint:disable-next-line:no-any
-async function setup(update: any): Promise<any> {
+async function setup(): Promise<{ compiler: Compiler; queue: Queue }> {
 	const queue: Queue = [];
 
-	const compiler = createCompiler([], { cwd: process.cwd() });
+	const compiler = createCompiler([], { cwd: process.cwd(), infrastructure: true });
 
 	compiler.hooks.compile.tap('alva', () => {
 		queue.unshift({ type: WebpackMessageType.Start, id: uuid.v4() });

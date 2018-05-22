@@ -1,3 +1,5 @@
+import * as Sender from '../message/client';
+import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
 import * as Types from '../model/types';
@@ -192,6 +194,20 @@ export class ViewStore {
 	public clearUndoRedoBuffers(): void {
 		this.undoBuffer = [];
 		this.redoBuffer = [];
+	}
+
+	public connectPatternLibrary(): void {
+		const project = this.project;
+
+		if (!project) {
+			return;
+		}
+
+		Sender.send({
+			type: ServerMessageType.ConnectPatternLibraryRequest,
+			id: uuid.v4(),
+			payload: project.toJSON()
+		});
 	}
 
 	public copyElementById(id: string): Model.Element | undefined {
@@ -905,5 +921,19 @@ export class ViewStore {
 
 	public unsetHighlightedPlaceholderElementById(): void {
 		this.highlightedPlaceholderElement = undefined;
+	}
+
+	public updatePatternLibrary(): void {
+		const project = this.project;
+
+		if (!project) {
+			return;
+		}
+
+		Sender.send({
+			type: ServerMessageType.UpdatePatternLibraryRequest,
+			id: uuid.v4(),
+			payload: project.toJSON()
+		});
 	}
 }

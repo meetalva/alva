@@ -1,7 +1,8 @@
 import { Box, Page, Placeholder, Text } from './builtins';
 import * as Fuse from 'fuse.js';
 import * as Mobx from 'mobx';
-import { Pattern, PatternFolder, PatternSlot, SyntheticPatternType } from '../pattern';
+import { Pattern, PatternSlot, SyntheticPatternType } from '../pattern';
+import { PatternFolder } from '../pattern-folder';
 import { AnyPatternProperty, PatternProperty } from '../pattern-property';
 import * as Types from '../types';
 import * as uuid from 'uuid';
@@ -46,16 +47,22 @@ export class PatternLibrary {
 			state: Types.PatternLibraryState.Pristine
 		});
 
-		const root = new PatternFolder({ name: 'root' }, { patternLibrary });
+		const root = new PatternFolder({
+			name: 'root',
+			type: Types.PatternFolderType.Builtin
+		}, { patternLibrary });
+
 		patternLibrary.setRootFolder(root);
 
 		const syntheticFolder = new PatternFolder(
 			{
 				name: 'Synthetic',
-				parent: root
+				type: Types.PatternFolderType.Builtin
 			},
 			{ patternLibrary }
 		);
+
+		root.addChild(syntheticFolder);
 
 		const { pagePattern, pageProperties } = Page({ patternLibrary });
 		const { placeholderPattern, placeholderProperties } = Placeholder({ patternLibrary });
@@ -80,15 +87,14 @@ export class PatternLibrary {
 	}
 
 	public static from(serialized: Types.SerializedPatternLibrary): PatternLibrary {
+		const state = deserializeState(serialized.state);
+
 		const patternLibrary = new PatternLibrary({
 			bundle: serialized.bundle,
 			id: serialized.id,
 			patterns: [],
 			patternProperties: serialized.patternProperties.map(p => PatternProperty.from(p)),
-			state:
-				serialized.state === 'pristine'
-					? Types.PatternLibraryState.Pristine
-					: Types.PatternLibraryState.Imported
+			state
 		});
 
 		patternLibrary.setRootFolder(PatternFolder.from(serialized.root, { patternLibrary }));
@@ -111,6 +117,10 @@ export class PatternLibrary {
 
 	public getBundle(): string {
 		return this.bundle;
+	}
+
+	public getId(): string {
+		return this.id;
 	}
 
 	public getPatternByContextId(contextId: string): Pattern | undefined {
@@ -198,5 +208,16 @@ export class PatternLibrary {
 		this.fuse = new Fuse(registry, {
 			keys: ['name']
 		});
+	}
+}
+
+function deserializeState(input: 'pristine' | 'connected' | 'disconnected'): Types.PatternLibraryState {
+	switch (input) {
+		case 'pristine':
+			return Types.PatternLibraryState.Pristine;
+		case 'connected':
+			return Types.PatternLibraryState.Connected;
+		case 'disconnected':
+			return Types.PatternLibraryState.Disconnected;
 	}
 }

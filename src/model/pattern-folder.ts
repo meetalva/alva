@@ -1,7 +1,7 @@
 import * as Mobx from 'mobx';
 import { Pattern } from './pattern';
-import { PatternLibrary } from '../pattern-library';
-import * as Types from '../types';
+import { PatternLibrary } from './pattern-library';
+import * as Types from './types';
 import * as uuid from 'uuid';
 
 export interface PatternFolderInit {
@@ -9,6 +9,7 @@ export interface PatternFolderInit {
 	name: string;
 	parent?: PatternFolder;
 	patterns?: string[];
+	type: Types.PatternFolderType;
 }
 
 export interface PatternFolderContext {
@@ -24,22 +25,21 @@ export class PatternFolder {
 
 	@Mobx.observable private parent?: PatternFolder;
 
-	private patternLibrary: PatternLibrary;
+	private readonly patternLibrary: PatternLibrary;
 
 	@Mobx.observable private patterns: string[] = [];
+
+	private readonly type: Types.PatternFolderType;
 
 	public constructor(init: PatternFolderInit, context: PatternFolderContext) {
 		this.id = init.id || uuid.v4();
 		this.name = init.name;
 		this.parent = init.parent;
 		this.patternLibrary = context.patternLibrary;
+		this.type = init.type;
 
 		if (init.patterns) {
 			this.patterns = init.patterns;
-		}
-
-		if (init.parent) {
-			init.parent.addChild(this);
 		}
 	}
 
@@ -51,7 +51,8 @@ export class PatternFolder {
 			{
 				id: serialized.id,
 				name: serialized.name,
-				patterns: serialized.patterns
+				patterns: serialized.patterns,
+				type: serialized.type === 'builtin' ? Types.PatternFolderType.Builtin : Types.PatternFolderType.UserProvided
 			},
 			context
 		);
@@ -108,6 +109,10 @@ export class PatternFolder {
 			.filter(isPattern);
 	}
 
+	public getType(): Types.PatternFolderType {
+		return this.type;
+	}
+
 	public remove(): void {
 		if (this.parent) {
 			this.parent.removeChild(this);
@@ -132,7 +137,8 @@ export class PatternFolder {
 			id: this.id,
 			name: this.name,
 			children: this.children.map(child => child.toJSON()),
-			patterns: Array.from(this.patterns)
+			patterns: Array.from(this.patterns),
+			type: this.type
 		};
 	}
 }

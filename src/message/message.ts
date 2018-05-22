@@ -17,6 +17,9 @@ export enum ServerMessageType {
 	AssetReadResponse = 'asset-read-response',
 	BundleChange = 'bundle-change',
 	CheckForUpdatesRequest = 'check-for-updates-request',
+	CheckLibraryRequest = 'check-library-request',
+	CheckLibraryResponse = 'check-library-response',
+	ConnectedPatternLibraryNotification = 'connected-pattern-library-notification',
 	ConnectPatternLibraryRequest = 'connect-pattern-library-request',
 	ConnectPatternLibraryResponse = 'connect-pattern-library-response',
 	ContentRequest = 'content-request',
@@ -52,7 +55,8 @@ export enum ServerMessageType {
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
 	PatternLibraryChange = 'pattern-library-change',
-	Undo = 'undo'
+	Undo = 'undo',
+	UpdatePatternLibraryRequest = 'update-pattern-library-request'
 }
 
 export interface Envelope<V, T> {
@@ -68,8 +72,11 @@ export type ServerMessage =
 	| AssetReadRequest
 	| AssetReadResponse
 	| CheckForUpdatesRequest
+	| CheckLibraryRequest
+	| CheckLibraryResponse
 	| ConnectPatternLibraryRequest
 	| ConnectPatternLibraryResponse
+	| ConnectedPatternLibraryNotification
 	| ContentRequest
 	| ContentResponse
 	| CopyPageElement
@@ -103,20 +110,24 @@ export type ServerMessage =
 	| SketchExportResponse
 	| StartAppMessage
 	| StyleGuideChange
-	| Undo;
+	| Undo
+	| UpdatePatternLibraryRequest;
 
 export type AppLoaded = EmptyEnvelope<ServerMessageType.AppLoaded>;
 export type AssetReadRequest = EmptyEnvelope<ServerMessageType.AssetReadRequest>;
 export type AssetReadResponse = Envelope<ServerMessageType.AssetReadResponse, string>;
 export type CheckForUpdatesRequest = EmptyEnvelope<ServerMessageType.CheckForUpdatesRequest>;
+export type CheckLibraryRequest = Envelope<ServerMessageType.CheckLibraryRequest, Types.SerializedProject>;
+export type CheckLibraryResponse = Envelope<ServerMessageType.CheckLibraryResponse, Types.LibraryCheckPayload[]>;
+export type ConnectedPatternLibraryNotification = Envelope<ServerMessageType.ConnectedPatternLibraryNotification, Types.LibraryNotificationPayload>;
 export type ConnectPatternLibraryRequest = Envelope<
 	ServerMessageType.ConnectPatternLibraryRequest,
-	Types.SerializedPatternLibrary
->;
+	Types.SerializedProject
+	>;
 export type ConnectPatternLibraryResponse = Envelope<
 	ServerMessageType.ConnectPatternLibraryResponse,
 	Types.ImportPayload
->;
+	>;
 export type ContentRequest = EmptyEnvelope<ServerMessageType.ContentRequest>;
 export type ContentResponse = Envelope<ServerMessageType.ContentResponse, string>;
 export type Copy = EmptyEnvelope<ServerMessageType.Copy>;
@@ -125,11 +136,11 @@ export type CreateNewPage = Envelope<ServerMessageType.CreateNewPage, undefined>
 export type CreateScriptBundleRequest = Envelope<
 	ServerMessageType.CreateScriptBundleRequest,
 	Types.SerializedProject
->;
+	>;
 export type CreateScriptBundleResponse = Envelope<
 	ServerMessageType.CreateScriptBundleResponse,
 	Types.FilePayload[]
->;
+	>;
 export type Cut = EmptyEnvelope<ServerMessageType.Cut>;
 export type Delete = EmptyEnvelope<ServerMessageType.Delete>;
 export type ElementChange = Envelope<ServerMessageType.ElementChange, string | undefined>;
@@ -155,11 +166,12 @@ export type Save = Envelope<ServerMessageType.Save, Types.SavePayload>;
 export type SketchExportRequest = Envelope<
 	ServerMessageType.SketchExportRequest,
 	Types.SketchExportPayload
->;
+	>;
 export type SketchExportResponse = Envelope<ServerMessageType.SketchExportResponse, string>;
 export type StartAppMessage = Envelope<ServerMessageType.StartApp, string>;
 export type StyleGuideChange = Envelope<
 	ServerMessageType.PatternLibraryChange,
 	Types.SerializedPatternLibrary
->;
+	>;
 export type Undo = EmptyEnvelope<ServerMessageType.Undo>;
+export type UpdatePatternLibraryRequest = Envelope<ServerMessageType.UpdatePatternLibraryRequest, Types.SerializedProject>;

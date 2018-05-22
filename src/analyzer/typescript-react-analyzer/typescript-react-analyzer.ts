@@ -4,6 +4,7 @@ import * as Path from 'path';
 import { PatternLibrary } from '../../model/pattern-library';
 import * as PropertyAnalyzer from './property-analyzer';
 import * as ReactUtils from '../typescript/react-utils';
+import * as readPkg from 'read-pkg';
 import * as SlotAnalyzer from './slot-analzyer';
 import * as Types from '../../model/types';
 import * as TypeScript from '../typescript';
@@ -31,6 +32,7 @@ type PatternAnalyzer = (candidate: PatternCandidate, predicate: PatternAnalyzerP
 type PatternAnalyzerPredicate = (ex: TypeScript.TypescriptExport, ctx: AnalyzeContext) => Types.PatternAnalysis | undefined;
 
 export async function analyze(path: string, previousLibrary: Types.SerializedPatternLibrary): Promise<Types.LibraryAnalysis> {
+	const pkg = await readPkg(path);
 	const library = PatternLibrary.from(previousLibrary);
 
 	const patternCandidates = await findPatternCandidates(path);
@@ -59,9 +61,11 @@ export async function analyze(path: string, previousLibrary: Types.SerializedPat
 	await Util.promisify(compiler.run).bind(compiler)();
 
 	return {
+		bundle: (compiler.outputFileSystem as typeof Fs).readFileSync('/components.js').toString(),
+		name: pkg.name || 'Unnamed Library',
 		patterns,
 		path,
-		bundle: (compiler.outputFileSystem as typeof Fs).readFileSync('/components.js').toString()
+		version: pkg.version || '1.0.0'
 	};
 }
 

@@ -43,7 +43,8 @@ export interface SerializedElementContent {
 
 export enum PatternLibraryState {
 	Pristine = 'pristine',
-	Imported = 'imported'
+	Connected = 'connected',
+	Disconnected = 'disconnected'
 }
 
 export interface SerializedPatternLibrary {
@@ -60,6 +61,7 @@ export interface SerializedPatternFolder {
 	id: string;
 	name: string;
 	patterns: string[];
+	type: 'builtin' | 'user-provided';
 }
 
 export enum SerializedPatternType {
@@ -198,8 +200,10 @@ export interface RenderPage {
 
 export interface LibraryAnalysis {
 	bundle: string;
+	name: string;
 	path: string;
 	patterns: PatternAnalysis[];
+	version: string;
 }
 
 export interface PatternAnalysis {
@@ -252,6 +256,24 @@ export interface ExportPayload {
 
 export interface ImportPayload {
 	bundle: string;
+	name: string;
 	path: string;
 	patterns: PatternAnalysis[];
+	version: string;
+}
+
+export interface LibraryNotificationPayload {
+	id: string;
+	path: string;
+}
+
+export interface LibraryCheckPayload {
+	connected: boolean;
+	id: string;
+	path: string;
+}
+
+export enum PatternFolderType {
+	Builtin = 'builtin',
+	UserProvided = 'user-provided'
 }

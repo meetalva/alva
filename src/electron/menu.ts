@@ -7,6 +7,7 @@ import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
 import { SketchExporter } from '../export/sketch-exporter';
 import { ViewStore } from '../store';
+import * as Types from '../model/types';
 import * as uuid from 'uuid';
 
 const { Menu, shell, app, dialog } = remote;
@@ -42,7 +43,13 @@ function queryPath(options: PathQuery): Promise<string> {
 
 export function createMenu(): void {
 	const store = ViewStore.getInstance();
-	const isSplashscreen: boolean = !Boolean(store.getProject());
+	const project = store.getProject();
+	const isLibraryConnected = project
+		? project.getPatternLibrary().getState() === Types.PatternLibraryState.Connected
+		: false;
+
+	const isSplashscreen: boolean = !Boolean(project);
+
 	const template: MenuItemConstructorOptions[] = [
 		{
 			label: '&File',
@@ -93,8 +100,6 @@ export function createMenu(): void {
 					accelerator: 'CmdOrCtrl+S',
 					role: 'save',
 					click: () => {
-						const project = store.getProject();
-
 						if (!project) {
 							return;
 						}
@@ -324,21 +329,17 @@ export function createMenu(): void {
 			label: '&Library',
 			submenu: [
 				{
-					label: '&Connect',
+					label: getLibraryLabel(store.getProject()),
+					enabled: !isSplashscreen,
 					accelerator: 'CmdOrCtrl+Shift+C',
-					click: () => {
-						const project = store.getProject();
-
-						if (!project) {
-							return;
-						}
-
-						Sender.send({
-							type: ServerMessageType.ConnectPatternLibraryRequest,
-							id: uuid.v4(),
-							payload: project.getPatternLibrary().toJSON()
-						});
-					}
+					click: () =>
+						store.connectPatternLibrary()
+				},
+				{
+					label: '&Update',
+					enabled: isLibraryConnected,
+					click: () =>
+						store.updatePatternLibrary()
 				}
 			]
 		},
@@ -491,4 +492,21 @@ export function createMenu(): void {
 
 	const menu = Menu.buildFromTemplate(template);
 	Menu.setApplicationMenu(menu);
+}
+
+function getLibraryLabel(project: Project | undefined): string {
+	if (!project) {
+		return '&Connect';
+	}
+
+	const library = project.getPatternLibrary();
+
+	switch (library.getState()) {
+		case Types.PatternLibraryState.Pristine:
+			return '&Connect';
+		case Types.PatternLibraryState.Disconnected:
+			return 'Re&connect';
+	}
+
+	return '&Connect';
 }

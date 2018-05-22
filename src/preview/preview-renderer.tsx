@@ -1,16 +1,9 @@
-// import { ComponentGetter } from './get-component';
 import { HighlightArea } from './highlight-area';
-import * as MobX from 'mobx';
-import * as MobXReact from 'mobx-react';
 import { PreviewStore } from './preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Helmet } from 'react-helmet';
 import * as Types from '../model/types';
-
-// TODO: Produces a deprecation warning, find a way
-// to dedupe MobX when upgrading to 4.x
-MobX.extras.shareGlobalState();
 
 export interface RenderInit {
 	highlight: HighlightArea;
@@ -25,23 +18,26 @@ export interface RenderInit {
 	getSlots(slots: any, render: (props: any) => any): any;
 }
 
-export interface InjectedPreviewHighlightProps {
+export interface PreviewHighlightProps {
 	highlight: HighlightArea;
 }
 
-export interface InjectedPreviewApplicationProps {
-	highlight: HighlightArea;
-	store: PreviewStore;
-}
-
-interface InjectedPreviewComponentProps extends Types.SerializedElement {
+export interface PreviewApplicationProps {
 	getChildren: RenderInit['getChildren'];
 	getComponent: RenderInit['getComponent'];
 	getProperties: RenderInit['getProperties'];
 	getSlots: RenderInit['getSlots'];
-	highlight: HighlightArea;
-	store: PreviewStore;
-	// tslint:disable-next-line:no-any
+	highlight: RenderInit['highlight'];
+	store: RenderInit['store'];
+}
+
+interface PreviewComponentProps extends Types.SerializedElement {
+	getChildren: RenderInit['getChildren'];
+	getComponent: RenderInit['getComponent'];
+	getProperties: RenderInit['getProperties'];
+	getSlots: RenderInit['getSlots'];
+	highlight: RenderInit['highlight'];
+	store: RenderInit['store'];
 }
 
 interface ErrorBoundaryProps {
@@ -101,25 +97,21 @@ const SYNTHETICS = {
 
 export function render(init: RenderInit): void {
 	ReactDom.render(
-		<MobXReact.Provider
+		<PreviewApplication
 			getChildren={init.getChildren}
 			getComponent={init.getComponent}
 			getProperties={init.getProperties}
 			getSlots={init.getSlots}
 			store={init.store}
 			highlight={init.highlight}
-		>
-			<PreviewApplication />
-		</MobXReact.Provider>,
+		/>,
 		document.getElementById('preview')
 	);
 }
 
-@MobXReact.inject('store', 'highlight')
-@MobXReact.observer
-class PreviewApplication extends React.Component {
+class PreviewApplication extends React.Component<PreviewApplicationProps> {
 	public render(): JSX.Element | null {
-		const props = this.props as InjectedPreviewApplicationProps;
+		const props = this.props;
 		const currentPage = props.store.pages.find(page => page.id === props.store.pageId);
 
 		if (!currentPage) {
@@ -136,12 +128,18 @@ class PreviewApplication extends React.Component {
 			<React.Fragment>
 				<PreviewComponent
 					contentIds={element.contentIds}
+					getChildren={props.getChildren}
+					getComponent={props.getComponent}
+					getProperties={props.getProperties}
+					getSlots={props.getSlots}
+					highlight={props.highlight}
+					id={element.id}
+					name={element.name}
 					patternId={element.patternId}
 					properties={element.properties}
-					name={element.name}
-					id={element.id}
+					store={props.store}
 				/>
-				<PreviewHighlight />
+				<PreviewHighlight highlight={props.highlight} />
 			</React.Fragment>
 		);
 	}
@@ -166,11 +164,9 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 	}
 }
 
-@MobXReact.inject('getChildren', 'getComponent', 'getProperties', 'getSlots', 'store', 'highlight')
-@MobXReact.observer
-class PreviewComponent extends React.Component<Types.SerializedElement> {
+class PreviewComponent extends React.Component<PreviewComponentProps> {
 	public componentWillUpdate(): void {
-		const props = this.props as InjectedPreviewComponentProps;
+		const props = this.props;
 
 		if (props.id === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
@@ -184,13 +180,33 @@ class PreviewComponent extends React.Component<Types.SerializedElement> {
 	}
 
 	public render(): JSX.Element | null {
-		const props = this.props as InjectedPreviewComponentProps;
+		const props = this.props;
 
-		const children = props.getChildren(props, child => (
-			<PreviewComponent key={child.id} {...child} />
+		const children = props.getChildren(props, (child: Types.SerializedElement) => (
+			<PreviewComponent
+				key={child.id}
+				getChildren={props.getChildren}
+				getComponent={props.getComponent}
+				getProperties={props.getProperties}
+				getSlots={props.getSlots}
+				highlight={props.highlight}
+				store={props.store}
+				{...child}
+			/>
 		));
 
-		const slots = props.getSlots(props, child => <PreviewComponent key={child.id} {...child} />);
+		const slots = props.getSlots(props, (child: Types.SerializedElement) => (
+			<PreviewComponent
+				key={child.id}
+				getChildren={props.getChildren}
+				getComponent={props.getComponent}
+				getProperties={props.getProperties}
+				getSlots={props.getSlots}
+				highlight={props.highlight}
+				store={props.store}
+				{...child}
+			/>
+		));
 
 		const properties = props.getProperties(props.properties);
 
@@ -211,11 +227,9 @@ class PreviewComponent extends React.Component<Types.SerializedElement> {
 	}
 }
 
-@MobXReact.inject('store', 'highlight')
-@MobXReact.observer
-class PreviewHighlight extends React.Component {
+class PreviewHighlight extends React.Component<PreviewHighlightProps> {
 	public render(): JSX.Element {
-		const props = this.props as InjectedPreviewHighlightProps;
+		const props = this.props;
 		const { highlight } = props;
 		const p = highlight.getProps();
 

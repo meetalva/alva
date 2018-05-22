@@ -124,6 +124,14 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 			return null;
 		}
 
+		const selectedElement = props.store.elements.find(e => e.id === props.store.elementId);
+
+		if (selectedElement) {
+			props.highlight.show();
+		} else {
+			props.highlight.hide();
+		}
+
 		return (
 			<React.Fragment>
 				<PreviewComponent
@@ -165,18 +173,44 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 }
 
 class PreviewComponent extends React.Component<PreviewComponentProps> {
-	public componentWillUpdate(): void {
+	public constructor(props: PreviewComponentProps) {
+		super(props);
+		this.handleResize = this.handleResize.bind(this);
+	}
+
+	public componentDidMount(): void {
+		window.addEventListener('resize', this.handleResize);
+	}
+
+	public componentDidUpdate(): void {
 		const props = this.props;
 
 		if (props.id === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {
-				props.highlight.show(node as Element, props.id);
-				setTimeout(() => {
-					props.store.elementId = '';
-				}, 500);
+				props.highlight.setSize(node as Element);
 			}
 		}
+	}
+
+	public componentWillUnmount(): void {
+		window.removeEventListener('resize', this.handleResize);
+	}
+
+	private handleResize(): void {
+		const props = this.props;
+		if (props.id !== props.store.elementId) {
+			return;
+		}
+
+		const node = ReactDom.findDOMNode(this);
+
+		if (!node) {
+			return;
+		}
+
+		props.highlight.update();
+		window.requestAnimationFrame(this.handleResize);
 	}
 
 	public render(): JSX.Element | null {
@@ -231,31 +265,83 @@ class PreviewHighlight extends React.Component<PreviewHighlightProps> {
 	public render(): JSX.Element {
 		const props = this.props;
 		const { highlight } = props;
-		const p = highlight.getProps();
 
 		return (
 			<div
 				style={{
 					position: 'absolute',
 					boxSizing: 'border-box',
-					border: '1px dashed rgba(55, 55, 55, .5)',
-					background: `
-					repeating-linear-gradient(
-						135deg,
-						transparent,
-						transparent 2.5px,rgba(51, 141, 222, .5) 2.5px,
-						rgba(51,141,222, .5) 5px),
-						rgba(102,169,230, .5)`,
-					transition: 'all .25s ease-in-out',
-					bottom: p.bottom,
-					height: p.height,
-					left: p.left,
-					opacity: p.opacity,
-					right: p.right,
-					top: p.top,
-					width: p.width
+					border: '1px solid rgba(255, 255, 255, 0.5)',
+					transition: '.1s ease-in-out',
+					transitionProperty: 'top, bottom, opacity',
+					bottom: highlight.bottom,
+					height: highlight.height,
+					left: highlight.left,
+					opacity: highlight.opacity,
+					right: highlight.right,
+					top: highlight.top,
+					width: highlight.width,
+					pointerEvents: 'none',
+					mixBlendMode: 'difference'
 				}}
-			/>
+			>
+				<div
+					style={{
+						position: 'absolute',
+						width: '100%',
+						height: '100%',
+						maxWidth: '12px',
+						maxHeight: '12px',
+						borderRadius: '3px 0 0 0',
+						borderLeft: '3px solid rgba(255, 255, 255, 0.75)',
+						borderTop: '3px solid rgba(255, 255, 255, 0.75)',
+						left: '-2px',
+						top: '-2px'
+					}}
+				/>
+				<div
+					style={{
+						position: 'absolute',
+						width: '100%',
+						height: '100%',
+						maxWidth: '12px',
+						maxHeight: '12px',
+						borderRadius: '0 3px 0 0',
+						borderRight: '3px solid rgba(255, 255, 255, 0.75)',
+						borderTop: '3px solid rgba(255, 255, 255, 0.75)',
+						right: '-2px',
+						top: '-2px'
+					}}
+				/>
+				<div
+					style={{
+						position: 'absolute',
+						width: '100%',
+						height: '100%',
+						maxWidth: '12px',
+						maxHeight: '12px',
+						borderRadius: '0 0 0 3px',
+						borderLeft: '3px solid rgba(255, 255, 255, 0.75)',
+						borderBottom: '3px solid rgba(255, 255, 255, 0.75)',
+						left: '-2px',
+						bottom: '-2px'
+					}}
+				/>
+				<div
+					style={{
+						position: 'absolute',
+						width: '100%',
+						height: '100%',
+						maxWidth: '12px',
+						maxHeight: '12px',
+						borderRadius: '0 0 3px 0',
+						borderRight: '3px solid rgba(255, 255, 255, 0.75)',
+						borderBottom: '3px solid rgba(255, 255, 255, 0.75)',
+						right: '-2px',
+						bottom: '-2px'
+					}}
+				/>
+			</div>
 		);
 	}
 }

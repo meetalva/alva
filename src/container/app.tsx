@@ -17,7 +17,6 @@ import {
 } from '../components';
 import { ConnectPaneContainer } from './connect-pane-container';
 import { ElementList } from './element-list';
-import { createMenu } from '../electron/menu';
 import { ServerMessageType } from '../message';
 import * as MobxReact from 'mobx-react';
 import { PageListContainer } from './page-list/page-list-container';
@@ -39,7 +38,6 @@ export class App extends React.Component {
 	private shiftDown: boolean = false;
 
 	public componentDidMount(): void {
-		createMenu();
 		this.redirectUndoRedo();
 	}
 

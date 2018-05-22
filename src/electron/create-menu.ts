@@ -2,7 +2,7 @@ import * as Sender from '../message/client';
 import { BrowserWindow, MenuItem, MenuItemConstructorOptions, remote } from 'electron';
 import { HtmlExporter } from '../export/html-exporter';
 import { ServerMessageType } from '../message';
-import { Page, Project } from '../model';
+import { Element, Page, PatternLibrary, Project } from '../model';
 import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
 import { SketchExporter } from '../export/sketch-exporter';
@@ -11,14 +11,6 @@ import * as Types from '../model/types';
 import * as uuid from 'uuid';
 
 const { Menu, shell, app, dialog } = remote;
-
-function getPageFileName(): string {
-	return (ViewStore.getInstance().getCurrentPage() as Page).getName();
-}
-
-function getProjectFileName(): string {
-	return (ViewStore.getInstance().getProject() as Project).getName();
-}
 
 interface PathQuery {
 	defaultName: string;
@@ -41,14 +33,16 @@ function queryPath(options: PathQuery): Promise<string> {
 	});
 }
 
-export function createMenu(): void {
-	const store = ViewStore.getInstance();
-	const project = store.getProject();
-	const isLibraryConnected = project
-		? project.getPatternLibrary().getState() === Types.PatternLibraryState.Connected
-		: false;
+export interface MenuContext {
+	page?: Page;
+	patternLibrary?: PatternLibrary;
+	project?: Project;
+	selectedElement?: Element;
+	store: ViewStore;
+}
 
-	const isSplashscreen: boolean = !Boolean(project);
+export function createMenu(ctx: MenuContext): void {
+	const project = ctx.project;
 
 	const template: MenuItemConstructorOptions[] = [
 		{
@@ -81,7 +75,7 @@ export function createMenu(): void {
 				},
 				{
 					label: 'New &Page',
-					enabled: !isSplashscreen,
+					enabled: typeof ctx.project !== 'undefined',
 					accelerator: 'CmdOrCtrl+Shift+N',
 					click: () => {
 						Sender.send({
@@ -96,7 +90,7 @@ export function createMenu(): void {
 				},
 				{
 					label: '&Save',
-					enabled: !isSplashscreen,
+					enabled: typeof ctx.project !== 'undefined',
 					accelerator: 'CmdOrCtrl+S',
 					role: 'save',
 					click: () => {
@@ -116,7 +110,7 @@ export function createMenu(): void {
 				},
 				{
 					label: '&Rename',
-					enabled: !isSplashscreen,
+					enabled: typeof ctx.project !== 'undefined',
 					role: 'rename'
 				},
 				{
@@ -127,12 +121,16 @@ export function createMenu(): void {
 					submenu: [
 						{
 							label: 'Export Page as Sketch',
-							enabled: !isSplashscreen,
+							enabled: typeof ctx.page !== 'undefined',
 							click: async () => {
+								if (!ctx.page) {
+									return;
+								}
+
 								const path = await queryPath({
 									title: 'Export Sketch as',
 									typeName: 'Almost Sketch JSON',
-									defaultName: `${getPageFileName()}.asketch`,
+									defaultName: `${ctx.page.getName()}.asketch`,
 									extname: 'json'
 								});
 
@@ -144,12 +142,16 @@ export function createMenu(): void {
 						},
 						{
 							label: 'Export Page as PDF',
-							enabled: !isSplashscreen,
+							enabled: typeof ctx.page !== 'undefined',
 							click: async () => {
+								if (!ctx.page) {
+									return;
+								}
+
 								const path = await queryPath({
 									title: 'Export PDF as',
 									typeName: 'PDF Document',
-									defaultName: getPageFileName(),
+									defaultName: ctx.page.getName(),
 									extname: 'pdf'
 								});
 
@@ -161,12 +163,16 @@ export function createMenu(): void {
 						},
 						{
 							label: 'Export Page as PNG',
-							enabled: !isSplashscreen,
+							enabled: typeof ctx.page !== 'undefined',
 							click: async () => {
+								if (!ctx.page) {
+									return;
+								}
+
 								const path = await queryPath({
 									title: 'Export PNG as',
 									typeName: 'PNG Image',
-									defaultName: getPageFileName(),
+									defaultName: ctx.page.getName(),
 									extname: 'png'
 								});
 
@@ -181,12 +187,16 @@ export function createMenu(): void {
 						},
 						{
 							label: 'Export Project as HTML',
-							enabled: !isSplashscreen,
+							enabled: typeof ctx.project !== 'undefined',
 							click: async () => {
+								if (!ctx.project) {
+									return;
+								}
+
 								const path = await queryPath({
 									title: 'Export HTML as',
 									typeName: 'HTML File',
-									defaultName: getProjectFileName(),
+									defaultName: ctx.project.getName(),
 									extname: 'html'
 								});
 
@@ -219,6 +229,7 @@ export function createMenu(): void {
 				{
 					label: '&Undo',
 					accelerator: 'CmdOrCtrl+Z',
+					enabled: typeof ctx.project !== 'undefined',
 					click: () =>
 						Sender.send({
 							id: uuid.v4(),
@@ -229,6 +240,7 @@ export function createMenu(): void {
 				{
 					label: '&Redo',
 					accelerator: 'Shift+CmdOrCtrl+Z',
+					enabled: typeof ctx.project !== 'undefined',
 					click: () =>
 						Sender.send({
 							id: uuid.v4(),
@@ -241,7 +253,7 @@ export function createMenu(): void {
 				},
 				{
 					label: '&Cut',
-					enabled: !isSplashscreen,
+					enabled: typeof ctx.project !== 'undefined',
 					accelerator: 'CmdOrCtrl+X',
 					click: () => {
 						Sender.send({
@@ -254,7 +266,7 @@ export function createMenu(): void {
 				},
 				{
 					label: 'C&opy',
-					enabled: !isSplashscreen,
+					enabled: typeof ctx.project !== 'undefined',
 					accelerator: 'CmdOrCtrl+C',
 					click: () => {
 						Sender.send({
@@ -267,7 +279,7 @@ export function createMenu(): void {
 				},
 				{
 					label: '&Paste',
-					enabled: !isSplashscreen,
+					enabled: typeof ctx.project !== 'undefined',
 					accelerator: 'CmdOrCtrl+V',
 					click: () => {
 						Sender.send({
@@ -283,7 +295,7 @@ export function createMenu(): void {
 				},
 				{
 					label: '&Duplicate',
-					enabled: !isSplashscreen,
+					enabled: typeof ctx.selectedElement !== 'undefined',
 					accelerator: 'CmdOrCtrl+D',
 					click: () => {
 						Sender.send({
@@ -306,7 +318,7 @@ export function createMenu(): void {
 				},
 				{
 					label: '&Delete',
-					enabled: !isSplashscreen,
+					enabled: typeof ctx.project !== 'undefined',
 					accelerator: (() => {
 						if (process.platform === 'darwin') {
 							return 'Backspace';
@@ -329,17 +341,17 @@ export function createMenu(): void {
 			label: '&Library',
 			submenu: [
 				{
-					label: getLibraryLabel(store.getProject()),
-					enabled: !isSplashscreen,
+					label: getLibraryLabel(ctx.project),
+					enabled: typeof ctx.patternLibrary !== 'undefined',
 					accelerator: 'CmdOrCtrl+Shift+C',
-					click: () =>
-						store.connectPatternLibrary()
+					click: () => ctx.store.connectPatternLibrary()
 				},
 				{
 					label: '&Update',
-					enabled: isLibraryConnected,
-					click: () =>
-						store.updatePatternLibrary()
+					enabled:
+						typeof ctx.patternLibrary !== 'undefined' &&
+						ctx.patternLibrary.getState() === Types.PatternLibraryState.Connected,
+					click: () => ctx.store.updatePatternLibrary()
 				}
 			]
 		},

@@ -1,64 +1,48 @@
 import * as MobX from 'mobx';
 
-export interface HighlightAreaProps {
-	bottom?: number;
-	height?: number;
-	left?: number;
-	opacity?: number;
-	right?: number;
-	top?: number;
-	width?: number;
-}
-
 export class HighlightArea {
-	private pageElementId?: string;
+	@MobX.observable public bottom: number = 0;
+	@MobX.observable public height: number = 0;
 
-	@MobX.observable
-	private props: HighlightAreaProps = {
-		bottom: 0,
-		height: 0,
-		left: 0,
-		opacity: 0,
-		right: 0,
-		top: 0,
-		width: 0
-	};
+	@MobX.observable public isVisible: boolean = false;
+	@MobX.observable public left: number = 0;
+	@MobX.observable public node: Element;
+	@MobX.observable public opacity: number = 0;
+	@MobX.observable public right: number = 0;
+	@MobX.observable public top: number = 0;
+	@MobX.observable public width: number = 0;
 
-	public getProps(): HighlightAreaProps {
-		return this.props;
-	}
-
+	@MobX.action
 	public hide(): void {
-		this.props.opacity = 0;
-		this.pageElementId = undefined;
+		this.opacity = 0;
+		this.isVisible = false;
 	}
 
-	public show(element: Element, pageElementId: string): void {
-		if (typeof element.getBoundingClientRect !== 'function') {
-			return;
+	@MobX.action
+	public setSize(element: Element): void | Element {
+		if (element.parentElement) {
+			const clientRect: ClientRect = element.getBoundingClientRect();
+			this.bottom = clientRect.bottom;
+			this.height = clientRect.height;
+			this.left = clientRect.left + window.scrollX;
+			this.right = clientRect.right;
+			this.top = clientRect.top + window.scrollY;
+			this.width = clientRect.width;
+			this.node = element;
+			return this.node;
 		}
-		if (this.pageElementId === pageElementId) {
-			return;
+	}
+
+	@MobX.action
+	public show(): void {
+		this.opacity = 1;
+		this.isVisible = true;
+	}
+
+	@MobX.action
+	public update(): void {
+		if (this.node) {
+			this.setSize(this.node);
 		}
-		this.pageElementId = pageElementId;
-
-		const clientRect: ClientRect = element.getBoundingClientRect();
-		this.props = {
-			bottom: clientRect.bottom,
-			height: clientRect.height,
-			left: clientRect.left + window.scrollX,
-			opacity: 1,
-			right: clientRect.right,
-			top: clientRect.top + window.scrollY,
-			width: clientRect.width
-		};
-
-		element.scrollIntoView({
-			behavior: 'smooth',
-			block: 'center',
-			inline: 'nearest'
-		});
-
-		setTimeout(() => this.hide(), 500);
 	}
 }

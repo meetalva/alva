@@ -73,9 +73,20 @@ interface ErrorMessageProps {
 @MobXReact.inject('store', 'highlight')
 @MobXReact.observer
 class PreviewApplication extends React.Component {
+	public componentDidUpdate(): void {
+		const props = this.props as InjectedPreviewApplicationProps;
+		props.highlight.update();
+	}
+
 	public render(): JSX.Element | null {
 		const props = this.props as InjectedPreviewApplicationProps;
 		const currentPage = props.store.pages.find(page => page.id === props.store.pageId);
+
+		if (props.store.elementId) {
+			props.highlight.show();
+		} else {
+			props.highlight.hide();
+		}
 
 		if (!currentPage) {
 			return null;
@@ -121,16 +132,46 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 @MobXReact.inject('getComponent', 'store', 'highlight')
 @MobXReact.observer
 class PreviewComponent extends React.Component<PreviewComponentProps> {
-	public componentWillUpdate(): void {
-		const props = this.props as InjectedPreviewComponentProps;
+	public constructor(props: InjectedPreviewComponentProps) {
+		super(props);
+		this.handleResize = this.handleResize.bind(this);
+		window.requestAnimationFrame(this.handleResize);
+	}
 
+	public componentDidMount(): void {
+		const props = this.props as InjectedPreviewComponentProps;
 		if (props.uuid === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {
-				props.highlight.show(node as Element, props.uuid);
-				setTimeout(() => {
-					props.store.elementId = '';
-				}, 500);
+				props.highlight.setSize(node as Element);
+			}
+		}
+		window.addEventListener('resize', this.handleResize);
+	}
+
+	public componentDidUpdate(): void {
+		const props = this.props as InjectedPreviewComponentProps;
+		if (props.uuid === props.store.elementId) {
+			const node = ReactDom.findDOMNode(this);
+			if (node) {
+				props.highlight.setSize(node as Element);
+			}
+		}
+	}
+
+	public componentWillUnmount(): void {
+		window.removeEventListener('resize', this.handleResize);
+	}
+
+	private handleResize(): void {
+		const props = this.props as InjectedPreviewComponentProps;
+		if (props.uuid !== props.store.elementId) {
+			return;
+		} else {
+			const node = ReactDom.findDOMNode(this);
+			if (node) {
+				props.highlight.update();
+				window.requestAnimationFrame(this.handleResize);
 			}
 		}
 	}
@@ -153,7 +194,6 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		// Access elementId in render method to trigger MobX subscription
 		// tslint:disable-next-line:no-unused-expression
 		props.store.elementId;
-
 		// tslint:disable-next-line:no-any
 		const Component = props.getComponent(props, {
 			// tslint:disable-next-line:no-any
@@ -190,31 +230,81 @@ class PreviewHighlight extends React.Component {
 	public render(): JSX.Element {
 		const props = this.props as InjectedPreviewHighlightProps;
 		const { highlight } = props;
-		const p = highlight.getProps();
 
 		return (
 			<div
 				style={{
 					position: 'absolute',
 					boxSizing: 'border-box',
-					border: '1px dashed rgba(55, 55, 55, .5)',
-					background: `
-					repeating-linear-gradient(
-						135deg,
-						transparent,
-						transparent 2.5px,rgba(51, 141, 222, .5) 2.5px,
-						rgba(51,141,222, .5) 5px),
-						rgba(102,169,230, .5)`,
-					transition: 'all .25s ease-in-out',
-					bottom: p.bottom,
-					height: p.height,
-					left: p.left,
-					opacity: p.opacity,
-					right: p.right,
-					top: p.top,
-					width: p.width
+					border: '1px solid rgba(255, 255, 255, 0.5)',
+					bottom: highlight.bottom,
+					height: highlight.height,
+					left: highlight.left,
+					opacity: highlight.opacity,
+					right: highlight.right,
+					top: highlight.top,
+					width: highlight.width,
+					pointerEvents: 'none',
+					mixBlendMode: 'difference'
 				}}
-			/>
+			>
+				<div
+					style={{
+						position: 'absolute',
+						width: '100%',
+						height: '100%',
+						maxWidth: '12px',
+						maxHeight: '12px',
+						borderRadius: '3px 0 0 0',
+						borderLeft: '3px solid rgba(255, 255, 255, 0.75)',
+						borderTop: '3px solid rgba(255, 255, 255, 0.75)',
+						left: '-2px',
+						top: '-2px'
+					}}
+				/>
+				<div
+					style={{
+						position: 'absolute',
+						width: '100%',
+						height: '100%',
+						maxWidth: '12px',
+						maxHeight: '12px',
+						borderRadius: '0 3px 0 0',
+						borderRight: '3px solid rgba(255, 255, 255, 0.75)',
+						borderTop: '3px solid rgba(255, 255, 255, 0.75)',
+						right: '-2px',
+						top: '-2px'
+					}}
+				/>
+				<div
+					style={{
+						position: 'absolute',
+						width: '100%',
+						height: '100%',
+						maxWidth: '12px',
+						maxHeight: '12px',
+						borderRadius: '0 0 0 3px',
+						borderLeft: '3px solid rgba(255, 255, 255, 0.75)',
+						borderBottom: '3px solid rgba(255, 255, 255, 0.75)',
+						left: '-2px',
+						bottom: '-2px'
+					}}
+				/>
+				<div
+					style={{
+						position: 'absolute',
+						width: '100%',
+						height: '100%',
+						maxWidth: '12px',
+						maxHeight: '12px',
+						borderRadius: '0 0 3px 0',
+						borderRight: '3px solid rgba(255, 255, 255, 0.75)',
+						borderBottom: '3px solid rgba(255, 255, 255, 0.75)',
+						right: '-2px',
+						bottom: '-2px'
+					}}
+				/>
+			</div>
 		);
 	}
 }

@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron';
+import * as Electron from 'electron';
 import { isMessage } from './is-message';
 import { ServerMessage } from '.';
 
@@ -10,12 +10,11 @@ export function send(message: ServerMessage): void {
 		console.warn(`Client tried to send invalid message: ${JSON.stringify(message)}`);
 		return;
 	}
-	ipcRenderer.send('message', message);
+	Electron.ipcRenderer.send('message', message);
 }
 
 export function receive(handler: (message: ServerMessage) => void): void {
-	// tslint:disable-next-line:no-any
-	ipcRenderer.on('message', (e: any, message: any) => {
+	Electron.ipcRenderer.on('message', (e: Electron.Event, message) => {
 		if (!isMessage(message)) {
 			return;
 		}

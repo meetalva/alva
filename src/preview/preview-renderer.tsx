@@ -93,7 +93,8 @@ const Box: React.SFC = (props: any) => {
 const SYNTHETICS = {
 	box: Box,
 	page: Page,
-	placeholder: props => <img src={props.src} style={{ width: '100%', height: 'auto' }} />,
+	placeholder: props =>
+		props.src ? <img src={props.src} style={{ width: '100%', height: 'auto' }} /> : null,
 	text: props => <span>{props.text}</span>
 };
 

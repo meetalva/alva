@@ -218,5 +218,3 @@ Alva follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 Proudly powered by [SinnerSchrader](https://github.com/sinnerschrader).
 
 Copyright 2017-2018. Released under the MIT license.
-
-[![Greenkeeper badge](https://badges.greenkeeper.io/meetalva/alva.svg)](https://greenkeeper.io/)

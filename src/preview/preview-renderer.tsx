@@ -273,8 +273,6 @@ class PreviewHighlight extends React.Component<PreviewHighlightProps> {
 					position: 'absolute',
 					boxSizing: 'border-box',
 					border: '1px solid rgba(255, 255, 255, 0.5)',
-					transition: '.1s ease-in-out',
-					transitionProperty: 'top, bottom, opacity',
 					bottom: highlight.bottom,
 					height: highlight.height,
 					left: highlight.left,

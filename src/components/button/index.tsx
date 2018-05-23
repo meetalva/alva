@@ -4,11 +4,11 @@ import { getSpace, SpaceSize } from '../space';
 import styled, { css } from 'styled-components';
 
 export interface ButtonProps {
-	textColor?: Color;
+	inverted?: boolean;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	order?: ButtonOrder;
 	size?: ButtonSize;
-	inverted?: boolean;
+	textColor?: Color;
 }
 
 export enum ButtonOrder {

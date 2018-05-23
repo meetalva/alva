@@ -2,19 +2,19 @@ import Button, { ButtonOrder, ButtonSize } from '../button';
 import { colors } from '../colors';
 import { Copy } from '../copy';
 import { Headline } from '../headline';
-import Link from '../link';
+// import Link from '../link';
 import * as React from 'react';
 import Space, { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface ConnectLibraryProps {
-	onClick?: React.MouseEventHandler<HTMLElement>;
-	headline?: string;
 	description?: string;
-	primaryButton?: string;
-	secondaryButton?: string;
+	headline?: string;
+	onClick?: React.MouseEventHandler<HTMLElement>;
 	onPrimaryButtonClick?: React.MouseEventHandler<HTMLElement>;
 	onSecondaryButtonClick?: React.MouseEventHandler<HTMLElement>;
+	primaryButton?: string;
+	secondaryButton?: string;
 }
 
 const StyledConnectLibrary = styled.div`
@@ -47,8 +47,10 @@ export const ConnectLibrary: React.SFC<ConnectLibraryProps> = props => (
 				{props.primaryButton}
 			</Button>
 		</Space>
-		<Link onClick={props.onSecondaryButtonClick}>
-			<Copy>{props.secondaryButton}</Copy>
-		</Link>
+		{/*
+			<Link onClick={props.onSecondaryButtonClick}>
+				<Copy>{props.secondaryButton}</Copy>
+			</Link>
+		*/}
 	</StyledConnectLibrary>
 );

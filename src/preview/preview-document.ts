@@ -95,8 +95,9 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 	<meta charset="utf-8"/>
 	<title></title>
 	<style>
-		body {
+		html, body {
 			margin: 0;
+			background: white;
 		}
 	</style>
 </head>

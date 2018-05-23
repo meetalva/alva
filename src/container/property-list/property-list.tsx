@@ -1,9 +1,12 @@
+import * as Sender from '../../message/client';
 import * as Component from '../../components';
+import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { ElementProperty, PatternEnumProperty } from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
-import { PatternPropertyType as P } from '../../model/types';
+import * as Types from '../../model/types';
+import * as uuid from 'uuid';
 
 @MobxReact.observer
 export class PropertyListContainer extends React.Component {
@@ -69,19 +72,44 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 		// - Object
 		// - StringArray
 		switch (type) {
-			case P.Asset: {
-				const value = property.getValue() as string | undefined;
-				const inputValue = value && !value.startsWith('data:') ? value : '';
+			case Types.PatternPropertyType.Asset: {
+				const imageSrc = (property.getValue() as string | undefined) || '';
+				const inputValue = imageSrc && !imageSrc.startsWith('data:') ? imageSrc : '';
+				const inputType =
+					imageSrc && imageSrc.startsWith('data:')
+						? Component.AssetPropertyInputType.File
+						: Component.AssetPropertyInputType.Url;
+
 				return (
 					<Component.AssetItem
 						{...base}
-						imageSrc={''}
+						imageSrc={imageSrc}
+						inputType={inputType}
 						inputValue={inputValue}
 						onInputChange={e => this.handleInputChange(e)}
+						onClearClick={() => property.setValue('')}
+						onChooseClick={() => {
+							const transactionId = uuid.v4();
+
+							Sender.receive(message => {
+								if (
+									message.type === ServerMessageType.AssetReadResponse &&
+									message.id === transactionId
+								) {
+									property.setValue(message.payload);
+								}
+							});
+
+							Sender.send({
+								id: transactionId,
+								payload: undefined,
+								type: ServerMessageType.AssetReadRequest
+							});
+						}}
 					/>
 				);
 			}
-			case P.Boolean: {
+			case Types.PatternPropertyType.Boolean: {
 				const value = property.getValue() as boolean;
 				return (
 					<Component.BooleanItem
@@ -91,7 +119,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 					/>
 				);
 			}
-			case P.Enum: {
+			case Types.PatternPropertyType.Enum: {
 				const value = property.getValue() as string;
 				const patternProperty = property.getPatternProperty() as PatternEnumProperty;
 				const selectedOption = patternProperty.getOptionByValue(value);
@@ -109,7 +137,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 					/>
 				);
 			}
-			case P.String: {
+			case Types.PatternPropertyType.String: {
 				const value = property.getValue() as string | undefined;
 				return (
 					<Component.StringItem

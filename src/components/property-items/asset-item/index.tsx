@@ -7,12 +7,18 @@ import styled from 'styled-components';
 
 export interface AssetItemProps {
 	className?: string;
-	imageSrc?: string;
+	imageSrc: string;
+	inputType: AssetPropertyInputType;
 	inputValue?: string;
 	label: string;
 	onChooseClick?: React.MouseEventHandler<HTMLButtonElement>;
 	onClearClick?: React.MouseEventHandler<HTMLButtonElement>;
 	onInputChange?: React.ChangeEventHandler<HTMLInputElement>;
+}
+
+export enum AssetPropertyInputType {
+	File,
+	Url
 }
 
 const StyledAssetItem = styled.div`
@@ -55,20 +61,30 @@ const StyledInput = styled.input`
 	}
 `;
 
-const StyledImageBox = styled.div`
-	box-sizing: border-box;
-	border-radius: 3px;
-	width: 42px;
-	height: 42px;
+const StyledImageBoxContainer = styled.div`
 	background-color: ${colors.white.toString()};
+	border-radius: 3px;
 	border: 0.5px solid ${colors.grey90.toString()};
-	padding: 3px;
-	margin-right: 6px;
+	box-sizing: border-box;
 	flex-shrink: 0;
+	height: 42px;
+	margin-right: 6px;
+	padding: 3px;
+	width: 42px;
+`;
+
+const StyledImageBox = styled.div`
+	display: flex;
+	box-sizing: border-box;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
 `;
 
 const StyledImage = styled.img`
 	width: 100%;
+	object-fit: cover;
+	object-position: center;
 `;
 
 const StyledButton = styled.button`
@@ -85,19 +101,34 @@ export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 		<label>
 			<PropertyLabel label={props.label} />
 			<StyledPreview>
-				<StyledImageBox>
-					<StyledImage src={props.imageSrc} />
-				</StyledImageBox>
-				<StyledInput
-					onChange={props.onInputChange}
-					type="textarea"
-					value={props.inputValue}
-					placeholder="Enter external URL"
-				/>
+				<StyledImageBoxContainer>
+					<StyledImageBox>
+						{props.imageSrc && <StyledImage src={props.imageSrc} />}
+					</StyledImageBox>
+				</StyledImageBoxContainer>
+				{props.inputType === AssetPropertyInputType.Url && (
+					<StyledInput
+						onChange={props.onInputChange}
+						type="textarea"
+						value={props.inputValue}
+						placeholder="Enter external URL"
+					/>
+				)}
+				{props.inputType === AssetPropertyInputType.File && (
+					<>
+						<StyledButton onClick={props.onChooseClick}>Choose ...</StyledButton>
+						<StyledButton disabled={props.imageSrc.length === 0} onClick={props.onClearClick}>
+							Clear
+						</StyledButton>
+					</>
+				)}
 			</StyledPreview>
 		</label>
-		<StyledButton onClick={props.onChooseClick}>Choose...</StyledButton>
-		<StyledButton onClick={props.onClearClick}>Clear</StyledButton>
+		{props.inputType === AssetPropertyInputType.Url && (
+			<>
+				<StyledButton onClick={props.onChooseClick}>Choose ...</StyledButton>
+			</>
+		)}
 	</StyledAssetItem>
 );
 

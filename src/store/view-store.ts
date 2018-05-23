@@ -621,12 +621,22 @@ export class ViewStore {
 
 	public pasteAfterSelectedElement(): Model.Element | undefined {
 		const selectedElement = this.getSelectedElement();
+		const page = this.getCurrentPage();
+		const rootElement = page ? page.getRoot() : undefined;
 
-		if (!selectedElement) {
+		if (!selectedElement && !rootElement) {
 			return;
 		}
 
-		return this.pasteAfterElement(selectedElement);
+		if (selectedElement) {
+			return this.pasteAfterElement(selectedElement);
+		}
+
+		if (rootElement) {
+			return this.pasteInsideElement(rootElement);
+		}
+
+		return;
 	}
 
 	public pasteInsideElement(element: Model.Element): Model.Element | undefined {
@@ -794,6 +804,7 @@ export class ViewStore {
 	}
 
 	public setActivePageByIndex(index: number): void {
+		this.selectedElement = undefined;
 		this.activePage = index;
 	}
 

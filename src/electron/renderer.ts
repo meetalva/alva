@@ -188,7 +188,7 @@ Sender.receive(message => {
 			store.pasteAfterElementById(message.payload);
 			break;
 		}
-		case ServerMessageType.PasteElemenInse: {
+		case ServerMessageType.PasteElementInside: {
 			store.pasteInsideElementById(message.payload);
 			break;
 		}

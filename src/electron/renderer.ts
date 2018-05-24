@@ -143,7 +143,7 @@ Sender.receive(message => {
 			}
 			break;
 		}
-		case ServerMessageType.CutPageElement: {
+		case ServerMessageType.CutElement: {
 			store.cutElementById(message.payload);
 			break;
 		}
@@ -156,7 +156,7 @@ Sender.receive(message => {
 			}
 			break;
 		}
-		case ServerMessageType.DeletePageElement: {
+		case ServerMessageType.DeleteElement: {
 			store.removeElementById(message.payload);
 			break;
 		}
@@ -170,7 +170,7 @@ Sender.receive(message => {
 			}
 			break;
 		}
-		case ServerMessageType.CopyPageElement: {
+		case ServerMessageType.CopyElement: {
 			store.copyElementById(message.payload);
 			break;
 		}
@@ -184,11 +184,11 @@ Sender.receive(message => {
 			}
 			break;
 		}
-		case ServerMessageType.PastePageElementBelow: {
+		case ServerMessageType.PasteElementBelow: {
 			store.pasteAfterElementById(message.payload);
 			break;
 		}
-		case ServerMessageType.PastePageElementInside: {
+		case ServerMessageType.PasteElemenInse: {
 			store.pasteInsideElementById(message.payload);
 			break;
 		}
@@ -198,7 +198,7 @@ Sender.receive(message => {
 			}
 			break;
 		}
-		case ServerMessageType.DuplicatePageElement: {
+		case ServerMessageType.DuplicateElement: {
 			if (store.getActiveView() === Types.AlvaView.PageDetail) {
 				store.duplicateElementById(message.payload);
 			}

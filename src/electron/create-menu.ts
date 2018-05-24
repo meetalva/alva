@@ -295,7 +295,8 @@ export function createMenu(ctx: MenuContext): void {
 				},
 				{
 					label: '&Duplicate',
-					enabled: typeof ctx.selectedElement !== 'undefined',
+					enabled:
+						typeof ctx.selectedElement !== 'undefined' || typeof ctx.page !== 'undefined',
 					accelerator: 'CmdOrCtrl+D',
 					click: () => {
 						Sender.send({

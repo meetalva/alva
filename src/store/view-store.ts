@@ -256,9 +256,6 @@ export class ViewStore {
 		this.cutElement(element);
 	}
 
-	/**
-	 * Remove the currently selected element and add it to clipboard
-	 */
 	public cutSelectedElement(): Model.Element | undefined {
 		if (!this.selectedElement) {
 			return;
@@ -269,16 +266,15 @@ export class ViewStore {
 		return element;
 	}
 
-	public duplicateElement(element: Model.Element): Model.Element {
-		const duplicatedElement = element.clone();
-		/* this.execute(
-			Model.ElementLocationCommand.addSibling({
-				newSibling: duplicatedElement,
-				sibling: element
-			})
-		);
-		this.setSelectedElement(duplicatedElement); */
-		return duplicatedElement;
+	public duplicateElement(element: Model.Element): Model.Element | undefined {
+		const clone = this.insertAfterElement({ element: element.clone(), targetElement: element });
+
+		if (!clone) {
+			return;
+		}
+
+		this.setSelectedElement(clone);
+		return clone;
 	}
 
 	public duplicateElementById(id: string): Model.Element | undefined {

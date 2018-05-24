@@ -15,7 +15,7 @@ export function elementMenu(element: Element): void {
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
-					type: ServerMessageType.PastePageElementBelow,
+					type: ServerMessageType.PasteElementBelow,
 					payload: element.getId()
 				});
 			}
@@ -26,7 +26,7 @@ export function elementMenu(element: Element): void {
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
-					type: ServerMessageType.PastePageElementInside,
+					type: ServerMessageType.PasteElemenInse,
 					payload: element.getId()
 				});
 			}
@@ -37,7 +37,7 @@ export function elementMenu(element: Element): void {
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
-					type: ServerMessageType.DuplicatePageElement,
+					type: ServerMessageType.DuplicateElement,
 					payload: element.getId()
 				});
 			}
@@ -51,7 +51,7 @@ export function elementMenu(element: Element): void {
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
-					type: ServerMessageType.CutPageElement,
+					type: ServerMessageType.CutElement,
 					payload: element.getId()
 				});
 				remote.Menu.sendActionToFirstResponder('cut:');
@@ -63,7 +63,7 @@ export function elementMenu(element: Element): void {
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
-					type: ServerMessageType.CopyPageElement,
+					type: ServerMessageType.CopyElement,
 					payload: element.getId()
 				});
 				remote.Menu.sendActionToFirstResponder('copy:');
@@ -75,7 +75,7 @@ export function elementMenu(element: Element): void {
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
-					type: ServerMessageType.DeletePageElement,
+					type: ServerMessageType.DeleteElement,
 					payload: element.getId()
 				});
 				remote.Menu.sendActionToFirstResponder('delete:');

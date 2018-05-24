@@ -48,6 +48,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	public createItemFromElement(element: Model.Element): ElementNodeProps {
 		const store = Store.ViewStore.getInstance();
 		const pattern: Model.Pattern | undefined = element.getPattern();
+		const selectedElement = store.getSelectedElement();
+		const open = element.getDescendants().some(e => e === selectedElement);
 
 		if (!pattern) {
 			return {
@@ -57,6 +59,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				dragging: this.state.dragging,
 				editable: false,
 				id: element.getId(),
+				open,
 				title: `Invalid: ${element.getName()}`
 			};
 		}
@@ -82,7 +85,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			dragging: this.state.dragging,
 			editable: element.isNameEditable(),
 			id: element.getId(),
-			title: element.getName()
+			title: element.getName(),
+			open: element.getOpen() || element.getDescendants().some(e => e === selectedElement)
 		};
 	}
 
@@ -103,7 +107,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			draggable: false,
 			dragging: this.state.dragging,
 			children: slotContent.getElements().map(e => this.createItemFromElement(e)),
-			active: false
+			active: false,
+			open: true
 		};
 
 		return slotListItem;
@@ -121,6 +126,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const target = e.target as HTMLElement;
+		const icon = above(target, `svg[${ElementAnchors.icon}]`);
 
 		// Skip and deselect elements if the root itself is clicked
 		if (target.getAttribute('data-drag-root')) {
@@ -136,6 +142,10 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		}
 
 		e.stopPropagation();
+
+		if (icon) {
+			element.toggleOpen();
+		}
 
 		if (store.getSelectedElement() === element && label) {
 			store.setNameEditableElement(element);
@@ -350,6 +360,7 @@ export interface ElementNodeProps extends ElementProps {
 	draggable: boolean;
 	dragging: boolean;
 	id: string;
+	open: boolean;
 }
 
 function ElementTree(props: ElementNodeProps): JSX.Element {

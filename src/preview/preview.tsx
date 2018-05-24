@@ -5,6 +5,9 @@ import * as Mobx from 'mobx';
 import { PreviewDocumentMode } from './preview-document';
 import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
 import * as Types from '../model/types';
+import * as uuid from 'uuid';
+
+declare var renderer: Types.Renderer;
 
 interface InitialData {
 	data: {
@@ -14,7 +17,7 @@ interface InitialData {
 	mode: 'static' | 'live';
 }
 
-export class PreviewStore {
+export class PreviewStore implements Types.RenderPreviewStore {
 	@Mobx.observable public elementContents: Types.SerializedElementContent[] = [];
 
 	@Mobx.observable public elementId: string = '';
@@ -85,20 +88,41 @@ function main(): void {
 
 	const highlight = new HighlightArea();
 
+	const connection = new WebSocket(`ws://${window.location.host}`);
+
 	const render = () => {
-		// tslint:disable-next-line:no-any
-		(window as any).renderer.render({
+		renderer.render({
 			getChildren: createChildrenGetter(store),
 			getComponent: createComponentGetter(store),
 			getProperties: createPropertiesGetter(store),
 			getSlots: createSlotGetter(store),
 			highlight,
+			onElementClick: (e: MouseEvent, payload) => {
+				e.preventDefault();
+				connection.send(
+					JSON.stringify({
+						type: PreviewMessageType.SelectElement,
+						id: uuid.v4(),
+						payload
+					})
+				);
+			},
+			onOutsideClick: e => {
+				e.preventDefault();
+
+				connection.send(
+					JSON.stringify({
+						type: PreviewMessageType.UnselectElement,
+						id: uuid.v4()
+					})
+				);
+			},
 			store
 		});
 	};
 
 	if (store.mode === PreviewDocumentMode.Live) {
-		listen(store, {
+		listen(store, connection, {
 			onReplacement(): void {
 				render();
 			}
@@ -166,8 +190,11 @@ function refetch(name: string): Promise<boolean> {
 	});
 }
 
-function listen(store: PreviewStore, handlers: { onReplacement(): void }): void {
-	const connection = new WebSocket(`ws://${window.location.host}`);
+function listen(
+	store: PreviewStore,
+	connection: WebSocket,
+	handlers: { onReplacement(): void }
+): void {
 	const close = () => connection.close();
 
 	connection.addEventListener('open', (...args) => {

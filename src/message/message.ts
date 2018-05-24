@@ -5,9 +5,11 @@ export enum PreviewMessageType {
 	ContentResponse = 'content-response',
 	ElementChange = 'element-change',
 	Reload = 'reload',
+	SelectElement = 'select-element',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	State = 'state',
+	UnselectElement = 'unselect-element',
 	Update = 'update'
 }
 
@@ -51,11 +53,13 @@ export enum ServerMessageType {
 	PastePageElementInside = 'paste-page-element-inside',
 	Redo = 'redo',
 	Save = 'save',
+	SelectElement = 'select-element',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
 	PatternLibraryChange = 'pattern-library-change',
 	Undo = 'undo',
+	UnselectElement = 'unselect-element',
 	UpdatePatternLibraryRequest = 'update-pattern-library-request'
 }
 
@@ -106,28 +110,39 @@ export type ServerMessage =
 	| PastePageElementInside
 	| Redo
 	| Save
+	| SelectElement
 	| SketchExportRequest
 	| SketchExportResponse
 	| StartAppMessage
 	| StyleGuideChange
 	| Undo
+	| UnselectElement
 	| UpdatePatternLibraryRequest;
 
 export type AppLoaded = EmptyEnvelope<ServerMessageType.AppLoaded>;
 export type AssetReadRequest = EmptyEnvelope<ServerMessageType.AssetReadRequest>;
 export type AssetReadResponse = Envelope<ServerMessageType.AssetReadResponse, string>;
 export type CheckForUpdatesRequest = EmptyEnvelope<ServerMessageType.CheckForUpdatesRequest>;
-export type CheckLibraryRequest = Envelope<ServerMessageType.CheckLibraryRequest, Types.SerializedProject>;
-export type CheckLibraryResponse = Envelope<ServerMessageType.CheckLibraryResponse, Types.LibraryCheckPayload[]>;
-export type ConnectedPatternLibraryNotification = Envelope<ServerMessageType.ConnectedPatternLibraryNotification, Types.LibraryNotificationPayload>;
+export type CheckLibraryRequest = Envelope<
+	ServerMessageType.CheckLibraryRequest,
+	Types.SerializedProject
+>;
+export type CheckLibraryResponse = Envelope<
+	ServerMessageType.CheckLibraryResponse,
+	Types.LibraryCheckPayload[]
+>;
+export type ConnectedPatternLibraryNotification = Envelope<
+	ServerMessageType.ConnectedPatternLibraryNotification,
+	Types.LibraryNotificationPayload
+>;
 export type ConnectPatternLibraryRequest = Envelope<
 	ServerMessageType.ConnectPatternLibraryRequest,
 	Types.SerializedProject
-	>;
+>;
 export type ConnectPatternLibraryResponse = Envelope<
 	ServerMessageType.ConnectPatternLibraryResponse,
 	Types.ImportPayload
-	>;
+>;
 export type ContentRequest = EmptyEnvelope<ServerMessageType.ContentRequest>;
 export type ContentResponse = Envelope<ServerMessageType.ContentResponse, string>;
 export type Copy = EmptyEnvelope<ServerMessageType.Copy>;
@@ -136,11 +151,11 @@ export type CreateNewPage = Envelope<ServerMessageType.CreateNewPage, undefined>
 export type CreateScriptBundleRequest = Envelope<
 	ServerMessageType.CreateScriptBundleRequest,
 	Types.SerializedProject
-	>;
+>;
 export type CreateScriptBundleResponse = Envelope<
 	ServerMessageType.CreateScriptBundleResponse,
 	Types.FilePayload[]
-	>;
+>;
 export type Cut = EmptyEnvelope<ServerMessageType.Cut>;
 export type Delete = EmptyEnvelope<ServerMessageType.Delete>;
 export type ElementChange = Envelope<ServerMessageType.ElementChange, string | undefined>;
@@ -149,7 +164,10 @@ export type ExportPDF = Envelope<ServerMessageType.ExportPDF, Types.ExportPayloa
 export type ExportPNG = Envelope<ServerMessageType.ExportPNG, Types.ExportPayload>;
 export type ExportSketch = Envelope<ServerMessageType.ExportSketch, Types.ExportPayload>;
 export type NewFileRequest = EmptyEnvelope<ServerMessageType.CreateNewFileRequest>;
-export type NewFileResponse = Envelope<ServerMessageType.CreateNewFileResponse, Types.ProjectPayload>;
+export type NewFileResponse = Envelope<
+	ServerMessageType.CreateNewFileResponse,
+	Types.ProjectPayload
+>;
 export type CutPageElement = Envelope<ServerMessageType.CutPageElement, string>;
 export type DeletePageElement = Envelope<ServerMessageType.DeletePageElement, string>;
 export type Duplicate = EmptyEnvelope<ServerMessageType.Duplicate>;
@@ -163,15 +181,20 @@ export type PastePageElementBelow = Envelope<ServerMessageType.PastePageElementB
 export type PastePageElementInside = Envelope<ServerMessageType.PastePageElementInside, string>;
 export type Redo = EmptyEnvelope<ServerMessageType.Redo>;
 export type Save = Envelope<ServerMessageType.Save, Types.SavePayload>;
+export type SelectElement = Envelope<ServerMessageType.SelectElement, Types.SelectPayload>;
 export type SketchExportRequest = Envelope<
 	ServerMessageType.SketchExportRequest,
 	Types.SketchExportPayload
-	>;
+>;
 export type SketchExportResponse = Envelope<ServerMessageType.SketchExportResponse, string>;
 export type StartAppMessage = Envelope<ServerMessageType.StartApp, string>;
 export type StyleGuideChange = Envelope<
 	ServerMessageType.PatternLibraryChange,
 	Types.SerializedPatternLibrary
-	>;
+>;
 export type Undo = EmptyEnvelope<ServerMessageType.Undo>;
-export type UpdatePatternLibraryRequest = Envelope<ServerMessageType.UpdatePatternLibraryRequest, Types.SerializedProject>;
+export type UnselectElement = EmptyEnvelope<ServerMessageType.UnselectElement>;
+export type UpdatePatternLibraryRequest = Envelope<
+	ServerMessageType.UpdatePatternLibraryRequest,
+	Types.SerializedProject
+>;

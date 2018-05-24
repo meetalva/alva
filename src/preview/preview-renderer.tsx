@@ -1,43 +1,25 @@
 import { HighlightArea } from './highlight-area';
-import { PreviewStore } from './preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Helmet } from 'react-helmet';
 import * as Types from '../model/types';
 
-export interface RenderInit {
-	highlight: HighlightArea;
-	store: PreviewStore;
-	// tslint:disable-next-line:no-any
-	getChildren(props: any, render: (props: any) => any): any;
-	// tslint:disable-next-line:no-any
-	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
-	// tslint:disable-next-line:no-any
-	getProperties(props: any): any;
-	// tslint:disable-next-line:no-any
-	getSlots(slots: any, render: (props: any) => any): any;
-}
-
 export interface PreviewHighlightProps {
 	highlight: HighlightArea;
 }
 
-export interface PreviewApplicationProps {
-	getChildren: RenderInit['getChildren'];
-	getComponent: RenderInit['getComponent'];
-	getProperties: RenderInit['getProperties'];
-	getSlots: RenderInit['getSlots'];
-	highlight: RenderInit['highlight'];
-	store: RenderInit['store'];
-}
-
-interface PreviewComponentProps extends Types.SerializedElement {
-	getChildren: RenderInit['getChildren'];
-	getComponent: RenderInit['getComponent'];
-	getProperties: RenderInit['getProperties'];
-	getSlots: RenderInit['getSlots'];
-	highlight: RenderInit['highlight'];
-	store: RenderInit['store'];
+interface PreviewComponentProps {
+	contentIds: Types.SerializedElement['contentIds'];
+	getChildren: Types.RenderInit['getChildren'];
+	getComponent: Types.RenderInit['getComponent'];
+	getProperties: Types.RenderInit['getProperties'];
+	getSlots: Types.RenderInit['getSlots'];
+	highlight: Types.RenderInit['highlight'];
+	id: Types.SerializedElement['id'];
+	name: Types.SerializedElement['name'];
+	patternId: Types.SerializedElement['patternId'];
+	properties: Types.SerializedElement['properties'];
+	store: Types.RenderInit['store'];
 }
 
 interface ErrorBoundaryProps {
@@ -96,7 +78,9 @@ const SYNTHETICS = {
 	text: props => <span>{props.text}</span>
 };
 
-export function render(init: RenderInit): void {
+const ELEMENT_REGISTRY = new Map<Element | Text, string>();
+
+export function render(init: Types.RenderInit): void {
 	ReactDom.render(
 		<PreviewApplication
 			getChildren={init.getChildren}
@@ -105,12 +89,43 @@ export function render(init: RenderInit): void {
 			getSlots={init.getSlots}
 			store={init.store}
 			highlight={init.highlight}
+			onElementClick={init.onElementClick}
+			onOutsideClick={init.onOutsideClick}
 		/>,
 		document.getElementById('preview')
 	);
 }
 
-class PreviewApplication extends React.Component<PreviewApplicationProps> {
+class PreviewApplication extends React.Component<Types.RenderInit> {
+	public constructor(props: Types.RenderInit) {
+		super(props);
+		this.handleClick = this.handleClick.bind(this);
+	}
+
+	public componentDidMount(): void {
+		document.addEventListener('click', this.handleClick);
+	}
+
+	public componentWillUnmount(): void {
+		document.removeEventListener('click', this.handleClick);
+	}
+
+	private handleClick(e: MouseEvent): void {
+		const target = e.target as HTMLElement;
+		const id = ELEMENT_REGISTRY.get(target);
+
+		if (e.metaKey) {
+			return;
+		}
+
+		if (!id) {
+			this.props.onOutsideClick(e);
+			return;
+		}
+
+		this.props.onElementClick(e, { id });
+	}
+
 	public render(): JSX.Element | null {
 		const props = this.props;
 		const currentPage = props.store.pages.find(page => page.id === props.store.pageId);
@@ -134,7 +149,7 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 		}
 
 		return (
-			<React.Fragment>
+			<>
 				<PreviewComponent
 					contentIds={element.contentIds}
 					getChildren={props.getChildren}
@@ -149,7 +164,7 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 					store={props.store}
 				/>
 				<PreviewHighlight highlight={props.highlight} />
-			</React.Fragment>
+			</>
 		);
 	}
 }
@@ -181,6 +196,11 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 	public componentDidMount(): void {
 		window.addEventListener('resize', this.handleResize);
+		const node = ReactDom.findDOMNode(this);
+
+		if (node) {
+			ELEMENT_REGISTRY.set(node, this.props.id);
+		}
 	}
 
 	public componentDidUpdate(): void {
@@ -196,6 +216,11 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 	public componentWillUnmount(): void {
 		window.removeEventListener('resize', this.handleResize);
+		const node = ReactDom.findDOMNode(this);
+
+		if (node) {
+			ELEMENT_REGISTRY.delete(node);
+		}
 	}
 
 	private handleResize(): void {

@@ -108,6 +108,17 @@ Sender.receive(message => {
 
 				library.setState(state);
 			});
+			break;
+		}
+		case ServerMessageType.SelectElement: {
+			const element = store.getElementById(message.payload.id);
+			if (element) {
+				store.setSelectedElement(element);
+			}
+			break;
+		}
+		case ServerMessageType.UnselectElement: {
+			store.unsetSelectedElement();
 		}
 	}
 });

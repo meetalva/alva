@@ -5,9 +5,11 @@ export enum PreviewMessageType {
 	ContentResponse = 'content-response',
 	ElementChange = 'element-change',
 	Reload = 'reload',
+	SelectElement = 'select-element',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	State = 'state',
+	UnselectElement = 'unselect-element',
 	Update = 'update'
 }
 
@@ -51,11 +53,13 @@ export enum ServerMessageType {
 	PasteElementInside = 'paste-page-element-inside',
 	Redo = 'redo',
 	Save = 'save',
+	SelectElement = 'select-element',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
 	PatternLibraryChange = 'pattern-library-change',
 	Undo = 'undo',
+	UnselectElement = 'unselect-element',
 	UpdatePatternLibraryRequest = 'update-pattern-library-request'
 }
 
@@ -106,11 +110,13 @@ export type ServerMessage =
 	| PastePageElementInside
 	| Redo
 	| Save
+	| SelectElement
 	| SketchExportRequest
 	| SketchExportResponse
 	| StartAppMessage
 	| StyleGuideChange
 	| Undo
+	| UnselectElement
 	| UpdatePatternLibraryRequest;
 
 export type AppLoaded = EmptyEnvelope<ServerMessageType.AppLoaded>;
@@ -175,6 +181,7 @@ export type PastePageElementBelow = Envelope<ServerMessageType.PasteElementBelow
 export type PastePageElementInside = Envelope<ServerMessageType.PasteElementInside, string>;
 export type Redo = EmptyEnvelope<ServerMessageType.Redo>;
 export type Save = Envelope<ServerMessageType.Save, Types.SavePayload>;
+export type SelectElement = Envelope<ServerMessageType.SelectElement, Types.SelectPayload>;
 export type SketchExportRequest = Envelope<
 	ServerMessageType.SketchExportRequest,
 	Types.SketchExportPayload
@@ -186,6 +193,7 @@ export type StyleGuideChange = Envelope<
 	Types.SerializedPatternLibrary
 >;
 export type Undo = EmptyEnvelope<ServerMessageType.Undo>;
+export type UnselectElement = EmptyEnvelope<ServerMessageType.UnselectElement>;
 export type UpdatePatternLibraryRequest = Envelope<
 	ServerMessageType.UpdatePatternLibraryRequest,
 	Types.SerializedProject

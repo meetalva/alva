@@ -148,6 +148,7 @@ export class ViewStore {
 		const element = new Model.Element(
 			{
 				contentIds: elementContents.map(e => e.getId()),
+				open: false,
 				patternId: init.pattern.getId(),
 				properties: [],
 				setDefaults: true
@@ -728,7 +729,12 @@ export class ViewStore {
 		const elementBefore = getNextSelected();
 
 		this.execute(new Model.ElementRemoveCommand({ element }));
-		this.setSelectedElement(elementBefore);
+
+		if (elementBefore) {
+			this.setSelectedElement(elementBefore);
+		} else {
+			this.unsetSelectedElement();
+		}
 	}
 
 	public removeElementById(id: string): void {
@@ -908,7 +914,7 @@ export class ViewStore {
 	 * @param selectedElement The selected element or undefined.
 	 * @see setElementFocussed
 	 */
-	public setSelectedElement(selectedElement?: Model.Element): void {
+	public setSelectedElement(selectedElement: Model.Element): void {
 		if (this.selectedElement && this.selectedElement !== selectedElement) {
 			this.setNameEditableElement();
 		}
@@ -958,6 +964,10 @@ export class ViewStore {
 
 	public unsetHighlightedPlaceholderElementById(): void {
 		this.highlightedPlaceholderElement = undefined;
+	}
+
+	public unsetSelectedElement(): void {
+		this.selectedElement = undefined;
 	}
 
 	public updatePatternLibrary(): void {

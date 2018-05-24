@@ -124,6 +124,7 @@
     "@types/webpack-dev-middleware": "2.0.1",
     "@types/ws": "5.1.0",
     "concurrently": "3.5.1",
+    "devtron": "1.4.0",
     "electron": "1.8.4",
     "electron-builder": "20.8.1",
     "electron-devtools-installer": "2.2.3",

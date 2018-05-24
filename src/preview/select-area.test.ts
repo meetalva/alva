@@ -1,7 +1,7 @@
-import { HighlightArea } from './highlight-area';
+import { SelectArea } from './select-area';
 
-describe('HighlightArea', () => {
-	const highlightArea = new HighlightArea();
+describe('SelectArea', () => {
+	const highlightArea = new SelectArea();
 	// tslint:disable:no-any
 	const node: any = {
 		getBoundingClientRect: jest.fn(() => ({
@@ -16,7 +16,7 @@ describe('HighlightArea', () => {
 		}))
 	};
 
-	test('HighlightArea sets bounding client values', () => {
+	test('SelectArea sets bounding client values', () => {
 		highlightArea.setSize(node);
 		expect(highlightArea).toEqual(
 			expect.objectContaining({
@@ -30,7 +30,7 @@ describe('HighlightArea', () => {
 		);
 	});
 
-	test('HighlightArea update values on update', () => {
+	test('SelectArea update values on update', () => {
 		highlightArea.setSize(node);
 		expect(highlightArea.node).toEqual(node);
 
@@ -48,7 +48,7 @@ describe('HighlightArea', () => {
 		);
 	});
 
-	test('HighlightArea hides element', () => {
+	test('SelectArea hides element', () => {
 		highlightArea.hide();
 		expect(highlightArea.isVisible).toBe(false);
 		expect(highlightArea).toEqual(
@@ -58,7 +58,7 @@ describe('HighlightArea', () => {
 		);
 	});
 
-	test('HighlightAria shows element', () => {
+	test('SelectArea shows element', () => {
 		highlightArea.show();
 
 		expect(highlightArea.isVisible).toBe(true);

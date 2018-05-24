@@ -62,11 +62,7 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 				onChange={onChange}
 				onBlur={onBlur}
 				type="text"
-<<<<<<< HEAD:src/components/property-items/string-item/index.tsx
 				value={value || ''}
-=======
-				value={value}
->>>>>>> b5c1963... feat: update styling of property pane (#436):src/lsg/patterns/property-items/string-item/index.tsx
 				placeholder="…"
 			/>
 		</StyledStringItem>

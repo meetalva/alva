@@ -388,6 +388,16 @@ export class ViewStore {
 			return;
 		}
 
+		const pages = this.project.getPages();
+
+		if (pages.length === 0) {
+			return;
+		}
+
+		if (pages.length - 1 < this.activePage) {
+			return;
+		}
+
 		return this.project.getPages()[this.activePage];
 	}
 

@@ -289,7 +289,7 @@ export interface Renderer {
 	render(init: RenderInit): void;
 }
 
-export interface RenderHighlightArea {
+export interface RenderSelectArea {
 	bottom: number;
 	height: number;
 	isVisible: boolean;
@@ -313,7 +313,7 @@ export interface RenderPreviewStore {
 }
 
 export interface RenderInit {
-	highlight: RenderHighlightArea;
+	highlight: RenderSelectArea;
 	store: RenderPreviewStore;
 	// tslint:disable-next-line:no-any
 	getChildren(props: any, render: (props: any) => any): any;

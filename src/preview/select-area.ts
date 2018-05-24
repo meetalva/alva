@@ -1,7 +1,7 @@
 import * as MobX from 'mobx';
 import * as Types from '../model/types';
 
-export class HighlightArea implements Types.RenderHighlightArea {
+export class SelectArea implements Types.RenderSelectArea {
 	@MobX.observable public bottom: number = 0;
 	@MobX.observable public height: number = 0;
 

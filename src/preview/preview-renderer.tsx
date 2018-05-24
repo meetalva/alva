@@ -1,11 +1,11 @@
-import { HighlightArea } from './highlight-area';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Helmet } from 'react-helmet';
+import { SelectArea } from './select-area';
 import * as Types from '../model/types';
 
 export interface PreviewHighlightProps {
-	highlight: HighlightArea;
+	highlight: SelectArea;
 }
 
 interface PreviewComponentProps {

@@ -11,54 +11,36 @@ export interface HighlightAreaProps {
 }
 
 export class HighlightArea {
-	private pageElementId?: string;
+	@MobX.observable public bottom = 0;
+	@MobX.observable public height = 0;
+	@MobX.observable public left = 0;
+	@MobX.observable public opacity = 0;
+	@MobX.observable public right = 0;
+	@MobX.observable public top = 0;
+	@MobX.observable public width = 0;
 
-	@MobX.observable
-	private props: HighlightAreaProps = {
-		bottom: 0,
-		height: 0,
-		left: 0,
-		opacity: 0,
-		right: 0,
-		top: 0,
-		width: 0
-	};
-
-	public getProps(): HighlightAreaProps {
-		return this.props;
-	}
-
+	@MobX.action
 	public hide(): void {
-		this.props.opacity = 0;
-		this.pageElementId = undefined;
+		this.opacity = 0;
 	}
 
-	public show(element: Element, pageElementId: string): void {
+	@MobX.action
+	public setSize(element: Element): void {
 		if (typeof element.getBoundingClientRect !== 'function') {
 			return;
 		}
-		if (this.pageElementId === pageElementId) {
-			return;
-		}
-		this.pageElementId = pageElementId;
 
 		const clientRect: ClientRect = element.getBoundingClientRect();
-		this.props = {
-			bottom: clientRect.bottom,
-			height: clientRect.height,
-			left: clientRect.left + window.scrollX,
-			opacity: 1,
-			right: clientRect.right,
-			top: clientRect.top + window.scrollY,
-			width: clientRect.width
-		};
+		this.bottom = clientRect.bottom;
+		this.height = clientRect.height;
+		this.left = clientRect.left + window.scrollX;
+		this.right = clientRect.right;
+		this.top = clientRect.top + window.scrollY;
+		this.width = clientRect.width;
+	}
 
-		element.scrollIntoView({
-			behavior: 'smooth',
-			block: 'center',
-			inline: 'nearest'
-		});
-
-		setTimeout(() => this.hide(), 500);
+	@MobX.action
+	public show(): void {
+		this.opacity = 1;
 	}
 }

@@ -48,7 +48,7 @@ export enum ServerMessageType {
 	ProjectChange = 'project-change',
 	Paste = 'paste',
 	PasteElementBelow = 'paste-page-element-below',
-	PasteElemenInse = 'paste-page-element-inside',
+	PasteElementInside = 'paste-page-element-inside',
 	Redo = 'redo',
 	Save = 'save',
 	SketchExportRequest = 'sketch-export-request',
@@ -172,7 +172,7 @@ export type PageChange = Envelope<ServerMessageType.PageChange, Types.PageChange
 export type ProjectChange = Envelope<ServerMessageType.ProjectChange, Types.SerializedProject>;
 export type Paste = EmptyEnvelope<ServerMessageType.Paste>;
 export type PastePageElementBelow = Envelope<ServerMessageType.PasteElementBelow, string>;
-export type PastePageElementInside = Envelope<ServerMessageType.PasteElemenInse, string>;
+export type PastePageElementInside = Envelope<ServerMessageType.PasteElementInside, string>;
 export type Redo = EmptyEnvelope<ServerMessageType.Redo>;
 export type Save = Envelope<ServerMessageType.Save, Types.SavePayload>;
 export type SketchExportRequest = Envelope<

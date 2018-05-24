@@ -26,7 +26,7 @@ export function elementMenu(element: Element): void {
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
-					type: ServerMessageType.PasteElemenInse,
+					type: ServerMessageType.PasteElementInside,
 					payload: element.getId()
 				});
 			}

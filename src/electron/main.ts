@@ -416,6 +416,22 @@ async function createWindow(): Promise<void> {
 						payload: message.payload,
 						type: ServerMessageType.SketchExportResponse
 					});
+					break;
+				}
+				case PreviewMessageType.SelectElement: {
+					Sender.send({
+						id: message.id,
+						payload: message.payload,
+						type: ServerMessageType.SelectElement
+					});
+					break;
+				}
+				case PreviewMessageType.UnselectElement: {
+					Sender.send({
+						id: message.id,
+						payload: undefined,
+						type: ServerMessageType.UnselectElement
+					});
 				}
 			}
 		} catch (err) {
@@ -440,21 +456,22 @@ async function createWindow(): Promise<void> {
 		e.preventDefault();
 	});
 
-	let devToolsInstaller;
-	try {
-		devToolsInstaller = require('electron-devtools-installer');
-	} catch (error) {
-		// Ignored
+	// Install development tools in dev mode
+	if (electronIsDev) {
+		require('devtron').install();
+
+		const {
+			REACT_DEVELOPER_TOOLS,
+			REACT_PERF,
+			MOBX_DEVTOOLS
+		} = require('electron-devtools-installer');
+		const installDevTool = require('electron-devtools-installer').default;
+
+		await installDevTool(REACT_DEVELOPER_TOOLS);
+		await installDevTool(REACT_PERF);
+		await installDevTool(MOBX_DEVTOOLS);
 	}
 
-	if (devToolsInstaller) {
-		devToolsInstaller
-			.default(devToolsInstaller.REACT_DEVELOPER_TOOLS)
-			// tslint:disable-next-line:no-any
-			.catch((err: any) => {
-				console.warn('An error occurred: ', err);
-			});
-	}
 	checkForUpdates(win);
 }
 

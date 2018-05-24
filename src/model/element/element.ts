@@ -13,6 +13,7 @@ export interface ElementInit {
 	contentIds: string[];
 	id?: string;
 	name?: string;
+	open: boolean;
 	patternId: string;
 	properties: ElementProperty[];
 	setDefaults?: boolean;
@@ -36,6 +37,8 @@ export class Element {
 
 	@Mobx.observable private nameEditable: boolean = false;
 
+	@Mobx.observable private open: boolean;
+
 	private page?: Page;
 
 	private parent: Element;
@@ -52,6 +55,7 @@ export class Element {
 		this.id = init.id ? init.id : uuid.v4();
 		this.patternId = init.patternId;
 		this.containerId = init.containerId;
+		this.open = init.open;
 		this.patternLibrary = context.patternLibrary;
 		this.project = context.project;
 
@@ -105,6 +109,7 @@ export class Element {
 				patternId: serialized.patternId,
 				containerId: serialized.containerId,
 				contentIds: serialized.contentIds,
+				open: serialized.open,
 				properties: serialized.properties.map(p =>
 					ElementProperty.from(p, { patternLibrary: context.patternLibrary })
 				)
@@ -133,6 +138,7 @@ export class Element {
 				containerId: undefined,
 				contentIds: clonedContents.map(content => content.getId()),
 				name: this.name,
+				open: false,
 				patternId: this.patternId,
 				properties: this.properties.map(propertyValue => propertyValue.clone())
 			},
@@ -210,6 +216,10 @@ export class Element {
 			);
 	}
 
+	public getDescendants(): Element[] {
+		return this.getContents().reduce((acc, content) => [...acc, ...content.getDescendants()], []);
+	}
+
 	public getElementById(id: string): Element | undefined {
 		let result;
 
@@ -254,6 +264,10 @@ export class Element {
 		}
 
 		return this.name;
+	}
+
+	public getOpen(): boolean {
+		return this.open;
 	}
 
 	public getPage(): Page | undefined {
@@ -349,6 +363,10 @@ export class Element {
 		this.nameEditable = nameEditable;
 	}
 
+	public setOpen(open: boolean): void {
+		this.open = open;
+	}
+
 	public setPage(page: Page): void {
 		this.page = page;
 	}
@@ -368,12 +386,17 @@ export class Element {
 		}
 	}
 
+	public toggleOpen(): void {
+		this.setOpen(!this.getOpen());
+	}
+
 	public toJSON(): Types.SerializedElement {
 		return {
 			containerId: this.containerId,
 			contentIds: Array.from(this.contentIds),
 			id: this.id,
 			name: this.name,
+			open: this.open,
 			patternId: this.patternId,
 			properties: this.properties.map(elementProperty => elementProperty.toJSON())
 		};

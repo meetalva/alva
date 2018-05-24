@@ -1,11 +1,10 @@
-import { Element, ElementAnchors } from '../../components';
+import { Element } from '../../components';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 
 export interface ElementWrapperState {
 	highlight?: boolean;
 	highlightPlaceholder?: boolean;
-	open?: boolean;
 }
 
 export interface ElementWrapperProps {
@@ -19,7 +18,7 @@ export interface ElementWrapperProps {
 	onDragDrop?: React.DragEventHandler<HTMLElement>;
 	onDragDropForChild?: React.DragEventHandler<HTMLElement>;
 	onDragStart?: React.DragEventHandler<HTMLElement>;
-	open?: boolean;
+	open: boolean;
 	title: string;
 }
 
@@ -38,18 +37,6 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 
 		if (element) {
 			element.setName(target.value);
-		}
-	}
-
-	private handleClick(e: React.MouseEvent<HTMLElement>): void {
-		const target = e.target as HTMLElement;
-		const icon = above(target, `svg[${ElementAnchors.icon}]`);
-
-		if (icon) {
-			e.stopPropagation();
-			this.setState({
-				open: !this.state.open
-			});
 		}
 	}
 
@@ -113,7 +100,6 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 				draggable={this.props.draggable}
 				editable={this.props.editable}
 				onChange={e => this.handleChange(e)}
-				onClick={e => this.handleClick(e)}
 				onDragDrop={e => this.handleDragDrop(e)}
 				onDragDropForChild={e => this.handleDragDropForChild(e)}
 				onDragEnter={e => this.handleDragEnter(e)}
@@ -124,7 +110,7 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 				highlight={this.state.highlight}
 				highlightPlaceholder={this.state.highlightPlaceholder}
 				id={this.props.id}
-				open={!this.state.open}
+				open={this.props.open}
 				title={title}
 			>
 				{children}
@@ -133,7 +119,7 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 	}
 }
 
-function above(node: EventTarget, selector: string): HTMLElement | null {
+/* function above(node: EventTarget, selector: string): HTMLElement | null {
 	let el = node as HTMLElement;
 	let ended = false;
 
@@ -151,4 +137,4 @@ function above(node: EventTarget, selector: string): HTMLElement | null {
 	}
 
 	return ended ? null : el;
-}
+} */

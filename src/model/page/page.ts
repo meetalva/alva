@@ -94,6 +94,7 @@ export class Page {
 			{
 				name: init.name,
 				contentIds: rootContents.map(c => c.getId()),
+				open: true,
 				patternId: rootPattern.getId(),
 				properties: [],
 				setDefaults: true

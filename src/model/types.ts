@@ -29,6 +29,7 @@ export interface SerializedElement {
 	contentIds: string[];
 	id: string;
 	name: string;
+	open: boolean;
 	patternId: string;
 	properties: SerializedElementProperty[];
 }
@@ -282,4 +283,50 @@ export interface Watcher {
 	getPath(): string;
 	isActive(): boolean;
 	stop(): void;
+}
+
+export interface Renderer {
+	render(init: RenderInit): void;
+}
+
+export interface RenderHighlightArea {
+	bottom: number;
+	height: number;
+	isVisible: boolean;
+	left: number;
+	node: Element;
+	opacity: number;
+	right: number;
+	top: number;
+	width: number;
+	hide(): void;
+	setSize(element: Element): void | Element;
+	show(): void;
+	update(): void;
+}
+
+export interface RenderPreviewStore {
+	elementId: string;
+	elements: SerializedElement[];
+	pageId: string;
+	pages: SerializedPage[];
+}
+
+export interface RenderInit {
+	highlight: RenderHighlightArea;
+	store: RenderPreviewStore;
+	// tslint:disable-next-line:no-any
+	getChildren(props: any, render: (props: any) => any): any;
+	// tslint:disable-next-line:no-any
+	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
+	// tslint:disable-next-line:no-any
+	getProperties(props: any): any;
+	// tslint:disable-next-line:no-any
+	getSlots(slots: any, render: (props: any) => any): any;
+	onElementClick(e: MouseEvent, payload: { id: string }): void;
+	onOutsideClick(e: MouseEvent): void;
+}
+
+export interface SelectPayload {
+	id: string;
 }

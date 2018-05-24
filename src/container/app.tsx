@@ -41,15 +41,6 @@ export class App extends React.Component {
 		this.redirectUndoRedo();
 	}
 
-	private getDevTools(): React.StatelessComponent | null {
-		try {
-			const DevToolsExports = require('mobx-react-devtools');
-			return DevToolsExports ? DevToolsExports.default : undefined;
-		} catch (error) {
-			return null;
-		}
-	}
-
 	private redirectUndoRedo(): void {
 		document.body.onkeydown = event => {
 			if (event.keyCode === 16) {
@@ -81,12 +72,6 @@ export class App extends React.Component {
 
 	public render(): JSX.Element | null {
 		const store = ViewStore.getInstance();
-		const DevTools = this.getDevTools();
-
-		// Using port as heuristic to determine
-		// if the backend has fully initialized
-		// might change to an explicit AppState
-		// in the future
 
 		if (store.getAppState() !== Types.AppState.Started) {
 			return null;
@@ -124,7 +109,7 @@ export class App extends React.Component {
 							<SideBar
 								side={LayoutSide.Left}
 								direction={LayoutDirection.Column}
-								onClick={() => store.setSelectedElement()}
+								onClick={() => store.unsetSelectedElement()}
 								border={LayoutBorder.Side}
 							>
 								<ElementPane>
@@ -136,7 +121,7 @@ export class App extends React.Component {
 									onClick={e => {
 										e.stopPropagation();
 										store.setRightPane(Types.RightPane.Patterns);
-										store.setSelectedElement();
+										store.unsetSelectedElement();
 									}}
 								/>
 							</SideBar>
@@ -170,7 +155,6 @@ export class App extends React.Component {
 					)}
 				</MainArea>
 				<IconRegistry names={IconName} />
-				{DevTools ? <DevTools /> : null}
 			</Layout>
 		);
 	}

@@ -86,6 +86,13 @@ export class ElementContent {
 		return clone;
 	}
 
+	public getDescendants(): Element[] {
+		return this.getElements().reduce(
+			(acc, element) => [...acc, element, ...element.getDescendants()],
+			[]
+		);
+	}
+
 	public getElementIndexById(id: string): number {
 		return this.elementIds.indexOf(id);
 	}

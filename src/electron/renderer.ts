@@ -35,7 +35,11 @@ Sender.receive(message => {
 			const newProject = Project.from(message.payload.contents);
 			newProject.setPath(message.payload.path);
 			store.setProject(newProject);
-			store.setActiveView(Types.AlvaView.PageDetail);
+
+			const view =
+				newProject.getPages().length === 0 ? Types.AlvaView.Pages : Types.AlvaView.PageDetail;
+
+			store.setActiveView(view);
 
 			const patternLibrary = newProject.getPatternLibrary();
 

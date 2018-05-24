@@ -1,8 +1,8 @@
 import * as HtmlSketchApp from '@brainly/html-sketchapp';
-import { HighlightArea } from './highlight-area';
 import { PreviewMessageType } from '../message';
 import * as Mobx from 'mobx';
 import { PreviewDocumentMode } from './preview-document';
+import { SelectArea } from './select-area';
 import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
 import * as Types from '../model/types';
 import * as uuid from 'uuid';
@@ -86,7 +86,7 @@ function main(): void {
 	const initialData = getInitialData();
 	const store = PreviewStore.from(initialData ? initialData.data : undefined);
 
-	const highlight = new HighlightArea();
+	const highlight = new SelectArea();
 
 	const connection = new WebSocket(`ws://${window.location.host}`);
 

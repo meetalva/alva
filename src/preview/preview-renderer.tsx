@@ -78,7 +78,8 @@ const SYNTHETICS = {
 	text: props => <span>{props.text}</span>
 };
 
-const ELEMENT_REGISTRY = new Map<Element | Text, string>();
+const ELEMENT_REGISTRY = new WeakMap<Element | Text, string>();
+const ID_REGISTRY = new Map<string, Element | Text>();
 
 export function render(init: Types.RenderInit): void {
 	ReactDom.render(
@@ -100,19 +101,26 @@ class PreviewApplication extends React.Component<Types.RenderInit> {
 	public constructor(props: Types.RenderInit) {
 		super(props);
 		this.handleClick = this.handleClick.bind(this);
+		this.handleResize = this.handleResize.bind(this);
 	}
 
 	public componentDidMount(): void {
 		document.addEventListener('click', this.handleClick);
+		window.addEventListener('resize', this.handleResize);
+		this.updateSelection();
+	}
+
+	public componentDidUpdate(): void {
+		this.updateSelection();
 	}
 
 	public componentWillUnmount(): void {
 		document.removeEventListener('click', this.handleClick);
+		window.removeEventListener('resize', this.handleResize);
 	}
 
 	private handleClick(e: MouseEvent): void {
-		const target = e.target as HTMLElement;
-		const id = ELEMENT_REGISTRY.get(target);
+		const id = getElementIdByNode(e.target as HTMLElement);
 
 		if (e.metaKey) {
 			return;
@@ -126,15 +134,13 @@ class PreviewApplication extends React.Component<Types.RenderInit> {
 		this.props.onElementClick(e, { id });
 	}
 
+	private handleResize(): void {
+		window.requestAnimationFrame(() => this.updateSelection());
+	}
+
 	public render(): JSX.Element | null {
 		const props = this.props;
 		const currentPage = props.store.pages.find(page => page.id === props.store.pageId);
-
-		if (props.store.elementId) {
-			props.highlight.show();
-		} else {
-			props.highlight.hide();
-		}
 
 		if (!currentPage) {
 			return null;
@@ -165,6 +171,17 @@ class PreviewApplication extends React.Component<Types.RenderInit> {
 			</>
 		);
 	}
+
+	private updateSelection(): void {
+		const node = getNodeByElementId(this.props.store.elementId);
+
+		if (node) {
+			this.props.highlight.show();
+			this.props.highlight.setSize(node);
+		} else {
+			this.props.highlight.hide();
+		}
+	}
 }
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -188,43 +205,27 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 class PreviewComponent extends React.Component<PreviewComponentProps> {
 	public componentDidMount(): void {
-		window.addEventListener('resize', () => this.handleResize());
 		const node = ReactDom.findDOMNode(this);
-
 		if (node) {
 			ELEMENT_REGISTRY.set(node, this.props.id);
+			ID_REGISTRY.set(this.props.id, node);
 		}
 	}
 
 	public componentDidUpdate(): void {
-		const props = this.props;
-		if (props.store && props.id === props.store.elementId) {
-			const node = ReactDom.findDOMNode(this);
-			if (node) {
-				props.highlight.setSize(node as Element);
-			}
+		const node = ReactDom.findDOMNode(this);
+		if (node) {
+			ELEMENT_REGISTRY.set(node, this.props.id);
+			ID_REGISTRY.set(this.props.id, node);
 		}
 	}
 
 	public componentWillUnmount(): void {
-		window.removeEventListener('resize', () => this.handleResize());
 		const node = ReactDom.findDOMNode(this);
+		ID_REGISTRY.delete(this.props.id);
 
 		if (node) {
 			ELEMENT_REGISTRY.delete(node);
-		}
-	}
-
-	private handleResize(): void {
-		const props = this.props;
-		if (props.id !== props.store.elementId) {
-			return;
-		} else {
-			const node = ReactDom.findDOMNode(this);
-			if (node) {
-				props.highlight.update();
-				window.requestAnimationFrame(() => this.handleResize);
-			}
 		}
 	}
 
@@ -381,3 +382,31 @@ const ErrorMessage: React.StatelessComponent<ErrorMessageProps> = props => (
 		</p>
 	</div>
 );
+
+function getElementIdByNode(node: HTMLElement): string | undefined {
+	let id = ELEMENT_REGISTRY.get(node);
+
+	while (!id && node.parentElement) {
+		node = node.parentElement;
+		id = ELEMENT_REGISTRY.get(node);
+	}
+
+	return id;
+}
+
+function getNodeByElementId(id: string): Element | undefined {
+	const selectedNode = ID_REGISTRY.get(id);
+
+	if (!selectedNode) {
+		return;
+	}
+
+	switch (selectedNode.nodeType) {
+		case 1:
+			return selectedNode as Element;
+		case 3:
+			return selectedNode.parentElement ? selectedNode.parentElement : undefined;
+	}
+
+	return;
+}

@@ -2,10 +2,8 @@ import { HighlightArea } from './highlight-area';
 import { PreviewStore } from './preview';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-
-// TODO: Produces a deprecation warning, find a way
-// to dedupe MobX when upgrading to 4.x
-MobX.extras.shareGlobalState();
+import { Helmet } from 'react-helmet';
+import * as Types from '../model/types';
 
 export interface RenderInit {
 	highlight: HighlightArea;
@@ -174,40 +172,33 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 }
 
 class PreviewComponent extends React.Component<PreviewComponentProps> {
-	public constructor(props: InjectedPreviewComponentProps) {
-		super(props);
-		this.handleResize = this.handleResize.bind(this);
-	}
-
 	public componentDidMount(): void {
-		window.addEventListener('resize', this.handleResize);
+		window.addEventListener('resize', () => this.handleResize);
 	}
 
 	public componentDidUpdate(): void {
-		const props = this.props as InjectedPreviewComponentProps;
-		if (props.uuid === props.store.elementId) {
+		const props = this.props;
+		if (props.store && props.id === props.store.elementId) {
 			const node = ReactDom.findDOMNode(this);
-			console.log('&&&&&&&&&&&&', props.store.elementId);
 			if (node) {
 				props.highlight.setSize(node as Element);
 			}
 		}
-		console.log('&&&&&&&&&', props.highlight.node);
 	}
 
 	public componentWillUnmount(): void {
-		window.removeEventListener('resize', this.handleResize);
+		window.removeEventListener('resize', () => this.handleResize);
 	}
 
 	private handleResize(): void {
-		const props = this.props as InjectedPreviewComponentProps;
-		if (props.uuid !== props.store.elementId) {
+		const props = this.props;
+		if (props.id !== props.store.elementId) {
 			return;
 		} else {
 			const node = ReactDom.findDOMNode(this);
 			if (node) {
 				props.highlight.update();
-				window.requestAnimationFrame(this.handleResize);
+				window.requestAnimationFrame(() => this.handleResize);
 			}
 		}
 	}

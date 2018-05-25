@@ -2,6 +2,7 @@ import { createCompiler } from '../compiler/create-compiler';
 import { EventEmitter } from 'events';
 import * as express from 'express';
 import * as Http from 'http';
+import { isEqual } from 'lodash';
 import { ServerMessage, ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
 import * as Types from '../model/types';
@@ -136,7 +137,9 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 	emitter.on('message', async (message: ServerMessage) => {
 		switch (message.type) {
 			case ServerMessageType.PatternLibraryChange: {
-				Object.assign(state.payload, message.payload);
+				state.payload.bundle = message.payload.bundle;
+				state.payload.patternProperties = message.payload.patternProperties;
+				state.payload.patterns = message.payload.patterns;
 
 				if (compilation.compiler && typeof compilation.compiler.close === 'function') {
 					compilation.compiler.close();
@@ -149,10 +152,14 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 				compilation.listeners = [];
 
 				next.compiler.hooks.watchRun.tap('alva', () => {
+					console.log('!');
 					send({
 						type: 'update',
 						id: uuid.v4(),
-						payload: {}
+						payload: {
+							patternProperties: message.payload.patternProperties,
+							patterns: message.payload.patterns
+						}
 					});
 				});
 
@@ -163,17 +170,43 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 				send({
 					type: 'update',
 					id: uuid.v4(),
-					payload: {}
+					payload: {
+						patternProperties: message.payload.patternProperties,
+						patterns: message.payload.patterns
+					}
 				});
 
 				break;
 			}
 			case ServerMessageType.PageChange: {
-				state.payload.elementContents = message.payload.elementContents;
-				state.payload.elements = message.payload.elements;
-				state.payload.pageId = message.payload.pageId;
-				state.payload.pages = message.payload.pages;
-				send(state);
+				// tslint:disable-next-line:no-any
+				const diff: any = {};
+
+				if (!isEqual(state.payload.elementContents, message.payload.elementContents)) {
+					diff.elementContents = message.payload.elementContents;
+				}
+
+				if (!isEqual(state.payload.elements, message.payload.elements)) {
+					diff.elements = message.payload.elements;
+				}
+
+				if (!isEqual(state.payload.pages, message.payload.pages)) {
+					diff.pages = message.payload.pages;
+				}
+
+				if (state.payload.pageId !== message.payload.pageId) {
+					diff.pageId = message.payload.pageId;
+				}
+
+				Object.assign(state.payload, diff);
+
+				send({
+					id: state.id,
+					type: state.type,
+					path: state.path,
+					payload: diff
+				});
+
 				break;
 			}
 			case ServerMessageType.ElementChange: {

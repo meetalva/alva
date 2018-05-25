@@ -1,4 +1,5 @@
 import * as HtmlSketchApp from '@brainly/html-sketchapp';
+import { differenceBy } from 'lodash';
 import { PreviewMessageType } from '../message';
 import * as Mobx from 'mobx';
 import { PreviewDocumentMode } from './preview-document';
@@ -205,11 +206,20 @@ function listen(
 		const message = parse(e.data);
 		const { type, id, payload } = message;
 
-		// TODO: Do type refinements on message here
 		switch (type) {
 			case PreviewMessageType.Update: {
-				Promise.all([refetch('renderer'), refetch('components')]).then(() => {
-					handlers.onReplacement();
+				Mobx.transaction(() => {
+					if (Array.isArray(payload.patterns)) {
+						store.patterns = payload.patterns;
+					}
+
+					if (Array.isArray(payload.patternProperties)) {
+						store.patternProperties = payload.patternProperties;
+					}
+
+					Promise.all([refetch('renderer'), refetch('components')]).then(() => {
+						handlers.onReplacement();
+					});
 				});
 				break;
 			}
@@ -218,25 +228,53 @@ function listen(
 					window.location.hash = '';
 				}
 
-				if (Array.isArray(payload.elements)) {
-					store.elements = payload.elements;
-				}
+				Mobx.transaction(() => {
+					if (Array.isArray(payload.elements)) {
+						const els = payload.elements as Types.SerializedElement[];
 
-				if (Array.isArray(payload.elementContents)) {
-					store.elementContents = payload.elementContents;
-				}
+						const newElements = differenceBy(els, store.elements, 'id');
+						const removedElements = differenceBy(store.elements, els, 'id');
+						const changedElements = els.filter(el => {
+							const storeEl = store.elements.find(se => se.id === el.id);
+							if (!storeEl) {
+								return false;
+							}
+							return !Mobx.extras.deepEqual(storeEl, el);
+						});
 
-				if (typeof payload.pageId === 'string') {
-					store.pageId = payload.pageId;
-				}
+						removedElements.forEach(removedElement => {
+							store.elements.splice(store.elements.indexOf(removedElement), 0);
+						});
 
-				if (Array.isArray(payload.pages)) {
-					store.pages = payload.pages;
-				}
+						newElements.forEach(newElement => {
+							store.elements.splice(els.indexOf(newElement), 0, newElement);
+						});
 
-				if (Array.isArray(payload.patterns)) {
-					store.patterns = payload.patterns;
-				}
+						changedElements.forEach(changedElement => {
+							store.elements.splice(els.indexOf(changedElement), 0, changedElement);
+						});
+					}
+
+					if (Array.isArray(payload.elementContents)) {
+						store.elementContents = payload.elementContents;
+					}
+
+					if (typeof payload.pageId === 'string') {
+						store.pageId = payload.pageId;
+					}
+
+					if (Array.isArray(payload.pages)) {
+						store.pages = payload.pages;
+					}
+
+					if (Array.isArray(payload.patterns)) {
+						store.patterns = payload.patterns;
+					}
+
+					if (Array.isArray(payload.patternProperties)) {
+						store.patternProperties = payload.patternProperties;
+					}
+				});
 
 				break;
 			}

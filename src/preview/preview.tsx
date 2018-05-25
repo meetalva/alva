@@ -90,7 +90,40 @@ function main(): void {
 	const initialData = getInitialData();
 	const store = PreviewStore.from(initialData ? initialData.data : undefined);
 
-	const connection = new WebSocket(`ws://${window.location.host}`);
+	const connection =
+		store.mode === PreviewDocumentMode.Live
+			? new WebSocket(`ws://${window.location.host}`)
+			: undefined;
+
+	const onElementClick = (e: MouseEvent, payload) => {
+		if (!connection) {
+			return;
+		}
+
+		e.preventDefault();
+		connection.send(
+			JSON.stringify({
+				type: PreviewMessageType.SelectElement,
+				id: uuid.v4(),
+				payload
+			})
+		);
+	};
+
+	const onOutsideClick = e => {
+		if (!connection) {
+			return;
+		}
+
+		e.preventDefault();
+
+		connection.send(
+			JSON.stringify({
+				type: PreviewMessageType.UnselectElement,
+				id: uuid.v4()
+			})
+		);
+	};
 
 	const render = () => {
 		renderer.render({
@@ -98,31 +131,13 @@ function main(): void {
 			getComponent: createComponentGetter(store),
 			getProperties: createPropertiesGetter(store),
 			getSlots: createSlotGetter(store),
-			onElementClick: (e: MouseEvent, payload) => {
-				e.preventDefault();
-				connection.send(
-					JSON.stringify({
-						type: PreviewMessageType.SelectElement,
-						id: uuid.v4(),
-						payload
-					})
-				);
-			},
-			onOutsideClick: e => {
-				e.preventDefault();
-
-				connection.send(
-					JSON.stringify({
-						type: PreviewMessageType.UnselectElement,
-						id: uuid.v4()
-					})
-				);
-			},
+			onElementClick,
+			onOutsideClick,
 			store
 		});
 	};
 
-	if (store.mode === PreviewDocumentMode.Live) {
+	if (connection) {
 		listen(store, connection, {
 			onReplacement(): void {
 				render();

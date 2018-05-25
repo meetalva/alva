@@ -2,10 +2,13 @@ import * as HtmlSketchApp from '@brainly/html-sketchapp';
 import { PreviewMessageType } from '../message';
 import * as Mobx from 'mobx';
 import { PreviewDocumentMode } from './preview-document';
-import { SelectArea } from './select-area';
 import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
 import * as Types from '../model/types';
 import * as uuid from 'uuid';
+
+// TODO: Produces a deprecation warning, find a way
+// to dedupe MobX when upgrading to 4.x
+Mobx.extras.shareGlobalState();
 
 declare var renderer: Types.Renderer;
 
@@ -86,8 +89,6 @@ function main(): void {
 	const initialData = getInitialData();
 	const store = PreviewStore.from(initialData ? initialData.data : undefined);
 
-	const highlight = new SelectArea();
-
 	const connection = new WebSocket(`ws://${window.location.host}`);
 
 	const render = () => {
@@ -96,7 +97,6 @@ function main(): void {
 			getComponent: createComponentGetter(store),
 			getProperties: createPropertiesGetter(store),
 			getSlots: createSlotGetter(store),
-			highlight,
 			onElementClick: (e: MouseEvent, payload) => {
 				e.preventDefault();
 				connection.send(
@@ -130,11 +130,7 @@ function main(): void {
 	}
 
 	startRouter(store);
-
-	Mobx.autorun(() => {
-		Object.keys(store).forEach(key => store[key]);
-		render();
-	});
+	render();
 }
 
 function getInitialData(): InitialData | undefined {

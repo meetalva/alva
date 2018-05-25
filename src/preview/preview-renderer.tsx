@@ -1,8 +1,14 @@
+import * as Mobx from 'mobx';
+import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Helmet } from 'react-helmet';
 import { SelectArea } from './select-area';
 import * as Types from '../model/types';
+
+// TODO: Produces a deprecation warning, find a way
+// to dedupe MobX when upgrading to 4.x
+Mobx.extras.shareGlobalState();
 
 export interface PreviewHighlightProps {
 	highlight: SelectArea;
@@ -10,16 +16,34 @@ export interface PreviewHighlightProps {
 
 interface PreviewComponentProps {
 	contentIds: Types.SerializedElement['contentIds'];
-	getChildren: Types.RenderInit['getChildren'];
-	getComponent: Types.RenderInit['getComponent'];
-	getProperties: Types.RenderInit['getProperties'];
-	getSlots: Types.RenderInit['getSlots'];
-	highlight: Types.RenderInit['highlight'];
 	id: Types.SerializedElement['id'];
 	name: Types.SerializedElement['name'];
 	patternId: Types.SerializedElement['patternId'];
 	properties: Types.SerializedElement['properties'];
+}
+
+interface StoreInjection {
 	store: Types.RenderInit['store'];
+}
+
+interface GetChildrenInjection {
+	getChildren: Types.RenderInit['getChildren'];
+}
+
+interface GetComponentInjection {
+	getComponent: Types.RenderInit['getComponent'];
+}
+
+interface GetPropertiesInjection {
+	getProperties: Types.RenderInit['getProperties'];
+}
+
+interface GetSlotsInjection {
+	getSlots: Types.RenderInit['getSlots'];
+}
+
+interface UpdateSelectionInjection {
+	updateSelection: SelectArea['setSize'];
 }
 
 interface ErrorBoundaryProps {
@@ -82,23 +106,40 @@ const ELEMENT_REGISTRY = new WeakMap<Element | Text, string>();
 const ID_REGISTRY = new Map<string, Element | Text>();
 
 export function render(init: Types.RenderInit): void {
+	const selection = new SelectArea();
+
 	ReactDom.render(
-		<PreviewApplication
+		<MobxReact.Provider
 			getChildren={init.getChildren}
 			getComponent={init.getComponent}
 			getProperties={init.getProperties}
 			getSlots={init.getSlots}
 			store={init.store}
-			highlight={init.highlight}
-			onElementClick={init.onElementClick}
-			onOutsideClick={init.onOutsideClick}
-		/>,
+			updateSelection={node => selection.setSize(node)}
+		>
+			<PreviewApplication
+				onElementClick={init.onElementClick}
+				onOutsideClick={init.onOutsideClick}
+				selection={selection}
+				store={init.store}
+			/>
+		</MobxReact.Provider>,
 		document.getElementById('preview')
 	);
 }
 
-class PreviewApplication extends React.Component<Types.RenderInit> {
-	public constructor(props: Types.RenderInit) {
+interface PreviewApplicationProps {
+	onElementClick: Types.RenderInit['onElementClick'];
+	onOutsideClick: Types.RenderInit['onOutsideClick'];
+	selection: SelectArea;
+	store: Types.RenderInit['store'];
+}
+
+@MobxReact.observer
+class PreviewApplication extends React.Component<PreviewApplicationProps> {
+	private disposer: () => void;
+
+	public constructor(props: PreviewApplicationProps) {
 		super(props);
 		this.handleClick = this.handleClick.bind(this);
 		this.handleResize = this.handleResize.bind(this);
@@ -107,16 +148,21 @@ class PreviewApplication extends React.Component<Types.RenderInit> {
 	public componentDidMount(): void {
 		document.addEventListener('click', this.handleClick);
 		window.addEventListener('resize', this.handleResize);
-		this.updateSelection();
-	}
 
-	public componentDidUpdate(): void {
+		this.disposer = Mobx.autorun(() => {
+			this.updateSelection();
+		});
+
 		this.updateSelection();
 	}
 
 	public componentWillUnmount(): void {
 		document.removeEventListener('click', this.handleClick);
 		window.removeEventListener('resize', this.handleResize);
+
+		if (this.disposer) {
+			this.disposer();
+		}
 	}
 
 	private handleClick(e: MouseEvent): void {
@@ -156,30 +202,24 @@ class PreviewApplication extends React.Component<Types.RenderInit> {
 			<>
 				<PreviewComponent
 					contentIds={element.contentIds}
-					getChildren={props.getChildren}
-					getComponent={props.getComponent}
-					getProperties={props.getProperties}
-					getSlots={props.getSlots}
-					highlight={props.highlight}
 					id={element.id}
 					name={element.name}
 					patternId={element.patternId}
 					properties={element.properties}
-					store={props.store}
 				/>
-				<PreviewHighlight highlight={props.highlight} />
+				<PreviewHighlight highlight={props.selection} />
 			</>
 		);
 	}
 
-	private updateSelection(): void {
-		const node = getNodeByElementId(this.props.store.elementId);
+	private updateSelection(elementId?: string): void {
+		const node = getNodeByElementId(elementId || this.props.store.elementId);
 
 		if (node) {
-			this.props.highlight.show();
-			this.props.highlight.setSize(node);
+			this.props.selection.show();
+			this.props.selection.setSize(node);
 		} else {
-			this.props.highlight.hide();
+			this.props.selection.hide();
 		}
 	}
 }
@@ -203,6 +243,22 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 	}
 }
 
+type InjectedPreviewComponentProps = PreviewComponentProps &
+	StoreInjection &
+	GetChildrenInjection &
+	GetSlotsInjection &
+	GetPropertiesInjection &
+	GetComponentInjection &
+	UpdateSelectionInjection &
+	StoreInjection;
+
+@MobxReact.inject('store')
+@MobxReact.inject('getChildren')
+@MobxReact.inject('getSlots')
+@MobxReact.inject('getProperties')
+@MobxReact.inject('getComponent')
+@MobxReact.inject('updateSelection')
+@MobxReact.observer
 class PreviewComponent extends React.Component<PreviewComponentProps> {
 	public componentDidMount(): void {
 		const node = ReactDom.findDOMNode(this);
@@ -214,9 +270,15 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 	public componentDidUpdate(): void {
 		const node = ReactDom.findDOMNode(this);
+		const props = this.props as InjectedPreviewComponentProps;
+
 		if (node) {
 			ELEMENT_REGISTRY.set(node, this.props.id);
 			ID_REGISTRY.set(this.props.id, node);
+		}
+
+		if (props.store.elementId === this.props.id && node && node.nodeType === 1) {
+			props.updateSelection(node as HTMLElement);
 		}
 	}
 
@@ -230,32 +292,14 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 	}
 
 	public render(): JSX.Element | null {
-		const props = this.props;
+		const props = this.props as InjectedPreviewComponentProps;
 
 		const children = props.getChildren(props, (child: Types.SerializedElement) => (
-			<PreviewComponent
-				key={child.id}
-				getChildren={props.getChildren}
-				getComponent={props.getComponent}
-				getProperties={props.getProperties}
-				getSlots={props.getSlots}
-				highlight={props.highlight}
-				store={props.store}
-				{...child}
-			/>
+			<PreviewComponent key={child.id} {...child} />
 		));
 
 		const slots = props.getSlots(props, (child: Types.SerializedElement) => (
-			<PreviewComponent
-				key={child.id}
-				getChildren={props.getChildren}
-				getComponent={props.getComponent}
-				getProperties={props.getProperties}
-				getSlots={props.getSlots}
-				highlight={props.highlight}
-				store={props.store}
-				{...child}
-			/>
+			<PreviewComponent key={child.id} {...child} />
 		));
 
 		const properties = props.getProperties(props.properties);
@@ -277,6 +321,7 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 	}
 }
 
+@MobxReact.observer
 class PreviewHighlight extends React.Component<PreviewHighlightProps> {
 	public render(): JSX.Element {
 		const props = this.props;

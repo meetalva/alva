@@ -26,6 +26,9 @@ const APP_ENTRY = require.resolve('./renderer');
 
 const RENDERER_DOCUMENT = `<!doctype html>
 <html>
+<head>
+	<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline'">
+</head>
 <body>
 	<div id="app" style="overflow: hidden; width: 100%; height: 100%;"></div>
 	<script>require('${stringEscape(APP_ENTRY)}')</script>

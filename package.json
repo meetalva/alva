@@ -125,7 +125,7 @@
     "@types/ws": "5.1.0",
     "concurrently": "3.5.1",
     "devtron": "1.4.0",
-    "electron": "1.8.4",
+    "electron": "2.0.2",
     "electron-builder": "20.8.1",
     "electron-devtools-installer": "2.2.3",
     "husky": "0.14.3",

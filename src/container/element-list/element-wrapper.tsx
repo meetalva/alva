@@ -118,23 +118,3 @@ export class ElementWrapper extends React.Component<ElementWrapperProps, Element
 		);
 	}
 }
-
-/* function above(node: EventTarget, selector: string): HTMLElement | null {
-	let el = node as HTMLElement;
-	let ended = false;
-
-	while (el && !ended) {
-		if (el.matches(selector)) {
-			break;
-		}
-
-		if (el.parentElement !== null) {
-			el = el.parentElement;
-		} else {
-			ended = true;
-			break;
-		}
-	}
-
-	return ended ? null : el;
-} */

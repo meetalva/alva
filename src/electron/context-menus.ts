@@ -95,5 +95,5 @@ export function elementMenu(element: Element): void {
 		...(!element.isNameEditable() ? defaultPasteItems : [])
 	];
 
-	remote.Menu.buildFromTemplate(template).popup();
+	remote.Menu.buildFromTemplate(template).popup({});
 }

@@ -17,6 +17,7 @@ export interface PreviewHighlightProps {
 interface PreviewComponentProps {
 	contentIds: Types.SerializedElement['contentIds'];
 	id: Types.SerializedElement['id'];
+	isRoot: boolean;
 	name: Types.SerializedElement['name'];
 	patternId: Types.SerializedElement['patternId'];
 	properties: Types.SerializedElement['properties'];
@@ -138,6 +139,7 @@ interface PreviewApplicationProps {
 @MobxReact.observer
 class PreviewApplication extends React.Component<PreviewApplicationProps> {
 	private disposer: () => void;
+	private observer: MutationObserver;
 
 	public constructor(props: PreviewApplicationProps) {
 		super(props);
@@ -148,6 +150,21 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 	public componentDidMount(): void {
 		document.addEventListener('click', this.handleClick);
 		window.addEventListener('resize', this.handleResize);
+
+		this.observer = new MutationObserver(mutations => {
+			mutations.forEach(mutation => {
+				// tslint:disable-next-line:prefer-for-of
+				for (let i = 0; i < mutation.addedNodes.length; i++) {
+					const addedNode = mutation.addedNodes[i];
+					const id = ELEMENT_REGISTRY.get(addedNode as HTMLElement);
+					if (id === this.props.store.elementId) {
+						this.updateSelection();
+					}
+				}
+			});
+		});
+
+		this.observer.observe(document.body, { childList: true, subtree: true });
 
 		this.disposer = Mobx.autorun(() => {
 			this.updateSelection();
@@ -162,6 +179,10 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 
 		if (this.disposer) {
 			this.disposer();
+		}
+
+		if (this.observer) {
+			this.observer.disconnect();
 		}
 	}
 
@@ -203,6 +224,7 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 				<PreviewComponent
 					contentIds={element.contentIds}
 					id={element.id}
+					isRoot
 					name={element.name}
 					patternId={element.patternId}
 					properties={element.properties}
@@ -213,12 +235,29 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 	}
 
 	private updateSelection(elementId?: string): void {
-		const node = getNodeByElementId(elementId || this.props.store.elementId);
+		const id = elementId || this.props.store.elementId;
+		const node = getNodeByElementId(id);
 
 		if (node) {
 			this.props.selection.show();
 			this.props.selection.setSize(node);
 		} else {
+			this.props.selection.hide();
+		}
+
+		const currentPage = this.props.store.pages.find(page => page.id === this.props.store.pageId);
+
+		if (!currentPage) {
+			return;
+		}
+
+		const element = this.props.store.elements.find(e => e.id === currentPage.rootId);
+
+		if (!element) {
+			return;
+		}
+
+		if (element.id === id) {
 			this.props.selection.hide();
 		}
 	}
@@ -261,6 +300,10 @@ type InjectedPreviewComponentProps = PreviewComponentProps &
 @MobxReact.observer
 class PreviewComponent extends React.Component<PreviewComponentProps> {
 	public componentDidMount(): void {
+		if (this.props.isRoot) {
+			return;
+		}
+
 		const node = ReactDom.findDOMNode(this);
 		if (node) {
 			ELEMENT_REGISTRY.set(node, this.props.id);
@@ -269,6 +312,10 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 	}
 
 	public componentDidUpdate(): void {
+		if (this.props.isRoot) {
+			return;
+		}
+
 		const node = ReactDom.findDOMNode(this);
 		const props = this.props as InjectedPreviewComponentProps;
 
@@ -283,6 +330,10 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 	}
 
 	public componentWillUnmount(): void {
+		if (this.props.isRoot) {
+			return;
+		}
+
 		const node = ReactDom.findDOMNode(this);
 		ID_REGISTRY.delete(this.props.id);
 
@@ -295,11 +346,11 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 		const props = this.props as InjectedPreviewComponentProps;
 
 		const children = props.getChildren(props, (child: Types.SerializedElement) => (
-			<PreviewComponent key={child.id} {...child} />
+			<PreviewComponent isRoot={false} key={child.id} {...child} />
 		));
 
 		const slots = props.getSlots(props, (child: Types.SerializedElement) => (
-			<PreviewComponent key={child.id} {...child} />
+			<PreviewComponent isRoot={false} key={child.id} {...child} />
 		));
 
 		const properties = props.getProperties(props.properties);

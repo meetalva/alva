@@ -21,7 +21,7 @@ export class SelectArea implements Types.RenderSelectArea {
 
 	@MobX.action
 	public setSize(element: Element): void | Element {
-		const clientRect: ClientRect = element.getBoundingClientRect();
+		const clientRect = element.getBoundingClientRect();
 		this.bottom = clientRect.bottom;
 		this.height = clientRect.height;
 		this.left = clientRect.left + window.scrollX;

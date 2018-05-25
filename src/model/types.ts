@@ -313,7 +313,6 @@ export interface RenderPreviewStore {
 }
 
 export interface RenderInit {
-	highlight: RenderSelectArea;
 	store: RenderPreviewStore;
 	// tslint:disable-next-line:no-any
 	getChildren(props: any, render: (props: any) => any): any;

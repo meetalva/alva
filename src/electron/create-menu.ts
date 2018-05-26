@@ -320,13 +320,7 @@ export function createMenu(ctx: MenuContext): void {
 				{
 					label: '&Delete',
 					enabled: typeof ctx.project !== 'undefined',
-					accelerator: (() => {
-						if (process.platform === 'darwin') {
-							return 'Backspace';
-						} else {
-							return 'Delete';
-						}
-					})(),
+					accelerator: process.platform === 'darwin' ? 'Backspace' : 'Delete',
 					click: () => {
 						Sender.send({
 							id: uuid.v4(),

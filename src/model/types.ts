@@ -286,7 +286,7 @@ export interface Watcher {
 }
 
 export interface Renderer {
-	render(init: RenderInit): void;
+	render(init: RenderInit, container: HTMLElement): void;
 }
 
 export interface RenderSelectArea {

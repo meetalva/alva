@@ -30,6 +30,8 @@ import { ViewStore } from '../store';
 import * as Types from '../model/types';
 import * as uuid from 'uuid';
 
+const Resizeable = require('re-resizable');
+
 globalStyles();
 
 @MobxReact.observer
@@ -106,51 +108,65 @@ export class App extends React.Component {
 					)}
 					{store.getActiveView() === Types.AlvaView.PageDetail && (
 						<React.Fragment>
-							<SideBar
-								side={LayoutSide.Left}
-								direction={LayoutDirection.Column}
-								onClick={() => store.unsetSelectedElement()}
-								border={LayoutBorder.Side}
+							<Resizeable
+								handleStyles={{ right: { zIndex: 1 } }}
+								defaultSize={{ width: 240, height: '100%' }}
+								enable={{ right: true }}
+								minWidth={240}
 							>
-								<ElementPane>
-									<ElementList />
-								</ElementPane>
-								<AddButton
-									active={store.getRightPane() === Types.RightPane.Patterns}
-									label="Add Elements"
-									onClick={e => {
-										e.stopPropagation();
-										store.setRightPane(Types.RightPane.Patterns);
-										store.unsetSelectedElement();
-									}}
-								/>
-							</SideBar>
+								<SideBar
+									side={LayoutSide.Left}
+									direction={LayoutDirection.Column}
+									onClick={() => store.unsetSelectedElement()}
+									border={LayoutBorder.Side}
+								>
+									<ElementPane>
+										<ElementList />
+									</ElementPane>
+									<AddButton
+										active={store.getRightPane() === Types.RightPane.Patterns}
+										label="Add Elements"
+										onClick={e => {
+											e.stopPropagation();
+											store.setRightPane(Types.RightPane.Patterns);
+											store.unsetSelectedElement();
+										}}
+									/>
+								</SideBar>
+							</Resizeable>
 							<PreviewPaneWrapper
 								key="center"
-								id="preview"
 								previewFrame={`http://localhost:${store.getServerPort()}/preview.html`}
 							/>
-							<SideBar
-								side={LayoutSide.Right}
-								direction={LayoutDirection.Column}
-								border={LayoutBorder.Side}
+							<Resizeable
+								handleStyles={{ left: { zIndex: 1 } }}
+								defaultSize={{ width: 240, height: '100%' }}
+								enable={{ left: true }}
+								minWidth={240}
 							>
-								{store.getPatternLibraryState() === Types.PatternLibraryState.Pristine && (
-									<ConnectPaneContainer
-										onPrimaryButtonClick={() => store.connectPatternLibrary()}
-									/>
-								)}
-								{store.getRightPane() === Types.RightPane.Properties && (
-									<PropertyPane>
-										<PropertyListContainer />
-									</PropertyPane>
-								)}
-								{store.getRightPane() === Types.RightPane.Patterns && (
-									<PatternsPane>
-										<PatternListContainer />
-									</PatternsPane>
-								)}
-							</SideBar>
+								<SideBar
+									side={LayoutSide.Right}
+									direction={LayoutDirection.Column}
+									border={LayoutBorder.Side}
+								>
+									{store.getPatternLibraryState() ===
+										Types.PatternLibraryState.Pristine && (
+										<ConnectPaneContainer
+											onPrimaryButtonClick={() => store.connectPatternLibrary()}
+										/>
+									)}
+									{store.getRightPane() === Types.RightPane.Properties && (
+										<PropertyPane>
+											<PropertyListContainer />
+										</PropertyPane>
+									)}
+									{store.getRightPane() === Types.RightPane.Patterns && (
+										<PatternsPane>
+											<PatternListContainer />
+										</PatternsPane>
+									)}
+								</SideBar>
+							</Resizeable>
 						</React.Fragment>
 					)}
 				</MainArea>

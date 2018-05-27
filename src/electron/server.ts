@@ -152,7 +152,6 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 				compilation.listeners = [];
 
 				next.compiler.hooks.watchRun.tap('alva', () => {
-					console.log('!');
 					send({
 						type: 'update',
 						id: uuid.v4(),

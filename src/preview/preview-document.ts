@@ -1,5 +1,6 @@
 export enum PreviewDocumentMode {
 	Live = 'live',
+	LiveMirror = 'live-mirror',
 	Static = 'static'
 }
 
@@ -89,6 +90,12 @@ preview,
 </div>
 `;
 
+const LIVE_SCRIPTS = `
+<script src="/scripts/renderer.js" data-script="renderer"><\/script>
+<script src="/scripts/components.js" data-script="components"><\/script>
+<script src="/scripts/preview.js" data-script="preview"><\/script>
+`;
+
 export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype html>
 <html>
 <head>
@@ -109,14 +116,8 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 			mode: config.mode
 		})
 	)}</textarea>
-	${
-		config.mode === PreviewDocumentMode.Live
-			? `
-		<script src="/scripts/renderer.js" data-script="renderer"><\/script>
-		<script src="/scripts/components.js" data-script="components"><\/script>
-		<script src="/scripts/preview.js" data-script="preview"><\/script>`
-			: config.scripts
-	}
+	${config.mode === PreviewDocumentMode.Static ? config.scripts : ''}
+	${config.mode !== PreviewDocumentMode.Static ? LIVE_SCRIPTS : ''}
 </body>
 </html>
 `;

@@ -56,6 +56,7 @@ export interface LayoutProps {
 const StyledLayout = styled.div`
 	display: flex;
 	width: 100%;
+	box-sizing: border-box;
 	flex-direction: ${(props: LayoutProps) =>
 		props.direction === LayoutDirection.Column ? 'column' : 'row'};
 	flex-wrap: ${(props: LayoutProps) => (props.wrap === LayoutWrap.Wrap ? 'wrap' : 'nowrap')};
@@ -84,6 +85,7 @@ const StyledMainArea = styled(StyledLayout)`
 
 const StyledSideBar = styled(StyledLayout)`
 	flex-basis: 240px;
+	height: 100%;
 	overflow-y: hidden;
 `;
 

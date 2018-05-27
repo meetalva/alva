@@ -12,6 +12,7 @@ import * as uuid from 'uuid';
 Mobx.extras.shareGlobalState();
 
 declare var renderer: Types.Renderer;
+declare var preview: HTMLElement;
 
 interface InitialData {
 	data: {
@@ -126,15 +127,18 @@ function main(): void {
 	};
 
 	const render = () => {
-		renderer.render({
-			getChildren: createChildrenGetter(store),
-			getComponent: createComponentGetter(store),
-			getProperties: createPropertiesGetter(store),
-			getSlots: createSlotGetter(store),
-			onElementClick,
-			onOutsideClick,
-			store
-		});
+		renderer.render(
+			{
+				getChildren: createChildrenGetter(store),
+				getComponent: createComponentGetter(store),
+				getProperties: createPropertiesGetter(store),
+				getSlots: createSlotGetter(store),
+				onElementClick,
+				onOutsideClick,
+				store
+			},
+			preview
+		);
 	};
 
 	if (connection) {

@@ -106,7 +106,7 @@ const SYNTHETICS = {
 const ELEMENT_REGISTRY = new WeakMap<Element | Text, string>();
 const ID_REGISTRY = new Map<string, Element | Text>();
 
-export function render(init: Types.RenderInit): void {
+export function render(init: Types.RenderInit, container: HTMLElement): void {
 	const selection = new SelectArea();
 
 	ReactDom.render(
@@ -125,7 +125,7 @@ export function render(init: Types.RenderInit): void {
 				store={init.store}
 			/>
 		</MobxReact.Provider>,
-		document.getElementById('preview')
+		container
 	);
 }
 

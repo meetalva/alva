@@ -129,9 +129,8 @@ Sender.receive(message => {
 
 // tslint:disable-next-line:cyclomatic-complexity
 Sender.receive(message => {
-	// Do not perform custom operations
-	// if anything on the page has focus
-	if (document.activeElement !== document.body) {
+	// Do not perform custom operations when an input is selected
+	if (document.activeElement.tagName.toLowerCase() === 'input') {
 		return;
 	}
 

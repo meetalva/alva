@@ -129,12 +129,8 @@ Sender.receive(message => {
 
 // tslint:disable-next-line:cyclomatic-complexity
 Sender.receive(message => {
-	// Do only perform custom operations if one of
-	// the followin conditions are true to ensure
-	// input elements behave as expected
-	// - when the body has focus
-	// - when the preview iframe has focus
-	if (['body', 'iframe'].includes(document.activeElement.tagName)) {
+	// Do not perform custom operations when an input is selected
+	if (document.activeElement.tagName.toLowerCase() === 'input') {
 		return;
 	}
 

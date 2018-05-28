@@ -17,39 +17,21 @@ export interface PatternListItemProps {
 }
 
 const StyledPatternList = styled.div`
-	box-sizing: border-box;
-	display: flex;
-	flex-wrap: wrap;
-	flex-basis: 100%;
-	justify-content: space-between;
-	margin: 0;
 `;
 
 const StyledPatternLabel = styled.div`
-	flex-basis: 100%;
-	margin-top: ${getSpace(SpaceSize.L)}px;
-	margin-bottom: ${getSpace(SpaceSize.S)}px;
-	color: ${colors.grey60.toString()};
-	text-transform: capitalize;
 
-	&:first-of-type {
-		margin-top: ${getSpace(SpaceSize.S)}px;
-	}
 `;
 
 const StyledPatternListItem = styled.div`
-	box-sizing: border-box;
-	width: calc(50% - ${getSpace(SpaceSize.XS) / 2}px);
-	padding: ${getSpace(SpaceSize.S)}px;
-	margin-bottom: ${getSpace(SpaceSize.XS)}px;
-	border-radius: 3px;
+	display: flex;
 	background: ${colors.white.toString()};
-	font-size: 12px;
-	color: ${colors.black.toString()};
-	text-align: center;
-
+	margin-bottom: ${getSpace(SpaceSize.XS)}px;
+	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.S)}px;
 	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15);
+	border-radius: 3px;
 	transition: box-shadow 0.2s;
+	align-items: center;
 
 	&:hover {
 		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
@@ -60,22 +42,12 @@ const StyledPatternListItem = styled.div`
 `;
 
 const StyledIcon = styled(Icon)`
-	display: block;
-	margin: 0 auto ${getSpace(SpaceSize.XS)}px;
-`;
-
-const StyledImg = styled.img`
-	display: block;
-	width: 18px;
-	height: 18px;
-	margin: 0 auto ${getSpace(SpaceSize.XS)}px;
-	user-select: none;
+	margin-right: 6px;
 `;
 
 const StyledPatternListItemLabel = styled.div`
-	text-align: center;
-	color: ${colors.grey36.toString()};
-	user-select: none;
+	font-size: 15px;
+	color: ${colors.grey20.toString()};
 `;
 
 export interface PatternFolderViewProps {
@@ -99,7 +71,7 @@ export const PatternListItem: React.StatelessComponent<PatternListItemProps> = p
 			onClick={onClick}
 		>
 			{icon ? (
-				<StyledImg {...{ [PatternAnchor.icon]: 'true' }} src={icon} />
+				<img {...{ [PatternAnchor.icon]: 'true' }} src={icon} />
 			) : (
 				<StyledIcon
 					dataIcon="true"

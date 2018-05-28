@@ -27,7 +27,6 @@ export class PatternListContainer extends React.Component {
 						value={store.getPatternSearchTerm()}
 					/>
 				</Space>
-				<Space size={[0, SpaceSize.L]}>
 					<PatternFolderContainer
 						isRoot
 						folder={patternRoot}
@@ -36,7 +35,6 @@ export class PatternListContainer extends React.Component {
 							<PatternItemContainer key={pattern.getId()} pattern={pattern} />
 						)}
 					/>
-				</Space>
 			</>
 		);
 	}

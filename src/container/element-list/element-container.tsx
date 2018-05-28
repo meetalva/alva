@@ -1,3 +1,4 @@
+import * as AlvaUtil from '../../alva-util';
 import * as Components from '../../components';
 import { ElementContentContainer } from './element-content-container';
 import * as MobxReact from 'mobx-react';
@@ -12,6 +13,8 @@ export interface ElementContainerProps {
 export class ElementContainer extends React.Component<ElementContainerProps> {
 	public render(): JSX.Element | null {
 		const { props } = this;
+		const open =
+			props.element.getOpen() || props.element.getDescendants().some(e => e.getSelected());
 		return (
 			<Components.Element
 				active={props.element.getSelected()}
@@ -22,12 +25,11 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 				highlightPlaceholder={props.element.getPlaceholderHighlighted()}
 				id={props.element.getId()}
 				mayOpen={props.element.acceptsChildren()}
-				open={
-					props.element.getOpen() || props.element.getDescendants().some(e => e.getSelected())
-				}
+				open={open}
+				onChange={AlvaUtil.noop}
 				title={props.element.getName()}
 			>
-				{props.element.getOpen()
+				{open
 					? props.element
 							.getContents()
 							.map(content => (

@@ -65,6 +65,15 @@ export class ElementList extends React.Component {
 		}
 	}
 
+	private handleChange(e: React.FormEvent<HTMLElement>): void {
+		const target = e.target as HTMLInputElement;
+		const changedElement = elementFromTarget(e.target, { sibling: false });
+
+		if (changedElement) {
+			changedElement.setName(target.value);
+		}
+	}
+
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const target = e.target as HTMLElement;
 		const icon = above(target, `svg[${ElementAnchors.icon}]`);
@@ -329,6 +338,7 @@ export class ElementList extends React.Component {
 				data-drag-root
 				{...{ [ElementAnchors.element]: rootElement.getId() }}
 				onBlur={e => this.handleBlur(e)}
+				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
 				onDragEnd={e => this.handleDragEnd(e)}

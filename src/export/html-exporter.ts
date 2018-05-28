@@ -63,6 +63,7 @@ export class HtmlExporter implements Types.Exporter {
 			};
 
 			const document = previewDocument({
+				content: '',
 				data,
 				mode: PreviewDocumentMode.Static,
 				scripts

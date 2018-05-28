@@ -67,9 +67,7 @@ export class Page {
 		}
 	}
 
-	/**
-	 * Create a new empty page
-	 */
+	@Mobx.action
 	public static create(init: PageCreateInit, context: PageContext): Page {
 		const rootPattern = context.patternLibrary.getPatternByType(
 			SyntheticPatternType.SyntheticPage
@@ -92,12 +90,16 @@ export class Page {
 
 		const rootElement = new Element(
 			{
+				highlighted: false,
 				name: init.name,
 				contentIds: rootContents.map(c => c.getId()),
+				dragged: false,
 				open: true,
 				patternId: rootPattern.getId(),
+				placeholderHighlighted: false,
 				properties: [],
-				setDefaults: true
+				setDefaults: true,
+				selected: false
 			},
 			{
 				patternLibrary: context.patternLibrary,
@@ -212,10 +214,6 @@ export class Page {
 		return this.project.getElementById(this.rootId);
 	}
 
-	/**
-	 * Sets the human-friendly name of the page.
-	 * @param name The human-friendly name of the page.
-	 */
 	@Mobx.action
 	public setName(name: string): void {
 		if (this.nameState === Types.EditState.Editing) {
@@ -226,10 +224,7 @@ export class Page {
 		this.name = name;
 	}
 
-	/**
-	 * Sets the editable state of the page name
-	 * @param state
-	 */
+	@Mobx.action
 	public setNameState(state: Types.EditState): void {
 		if (state === Types.EditState.Editing) {
 			this.editedName = this.name;

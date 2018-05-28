@@ -14,34 +14,77 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer title="Element">
 		<StyledTestDiv>
 			Default
-			<Element title="Active Element" dragging />
+			<Element
+				id="1"
+				active={false}
+				draggable={false}
+				editable={false}
+				highlight={false}
+				highlightPlaceholder={false}
+				open={false}
+				title="Element"
+				dragging={false}
+			/>
 		</StyledTestDiv>
 		<StyledTestDiv>
 			Active
-			<Element active title="Active Element" dragging />
-		</StyledTestDiv>
-
-		<StyledTestDiv>
-			With Child and handleIconClick
-			<Element onClick={e => e.stopPropagation()} title="Element" dragging>
-				Child
-			</Element>
+			<Element
+				id="2"
+				active
+				draggable={false}
+				editable={false}
+				highlight={false}
+				highlightPlaceholder={false}
+				open={false}
+				title="Element"
+				dragging={false}
+			/>
 		</StyledTestDiv>
 		<StyledTestDiv>
 			With Child and open
-			<Element title="Element Open" open dragging>
+			<Element
+				id="3"
+				active={false}
+				draggable={false}
+				editable={false}
+				highlight={false}
+				highlightPlaceholder={false}
+				open
+				title="Element"
+				dragging={false}
+			>
 				Child
 			</Element>
 		</StyledTestDiv>
 		<StyledTestDiv>
 			With child and active
-			<Element active title="Active Element" dragging>
+			<Element
+				id="3"
+				active
+				draggable={false}
+				editable={false}
+				highlight={false}
+				highlightPlaceholder={false}
+				open={false}
+				title="Element"
+				dragging={false}
+			>
 				Child
 			</Element>
 		</StyledTestDiv>
 		<StyledTestDiv>
 			With child, active and open
-			<Element active open title="Active Element" dragging>
+			<Element
+				id="3"
+				active
+				draggable={false}
+				editable={false}
+				highlight={false}
+				highlightPlaceholder={false}
+				open
+				title="Element"
+				dragging={false}
+			>
 				Child
 			</Element>
 		</StyledTestDiv>

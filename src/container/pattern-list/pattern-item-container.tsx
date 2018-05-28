@@ -10,27 +10,31 @@ export interface PatternItemContainerContainerProps {
 export class PatternItemContainer extends React.Component<PatternItemContainerContainerProps> {
 	private handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
 		const store = ViewStore.getInstance();
-		const element = store.addNewElement({ pattern: this.props.pattern });
+		const element = store.createElement({ pattern: this.props.pattern });
 		const selectedElement = store.getSelectedElement();
 		const page = store.getCurrentPage();
 
 		const targetElement = selectedElement ? selectedElement : page ? page.getRoot() : null;
 
 		if (element && targetElement) {
+			store.addElement(element);
 			store.insertAfterElement({ element, targetElement });
 		}
 	}
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
-		e.dataTransfer.dropEffect = 'copy';
+		const store = ViewStore.getInstance();
+
+		const element = store.createElement({ pattern: this.props.pattern, dragged: true });
+		store.addElement(element);
+
+		e.dataTransfer.effectAllowed = 'copy';
 
 		e.dataTransfer.setDragImage(
 			e.currentTarget.querySelector(`[${PatternAnchor.icon}]`) as Element,
 			12,
 			12
 		);
-
-		e.dataTransfer.setData('patternId', this.props.pattern.getId());
 	}
 
 	public render(): JSX.Element | null {

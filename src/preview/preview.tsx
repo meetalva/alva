@@ -22,6 +22,15 @@ interface InitialData {
 	mode: 'static' | 'live';
 }
 
+const PRESENTATIONAL_KEYS = [
+	'open',
+	'selected',
+	'highlighted',
+	'placeholderHighlighted',
+	'dragged',
+	'name'
+];
+
 export class PreviewStore implements Types.RenderPreviewStore {
 	@Mobx.observable public elementContents: Types.SerializedElementContent[] = [];
 
@@ -258,6 +267,15 @@ function listen(
 							if (!storeEl) {
 								return false;
 							}
+
+							const changedKeys = diff(storeEl, el).filter(
+								c => !PRESENTATIONAL_KEYS.includes(c)
+							);
+
+							if (changedKeys.length === 0) {
+								return false;
+							}
+
 							return !Mobx.extras.deepEqual(storeEl, el);
 						});
 
@@ -491,6 +509,12 @@ function createSlotGetter(store: PreviewStore): (contents: any, render: any) => 
 			return acc;
 		}, {});
 	};
+}
+
+function diff(object: { [key: string]: any }, base: { [key: string]: any }): string[] {
+	return Object.entries(object)
+		.filter(([k, v]) => !Mobx.extras.deepEqual(base[k], v))
+		.map(([k]) => k);
 }
 
 main();

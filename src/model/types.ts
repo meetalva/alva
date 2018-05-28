@@ -27,11 +27,15 @@ export interface SerializedPage {
 export interface SerializedElement {
 	containerId?: string;
 	contentIds: string[];
+	dragged: boolean;
+	highlighted: boolean;
 	id: string;
 	name: string;
 	open: boolean;
 	patternId: string;
+	placeholderHighlighted: boolean;
 	properties: SerializedElementProperty[];
+	selected: boolean;
 }
 
 export interface SerializedElementContent {

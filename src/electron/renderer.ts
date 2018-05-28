@@ -274,8 +274,16 @@ ReactDom.render(React.createElement(App), document.getElementById('app'));
 
 // Disable drag and drop from outside the application
 document.addEventListener(
+	'dragenter',
+	event => {
+		event.preventDefault();
+	},
+	false
+);
+document.addEventListener(
 	'dragover',
 	event => {
+		event.dataTransfer.dropEffect = 'none';
 		event.preventDefault();
 	},
 	false

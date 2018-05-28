@@ -2,6 +2,7 @@ import { colors, ElementAnchors, ElementProps } from '../../components';
 import { elementMenu } from '../../electron/context-menus';
 import { ElementWrapper } from './element-wrapper';
 import { partition } from 'lodash';
+import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
@@ -25,43 +26,42 @@ const DRAG_IMG_STYLE = `
 `;
 
 @MobxReact.observer
-export class ElementList extends React.Component<{}, ElementListState> {
+export class ElementList extends React.Component {
 	private dragImg?: HTMLElement;
+	private globalDragEndListener?: (e: DragEvent) => void;
+	private globalDropListener?: (e: DragEvent) => void;
 	private globalKeyDownListener?: (e: KeyboardEvent) => void;
 	private ref: HTMLElement | null;
 
-	public state = {
-		dragging: true
-	};
-
 	public componentDidMount(): void {
+		const store = Store.ViewStore.getInstance();
 		this.globalKeyDownListener = e => this.handleKeyDown(e);
+		this.globalDragEndListener = e => store.unsetDraggedElement();
+		this.globalDropListener = this.globalDragEndListener;
+
 		window.addEventListener('keydown', this.globalKeyDownListener);
+		window.addEventListener('drop', this.globalDropListener);
+		window.addEventListener('dragend', this.globalDragEndListener);
 	}
 
 	public componentWillUnmount(): void {
+		if (this.globalDropListener) {
+			window.removeEventListener('drop', this.globalDropListener);
+		}
+		if (this.globalDragEndListener) {
+			window.removeEventListener('drop', this.globalDragEndListener);
+		}
 		if (this.globalKeyDownListener) {
 			window.removeEventListener('keydown', this.globalKeyDownListener);
 		}
 	}
 
-	public createItemFromElement(element: Model.Element): ElementNodeProps {
+	public createItemFromElement(element: Model.Element): ElementNodeProps | undefined {
 		const store = Store.ViewStore.getInstance();
-		const pattern: Model.Pattern | undefined = element.getPattern();
-		const selectedElement = store.getSelectedElement();
-		const open = element.getDescendants().some(e => e === selectedElement);
+		const pattern = element.getPattern();
 
 		if (!pattern) {
-			return {
-				active: store.getSelectedElement() === element,
-				children: [],
-				draggable: false,
-				dragging: this.state.dragging,
-				editable: false,
-				id: element.getId(),
-				open,
-				title: `Invalid: ${element.getName()}`
-			};
+			return;
 		}
 
 		const createSlot = slot => this.createItemFromSlot(slot, element);
@@ -79,14 +79,16 @@ export class ElementList extends React.Component<{}, ElementListState> {
 			.filter((s): s is ElementNodeProps => typeof s !== 'undefined');
 
 		return {
-			active: store.getSelectedElement() === element,
+			active: element.getSelected(),
 			children: [...slots, ...children],
 			draggable: !element.isNameEditable(),
-			dragging: this.state.dragging,
+			dragging: store.getDragging(),
 			editable: element.isNameEditable(),
+			highlight: element.getHighlighted(),
+			highlightPlaceholder: element.getPlaceholderHighlighted(),
 			id: element.getId(),
 			title: element.getName(),
-			open: element.getOpen() || element.getDescendants().some(e => e === selectedElement)
+			open: element.getOpen() || element.getDescendants().some(e => e.getSelected())
 		};
 	}
 
@@ -94,24 +96,28 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		slot: Model.PatternSlot,
 		element: Model.Element
 	): ElementNodeProps | undefined {
+		const store = Store.ViewStore.getInstance();
 		const slotContent = element.getContentBySlotId(slot.getId());
 
 		if (!slotContent) {
 			return;
 		}
 
-		const slotListItem: ElementNodeProps = {
-			id: slotContent.getId(),
-			title: slot.getName(),
-			editable: false,
-			draggable: false,
-			dragging: this.state.dragging,
-			children: slotContent.getElements().map(e => this.createItemFromElement(e)),
+		return {
 			active: false,
-			open: true
+			children: slotContent
+				.getElements()
+				.map(e => this.createItemFromElement(e))
+				.filter((e): e is ElementNodeProps => typeof e !== 'undefined'),
+			draggable: false,
+			dragging: store.getDragging(),
+			editable: false,
+			highlight: element.getHighlighted(),
+			highlightPlaceholder: false,
+			id: slotContent.getId(),
+			open: true,
+			title: slot.getName()
 		};
-
-		return slotListItem;
 	}
 
 	private handleBlur(e: React.FormEvent<HTMLElement>): void {
@@ -145,6 +151,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		if (icon) {
 			element.toggleOpen();
+			return;
 		}
 
 		if (store.getSelectedElement() === element && label) {
@@ -171,6 +178,52 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		}
 	}
 
+	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
+		const targetElement = elementFromTarget(e.target, { sibling: false });
+
+		if (!targetElement) {
+			return;
+		}
+
+		targetElement.setHighlighted(false);
+		targetElement.setPlaceholderHighlighted(false);
+	}
+
+	private handleDragOver(e: React.DragEvent<HTMLElement>): void {
+		const target = e.target as HTMLElement;
+		const isSibling = target.getAttribute(ElementAnchors.placeholder) === 'true';
+
+		const targetParentElement = elementFromTarget(target, { sibling: isSibling });
+		const visualTargetElement = elementFromTarget(target, { sibling: false });
+
+		const store = Store.ViewStore.getInstance();
+		const draggedElement = store.getDraggedElement();
+
+		if (!targetParentElement || !visualTargetElement) {
+			return;
+		}
+
+		Mobx.transaction(() => {
+			if (!draggedElement) {
+				// e.dataTransfer.dropEffect = 'none';
+				visualTargetElement.setHighlighted(false);
+				visualTargetElement.setPlaceholderHighlighted(false);
+				return;
+			}
+
+			const accepted = targetParentElement.accepts(draggedElement);
+
+			if (!accepted) {
+				// e.dataTransfer.dropEffect = 'none';
+				return;
+			}
+
+			e.dataTransfer.dropEffect = 'copy';
+			visualTargetElement.setHighlighted(!isSibling);
+			visualTargetElement.setPlaceholderHighlighted(isSibling);
+		});
+	}
+
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		const element = elementFromTarget(e.target, { sibling: false });
 
@@ -190,47 +243,31 @@ export class ElementList extends React.Component<{}, ElementListState> {
 		dragImg.textContent = element.getName();
 		dragImg.setAttribute('style', DRAG_IMG_STYLE);
 		document.body.appendChild(dragImg);
+
+		e.dataTransfer.effectAllowed = 'copy';
 		e.dataTransfer.setDragImage(dragImg, 75, 15);
-		e.dataTransfer.setData('elementId', element.getId());
 		this.dragImg = dragImg;
+
+		element.setDragged(true);
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
 		this.handleDragEnd(e);
 
-		const target = e.target as HTMLElement;
-		const patternId = e.dataTransfer.getData('patternId');
-		const elementId = e.dataTransfer.getData('elementId');
-		const isSiblingDrop = target.getAttribute(ElementAnchors.placeholder) === 'true';
-
 		const store = Store.ViewStore.getInstance();
-		const pattern = store.getPatternById(patternId);
-		const element = store.getElementById(elementId);
-
-		if (!element && !pattern) {
-			return;
-		}
+		const target = e.target as HTMLElement;
+		const isSiblingDrop = target.getAttribute(ElementAnchors.placeholder) === 'true';
 
 		const rawTargetElement = elementFromTarget(e.target, { sibling: false });
 		const dropTargetElement = elementFromTarget(e.target, { sibling: isSiblingDrop });
 		const dropTargetContent = contentFromTarget(e.target, { sibling: isSiblingDrop });
+		const draggedElement = store.getDraggedElement();
 
-		if (!rawTargetElement || !dropTargetElement || !dropTargetContent) {
+		if (!rawTargetElement || !dropTargetElement || !dropTargetContent || !draggedElement) {
 			return;
 		}
 
-		// prettier-ignore
-		const draggedElement = pattern
-			? // drag from pattern list, create new element
-			store.addNewElement({pattern})
-			: // drag from element list, obtain reference
-			store.getElementById(elementId);
-
-		if (!draggedElement) {
-			return;
-		}
-
-		if (draggedElement.isAncestorOfById(dropTargetElement.getId())) {
+		if (!dropTargetElement.accepts(draggedElement)) {
 			return;
 		}
 
@@ -248,6 +285,15 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		if (index === -1) {
 			return;
+		}
+
+		if (
+			store
+				.getProject()
+				.getElements()
+				.some(el => el.getId() === draggedElement.getId())
+		) {
+			store.addElement(draggedElement);
 		}
 
 		const command = Model.ElementLocationCommand.addChild({
@@ -306,11 +352,36 @@ export class ElementList extends React.Component<{}, ElementListState> {
 	}
 
 	private handleMouseLeave(e: React.MouseEvent<HTMLElement>): void {
-		this.setState({ dragging: true });
+		const element = elementFromTarget(e.target as HTMLElement, { sibling: false });
+
+		if (element) {
+			element.setHighlighted(false);
+			this.setState({ dragging: true });
+		}
 	}
 
 	private handleMouseOver(e: React.MouseEvent<HTMLElement>): void {
-		this.setState({ dragging: false });
+		const store = Store.ViewStore.getInstance();
+		const element = elementFromTarget(e.target as HTMLElement, { sibling: false });
+		const label = above(e.target, `[${ElementAnchors.label}]`);
+
+		// Special case: leaving the hover area of the last
+		// element, entering the catch-all zone of the page root
+		if (!label && element && element.isRoot()) {
+			store
+				.getProject()
+				.getElements()
+				.forEach(se => se.setHighlighted(false));
+		}
+
+		if (label && element) {
+			store
+				.getProject()
+				.getElements()
+				.forEach(se => se.setHighlighted(false));
+			element.setHighlighted(true);
+			this.setState({ dragging: false });
+		}
 	}
 
 	public render(): JSX.Element | null {
@@ -329,6 +400,10 @@ export class ElementList extends React.Component<{}, ElementListState> {
 
 		const item = this.createItemFromElement(rootElement);
 
+		if (!item) {
+			return null;
+		}
+
 		return (
 			<StyledDragRoot
 				data-drag-root
@@ -337,6 +412,8 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
 				onDragEnd={e => this.handleDragEnd(e)}
+				onDragLeave={e => this.handleDragLeave(e)}
+				onDragOver={e => this.handleDragOver(e)}
 				onDragStart={e => this.handleDragStart(e)}
 				onDrop={e => this.handleDrop(e)}
 				onKeyDown={e => this.handleKeyDown(e.nativeEvent)}
@@ -344,7 +421,7 @@ export class ElementList extends React.Component<{}, ElementListState> {
 				onMouseOver={e => this.handleMouseOver(e)}
 				innerRef={ref => (this.ref = ref)}
 			>
-				<ElementTree {...item} dragging={this.state.dragging} />
+				<ElementTree {...item} />
 			</StyledDragRoot>
 		);
 	}

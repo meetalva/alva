@@ -83,12 +83,6 @@ export class ViewStore {
 	@Mobx.observable private redoBuffer: Model.Command[] = [];
 
 	/**
-	 * The well-known enum name of content that should be visible in
-	 * the right-hand sidebar/pane.
-	 */
-	@Mobx.observable private rightPane: Types.RightPane | null = null;
-
-	/**
 	 * The currently selected element in the element list.
 	 * The properties pane shows the properties of this element,
 	 * and keyboard commands like cut, copy, or delete operate on this element.
@@ -475,16 +469,6 @@ export class ViewStore {
 
 	public getProject(): Model.Project {
 		return this.project;
-	}
-
-	/**
-	 * @return The content id to show in the right-hand sidebar
-	 */
-	public getRightPane(): Types.RightPane {
-		if (this.rightPane === null) {
-			return this.selectedElement ? Types.RightPane.Properties : Types.RightPane.Patterns;
-		}
-		return this.rightPane;
 	}
 
 	public getSelectedElement(): Model.Element | undefined {
@@ -899,14 +883,6 @@ export class ViewStore {
 	}
 
 	/**
-	 * @return The content id to show in the right-hand sidebar
-	 * @see rightPane
-	 */
-	public setRightPane(pane: Types.RightPane | null): void {
-		this.rightPane = pane;
-	}
-
-	/**
 	 * Sets the currently selected element in the element list.
 	 * The properties pane shows the properties of this element,
 	 * and keyboard commands like cut, copy, or delete operate on this element.
@@ -918,7 +894,6 @@ export class ViewStore {
 		if (this.selectedElement && this.selectedElement !== selectedElement) {
 			this.setNameEditableElement();
 		}
-		this.rightPane = null;
 		this.selectedElement = selectedElement;
 	}
 

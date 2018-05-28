@@ -1,4 +1,3 @@
-export * from './add-button';
 export * from './button';
 export * from './chrome';
 export * from './colors';

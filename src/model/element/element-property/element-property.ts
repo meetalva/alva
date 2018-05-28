@@ -16,10 +16,10 @@ export interface ElementPropertyContext {
 }
 
 export class ElementProperty {
-	private id: string;
-	private patternLibrary: PatternLibrary;
-	private patternPropertyId: string;
-	private setDefault: boolean;
+	private readonly id: string;
+	private readonly patternLibrary: PatternLibrary;
+	private readonly patternPropertyId: string;
+	private readonly setDefault: boolean;
 
 	@Mobx.observable private value: Types.ElementPropertyValue;
 
@@ -65,6 +65,16 @@ export class ElementProperty {
 				patternLibrary: this.patternLibrary
 			}
 		);
+	}
+
+	public getHidden(): boolean | undefined {
+		const patternProperty = this.getPatternProperty();
+
+		if (!patternProperty) {
+			return;
+		}
+
+		return patternProperty.getHidden();
 	}
 
 	public getId(): string {

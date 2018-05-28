@@ -55,6 +55,10 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 		const { props } = this;
 		const { property } = props;
 
+		if (property.getHidden()) {
+			return null;
+		}
+
 		const id = property.getId();
 		const label = property.getLabel();
 		const type = property.getType();

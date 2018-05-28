@@ -148,6 +148,10 @@ export abstract class PatternPropertyBase<T> {
 		return this.defaultValue;
 	}
 
+	public getHidden(): boolean {
+		return this.hidden;
+	}
+
 	/**
 	 * Returns the technical ID of this property (e.g. the property name in the TypeScript props
 	 * interface).
@@ -166,26 +170,12 @@ export abstract class PatternPropertyBase<T> {
 		return this.label;
 	}
 
+	public getRequired(): boolean {
+		return this.required;
+	}
+
 	public getType(): Types.PatternPropertyType {
 		return this.type;
-	}
-
-	/**
-	 * Returns whether this property is marked as hidden in Alva (exists in the pattern, but the designer
-	 * should not provide content for it).
-	 * @return Whether this property is hidden in Alva.
-	 */
-	public isHidden(): boolean {
-		return this.hidden;
-	}
-
-	/**
-	 * Returns whether the designer, when editing a page element, is required to enter a value
-	 * for this property.
-	 * @return Whether the property is required.
-	 */
-	public isRequired(): boolean {
-		return this.required;
 	}
 
 	public abstract toJSON(): Types.SerializedPatternProperty;

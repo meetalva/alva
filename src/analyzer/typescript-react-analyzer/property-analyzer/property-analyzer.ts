@@ -299,7 +299,7 @@ function createStringProperty(
 	args: PropertyFactoryArgs
 ): Types.SerializedPatternAssetProperty | Types.SerializedStringProperty | undefined {
 	if ((args.type.flags & Ts.TypeFlags.String) === Ts.TypeFlags.String) {
-		if (getJsDocValueFromSymbol(args.symbol, 'asset') !== undefined) {
+		if (TypescriptUtils.getJsDocValueFromSymbol(args.symbol, 'asset') !== undefined) {
 			// return new AssetProperty(args.symbol.name);
 			return {
 				hidden: false,
@@ -348,29 +348,6 @@ function getJsDocValue(node: Ts.Node, tagName: string): string | undefined {
 }
 
 /**
- * Searches a TypeScript type-checker (semantic) symbol for a named JSDoc tag, and returns its
- * value if found. This is used to read Alva declaration annotations.
- * @param node The node to scan.
- * @param tagName The JsDoc tag name, or undefined if the tag has not been found.
- */
-function getJsDocValueFromSymbol(symbol: Ts.Symbol, tagName: string): string | undefined {
-	const jsDocTags = symbol.getJsDocTags();
-	let result: string | undefined;
-	if (jsDocTags) {
-		jsDocTags.forEach(jsDocTag => {
-			if (jsDocTag.name === tagName) {
-				if (result === undefined) {
-					result = '';
-				}
-				result += ` ${jsDocTag.text}`;
-			}
-		});
-	}
-
-	return result !== undefined ? result.trim() : undefined;
-}
-
-/**
  * Updates a created property from the meta-data found in the declaration file, such as required
  * flag, name-override, and default value.
  * @param property The property to enrich
@@ -381,15 +358,19 @@ function setPropertyMetaData(
 	symbol: Ts.Symbol
 ): Types.SerializedPatternProperty {
 	property.required = (symbol.flags & Ts.SymbolFlags.Optional) !== Ts.SymbolFlags.Optional;
-	property.label = getJsDocValueFromSymbol(symbol, 'name') || property.label;
+	property.label = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'name') || property.label;
+	property.hidden = TypescriptUtils.symbolHasJsDocTag(symbol, 'ignore');
 
 	switch (property.type) {
 		case Types.PatternPropertyType.Enum:
-			const defaultOption = property.options.find(option => option.name === getJsDocValueFromSymbol(symbol, 'default'));
+			const defaultOption = property.options.find(
+				option => option.name === TypescriptUtils.getJsDocValueFromSymbol(symbol, 'default')
+			);
 			property.defaultOptionId = defaultOption ? defaultOption.id : undefined;
 			break;
 		default:
-			const defaultValue = getJsDocValueFromSymbol(symbol, 'default') || property.defaultValue;
+			const defaultValue =
+				TypescriptUtils.getJsDocValueFromSymbol(symbol, 'default') || property.defaultValue;
 			property.defaultValue = defaultValue;
 	}
 

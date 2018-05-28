@@ -24,7 +24,7 @@ interface InitialData {
 const PRESENTATIONAL_KEYS = [
 	'open',
 	'selected',
-	'highlighted',
+	// 'highlighted',
 	'placeholderHighlighted',
 	'dragged',
 	'name'

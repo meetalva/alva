@@ -195,9 +195,11 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 
 		this.disposer = Mobx.autorun(() => {
 			this.updateSelection();
+			this.updateHighlight();
 		});
 
 		this.updateSelection();
+		this.updateHighlight();
 	}
 
 	public componentWillUnmount(): void {
@@ -271,6 +273,22 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 				<PreviewSelect selectedArea={props.selection} />
 			</>
 		);
+	}
+
+	private updateHighlight(): void {
+		const currentElement = this.props.store.elements.find(element => element.highlighted);
+		if (!currentElement) {
+			this.props.highlight.hide();
+			return;
+		}
+		const node = getNodeByElementId(currentElement.id);
+		if (!node) {
+			return;
+		}
+		if (!currentElement.selected) {
+			this.props.highlight.setSize(node);
+			this.props.highlight.show();
+		}
 	}
 
 	private updateSelection(elementId?: string): void {

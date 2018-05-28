@@ -106,8 +106,6 @@ export class ElementList extends React.Component {
 	}
 
 	private handleDragEnd(e: React.DragEvent<HTMLElement>): void {
-		this.setState({ dragging: false });
-
 		if (this.dragImg && this.dragImg.parentNode) {
 			this.dragImg.parentNode.removeChild(this.dragImg);
 		}
@@ -160,30 +158,30 @@ export class ElementList extends React.Component {
 	}
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
-		const element = elementFromTarget(e.target, { sibling: false });
+		const store = Store.ViewStore.getInstance();
+		const draggedElement = elementFromTarget(e.target, { sibling: false });
 
-		if (!element) {
+		if (!draggedElement) {
 			e.preventDefault();
 			return;
 		}
 
-		if (element.isNameEditable()) {
+		if (draggedElement.isNameEditable()) {
 			e.preventDefault();
 			return;
 		}
 
-		this.setState({ dragging: true });
+		draggedElement.setDragged(true);
+		store.setSelectedElement(draggedElement);
 
 		const dragImg = document.createElement('div');
-		dragImg.textContent = element.getName();
+		dragImg.textContent = draggedElement.getName();
 		dragImg.setAttribute('style', DRAG_IMG_STYLE);
 		document.body.appendChild(dragImg);
 
 		e.dataTransfer.effectAllowed = 'copy';
 		e.dataTransfer.setDragImage(dragImg, 75, 15);
 		this.dragImg = dragImg;
-
-		element.setDragged(true);
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
@@ -291,7 +289,6 @@ export class ElementList extends React.Component {
 
 		if (element) {
 			element.setHighlighted(false);
-			this.setState({ dragging: true });
 		}
 	}
 
@@ -310,7 +307,6 @@ export class ElementList extends React.Component {
 
 		if (label && element) {
 			element.setHighlighted(true);
-			this.setState({ dragging: false });
 		}
 	}
 

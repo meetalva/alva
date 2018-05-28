@@ -12,7 +12,6 @@ import * as uuid from 'uuid';
 Mobx.extras.shareGlobalState();
 
 declare var renderer: Types.Renderer;
-declare var preview: HTMLElement;
 
 interface InitialData {
 	data: {
@@ -146,7 +145,7 @@ function main(): void {
 				onOutsideClick,
 				store
 			},
-			preview
+			document.getElementById('preview') as HTMLElement
 		);
 	};
 

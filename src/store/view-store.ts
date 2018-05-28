@@ -884,7 +884,7 @@ export class ViewStore {
 		const previousHighlightedElement = this.getHighlightedElement();
 
 		if (previousHighlightedElement) {
-			previousHighlightedElement.setSelected(false);
+			previousHighlightedElement.setHighlighted(false);
 		}
 
 		highlightedElement.setHighlighted(true);

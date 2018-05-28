@@ -1,7 +1,6 @@
-import { colors, ElementAnchors, ElementProps } from '../../components';
+import { colors, ElementAnchors } from '../../components';
 import { elementMenu } from '../../electron/context-menus';
-import { ElementWrapper } from './element-wrapper';
-import { partition } from 'lodash';
+import { ElementContainer } from './element-container';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
@@ -54,70 +53,6 @@ export class ElementList extends React.Component {
 		if (this.globalKeyDownListener) {
 			window.removeEventListener('keydown', this.globalKeyDownListener);
 		}
-	}
-
-	public createItemFromElement(element: Model.Element): ElementNodeProps | undefined {
-		const store = Store.ViewStore.getInstance();
-		const pattern = element.getPattern();
-
-		if (!pattern) {
-			return;
-		}
-
-		const createSlot = slot => this.createItemFromSlot(slot, element);
-
-		const [[defaultSlotData], slotsData] = partition(
-			pattern.getSlots(),
-			slot => slot.getType() === Types.SlotType.Children
-		);
-
-		const defaultSlot = defaultSlotData ? createSlot(defaultSlotData) : { children: [] };
-		const children = defaultSlot && defaultSlot.children ? Array.from(defaultSlot.children) : [];
-
-		const slots = slotsData
-			.map(createSlot)
-			.filter((s): s is ElementNodeProps => typeof s !== 'undefined');
-
-		return {
-			active: element.getSelected(),
-			children: [...slots, ...children],
-			draggable: !element.isNameEditable(),
-			dragging: store.getDragging(),
-			editable: element.isNameEditable(),
-			highlight: element.getHighlighted(),
-			highlightPlaceholder: element.getPlaceholderHighlighted(),
-			id: element.getId(),
-			title: element.getName(),
-			open: element.getOpen() || element.getDescendants().some(e => e.getSelected())
-		};
-	}
-
-	public createItemFromSlot(
-		slot: Model.PatternSlot,
-		element: Model.Element
-	): ElementNodeProps | undefined {
-		const store = Store.ViewStore.getInstance();
-		const slotContent = element.getContentBySlotId(slot.getId());
-
-		if (!slotContent) {
-			return;
-		}
-
-		return {
-			active: false,
-			children: slotContent
-				.getElements()
-				.map(e => this.createItemFromElement(e))
-				.filter((e): e is ElementNodeProps => typeof e !== 'undefined'),
-			draggable: false,
-			dragging: store.getDragging(),
-			editable: false,
-			highlight: element.getHighlighted(),
-			highlightPlaceholder: false,
-			id: slotContent.getId(),
-			open: true,
-			title: slot.getName()
-		};
 	}
 
 	private handleBlur(e: React.FormEvent<HTMLElement>): void {
@@ -365,20 +300,15 @@ export class ElementList extends React.Component {
 		const element = elementFromTarget(e.target as HTMLElement, { sibling: false });
 		const label = above(e.target, `[${ElementAnchors.label}]`);
 
-		// Special case: leaving the hover area of the last
-		// element, entering the catch-all zone of the page root
-		if (!label && element && element.isRoot()) {
+		if ((label && element) || (!label && element && element.isRoot())) {
 			store
 				.getProject()
 				.getElements()
+				.filter(se => se.getHighlighted())
 				.forEach(se => se.setHighlighted(false));
 		}
 
 		if (label && element) {
-			store
-				.getProject()
-				.getElements()
-				.forEach(se => se.setHighlighted(false));
 			element.setHighlighted(true);
 			this.setState({ dragging: false });
 		}
@@ -395,12 +325,6 @@ export class ElementList extends React.Component {
 		const rootElement = page.getRoot();
 
 		if (!rootElement) {
-			return null;
-		}
-
-		const item = this.createItemFromElement(rootElement);
-
-		if (!item) {
 			return null;
 		}
 
@@ -421,7 +345,7 @@ export class ElementList extends React.Component {
 				onMouseOver={e => this.handleMouseOver(e)}
 				innerRef={ref => (this.ref = ref)}
 			>
-				<ElementTree {...item} />
+				<ElementContainer element={rootElement} />
 			</StyledDragRoot>
 		);
 	}
@@ -431,26 +355,6 @@ const StyledDragRoot = styled.div`
 	height: 100%;
 	width: 100%;
 `;
-
-export interface ElementNodeProps extends ElementProps {
-	children?: ElementNodeProps[];
-	draggable: boolean;
-	dragging: boolean;
-	id: string;
-	open: boolean;
-}
-
-function ElementTree(props: ElementNodeProps): JSX.Element {
-	const children = Array.isArray(props.children) ? props.children : [];
-
-	return (
-		<ElementWrapper {...props} dragging={props.dragging}>
-			{children.map(child => (
-				<ElementTree {...child} key={child.id} dragging={props.dragging} />
-			))}
-		</ElementWrapper>
-	);
-}
 
 function above(node: EventTarget, selector: string): HTMLElement | null {
 	let el = node as HTMLElement;

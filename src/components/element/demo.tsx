@@ -21,6 +21,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				editable={false}
 				highlight={false}
 				highlightPlaceholder={false}
+				mayOpen={false}
 				open={false}
 				title="Element"
 				dragging={false}
@@ -35,6 +36,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				editable={false}
 				highlight={false}
 				highlightPlaceholder={false}
+				mayOpen={false}
 				open={false}
 				title="Element"
 				dragging={false}
@@ -49,6 +51,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				editable={false}
 				highlight={false}
 				highlightPlaceholder={false}
+				mayOpen={true}
 				open
 				title="Element"
 				dragging={false}
@@ -65,6 +68,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				editable={false}
 				highlight={false}
 				highlightPlaceholder={false}
+				mayOpen={true}
 				open={false}
 				title="Element"
 				dragging={false}
@@ -81,6 +85,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				editable={false}
 				highlight={false}
 				highlightPlaceholder={false}
+				mayOpen={true}
 				open
 				title="Element"
 				dragging={false}

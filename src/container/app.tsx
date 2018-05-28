@@ -123,9 +123,16 @@ export class App extends React.Component {
 										<ElementList />
 									</ElementPane>
 
-									<PatternsPane>
-										<PatternListContainer />
-									</PatternsPane>
+									<Resizeable
+										handleStyles={{ top: { zIndex: 1 } }}
+										defaultSize={{ height: 500, width: '100%' }}
+										enable={{ top: true }}
+										minHeight={240}
+									>
+										<PatternsPane>
+											<PatternListContainer />
+										</PatternsPane>
+									</Resizeable>
 								</SideBar>
 							</Resizeable>
 							<PreviewPaneWrapper

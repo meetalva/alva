@@ -1,6 +1,6 @@
 import DemoContainer from '../demo-container';
 import { IconName, IconRegistry } from '../icons';
-import Element from './index';
+import { Element, ElementState } from './index';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -10,19 +10,33 @@ const StyledTestDiv = styled.div`
 	padding: 20px 10px;
 `;
 
+// tslint:disable-next-line:no-empty
+const NOOP = () => {};
+
+const CHILD = (
+	<Element
+		id="1"
+		state={ElementState.Default}
+		draggable={false}
+		mayOpen={false}
+		open={false}
+		onChange={NOOP}
+		title="Child Element"
+		dragging={false}
+	/>
+);
+
 const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer title="Element">
 		<StyledTestDiv>
 			Default
 			<Element
 				id="1"
-				active={false}
+				state={ElementState.Default}
 				draggable={false}
-				editable={false}
-				highlight={false}
-				highlightPlaceholder={false}
 				mayOpen={false}
 				open={false}
+				onChange={NOOP}
 				title="Element"
 				dragging={false}
 			/>
@@ -31,66 +45,98 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			Active
 			<Element
 				id="2"
-				active
 				draggable={false}
-				editable={false}
-				highlight={false}
-				highlightPlaceholder={false}
 				mayOpen={false}
 				open={false}
+				onChange={NOOP}
+				state={ElementState.Active}
 				title="Element"
 				dragging={false}
 			/>
 		</StyledTestDiv>
 		<StyledTestDiv>
-			With Child and open
+			Highlighted
 			<Element
-				id="3"
-				active={false}
+				id="2"
 				draggable={false}
-				editable={false}
-				highlight={false}
-				highlightPlaceholder={false}
-				mayOpen={true}
-				open
+				mayOpen={false}
+				open={false}
+				onChange={NOOP}
+				state={ElementState.Highlighted}
 				title="Element"
 				dragging={false}
+			/>
+		</StyledTestDiv>
+		<StyledTestDiv>
+			Placeholder Highlighted
+			<Element
+				id="2"
+				draggable={false}
+				mayOpen={false}
+				open={false}
+				onChange={NOOP}
+				placeholderHighlighted={true}
+				state={ElementState.Default}
+				title="Element"
+				dragging={true}
+			/>
+		</StyledTestDiv>
+		<StyledTestDiv>
+			Editable
+			<Element
+				id="2"
+				draggable={false}
+				mayOpen={false}
+				open={false}
+				onChange={NOOP}
+				state={ElementState.Editable}
+				title="Element"
+				dragging={false}
+			/>
+		</StyledTestDiv>
+		<StyledTestDiv>
+			May open, closed
+			<Element
+				id="3"
+				draggable={false}
+				mayOpen={true}
+				onChange={NOOP}
+				open={false}
+				title="Element"
+				state={ElementState.Default}
+				dragging={false}
 			>
-				Child
+				{CHILD}
 			</Element>
 		</StyledTestDiv>
 		<StyledTestDiv>
-			With child and active
+			May open, opened
 			<Element
 				id="3"
-				active
 				draggable={false}
-				editable={false}
-				highlight={false}
-				highlightPlaceholder={false}
 				mayOpen={true}
-				open={false}
+				onChange={NOOP}
+				open
 				title="Element"
+				state={ElementState.Default}
 				dragging={false}
 			>
-				Child
+				{CHILD}
 			</Element>
 		</StyledTestDiv>
 		<StyledTestDiv>
 			With child, active and open
 			<Element
-				id="3"
-				active
+				id="4"
 				draggable={false}
-				editable={false}
-				highlight={false}
-				highlightPlaceholder={false}
 				mayOpen={true}
+				onChange={NOOP}
 				open
 				title="Element"
+				state={ElementState.Active}
 				dragging={false}
 			>
-				Child
+				{CHILD}
 			</Element>
 		</StyledTestDiv>
 

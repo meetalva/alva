@@ -13,53 +13,41 @@ export const ElementAnchors = {
 	placeholder: 'data-element-placeholder'
 };
 
+export enum ElementState {
+	Default = 'default',
+	Editable = 'editable',
+	Active = 'active',
+	Disabled = 'disabled',
+	Highlighted = 'highlighted'
+}
+
 export interface ElementProps {
-	active: boolean;
 	draggable: boolean;
 	dragging: boolean;
-	editable: boolean;
-	highlight: boolean;
-	highlightPlaceholder: boolean;
 	id: string;
 	mayOpen: boolean;
-	onChange?: React.FormEventHandler<HTMLInputElement>;
-	onClick?: React.MouseEventHandler<HTMLElement>;
-	onContextMenu?: React.MouseEventHandler<HTMLElement>;
-	onDragDrop?: React.DragEventHandler<HTMLElement>;
-	onDragDropForChild?: React.DragEventHandler<HTMLElement>;
-	onDragEnter?: React.DragEventHandler<HTMLElement>;
-	onDragEnterForChild?: React.DragEventHandler<HTMLElement>;
-	onDragLeave?: React.DragEventHandler<HTMLElement>;
-	onDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
-	onDragStart?: React.DragEventHandler<HTMLElement>;
+	onChange: React.FormEventHandler<HTMLInputElement>;
 	open: boolean;
+	placeholderHighlighted?: boolean;
+	state: ElementState;
 	title: string;
 }
 
 interface StyledElementLabelProps {
-	active?: boolean;
-	highlight?: boolean;
+	state: ElementState;
 }
 
 interface StyledIconProps {
-	active?: boolean;
-	id?: string;
-	open?: boolean;
+	active: boolean;
+	open: boolean;
 }
 
 interface LabelContentProps {
-	active?: boolean;
+	active: boolean;
 }
 
 export interface StyledElementChildProps {
-	open?: boolean;
-}
-
-export interface StyledPlaceholder {
-	highlightPlaceholder?: boolean;
-	onDragDropForChild?: React.DragEventHandler<HTMLElement>;
-	onDragEnterForChild?: React.DragEventHandler<HTMLElement>;
-	onDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
+	open: boolean;
 }
 
 const StyledElement = styled.div`
@@ -70,23 +58,27 @@ const StyledElement = styled.div`
 const div = tag('div').omit(['active', 'highlight']);
 
 const LABEL_COLOR = (props: StyledElementLabelProps): string => {
-	if (props.active) {
-		return colors.blue.toString();
+	switch (props.state) {
+		case ElementState.Active:
+		case ElementState.Editable:
+			return colors.blue.toString();
+		case ElementState.Disabled:
+			return colors.grey60.toString();
+		default:
+			return 'inherit';
 	}
-
-	return 'inherit';
 };
 
 const LABEL_BACKGROUND = (props: StyledElementLabelProps): string => {
-	if (props.active) {
-		return colors.blue80.toString();
+	switch (props.state) {
+		case ElementState.Active:
+		case ElementState.Editable:
+			return colors.blue80.toString();
+		case ElementState.Highlighted:
+			return colors.grey90.toString();
+		default:
+			return 'transparent';
 	}
-
-	if (props.highlight) {
-		return colors.grey90.toString();
-	}
-
-	return 'transparent';
 };
 
 const StyledElementLabel = styled(div)`
@@ -113,8 +105,13 @@ const StyledElementLabel = styled(div)`
 	}
 `;
 
-const placeholderDiv = tag('div').omit(['highlightPlaceholder']);
-const StyledPlaceholder = styled(placeholderDiv)`
+interface StyledPlaceholderProps {
+	visible: boolean;
+}
+
+const PLACEHOLDER_SCALE = (props: StyledPlaceholderProps): number => (props.visible ? 1 : 0);
+
+const StyledPlaceholder = styled.div`
 	position: relative;
 	height: ${getSpace(SpaceSize.S)}px;
 	width: 100%;
@@ -132,7 +129,7 @@ const StyledPlaceholder = styled(placeholderDiv)`
 		top: 3px;
 		border-radius: 3px;
 		background: ${colors.blue40.toString()};
-		transform: scale(0);
+		transform: scale(${PLACEHOLDER_SCALE});
 		transition: transform 0.2s;
 		z-index: 20;
 	}
@@ -146,30 +143,17 @@ const StyledPlaceholder = styled(placeholderDiv)`
 		left: ${getSpace(SpaceSize.XS)};
 		top: 5px;
 		background: ${colors.blue40.toString()};
-		transform: scaleY(0);
+		transform: scaleY(${PLACEHOLDER_SCALE});
 		transition: transform 0.2s;
 		z-index: 20;
 	}
-
-	${(props: StyledPlaceholder) =>
-		props.highlightPlaceholder
-			? `
-			&::before {
-				transform: scale(1);
-			}
-
-			&::after {
-				transform: scaleY(1);
-			}
-		`
-			: ''};
 `;
 
 const elementDiv = tag('div').omit(['open']);
-const StyledElementChild = styled(elementDiv)`
+
+const StyledElementChildren = styled(elementDiv)`
 	flex-basis: 100%;
 	padding-left: ${getSpace(SpaceSize.L)}px;
-	${(props: StyledElementChildProps) => (props.open ? 'display: block;' : 'display: none;')};
 `;
 
 const StyledIcon = styled(Icon)`
@@ -242,28 +226,14 @@ class SeamlessInput extends React.Component<SeamlessInputProps> {
 }
 
 export const Element: React.StatelessComponent<ElementProps> = props => (
-	<StyledElement
-		{...{ [ElementAnchors.element]: props.id }}
-		draggable={props.draggable}
-		onClick={props.onClick}
-	>
+	<StyledElement {...{ [ElementAnchors.element]: props.id }} draggable={props.draggable}>
 		{props.dragging && (
 			<StyledPlaceholder
 				{...{ [ElementAnchors.placeholder]: true }}
-				highlightPlaceholder={props.highlightPlaceholder}
-				onDragEnter={props.onDragEnterForChild}
-				onDragLeave={props.onDragLeaveForChild}
-				onDrop={props.onDragDropForChild}
+				visible={Boolean(props.placeholderHighlighted)}
 			/>
 		)}
-		<StyledElementLabel
-			active={props.active}
-			highlight={props.highlight}
-			onContextMenu={props.onContextMenu}
-			onDragEnter={props.onDragEnter}
-			onDragLeave={props.onDragLeave}
-			onDrop={props.onDragDrop}
-		>
+		<StyledElementLabel state={props.state}>
 			{props.mayOpen && (
 				<StyledIcon
 					dataIcon={props.id}
@@ -271,10 +241,10 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 					size={IconSize.XXS}
 					color={colors.grey60}
 					open={props.open}
-					active={props.active}
+					active={props.state === ElementState.Active}
 				/>
 			)}
-			{props.editable ? (
+			{props.state === ElementState.Editable ? (
 				<SeamlessInput
 					{...{ [ElementAnchors.label]: true }}
 					value={props.title}
@@ -283,14 +253,17 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 					autoSelect
 				/>
 			) : (
-				<LabelContent active={props.active} {...{ [ElementAnchors.label]: true }}>
+				<LabelContent
+					active={props.state === ElementState.Active}
+					{...{ [ElementAnchors.label]: true }}
+				>
 					{props.title}
 				</LabelContent>
 			)}
 		</StyledElementLabel>
-		{props.children && (
-			<StyledElementChild open={props.open}>{props.children}</StyledElementChild>
-		)}
+		{props.open && props.children ? (
+			<StyledElementChildren>{props.children}</StyledElementChildren>
+		) : null}
 	</StyledElement>
 );
 

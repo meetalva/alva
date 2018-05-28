@@ -76,7 +76,7 @@ const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
 		[
 			<path
 				key="pattern"
-				d="M6 15h5v2H6v-2zm0-8h10v1H6V7zm0 3h7v1H6v-1zM4 5v14h16V5H4zm0-1h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"
+				d="M5 9h14a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1zm4.16-2H19.5a.5.5 0 1 1 0 1H7.58a.26.26 0 0 1-.08-.5l1.35-.45A1 1 0 0 1 9.16 7z"
 			/>
 		]
 	],

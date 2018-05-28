@@ -1,3 +1,4 @@
+import * as AlvaUtil from '../../alva-util';
 import { PatternPropertyBase, PatternPropertyType } from './property-base';
 import * as Types from '../types';
 
@@ -24,10 +25,8 @@ export class PatternNumberArrayProperty extends PatternPropertyBase<number[]> {
 		});
 	}
 
-	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
-		// tslint:disable-next-line:no-any
-		return this.coerceArrayValue(value, (element: any) => parseFloat(value));
+	public coerceValue<T>(value: T): number[] {
+		return AlvaUtil.ensureArray(value).map(parseFloat);
 	}
 
 	public toJSON(): Types.SerializedPatternNumberArrayProperty {

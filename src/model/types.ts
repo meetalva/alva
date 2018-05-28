@@ -232,7 +232,7 @@ export interface FilePayload {
 	path: string;
 }
 
-export interface PageChangePaylod {
+export interface PageChangePayload {
 	elementContents: SerializedElementContent[];
 	elements: SerializedElement[];
 	pageId: string;

@@ -21,6 +21,7 @@ export interface ElementProps {
 	highlight: boolean;
 	highlightPlaceholder: boolean;
 	id: string;
+	mayOpen: boolean;
 	onChange?: React.FormEventHandler<HTMLInputElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onContextMenu?: React.MouseEventHandler<HTMLElement>;
@@ -263,17 +264,16 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 			onDragLeave={props.onDragLeave}
 			onDrop={props.onDragDrop}
 		>
-			{Array.isArray(props.children) &&
-				props.children.length > 0 && (
-					<StyledIcon
-						dataIcon={props.id}
-						name={IconName.ArrowFillRight}
-						size={IconSize.XXS}
-						color={colors.grey60}
-						open={props.open}
-						active={props.active}
-					/>
-				)}
+			{props.mayOpen && (
+				<StyledIcon
+					dataIcon={props.id}
+					name={IconName.ArrowFillRight}
+					size={IconSize.XXS}
+					color={colors.grey60}
+					open={props.open}
+					active={props.active}
+				/>
+			)}
 			{props.editable ? (
 				<SeamlessInput
 					{...{ [ElementAnchors.label]: true }}

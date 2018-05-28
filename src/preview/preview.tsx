@@ -262,8 +262,18 @@ function listen(
 
 						const newElements = differenceBy(els, store.elements, 'id');
 						const removedElements = differenceBy(store.elements, els, 'id');
+
 						const changedElements = els.filter(el => {
+							if (newElements.includes(el)) {
+								return;
+							}
+
+							if (removedElements.includes(el)) {
+								return;
+							}
+
 							const storeEl = store.elements.find(se => se.id === el.id);
+
 							if (!storeEl) {
 								return false;
 							}
@@ -280,7 +290,7 @@ function listen(
 						});
 
 						removedElements.forEach(removedElement => {
-							store.elements.splice(store.elements.indexOf(removedElement), 0);
+							store.elements.splice(store.elements.indexOf(removedElement), 1);
 						});
 
 						newElements.forEach(newElement => {
@@ -288,7 +298,7 @@ function listen(
 						});
 
 						changedElements.forEach(changedElement => {
-							store.elements.splice(els.indexOf(changedElement), 0, changedElement);
+							store.elements.splice(els.indexOf(changedElement), 1, changedElement);
 						});
 					}
 

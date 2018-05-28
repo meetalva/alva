@@ -12,7 +12,6 @@ import * as uuid from 'uuid';
 Mobx.extras.shareGlobalState();
 
 declare var renderer: Types.Renderer;
-declare var preview: HTMLElement;
 
 interface InitialData {
 	data: {
@@ -21,6 +20,15 @@ interface InitialData {
 	};
 	mode: 'static' | 'live';
 }
+
+const PRESENTATIONAL_KEYS = [
+	'open',
+	'selected',
+	'highlighted',
+	'placeholderHighlighted',
+	'dragged',
+	'name'
+];
 
 export class PreviewStore implements Types.RenderPreviewStore {
 	@Mobx.observable public elementContents: Types.SerializedElementContent[] = [];
@@ -137,7 +145,7 @@ function main(): void {
 				onOutsideClick,
 				store
 			},
-			preview
+			document.getElementById('preview') as HTMLElement
 		);
 	};
 
@@ -253,16 +261,35 @@ function listen(
 
 						const newElements = differenceBy(els, store.elements, 'id');
 						const removedElements = differenceBy(store.elements, els, 'id');
+
 						const changedElements = els.filter(el => {
+							if (newElements.includes(el)) {
+								return;
+							}
+
+							if (removedElements.includes(el)) {
+								return;
+							}
+
 							const storeEl = store.elements.find(se => se.id === el.id);
+
 							if (!storeEl) {
 								return false;
 							}
+
+							const changedKeys = diff(storeEl, el).filter(
+								c => !PRESENTATIONAL_KEYS.includes(c)
+							);
+
+							if (changedKeys.length === 0) {
+								return false;
+							}
+
 							return !Mobx.extras.deepEqual(storeEl, el);
 						});
 
 						removedElements.forEach(removedElement => {
-							store.elements.splice(store.elements.indexOf(removedElement), 0);
+							store.elements.splice(store.elements.indexOf(removedElement), 1);
 						});
 
 						newElements.forEach(newElement => {
@@ -270,7 +297,7 @@ function listen(
 						});
 
 						changedElements.forEach(changedElement => {
-							store.elements.splice(els.indexOf(changedElement), 0, changedElement);
+							store.elements.splice(els.indexOf(changedElement), 1, changedElement);
 						});
 					}
 
@@ -491,6 +518,12 @@ function createSlotGetter(store: PreviewStore): (contents: any, render: any) => 
 			return acc;
 		}, {});
 	};
+}
+
+function diff(object: { [key: string]: any }, base: { [key: string]: any }): string[] {
+	return Object.entries(object)
+		.filter(([k, v]) => !Mobx.extras.deepEqual(base[k], v))
+		.map(([k]) => k);
 }
 
 main();

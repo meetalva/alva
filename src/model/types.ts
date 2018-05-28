@@ -27,11 +27,15 @@ export interface SerializedPage {
 export interface SerializedElement {
 	containerId?: string;
 	contentIds: string[];
+	dragged: boolean;
+	highlighted: boolean;
 	id: string;
 	name: string;
 	open: boolean;
 	patternId: string;
+	placeholderHighlighted: boolean;
 	properties: SerializedElementProperty[];
+	selected: boolean;
 }
 
 export interface SerializedElementContent {
@@ -228,7 +232,7 @@ export interface FilePayload {
 	path: string;
 }
 
-export interface PageChangePaylod {
+export interface PageChangePayload {
 	elementContents: SerializedElementContent[];
 	elements: SerializedElement[];
 	pageId: string;

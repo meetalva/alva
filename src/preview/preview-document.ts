@@ -8,10 +8,11 @@ export type PreviewDocumentConfig = LivePreviewDocumentConfig | StaticPreviewDoc
 
 export interface LivePreviewDocumentConfig {
 	data: object;
-	mode: PreviewDocumentMode.Live;
+	mode: PreviewDocumentMode.Live | PreviewDocumentMode.LiveMirror;
 }
 
 export interface StaticPreviewDocumentConfig {
+	content: string;
 	data: object;
 	mode: PreviewDocumentMode.Static;
 	scripts: string;
@@ -109,7 +110,10 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 	</style>
 </head>
 <body>
-	<div id="preview">${config.mode === PreviewDocumentMode.Live ? PRELOADER : ''}</div>
+	<div id="preview">
+		${config.mode === PreviewDocumentMode.Static ? config.content : ''}
+		${config.mode === PreviewDocumentMode.Live ? PRELOADER : ''}
+	</div>
 	<textarea data-data="alva" style="display: none">${encodeURIComponent(
 		JSON.stringify({
 			data: config.data,

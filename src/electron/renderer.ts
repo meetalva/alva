@@ -216,7 +216,7 @@ Sender.receive(message => {
 	}
 });
 
-Mobx.autorun(() => {
+Mobx.autorunAsync(() => {
 	const patternLibrary = store.getPatternLibrary();
 
 	if (patternLibrary) {
@@ -228,27 +228,32 @@ Mobx.autorun(() => {
 	}
 });
 
-Mobx.autorun(() => {
+Mobx.autorunAsync(() => {
 	const project = store.getProject();
 	const currentPage = store.getCurrentPage();
 
 	if (project && currentPage) {
-		Sender.send({
-			id: uuid.v4(),
-			payload: {
-				pageId: currentPage.getId(),
-				pages: project.getPages().map(page => page.toJSON()),
-				elementContents: project
-					.getElementContents()
-					.map(elementContent => elementContent.toJSON()),
-				elements: project.getElements().map(element => element.toJSON())
-			},
-			type: ServerMessageType.PageChange
+		const payload = {
+			pageId: currentPage.getId(),
+			pages: project.getPages().map(page => page.toJSON()),
+			elementContents: project
+				.getElementContents()
+				.map(elementContent => elementContent.toJSON()),
+			elements: project.getElements().map(element => element.toJSON())
+		};
+
+		// tslint:disable-next-line:no-any
+		(window as any).requestIdleCallback(() => {
+			Sender.send({
+				id: uuid.v4(),
+				payload,
+				type: ServerMessageType.PageChange
+			});
 		});
 	}
 });
 
-Mobx.autorun(() => {
+Mobx.autorunAsync(() => {
 	const selectedElement = store.getSelectedElement();
 	Sender.send({
 		id: uuid.v4(),
@@ -257,7 +262,7 @@ Mobx.autorun(() => {
 	});
 });
 
-Mobx.autorun(() => {
+Mobx.autorunAsync(() => {
 	const project = store.getProject();
 	const patternLibrary = store.getPatternLibrary();
 	const page = store.getCurrentPage();
@@ -274,8 +279,16 @@ ReactDom.render(React.createElement(App), document.getElementById('app'));
 
 // Disable drag and drop from outside the application
 document.addEventListener(
+	'dragenter',
+	event => {
+		event.preventDefault();
+	},
+	false
+);
+document.addEventListener(
 	'dragover',
 	event => {
+		event.dataTransfer.dropEffect = 'none';
 		event.preventDefault();
 	},
 	false

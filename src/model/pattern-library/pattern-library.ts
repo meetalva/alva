@@ -209,6 +209,7 @@ export class PatternLibrary {
 			.map(match => match.id);
 	}
 
+	@Mobx.action
 	public removePattern(pattern: Pattern): void {
 		const index = this.patterns.indexOf(pattern);
 
@@ -219,14 +220,17 @@ export class PatternLibrary {
 		this.patterns.splice(index, 1);
 	}
 
+	@Mobx.action
 	public setBundle(bundle: string): void {
 		this.bundle = bundle;
 	}
 
+	@Mobx.action
 	public setRootFolder(root: PatternFolder): void {
 		this.root = root;
 	}
 
+	@Mobx.action
 	public setState(state: Types.PatternLibraryState): void {
 		this.state = state;
 	}
@@ -242,6 +246,7 @@ export class PatternLibrary {
 		};
 	}
 
+	@Mobx.action
 	public updateSearch(): void {
 		const registry = this.root.getDescendants().map(item => item.toJSON());
 

@@ -80,9 +80,24 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 
 	app.get('/preview.html', (req, res) => {
 		res.type('html');
+
+		const mode = getMode(req.query.mode || '');
+
+		if (mode === PreviewDocumentMode.Static) {
+			res.send(
+				previewDocument({
+					content: '',
+					mode,
+					data: state,
+					scripts: ''
+				})
+			);
+			return;
+		}
+
 		res.send(
 			previewDocument({
-				mode: PreviewDocumentMode.Live,
+				mode,
 				data: state
 			})
 		);
@@ -268,4 +283,16 @@ async function setup(): Promise<{ compiler: Compiler; queue: Queue }> {
 		compiler,
 		queue
 	};
+}
+
+function getMode(input: string): PreviewDocumentMode {
+	switch (input) {
+		case PreviewDocumentMode['LiveMirror']:
+			return PreviewDocumentMode.LiveMirror;
+		case PreviewDocumentMode['Static']:
+			return PreviewDocumentMode.Static;
+		case PreviewDocumentMode['Live']:
+		default:
+			return PreviewDocumentMode.Live;
+	}
 }

@@ -9,10 +9,6 @@ import * as Store from '../../store';
 import styled from 'styled-components';
 import * as Types from '../../model/types';
 
-export interface ElementListState {
-	dragging: boolean;
-}
-
 const DRAG_IMG_STYLE = `
 	position: fixed;
 	top: 100vh;
@@ -180,9 +176,6 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		draggedElement.setDragged(true);
-		store.setSelectedElement(draggedElement);
-
 		const dragImg = document.createElement('div');
 		dragImg.textContent = draggedElement.getName();
 		dragImg.setAttribute('style', DRAG_IMG_STYLE);
@@ -191,6 +184,12 @@ export class ElementList extends React.Component {
 		e.dataTransfer.effectAllowed = 'copy';
 		e.dataTransfer.setDragImage(dragImg, 75, 15);
 		this.dragImg = dragImg;
+
+		// tslint:disable-next-line:no-any
+		(window as any).requestIdleCallback(() => {
+			draggedElement.setDragged(true);
+			store.setSelectedElement(draggedElement);
+		});
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {

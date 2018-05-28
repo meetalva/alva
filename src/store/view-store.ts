@@ -84,15 +84,6 @@ export class ViewStore {
 	@Mobx.observable private redoBuffer: Model.Command[] = [];
 
 	/**
-	 * The currently selected element in the element list.
-	 * The properties pane shows the properties of this element,
-	 * and keyboard commands like cut, copy, or delete operate on this element.
-	 * May be empty if no element is selected.
-	 * @see isElementFocussed
-	 */
-	@Mobx.observable private selectedElement?: Model.Element;
-
-	/**
 	 * http port the preview server is listening on
 	 */
 	@Mobx.observable private serverPort: number;

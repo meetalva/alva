@@ -11,11 +11,15 @@ import * as uuid from 'uuid';
 export interface ElementInit {
 	containerId?: string;
 	contentIds: string[];
+	dragged: boolean;
+	highlighted: boolean;
 	id?: string;
 	name?: string;
 	open: boolean;
 	patternId: string;
+	placeholderHighlighted: boolean;
 	properties: ElementProperty[];
+	selected: boolean;
 	setDefaults?: boolean;
 }
 
@@ -25,13 +29,17 @@ export interface ElementContext {
 }
 
 export class Element {
-	private containerId?: string;
+	@Mobx.observable private containerId?: string;
 
-	@Mobx.observable private contentIds: string[] = [];
+	private readonly contentIds: string[] = [];
+
+	@Mobx.observable private dragged: boolean;
 
 	@Mobx.observable private editedName: string;
 
-	@Mobx.observable private id: string;
+	@Mobx.observable private highlighted: boolean;
+
+	private readonly id: string;
 
 	@Mobx.observable private name: string;
 
@@ -39,25 +47,32 @@ export class Element {
 
 	@Mobx.observable private open: boolean;
 
-	private page?: Page;
+	@Mobx.observable private page?: Page;
 
-	private parent: Element;
+	@Mobx.observable private parent: Element;
 
-	private patternId: string;
+	private readonly patternId: string;
 
-	private patternLibrary: PatternLibrary;
+	private readonly patternLibrary: PatternLibrary;
 
-	private project: Project;
+	@Mobx.observable private placeholderHighlighted: boolean;
 
-	private properties: ElementProperty[];
+	private readonly project: Project;
+
+	private readonly properties: ElementProperty[];
+
+	@Mobx.observable private selected: boolean;
 
 	public constructor(init: ElementInit, context: ElementContext) {
+		this.dragged = init.dragged;
+		this.highlighted = init.highlighted;
 		this.id = init.id ? init.id : uuid.v4();
 		this.patternId = init.patternId;
 		this.containerId = init.containerId;
 		this.open = init.open;
 		this.patternLibrary = context.patternLibrary;
 		this.project = context.project;
+		this.selected = init.selected;
 
 		const pattern = this.patternLibrary.getPatternById(this.patternId);
 
@@ -104,20 +119,33 @@ export class Element {
 	public static from(serialized: Types.SerializedElement, context: ElementContext): Element {
 		return new Element(
 			{
+				dragged: serialized.dragged,
+				highlighted: serialized.highlighted,
 				id: serialized.id,
 				name: serialized.name,
 				patternId: serialized.patternId,
+				placeholderHighlighted: serialized.placeholderHighlighted,
 				containerId: serialized.containerId,
 				contentIds: serialized.contentIds,
 				open: serialized.open,
 				properties: serialized.properties.map(p =>
 					ElementProperty.from(p, { patternLibrary: context.patternLibrary })
-				)
+				),
+				selected: serialized.selected
 			},
 			context
 		);
 	}
 
+	public accepts(child: Element): boolean {
+		return !child.isAncestorOfById(this.getId()) && child !== this && this.acceptsChildren();
+	}
+
+	public acceptsChildren(): boolean {
+		return typeof this.getContentBySlotType(Types.SlotType.Children) !== 'undefined';
+	}
+
+	@Mobx.action
 	public addChild(child: Element, slotId: string, index: number): void {
 		child.setParent({
 			parent: this,
@@ -126,6 +154,7 @@ export class Element {
 		});
 	}
 
+	@Mobx.action
 	public clone(): Element {
 		const clonedContents = this.contentIds
 			.map(contentId => this.project.getElementContentById(contentId))
@@ -134,13 +163,17 @@ export class Element {
 
 		const clone = new Element(
 			{
+				dragged: false,
+				highlighted: false,
 				id: uuid.v4(),
 				containerId: undefined,
 				contentIds: clonedContents.map(content => content.getId()),
 				name: this.name,
 				open: false,
 				patternId: this.patternId,
-				properties: this.properties.map(propertyValue => propertyValue.clone())
+				placeholderHighlighted: false,
+				properties: this.properties.map(propertyValue => propertyValue.clone()),
+				selected: false
 			},
 			{
 				patternLibrary: this.patternLibrary,
@@ -220,6 +253,10 @@ export class Element {
 		return this.getContents().reduce((acc, content) => [...acc, ...content.getDescendants()], []);
 	}
 
+	public getDragged(): boolean {
+		return this.dragged;
+	}
+
 	public getElementById(id: string): Element | undefined {
 		let result;
 
@@ -242,6 +279,10 @@ export class Element {
 		}
 
 		return result;
+	}
+
+	public getHighlighted(): boolean {
+		return this.highlighted;
 	}
 
 	public getId(): string {
@@ -302,8 +343,16 @@ export class Element {
 		return this.patternLibrary.getPatternById(this.patternId);
 	}
 
+	public getPlaceholderHighlighted(): boolean {
+		return this.placeholderHighlighted;
+	}
+
 	public getProperties(): ElementProperty[] {
 		return this.properties;
+	}
+
+	public getSelected(): boolean {
+		return this.selected;
 	}
 
 	public isAncestorOfById(id: string): boolean {
@@ -319,6 +368,7 @@ export class Element {
 		return !Boolean(this.getContainer());
 	}
 
+	@Mobx.action
 	public remove(): void {
 		const container = this.getContainer();
 
@@ -327,10 +377,22 @@ export class Element {
 		}
 	}
 
+	@Mobx.action
 	public setContainer(container: ElementContent): void {
 		this.containerId = container.getId();
 	}
 
+	@Mobx.action
+	public setDragged(dragged: boolean): void {
+		this.dragged = dragged;
+	}
+
+	@Mobx.action
+	public setHighlighted(highlighted: boolean): void {
+		this.highlighted = highlighted;
+	}
+
+	@Mobx.action
 	public setIndex(index: number): void {
 		const container = this.getContainer();
 
@@ -345,6 +407,7 @@ export class Element {
 		});
 	}
 
+	@Mobx.action
 	public setName(name: string): void {
 		if (this.nameEditable) {
 			this.editedName = name;
@@ -353,6 +416,7 @@ export class Element {
 		}
 	}
 
+	@Mobx.action
 	public setNameEditable(nameEditable: boolean): void {
 		if (nameEditable) {
 			this.editedName = this.name;
@@ -363,14 +427,17 @@ export class Element {
 		this.nameEditable = nameEditable;
 	}
 
+	@Mobx.action
 	public setOpen(open: boolean): void {
 		this.open = open;
 	}
 
+	@Mobx.action
 	public setPage(page: Page): void {
 		this.page = page;
 	}
 
+	@Mobx.action
 	public setParent(init: { index: number; parent: Element; slotId: string }): void {
 		const previousContainer = this.getContainer();
 
@@ -386,22 +453,59 @@ export class Element {
 		}
 	}
 
+	@Mobx.action
+	public setPlaceholderHighlighted(placeholderHighlighted: boolean): void {
+		this.placeholderHighlighted = placeholderHighlighted;
+	}
+
+	@Mobx.action
+	public setSelected(selected: boolean): void {
+		this.selected = selected;
+	}
+
+	public toDisk(): Types.SerializedElement {
+		const serialized = this.toJSON();
+		// Do not save higlighted and selected states
+		// to avoid excessive file changes e.g. for sharing
+		serialized.dragged = false;
+		serialized.highlighted = false;
+		serialized.placeholderHighlighted = false;
+		serialized.selected = false;
+		return serialized;
+	}
+
+	@Mobx.action
+	public toggleHighlighted(): void {
+		this.setHighlighted(!this.getHighlighted());
+	}
+
+	@Mobx.action
 	public toggleOpen(): void {
 		this.setOpen(!this.getOpen());
+	}
+
+	@Mobx.action
+	public toggleSelected(): void {
+		this.setSelected(!this.getSelected());
 	}
 
 	public toJSON(): Types.SerializedElement {
 		return {
 			containerId: this.containerId,
 			contentIds: Array.from(this.contentIds),
+			dragged: this.dragged,
+			highlighted: this.highlighted,
 			id: this.id,
 			name: this.name,
 			open: this.open,
 			patternId: this.patternId,
-			properties: this.properties.map(elementProperty => elementProperty.toJSON())
+			placeholderHighlighted: this.placeholderHighlighted,
+			properties: this.properties.map(elementProperty => elementProperty.toJSON()),
+			selected: this.selected
 		};
 	}
 
+	@Mobx.action
 	public unsetContainer(): void {
 		this.containerId = undefined;
 	}

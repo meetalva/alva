@@ -14,13 +14,13 @@ export const ElementAnchors = {
 };
 
 export interface ElementProps {
-	active?: boolean;
-	draggable?: boolean;
+	active: boolean;
+	draggable: boolean;
 	dragging: boolean;
-	editable?: boolean;
-	highlight?: boolean;
-	highlightPlaceholder?: boolean;
-	id?: string;
+	editable: boolean;
+	highlight: boolean;
+	highlightPlaceholder: boolean;
+	id: string;
 	onChange?: React.FormEventHandler<HTMLInputElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onContextMenu?: React.MouseEventHandler<HTMLElement>;
@@ -31,7 +31,7 @@ export interface ElementProps {
 	onDragLeave?: React.DragEventHandler<HTMLElement>;
 	onDragLeaveForChild?: React.DragEventHandler<HTMLElement>;
 	onDragStart?: React.DragEventHandler<HTMLElement>;
-	open?: boolean;
+	open: boolean;
 	title: string;
 }
 
@@ -68,6 +68,26 @@ const StyledElement = styled.div`
 
 const div = tag('div').omit(['active', 'highlight']);
 
+const LABEL_COLOR = (props: StyledElementLabelProps): string => {
+	if (props.active) {
+		return colors.blue.toString();
+	}
+
+	return 'inherit';
+};
+
+const LABEL_BACKGROUND = (props: StyledElementLabelProps): string => {
+	if (props.active) {
+		return colors.blue80.toString();
+	}
+
+	if (props.highlight) {
+		return colors.grey90.toString();
+	}
+
+	return 'transparent';
+};
+
 const StyledElementLabel = styled(div)`
 	position: relative;
 	display: flex;
@@ -77,55 +97,19 @@ const StyledElementLabel = styled(div)`
 	font-size: 15px;
 	line-height: 21px;
 	z-index: 1;
-
+	color: ${LABEL_COLOR};
+	background: ${LABEL_BACKGROUND};
 	&::before {
 		content: '';
 		display: block;
 		position: absolute;
-		height: 100%;
-		width: 240px;
-		left: 0;
+		z-index: -1;
 		top: 0;
-		margin-left: -240px;
+		right: 100%;
+		height: 100%;
+		width: 100vw;
+		background: inherit;
 	}
-
-	&:hover {
-		background ${colors.black.toString('rgb', { alpha: 0.05 })};
-
-		&::before {
-			background: ${colors.black.toString('rgb', { alpha: 0.05 })};
-		}
-	}
-
-	${(props: StyledElementLabelProps) =>
-		props.active
-			? `
-				color: ${colors.blue.toString()};
-				background: ${colors.blue80.toString()};
-
-				&::before {
-					background: ${colors.blue80.toString()};
-				}
-
-				&:hover {
-					background: ${colors.blue80.toString()};
-
-					&::before {
-						background: ${colors.blue80.toString()};
-					}
-				}
-			`
-			: ''};
-	${(props: StyledElementLabelProps) =>
-		props.highlight
-			? `
-			background: ${colors.grey90.toString()};
-
-			&::before {
-				background: ${colors.grey90.toString()};
-			}
-		`
-			: ''};
 `;
 
 const placeholderDiv = tag('div').omit(['highlightPlaceholder']);
@@ -266,9 +250,6 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 			<StyledPlaceholder
 				{...{ [ElementAnchors.placeholder]: true }}
 				highlightPlaceholder={props.highlightPlaceholder}
-				onDragOver={(e: React.DragEvent<HTMLElement>) => {
-					e.preventDefault();
-				}}
 				onDragEnter={props.onDragEnterForChild}
 				onDragLeave={props.onDragLeaveForChild}
 				onDrop={props.onDragDropForChild}
@@ -278,9 +259,6 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 			active={props.active}
 			highlight={props.highlight}
 			onContextMenu={props.onContextMenu}
-			onDragOver={(e: React.DragEvent<HTMLElement>) => {
-				e.preventDefault();
-			}}
 			onDragEnter={props.onDragEnter}
 			onDragLeave={props.onDragLeave}
 			onDrop={props.onDragDrop}

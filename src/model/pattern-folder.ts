@@ -52,7 +52,10 @@ export class PatternFolder {
 				id: serialized.id,
 				name: serialized.name,
 				patterns: serialized.patterns,
-				type: serialized.type === 'builtin' ? Types.PatternFolderType.Builtin : Types.PatternFolderType.UserProvided
+				type:
+					serialized.type === 'builtin'
+						? Types.PatternFolderType.Builtin
+						: Types.PatternFolderType.UserProvided
 			},
 			context
 		);
@@ -113,6 +116,7 @@ export class PatternFolder {
 		return this.type;
 	}
 
+	@Mobx.action
 	public remove(): void {
 		if (this.parent) {
 			this.parent.removeChild(this);
@@ -120,6 +124,7 @@ export class PatternFolder {
 		}
 	}
 
+	@Mobx.action
 	public removeChild(child: PatternFolder): void {
 		const index = this.children.indexOf(child);
 		if (index > -1) {

@@ -59,6 +59,7 @@ export class ElementContent {
 		);
 	}
 
+	@Mobx.action
 	public clone(): ElementContent {
 		const clonedElements = this.elementIds
 			.map(elementId => this.project.getElementById(elementId))

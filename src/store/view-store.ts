@@ -29,6 +29,11 @@ export interface ClipboardElement {
  * and call the respective business methods to perform operations.
  */
 export class ViewStore {
+	private static EPHEMERAL_CONTENTS: WeakMap<
+		Model.Element,
+		Model.ElementContent[]
+	> = new WeakMap();
+
 	/**
 	 * The store singleton instance.
 	 */
@@ -59,10 +64,6 @@ export class ViewStore {
 	 */
 	@Mobx.observable private clipboardItem?: ClipBoardItem;
 
-	@Mobx.observable private highlightedElement?: Model.Element;
-
-	@Mobx.observable private highlightedPlaceholderElement?: Model.Element;
-
 	/**
 	 * The currently name-editable element in the element list.
 	 */
@@ -87,15 +88,6 @@ export class ViewStore {
 	 * the right-hand sidebar/pane.
 	 */
 	@Mobx.observable private rightPane: Types.RightPane | null = null;
-
-	/**
-	 * The currently selected element in the element list.
-	 * The properties pane shows the properties of this element,
-	 * and keyboard commands like cut, copy, or delete operate on this element.
-	 * May be empty if no element is selected.
-	 * @see isElementFocussed
-	 */
-	@Mobx.observable private selectedElement?: Model.Element;
 
 	/**
 	 * http port the preview server is listening on
@@ -128,47 +120,20 @@ export class ViewStore {
 		return ViewStore.INSTANCE;
 	}
 
-	public addNewElement(init: { pattern: Model.Pattern }): Model.Element | undefined {
-		const project = this.getProject();
-		const patternLibrary = project.getPatternLibrary();
+	@Mobx.action
+	public addElement(element: Model.Element): void {
+		const contents = ViewStore.EPHEMERAL_CONTENTS.get(element) || [];
 
-		const elementContents = init.pattern.getSlots().map(
-			slot =>
-				new Model.ElementContent(
-					{
-						elementIds: [],
-						id: uuid.v4(),
-						name: slot.getName(),
-						slotId: slot.getId()
-					},
-					{ project, patternLibrary }
-				)
-		);
-
-		const element = new Model.Element(
-			{
-				contentIds: elementContents.map(e => e.getId()),
-				open: false,
-				patternId: init.pattern.getId(),
-				properties: [],
-				setDefaults: true
-			},
-			{
-				patternLibrary,
-				project
-			}
-		);
-
-		elementContents.forEach(elementContent => {
+		contents.forEach(elementContent => {
 			elementContent.setParentElement(element);
-			project.addElementContent(elementContent);
+			this.project.addElementContent(elementContent);
 		});
 
-		project.addElement(element);
-
-		return element;
+		this.project.addElement(element);
+		ViewStore.EPHEMERAL_CONTENTS.delete(element);
 	}
 
+	@Mobx.action
 	public addNewPage(): Model.Page | undefined {
 		const patternLibrary = this.project.getPatternLibrary();
 		const name = 'Untitled Page';
@@ -192,6 +157,7 @@ export class ViewStore {
 	 * Clears the undo and redo buffers (e.g. if a page is loaded or the page state get
 	 * incompatible with the buffers).
 	 */
+	@Mobx.action
 	public clearUndoRedoBuffers(): void {
 		this.undoBuffer = [];
 		this.redoBuffer = [];
@@ -211,6 +177,7 @@ export class ViewStore {
 		});
 	}
 
+	@Mobx.action
 	public copyElementById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
@@ -225,13 +192,55 @@ export class ViewStore {
 	/**
 	 * Copy the currently selected element to clip
 	 */
+	@Mobx.action
 	public copySelectedElement(): Model.Element | undefined {
-		if (!this.selectedElement) {
+		const selectedElement = this.getSelectedElement();
+
+		if (!selectedElement) {
 			return;
 		}
 
-		const element = this.selectedElement;
-		this.setClipboardItem(element);
+		this.setClipboardItem(selectedElement);
+		return selectedElement;
+	}
+
+	@Mobx.action
+	public createElement(init: { dragged?: boolean; pattern: Model.Pattern }): Model.Element {
+		const project = this.getProject();
+		const patternLibrary = project.getPatternLibrary();
+
+		const elementContents = init.pattern.getSlots().map(
+			slot =>
+				new Model.ElementContent(
+					{
+						elementIds: [],
+						id: uuid.v4(),
+						name: slot.getName(),
+						slotId: slot.getId()
+					},
+					{ project, patternLibrary }
+				)
+		);
+
+		const element = new Model.Element(
+			{
+				contentIds: elementContents.map(e => e.getId()),
+				dragged: init.dragged || false,
+				highlighted: false,
+				open: false,
+				patternId: init.pattern.getId(),
+				placeholderHighlighted: false,
+				properties: [],
+				setDefaults: true,
+				selected: false
+			},
+			{
+				patternLibrary,
+				project
+			}
+		);
+
+		ViewStore.EPHEMERAL_CONTENTS.set(element, elementContents);
 		return element;
 	}
 
@@ -239,6 +248,7 @@ export class ViewStore {
 	 * Remove the given element from its page and add it to clipboard
 	 * @param element
 	 */
+	@Mobx.action
 	public cutElement(element: Model.Element): void {
 		if (element.isRoot()) {
 			return;
@@ -248,6 +258,7 @@ export class ViewStore {
 		this.execute(new Model.ElementRemoveCommand({ element }));
 	}
 
+	@Mobx.action
 	public cutElementById(id: string): void {
 		const element = this.getElementById(id);
 		if (!element) {
@@ -257,16 +268,19 @@ export class ViewStore {
 		this.cutElement(element);
 	}
 
+	@Mobx.action
 	public cutSelectedElement(): Model.Element | undefined {
-		if (!this.selectedElement) {
+		const selectedElement = this.getSelectedElement();
+
+		if (!selectedElement) {
 			return;
 		}
 
-		const element = this.selectedElement;
-		this.cutElement(element);
-		return element;
+		this.cutElement(selectedElement);
+		return selectedElement;
 	}
 
+	@Mobx.action
 	public duplicateElement(element: Model.Element): Model.Element | undefined {
 		const clone = this.insertAfterElement({ element: element.clone(), targetElement: element });
 
@@ -278,6 +292,7 @@ export class ViewStore {
 		return clone;
 	}
 
+	@Mobx.action
 	public duplicateElementById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
@@ -288,17 +303,22 @@ export class ViewStore {
 		return this.duplicateElement(element);
 	}
 
+	@Mobx.action
 	public duplicateSelectedElement(): Model.Element | undefined {
-		if (!this.selectedElement) {
+		const selectedElement = this.getSelectedElement();
+
+		if (!selectedElement) {
 			return;
 		}
-		return this.duplicateElement(this.selectedElement);
+
+		return this.duplicateElement(selectedElement);
 	}
 
 	/**
 	 * Executes a user command (user operation) and registers it as undoable command.
 	 * @param command The command to execute and register.
 	 */
+	@Mobx.action
 	public execute(command: Model.Command): void {
 		const successful: boolean = command.execute();
 		if (!successful) {
@@ -348,6 +368,8 @@ export class ViewStore {
 
 	public getClipboardItem(type: ClipBoardType.Element): Model.Element | undefined;
 	public getClipboardItem(type: ClipBoardType.Page): Model.Page | undefined;
+
+	@Mobx.action
 	public getClipboardItem(type: ClipBoardType): Model.Page | Model.Element | undefined {
 		const item = this.clipboardItem;
 
@@ -398,6 +420,14 @@ export class ViewStore {
 		return this.project.getPages()[this.activePage];
 	}
 
+	public getDraggedElement(): Model.Element | undefined {
+		return this.project.getElements().find(e => e.getDragged());
+	}
+
+	public getDragging(): boolean {
+		return this.project.getElements().some(e => e.getDragged());
+	}
+
 	public getElementById(id: string): Model.Element | undefined {
 		const project = this.getProject();
 
@@ -409,14 +439,6 @@ export class ViewStore {
 		});
 
 		return result;
-	}
-
-	public getHighlightedElement(): Model.Element | undefined {
-		return this.highlightedElement;
-	}
-
-	public getHighlightedPlaceholderElement(): Model.Element | undefined {
-		return this.highlightedPlaceholderElement;
 	}
 
 	public getNameEditableElement(): Model.Element | undefined {
@@ -482,13 +504,17 @@ export class ViewStore {
 	 */
 	public getRightPane(): Types.RightPane {
 		if (this.rightPane === null) {
-			return this.selectedElement ? Types.RightPane.Properties : Types.RightPane.Patterns;
+			return this.getSelectedElement() ? Types.RightPane.Properties : Types.RightPane.Patterns;
 		}
 		return this.rightPane;
 	}
 
 	public getSelectedElement(): Model.Element | undefined {
-		return this.selectedElement;
+		if (!this.project) {
+			return;
+		}
+
+		return this.project.getElements().find(element => element.getSelected());
 	}
 
 	public getServerPort(): number {
@@ -499,14 +525,24 @@ export class ViewStore {
 		const view = this.getActiveView();
 
 		if (view === Types.AlvaView.PageDetail) {
-			return Boolean(this.getClipboardItem(ClipBoardType.Element));
+			return this.hasClipboardItem(ClipBoardType.Element);
 		}
 
 		if (view === Types.AlvaView.Pages) {
-			return Boolean(this.getClipboardItem(ClipBoardType.Page));
+			return this.hasClipboardItem(ClipBoardType.Element);
 		}
 
 		return false;
+	}
+
+	public hasClipboardItem(type: ClipBoardType): boolean {
+		const item = this.clipboardItem;
+
+		if (!item) {
+			return false;
+		}
+
+		return item.type === type;
 	}
 
 	/**
@@ -527,6 +563,7 @@ export class ViewStore {
 		return this.undoBuffer.length > 0;
 	}
 
+	@Mobx.action
 	public insertAfterElement(init: {
 		element: Model.Element;
 		targetElement: Model.Element;
@@ -553,6 +590,7 @@ export class ViewStore {
 		return init.element;
 	}
 
+	@Mobx.action
 	public insertInsideElement(init: {
 		element: Model.Element;
 		targetElement: Model.Element;
@@ -576,16 +614,6 @@ export class ViewStore {
 		return init.element;
 	}
 
-	public isElementHighlightedById(id: string): boolean {
-		const highlightedElement = this.getHighlightedElement();
-
-		if (highlightedElement) {
-			return highlightedElement.getId() === id;
-		}
-
-		return false;
-	}
-
 	public isElementSelectedById(id: string): boolean {
 		const selectedElement = this.getSelectedElement();
 
@@ -596,16 +624,7 @@ export class ViewStore {
 		return false;
 	}
 
-	public isPlaceholderHiglightedById(id: string): boolean {
-		const highlightedElement = this.getHighlightedPlaceholderElement();
-
-		if (highlightedElement) {
-			return highlightedElement.getId() === id;
-		}
-
-		return false;
-	}
-
+	@Mobx.action
 	public pasteAfterElement(targetElement: Model.Element): Model.Element | undefined {
 		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
 
@@ -616,6 +635,7 @@ export class ViewStore {
 		return this.insertAfterElement({ element: clipboardElement, targetElement });
 	}
 
+	@Mobx.action
 	public pasteAfterElementById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
@@ -626,6 +646,7 @@ export class ViewStore {
 		return this.pasteAfterElement(element);
 	}
 
+	@Mobx.action
 	public pasteAfterSelectedElement(): Model.Element | undefined {
 		const selectedElement = this.getSelectedElement();
 		const page = this.getCurrentPage();
@@ -646,6 +667,7 @@ export class ViewStore {
 		return;
 	}
 
+	@Mobx.action
 	public pasteInsideElement(element: Model.Element): Model.Element | undefined {
 		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
 
@@ -658,6 +680,7 @@ export class ViewStore {
 		return clipboardElement;
 	}
 
+	@Mobx.action
 	public pasteInsideElementById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
@@ -668,19 +691,18 @@ export class ViewStore {
 		return this.pasteInsideElement(element);
 	}
 
+	@Mobx.action
 	public pasteInsideSelectedElement(): Model.Element | undefined {
-		if (!this.selectedElement) {
+		const selectedElement = this.getSelectedElement();
+
+		if (!selectedElement) {
 			return;
 		}
 
-		return this.pasteInsideElement(this.selectedElement);
+		return this.pasteInsideElement(selectedElement);
 	}
 
-	/**
-	 * Redoes the last undone user operation, if available.
-	 * @return Whether the redo was successful.
-	 * @see hasRedoCommand
-	 */
+	@Mobx.action
 	public redo(): boolean {
 		const command = this.redoBuffer.pop();
 		if (!command) {
@@ -700,10 +722,7 @@ export class ViewStore {
 		return true;
 	}
 
-	/**
-	 * Removes the given element from its page
-	 * @param element The Element to remove
-	 */
+	@Mobx.action
 	public removeElement(element: Model.Element): void {
 		if (element.isRoot()) {
 			return;
@@ -737,6 +756,7 @@ export class ViewStore {
 		}
 	}
 
+	@Mobx.action
 	public removeElementById(id: string): void {
 		const element = this.getElementById(id);
 
@@ -745,6 +765,7 @@ export class ViewStore {
 		}
 	}
 
+	@Mobx.action
 	public removePage(page: Model.Page): void {
 		const project = this.getProject();
 
@@ -760,24 +781,19 @@ export class ViewStore {
 		);
 	}
 
-	/**
-	 * Remove the currently selected element from its page
-	 * Returns the deleted Element or undefined if nothing was deleted
-	 */
+	@Mobx.action
 	public removeSelectedElement(): Model.Element | undefined {
-		if (!this.selectedElement) {
+		const selectedElement = this.getSelectedElement();
+
+		if (!selectedElement) {
 			return;
 		}
 
-		const element = this.selectedElement;
-		this.removeElement(this.selectedElement);
-		return element;
+		this.removeElement(selectedElement);
+		return selectedElement;
 	}
 
-	/**
-	 * Remove the currently selected page from its project
-	 * Returns the deleted PageRef or undefined if nothing was deleted
-	 */
+	@Mobx.action
 	public removeSelectedPage(): Model.Page | undefined {
 		const page = this.getCurrentPage();
 
@@ -789,6 +805,7 @@ export class ViewStore {
 		return page;
 	}
 
+	@Mobx.action
 	public setActivePage(page: Model.Page): boolean {
 		if (!this.project) {
 			return false;
@@ -805,6 +822,7 @@ export class ViewStore {
 		return true;
 	}
 
+	@Mobx.action
 	public setActivePageById(id: string): boolean {
 		const page = this.getPageById(id);
 
@@ -815,24 +833,23 @@ export class ViewStore {
 		return this.setActivePage(page);
 	}
 
+	@Mobx.action
 	public setActivePageByIndex(index: number): void {
-		this.selectedElement = undefined;
+		this.unsetSelectedElement();
 		this.activePage = index;
 	}
 
+	@Mobx.action
 	public setActiveView(view: Types.AlvaView): void {
 		this.activeView = view;
 	}
 
+	@Mobx.action
 	public setAppState(state: Types.AppState): void {
 		this.appState = state;
 	}
 
-	/**
-	 * Sets the element currently in the clipboard, or undefined if there is none.
-	 * Note: The element is cloned lazily, so you don't need to clone it when setting.
-	 * @see getClipboardElement
-	 */
+	@Mobx.action
 	public setClipboardItem(item: Model.Element | Model.Page): void {
 		if (item instanceof Model.Element) {
 			if (item.isRoot()) {
@@ -853,14 +870,7 @@ export class ViewStore {
 		}
 	}
 
-	public setHighlightedElementById(id: string): void {
-		this.highlightedElement = this.getElementById(id);
-	}
-
-	public setHighlightedPlaceholderElementById(id: string): void {
-		this.highlightedPlaceholderElement = this.getElementById(id);
-	}
-
+	@Mobx.action
 	public setNameEditableElement(editableElement?: Model.Element): void {
 		if (this.nameEditableElement && this.nameEditableElement !== editableElement) {
 			this.nameEditableElement.setNameEditable(false);
@@ -873,14 +883,12 @@ export class ViewStore {
 		this.nameEditableElement = editableElement;
 	}
 
-	/**
-	 * Sets the current search term in the patterns list, or an empty string if there is none.
-	 * @param patternSearchTerm The current pattern search term or an empty string.
-	 */
+	@Mobx.action
 	public setPatternSearchTerm(patternSearchTerm: string): void {
 		this.patternSearchTerm = patternSearchTerm;
 	}
 
+	@Mobx.action
 	public setProject(project: Model.Project): void {
 		this.project = project;
 		const pages = this.project.getPages();
@@ -898,43 +906,33 @@ export class ViewStore {
 		}
 	}
 
-	/**
-	 * @return The content id to show in the right-hand sidebar
-	 * @see rightPane
-	 */
+	@Mobx.action
 	public setRightPane(pane: Types.RightPane | null): void {
 		this.rightPane = pane;
 	}
 
-	/**
-	 * Sets the currently selected element in the element list.
-	 * The properties pane shows the properties of this element,
-	 * and keyboard commands like cut, copy, or delete operate on this element.
-	 * May be empty if no element is selected.
-	 * @param selectedElement The selected element or undefined.
-	 * @see setElementFocussed
-	 */
+	@Mobx.action
 	public setSelectedElement(selectedElement: Model.Element): void {
-		if (this.selectedElement && this.selectedElement !== selectedElement) {
+		const previousSelectedElement = this.getSelectedElement();
+
+		if (previousSelectedElement && previousSelectedElement !== selectedElement) {
 			this.setNameEditableElement();
 		}
+
+		if (previousSelectedElement) {
+			previousSelectedElement.setSelected(false);
+		}
+
 		this.rightPane = null;
-		this.selectedElement = selectedElement;
+		selectedElement.setSelected(true);
 	}
 
-	/**
-	 * Set the port the preview server is listening to
-	 * @param port
-	 */
+	@Mobx.action
 	public setServerPort(port: number): void {
 		this.serverPort = port;
 	}
 
-	/**
-	 * Undoes the last user operation, if available.
-	 * @return Whether the undo was successful.
-	 * @see hasUndoCommand
-	 */
+	@Mobx.action
 	public undo(): boolean {
 		const command = this.undoBuffer.pop();
 		if (!command) {
@@ -954,22 +952,30 @@ export class ViewStore {
 		return true;
 	}
 
+	@Mobx.action
 	public unsetActivePage(): void {
 		this.activePage = undefined;
 	}
 
-	public unsetHighlightedElementById(): void {
-		this.highlightedElement = undefined;
+	@Mobx.action
+	public unsetDraggedElement(): void {
+		this.project.getElements().forEach(e => {
+			e.setHighlighted(false);
+			e.setPlaceholderHighlighted(false);
+			e.setDragged(false);
+		});
 	}
 
-	public unsetHighlightedPlaceholderElementById(): void {
-		this.highlightedPlaceholderElement = undefined;
-	}
-
+	@Mobx.action
 	public unsetSelectedElement(): void {
-		this.selectedElement = undefined;
+		if (!this.project) {
+			return;
+		}
+
+		this.project.getElements().forEach(element => element.setSelected(false));
 	}
 
+	@Mobx.action
 	public updatePatternLibrary(): void {
 		const project = this.project;
 

@@ -213,7 +213,7 @@ export class Project {
 	public toDisk(): Types.SavedProject {
 		return {
 			elementContents: this.elementContents.map(e => e.toJSON()),
-			elements: this.elements.map(e => e.toJSON()),
+			elements: this.elements.map(e => e.toDisk()),
 			id: this.id,
 			name: this.name,
 			lastChangedAuthor: this.lastChangedAuthor,

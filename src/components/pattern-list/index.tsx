@@ -17,10 +17,18 @@ export interface PatternListItemProps {
 }
 
 const StyledPatternList = styled.div`
+	margin-bottom: 30px;
 `;
 
 const StyledPatternLabel = styled.div`
-
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	margin-bottom: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px;
+	font-weight: 700;
+	color: ${colors.grey50.toString()};
+	user-select: none;
+	cursor: default;
 `;
 
 const StyledPatternListItem = styled.div`
@@ -30,11 +38,13 @@ const StyledPatternListItem = styled.div`
 	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.S)}px;
 	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15);
 	border-radius: 3px;
-	transition: box-shadow 0.2s;
+	transition: box-shadow 0.2s, color 0.2s;
 	align-items: center;
+	color: ${colors.grey20.toString()};
 
 	&:hover {
 		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+		color: ${colors.black.toString()};
 	}
 
 	${(props: PatternListItemProps) =>
@@ -47,7 +57,6 @@ const StyledIcon = styled(Icon)`
 
 const StyledPatternListItemLabel = styled.div`
 	font-size: 15px;
-	color: ${colors.grey20.toString()};
 `;
 
 export interface PatternFolderViewProps {

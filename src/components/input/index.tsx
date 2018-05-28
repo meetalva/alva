@@ -1,4 +1,5 @@
 import { colors } from '../colors';
+import { Icon, IconSize, IconName } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
@@ -23,6 +24,10 @@ export enum InputTypes {
 	search = 'search'
 }
 
+const StyledContainer = styled.div`
+	position: relative;
+`;
+
 const StyledInput = styled.input`
 	/* reset Styles */
 	-webkit-appearance: textfield;
@@ -30,13 +35,15 @@ const StyledInput = styled.input`
 	border: none;
 	background: transparent;
 
-	margin: 0 ${getSpace(SpaceSize.L)}px;
+	margin-bottom: ${getSpace(SpaceSize.M)}px;
 	font-size: 15px;
 
 	box-sizing: border-box;
 	display: block;
-	width: calc(100% - ${getSpace(SpaceSize.M) * 2}px);
+	width: 100%;
 	color: ${colors.black.toString()};
+	padding: ${getSpace(SpaceSize.S)}px 0 ${getSpace(SpaceSize.S)}px
+		${getSpace(SpaceSize.L) + getSpace(SpaceSize.XXS)}px;
 
 	font-weight: 500;
 	transition: color 0.2s;
@@ -44,6 +51,7 @@ const StyledInput = styled.input`
 	::placeholder {
 		color: ${colors.grey50.toString()};
 		transition: color 0.2s;
+		user-select: none;
 	}
 
 	:hover {
@@ -57,20 +65,30 @@ const StyledInput = styled.input`
 	}
 `;
 
+const StyledIcon = styled(Icon)`
+	position: absolute;
+	left: 0;
+	top: ${getSpace(SpaceSize.M) - 1}px; // fix to propertly align icon
+	pointer-events: none;
+`;
+
 export const Input: React.StatelessComponent<InputProps> = props => (
-	<StyledInput
-		autoFocus={props.focused}
-		className={props.className}
-		disabled={props.disabled}
-		type={props.type}
-		value={props.value}
-		onBlur={props.onBlur}
-		onFocus={props.onFocus}
-		onChange={props.onChange}
-		onClick={props.onClick}
-		onKeyDown={props.onKeyDown}
-		placeholder={props.placeholder}
-	/>
+	<StyledContainer>
+		<StyledIcon name={IconName.Search} size={IconSize.XS} color={colors.grey36} />
+		<StyledInput
+			autoFocus={props.focused}
+			className={props.className}
+			disabled={props.disabled}
+			type={props.type}
+			value={props.value}
+			onBlur={props.onBlur}
+			onFocus={props.onFocus}
+			onChange={props.onChange}
+			onClick={props.onClick}
+			onKeyDown={props.onKeyDown}
+			placeholder={props.placeholder}
+		/>
+	</StyledContainer>
 );
 
 export default Input;

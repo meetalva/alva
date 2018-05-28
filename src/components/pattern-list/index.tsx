@@ -17,7 +17,7 @@ export interface PatternListItemProps {
 }
 
 const StyledPatternList = styled.div`
-	margin-bottom: 30px;
+	margin-bottom: ${getSpace(SpaceSize.XXL)}px;
 `;
 
 const StyledPatternLabel = styled.div`
@@ -26,7 +26,7 @@ const StyledPatternLabel = styled.div`
 	letter-spacing: 0.1em;
 	margin-bottom: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px;
 	font-weight: 700;
-	color: ${colors.grey50.toString()};
+	color: ${colors.grey60.toString()};
 	user-select: none;
 	cursor: default;
 `;

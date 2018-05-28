@@ -1,4 +1,4 @@
-import { Input, Space, SpaceSize } from '../../components';
+import { Input, Space, SpaceSize, InputTypes } from '../../components';
 import * as MobxReact from 'mobx-react';
 import { PatternFolderContainer } from './pattern-folder-container';
 import { PatternItemContainer } from './pattern-item-container';
@@ -22,19 +22,18 @@ export class PatternListContainer extends React.Component {
 			<>
 				<Space sizeBottom={SpaceSize.XXS}>
 					<Input
-						placeholder="Search patterns"
+						placeholder="Search Library"
+						type={InputTypes.search}
 						onChange={e => store.setPatternSearchTerm(e.target.value)}
 						value={store.getPatternSearchTerm()}
 					/>
 				</Space>
-					<PatternFolderContainer
-						isRoot
-						folder={patternRoot}
-						matches={matches}
-						render={pattern => (
-							<PatternItemContainer key={pattern.getId()} pattern={pattern} />
-						)}
-					/>
+				<PatternFolderContainer
+					isRoot
+					folder={patternRoot}
+					matches={matches}
+					render={pattern => <PatternItemContainer key={pattern.getId()} pattern={pattern} />}
+				/>
 			</>
 		);
 	}

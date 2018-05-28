@@ -11,7 +11,8 @@ export enum IconName {
 	Uncheck,
 	Robo,
 	Plus,
-	Pattern
+	Pattern,
+	Search
 }
 export interface IconRegistryProps {
 	names: typeof IconName;
@@ -93,6 +94,14 @@ const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
 			<path
 				key="check"
 				d="M8.66 15.2l10.6-10.61A2 2 0 1 1 22.1 7.4L10.07 19.44a2 2 0 0 1-2.83 0L1.6 13.78a2 2 0 1 1 2.82-2.83l4.25 4.24z"
+			/>
+		]
+	],
+	[IconName.Search]: [
+		[
+			<path
+				key="check"
+				d="M14.89 13.477l6.024 6.023-1.414 1.414-6.023-6.023a6 6 0 1 1 1.414-1.414zm-1.649-1.132a4 4 0 1 0-.896.896l.896-.896z"
 			/>
 		]
 	]

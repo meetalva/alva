@@ -16,6 +16,26 @@ export const Placeholder = (context: BuiltInContext): BuiltInResult => {
 			label: 'Source',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'src'
+		}),
+		new PatternProperty.PatternStringProperty({
+			label: 'Min Width',
+			propertyName: 'minWidth',
+			defaultValue: 'none'
+		}),
+		new PatternProperty.PatternStringProperty({
+			label: 'Min Height',
+			propertyName: 'minHeight',
+			defaultValue: 'none'
+		}),
+		new PatternProperty.PatternStringProperty({
+			label: 'Max Width',
+			propertyName: 'maxWidth',
+			defaultValue: 'none'
+		}),
+		new PatternProperty.PatternStringProperty({
+			label: 'Max Height',
+			propertyName: 'maxHeight',
+			defaultValue: 'none'
 		})
 	];
 

@@ -28,11 +28,11 @@ export interface SerializedElement {
 	containerId?: string;
 	contentIds: string[];
 	dragged: boolean;
+	forcedOpen: boolean;
 	highlighted: boolean;
 	id: string;
 	name: string;
 	open: boolean;
-	forcedOpen: boolean;
 	patternId: string;
 	placeholderHighlighted: boolean;
 	properties: SerializedElementProperty[];

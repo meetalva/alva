@@ -12,11 +12,11 @@ export interface ElementInit {
 	containerId?: string;
 	contentIds: string[];
 	dragged: boolean;
+	forcedOpen: boolean;
 	highlighted: boolean;
 	id?: string;
 	name?: string;
 	open: boolean;
-	forcedOpen: boolean;
 	patternId: string;
 	placeholderHighlighted: boolean;
 	properties: ElementProperty[];
@@ -517,7 +517,6 @@ export class Element {
 	public toggleSelected(): void {
 		this.setSelected(!this.getSelected());
 	}
-	
 
 	public toJSON(): Types.SerializedElement {
 		return {

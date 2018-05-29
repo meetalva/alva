@@ -95,6 +95,7 @@ export class Page {
 				contentIds: rootContents.map(c => c.getId()),
 				dragged: false,
 				open: true,
+				forcedOpen: false,
 				patternId: rootPattern.getId(),
 				placeholderHighlighted: false,
 				properties: [],

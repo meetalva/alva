@@ -923,17 +923,17 @@ export class ViewStore {
 		if (previousSelectedElement) {
 			previousSelectedElement.setSelected(false);
 
-			previousSelectedElement.getAncestors().forEach((ancestor) => {
+			previousSelectedElement.getAncestors().forEach(ancestor => {
 				ancestor.setForcedOpen(false);
-			})
+			});
 		}
 
 		this.rightPane = null;
 		selectedElement.setSelected(true);
 
-		selectedElement.getAncestors().forEach((ancestor) => {
+		selectedElement.getAncestors().forEach(ancestor => {
 			ancestor.setForcedOpen(true);
-		})
+		});
 	}
 
 	@Mobx.action
@@ -983,9 +983,9 @@ export class ViewStore {
 
 		this.project.getElements().forEach(element => {
 			element.setSelected(false);
-			element.getAncestors().forEach((ancestor) => {
+			element.getAncestors().forEach(ancestor => {
 				ancestor.setForcedOpen(false);
-			})
+			});
 		});
 	}
 

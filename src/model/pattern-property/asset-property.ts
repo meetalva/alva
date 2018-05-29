@@ -1,24 +1,17 @@
-import { PatternPropertyBase, PatternPropertyType } from './property-base';
+import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../types';
 
-/**
- * An asset property is a property that takes an uploaded file (e.g. an image)
- * as a data-URL string to output it as src of an img tag or alike.
- * As designer content value (raw value), the asset property accepts data-URL strings and
- * undefined (as empty src) only. All other values are invalid and converted into undefined.
- * To convert a given file, Buffer, or HTTP URL into a data-URL string,
- * use getValueFromFile, getValueFromBuffer, or getValueFromUrl.
- * @see Property
- */
 export class PatternAssetProperty extends PatternPropertyBase<string | undefined> {
-	public readonly type = PatternPropertyType.Asset;
+	public readonly type = Types.PatternPropertyType.Asset;
 
 	public static from(serialized: Types.SerializedPatternAssetProperty): PatternAssetProperty {
 		return new PatternAssetProperty({
+			contextId: serialized.contextId,
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,
 			label: serialized.label,
+			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
@@ -35,13 +28,24 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 
 	public toJSON(): Types.SerializedPatternAssetProperty {
 		return {
+			contextId: this.contextId,
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,
 			label: this.label,
+			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type
 		};
+	}
+
+	public update(prop: PatternAssetProperty): void {
+		this.contextId = prop.getContextId();
+		this.label = prop.getLabel();
+		this.propertyName = prop.getPropertyName();
+		this.hidden = prop.getHidden();
+		this.required = prop.getRequired();
+		this.defaultValue = prop.getDefaultValue();
 	}
 }

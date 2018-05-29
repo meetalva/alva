@@ -4,7 +4,7 @@ import { createMenu } from './create-menu';
 import { webFrame } from 'electron';
 import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
-import { Project } from '../model';
+import { PatternLibrary, Project } from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
@@ -84,8 +84,9 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.ConnectPatternLibraryResponse: {
-			const library = project.getPatternLibrary();
-			library.import(message.payload);
+			const previousLibrary = store.getProject().getPatternLibrary();
+			const library = PatternLibrary.import(message.payload, previousLibrary);
+			project.setPatternLibrary(library);
 
 			Sender.send({
 				id: uuid.v4(),

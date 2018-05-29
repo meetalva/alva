@@ -24,7 +24,7 @@ export class ElementContent {
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
 	@Mobx.observable private parentElementId?: string;
-	private patternLibrary: PatternLibrary;
+	@Mobx.observable private patternLibrary: PatternLibrary;
 	private project: Project;
 
 	@Mobx.observable private slotId: string;
@@ -162,6 +162,11 @@ export class ElementContent {
 	@Mobx.action
 	public setParentElement(element: Element): void {
 		this.parentElementId = element.getId();
+	}
+
+	@Mobx.action
+	public setPatternLibrary(patternLibrary: PatternLibrary): void {
+		this.patternLibrary = patternLibrary;
 	}
 
 	public toJSON(): Types.SerializedElementContent {

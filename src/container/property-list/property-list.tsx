@@ -55,13 +55,15 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 		const { props } = this;
 		const { property } = props;
 
-		if (property.getHidden()) {
+		const patternProperty = property.getPatternProperty();
+
+		if (!patternProperty || patternProperty.getHidden()) {
 			return null;
 		}
 
 		const id = property.getId();
-		const label = property.getLabel();
-		const type = property.getType();
+		const label = patternProperty.getLabel();
+		const type = patternProperty.getType();
 
 		if (!label || !type) {
 			return null;
@@ -125,15 +127,15 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 			}
 			case Types.PatternPropertyType.Enum: {
 				const value = property.getValue() as string;
-				const patternProperty = property.getPatternProperty() as PatternEnumProperty;
-				const selectedOption = patternProperty.getOptionByValue(value);
+				const enumProp = patternProperty as PatternEnumProperty;
+				const selectedOption = enumProp.getOptionByValue(value);
 				const selectedValue = selectedOption ? selectedOption.getId() : undefined;
 
 				return (
 					<Component.EnumItem
 						{...base}
 						selectedValue={selectedValue}
-						values={patternProperty.getOptions().map(option => ({
+						values={enumProp.getOptions().map(option => ({
 							id: option.getId(),
 							name: option.getName()
 						}))}

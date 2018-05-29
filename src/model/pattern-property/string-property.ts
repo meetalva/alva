@@ -1,4 +1,4 @@
-import { PatternPropertyBase, PatternPropertyType } from './property-base';
+import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../types';
 
 /**
@@ -9,14 +9,16 @@ import * as Types from '../types';
  * @see Property
  */
 export class PatternStringProperty extends PatternPropertyBase<string | undefined> {
-	public readonly type = PatternPropertyType.String;
+	public readonly type = Types.PatternPropertyType.String;
 
 	public static from(serialized: Types.SerializedStringProperty): PatternStringProperty {
 		return new PatternStringProperty({
+			contextId: serialized.contextId,
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,
 			label: serialized.label,
+			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
@@ -33,13 +35,24 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 
 	public toJSON(): Types.SerializedStringProperty {
 		return {
+			contextId: this.contextId,
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,
 			label: this.label,
+			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type
 		};
+	}
+
+	public update(prop: PatternStringProperty): void {
+		this.contextId = prop.getContextId();
+		this.label = prop.getLabel();
+		this.propertyName = prop.getPropertyName();
+		this.hidden = prop.getHidden();
+		this.required = prop.getRequired();
+		this.defaultValue = prop.getDefaultValue();
 	}
 }

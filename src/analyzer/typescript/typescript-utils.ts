@@ -180,6 +180,13 @@ export function isExport(node: Ts.Node): boolean {
 	return false;
 }
 
+export function getJsDocValueFromNode(node: Ts.Node, tagName: string): string | undefined {
+	const jsdocTag = (Ts.getJSDocTags(node) || []).find(
+		tag => tag.tagName && tag.tagName.text === tagName
+	);
+	return jsdocTag ? (jsdocTag.comment || '').trim() : undefined;
+}
+
 export function getJsDocValueFromSymbol(symbol: Ts.Symbol, tagName: string): string | undefined {
 	const jsdocTag = symbol.getJsDocTags().find(tag => tag.name === tagName);
 	return jsdocTag ? (jsdocTag.text || '').trim() : undefined;

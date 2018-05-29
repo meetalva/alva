@@ -70,22 +70,41 @@ export interface SerializedPatternFolder {
 	type: 'builtin' | 'user-provided';
 }
 
-export enum SerializedPatternType {
+export enum PatternType {
 	Pattern = 'pattern',
-	Synthetic = 'synthetic'
+	SyntheticBox = 'synthetic:box',
+	SyntheticPage = 'synthetic:page',
+	SyntheticPlaceholder = 'synthetic:placeholder',
+	SyntheticText = 'synthetic:text'
 }
+
+export type SerializedPatternType =
+	| 'pattern'
+	| 'synthetic:box'
+	| 'synthetic:page'
+	| 'synthetic:placeholder'
+	| 'synthetic:text';
+
+export enum PatternOrigin {
+	BuiltIn = 'built-in',
+	UserProvided = 'user-provided'
+}
+
+export type SerializedPatternOrigin = 'built-in' | 'user-provided';
 
 export interface SerializedPattern {
 	contextId: string;
 	exportName: string;
 	id: string;
 	name: string;
+	origin: SerializedPatternOrigin;
 	propertyIds: string[];
 	slots: SerializedPatternSlot[];
-	type: SerializedPatternType | string;
+	type: SerializedPatternType;
 }
 
 export interface SerializedPatternSlot {
+	contextId: string;
 	displayName: string;
 	id: string;
 	propertyName: string;
@@ -101,6 +120,22 @@ export enum PatternPropertyType {
 	StringArray = 'string[]',
 	String = 'string'
 }
+
+export type SerializedPatternPropertyType =
+	| 'asset'
+	| 'boolean'
+	| 'enum'
+	| 'number[]'
+	| 'number'
+	| 'string[]'
+	| 'string';
+
+export enum PatternPropertyOrigin {
+	BuiltIn = 'built-in',
+	UserProvided = 'user-provided'
+}
+
+export type SerializedPatternPropertyOrigin = 'built-in' | 'user-provided';
 
 export type ElementPropertyValue =
 	| undefined
@@ -121,9 +156,11 @@ export type SerializedPatternProperty =
 	| SerializedStringProperty;
 
 export interface SerializedPropertyBase {
+	contextId: string;
 	hidden: boolean;
 	id: string;
 	label: string;
+	origin: SerializedPatternPropertyOrigin;
 	propertyName: string;
 	required: boolean;
 }
@@ -145,6 +182,7 @@ export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
 }
 
 export interface SerializedEnumOption {
+	contextId: string;
 	id: string;
 	name: string;
 	ordinal: number;

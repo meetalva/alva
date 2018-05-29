@@ -1,6 +1,7 @@
 import * as chokidar from 'chokidar';
 import { createCompiler } from '../../compiler';
 import * as Fs from 'fs';
+import { debounce } from 'lodash';
 import * as Path from 'path';
 import * as PropertyAnalyzer from './property-analyzer';
 import * as ReactUtils from '../typescript/react-utils';
@@ -11,6 +12,7 @@ import * as TypeScript from '../typescript';
 import * as ts from 'typescript';
 import * as TypescriptUtils from '../typescript/typescript-utils';
 import * as Util from 'util';
+import { Compiler } from 'webpack';
 
 const loadPatternplateConfig = require('@patternplate/load-config');
 const loadPatternplateMeta = require('@patternplate/load-meta');
@@ -25,7 +27,11 @@ export interface PatternCandidate {
 }
 
 export interface AnalyzeOptions {
-	getGlobalId(contextId: string): string;
+	withBundle?: boolean;
+	getGlobalPatternId(contextId: string): string;
+	getGlobalPropertyId(patternContextId: string, propertyContextId: string): string;
+	getGlobalSlotId(patternContextId: string, slotContextId: string): string;
+	getGobalEnumOptionId(enumId: string, optionContextId: string): string;
 }
 
 interface AnalyzeContext {
@@ -48,26 +54,18 @@ export async function analyze(
 	options: AnalyzeOptions
 ): Promise<Types.LibraryAnalysis> {
 	const pkg = await readPkg(path);
+	const patterns = await analyzePatterns({ cwd: path, options });
 
-	const patternCandidates = await findPatternCandidates(path);
-	const sourcePaths = patternCandidates.map(p => p.sourcePath);
-	const analyzePattern = getPatternAnalyzer(ts.createProgram(sourcePaths, {}), options);
+	const getBundle = async () => {
+		const compiler = await createPatternCompiler(patterns, { cwd: path });
+		await Util.promisify(compiler.run).bind(compiler)();
+		return (compiler.outputFileSystem as typeof Fs).readFileSync('/components.js').toString();
+	};
 
-	const patterns = patternCandidates.reduce(
-		(acc, candidate) => [...acc, ...analyzePattern(candidate, analyzePatternExport)],
-		[]
-	);
-
-	const compilerPatterns = patterns.map(({ path: patternPath, pattern }) => ({
-		id: pattern.id,
-		path: patternPath
-	}));
-
-	const compiler = createCompiler(compilerPatterns, { cwd: path, infrastructure: false });
-	await Util.promisify(compiler.run).bind(compiler)();
+	const bundle = options.withBundle ? await getBundle() : '';
 
 	return {
-		bundle: (compiler.outputFileSystem as typeof Fs).readFileSync('/components.js').toString(),
+		bundle,
 		name: pkg.name || 'Unnamed Library',
 		patterns,
 		path,
@@ -80,26 +78,55 @@ export async function watch(
 	options: AnalyzeOptions,
 	onChange: (analyis: Types.LibraryAnalysis) => void
 ): Promise<Types.Watcher> {
-	let active = true;
+	let active = false;
+	let running = deferrable();
+
+	const patterns = await analyzePatterns({ cwd: path, options });
+	const compiler = await createPatternCompiler(patterns, { cwd: path });
+
 	let parents = await getParents(path);
 
 	const watcher = chokidar.watch(parents, {
 		ignoreInitial: true
 	});
 
-	watcher.on('all', async () => {
-		const analysis = await analyze(path, options);
+	const analysis = await analyze(path, options);
+
+	watcher.on(
+		'all',
+		debounce(async () => {
+			await running;
+			const updatedParents = await getParents(path);
+
+			const addedParents = updatedParents.filter(u => !parents.includes(u));
+			const removedParents = parents.filter(p => !updatedParents.includes(p));
+
+			watcher.add(addedParents);
+			watcher.unwatch(removedParents);
+
+			parents = updatedParents;
+
+			const update = await analyze(path, { ...options, withBundle: false });
+
+			analysis.name = update.name;
+			analysis.path = update.path;
+			analysis.patterns = update.patterns;
+			analysis.version = update.version;
+
+			onChange(analysis);
+		}, 300)
+	);
+
+	compiler.hooks.watchRun.tap('typescript-react-analyzer', () => {
+		running = deferrable();
+	});
+
+	compiler.watch({}, async () => {
+		running.resolve();
+		analysis.bundle = (compiler.outputFileSystem as typeof Fs)
+			.readFileSync('/components.js')
+			.toString();
 		onChange(analysis);
-
-		const updatedParents = await getParents(path);
-
-		const addedParents = updatedParents.filter(u => !parents.includes(u));
-		const removedParents = parents.filter(p => !updatedParents.includes(p));
-
-		watcher.add(addedParents);
-		watcher.unwatch(removedParents);
-
-		parents = updatedParents;
 	});
 
 	return {
@@ -114,6 +141,41 @@ export async function watch(
 			active = false;
 		}
 	};
+}
+
+// tslint:disable-next-line:no-any
+function deferrable(): any {
+	let resolve;
+	const promise = new Promise(r => (resolve = r));
+	// tslint:disable-next-line:no-any
+	(promise as any).resolve = resolve;
+	return promise;
+}
+
+async function analyzePatterns(context: {
+	cwd: string;
+	options: AnalyzeOptions;
+}): Promise<Types.PatternAnalysis[]> {
+	const patternCandidates = await findPatternCandidates(context.cwd);
+	const sourcePaths = patternCandidates.map(p => p.sourcePath);
+	const program = ts.createProgram(sourcePaths, {});
+	const analyzePattern = getPatternAnalyzer(program, context.options);
+	return patternCandidates.reduce(
+		(acc, candidate) => [...acc, ...analyzePattern(candidate, analyzePatternExport)],
+		[]
+	);
+}
+
+async function createPatternCompiler(
+	patterns: Types.PatternAnalysis[],
+	context: { cwd: string }
+): Promise<Compiler> {
+	const compilerPatterns = patterns.map(({ path: patternPath, pattern }) => ({
+		id: pattern.id,
+		path: patternPath
+	}));
+
+	return createCompiler(compilerPatterns, { cwd: context.cwd, infrastructure: false });
 }
 
 async function getParents(path: string): Promise<string[]> {
@@ -166,18 +228,34 @@ function analyzePatternExport(
 	}
 
 	const [propTypes] = reactTypeArguments;
-	const properties = PropertyAnalyzer.analyze(propTypes.type, ctx.program);
-	const slots = SlotAnalyzer.analyzeSlots(propTypes.type, ctx.program);
 	const exportName = ex.name || 'default';
 	const contextId = `${ctx.candidate.id}:${exportName}`;
+	const id = ctx.options.getGlobalPatternId(contextId);
+
+	const properties = PropertyAnalyzer.analyze(propTypes.type, {
+		program: ctx.program,
+		getPropertyId(propertyContextId: string): string {
+			return ctx.options.getGlobalPropertyId(id, propertyContextId);
+		},
+		getEnumOptionId: (enumId, optionContextId) =>
+			ctx.options.getGobalEnumOptionId(enumId, optionContextId)
+	});
+
+	const slots = SlotAnalyzer.analyzeSlots(propTypes.type, {
+		program: ctx.program,
+		getSlotId(slotContextId: string): string {
+			return ctx.options.getGlobalSlotId(id, slotContextId);
+		}
+	});
 
 	return {
 		path: ctx.candidate.artifactPath,
 		pattern: {
 			contextId,
 			exportName,
-			id: ctx.options.getGlobalId(contextId),
+			id,
 			name: exportName !== 'default' ? exportName : ctx.candidate.displayName,
+			origin: 'user-provided',
 			propertyIds: properties.map(p => p.id),
 			slots,
 			type: 'pattern'

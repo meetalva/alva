@@ -10,7 +10,7 @@ import * as stringEscape from 'js-string-escape';
 import { isEqual, uniqWith } from 'lodash';
 import { PreviewMessageType, ServerMessage, ServerMessageType } from '../message';
 import * as MimeTypes from 'mime-types';
-import { Project } from '../model';
+import { PatternLibrary, Project } from '../model';
 import * as Path from 'path';
 import { Persistence, PersistenceState } from '../persistence';
 import * as Sender from '../message/server';
@@ -293,7 +293,12 @@ async function createWindow(): Promise<void> {
 				const library = project.getPatternLibrary();
 
 				const analysis = await Analyzer.analyze(path, {
-					getGlobalId: contextId => library.assignId(contextId)
+					getGobalEnumOptionId: (patternId, contextId) =>
+						library.assignEnumOptionId(patternId, contextId),
+					getGlobalPatternId: contextId => library.assignPatternId(contextId),
+					getGlobalPropertyId: (patternId, contextId) =>
+						library.assignPropertyId(patternId, contextId),
+					getGlobalSlotId: (patternId, contextId) => library.assignSlotId(patternId, contextId)
 				});
 
 				send({
@@ -323,7 +328,12 @@ async function createWindow(): Promise<void> {
 				}
 
 				const analysis = await Analyzer.analyze(connection.path, {
-					getGlobalId: contextId => library.assignId(contextId)
+					getGobalEnumOptionId: (patternId, contextId) =>
+						library.assignEnumOptionId(patternId, contextId),
+					getGlobalPatternId: contextId => library.assignPatternId(contextId),
+					getGlobalPropertyId: (patternId, contextId) =>
+						library.assignPropertyId(patternId, contextId),
+					getGlobalSlotId: (patternId, contextId) => library.assignSlotId(patternId, contextId)
 				});
 
 				send({
@@ -348,7 +358,7 @@ async function createWindow(): Promise<void> {
 				break;
 			}
 			case ServerMessageType.CheckLibraryRequest: {
-				const library = Project.from(message.payload).getPatternLibrary();
+				let library = Project.from(message.payload).getPatternLibrary();
 
 				const id = library.getId();
 				const connections = userStore.get('connections') || [];
@@ -363,10 +373,16 @@ async function createWindow(): Promise<void> {
 							const newWatcher = await Analyzer.watch(
 								connection.path,
 								{
-									getGlobalId: contextId => library.assignId(contextId)
+									getGobalEnumOptionId: (patternId, contextId) =>
+										library.assignEnumOptionId(patternId, contextId),
+									getGlobalPatternId: contextId => library.assignPatternId(contextId),
+									getGlobalPropertyId: (patternId, contextId) =>
+										library.assignPropertyId(patternId, contextId),
+									getGlobalSlotId: (patternId, contextId) =>
+										library.assignSlotId(patternId, contextId)
 								},
 								analysis => {
-									library.import(analysis);
+									library = PatternLibrary.import(analysis, library);
 
 									send({
 										type: ServerMessageType.ConnectPatternLibraryResponse,

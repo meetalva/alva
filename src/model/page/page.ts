@@ -1,6 +1,5 @@
 import { Element, ElementContent } from '../element';
 import * as Mobx from 'mobx';
-import { SyntheticPatternType } from '../pattern';
 import { PatternLibrary } from '../pattern-library';
 import { Project } from '../project';
 import * as Types from '../types';
@@ -69,9 +68,7 @@ export class Page {
 
 	@Mobx.action
 	public static create(init: PageCreateInit, context: PageContext): Page {
-		const rootPattern = context.patternLibrary.getPatternByType(
-			SyntheticPatternType.SyntheticPage
-		);
+		const rootPattern = context.patternLibrary.getPatternByType(Types.PatternType.SyntheticPage);
 
 		const rootContents = rootPattern.getSlots().map(
 			slot =>

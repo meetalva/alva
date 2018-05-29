@@ -1,46 +1,34 @@
-// TODO: Disband this file in favor of a pure interface
-// that can be implemented by properties. Also consider
-// splitting array vs enum vs object vs primitive properties
+import * as Mobx from 'mobx';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
-export { PatternPropertyType } from '../types';
-
 export interface PatternPropertyInit<T> {
+	contextId: string;
 	defaultValue?: T;
 	hidden?: boolean;
 	id?: string;
 	label: string;
+	origin: Types.PatternPropertyOrigin;
 	propertyName: string;
 	required?: boolean;
 }
 
-/**
- * A property is the meta-information about one styleguide pattern component property
- * (props interface), such as its name and type. Read by the pattern parsers and provided to build
- * the property editing pane.
- * Page elements contain the actual values for each property.
- * @see PageElement
- * @see PatternParser
- */
 export abstract class PatternPropertyBase<T> {
-	protected readonly defaultValue: T;
-
-	protected readonly hidden: boolean = false;
-
-	protected readonly id: string;
-
-	protected readonly label: string;
-
-	protected readonly propertyName: string;
-
-	protected readonly required: boolean = false;
-
-	public readonly type: Types.PatternPropertyType;
+	@Mobx.observable protected contextId: string;
+	@Mobx.observable protected defaultValue: T;
+	@Mobx.observable protected hidden: boolean = false;
+	@Mobx.observable protected id: string;
+	@Mobx.observable protected label: string;
+	@Mobx.observable protected origin: Types.PatternPropertyOrigin;
+	@Mobx.observable protected propertyName: string;
+	@Mobx.observable protected required: boolean = false;
+	@Mobx.observable public type: Types.PatternPropertyType;
 
 	public constructor(init: PatternPropertyInit<T>) {
+		this.contextId = init.contextId;
 		this.id = init.id || uuid.v4();
 		this.label = init.label;
+		this.origin = init.origin;
 		this.propertyName = init.propertyName;
 
 		if (typeof init.hidden !== 'undefined') {
@@ -56,6 +44,10 @@ export abstract class PatternPropertyBase<T> {
 
 	// tslint:disable-next-line:no-any
 	public abstract coerceValue(value: any): T;
+
+	public getContextId(): string {
+		return this.contextId;
+	}
 
 	public getDefaultValue(): T | undefined {
 		return this.defaultValue;
@@ -73,6 +65,10 @@ export abstract class PatternPropertyBase<T> {
 		return this.label;
 	}
 
+	public getPropertyName(): string {
+		return this.propertyName;
+	}
+
 	public getRequired(): boolean {
 		return this.required;
 	}
@@ -82,4 +78,30 @@ export abstract class PatternPropertyBase<T> {
 	}
 
 	public abstract toJSON(): Types.SerializedPatternProperty;
+
+	public abstract update(patternProperty: PatternPropertyBase<T>): void;
+}
+
+export function deserializeOrigin(
+	input: Types.SerializedPatternOrigin
+): Types.PatternPropertyOrigin {
+	switch (input) {
+		case 'built-in':
+			return Types.PatternPropertyOrigin.BuiltIn;
+		case 'user-provided':
+			return Types.PatternPropertyOrigin.UserProvided;
+	}
+	throw new Error(`Unknown pattern property origin: ${input}`);
+}
+
+export function serializeOrigin(
+	input: Types.PatternPropertyOrigin
+): Types.SerializedPatternPropertyOrigin {
+	switch (input) {
+		case Types.PatternPropertyOrigin.BuiltIn:
+			return 'built-in';
+		case Types.PatternPropertyOrigin.UserProvided:
+			return 'user-provided';
+	}
+	throw new Error(`Unknown pattern property origin: ${input}`);
 }

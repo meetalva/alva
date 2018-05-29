@@ -2,10 +2,17 @@ import * as ReactUtils from '../typescript/react-utils';
 import * as Types from '../../model/types';
 import * as Ts from 'typescript';
 import * as TypescriptUtils from '../typescript/typescript-utils';
-import * as uuid from 'uuid';
 
-export function analyzeSlots(type: Ts.Type, program: Ts.Program): Types.SerializedPatternSlot[] {
-	const typechecker = program.getTypeChecker();
+export interface SlotAnalyzeContext {
+	program: Ts.Program;
+	getSlotId(contextId: string): string;
+}
+
+export function analyzeSlots(
+	type: Ts.Type,
+	ctx: SlotAnalyzeContext
+): Types.SerializedPatternSlot[] {
+	const typechecker = ctx.program.getTypeChecker();
 
 	return type
 		.getApparentProperties()
@@ -16,13 +23,14 @@ export function analyzeSlots(type: Ts.Type, program: Ts.Program): Types.Serializ
 				? memberSymbol.type
 				: declaration && typechecker.getTypeAtLocation(declaration);
 
-			if (!memberType || !ReactUtils.isSlotType(program, memberType)) {
+			if (!memberType || !ReactUtils.isSlotType(ctx.program, memberType)) {
 				return;
 			}
 
 			return {
+				contextId: memberSymbol.getName(),
 				displayName: memberSymbol.getName(),
-				id: uuid.v4(),
+				id: ctx.getSlotId(memberSymbol.getName()),
 				propertyName: memberSymbol.getName(),
 				type: memberSymbol.getName() === 'children' ? 'children' : 'property'
 			};

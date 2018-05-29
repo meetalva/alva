@@ -3,7 +3,6 @@ import * as Mobx from 'mobx';
 import { Page } from './page';
 import { PatternLibrary } from './pattern-library';
 import * as Types from './types';
-import * as username from 'username';
 import * as uuid from 'uuid';
 
 export interface ProjectProperties {
@@ -36,7 +35,7 @@ export class Project {
 
 	@Mobx.observable private pages: Page[] = [];
 
-	private path;
+	@Mobx.observable private path;
 
 	@Mobx.observable private patternLibrary: PatternLibrary;
 
@@ -58,7 +57,12 @@ export class Project {
 	}
 
 	public static create(init: ProjectCreateInit): Project {
-		const patternLibrary = PatternLibrary.create();
+		const patternLibrary = PatternLibrary.create({
+			getGloablEnumOptionId: () => uuid.v4(),
+			getGlobalPatternId: () => uuid.v4(),
+			getGlobalPropertyId: () => uuid.v4(),
+			getGlobalSlotId: () => uuid.v4()
+		});
 
 		const project = new Project({
 			name: init.name,
@@ -202,12 +206,21 @@ export class Project {
 		return true;
 	}
 
+	@Mobx.action
 	public setName(name: string): void {
 		this.name = name;
 	}
 
+	@Mobx.action
 	public setPath(path: string): void {
 		this.path = path;
+	}
+
+	@Mobx.action
+	public setPatternLibrary(patternLibrary: PatternLibrary): void {
+		this.patternLibrary = patternLibrary;
+		this.elements.forEach(e => e.setPatternLibrary(this.patternLibrary));
+		this.elementContents.forEach(e => e.setPatternLibrary(this.patternLibrary));
 	}
 
 	public toDisk(): Types.SavedProject {
@@ -223,10 +236,6 @@ export class Project {
 		};
 	}
 
-	/**
-	 * Extract serializable object from project.
-	 * @return The JSON object
-	 */
 	public toJSON(): Types.SerializedProject {
 		return {
 			elements: this.elements.map(e => e.toJSON()),
@@ -241,21 +250,7 @@ export class Project {
 		};
 	}
 
-	/**
-	 * Serialize the project into a string for persistence and transfer
-	 * @return The JSON string
-	 */
 	public toString(): string {
 		return JSON.stringify(this.toJSON());
-	}
-
-	/**
-	 * Updates the last-changed date and author. Call this on any page or project user command.
-	 */
-	public touch(): void {
-		void (async () => {
-			this.lastChangedAuthor = await username();
-			this.lastChangedDate = new Date();
-		})();
 	}
 }

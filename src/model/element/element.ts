@@ -56,13 +56,13 @@ export class Element {
 
 	private readonly patternId: string;
 
-	private readonly patternLibrary: PatternLibrary;
+	@Mobx.observable private patternLibrary: PatternLibrary;
 
 	@Mobx.observable private placeholderHighlighted: boolean;
 
 	private readonly project: Project;
 
-	private readonly properties: ElementProperty[];
+	@Mobx.observable private properties: ElementProperty[];
 
 	@Mobx.observable private selected: boolean;
 
@@ -479,6 +479,12 @@ export class Element {
 			container.insert({ element: this, at: init.index });
 			this.setContainer(container);
 		}
+	}
+
+	@Mobx.action
+	public setPatternLibrary(patternLibrary: PatternLibrary): void {
+		this.patternLibrary = patternLibrary;
+		this.properties.forEach(property => property.setPatternLibrary(this.patternLibrary));
 	}
 
 	@Mobx.action

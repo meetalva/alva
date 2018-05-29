@@ -7,7 +7,7 @@ const StyledPatternsPane = styled.div`
 	box-sizing: border-box;
 	flex: 1;
 	padding: 0 ${getSpace(SpaceSize.M)}px;
-	overflow-y: scroll;
+	overflow-y: auto;
 	height: 100%;
 	border-top: 1px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
 

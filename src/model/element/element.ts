@@ -519,6 +519,7 @@ export class Element {
 	@Mobx.action
 	public setSelected(selected: boolean): void {
 		this.selected = selected;
+		this.highlighted = !selected;
 	}
 
 	public toDisk(): Types.SerializedElement {

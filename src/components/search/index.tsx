@@ -1,10 +1,10 @@
 import { colors } from '../colors';
-import { Icon, IconSize, IconName } from '../icons';
+import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
-export interface InputProps {
+export interface SearchProps {
 	className?: string;
 	disabled?: boolean;
 	focused?: boolean;
@@ -14,21 +14,14 @@ export interface InputProps {
 	onFocus?: React.FocusEventHandler<HTMLInputElement>;
 	onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 	placeholder?: string;
-	type?: InputTypes;
 	value?: string | number;
-}
-
-export enum InputTypes {
-	string = 'text',
-	number = 'number',
-	search = 'search'
 }
 
 const StyledContainer = styled.div`
 	position: relative;
 `;
 
-const StyledInput = styled.input`
+const StyledSearch = styled.input`
 	/* reset Styles */
 	-webkit-appearance: textfield;
 	outline: none;
@@ -72,14 +65,14 @@ const StyledIcon = styled(Icon)`
 	pointer-events: none;
 `;
 
-export const Input: React.StatelessComponent<InputProps> = props => (
+export const Search: React.StatelessComponent<SearchProps> = props => (
 	<StyledContainer>
 		<StyledIcon name={IconName.Search} size={IconSize.XS} color={colors.grey36} />
-		<StyledInput
+		<StyledSearch
 			autoFocus={props.focused}
 			className={props.className}
 			disabled={props.disabled}
-			type={props.type}
+			type="search"
 			value={props.value}
 			onBlur={props.onBlur}
 			onFocus={props.onFocus}
@@ -91,4 +84,4 @@ export const Input: React.StatelessComponent<InputProps> = props => (
 	</StyledContainer>
 );
 
-export default Input;
+export default Search;

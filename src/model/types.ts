@@ -32,6 +32,7 @@ export interface SerializedElement {
 	id: string;
 	name: string;
 	open: boolean;
+	forcedOpen: boolean;
 	patternId: string;
 	placeholderHighlighted: boolean;
 	properties: SerializedElementProperty[];

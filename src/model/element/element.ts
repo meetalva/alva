@@ -16,6 +16,7 @@ export interface ElementInit {
 	id?: string;
 	name?: string;
 	open: boolean;
+	forcedOpen: boolean;
 	patternId: string;
 	placeholderHighlighted: boolean;
 	properties: ElementProperty[];
@@ -36,6 +37,8 @@ export class Element {
 	@Mobx.observable private dragged: boolean;
 
 	@Mobx.observable private editedName: string;
+
+	@Mobx.observable private forcedOpen: boolean;
 
 	@Mobx.observable private highlighted: boolean;
 
@@ -70,6 +73,7 @@ export class Element {
 		this.patternId = init.patternId;
 		this.containerId = init.containerId;
 		this.open = init.open;
+		this.forcedOpen = init.forcedOpen;
 		this.patternLibrary = context.patternLibrary;
 		this.project = context.project;
 		this.selected = init.selected;
@@ -128,6 +132,7 @@ export class Element {
 				containerId: serialized.containerId,
 				contentIds: serialized.contentIds,
 				open: serialized.open,
+				forcedOpen: serialized.forcedOpen,
 				properties: serialized.properties.map(p =>
 					ElementProperty.from(p, { patternLibrary: context.patternLibrary })
 				),
@@ -170,6 +175,7 @@ export class Element {
 				contentIds: clonedContents.map(content => content.getId()),
 				name: this.name,
 				open: false,
+				forcedOpen: false,
 				patternId: this.patternId,
 				placeholderHighlighted: false,
 				properties: this.properties.map(propertyValue => propertyValue.clone()),
@@ -188,6 +194,19 @@ export class Element {
 
 		this.project.addElement(clone);
 		return clone;
+	}
+
+	public getAncestors(init: Element[] = []): Element[] {
+		const parent = this.getParent();
+
+		if (!parent) {
+			return init;
+		}
+
+		init.push(parent);
+		parent.getAncestors(init);
+
+		return init;
 	}
 
 	public getContainer(): ElementContent | undefined {
@@ -279,6 +298,10 @@ export class Element {
 		}
 
 		return result;
+	}
+
+	public getForcedOpen(): boolean {
+		return this.forcedOpen;
 	}
 
 	public getHighlighted(): boolean {
@@ -388,6 +411,11 @@ export class Element {
 	}
 
 	@Mobx.action
+	public setForcedOpen(forcedOpen: boolean): void {
+		this.forcedOpen = forcedOpen;
+	}
+
+	@Mobx.action
 	public setHighlighted(highlighted: boolean): void {
 		this.highlighted = highlighted;
 	}
@@ -481,13 +509,15 @@ export class Element {
 
 	@Mobx.action
 	public toggleOpen(): void {
-		this.setOpen(!this.getOpen());
+		this.setOpen(!this.getOpen() && !this.getForcedOpen());
+		this.setForcedOpen(false);
 	}
 
 	@Mobx.action
 	public toggleSelected(): void {
 		this.setSelected(!this.getSelected());
 	}
+	
 
 	public toJSON(): Types.SerializedElement {
 		return {
@@ -498,6 +528,7 @@ export class Element {
 			id: this.id,
 			name: this.name,
 			open: this.open,
+			forcedOpen: this.forcedOpen,
 			patternId: this.patternId,
 			placeholderHighlighted: this.placeholderHighlighted,
 			properties: this.properties.map(elementProperty => elementProperty.toJSON()),

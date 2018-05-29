@@ -1,5 +1,4 @@
 import { colors } from '../colors';
-import Input, { InputTypes } from '../input';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { getSpace, SpaceSize } from '../space';
@@ -78,7 +77,7 @@ const StyledTitle = (props: StyledPreviewTitleProps): JSX.Element => {
 	return <Strong data-title={true}>{props.children}</Strong>;
 };
 
-const StyledEditableTitle = styled(Input)`
+const StyledEditableTitle = styled.input`
 	display: inline-block;
 	width: 100%;
 	font-size: 12px;
@@ -120,12 +119,10 @@ class EditableTitle extends React.Component<EditableTitleProps> {
 		const { props } = this;
 		return (
 			<StyledEditableTitle
-				focused={props.focused}
 				onBlur={props.onBlur}
 				onChange={props.onChange}
 				onFocus={props.onFocus}
 				onKeyDown={props.onKeyDown}
-				type={InputTypes.string}
 				value={props.value}
 			/>
 		);

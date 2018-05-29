@@ -2,8 +2,6 @@ export * from './button';
 export * from './chrome';
 export * from './colors';
 export * from './copy';
-export * from './dropdown';
-export * from './dropdown-item';
 export * from './element';
 export * from './floating-button';
 export * from './fonts';

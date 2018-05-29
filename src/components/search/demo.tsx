@@ -1,8 +1,8 @@
-import Input, { InputTypes } from './index';
+import Search from './index';
 import * as React from 'react';
 
-const InputDemo: React.StatelessComponent<void> = (): JSX.Element => (
-	<Input type={InputTypes.string} placeholder="Placeholder.." />
+const SearchDemo: React.StatelessComponent<void> = (): JSX.Element => (
+	<Search placeholder="Placeholder.." />
 );
 
-export default InputDemo;
+export default SearchDemo;

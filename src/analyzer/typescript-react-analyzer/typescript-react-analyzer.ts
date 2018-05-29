@@ -27,7 +27,6 @@ export interface PatternCandidate {
 }
 
 export interface AnalyzeOptions {
-	withBundle?: boolean;
 	getGlobalPatternId(contextId: string): string;
 	getGlobalPropertyId(patternContextId: string, propertyContextId: string): string;
 	getGlobalSlotId(patternContextId: string, slotContextId: string): string;
@@ -62,10 +61,8 @@ export async function analyze(
 		return (compiler.outputFileSystem as typeof Fs).readFileSync('/components.js').toString();
 	};
 
-	const bundle = options.withBundle ? await getBundle() : '';
-
 	return {
-		bundle,
+		bundle: await getBundle(),
 		name: pkg.name || 'Unnamed Library',
 		patterns,
 		path,
@@ -79,10 +76,6 @@ export async function watch(
 	onChange: (analyis: Types.LibraryAnalysis) => void
 ): Promise<Types.Watcher> {
 	let active = false;
-	let running = deferrable();
-
-	const patterns = await analyzePatterns({ cwd: path, options });
-	const compiler = await createPatternCompiler(patterns, { cwd: path });
 
 	let parents = await getParents(path);
 
@@ -90,12 +83,9 @@ export async function watch(
 		ignoreInitial: true
 	});
 
-	const analysis = await analyze(path, options);
-
 	watcher.on(
 		'all',
 		debounce(async () => {
-			await running;
 			const updatedParents = await getParents(path);
 
 			const addedParents = updatedParents.filter(u => !parents.includes(u));
@@ -106,28 +96,10 @@ export async function watch(
 
 			parents = updatedParents;
 
-			const update = await analyze(path, { ...options, withBundle: false });
-
-			analysis.name = update.name;
-			analysis.path = update.path;
-			analysis.patterns = update.patterns;
-			analysis.version = update.version;
-
+			const analysis = await analyze(path, options);
 			onChange(analysis);
 		}, 300)
 	);
-
-	compiler.hooks.watchRun.tap('typescript-react-analyzer', () => {
-		running = deferrable();
-	});
-
-	compiler.watch({}, async () => {
-		running.resolve();
-		analysis.bundle = (compiler.outputFileSystem as typeof Fs)
-			.readFileSync('/components.js')
-			.toString();
-		onChange(analysis);
-	});
 
 	return {
 		getPath(): string {
@@ -141,15 +113,6 @@ export async function watch(
 			active = false;
 		}
 	};
-}
-
-// tslint:disable-next-line:no-any
-function deferrable(): any {
-	let resolve;
-	const promise = new Promise(r => (resolve = r));
-	// tslint:disable-next-line:no-any
-	(promise as any).resolve = resolve;
-	return promise;
 }
 
 async function analyzePatterns(context: {

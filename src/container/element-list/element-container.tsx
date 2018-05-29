@@ -16,7 +16,7 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 		const store = ViewStore.getInstance();
 		const { props } = this;
 		const open =
-			props.element.getOpen() || props.element.getDescendants().some(e => e.getSelected());
+			props.element.getOpen() || props.element.getForcedOpen();
 
 		// Ensure mobx registers
 		props.element.getSelected();

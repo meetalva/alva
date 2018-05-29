@@ -32,7 +32,7 @@ export class ViewStore {
 	private static EPHEMERAL_CONTENTS: WeakMap<
 		Model.Element,
 		Model.ElementContent[]
-	> = new WeakMap();
+		> = new WeakMap();
 
 	/**
 	 * The store singleton instance.
@@ -104,7 +104,7 @@ export class ViewStore {
 	/**
 	 * Creates a new store.
 	 */
-	private constructor() {}
+	private constructor() { }
 
 	/**
 	 * Returns (or creates) the one global store instance.
@@ -227,6 +227,7 @@ export class ViewStore {
 				contentIds: elementContents.map(e => e.getId()),
 				dragged: init.dragged || false,
 				highlighted: false,
+				forcedOpen: false,
 				open: false,
 				patternId: init.pattern.getId(),
 				placeholderHighlighted: false,
@@ -921,10 +922,18 @@ export class ViewStore {
 
 		if (previousSelectedElement) {
 			previousSelectedElement.setSelected(false);
+
+			previousSelectedElement.getAncestors().forEach(ancestor => {
+				ancestor.setForcedOpen(false);
+			});
 		}
 
 		this.rightPane = null;
 		selectedElement.setSelected(true);
+
+		selectedElement.getAncestors().forEach(ancestor => {
+			ancestor.setForcedOpen(true);
+		});
 	}
 
 	@Mobx.action
@@ -972,7 +981,12 @@ export class ViewStore {
 			return;
 		}
 
-		this.project.getElements().forEach(element => element.setSelected(false));
+		this.project.getElements().forEach(element => {
+			element.setSelected(false);
+			element.getAncestors().forEach(ancestor => {
+				ancestor.setForcedOpen(false);
+			});
+		});
 	}
 
 	@Mobx.action

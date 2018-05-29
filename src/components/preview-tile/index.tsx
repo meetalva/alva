@@ -50,22 +50,24 @@ const StyledPreview = styled.section`
 `;
 
 const StyledPreviewTile = styled.div`
+	position: relative;
 	box-sizing: border-box;
 	width: inherit;
 	height: 340px;
 	border: 4px solid;
 	border-color: ${(props: StyledPreviewTileProps) =>
 		props.focused ? colors.blue40.toString() : 'transparent'};
-	border-radius: 5px;
+	border-radius: 6px;
 	box-shadow: 0 3px 12px ${colors.blackAlpha13.toString()};
 	background-color: ${colors.white.toString()};
+	overflow: hidden;
 `;
 
 const StyledTitle = (props: StyledPreviewTitleProps): JSX.Element => {
 	const Strong = styled.strong`
 		display: inline-block;
 		width: 100%;
-		margin-bottom: ${getSpace(SpaceSize.S)}px;
+		margin: 0;
 		font-size: 12px;
 		font-weight: normal;
 		text-align: center;
@@ -73,27 +75,37 @@ const StyledTitle = (props: StyledPreviewTitleProps): JSX.Element => {
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+		padding: 0;
 	`;
 	return <Strong data-title={true}>{props.children}</Strong>;
 };
 
 const StyledEditableTitle = styled.input`
+	border: 0;
 	display: inline-block;
 	width: 100%;
-	font-size: 12px;
+	margin: 0;
+	font-size: inherit;
+	line-height: inherit;
 	font-weight: normal;
 	text-align: center;
-	margin: 0;
-	margin-bottom: ${getSpace(SpaceSize.S + 3)}px;
-	padding: 0;
-	::placeholder {
-		color: ${colors.grey60.toString()};
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	padding: 3px 0;
+
+	&:focus {
+		outline: none;
 	}
-	:hover {
-		::placeholder {
-			color: ${colors.grey60.toString()};
-		}
-	}
+`;
+
+const StyledContainer = styled.div`
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	padding: ${getSpace(SpaceSize.S)}px 0;
+	background: ${colors.white.toString()};
 `;
 
 class EditableTitle extends React.Component<EditableTitleProps> {
@@ -131,21 +143,24 @@ class EditableTitle extends React.Component<EditableTitleProps> {
 
 export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): JSX.Element => (
 	<StyledPreview data-id={props.id} onClick={props.onClick} onDoubleClick={props.onDoubleClick}>
-		{props.nameState === EditState.Editing ? (
-			<EditableTitle
-				autoFocus
-				autoSelect
-				data-title={true}
-				focused={props.focused}
-				onBlur={props.onBlur}
-				onChange={props.onChange}
-				onFocus={props.onFocus}
-				onKeyDown={props.onKeyDown}
-				value={props.name}
-			/>
-		) : (
-			<StyledTitle editable={props.focused}>{props.name}</StyledTitle>
-		)}
-		<StyledPreviewTile focused={props.focused} />
+		<StyledPreviewTile focused={props.focused}>
+			<StyledContainer>
+			{props.nameState === EditState.Editing ? (
+				<EditableTitle
+					autoFocus
+					autoSelect
+					data-title={true}
+					focused={props.focused}
+					onBlur={props.onBlur}
+					onChange={props.onChange}
+					onFocus={props.onFocus}
+					onKeyDown={props.onKeyDown}
+					value={props.name}
+				/>
+			) : (
+				<StyledTitle editable={props.focused}>{props.name}</StyledTitle>
+			)}
+			</StyledContainer>
+		</StyledPreviewTile>
 	</StyledPreview>
 );

@@ -21,6 +21,7 @@ const globParent = require('glob-parent');
 
 export interface PatternCandidate {
 	artifactPath: string;
+	declarationPath: string | undefined;
 	displayName: string;
 	id: string;
 	sourcePath: string;
@@ -120,8 +121,9 @@ async function analyzePatterns(context: {
 	options: AnalyzeOptions;
 }): Promise<Types.PatternAnalysis[]> {
 	const patternCandidates = await findPatternCandidates(context.cwd);
-	const sourcePaths = patternCandidates.map(p => p.sourcePath);
-	const program = ts.createProgram(sourcePaths, {});
+	const declarationPaths = patternCandidates.map(p => p.declarationPath || p.sourcePath);
+	const program = ts.createProgram(declarationPaths, {});
+
 	const analyzePattern = getPatternAnalyzer(program, context.options);
 	return patternCandidates.reduce(
 		(acc, candidate) => [...acc, ...analyzePattern(candidate, analyzePatternExport)],
@@ -162,7 +164,7 @@ function getPatternAnalyzer(program: ts.Program, options: AnalyzeOptions): Patte
 		candidate: PatternCandidate,
 		predicate: PatternAnalyzerPredicate
 	): Types.PatternAnalysis[] => {
-		const sourceFile = program.getSourceFile(candidate.sourcePath);
+		const sourceFile = program.getSourceFile(candidate.declarationPath || candidate.sourcePath);
 
 		if (!sourceFile) {
 			return [];
@@ -247,8 +249,12 @@ async function findPatternCandidates(path: string): Promise<PatternCandidate[]> 
 		const artifactBasename = Path.basename(sourcePath, Path.extname(sourcePath));
 		const artifactExtname = Path.extname(pattern.artifact);
 
+		const artifactPath = Path.join(artifactDirname, `${artifactBasename}${artifactExtname}`);
+		const declarationPath = Path.join(artifactDirname, `${artifactBasename}.d.ts`);
+
 		return {
-			artifactPath: Path.join(artifactDirname, `${artifactBasename}${artifactExtname}`),
+			artifactPath: Fs.existsSync(artifactPath) ? artifactPath : undefined,
+			declarationPath: Fs.existsSync(declarationPath) ? declarationPath : undefined,
 			displayName: pattern.manifest.displayName || pattern.manifest.name,
 			id: pattern.id,
 			sourcePath

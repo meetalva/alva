@@ -28,17 +28,23 @@ export function findDeclaration(expression: Ts.Expression): Ts.Declaration | und
  * @param symbol The symbol to return the declaration for.
  * @return TypeScript type declaration.
  */
-export function findTypeDeclaration(symbol: Ts.Symbol): Ts.Declaration | undefined {
-	if (symbol.valueDeclaration) {
-		return symbol.valueDeclaration;
+export function findTypeDeclaration(
+	symbol: Ts.Symbol,
+	ctx: { typechecker: Ts.TypeChecker }
+): Ts.Declaration | undefined {
+	const resolved =
+		symbol.flags & Ts.SymbolFlags.AliasExcludes
+			? ctx.typechecker.getAliasedSymbol(symbol)
+			: symbol;
+
+	if (resolved.valueDeclaration) {
+		return resolved.valueDeclaration;
 	}
 
-	if (symbol.declarations) {
-		return symbol.declarations[0];
-	}
+	const [declaration = null] = resolved.getDeclarations() || [];
 
-	if (symbol.type && symbol.type.symbol) {
-		return findTypeDeclaration(symbol.type.symbol);
+	if (declaration) {
+		return declaration;
 	}
 
 	return;

@@ -35,11 +35,10 @@ export function analyze(
 				return;
 			}
 
-			const declaration = TypescriptUtils.findTypeDeclaration(symbol) as Ts.Declaration;
-
-			const memberType = symbol.type
-				? symbol.type
-				: declaration && typechecker.getTypeAtLocation(declaration);
+			const declaration = TypescriptUtils.findTypeDeclaration(symbol, {
+				typechecker
+			}) as Ts.Declaration;
+			const memberType = typechecker.getTypeAtLocation(declaration);
 
 			if (ReactUtils.isSlotType(ctx.program, memberType)) {
 				return;
@@ -69,10 +68,8 @@ function getSymbolType(
 	symbol: Ts.Symbol,
 	ctx: { typechecker: Ts.TypeChecker }
 ): Ts.Type | undefined {
-	const declaration = TypescriptUtils.findTypeDeclaration(symbol) as Ts.Declaration;
-	const type = symbol.type
-		? symbol.type
-		: declaration && ctx.typechecker.getTypeAtLocation(declaration);
+	const declaration = TypescriptUtils.findTypeDeclaration(symbol, ctx) as Ts.Declaration;
+	const type = ctx.typechecker.getTypeAtLocation(declaration);
 
 	if (!type) {
 		return;
@@ -182,7 +179,9 @@ function createEnumProperty(
 		return;
 	}
 
-	const enumMemberDeclaration = TypescriptUtils.findTypeDeclaration(args.type.symbol);
+	const enumMemberDeclaration = TypescriptUtils.findTypeDeclaration(args.type.symbol, {
+		typechecker: ctx.program.getTypeChecker()
+	});
 	if (!enumMemberDeclaration || !enumMemberDeclaration.parent) {
 		return;
 	}

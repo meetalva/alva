@@ -17,11 +17,10 @@ export function analyzeSlots(
 	return type
 		.getApparentProperties()
 		.map(memberSymbol => {
-			const declaration = TypescriptUtils.findTypeDeclaration(memberSymbol) as Ts.Declaration;
-
-			const memberType = memberSymbol.type
-				? memberSymbol.type
-				: declaration && typechecker.getTypeAtLocation(declaration);
+			const declaration = TypescriptUtils.findTypeDeclaration(memberSymbol, {
+				typechecker: ctx.program.getTypeChecker()
+			});
+			const memberType = typechecker.getTypeAtLocation(declaration as Ts.Declaration);
 
 			if (!memberType || !ReactUtils.isSlotType(ctx.program, memberType)) {
 				return;

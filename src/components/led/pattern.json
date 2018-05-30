@@ -1,0 +1,7 @@
+{
+	"main": "./led",
+	"name": "led",
+	"displayName": "LED",
+	"flag": "alpha",
+	"version": "1.0.0"
+ }

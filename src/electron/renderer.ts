@@ -278,9 +278,10 @@ Mobx.autorunAsync(() => {
 
 Mobx.autorunAsync(() => {
 	const project = store.getProject();
-	const serializedProject = project.toJSON();
 
 	if (project) {
+		const serializedProject = project.toJSON();
+
 		const payload = {
 			path: project.getPath(),
 			project: serializedProject

@@ -10,10 +10,12 @@ export interface ElementContainerProps {
 	element: Model.Element;
 }
 
+@MobxReact.inject('store')
 @MobxReact.observer
 export class ElementContainer extends React.Component<ElementContainerProps> {
 	public render(): JSX.Element | null {
-		const store = ViewStore.getInstance();
+		const { store } = this.props as ElementContainerProps & { store: ViewStore };
+
 		const { props } = this;
 		const open = props.element.getOpen() || props.element.getForcedOpen();
 
@@ -32,7 +34,7 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 				open={open}
 				onChange={AlvaUtil.noop}
 				placeholderHighlighted={props.element.getPlaceholderHighlighted()}
-				state={getState(props.element)}
+				state={getState(props.element, store)}
 				title={props.element.getName()}
 			>
 				{open
@@ -47,9 +49,7 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 	}
 }
 
-const getState = (element: Model.Element): Components.ElementState => {
-	const store = ViewStore.getInstance();
-
+const getState = (element: Model.Element, store: ViewStore): Components.ElementState => {
 	if (element.getSelected() && element.getNameEditable()) {
 		return Components.ElementState.Editable;
 	}

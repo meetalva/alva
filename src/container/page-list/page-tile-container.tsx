@@ -10,6 +10,7 @@ export interface PageTileContainerProps {
 	page: Page;
 }
 
+@MobxReact.inject('store')
 @MobxReact.observer
 export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	private onKeyDown: (e: KeyboardEvent) => void;
@@ -41,7 +42,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	}
 
 	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
-		const store = ViewStore.getInstance();
+		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
 
 		const target = e.target as HTMLElement;
 
@@ -59,7 +60,8 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 			return;
 		}
 
-		const store = ViewStore.getInstance();
+		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
+
 		const next =
 			store.getActiveView() === Types.AlvaView.Pages
 				? Types.AlvaView.PageDetail

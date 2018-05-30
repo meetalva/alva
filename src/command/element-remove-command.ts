@@ -8,8 +8,8 @@ export class ElementRemoveCommand extends ElementCommand {
 	protected index: number;
 	protected page: Page;
 
-	public constructor(init: { element: Element }) {
-		super(init.element);
+	public constructor(init: { element: Element; store: ViewStore }) {
+		super(init.element, init.store);
 
 		this.container = this.element.getContainer() as ElementContent;
 		this.index = this.element.getIndex();
@@ -58,14 +58,12 @@ export class ElementRemoveCommand extends ElementCommand {
 			return false;
 		}
 
-		const store = ViewStore.getInstance();
-
 		this.container.insert({
 			element: this.element,
 			at: this.index
 		});
 
-		store.setSelectedElement(this.element);
+		this.store.setSelectedElement(this.element);
 
 		return true;
 	}

@@ -9,6 +9,12 @@ import * as Types from '../model/types';
 export class PdfExporter implements Types.Exporter {
 	public contents: Buffer;
 
+	private store: ViewStore;
+
+	public constructor(store: ViewStore) {
+		this.store = store;
+	}
+
 	public execute(path: string): void {
 		const id = uuid.v4();
 		const initial = 'data:text/html;<html></html>';
@@ -20,7 +26,6 @@ export class PdfExporter implements Types.Exporter {
 		webview.webpreferences = 'useContentSize=yes, javascript=no';
 		document.body.insertBefore(webview, document.body.firstChild);
 
-		const store = ViewStore.getInstance();
 		let started;
 
 		// (1) Request HTML contents from preview
@@ -43,7 +48,7 @@ export class PdfExporter implements Types.Exporter {
 
 			const parsed = Url.parse(payload.location);
 
-			if (parsed.host !== `localhost:${store.getServerPort()}`) {
+			if (parsed.host !== `localhost:${this.store.getServerPort()}`) {
 				return;
 			}
 

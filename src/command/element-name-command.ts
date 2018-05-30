@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { ElementCommand } from './element-command';
 import { Element } from '../model';
+import { ViewStore } from '../store';
 
 /**
  * A user operation to set the name of a page element.
@@ -22,8 +23,8 @@ export class ElementNameCommand extends ElementCommand {
 	 * @param name The new name for the page element.
 	 */
 	// tslint:disable-next-line:no-any
-	public constructor(element: Element, name: string) {
-		super(element);
+	public constructor(element: Element, name: string, store: ViewStore) {
+		super(element, store);
 
 		this.name = name.length === 0 ? element.getName({ unedited: true }) : name;
 		this.previousName = element.getName({ unedited: true });

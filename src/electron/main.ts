@@ -16,7 +16,6 @@ import { Persistence, PersistenceState } from '../persistence';
 import * as Sender from '../message/server';
 import { createServer } from './server';
 import * as Types from '../model/types';
-import * as Url from 'url';
 import * as Util from 'util';
 import * as uuid from 'uuid';
 
@@ -34,8 +33,6 @@ const RENDERER_DOCUMENT = `<!doctype html>
 	<script>require('${stringEscape(APP_ENTRY)}')</script>
 </body>
 </html>`;
-
-Fs.writeFileSync(Path.join(__dirname, 'app.html'), RENDERER_DOCUMENT);
 
 const showOpenDialog = (options: Electron.OpenDialogOptions): Promise<string[]> =>
 	new Promise(resolve => dialog.showOpenDialog(options, resolve));
@@ -69,13 +66,7 @@ async function createWindow(): Promise<void> {
 	});
 
 	// and load the index.html of the app.
-	win.loadURL(
-		Url.format({
-			pathname: Path.join(__dirname, 'app.html'),
-			protocol: 'file:',
-			slashes: true
-		})
-	);
+	win.loadURL('data:text/html;charset=utf-8,' + encodeURI(RENDERER_DOCUMENT));
 
 	// Cast getPort return type from PromiseLike<number> to Promise<number>
 	// to avoid async-promise tslint rule to produce errors here

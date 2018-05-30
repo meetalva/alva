@@ -1,6 +1,7 @@
 import * as Types from '../types';
 
 export interface PatternSlotInit {
+	contextId: string;
 	displayName: string;
 	id: string;
 	propertyName: string;
@@ -8,6 +9,7 @@ export interface PatternSlotInit {
 }
 
 export class PatternSlot {
+	private contextId: string;
 	private displayName: string;
 	private id: string;
 	private propertyName: string;
@@ -19,15 +21,21 @@ export class PatternSlot {
 		this.displayName = init.displayName;
 		this.type = init.type;
 		this.propertyName = init.propertyName;
+		this.contextId = init.contextId;
 	}
 
 	public static from(serialized: Types.SerializedPatternSlot): PatternSlot {
 		return new PatternSlot({
+			contextId: serialized.contextId,
 			displayName: serialized.displayName,
 			id: serialized.id,
 			propertyName: serialized.propertyName,
 			type: toSlotType(serialized.type)
 		});
+	}
+
+	public getContextId(): string {
+		return this.contextId;
 	}
 
 	public getId(): string {
@@ -48,6 +56,7 @@ export class PatternSlot {
 
 	public toJSON(): Types.SerializedPatternSlot {
 		return {
+			contextId: this.contextId,
 			displayName: this.displayName,
 			propertyName: this.propertyName,
 			id: this.id,

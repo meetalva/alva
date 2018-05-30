@@ -27,20 +27,17 @@ export function createCompiler(
 		entry.preview = PREVIEW_PATH;
 	}
 
-	if (patterns.length > 0) {
-		const components = patterns.reduce((acc, pattern) => {
-			acc[compilerSafeName(pattern.id)] = `./${Path.relative(options.cwd, pattern.path)
-				.split(Path.sep)
-				.join('/')}`;
+	const components = patterns.reduce((acc, pattern) => {
+		acc[compilerSafeName(pattern.id)] = `./${Path.relative(options.cwd, pattern.path)
+			.split(Path.sep)
+			.join('/')}`;
+		return acc;
+	}, {});
 
-			return acc;
-		}, {});
-
-		entry.components = `${LOADER_PATH}?${QueryString.stringify({
-			cwd: options.cwd,
-			components: JSON.stringify(components)
-		})}!`;
-	}
+	entry.components = `${LOADER_PATH}?${QueryString.stringify({
+		cwd: options.cwd,
+		components: JSON.stringify(components)
+	})}!`;
 
 	const compiler = webpack({
 		mode: 'development',

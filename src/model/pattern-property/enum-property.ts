@@ -1,12 +1,15 @@
-import { PatternPropertyBase, PatternPropertyType } from './property-base';
+import * as Mobx from 'mobx';
+import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../types';
 
 export interface PatternEnumPropertyInit {
+	contextId: string;
 	defaultOptionId?: string;
 	hidden: boolean;
 	id: string;
 	label: string;
 	options: PatternEnumPropertyOption[];
+	origin: Types.PatternPropertyOrigin;
 	propertyName: string;
 	required: boolean;
 }
@@ -14,10 +17,10 @@ export interface PatternEnumPropertyInit {
 export type EnumValue = string | number;
 
 export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefined> {
-	private defaultOptionId?: string;
-	private options: PatternEnumPropertyOption[] = [];
+	@Mobx.observable private defaultOptionId?: string;
+	@Mobx.observable private options: PatternEnumPropertyOption[] = [];
 
-	public readonly type = PatternPropertyType.Enum;
+	public readonly type = Types.PatternPropertyType.Enum;
 
 	public constructor(init: PatternEnumPropertyInit) {
 		super(init);
@@ -25,19 +28,19 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		this.defaultOptionId = init.defaultOptionId;
 	}
 
-	public static from(
-		serializedProperty: Types.SerializedPatternEnumProperty
-	): PatternEnumProperty {
+	public static from(serialized: Types.SerializedPatternEnumProperty): PatternEnumProperty {
 		return new PatternEnumProperty({
-			hidden: serializedProperty.hidden,
-			defaultOptionId: serializedProperty.defaultOptionId,
-			id: serializedProperty.id,
-			label: serializedProperty.label,
-			options: serializedProperty.options.map(serializedOption =>
+			contextId: serialized.contextId,
+			hidden: serialized.hidden,
+			defaultOptionId: serialized.defaultOptionId,
+			id: serialized.id,
+			label: serialized.label,
+			options: serialized.options.map(serializedOption =>
 				PatternEnumPropertyOption.from(serializedOption)
 			),
-			propertyName: serializedProperty.propertyName,
-			required: serializedProperty.required
+			origin: deserializeOrigin(serialized.origin),
+			propertyName: serialized.propertyName,
+			required: serialized.required
 		});
 	}
 
@@ -54,6 +57,10 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		return value;
 	}
 
+	public getDefaultOptionId(): string | undefined {
+		return this.defaultOptionId;
+	}
+
 	public getDefaultValue(): EnumValue | undefined {
 		const option = this.options.find(o => o.getId() === this.defaultOptionId);
 
@@ -62,6 +69,10 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		}
 
 		return option.getValue();
+	}
+
+	public getOptionByContextId(contextId: string): PatternEnumPropertyOption | undefined {
+		return this.options.find(option => option.getContextId() === contextId);
 	}
 
 	public getOptionById(id: string): PatternEnumPropertyOption | undefined {
@@ -78,19 +89,32 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 
 	public toJSON(): Types.SerializedPatternEnumProperty {
 		return {
+			contextId: this.contextId,
 			defaultOptionId: this.defaultOptionId,
 			hidden: this.hidden,
 			id: this.id,
 			label: this.label,
 			propertyName: this.propertyName,
 			options: this.options.map(option => option.toJSON()),
+			origin: serializeOrigin(this.origin),
 			required: this.required,
 			type: this.type
 		};
 	}
+
+	public update(prop: PatternEnumProperty): void {
+		this.contextId = prop.getContextId();
+		this.defaultOptionId = prop.getDefaultOptionId();
+		this.hidden = prop.getHidden();
+		this.label = prop.getLabel();
+		this.propertyName = prop.getPropertyName();
+		this.options = prop.getOptions();
+		this.required = prop.getRequired();
+	}
 }
 
 export interface PatternEnumPropertyOptionInit {
+	contextId: string;
 	id: string;
 	name: string;
 	ordinal: number;
@@ -98,20 +122,26 @@ export interface PatternEnumPropertyOptionInit {
 }
 
 export class PatternEnumPropertyOption {
-	private id: string;
-	private name: string;
-	private ordinal: number;
-	private value: string | number;
+	@Mobx.observable private contextId: string;
+	@Mobx.observable private id: string;
+	@Mobx.observable private name: string;
+	@Mobx.observable private ordinal: number;
+	@Mobx.observable private value: string | number;
 
 	public constructor(init: PatternEnumPropertyOptionInit) {
 		this.id = init.id;
 		this.name = init.name;
 		this.ordinal = init.ordinal;
 		this.value = init.value;
+		this.contextId = init.contextId;
 	}
 
 	public static from(serialized: Types.SerializedEnumOption): PatternEnumPropertyOption {
 		return new PatternEnumPropertyOption(serialized);
+	}
+
+	public getContextId(): string {
+		return this.contextId;
 	}
 
 	public getId(): string {
@@ -132,6 +162,7 @@ export class PatternEnumPropertyOption {
 
 	public toJSON(): Types.SerializedEnumOption {
 		return {
+			contextId: this.contextId,
 			id: this.id,
 			name: this.name,
 			ordinal: this.ordinal,

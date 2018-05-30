@@ -51,8 +51,6 @@ let projectPath: string | undefined;
 
 const userStore = new ElectronStore();
 
-const watchers: Types.Watcher[] = [];
-
 async function createWindow(): Promise<void> {
 	const { width = 1280, height = 800 } = screen.getPrimaryDisplay().workAreaSize;
 
@@ -284,7 +282,12 @@ async function createWindow(): Promise<void> {
 				const library = project.getPatternLibrary();
 
 				const analysis = await Analyzer.analyze(path, {
-					getGlobalId: contextId => library.assignId(contextId)
+					getGobalEnumOptionId: (patternId, contextId) =>
+						library.assignEnumOptionId(patternId, contextId),
+					getGlobalPatternId: contextId => library.assignPatternId(contextId),
+					getGlobalPropertyId: (patternId, contextId) =>
+						library.assignPropertyId(patternId, contextId),
+					getGlobalSlotId: (patternId, contextId) => library.assignSlotId(patternId, contextId)
 				});
 
 				send({
@@ -314,7 +317,12 @@ async function createWindow(): Promise<void> {
 				}
 
 				const analysis = await Analyzer.analyze(connection.path, {
-					getGlobalId: contextId => library.assignId(contextId)
+					getGobalEnumOptionId: (patternId, contextId) =>
+						library.assignEnumOptionId(patternId, contextId),
+					getGlobalPatternId: contextId => library.assignPatternId(contextId),
+					getGlobalPropertyId: (patternId, contextId) =>
+						library.assignPropertyId(patternId, contextId),
+					getGlobalSlotId: (patternId, contextId) => library.assignSlotId(patternId, contextId)
 				});
 
 				send({
@@ -339,42 +347,12 @@ async function createWindow(): Promise<void> {
 				break;
 			}
 			case ServerMessageType.CheckLibraryRequest: {
-				const library = Project.from(message.payload).getPatternLibrary();
-
-				const id = library.getId();
 				const connections = userStore.get('connections') || [];
 
-				connections.filter(c => c.id === id).forEach(connection => {
+				connections.filter(c => c.id === message.payload.id).forEach(connection => {
 					Fs.exists(connection.path, async exists => {
-						const watcher = watchers.find(
-							w => w.isActive() && w.getPath() === connection.path
-						);
-
-						if (exists && !watcher) {
-							const newWatcher = await Analyzer.watch(
-								connection.path,
-								{
-									getGlobalId: contextId => library.assignId(contextId)
-								},
-								analysis => {
-									library.import(analysis);
-
-									send({
-										type: ServerMessageType.ConnectPatternLibraryResponse,
-										id: message.id,
-										payload: analysis
-									});
-								}
-							);
-							watchers.push(newWatcher);
-						}
-
-						if (!exists && watcher) {
-							watcher.stop();
-						}
-
 						send({
-							id,
+							id: message.id,
 							type: ServerMessageType.CheckLibraryResponse,
 							payload: [
 								{

@@ -1,9 +1,9 @@
 import { Box, Page, Placeholder, Text } from './builtins';
 import * as Fuse from 'fuse.js';
 import * as Mobx from 'mobx';
-import { Pattern, PatternSlot, SyntheticPatternType } from '../pattern';
+import { Pattern, PatternSlot } from '../pattern';
 import { PatternFolder } from '../pattern-folder';
-import { AnyPatternProperty, PatternProperty } from '../pattern-property';
+import { AnyPatternProperty, PatternEnumProperty, PatternProperty } from '../pattern-property';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
@@ -16,13 +16,30 @@ export interface PatternLibraryInit {
 	state: Types.PatternLibraryState;
 }
 
+export interface BuiltInContext {
+	options: PatternLibraryCreateOptions;
+	patternLibrary: PatternLibrary;
+}
+
+export interface BuiltInResult {
+	pattern: Pattern;
+	properties: AnyPatternProperty[];
+}
+
+export interface PatternLibraryCreateOptions {
+	getGloablEnumOptionId(enumId: string, contextId: string): string;
+	getGlobalPatternId(contextId: string): string;
+	getGlobalPropertyId(patternId: string, contextId: string): string;
+	getGlobalSlotId(patternId: string, contextId: string): string;
+}
+
 export class PatternLibrary {
-	private bundle: string;
-	private fuse: Fuse;
-	private id: string;
-	private patternProperties: AnyPatternProperty[] = [];
-	private patterns: Pattern[] = [];
-	private root: PatternFolder;
+	@Mobx.observable private bundle: string;
+	@Mobx.observable private fuse: Fuse;
+	@Mobx.observable private id: string;
+	@Mobx.observable private patternProperties: AnyPatternProperty[] = [];
+	@Mobx.observable private patterns: Pattern[] = [];
+	@Mobx.observable private root: PatternFolder;
 	@Mobx.observable private state: Types.PatternLibraryState;
 
 	public constructor(init: PatternLibraryInit) {
@@ -38,7 +55,7 @@ export class PatternLibrary {
 		}
 	}
 
-	public static create(): PatternLibrary {
+	public static create(options: PatternLibraryCreateOptions): PatternLibrary {
 		const patternLibrary = new PatternLibrary({
 			bundle: '',
 			id: uuid.v4(),
@@ -67,24 +84,27 @@ export class PatternLibrary {
 
 		root.addChild(syntheticFolder);
 
-		const { pagePattern, pageProperties } = Page({ patternLibrary });
-		const { placeholderPattern, placeholderProperties } = Placeholder({ patternLibrary });
-		const { textPattern, textProperties } = Text({ patternLibrary });
-		const { boxPattern, boxProperties } = Box({ patternLibrary });
+		const page = Page({ patternLibrary, options });
+		const placeholder = Placeholder({ patternLibrary, options });
+		const text = Text({ patternLibrary, options });
+		const box = Box({ patternLibrary, options });
 
-		syntheticFolder.addPattern(textPattern);
-		syntheticFolder.addPattern(boxPattern);
-		syntheticFolder.addPattern(placeholderPattern);
+		syntheticFolder.addPattern(text.pattern);
+		syntheticFolder.addPattern(box.pattern);
+		syntheticFolder.addPattern(placeholder.pattern);
 
-		[pagePattern, textPattern, boxPattern, placeholderPattern].forEach(pattern => {
+		[page.pattern, text.pattern, box.pattern, placeholder.pattern].forEach(pattern => {
 			patternLibrary.addPattern(pattern);
 		});
 
-		[...pageProperties, ...placeholderProperties, ...textProperties, ...boxProperties].forEach(
-			property => {
-				patternLibrary.addProperty(property);
-			}
-		);
+		[
+			...page.properties,
+			...placeholder.properties,
+			...text.properties,
+			...box.properties
+		].forEach(property => {
+			patternLibrary.addProperty(property);
+		});
 
 		return patternLibrary;
 	}
@@ -109,6 +129,45 @@ export class PatternLibrary {
 		return patternLibrary;
 	}
 
+	public static import(
+		analysis: Types.LibraryAnalysis,
+		previousLibrary?: PatternLibrary
+	): PatternLibrary {
+		const patternLibrary = PatternLibrary.create({
+			getGloablEnumOptionId: (enumId, contextId) =>
+				previousLibrary ? previousLibrary.assignEnumOptionId(enumId, contextId) : uuid.v4(),
+			getGlobalPatternId: contextId =>
+				previousLibrary ? previousLibrary.assignPatternId(contextId) : uuid.v4(),
+			getGlobalPropertyId: (patternId, contextId) =>
+				previousLibrary ? previousLibrary.assignPropertyId(patternId, contextId) : uuid.v4(),
+			getGlobalSlotId: (patternId, contextId) =>
+				previousLibrary ? previousLibrary.assignSlotId(patternId, contextId) : uuid.v4()
+		});
+
+		const folder = new PatternFolder(
+			{ name: analysis.name, type: Types.PatternFolderType.UserProvided },
+			{ patternLibrary }
+		);
+
+		analysis.patterns
+			.map(item => Pattern.from(item.pattern, { patternLibrary }))
+			.forEach(pattern => {
+				patternLibrary.addPattern(pattern);
+				folder.addPattern(pattern);
+			});
+
+		analysis.patterns.forEach(item => {
+			item.properties
+				.map(property => PatternProperty.from(property))
+				.forEach(property => patternLibrary.addProperty(property));
+		});
+
+		patternLibrary.getRoot().addChild(folder);
+		patternLibrary.setState(Types.PatternLibraryState.Connected);
+		patternLibrary.setBundle(analysis.bundle);
+		return patternLibrary;
+	}
+
 	public addPattern(pattern: Pattern): void {
 		this.patterns.push(pattern);
 		this.updateSearch();
@@ -118,9 +177,38 @@ export class PatternLibrary {
 		this.patternProperties.push(property);
 	}
 
-	public assignId(contextId: string): string {
+	public assignEnumOptionId(enumId: string, contextId: string): string {
+		const enumProperty = this.getPatternPropertyById(enumId) as PatternEnumProperty;
+
+		if (!enumProperty) {
+			return uuid.v4();
+		}
+
+		const option = enumProperty.getOptionByContextId(contextId);
+		return option ? option.getId() : uuid.v4();
+	}
+
+	public assignPatternId(contextId: string): string {
 		const pattern = this.getPatternByContextId(contextId);
 		return pattern ? pattern.getId() : uuid.v4();
+	}
+
+	public assignPropertyId(patternId: string, contextId: string): string {
+		const pattern = this.getPatternById(patternId);
+		if (!pattern) {
+			return uuid.v4();
+		}
+		const property = pattern.getPropertyByContextId(contextId);
+		return property ? property.getId() : uuid.v4();
+	}
+
+	public assignSlotId(patternId: string, contextId: string): string {
+		const pattern = this.getPatternById(patternId);
+		if (!pattern) {
+			return uuid.v4();
+		}
+		const slot = pattern.getSlots().find(s => s.getContextId() === contextId);
+		return slot ? slot.getId() : uuid.v4();
 	}
 
 	public getBundle(): string {
@@ -139,7 +227,7 @@ export class PatternLibrary {
 		return this.patterns.find(pattern => pattern.getId() === id);
 	}
 
-	public getPatternByType(type: SyntheticPatternType): Pattern {
+	public getPatternByType(type: Types.PatternType): Pattern {
 		return this.patterns.find(pattern => pattern.getType() === type) as Pattern;
 	}
 
@@ -167,38 +255,6 @@ export class PatternLibrary {
 		return this.state;
 	}
 
-	@Mobx.action
-	public import(analysis: Types.LibraryAnalysis): void {
-		// Remove all previously existing
-		// user-provided folders.
-		// TODO: Only remove affected folders
-		this.getRoot()
-			.getChildren()
-			.filter(f => f.getType() !== Types.PatternFolderType.Builtin)
-			.forEach(f => f.remove());
-
-		const folder = new PatternFolder(
-			{ name: analysis.name, type: Types.PatternFolderType.UserProvided },
-			{ patternLibrary: this }
-		);
-
-		this.getRoot().addChild(folder);
-
-		analysis.patterns.forEach(item => {
-			const pattern = Pattern.from(item.pattern, { patternLibrary: this });
-			this.addPattern(pattern);
-
-			item.properties
-				.map(property => PatternProperty.from(property))
-				.forEach(property => this.addProperty(property));
-
-			folder.addPattern(pattern);
-		});
-
-		this.setState(Types.PatternLibraryState.Connected);
-		this.setBundle(analysis.bundle);
-	}
-
 	public query(term: string): string[] {
 		if (term.trim().length === 0) {
 			return this.root.getDescendants().map(item => item.getId());
@@ -218,6 +274,17 @@ export class PatternLibrary {
 		}
 
 		this.patterns.splice(index, 1);
+	}
+
+	@Mobx.action
+	public removeProperty(property: AnyPatternProperty): void {
+		const index = this.patternProperties.indexOf(property);
+
+		if (index === -1) {
+			return;
+		}
+
+		this.patternProperties.splice(index, 1);
 	}
 
 	@Mobx.action

@@ -1,10 +1,9 @@
 // tslint:disable:no-bitwise
-
-import * as ts from 'typescript';
+import * as Ts from 'typescript';
 import { TypescriptExport } from './typescript-export';
 import { TypeScriptType } from './typescript-type';
 
-export function findDeclaration(expression: ts.Expression): ts.Declaration | undefined {
+export function findDeclaration(expression: Ts.Expression): Ts.Declaration | undefined {
 	const sourceFile = expression.getSourceFile();
 
 	if (!sourceFile) {
@@ -12,7 +11,7 @@ export function findDeclaration(expression: ts.Expression): ts.Declaration | und
 	}
 
 	for (const statement of sourceFile.statements) {
-		if (ts.isVariableStatement(statement)) {
+		if (Ts.isVariableStatement(statement)) {
 			for (const variableDeclaration of statement.declarationList.declarations) {
 				if (variableDeclaration.name.getText() === expression.getText()) {
 					return variableDeclaration;
@@ -29,33 +28,39 @@ export function findDeclaration(expression: ts.Expression): ts.Declaration | und
  * @param symbol The symbol to return the declaration for.
  * @return TypeScript type declaration.
  */
-export function findTypeDeclaration(symbol: ts.Symbol): ts.Declaration | undefined {
-	if (symbol.valueDeclaration) {
-		return symbol.valueDeclaration;
+export function findTypeDeclaration(
+	symbol: Ts.Symbol,
+	ctx: { typechecker: Ts.TypeChecker }
+): Ts.Declaration | undefined {
+	const resolved =
+		symbol.flags & Ts.SymbolFlags.AliasExcludes
+			? ctx.typechecker.getAliasedSymbol(symbol)
+			: symbol;
+
+	if (resolved.valueDeclaration) {
+		return resolved.valueDeclaration;
 	}
 
-	if (symbol.declarations) {
-		return symbol.declarations[0];
-	}
+	const [declaration = null] = resolved.getDeclarations() || [];
 
-	if (symbol.type && symbol.type.symbol) {
-		return findTypeDeclaration(symbol.type.symbol);
+	if (declaration) {
+		return declaration;
 	}
 
 	return;
 }
 
 export function getExportInfos(
-	program: ts.Program,
-	statement: ts.Statement
+	program: Ts.Program,
+	statement: Ts.Statement
 ): TypescriptExport[] | undefined {
 	const typechecker = program.getTypeChecker();
 
 	const modifiers = statement.modifiers;
 	const isDefault =
-		modifiers && modifiers.some(modifier => modifier.kind === ts.SyntaxKind.DefaultKeyword);
+		modifiers && modifiers.some(modifier => modifier.kind === Ts.SyntaxKind.DefaultKeyword);
 
-	if (ts.isVariableStatement(statement)) {
+	if (Ts.isVariableStatement(statement)) {
 		for (const declaration of statement.declarationList.declarations) {
 			if (!declaration.type) {
 				continue;
@@ -76,7 +81,7 @@ export function getExportInfos(
 		}
 	}
 
-	if (ts.isClassDeclaration(statement)) {
+	if (Ts.isClassDeclaration(statement)) {
 		if (!statement.name) {
 			return;
 		}
@@ -95,7 +100,7 @@ export function getExportInfos(
 		];
 	}
 
-	if (ts.isExportAssignment(statement)) {
+	if (Ts.isExportAssignment(statement)) {
 		const expression = statement.expression;
 		const declaration = findDeclaration(expression);
 
@@ -112,7 +117,7 @@ export function getExportInfos(
 		}
 	}
 
-	if (ts.isExportDeclaration(statement)) {
+	if (Ts.isExportDeclaration(statement)) {
 		if (!statement.exportClause) {
 			return;
 		}
@@ -134,7 +139,7 @@ export function getExportInfos(
 	return;
 }
 
-export function getExports(sourceFile: ts.SourceFile, program: ts.Program): TypescriptExport[] {
+export function getExports(sourceFile: Ts.SourceFile, program: Ts.Program): TypescriptExport[] {
 	let exports: TypescriptExport[] = [];
 
 	const exportStatements = getExportStatements(sourceFile);
@@ -152,8 +157,8 @@ export function getExports(sourceFile: ts.SourceFile, program: ts.Program): Type
 	return exports;
 }
 
-export function getExportStatements(sourceFile: ts.SourceFile): ts.Statement[] {
-	const exports: ts.Statement[] = [];
+export function getExportStatements(sourceFile: Ts.SourceFile): Ts.Statement[] {
+	const exports: Ts.Statement[] = [];
 
 	sourceFile.statements.forEach(child => {
 		if (isExport(child)) {
@@ -164,8 +169,8 @@ export function getExportStatements(sourceFile: ts.SourceFile): ts.Statement[] {
 	return exports;
 }
 
-export function isExport(node: ts.Node): boolean {
-	if (ts.isExportAssignment(node) || ts.isExportDeclaration(node) || ts.isExportSpecifier(node)) {
+export function isExport(node: Ts.Node): boolean {
+	if (Ts.isExportAssignment(node) || Ts.isExportDeclaration(node) || Ts.isExportSpecifier(node)) {
 		return true;
 	}
 
@@ -173,10 +178,26 @@ export function isExport(node: ts.Node): boolean {
 		return false;
 	}
 
-	const modifiers = ts.getCombinedModifierFlags(node);
-	if ((modifiers & ts.ModifierFlags.Export) === ts.ModifierFlags.Export) {
+	const modifiers = Ts.getCombinedModifierFlags(node);
+	if ((modifiers & Ts.ModifierFlags.Export) === Ts.ModifierFlags.Export) {
 		return true;
 	}
 
 	return false;
+}
+
+export function getJsDocValueFromNode(node: Ts.Node, tagName: string): string | undefined {
+	const jsdocTag = (Ts.getJSDocTags(node) || []).find(
+		tag => tag.tagName && tag.tagName.text === tagName
+	);
+	return jsdocTag ? (jsdocTag.comment || '').trim() : undefined;
+}
+
+export function getJsDocValueFromSymbol(symbol: Ts.Symbol, tagName: string): string | undefined {
+	const jsdocTag = symbol.getJsDocTags().find(tag => tag.name === tagName);
+	return jsdocTag ? (jsdocTag.text || '').trim() : undefined;
+}
+
+export function symbolHasJsDocTag(symbol: Ts.Symbol, tagName: string): boolean {
+	return symbol.getJsDocTags().some(tag => tag.name === tagName);
 }

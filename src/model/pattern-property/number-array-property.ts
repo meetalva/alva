@@ -1,4 +1,5 @@
-import { PatternPropertyBase, PatternPropertyType } from './property-base';
+import * as AlvaUtil from '../../alva-util';
+import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../types';
 
 /**
@@ -9,36 +10,46 @@ import * as Types from '../types';
  * @see Property
  */
 export class PatternNumberArrayProperty extends PatternPropertyBase<number[]> {
-	public readonly type = PatternPropertyType.NumberArray;
+	public readonly type = Types.PatternPropertyType.NumberArray;
 
 	public static from(
 		serialized: Types.SerializedPatternNumberArrayProperty
 	): PatternNumberArrayProperty {
 		return new PatternNumberArrayProperty({
+			contextId: serialized.contextId,
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,
 			label: serialized.label,
+			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
 	}
 
-	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
-		// tslint:disable-next-line:no-any
-		return this.coerceArrayValue(value, (element: any) => parseFloat(value));
+	public coerceValue<T>(value: T): number[] {
+		return AlvaUtil.ensureArray(value).map(parseFloat);
 	}
 
 	public toJSON(): Types.SerializedPatternNumberArrayProperty {
 		return {
+			contextId: this.contextId,
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,
 			label: this.label,
+			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type
 		};
+	}
+
+	public update(prop: PatternNumberArrayProperty): void {
+		this.contextId = prop.getContextId();
+		this.label = prop.getLabel();
+		this.propertyName = prop.getPropertyName();
+		this.hidden = prop.getHidden();
+		this.required = prop.getRequired();
 	}
 }

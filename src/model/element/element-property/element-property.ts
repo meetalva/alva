@@ -1,6 +1,6 @@
 import * as Mobx from 'mobx';
 import { PatternLibrary } from '../../pattern-library';
-import { AnyPatternProperty, PatternPropertyType } from '../../pattern-property';
+import { AnyPatternProperty } from '../../pattern-property';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
@@ -16,11 +16,10 @@ export interface ElementPropertyContext {
 }
 
 export class ElementProperty {
-	private id: string;
-	private patternLibrary: PatternLibrary;
-	private patternPropertyId: string;
-	private setDefault: boolean;
-
+	@Mobx.observable private id: string;
+	@Mobx.observable private patternLibrary: PatternLibrary;
+	@Mobx.observable private patternPropertyId: string;
+	@Mobx.observable private setDefault: boolean;
 	@Mobx.observable private value: Types.ElementPropertyValue;
 
 	public constructor(init: ElementPropertyInit, context: ElementPropertyContext) {
@@ -67,32 +66,26 @@ export class ElementProperty {
 		);
 	}
 
-	public getId(): string {
-		return this.id;
-	}
-
-	public getLabel(): string | undefined {
+	public getHidden(): boolean | undefined {
 		const patternProperty = this.getPatternProperty();
 
 		if (!patternProperty) {
 			return;
 		}
 
-		return patternProperty.getLabel();
+		return patternProperty.getHidden();
+	}
+
+	public getId(): string {
+		return this.id;
 	}
 
 	public getPatternProperty(): AnyPatternProperty | undefined {
 		return this.patternLibrary.getPatternPropertyById(this.patternPropertyId);
 	}
 
-	public getType(): PatternPropertyType | undefined {
-		const patternProperty = this.getPatternProperty();
-
-		if (!patternProperty) {
-			return;
-		}
-
-		return patternProperty.getType();
+	public getPatternPropertyId(): string {
+		return this.patternPropertyId;
 	}
 
 	public getValue(): Types.ElementPropertyValue {
@@ -101,6 +94,11 @@ export class ElementProperty {
 
 	public hasPatternProperty(patternProperty: AnyPatternProperty): boolean {
 		return this.patternPropertyId === patternProperty.getId();
+	}
+
+	@Mobx.action
+	public setPatternLibrary(patternLibrary: PatternLibrary): void {
+		this.patternLibrary = patternLibrary;
 	}
 
 	@Mobx.action

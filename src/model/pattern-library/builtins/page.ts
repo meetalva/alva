@@ -1,18 +1,27 @@
 import { languages } from './languages';
-import { Pattern, PatternSlot, SyntheticPatternType } from '../../pattern';
+import { Pattern, PatternSlot } from '../../pattern';
+import { BuiltInContext, BuiltInResult } from '../pattern-library';
 import {
 	PatternBooleanProperty,
 	PatternEnumProperty,
 	PatternEnumPropertyOption
 } from '../../pattern-property';
 import * as Types from '../../types';
-import * as uuid from 'uuid';
 
-export const Page = context => {
+const PATTERN_CONTEXT_ID = 'synthetic:page';
+const SLOT_CONTEXT_ID = 'children';
+const VIEWPORT_CONTEXT_ID = 'viewport';
+const LANG_CONTEXT_ID = 'lang';
+
+export const Page = (context: BuiltInContext): BuiltInResult => {
+	const patternId = context.options.getGlobalPatternId(PATTERN_CONTEXT_ID);
+	const langEnumId = context.options.getGlobalPropertyId(patternId, LANG_CONTEXT_ID);
+
 	const options = languages.map(
 		(language, index) =>
 			new PatternEnumPropertyOption({
-				id: uuid.v4(),
+				contextId: language.value,
+				id: context.options.getGloablEnumOptionId(langEnumId, language.value),
 				name: language.name,
 				ordinal: index,
 				value: language.value
@@ -21,44 +30,52 @@ export const Page = context => {
 
 	const defaultLanguage = options.find(option => option.getValue() === 'en');
 
-	const pageProperties = [
+	const properties = [
 		new PatternBooleanProperty({
+			contextId: VIEWPORT_CONTEXT_ID,
+			id: context.options.getGlobalPropertyId(patternId, VIEWPORT_CONTEXT_ID),
 			label: 'Mobile Viewport',
+			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'viewport',
 			defaultValue: true
 		}),
 		new PatternEnumProperty({
+			contextId: LANG_CONTEXT_ID,
 			defaultOptionId: defaultLanguage ? defaultLanguage.getId() : undefined,
 			hidden: false,
-			id: uuid.v4(),
+			id: langEnumId,
 			label: 'Language',
+			origin: Types.PatternPropertyOrigin.BuiltIn,
 			options,
 			propertyName: 'lang',
 			required: false
 		})
 	];
 
-	const pagePattern = new Pattern(
+	const pattern = new Pattern(
 		{
-			contextId: 'synthetic:page',
+			contextId: PATTERN_CONTEXT_ID,
 			exportName: 'default',
+			id: patternId,
 			name: 'Page',
-			propertyIds: pageProperties.map(p => p.getId()),
+			origin: Types.PatternOrigin.BuiltIn,
+			propertyIds: properties.map(p => p.getId()),
 			slots: [
 				new PatternSlot({
+					contextId: 'children',
 					displayName: 'Children',
 					propertyName: 'children',
-					id: uuid.v4(),
+					id: context.options.getGlobalSlotId(patternId, SLOT_CONTEXT_ID),
 					type: Types.SlotType.Children
 				})
 			],
-			type: SyntheticPatternType.SyntheticPage
+			type: Types.PatternType.SyntheticPage
 		},
 		context
 	);
 
 	return {
-		pagePattern,
-		pageProperties
+		pattern,
+		properties
 	};
 };

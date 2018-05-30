@@ -99,7 +99,19 @@ const SYNTHETICS = {
 	box: Box,
 	page: Page,
 	placeholder: props =>
-		props.src ? <img src={props.src} style={{ width: '100%', height: 'auto' }} /> : null,
+		props.src ? (
+			<img
+				src={props.src}
+				style={{
+					width: props.width,
+					height: props.height,
+					minWidth: props.minWidth,
+					maxWidth: props.maxWidth,
+					minHeight: props.minHeight,
+					maxHeight: props.maxHeight
+				}}
+			/>
+		) : null,
 	text: props => <span>{props.text}</span>
 };
 

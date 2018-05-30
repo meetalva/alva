@@ -224,7 +224,6 @@ async function createWindow(): Promise<void> {
 			case ServerMessageType.Save: {
 				const project = Project.from(message.payload.project);
 				project.setPath(message.payload.path);
-
 				if (process.env.NODE_ENV === 'development') {
 					projectPath = project.getPath();
 				}

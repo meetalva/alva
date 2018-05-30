@@ -346,6 +346,7 @@ export function createMenu(ctx: MenuContext): void {
 					enabled:
 						typeof ctx.patternLibrary !== 'undefined' &&
 						ctx.patternLibrary.getState() === Types.PatternLibraryState.Connected,
+					accelerator: 'CmdOrCtrl+U',
 					click: () => ctx.store.updatePatternLibrary()
 				}
 			]

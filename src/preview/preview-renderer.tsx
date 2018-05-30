@@ -103,6 +103,8 @@ const SYNTHETICS = {
 			<img
 				src={props.src}
 				style={{
+					width: props.width,
+					height: props.height,
 					minWidth: props.minWidth,
 					maxWidth: props.maxWidth,
 					minHeight: props.minHeight,

@@ -129,7 +129,6 @@ function analyzePatternExport(
 	}
 
 	const [propTypes] = reactTypeArguments;
-
 	const exportName = ex.name || 'default';
 	const contextId = `${ctx.candidate.id}:${exportName}`;
 	const id = ctx.options.getGlobalPatternId(contextId);

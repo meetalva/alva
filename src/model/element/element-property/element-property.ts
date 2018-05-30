@@ -84,6 +84,10 @@ export class ElementProperty {
 		return this.patternLibrary.getPatternPropertyById(this.patternPropertyId);
 	}
 
+	public getPatternPropertyId(): string {
+		return this.patternPropertyId;
+	}
+
 	public getValue(): Types.ElementPropertyValue {
 		return this.value;
 	}

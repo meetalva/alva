@@ -484,7 +484,25 @@ export class Element {
 	@Mobx.action
 	public setPatternLibrary(patternLibrary: PatternLibrary): void {
 		this.patternLibrary = patternLibrary;
-		this.properties.forEach(property => property.setPatternLibrary(this.patternLibrary));
+		const pattern = this.getPattern();
+
+		if (pattern) {
+			// Recreate element properties
+			this.properties = pattern.getProperties().map(patternProperty => {
+				const previous = this.properties.find(
+					prop => prop.getPatternPropertyId() === patternProperty.getId()
+				);
+				return new ElementProperty(
+					{
+						id: previous ? previous.getId() : uuid.v4(),
+						patternPropertyId: patternProperty.getId(),
+						setDefault: true,
+						value: previous ? previous.getValue() : undefined // copy previous values
+					},
+					{ patternLibrary }
+				);
+			});
+		}
 	}
 
 	@Mobx.action

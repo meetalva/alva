@@ -84,6 +84,8 @@ export class ViewStore {
 	 */
 	@Mobx.observable private redoBuffer: Command.Command[] = [];
 
+	private savedProjects: Types.SavedProject[] = [];
+
 	/**
 	 * http port the preview server is listening on
 	 */
@@ -146,6 +148,10 @@ export class ViewStore {
 
 		this.execute(Command.PageAddCommand.create({ page, project: this.project }));
 		return page;
+	}
+
+	public addSavedProject(project: Model.Project): void {
+		this.savedProjects.push(project.toDisk());
 	}
 
 	/**
@@ -511,6 +517,10 @@ export class ViewStore {
 
 	public getProject(): Model.Project {
 		return this.project;
+	}
+
+	public getSavedProjects(): Types.SavedProject[] {
+		return this.savedProjects;
 	}
 
 	public getSelectedElement(): Model.Element | undefined {

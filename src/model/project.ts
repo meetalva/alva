@@ -1,4 +1,5 @@
 import { Element, ElementContent } from './element';
+import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Page } from './page';
 import { PatternLibrary } from './pattern-library';
@@ -118,6 +119,15 @@ export class Project {
 		);
 
 		return project;
+	}
+
+	public static isEqual(a: Types.SavedProject, b: Types.SavedProject): boolean;
+	public static isEqual(
+		a: Types.SavedProject | Project,
+		b: Types.SavedProject | Project
+	): boolean {
+		const toData = input => (input instanceof Project ? input.toDisk() : input);
+		return isEqual(toData(a), toData(b));
 	}
 
 	public addElement(element: Element): void {

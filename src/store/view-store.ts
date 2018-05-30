@@ -572,6 +572,10 @@ export class ViewStore {
 		element: Model.Element;
 		targetElement: Model.Element;
 	}): Model.Element | undefined {
+		if (init.element.isRoot()) {
+			return;
+		}
+
 		if (init.targetElement.isRoot()) {
 			return this.insertInsideElement(init);
 		}
@@ -599,6 +603,10 @@ export class ViewStore {
 		element: Model.Element;
 		targetElement: Model.Element;
 	}): Model.Element | undefined {
+		if (init.element.isRoot()) {
+			return;
+		}
+
 		const contents = init.targetElement.getContentBySlotType(Types.SlotType.Children);
 
 		if (!contents) {

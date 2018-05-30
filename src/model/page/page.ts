@@ -96,6 +96,7 @@ export class Page {
 				patternId: rootPattern.getId(),
 				placeholderHighlighted: false,
 				properties: [],
+				role: Types.ElementRole.Root,
 				setDefaults: true,
 				selected: false
 			},

@@ -246,7 +246,7 @@ export class ViewStore {
 	 */
 	@Mobx.action
 	public cutElement(element: Model.Element): void {
-		if (element.isRoot()) {
+		if (element.getRole() === Types.ElementRole.Root) {
 			return;
 		}
 
@@ -572,11 +572,11 @@ export class ViewStore {
 		element: Model.Element;
 		targetElement: Model.Element;
 	}): Model.Element | undefined {
-		if (init.element.isRoot()) {
+		if (init.element.getRole() === Types.ElementRole.Root) {
 			return;
 		}
 
-		if (init.targetElement.isRoot()) {
+		if (init.targetElement.getRole() === Types.ElementRole.Root) {
 			return this.insertInsideElement(init);
 		}
 
@@ -603,7 +603,7 @@ export class ViewStore {
 		element: Model.Element;
 		targetElement: Model.Element;
 	}): Model.Element | undefined {
-		if (init.element.isRoot()) {
+		if (init.element.getRole() === Types.ElementRole.Root) {
 			return;
 		}
 
@@ -736,7 +736,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public removeElement(element: Model.Element): void {
-		if (element.isRoot()) {
+		if (element.getRole() === Types.ElementRole.Root) {
 			return;
 		}
 
@@ -864,7 +864,7 @@ export class ViewStore {
 	@Mobx.action
 	public setClipboardItem(item: Model.Element | Model.Page): void {
 		if (item instanceof Model.Element) {
-			if (item.isRoot()) {
+			if (item.getRole() === Types.ElementRole.Root) {
 				return;
 			}
 

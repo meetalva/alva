@@ -20,6 +20,7 @@ export interface ElementInit {
 	patternId: string;
 	placeholderHighlighted: boolean;
 	properties: ElementProperty[];
+	role?: Types.ElementRole;
 	selected: boolean;
 	setDefaults?: boolean;
 }
@@ -64,6 +65,8 @@ export class Element {
 
 	@Mobx.observable private properties: ElementProperty[];
 
+	private role: Types.ElementRole;
+
 	@Mobx.observable private selected: boolean;
 
 	public constructor(init: ElementInit, context: ElementContext) {
@@ -76,6 +79,7 @@ export class Element {
 		this.forcedOpen = init.forcedOpen;
 		this.patternLibrary = context.patternLibrary;
 		this.project = context.project;
+		this.role = init.role || Types.ElementRole.Node;
 		this.selected = init.selected;
 
 		const pattern = this.patternLibrary.getPatternById(this.patternId);
@@ -136,6 +140,7 @@ export class Element {
 				properties: serialized.properties.map(p =>
 					ElementProperty.from(p, { patternLibrary: context.patternLibrary })
 				),
+				role: deserializeRole(serialized.role),
 				selected: serialized.selected
 			},
 			context
@@ -179,6 +184,7 @@ export class Element {
 				patternId: this.patternId,
 				placeholderHighlighted: false,
 				properties: this.properties.map(propertyValue => propertyValue.clone()),
+				role: this.role,
 				selected: false
 			},
 			{
@@ -330,6 +336,10 @@ export class Element {
 		return this.name;
 	}
 
+	public getNameEditable(): boolean {
+		return this.nameEditable;
+	}
+
 	public getOpen(): boolean {
 		return this.open;
 	}
@@ -374,6 +384,10 @@ export class Element {
 		return this.properties;
 	}
 
+	public getRole(): Types.ElementRole {
+		return this.role;
+	}
+
 	public getSelected(): boolean {
 		return this.selected;
 	}
@@ -381,14 +395,6 @@ export class Element {
 	public isAncestorOfById(id: string): boolean {
 		const match = this.getElementById(id);
 		return Boolean(match);
-	}
-
-	public isNameEditable(): boolean {
-		return this.nameEditable;
-	}
-
-	public isRoot(): boolean {
-		return !Boolean(this.getContainer());
 	}
 
 	@Mobx.action
@@ -555,6 +561,7 @@ export class Element {
 			patternId: this.patternId,
 			placeholderHighlighted: this.placeholderHighlighted,
 			properties: this.properties.map(elementProperty => elementProperty.toJSON()),
+			role: serializeRole(this.role),
 			selected: this.selected
 		};
 	}
@@ -563,4 +570,24 @@ export class Element {
 	public unsetContainer(): void {
 		this.containerId = undefined;
 	}
+}
+
+function deserializeRole(input: Types.SerializedElementRole): Types.ElementRole {
+	switch (input) {
+		case 'root':
+			return Types.ElementRole.Root;
+		case 'node':
+			return Types.ElementRole.Node;
+	}
+	throw new Error(`Unknown element role: ${input}`);
+}
+
+function serializeRole(input: Types.ElementRole): Types.SerializedElementRole {
+	switch (input) {
+		case Types.ElementRole.Root:
+			return 'root';
+		case Types.ElementRole.Node:
+			return 'node';
+	}
+	throw new Error(`Unknown element role: ${input}`);
 }

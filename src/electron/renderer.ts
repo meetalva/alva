@@ -275,6 +275,24 @@ Mobx.autorunAsync(() => {
 	});
 });
 
+Mobx.autorunAsync(() => {
+	const project = store.getProject();
+	const serializedProject = project.toJSON();
+
+	if (project) {
+		const payload = {
+			path: project.getPath(),
+			project: serializedProject
+		};
+
+		Sender.send({
+			id: uuid.v4(),
+			payload,
+			type: ServerMessageType.Save
+		});
+	}
+});
+
 ReactDom.render(React.createElement(App), document.getElementById('app'));
 
 // Disable drag and drop from outside the application

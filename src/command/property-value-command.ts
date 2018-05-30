@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { ElementCommand } from './element-command';
 import { Element } from '../model';
+import { ViewStore } from '../store';
 
 /**
  * A user operation to set the value of a page element property.
@@ -45,12 +46,11 @@ export class PropertyValueCommand extends ElementCommand {
 	 * the operation edits 'image.src.srcSet.xs' on the element.
 	 */
 	// tslint:disable-next-line:no-any
-	public constructor(element: Element, propertyId: string, value: any, path?: string) {
-		super(element);
+	public constructor(element: Element, propertyId: string, value: any, store: ViewStore) {
+		super(element, store);
 
 		this.propertyId = propertyId;
 		this.value = value;
-		this.path = path;
 		// 		this.previousValue = element.getPropertyValue(propertyId, path);
 	}
 

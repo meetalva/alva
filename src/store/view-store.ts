@@ -36,11 +36,6 @@ export class ViewStore {
 	> = new WeakMap();
 
 	/**
-	 * The store singleton instance.
-	 */
-	private static INSTANCE: ViewStore;
-
-	/**
 	 * The page that is currently being displayed in the preview, and edited in the elements
 	 * and properties panes. May be undefined if there is none.
 	 */
@@ -98,25 +93,6 @@ export class ViewStore {
 	 */
 	@Mobx.observable private undoBuffer: Command.Command[] = [];
 
-	/**
-	 * Creates a new store.
-	 */
-	private constructor() {}
-
-	/**
-	 * Returns (or creates) the one global store instance.
-	 * @return The one global store instance.
-	 */
-	public static getInstance(): ViewStore {
-		if (!ViewStore.INSTANCE) {
-			ViewStore.INSTANCE = new ViewStore();
-			// tslint:disable-next-line:no-any
-			(global as any).viewStore = ViewStore.INSTANCE;
-		}
-
-		return ViewStore.INSTANCE;
-	}
-
 	@Mobx.action
 	public addElement(element: Model.Element): void {
 		const contents = ViewStore.EPHEMERAL_CONTENTS.get(element) || [];
@@ -146,7 +122,7 @@ export class ViewStore {
 			{ project: this.project, patternLibrary }
 		);
 
-		this.execute(Command.PageAddCommand.create({ page, project: this.project }));
+		this.execute(Command.PageAddCommand.create({ page, project: this.project, store: this }));
 		return page;
 	}
 
@@ -257,7 +233,7 @@ export class ViewStore {
 		}
 
 		this.setClipboardItem(element);
-		this.execute(new Command.ElementRemoveCommand({ element }));
+		this.execute(new Command.ElementRemoveCommand({ element, store: this }));
 	}
 
 	@Mobx.action
@@ -361,13 +337,16 @@ export class ViewStore {
 			Command.ElementLocationCommand.addChild({
 				childId: init.element.getId(),
 				contentId: init.content.getId(),
-				index: init.index
+				index: init.index,
+				store: this
 			})
 		);
 	}
 
 	public executeElementRename(editableElement: Model.Element): void {
-		this.execute(new Command.ElementNameCommand(editableElement, editableElement.getName()));
+		this.execute(
+			new Command.ElementNameCommand(editableElement, editableElement.getName(), this)
+		);
 	}
 
 	public getActiveView(): Types.AlvaView {
@@ -600,7 +579,8 @@ export class ViewStore {
 			Command.ElementLocationCommand.addChild({
 				index: init.targetElement.getIndex() + 1,
 				contentId: container.getId(),
-				childId: init.element.getId()
+				childId: init.element.getId(),
+				store: this
 			})
 		);
 
@@ -627,7 +607,8 @@ export class ViewStore {
 			Command.ElementLocationCommand.addChild({
 				contentId: contents.getId(),
 				childId: init.element.getId(),
-				index: contents.getElements().length
+				index: contents.getElements().length,
+				store: this
 			})
 		);
 
@@ -769,7 +750,7 @@ export class ViewStore {
 
 		const elementBefore = getNextSelected();
 
-		this.execute(new Command.ElementRemoveCommand({ element }));
+		this.execute(new Command.ElementRemoveCommand({ element, store: this }));
 
 		if (elementBefore) {
 			this.setSelectedElement(elementBefore);
@@ -783,7 +764,7 @@ export class ViewStore {
 		const element = this.getElementById(id);
 
 		if (element) {
-			this.execute(new Command.ElementRemoveCommand({ element }));
+			this.execute(new Command.ElementRemoveCommand({ element, store: this }));
 		}
 	}
 
@@ -798,7 +779,8 @@ export class ViewStore {
 		this.execute(
 			Command.PageRemoveCommand.create({
 				page,
-				project
+				project,
+				store: this
 			})
 		);
 	}

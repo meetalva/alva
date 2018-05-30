@@ -4,6 +4,7 @@ import {
 	PatternItemLabel,
 	PatternListItem
 } from '../../components';
+import * as MobxReact from 'mobx-react';
 import { Pattern } from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
@@ -12,9 +13,11 @@ export interface PatternItemContainerContainerProps {
 	pattern: Pattern;
 }
 
+@MobxReact.inject('store')
+@MobxReact.observer
 export class PatternItemContainer extends React.Component<PatternItemContainerContainerProps> {
 	private handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
-		const store = ViewStore.getInstance();
+		const { store } = this.props as PatternItemContainerContainerProps & { store: ViewStore };
 		const element = store.createElement({ pattern: this.props.pattern });
 
 		const getTargetElement = () => {
@@ -42,7 +45,7 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 	}
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
-		const store = ViewStore.getInstance();
+		const { store } = this.props as PatternItemContainerContainerProps & { store: ViewStore };
 
 		const element = store.createElement({ pattern: this.props.pattern, dragged: true });
 		store.addElement(element);

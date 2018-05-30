@@ -8,10 +8,12 @@ import { ViewStore } from '../../store';
 import * as Types from '../../model/types';
 import * as uuid from 'uuid';
 
+@MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyListContainer extends React.Component {
 	public render(): React.ReactNode {
-		const selectedElement = ViewStore.getInstance().getSelectedElement();
+		const { store } = this.props as { store: ViewStore };
+		const selectedElement = store.getSelectedElement();
 
 		if (!selectedElement) {
 			return null;

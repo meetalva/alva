@@ -4,6 +4,7 @@ import { createMenu } from './create-menu';
 import { webFrame } from 'electron';
 import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
+import * as MobxReact from 'mobx-react';
 import { PatternLibrary, Project } from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
@@ -15,7 +16,7 @@ import * as uuid from 'uuid';
 webFrame.setVisualZoomLevelLimits(1, 1);
 webFrame.setLayoutZoomLevelLimits(0, 0);
 
-const store = ViewStore.getInstance();
+const store = new ViewStore();
 
 Sender.send({
 	id: uuid.v4(),
@@ -302,7 +303,12 @@ Mobx.autorunAsync(() => {
 	}
 });
 
-ReactDom.render(React.createElement(App), document.getElementById('app'));
+ReactDom.render(
+	<MobxReact.Provider store={store}>
+		<App />
+	</MobxReact.Provider>,
+	document.getElementById('app')
+);
 
 // Disable drag and drop from outside the application
 document.addEventListener(

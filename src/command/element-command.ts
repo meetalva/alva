@@ -23,6 +23,8 @@ export abstract class ElementCommand extends Command {
 	 */
 	protected pageId: string;
 
+	protected store: ViewStore;
+
 	/**
 	 * Creates a new user operation on a page element.
 	 * @param element The element the user operation is performed on.
@@ -33,9 +35,10 @@ export abstract class ElementCommand extends Command {
 	 * the operation edits 'image.src.srcSet.xs' on the element.
 	 */
 	// tslint:disable-next-line:no-any
-	public constructor(element: Element) {
+	public constructor(element: Element, store: ViewStore) {
 		super();
 
+		this.store = store;
 		this.element = element;
 
 		// Memorize the element and page IDs.
@@ -55,16 +58,15 @@ export abstract class ElementCommand extends Command {
 	 * @return Whether the operation was successful. On failure, the execute/undo should abort.
 	 */
 	protected ensurePageAndElement(): boolean {
-		const store = ViewStore.getInstance();
-		const currentPage = store.getCurrentPage();
+		const currentPage = this.store.getCurrentPage();
 
 		if (!currentPage || currentPage.getId() !== this.pageId) {
-			store.setActivePageById(this.pageId);
+			this.store.setActivePageById(this.pageId);
 			return true;
 		}
 
 		if (this.elementId) {
-			const element = store.getElementById(this.elementId);
+			const element = this.store.getElementById(this.elementId);
 			if (!element) {
 				return false;
 			}
@@ -85,7 +87,7 @@ export abstract class ElementCommand extends Command {
 		const page = this.element.getPage();
 
 		if (page) {
-			ViewStore.getInstance().setSelectedElement(this.element);
+			this.store.setSelectedElement(this.element);
 		}
 
 		return true;
@@ -116,7 +118,7 @@ export abstract class ElementCommand extends Command {
 		}
 
 		if (this.element.getPage()) {
-			ViewStore.getInstance().setSelectedElement(this.element);
+			this.store.setSelectedElement(this.element);
 		}
 
 		return true;

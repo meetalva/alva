@@ -9,9 +9,15 @@ import * as Types from '../model/types';
 export class SketchExporter implements Types.Exporter {
 	public contents: Buffer;
 
+	private store: ViewStore;
+
+	public constructor(store: ViewStore) {
+		this.store = store;
+	}
+
 	public execute(path: string): void {
 		const id = uuid.v4();
-		const page = ViewStore.getInstance().getCurrentPage() as Page;
+		const page = this.store.getCurrentPage() as Page;
 		const artboardName = page.getName();
 		const pageName = page.getName();
 

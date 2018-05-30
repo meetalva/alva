@@ -17,10 +17,16 @@ export class ElementLocationCommand extends ElementCommand {
 	protected previousContentId: string;
 	protected previousIndex: number;
 
-	public constructor(init: { contentId: string; elementId: string; index: number }) {
-		super((ViewStore.getInstance().getProject() as Project).getElementById(
-			init.elementId
-		) as Element);
+	public constructor(init: {
+		contentId: string;
+		elementId: string;
+		index: number;
+		store: ViewStore;
+	}) {
+		super(
+			(init.store.getProject() as Project).getElementById(init.elementId) as Element,
+			init.store
+		);
 		this.index = init.index;
 		this.contentId = init.contentId;
 	}
@@ -39,19 +45,27 @@ export class ElementLocationCommand extends ElementCommand {
 		childId: string;
 		contentId: string;
 		index: number;
+		store: ViewStore;
 	}): ElementCommand {
 		return new ElementLocationCommand({
 			elementId: init.childId,
 			contentId: init.contentId,
-			index: init.index
+			index: init.index,
+			store: init.store
 		});
 	}
 
-	public static setParent(childId: string, contentId: string, index: number): ElementCommand {
+	public static setParent(
+		childId: string,
+		contentId: string,
+		index: number,
+		store: ViewStore
+	): ElementCommand {
 		return new ElementLocationCommand({
 			elementId: childId,
 			contentId,
-			index
+			index,
+			store
 		});
 	}
 
@@ -63,8 +77,7 @@ export class ElementLocationCommand extends ElementCommand {
 			return false;
 		}
 
-		const store = ViewStore.getInstance();
-		const project = store.getProject();
+		const project = this.store.getProject();
 
 		if (!project || !this.contentId) {
 			return false;
@@ -112,8 +125,7 @@ export class ElementLocationCommand extends ElementCommand {
 			return false;
 		}
 
-		const store = ViewStore.getInstance();
-		const project = store.getProject();
+		const project = this.store.getProject();
 
 		if (!project) {
 			return false;

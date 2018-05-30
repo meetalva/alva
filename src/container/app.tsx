@@ -33,48 +33,17 @@ const Resizeable = require('re-resizable');
 
 globalStyles();
 
+interface InjectedAppProps {
+	store: ViewStore;
+}
+
+@MobxReact.inject('store')
 @MobxReact.observer
 export class App extends React.Component {
-	private ctrlDown: boolean = false;
-	private shiftDown: boolean = false;
-
-	public componentDidMount(): void {
-		this.redirectUndoRedo();
-	}
-
-	private redirectUndoRedo(): void {
-		document.body.onkeydown = event => {
-			if (event.keyCode === 16) {
-				this.shiftDown = true;
-			} else if (event.keyCode === 17 || event.keyCode === 91) {
-				this.ctrlDown = true;
-			} else if (this.ctrlDown && event.keyCode === 90) {
-				event.preventDefault();
-				if (this.shiftDown) {
-					ViewStore.getInstance().redo();
-				} else {
-					ViewStore.getInstance().undo();
-				}
-
-				return false;
-			}
-
-			return true;
-		};
-
-		document.body.onkeyup = event => {
-			if (event.keyCode === 16) {
-				this.shiftDown = false;
-			} else if (event.keyCode === 17 || event.keyCode === 91) {
-				this.ctrlDown = false;
-			}
-		};
-	}
-
 	public render(): JSX.Element | null {
-		const store = ViewStore.getInstance();
+		const props = this.props as InjectedAppProps;
 
-		if (store.getAppState() !== Types.AppState.Started) {
+		if (props.store.getAppState() !== Types.AppState.Started) {
 			return null;
 		}
 
@@ -82,7 +51,7 @@ export class App extends React.Component {
 			<Layout direction={LayoutDirection.Column}>
 				<ChromeContainer />
 				<MainArea>
-					{store.getActiveView() === Types.AlvaView.SplashScreen && (
+					{props.store.getActiveView() === Types.AlvaView.SplashScreen && (
 						<SplashScreenContainer
 							onPrimaryButtonClick={() => {
 								Sender.send({
@@ -100,12 +69,12 @@ export class App extends React.Component {
 							}}
 						/>
 					)}
-					{store.getActiveView() === Types.AlvaView.Pages && (
+					{props.store.getActiveView() === Types.AlvaView.Pages && (
 						<PageListPreview>
 							<PageListContainer />
 						</PageListPreview>
 					)}
-					{store.getActiveView() === Types.AlvaView.PageDetail && (
+					{props.store.getActiveView() === Types.AlvaView.PageDetail && (
 						<React.Fragment>
 							<Resizeable
 								handleStyles={{ right: { zIndex: 1 } }}
@@ -116,7 +85,7 @@ export class App extends React.Component {
 								<SideBar
 									side={LayoutSide.Left}
 									direction={LayoutDirection.Column}
-									onClick={() => store.unsetSelectedElement()}
+									onClick={() => props.store.unsetSelectedElement()}
 									border={LayoutBorder.Side}
 								>
 									<ElementPane>
@@ -137,7 +106,7 @@ export class App extends React.Component {
 							</Resizeable>
 							<PreviewPaneWrapper
 								key="center"
-								previewFrame={`http://localhost:${store.getServerPort()}/preview.html`}
+								previewFrame={`http://localhost:${props.store.getServerPort()}/preview.html`}
 							/>
 							<Resizeable
 								handleStyles={{ left: { zIndex: 1 } }}
@@ -150,10 +119,10 @@ export class App extends React.Component {
 									direction={LayoutDirection.Column}
 									border={LayoutBorder.Side}
 								>
-									{store.getPatternLibraryState() ===
+									{props.store.getPatternLibraryState() ===
 										Types.PatternLibraryState.Pristine && (
 										<ConnectPaneContainer
-											onPrimaryButtonClick={() => store.connectPatternLibrary()}
+											onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
 										/>
 									)}
 									<PropertyPane>

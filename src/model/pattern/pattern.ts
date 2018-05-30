@@ -9,6 +9,7 @@ import * as uuid from 'uuid';
 
 export interface PatternInit {
 	contextId: string;
+	description: string;
 	exportName: string;
 	id?: string;
 	name: string;
@@ -24,6 +25,7 @@ export interface PatternContext {
 
 export class Pattern {
 	@Mobx.observable private contextId: string;
+	@Mobx.observable private description: string;
 	@Mobx.observable private exportName: string;
 	@Mobx.observable private folder: PatternFolder;
 	@Mobx.observable private id: string;
@@ -36,6 +38,7 @@ export class Pattern {
 
 	public constructor(init: PatternInit, context: PatternContext) {
 		this.contextId = init.contextId;
+		this.description = init.description;
 		this.exportName = init.exportName;
 		this.id = init.id || uuid.v4();
 		this.name = AlvaUtil.guessName(init.name);
@@ -50,6 +53,7 @@ export class Pattern {
 		return new Pattern(
 			{
 				contextId: serialized.contextId,
+				description: serialized.description,
 				exportName: serialized.exportName,
 				id: serialized.id,
 				name: serialized.name,
@@ -68,6 +72,10 @@ export class Pattern {
 
 	public getContextId(): string {
 		return this.contextId;
+	}
+
+	public getDescription(): string {
+		return this.description;
 	}
 
 	public getExportName(): string {
@@ -117,6 +125,7 @@ export class Pattern {
 	public toJSON(): Types.SerializedPattern {
 		return {
 			contextId: this.contextId,
+			description: this.description,
 			exportName: this.exportName,
 			id: this.id,
 			name: this.name,
@@ -129,6 +138,7 @@ export class Pattern {
 
 	public update(pattern: Pattern, context: PatternContext): void {
 		this.contextId = pattern.getContextId();
+		this.description = pattern.getDescription();
 		this.exportName = pattern.getExportName();
 		this.name = pattern.getName();
 		this.origin = pattern.getOrigin();

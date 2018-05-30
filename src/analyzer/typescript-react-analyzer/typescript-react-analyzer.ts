@@ -18,6 +18,7 @@ const loadPatternplateMeta = require('@patternplate/load-meta');
 export interface PatternCandidate {
 	artifactPath: string;
 	declarationPath: string | undefined;
+	description: string;
 	displayName: string;
 	id: string;
 	sourcePath: string;
@@ -152,6 +153,7 @@ function analyzePatternExport(
 		path: ctx.candidate.artifactPath,
 		pattern: {
 			contextId,
+			description: ctx.candidate.description,
 			exportName,
 			id,
 			name: exportName !== 'default' ? exportName : ctx.candidate.displayName,
@@ -190,6 +192,7 @@ async function findPatternCandidates(path: string): Promise<PatternCandidate[]> 
 		return {
 			artifactPath: Fs.existsSync(artifactPath) ? artifactPath : undefined,
 			declarationPath: Fs.existsSync(declarationPath) ? declarationPath : undefined,
+			description: pattern.manifest.description || '',
 			displayName: pattern.manifest.displayName || pattern.manifest.name,
 			id: pattern.id,
 			sourcePath

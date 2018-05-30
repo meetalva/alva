@@ -76,7 +76,7 @@ export class PatternLibrary {
 
 		const syntheticFolder = new PatternFolder(
 			{
-				name: 'Synthetic',
+				name: 'Built-In Components',
 				type: Types.PatternFolderType.Builtin
 			},
 			{ patternLibrary }

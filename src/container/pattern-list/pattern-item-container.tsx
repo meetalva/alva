@@ -1,4 +1,9 @@
-import { PatternAnchor, PatternListItem } from '../../components';
+import {
+	PatternAnchor,
+	PatternItemDescription,
+	PatternItemLabel,
+	PatternListItem
+} from '../../components';
 import { Pattern } from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
@@ -60,7 +65,8 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 				onDoubleClick={e => this.handleDoubleClick(e)}
 				onDragStart={e => this.handleDragStart(e)}
 			>
-				{props.pattern.getName()}
+				<PatternItemLabel>{props.pattern.getName()}</PatternItemLabel>
+				<PatternItemDescription>{props.pattern.getDescription()}</PatternItemDescription>
 			</PatternListItem>
 		);
 	}

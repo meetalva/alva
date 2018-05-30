@@ -47,25 +47,14 @@
     "appId": "io.github.meetalva",
     "productName": "Alva",
     "copyright": "Copyright (c) 2017-2018 SinnerSchrader Deutschland GmbH",
-    "npmArgs": "npm i @types/react",
     "files": [
       "build/**/*",
-      "package.json",
-      {
-        "from": "build/designkit/node_modules/@types",
-        "to": "build/designkit/node_modules/@types",
-        "filter": [
-          "**/*.d.ts"
-        ]
-      }
+      "package.json"
     ],
     "directories": {
       "buildResources": "src/resources",
       "output": "dist"
     },
-    "asarUnpack": [
-      "build/designkit/**"
-    ],
     "mac": {
       "category": "public.app-category.graphics-design"
     },

@@ -24,6 +24,8 @@ export interface SerializedPage {
 	rootId: string;
 }
 
+export type SerializedElementRole = 'root' | 'node';
+
 export interface SerializedElement {
 	containerId?: string;
 	contentIds: string[];
@@ -36,6 +38,7 @@ export interface SerializedElement {
 	patternId: string;
 	placeholderHighlighted: boolean;
 	properties: SerializedElementProperty[];
+	role: SerializedElementRole;
 	selected: boolean;
 }
 
@@ -371,4 +374,9 @@ export interface RenderInit {
 
 export interface SelectPayload {
 	id: string;
+}
+
+export enum ElementRole {
+	Root = 'root',
+	Node = 'node'
 }

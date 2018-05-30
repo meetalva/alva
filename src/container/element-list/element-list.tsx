@@ -171,7 +171,7 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		if (draggedElement.isNameEditable()) {
+		if (draggedElement.getNameEditable()) {
 			e.preventDefault();
 			return;
 		}
@@ -302,7 +302,10 @@ export class ElementList extends React.Component {
 		const element = elementFromTarget(e.target as HTMLElement, { sibling: false });
 		const label = above(e.target, `[${ElementAnchors.label}]`);
 
-		if ((label && element) || (!label && element && element.isRoot())) {
+		if (
+			(label && element) ||
+			(!label && element && element.getRole() === Types.ElementRole.Root)
+		) {
 			store
 				.getProject()
 				.getElements()

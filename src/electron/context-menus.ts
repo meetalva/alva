@@ -3,6 +3,7 @@ import { MenuItemConstructorOptions, remote } from 'electron';
 import { ServerMessageType } from '../message';
 import { Element } from '../model';
 import { ViewStore } from '../store';
+import * as Types from '../model/types';
 import * as uuid from 'uuid';
 
 const store = ViewStore.getInstance();
@@ -11,7 +12,8 @@ export function elementMenu(element: Element): void {
 	const defaultPasteItems = [
 		{
 			label: 'Paste Below',
-			enabled: store.hasApplicableClipboardItem() && !element.isRoot(),
+			enabled:
+				store.hasApplicableClipboardItem() && element.getRole() !== Types.ElementRole.Root,
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
@@ -33,7 +35,7 @@ export function elementMenu(element: Element): void {
 		},
 		{
 			label: 'Duplicate',
-			enabled: !element.isRoot(),
+			enabled: element.getRole() !== Types.ElementRole.Root,
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
@@ -47,7 +49,7 @@ export function elementMenu(element: Element): void {
 	const template: MenuItemConstructorOptions[] = [
 		{
 			label: 'Cut',
-			enabled: !element.isRoot(),
+			enabled: element.getRole() !== Types.ElementRole.Root,
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
@@ -59,7 +61,7 @@ export function elementMenu(element: Element): void {
 		},
 		{
 			label: 'Copy',
-			enabled: !element.isRoot(),
+			enabled: element.getRole() !== Types.ElementRole.Root,
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
@@ -71,7 +73,7 @@ export function elementMenu(element: Element): void {
 		},
 		{
 			label: 'Delete',
-			enabled: !element.isRoot(),
+			enabled: element.getRole() !== Types.ElementRole.Root,
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),
@@ -92,7 +94,7 @@ export function elementMenu(element: Element): void {
 				remote.Menu.sendActionToFirstResponder('paste:');
 			}
 		} */
-		...(!element.isNameEditable() ? defaultPasteItems : [])
+		...(!element.getNameEditable() ? defaultPasteItems : [])
 	];
 
 	remote.Menu.buildFromTemplate(template).popup({});

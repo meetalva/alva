@@ -11,10 +11,24 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 	private handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
 		const store = ViewStore.getInstance();
 		const element = store.createElement({ pattern: this.props.pattern });
-		const selectedElement = store.getSelectedElement();
-		const page = store.getCurrentPage();
 
-		const targetElement = selectedElement ? selectedElement : page ? page.getRoot() : null;
+		const getTargetElement = () => {
+			const selectedElement = store.getSelectedElement();
+
+			if (selectedElement) {
+				return selectedElement;
+			}
+
+			const page = store.getCurrentPage();
+
+			if (page) {
+				return page.getRoot();
+			}
+
+			return undefined;
+		};
+
+		const targetElement = getTargetElement();
 
 		if (element && targetElement) {
 			store.addElement(element);

@@ -15,12 +15,11 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 	public render(): JSX.Element | null {
 		const store = ViewStore.getInstance();
 		const { props } = this;
-		const open =
-			props.element.getOpen() || props.element.getForcedOpen();
+		const open = props.element.getOpen() || props.element.getForcedOpen();
 
 		// Ensure mobx registers
 		props.element.getSelected();
-		props.element.isNameEditable();
+		props.element.getNameEditable();
 		props.element.getHighlighted();
 		props.element.acceptsChildren();
 
@@ -51,7 +50,7 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 const getState = (element: Model.Element): Components.ElementState => {
 	const store = ViewStore.getInstance();
 
-	if (element.getSelected() && element.isNameEditable()) {
+	if (element.getSelected() && element.getNameEditable()) {
 		return Components.ElementState.Editable;
 	}
 

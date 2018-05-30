@@ -56,7 +56,7 @@ export class ElementList extends React.Component {
 		const editableElement = store.getNameEditableElement();
 
 		if (editableElement) {
-			store.execute(new Model.ElementNameCommand(editableElement, editableElement.getName()));
+			store.executeElementRename(editableElement);
 			store.setNameEditableElement();
 		}
 	}
@@ -237,13 +237,12 @@ export class ElementList extends React.Component {
 			store.addElement(draggedElement);
 		}
 
-		const command = Model.ElementLocationCommand.addChild({
-			childId: draggedElement.getId(),
-			contentId: dropTargetContent.getId(),
+		store.executeElementMove({
+			element: draggedElement,
+			content: dropTargetContent,
 			index
 		});
 
-		store.execute(command);
 		store.setSelectedElement(draggedElement);
 	}
 
@@ -268,9 +267,7 @@ export class ElementList extends React.Component {
 				const selectedElement = store.getSelectedElement();
 
 				if (editableElement) {
-					store.execute(
-						new Model.ElementNameCommand(editableElement, editableElement.getName())
-					);
+					store.executeElementRename(editableElement);
 					store.setNameEditableElement();
 				} else {
 					store.setNameEditableElement(selectedElement);

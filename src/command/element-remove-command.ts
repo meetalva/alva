@@ -1,8 +1,7 @@
 import { Command } from './command';
-import { Element, ElementContent } from '../element';
 import { ElementCommand } from './element-command';
-import { Page } from '../page/page';
-import { ViewStore } from '../../store'; // TODO: Remove dependency on store
+import { Element, ElementContent, Page } from '../model';
+import { ViewStore } from '../store';
 
 export class ElementRemoveCommand extends ElementCommand {
 	protected container: ElementContent;

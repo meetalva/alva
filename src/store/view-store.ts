@@ -84,12 +84,6 @@ export class ViewStore {
 	@Mobx.observable private redoBuffer: Model.Command[] = [];
 
 	/**
-	 * The well-known enum name of content that should be visible in
-	 * the right-hand sidebar/pane.
-	 */
-	@Mobx.observable private rightPane: Types.RightPane | null = null;
-
-	/**
 	 * http port the preview server is listening on
 	 */
 	@Mobx.observable private serverPort: number;
@@ -500,16 +494,6 @@ export class ViewStore {
 		return this.project;
 	}
 
-	/**
-	 * @return The content id to show in the right-hand sidebar
-	 */
-	public getRightPane(): Types.RightPane {
-		if (this.rightPane === null) {
-			return this.getSelectedElement() ? Types.RightPane.Properties : Types.RightPane.Patterns;
-		}
-		return this.rightPane;
-	}
-
 	public getSelectedElement(): Model.Element | undefined {
 		if (!this.project) {
 			return;
@@ -908,11 +892,6 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public setRightPane(pane: Types.RightPane | null): void {
-		this.rightPane = pane;
-	}
-
-	@Mobx.action
 	public setSelectedElement(selectedElement: Model.Element): void {
 		const previousSelectedElement = this.getSelectedElement();
 
@@ -928,7 +907,6 @@ export class ViewStore {
 			});
 		}
 
-		this.rightPane = null;
 		selectedElement.setSelected(true);
 
 		selectedElement.getAncestors().forEach(ancestor => {

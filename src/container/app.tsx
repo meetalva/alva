@@ -1,7 +1,6 @@
 import { ChromeContainer } from './chrome/chrome-container';
 import * as Sender from '../message/client';
 import {
-	AddButton,
 	ElementPane,
 	globalStyles,
 	IconName,
@@ -123,15 +122,17 @@ export class App extends React.Component {
 									<ElementPane>
 										<ElementList />
 									</ElementPane>
-									<AddButton
-										active={store.getRightPane() === Types.RightPane.Patterns}
-										label="Add Elements"
-										onClick={e => {
-											e.stopPropagation();
-											store.setRightPane(Types.RightPane.Patterns);
-											store.unsetSelectedElement();
-										}}
-									/>
+
+									<Resizeable
+										handleStyles={{ top: { zIndex: 1 } }}
+										defaultSize={{ height: 500, width: '100%' }}
+										enable={{ top: true }}
+										minHeight={240}
+									>
+										<PatternsPane>
+											<PatternListContainer />
+										</PatternsPane>
+									</Resizeable>
 								</SideBar>
 							</Resizeable>
 							<PreviewPaneWrapper
@@ -155,16 +156,9 @@ export class App extends React.Component {
 											onPrimaryButtonClick={() => store.connectPatternLibrary()}
 										/>
 									)}
-									{store.getRightPane() === Types.RightPane.Properties && (
-										<PropertyPane>
-											<PropertyListContainer />
-										</PropertyPane>
-									)}
-									{store.getRightPane() === Types.RightPane.Patterns && (
-										<PatternsPane>
-											<PatternListContainer />
-										</PatternsPane>
-									)}
+									<PropertyPane>
+										<PropertyListContainer />
+									</PropertyPane>
 								</SideBar>
 							</Resizeable>
 						</React.Fragment>

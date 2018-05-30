@@ -1,4 +1,3 @@
-export * from './command';
 export * from './element';
 export * from './page';
 export * from './pattern-folder';

@@ -1,6 +1,6 @@
 import { Command } from './command';
-import { Element } from '../element';
-import { ViewStore } from '../../store'; // TODO: Remove dependency on store
+import { Element } from '../model';
+import { ViewStore } from '../store';
 
 /**
  * A user operation on a page element, ensuring that the page is loaded and references get

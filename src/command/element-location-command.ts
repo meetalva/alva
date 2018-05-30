@@ -1,9 +1,7 @@
 import { Command } from './command';
-import { Element } from '../element';
 import { ElementCommand } from './element-command';
-import { Project } from '../project';
-// import { Page } from '../page/page';
-import { ViewStore } from '../../store'; // TODO: Remove dependency on store
+import { Element, Project } from '../model';
+import { ViewStore } from '../store';
 
 /**
  * A user operation to add or remove a child to/from a parent, or to relocate it.

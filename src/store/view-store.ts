@@ -1,4 +1,5 @@
 import * as Sender from '../message/client';
+import * as Command from '../command';
 import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
@@ -32,7 +33,7 @@ export class ViewStore {
 	private static EPHEMERAL_CONTENTS: WeakMap<
 		Model.Element,
 		Model.ElementContent[]
-		> = new WeakMap();
+	> = new WeakMap();
 
 	/**
 	 * The store singleton instance.
@@ -81,7 +82,7 @@ export class ViewStore {
 	 * Note that operations that close or open a page clear this buffer.
 	 * The last command in the list is the most recent undone.
 	 */
-	@Mobx.observable private redoBuffer: Model.Command[] = [];
+	@Mobx.observable private redoBuffer: Command.Command[] = [];
 
 	/**
 	 * http port the preview server is listening on
@@ -93,12 +94,12 @@ export class ViewStore {
 	 * Note that operations that close or open a page clear this buffer.
 	 * The last command in the list is the most recent executed one.
 	 */
-	@Mobx.observable private undoBuffer: Model.Command[] = [];
+	@Mobx.observable private undoBuffer: Command.Command[] = [];
 
 	/**
 	 * Creates a new store.
 	 */
-	private constructor() { }
+	private constructor() {}
 
 	/**
 	 * Returns (or creates) the one global store instance.
@@ -143,7 +144,7 @@ export class ViewStore {
 			{ project: this.project, patternLibrary }
 		);
 
-		this.execute(Model.PageAddCommand.create({ page, project: this.project }));
+		this.execute(Command.PageAddCommand.create({ page, project: this.project }));
 		return page;
 	}
 
@@ -250,7 +251,7 @@ export class ViewStore {
 		}
 
 		this.setClipboardItem(element);
-		this.execute(new Model.ElementRemoveCommand({ element }));
+		this.execute(new Command.ElementRemoveCommand({ element }));
 	}
 
 	@Mobx.action
@@ -314,7 +315,7 @@ export class ViewStore {
 	 * @param command The command to execute and register.
 	 */
 	@Mobx.action
-	public execute(command: Model.Command): void {
+	public execute(command: Command.Command): void {
 		const successful: boolean = command.execute();
 		if (!successful) {
 			// The state and the undo/redo buffers are out of sync.
@@ -343,6 +344,24 @@ export class ViewStore {
 
 		// All previously undone commands (the redo stack) are invalid after a forward command
 		this.redoBuffer = [];
+	}
+
+	public executeElementMove(init: {
+		content: Model.ElementContent;
+		element: Model.Element;
+		index: number;
+	}): void {
+		this.execute(
+			Command.ElementLocationCommand.addChild({
+				childId: init.element.getId(),
+				contentId: init.content.getId(),
+				index: init.index
+			})
+		);
+	}
+
+	public executeElementRename(editableElement: Model.Element): void {
+		this.execute(new Command.ElementNameCommand(editableElement, editableElement.getName()));
 	}
 
 	public getActiveView(): Types.AlvaView {
@@ -564,7 +583,7 @@ export class ViewStore {
 		}
 
 		this.execute(
-			Model.ElementLocationCommand.addChild({
+			Command.ElementLocationCommand.addChild({
 				index: init.targetElement.getIndex() + 1,
 				contentId: container.getId(),
 				childId: init.element.getId()
@@ -587,7 +606,7 @@ export class ViewStore {
 		}
 
 		this.execute(
-			Model.ElementLocationCommand.addChild({
+			Command.ElementLocationCommand.addChild({
 				contentId: contents.getId(),
 				childId: init.element.getId(),
 				index: contents.getElements().length
@@ -732,7 +751,7 @@ export class ViewStore {
 
 		const elementBefore = getNextSelected();
 
-		this.execute(new Model.ElementRemoveCommand({ element }));
+		this.execute(new Command.ElementRemoveCommand({ element }));
 
 		if (elementBefore) {
 			this.setSelectedElement(elementBefore);
@@ -746,7 +765,7 @@ export class ViewStore {
 		const element = this.getElementById(id);
 
 		if (element) {
-			this.execute(new Model.ElementRemoveCommand({ element }));
+			this.execute(new Command.ElementRemoveCommand({ element }));
 		}
 	}
 
@@ -759,7 +778,7 @@ export class ViewStore {
 		}
 
 		this.execute(
-			Model.PageRemoveCommand.create({
+			Command.PageRemoveCommand.create({
 				page,
 				project
 			})

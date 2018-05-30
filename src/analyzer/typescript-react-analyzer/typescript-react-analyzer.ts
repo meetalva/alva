@@ -1,7 +1,5 @@
-import * as chokidar from 'chokidar';
 import { createCompiler } from '../../compiler';
 import * as Fs from 'fs';
-import { debounce } from 'lodash';
 import * as Path from 'path';
 import * as PropertyAnalyzer from './property-analyzer';
 import * as ReactUtils from '../typescript/react-utils';
@@ -16,8 +14,6 @@ import { Compiler } from 'webpack';
 
 const loadPatternplateConfig = require('@patternplate/load-config');
 const loadPatternplateMeta = require('@patternplate/load-meta');
-const commonDir = require('common-dir');
-const globParent = require('glob-parent');
 
 export interface PatternCandidate {
 	artifactPath: string;
@@ -71,51 +67,6 @@ export async function analyze(
 	};
 }
 
-export async function watch(
-	path: string,
-	options: AnalyzeOptions,
-	onChange: (analyis: Types.LibraryAnalysis) => void
-): Promise<Types.Watcher> {
-	let active = false;
-
-	let parents = await getParents(path);
-
-	const watcher = chokidar.watch(parents, {
-		ignoreInitial: true
-	});
-
-	watcher.on(
-		'all',
-		debounce(async () => {
-			const updatedParents = await getParents(path);
-
-			const addedParents = updatedParents.filter(u => !parents.includes(u));
-			const removedParents = parents.filter(p => !updatedParents.includes(p));
-
-			watcher.add(addedParents);
-			watcher.unwatch(removedParents);
-
-			parents = updatedParents;
-
-			const analysis = await analyze(path, options);
-			onChange(analysis);
-		}, 300)
-	);
-
-	return {
-		getPath(): string {
-			return path;
-		},
-		isActive(): boolean {
-			return active;
-		},
-		stop(): void {
-			watcher.close();
-			active = false;
-		}
-	};
-}
-
 async function analyzePatterns(context: {
 	cwd: string;
 	options: AnalyzeOptions;
@@ -141,22 +92,6 @@ async function createPatternCompiler(
 	}));
 
 	return createCompiler(compilerPatterns, { cwd: context.cwd, infrastructure: false });
-}
-
-async function getParents(path: string): Promise<string[]> {
-	const patternplateConfig = await loadPatternplateConfig({ cwd: path });
-	const { config, filepath } = patternplateConfig;
-	const cwd = filepath ? Path.dirname(filepath) : path;
-	const { patterns } = await loadPatternplateMeta({ entry: config.entry, cwd });
-
-	const globParents = config.entry
-		.filter(e => !e.startsWith('!'))
-		.map(e => Path.join(cwd, globParent(e)));
-
-	const metaParents =
-		patterns.length === 0 ? [] : [commonDir(patterns.map(p => Path.join(cwd, p.path)))];
-
-	return [filepath, ...globParents, ...metaParents].filter(p => typeof p === 'string');
 }
 
 function getPatternAnalyzer(program: ts.Program, options: AnalyzeOptions): PatternAnalyzer {

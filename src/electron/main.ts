@@ -10,7 +10,7 @@ import * as stringEscape from 'js-string-escape';
 import { isEqual, uniqWith } from 'lodash';
 import { PreviewMessageType, ServerMessage, ServerMessageType } from '../message';
 import * as MimeTypes from 'mime-types';
-import { PatternLibrary, Project } from '../model';
+import { Project } from '../model';
 import * as Path from 'path';
 import { Persistence, PersistenceState } from '../persistence';
 import * as Sender from '../message/server';
@@ -53,8 +53,6 @@ let win: BrowserWindow | undefined;
 let projectPath: string | undefined;
 
 const userStore = new ElectronStore();
-
-const watchers: Types.Watcher[] = [];
 
 async function createWindow(): Promise<void> {
 	const { width = 1280, height = 800 } = screen.getPrimaryDisplay().workAreaSize;
@@ -358,48 +356,12 @@ async function createWindow(): Promise<void> {
 				break;
 			}
 			case ServerMessageType.CheckLibraryRequest: {
-				let library = Project.from(message.payload).getPatternLibrary();
-
-				const id = library.getId();
 				const connections = userStore.get('connections') || [];
 
-				connections.filter(c => c.id === id).forEach(connection => {
+				connections.filter(c => c.id === message.payload.id).forEach(connection => {
 					Fs.exists(connection.path, async exists => {
-						const watcher = watchers.find(
-							w => w.isActive() && w.getPath() === connection.path
-						);
-
-						if (exists && !watcher) {
-							const newWatcher = await Analyzer.watch(
-								connection.path,
-								{
-									getGobalEnumOptionId: (patternId, contextId) =>
-										library.assignEnumOptionId(patternId, contextId),
-									getGlobalPatternId: contextId => library.assignPatternId(contextId),
-									getGlobalPropertyId: (patternId, contextId) =>
-										library.assignPropertyId(patternId, contextId),
-									getGlobalSlotId: (patternId, contextId) =>
-										library.assignSlotId(patternId, contextId)
-								},
-								analysis => {
-									library = PatternLibrary.import(analysis, library);
-
-									send({
-										type: ServerMessageType.ConnectPatternLibraryResponse,
-										id: message.id,
-										payload: analysis
-									});
-								}
-							);
-							watchers.push(newWatcher);
-						}
-
-						if (!exists && watcher) {
-							watcher.stop();
-						}
-
 						send({
-							id,
+							id: message.id,
 							type: ServerMessageType.CheckLibraryResponse,
 							payload: [
 								{

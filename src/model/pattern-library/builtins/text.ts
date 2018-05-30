@@ -25,6 +25,7 @@ export const Text = (context: BuiltInContext): BuiltInResult => {
 		pattern: new Pattern(
 			{
 				contextId: PATTERN_CONTEXT_ID,
+				description: 'for Headlines, Copy and more',
 				exportName: 'default',
 				id: patternId,
 				name: 'Text',

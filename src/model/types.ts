@@ -97,6 +97,7 @@ export type SerializedPatternOrigin = 'built-in' | 'user-provided';
 
 export interface SerializedPattern {
 	contextId: string;
+	description: string;
 	exportName: string;
 	id: string;
 	name: string;

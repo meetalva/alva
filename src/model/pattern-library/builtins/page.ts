@@ -55,6 +55,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 	const pattern = new Pattern(
 		{
 			contextId: PATTERN_CONTEXT_ID,
+			description: '',
 			exportName: 'default',
 			id: patternId,
 			name: 'Page',

@@ -39,7 +39,6 @@ const StyledPatternListItem = styled.div`
 	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15);
 	border-radius: 3px;
 	transition: box-shadow 0.2s, color 0.2s;
-	align-items: center;
 	color: ${colors.grey20.toString()};
 
 	&:hover {
@@ -52,11 +51,29 @@ const StyledPatternListItem = styled.div`
 `;
 
 const StyledIcon = styled(Icon)`
-	margin-right: 6px;
+	margin-right: ${getSpace(SpaceSize.XS)}px;
+	flex: 0 0 ${IconSize.S}px;
 `;
 
-const StyledPatternListItemLabel = styled.div`
+const StyledPatternListItemContainer = styled.div`
+	padding: ${getSpace(SpaceSize.XXS)}px 0;
+	overflow: hidden;
+`;
+
+const StyledPatternListItemName = styled.div`
 	font-size: 15px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+`;
+
+const StyledPatternListItemDescription = styled.div`
+	padding-top: ${getSpace(SpaceSize.XXS)}px;
+	font-size: 12px;
+	color: ${colors.grey50.toString()};
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 `;
 
 export interface PatternFolderViewProps {
@@ -89,13 +106,21 @@ export const PatternListItem: React.StatelessComponent<PatternListItemProps> = p
 					color={colors.grey50}
 				/>
 			)}
-			<StyledPatternListItemLabel>{props.children}</StyledPatternListItemLabel>
+			<StyledPatternListItemContainer>{props.children}</StyledPatternListItemContainer>
 		</StyledPatternListItem>
 	);
 };
 
 export const PatternLabel: React.StatelessComponent = props => (
 	<StyledPatternLabel>{props.children}</StyledPatternLabel>
+);
+
+export const PatternItemLabel: React.StatelessComponent = props => (
+	<StyledPatternListItemName>{props.children}</StyledPatternListItemName>
+);
+
+export const PatternItemDescription: React.StatelessComponent = props => (
+	<StyledPatternListItemDescription>{props.children}</StyledPatternListItemDescription>
 );
 
 const PatternList: React.StatelessComponent = props => (

@@ -6,12 +6,14 @@ import * as Types from '../types';
 import * as uuid from 'uuid';
 
 export interface PageInit {
+	active: boolean;
 	id: string;
 	name: string;
 	rootId: string;
 }
 
 export interface PageCreateInit {
+	active: boolean;
 	id: string;
 	name: string;
 	patternLibrary: PatternLibrary;
@@ -23,6 +25,8 @@ export interface PageContext {
 }
 
 export class Page {
+	@Mobx.observable private active: boolean;
+
 	/**
 	 * Intermediary edited name
 	 */
@@ -54,6 +58,7 @@ export class Page {
 	private rootId: string;
 
 	public constructor(init: PageInit, context: PageContext) {
+		this.active = init.active;
 		this.id = init.id;
 		this.rootId = init.rootId;
 		this.name = init.name;
@@ -111,6 +116,7 @@ export class Page {
 
 		return new Page(
 			{
+				active: init.active,
 				id: init.id,
 				name: init.name,
 				rootId: rootElement.getId()
@@ -128,6 +134,7 @@ export class Page {
 	public static from(serializedPage: Types.SerializedPage, context: PageContext): Page {
 		const page = new Page(
 			{
+				active: serializedPage.active,
 				id: serializedPage.id,
 				name: serializedPage.name,
 				rootId: serializedPage.rootId
@@ -145,6 +152,10 @@ export class Page {
 		});
 	}
 
+	public getActive(): boolean {
+		return this.active;
+	}
+
 	public getContentById(id: string): ElementContent | undefined {
 		const rootElement = this.getRoot();
 
@@ -155,17 +166,10 @@ export class Page {
 		return rootElement.getContentById(id);
 	}
 
-	/**
-	 * Get the current edited value of the page name
-	 */
 	public getEditedName(): string {
 		return this.editedName;
 	}
 
-	/**
-	 * Returns the page element for a given Id or undefined, if no such ID exists.
-	 * @return The page element or undefined.
-	 */
 	public getElementById(id: string): Element | undefined {
 		const rootElement = this.getRoot();
 
@@ -214,6 +218,11 @@ export class Page {
 	}
 
 	@Mobx.action
+	public setActive(active: boolean): void {
+		this.active = active;
+	}
+
+	@Mobx.action
 	public setName(name: string): void {
 		if (this.nameState === Types.EditState.Editing) {
 			this.editedName = name;
@@ -232,15 +241,15 @@ export class Page {
 		this.nameState = state;
 	}
 
-	/**
-	 * Serializes the page into a JSON object for persistence.
-	 * @param forRendering Whether all property values should be converted using
-	 * Property.convertToRender (for the preview app instead of file persistence).
-	 * @return The JSON object to be persisted.
-	 * @see Property.convertToRender()
-	 */
+	public toDisk(): Types.SerializedPage {
+		const serialized = this.toJSON();
+		serialized.active = false;
+		return serialized;
+	}
+
 	public toJSON(): Types.SerializedPage {
 		return {
+			active: this.getActive(),
 			id: this.getId(),
 			name: this.getName(),
 			rootId: this.rootId

@@ -19,6 +19,7 @@ export interface SerializedProject extends SavedProject {
 }
 
 export interface SerializedPage {
+	active: boolean;
 	id: string;
 	name: string;
 	rootId: string;

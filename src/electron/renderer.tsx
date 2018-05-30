@@ -18,6 +18,14 @@ webFrame.setLayoutZoomLevelLimits(0, 0);
 
 const store = new ViewStore();
 
+const id = `s${uuid
+	.v4()
+	.split('-')
+	.join('')}`;
+// tslint:disable-next-line:no-any
+(window as any)[id] = store;
+console.log(`Access ViewStore at ${id}`);
+
 Sender.send({
 	id: uuid.v4(),
 	type: ServerMessageType.AppLoaded,

@@ -36,12 +36,6 @@ export class ViewStore {
 	> = new WeakMap();
 
 	/**
-	 * The page that is currently being displayed in the preview, and edited in the elements
-	 * and properties panes. May be undefined if there is none.
-	 */
-	@Mobx.observable private activePage?: number = 0;
-
-	/**
 	 * The current state of the Page Overview
 	 */
 	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
@@ -115,6 +109,7 @@ export class ViewStore {
 
 		const page = Model.Page.create(
 			{
+				active: true,
 				id: uuid.v4(),
 				name: `${name} ${count + 1}`,
 				patternLibrary: this.project.getPatternLibrary()
@@ -402,21 +397,7 @@ export class ViewStore {
 			return;
 		}
 
-		if (typeof this.activePage === 'undefined') {
-			return;
-		}
-
-		const pages = this.project.getPages();
-
-		if (pages.length === 0) {
-			return;
-		}
-
-		if (pages.length - 1 < this.activePage) {
-			return;
-		}
-
-		return this.project.getPages()[this.activePage];
+		return this.project.getPages().find(page => page.getActive());
 	}
 
 	public getDraggedElement(): Model.Element | undefined {
@@ -840,7 +821,12 @@ export class ViewStore {
 	@Mobx.action
 	public setActivePageByIndex(index: number): void {
 		this.unsetSelectedElement();
-		this.activePage = index;
+		this.unsetActivePage();
+
+		const page = this.project.getPages()[index];
+		if (page) {
+			page.setActive(true);
+		}
 	}
 
 	@Mobx.action
@@ -960,7 +946,11 @@ export class ViewStore {
 
 	@Mobx.action
 	public unsetActivePage(): void {
-		this.activePage = undefined;
+		if (!this.project) {
+			return;
+		}
+
+		this.project.getPages().forEach(page => page.setActive(false));
 	}
 
 	@Mobx.action

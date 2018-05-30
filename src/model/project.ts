@@ -75,6 +75,7 @@ export class Project {
 		project.addPage(
 			Page.create(
 				{
+					active: true,
 					id: uuid.v4(),
 					name: 'Untitled Page',
 					patternLibrary

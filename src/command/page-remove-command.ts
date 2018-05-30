@@ -12,6 +12,7 @@ export class PageRemoveCommand extends Command {
 		super();
 		this.page = init.page;
 		this.project = init.project;
+		this.store = init.store;
 	}
 
 	public static create(init: {

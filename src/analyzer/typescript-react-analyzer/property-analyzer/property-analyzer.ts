@@ -128,6 +128,7 @@ function createArrayProperty(
 		return {
 			contextId: args.symbol.name,
 			defaultValue: [],
+			description: args.symbol.name,
 			hidden: false,
 			id: ctx.getPropertyId(args.symbol.name),
 			label: args.symbol.name,
@@ -142,6 +143,7 @@ function createArrayProperty(
 		return {
 			contextId: args.symbol.name,
 			defaultValue: [],
+			description: args.symbol.name,
 			hidden: false,
 			id: ctx.getPropertyId(args.symbol.name),
 			label: args.symbol.name,
@@ -161,6 +163,7 @@ function createBooleanProperty(
 ): Types.SerializedPatternBooleanProperty | undefined {
 	return {
 		contextId: args.symbol.name,
+		description: args.symbol.name,
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		label: args.symbol.name,
@@ -195,6 +198,7 @@ function createEnumProperty(
 
 	return {
 		contextId: args.symbol.name,
+		description: args.symbol.name,
 		hidden: false,
 		id: enumId,
 		label: args.symbol.name,
@@ -227,6 +231,7 @@ function createNumberProperty(
 ): Types.SerializedPatternNumberProperty {
 	return {
 		contextId: args.symbol.name,
+		description: args.symbol.name,
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		label: args.symbol.name,
@@ -244,6 +249,7 @@ function createStringProperty(
 	if (TypescriptUtils.symbolHasJsDocTag(args.symbol, 'asset')) {
 		return {
 			contextId: args.symbol.name,
+			description: args.symbol.name,
 			hidden: false,
 			id: ctx.getPropertyId(args.symbol.name),
 			label: args.symbol.name,
@@ -256,6 +262,7 @@ function createStringProperty(
 
 	return {
 		contextId: args.symbol.name,
+		description: args.symbol.name,
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		label: args.symbol.name,

@@ -13,6 +13,7 @@ export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefi
 	public static from(serialized: Types.SerializedPatternBooleanProperty): PatternBooleanProperty {
 		return new PatternBooleanProperty({
 			contextId: serialized.contextId,
+			description: serialized.description,
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,
@@ -34,6 +35,7 @@ export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefi
 	public toJSON(): Types.SerializedPatternBooleanProperty {
 		return {
 			contextId: this.contextId,
+			description: this.description,
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,

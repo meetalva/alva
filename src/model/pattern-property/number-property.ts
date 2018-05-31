@@ -14,6 +14,7 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 	public static from(serialized: Types.SerializedPatternNumberProperty): PatternNumberProperty {
 		return new PatternNumberProperty({
 			contextId: serialized.contextId,
+			description: serialized.description,
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			id: serialized.id,
@@ -33,6 +34,7 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 	public toJSON(): Types.SerializedPatternNumberProperty {
 		return {
 			contextId: this.contextId,
+			description: this.description,
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,

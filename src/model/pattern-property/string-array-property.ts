@@ -38,6 +38,7 @@ export class PatternStringArrayProperty extends PatternPropertyBase<string[]> {
 		return {
 			contextId: this.contextId,
 			hidden: this.hidden,
+			description: this.description,
 			defaultValue: this.defaultValue,
 			id: this.id,
 			label: this.label,

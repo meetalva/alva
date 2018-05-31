@@ -62,6 +62,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 		}
 
 		const id = property.getId();
+		const description = patternProperty.getDescription();
 		const label = patternProperty.getLabel();
 		const type = patternProperty.getType();
 
@@ -69,7 +70,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 			return null;
 		}
 
-		const base = { key: id, label };
+		const base = { key: id, label, description };
 
 		// TODO: Split ElementProperty into type-specific classes for better type safety
 		// TODO: Implement inputs for

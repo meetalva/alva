@@ -29,6 +29,7 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 	public toJSON(): Types.SerializedPatternAssetProperty {
 		return {
 			contextId: this.contextId,
+			description: this.description,
 			hidden: this.hidden,
 			defaultValue: this.defaultValue,
 			id: this.id,

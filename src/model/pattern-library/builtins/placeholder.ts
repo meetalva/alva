@@ -25,6 +25,7 @@ export const Placeholder = (context: BuiltInContext): BuiltInResult => {
 		}),
 		new PatternProperty.PatternStringProperty({
 			contextId: WIDTH_CONTEXT_ID,
+			description: 'Lorem ipsum',
 			id: context.options.getGlobalPropertyId(patternId, WIDTH_CONTEXT_ID),
 			label: 'Width',
 			origin: Types.PatternPropertyOrigin.BuiltIn,

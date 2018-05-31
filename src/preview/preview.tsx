@@ -110,6 +110,29 @@ function main(): void {
 		}
 
 		e.preventDefault();
+
+		if (e.metaKey) {
+			return connection.send(
+				JSON.stringify({
+					type: PreviewMessageType.ClickElement,
+					id: uuid.v4(),
+					payload
+				})
+			);
+		}
+	};
+
+	const onElementSelect = (e: MouseEvent, payload) => {
+		if (!connection) {
+			return;
+		}
+
+		if (e.metaKey) {
+			return;
+		}
+
+		e.preventDefault();
+
 		connection.send(
 			JSON.stringify({
 				type: PreviewMessageType.SelectElement,
@@ -142,6 +165,7 @@ function main(): void {
 				getProperties: createPropertiesGetter(store),
 				getSlots: createSlotGetter(store),
 				onElementClick,
+				onElementSelect,
 				onOutsideClick,
 				store
 			},
@@ -430,6 +454,8 @@ function createComponentGetter(store: PreviewStore): (props: any, synthetics: an
 				return synthetics.text;
 			case 'synthetic:box':
 				return synthetics.box;
+			case 'synthetic:link':
+				return synthetics.link;
 		}
 	};
 }
@@ -456,6 +482,7 @@ function createChildrenGetter(store: PreviewStore): (contents: any, render: any)
 
 		return childContent.elementIds
 			.map(elementId => store.elements.find(e => e.id === elementId))
+			.filter(c => typeof c !== 'undefined')
 			.map(render);
 	};
 }

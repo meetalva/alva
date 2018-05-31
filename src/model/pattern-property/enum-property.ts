@@ -93,6 +93,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		return {
 			contextId: this.contextId,
 			defaultOptionId: this.defaultOptionId,
+			example: String(this.example),
 			description: this.description,
 			hidden: this.hidden,
 			id: this.id,
@@ -108,6 +109,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 	public update(prop: PatternEnumProperty): void {
 		this.contextId = prop.getContextId();
 		this.defaultOptionId = prop.getDefaultOptionId();
+		this.example = prop.getExample();
 		this.hidden = prop.getHidden();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();

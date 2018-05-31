@@ -1,6 +1,7 @@
 export * from './asset-property';
 export * from './boolean-property';
 export * from './enum-property';
+export * from './href-property';
 export * from './number-array-property';
 export * from './number-property';
 export * from './property-base';

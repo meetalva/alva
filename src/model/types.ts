@@ -77,6 +77,7 @@ export interface SerializedPatternFolder {
 export enum PatternType {
 	Pattern = 'pattern',
 	SyntheticBox = 'synthetic:box',
+	SyntheticLink = 'synthetic:link',
 	SyntheticPage = 'synthetic:page',
 	SyntheticPlaceholder = 'synthetic:placeholder',
 	SyntheticText = 'synthetic:text'
@@ -87,7 +88,8 @@ export type SerializedPatternType =
 	| 'synthetic:box'
 	| 'synthetic:page'
 	| 'synthetic:placeholder'
-	| 'synthetic:text';
+	| 'synthetic:text'
+	| 'synthetic:link';
 
 export enum PatternOrigin {
 	BuiltIn = 'built-in',
@@ -120,6 +122,7 @@ export enum PatternPropertyType {
 	Asset = 'asset',
 	Boolean = 'boolean',
 	Enum = 'enum',
+	Href = 'href',
 	NumberArray = 'number[]',
 	Number = 'number',
 	StringArray = 'string[]',
@@ -130,6 +133,7 @@ export type SerializedPatternPropertyType =
 	| 'asset'
 	| 'boolean'
 	| 'enum'
+	| 'href'
 	| 'number[]'
 	| 'number'
 	| 'string[]'
@@ -158,33 +162,36 @@ export type SerializedPatternProperty =
 	| SerializedPatternNumberArrayProperty
 	| SerializedPatternNumberProperty
 	| SerializedPatternStringArrayProperty
-	| SerializedStringProperty;
+	| SerializedStringProperty
+	| SerializedHrefProperty;
 
 export interface SerializedPropertyBase {
 	contextId: string;
 	description: string;
+	example: string;
 	hidden: boolean;
 	id: string;
 	label: string;
 	origin: SerializedPatternPropertyOrigin;
 	propertyName: string;
 	required: boolean;
+	type: SerializedPatternPropertyType;
 }
 
 export interface SerializedPatternAssetProperty extends SerializedPropertyBase {
 	defaultValue?: string;
-	type: PatternPropertyType.Asset;
+	type: 'asset';
 }
 
 export interface SerializedPatternBooleanProperty extends SerializedPropertyBase {
 	defaultValue?: boolean;
-	type: PatternPropertyType.Boolean;
+	type: 'boolean';
 }
 
 export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
 	defaultOptionId?: string;
 	options: SerializedEnumOption[];
-	type: PatternPropertyType.Enum;
+	type: 'enum';
 }
 
 export interface SerializedEnumOption {
@@ -197,22 +204,27 @@ export interface SerializedEnumOption {
 
 export interface SerializedPatternNumberArrayProperty extends SerializedPropertyBase {
 	defaultValue: number[];
-	type: PatternPropertyType.NumberArray;
+	type: 'number[]';
 }
 
 export interface SerializedPatternNumberProperty extends SerializedPropertyBase {
 	defaultValue?: number;
-	type: PatternPropertyType.Number;
+	type: 'number';
 }
 
 export interface SerializedPatternStringArrayProperty extends SerializedPropertyBase {
 	defaultValue: string[];
-	type: PatternPropertyType.StringArray;
+	type: 'string[]';
 }
 
 export interface SerializedStringProperty extends SerializedPropertyBase {
 	defaultValue?: string;
-	type: PatternPropertyType.String;
+	type: 'string';
+}
+
+export interface SerializedHrefProperty extends SerializedPropertyBase {
+	defaultValue?: string;
+	type: 'href';
 }
 
 export enum AlvaView {
@@ -374,6 +386,7 @@ export interface RenderInit {
 	// tslint:disable-next-line:no-any
 	getSlots(slots: any, render: (props: any) => any): any;
 	onElementClick(e: MouseEvent, payload: { id: string }): void;
+	onElementSelect(e: MouseEvent, payload: { id: string }): void;
 	onOutsideClick(e: MouseEvent): void;
 }
 

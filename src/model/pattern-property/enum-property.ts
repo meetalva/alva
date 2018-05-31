@@ -32,9 +32,9 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 	public static from(serialized: Types.SerializedPatternEnumProperty): PatternEnumProperty {
 		return new PatternEnumProperty({
 			contextId: serialized.contextId,
+			defaultOptionId: serialized.defaultOptionId,
 			description: serialized.description,
 			hidden: serialized.hidden,
-			defaultOptionId: serialized.defaultOptionId,
 			id: serialized.id,
 			label: serialized.label,
 			options: serialized.options.map(serializedOption =>

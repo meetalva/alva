@@ -115,7 +115,7 @@ const SYNTHETICS = {
 				}}
 			/>
 		) : null,
-  link: Link,
+	link: Link,
 	text: props => <span>{props.text}</span>
 };
 

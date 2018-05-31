@@ -1,4 +1,4 @@
-import { Box, Link, Image, Page, Text } from './builtins';
+import { Box, Image, Link, Page, Text } from './builtins';
 import * as Fuse from 'fuse.js';
 import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
@@ -96,11 +96,9 @@ export class PatternLibrary {
 		syntheticFolder.addPattern(image.pattern);
 		syntheticFolder.addPattern(link.pattern);
 
-		[page.pattern, text.pattern, box.pattern, placeholder.pattern, link.pattern].forEach(
-			pattern => {
-				patternLibrary.addPattern(pattern);
-			}
-		);
+		[page.pattern, text.pattern, box.pattern, image.pattern, link.pattern].forEach(pattern => {
+			patternLibrary.addPattern(pattern);
+		});
 
 		[
 			...page.properties,

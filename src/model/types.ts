@@ -87,10 +87,9 @@ export type SerializedPatternType =
 	| 'pattern'
 	| 'synthetic:box'
 	| 'synthetic:image'
+	| 'synthetic:link'
 	| 'synthetic:page'
-	| 'synthetic:text'
-	| 'synthetic:text'
-	| 'synthetic:link';
+	| 'synthetic:text';
 
 export enum PatternOrigin {
 	BuiltIn = 'built-in',

@@ -1,5 +1,6 @@
 import { Box, Page, Placeholder, Text } from './builtins';
 import * as Fuse from 'fuse.js';
+import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Pattern, PatternSlot } from '../pattern';
 import { PatternFolder } from '../pattern-folder';
@@ -166,6 +167,10 @@ export class PatternLibrary {
 		patternLibrary.setState(Types.PatternLibraryState.Connected);
 		patternLibrary.setBundle(analysis.bundle);
 		return patternLibrary;
+	}
+
+	public static isEqual(a: PatternLibrary, b: PatternLibrary): boolean {
+		return isEqual(a.toJSON(), b.toJSON());
 	}
 
 	public addPattern(pattern: Pattern): void {

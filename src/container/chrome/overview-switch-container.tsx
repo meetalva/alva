@@ -17,13 +17,13 @@ export class OverviewSwitchContainer extends React.Component {
 		}
 
 		const title =
-			store.getActiveView() === Types.AlvaView.Pages ? `Show "${page.getName()}"` : 'Pages';
+			store.getActiveAppView() === Types.AlvaView.Pages ? `Show "${page.getName()}"` : 'Pages';
 
 		const next =
-			store.getActiveView() === Types.AlvaView.Pages
+			store.getActiveAppView() === Types.AlvaView.Pages
 				? Types.AlvaView.PageDetail
 				: Types.AlvaView.Pages;
 
-		return <ViewButton onClick={() => store.setActiveView(next)} title={title} />;
+		return <ViewButton onClick={() => store.setActiveAppView(next)} title={title} />;
 	}
 }

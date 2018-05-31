@@ -51,7 +51,7 @@ export class App extends React.Component {
 			<Layout direction={LayoutDirection.Column}>
 				<ChromeContainer />
 				<MainArea>
-					{props.store.getActiveView() === Types.AlvaView.SplashScreen && (
+					{props.store.getActiveAppView() === Types.AlvaView.SplashScreen && (
 						<SplashScreenContainer
 							onPrimaryButtonClick={() => {
 								Sender.send({
@@ -69,12 +69,12 @@ export class App extends React.Component {
 							}}
 						/>
 					)}
-					{props.store.getActiveView() === Types.AlvaView.Pages && (
+					{props.store.getActiveAppView() === Types.AlvaView.Pages && (
 						<PageListPreview>
 							<PageListContainer />
 						</PageListPreview>
 					)}
-					{props.store.getActiveView() === Types.AlvaView.PageDetail && (
+					{props.store.getActiveAppView() === Types.AlvaView.PageDetail && (
 						<React.Fragment>
 							<Resizeable
 								handleStyles={{ right: { zIndex: 1 } }}
@@ -85,7 +85,6 @@ export class App extends React.Component {
 								<SideBar
 									side={LayoutSide.Left}
 									direction={LayoutDirection.Column}
-									onClick={() => props.store.unsetSelectedElement()}
 									border={LayoutBorder.Side}
 								>
 									<ElementPane>

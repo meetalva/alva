@@ -1,3 +1,5 @@
+export * from './alva-app';
+export * from './edit-history';
 export * from './element';
 export * from './page';
 export * from './pattern-folder';

@@ -38,12 +38,12 @@ export const ChromeContainer = MobxReact.inject('store')(
 
 		return (
 			<Chrome>
-				{store.getActiveView() === Types.AlvaView.PageDetail ? (
+				{store.getActiveAppView() === Types.AlvaView.PageDetail ? (
 					<OverviewSwitchContainer />
 				) : (
 					<div />
 				)}
-				{store.getActiveView() === Types.AlvaView.PageDetail && (
+				{store.getActiveAppView() === Types.AlvaView.PageDetail && (
 					<ViewSwitch
 						fontSize={CopySize.M}
 						justify="center"
@@ -54,7 +54,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 						title={page ? page.getName() : ''}
 					/>
 				)}
-				{store.getActiveView() === Types.AlvaView.Pages && (
+				{store.getActiveAppView() === Types.AlvaView.Pages && (
 					<ViewTitle
 						fontSize={CopySize.M}
 						justify="center"

@@ -28,10 +28,6 @@ export class Project {
 
 	@Mobx.observable private id: string;
 
-	@Mobx.observable private lastChangedAuthor: string;
-
-	@Mobx.observable private lastChangedDate: Date = new Date();
-
 	@Mobx.observable private name: string;
 
 	@Mobx.observable private pages: Page[] = [];
@@ -50,9 +46,6 @@ export class Project {
 		this.name = properties.name;
 
 		this.id = properties.id ? properties.id : uuid.v4();
-		this.lastChangedAuthor = properties.lastChangedAuthor || 'unknown';
-		this.lastChangedDate = properties.lastChangedDate || new Date();
-
 		this.pages = properties.pages ? properties.pages : [];
 		this.path = properties.path;
 	}
@@ -97,10 +90,6 @@ export class Project {
 
 		const project = new Project({
 			id: serialized.id,
-			lastChangedAuthor: serialized.lastChangedAuthor,
-			lastChangedDate: serialized.lastChangedDate
-				? new Date(serialized.lastChangedDate)
-				: undefined,
 			name: serialized.name,
 			path: serialized.path,
 			pages: [],
@@ -163,24 +152,6 @@ export class Project {
 		return this.id;
 	}
 
-	/**
-	 * The last author who edited this project or one of its pages (including elements,
-	 * properties etc.). Updated when calling the touch method.
-	 * @see touch()
-	 */
-	public getLastChangedAuthor(): string {
-		return this.lastChangedAuthor;
-	}
-
-	/**
-	 * The last change date when this project or one of its pages was edited (including elements,
-	 * properties etc.). Updated when calling the touch method.
-	 * @see touch()
-	 */
-	public getLastChangedDate(): Date {
-		return this.lastChangedDate;
-	}
-
 	public getName(): string {
 		return this.name;
 	}
@@ -218,8 +189,18 @@ export class Project {
 	}
 
 	@Mobx.action
+	public setId(id: string): void {
+		this.id = name;
+	}
+
+	@Mobx.action
 	public setName(name: string): void {
 		this.name = name;
+	}
+
+	@Mobx.action
+	public setPages(pages: Page[]): void {
+		this.pages = pages;
 	}
 
 	@Mobx.action
@@ -240,8 +221,6 @@ export class Project {
 			elements: this.elements.map(e => e.toDisk()),
 			id: this.id,
 			name: this.name,
-			lastChangedAuthor: this.lastChangedAuthor,
-			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
 			pages: this.pages.map(p => p.toJSON()),
 			patternLibrary: this.patternLibrary.toJSON()
 		};
@@ -253,8 +232,6 @@ export class Project {
 			elementContents: this.elementContents.map(e => e.toJSON()),
 			id: this.id,
 			name: this.name,
-			lastChangedAuthor: this.lastChangedAuthor,
-			lastChangedDate: this.lastChangedDate ? this.lastChangedDate.toJSON() : undefined,
 			pages: this.pages.map(p => p.toJSON()),
 			path: this.path,
 			patternLibrary: this.patternLibrary.toJSON()

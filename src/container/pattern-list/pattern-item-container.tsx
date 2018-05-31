@@ -40,7 +40,7 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 
 		if (element && targetElement) {
 			store.addElement(element);
-			store.insertAfterElement({ element, targetElement });
+			store.executeElementInsertAfter({ element, targetElement });
 		}
 	}
 

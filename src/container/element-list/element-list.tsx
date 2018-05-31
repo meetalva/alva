@@ -80,6 +80,7 @@ export class ElementList extends React.Component {
 
 		// Skip and deselect elements if the root itself is clicked
 		if (target.getAttribute('data-drag-root')) {
+			store.unsetSelectedElement();
 			return;
 		}
 

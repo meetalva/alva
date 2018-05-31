@@ -171,6 +171,9 @@ export class PatternLibrary {
 		patternLibrary.getRoot().addChild(folder);
 		patternLibrary.setState(Types.PatternLibraryState.Connected);
 		patternLibrary.setBundle(analysis.bundle);
+
+		patternLibrary.updateSearch();
+
 		return patternLibrary;
 	}
 

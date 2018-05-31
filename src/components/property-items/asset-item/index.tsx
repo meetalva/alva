@@ -7,6 +7,7 @@ import styled from 'styled-components';
 
 export interface AssetItemProps {
 	className?: string;
+	description?: string;
 	imageSrc: string;
 	inputType: AssetPropertyInputType;
 	inputValue?: string;
@@ -129,6 +130,7 @@ export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 				<StyledButton onClick={props.onChooseClick}>Choose ...</StyledButton>
 			</>
 		)}
+		{props.description}
 	</StyledAssetItem>
 );
 

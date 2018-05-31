@@ -13,6 +13,7 @@ export interface EnumItemValues {
 
 export interface EnumItemProps {
 	className?: string;
+	description?: string;
 	label: string;
 	onChange?: React.ChangeEventHandler<HTMLSelectElement>;
 	required?: boolean;
@@ -78,7 +79,7 @@ const StyledIcon = styled(Icon)`
 `;
 
 export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
-	const { className, values, selectedValue, onChange, label, required } = props;
+	const { className, description, values, selectedValue, onChange, label, required } = props;
 
 	return (
 		<StyledEnumItem className={className}>
@@ -98,6 +99,7 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 				</StyledSelect>
 				<StyledIcon name={IconName.ArrowFillRight} size={IconSize.XXS} color={colors.grey60} />
 			</StyledSelectWrapper>
+			{description}
 		</StyledEnumItem>
 	);
 };

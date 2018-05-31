@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 export interface StringItemProps {
 	className?: string;
-	description: string;
+	description?: string;
 	label: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;

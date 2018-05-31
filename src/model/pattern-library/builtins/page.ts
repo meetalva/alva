@@ -33,6 +33,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 	const properties = [
 		new PatternBooleanProperty({
 			contextId: VIEWPORT_CONTEXT_ID,
+			description: 'Lorem ipsum',
 			id: context.options.getGlobalPropertyId(patternId, VIEWPORT_CONTEXT_ID),
 			label: 'Mobile Viewport',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
@@ -41,6 +42,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 		}),
 		new PatternEnumProperty({
 			contextId: LANG_CONTEXT_ID,
+			description: 'Lorem ipsum',
 			defaultOptionId: defaultLanguage ? defaultLanguage.getId() : undefined,
 			hidden: false,
 			id: langEnumId,

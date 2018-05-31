@@ -18,6 +18,7 @@ export const Placeholder = (context: BuiltInContext): BuiltInResult => {
 	const properties = [
 		new PatternProperty.PatternAssetProperty({
 			contextId: SRC_CONTEXT_ID,
+			description: 'Lorem ipsum',
 			id: context.options.getGlobalPropertyId(patternId, SRC_CONTEXT_ID),
 			label: 'Source',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
@@ -25,7 +26,7 @@ export const Placeholder = (context: BuiltInContext): BuiltInResult => {
 		}),
 		new PatternProperty.PatternStringProperty({
 			contextId: WIDTH_CONTEXT_ID,
-			description: 'Lorem ipsum',
+			description: 'Lorem ipsum 4',
 			id: context.options.getGlobalPropertyId(patternId, WIDTH_CONTEXT_ID),
 			label: 'Width',
 			origin: Types.PatternPropertyOrigin.BuiltIn,

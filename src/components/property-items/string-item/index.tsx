@@ -74,7 +74,7 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 					placeholder="…"
 				/>
 			</StyledContainer>
-			{description !== '' && <PropertyDescription description={description || ''} />}
+			{description && <PropertyDescription description={description || ''} />}
 		</StyledStringItem>
 	);
 };

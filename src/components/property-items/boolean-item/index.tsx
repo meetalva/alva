@@ -120,7 +120,7 @@ export const BooleanItem: React.StatelessComponent<BooleanItemProps> = props => 
 					</StyledIndicatorKnob>
 				</StyledIndicator>
 			</StyledContainer>
-			<PropertyDescription description={description || ''} />
+			{description && <PropertyDescription description={description || ''} />}
 		</StyledBooleanItem>
 	);
 };

@@ -131,7 +131,7 @@ export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 				<StyledButton onClick={props.onChooseClick}>Choose ...</StyledButton>
 			</>
 		)}
-		<PropertyDescription description={props.description || ''} />
+		{props.description && <PropertyDescription description={props.description || ''} />}
 	</StyledAssetItem>
 );
 

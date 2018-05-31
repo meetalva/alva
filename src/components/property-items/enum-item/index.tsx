@@ -111,7 +111,7 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 					/>
 				</StyledSelectWrapper>
 			</StyledContainer>
-			{description !== '' && <PropertyDescription description={description || ''} />}
+			{description && <PropertyDescription description={description || ''} />}
 		</StyledEnumItem>
 	);
 };

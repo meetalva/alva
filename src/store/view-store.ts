@@ -962,6 +962,11 @@ export class ViewStore {
 	}
 
 	@Mobx.action
+	public unsetClipboardItem(): void {
+		this.clipboardItem = undefined;
+	}
+
+	@Mobx.action
 	public unsetDraggedElement(): void {
 		this.unsetHighlightedElement();
 		this.project.getElements().forEach(e => {

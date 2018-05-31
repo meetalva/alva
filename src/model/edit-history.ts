@@ -18,6 +18,11 @@ export class EditHistory {
 		return item;
 	}
 
+	public clear(): void {
+		this.items = [];
+		this.pointer = undefined;
+	}
+
 	public forward(): Types.EditHistoryItem | undefined {
 		if (typeof this.pointer === 'undefined') {
 			this.pointer = Math.max(this.items.length - 1, 0);

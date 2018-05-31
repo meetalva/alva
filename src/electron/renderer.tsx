@@ -34,8 +34,8 @@ Sender.send({
 	payload: undefined
 });
 
+// Init messages
 Sender.receive(message => {
-	// Initilazing messages
 	switch (message.type) {
 		case ServerMessageType.StartApp: {
 			app.setState(Types.AppState.Started);
@@ -44,6 +44,7 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.OpenFileResponse: {
+			history.clear();
 			const newProject = Project.from(message.payload.contents);
 			newProject.setPath(message.payload.path);
 			store.setProject(newProject);
@@ -62,9 +63,12 @@ Sender.receive(message => {
 					type: ServerMessageType.CheckLibraryRequest
 				});
 			}
+
+			store.commit();
 			break;
 		}
 		case ServerMessageType.CreateNewFileResponse: {
+			history.clear();
 			const newProject = Project.from(message.payload.contents);
 			store.setProject(newProject);
 			app.setActiveView(Types.AlvaView.PageDetail);
@@ -73,6 +77,7 @@ Sender.receive(message => {
 	}
 });
 
+// Project-dependent messages
 Sender.receive(message => {
 	const project = store.getProject();
 
@@ -140,6 +145,7 @@ Sender.receive(message => {
 	}
 });
 
+// Edit messages
 // tslint:disable-next-line:cyclomatic-complexity
 Sender.receive(message => {
 	// Do not perform custom operations when an input is selected
@@ -238,6 +244,7 @@ Mobx.autorunAsync(() => {
 	}
 
 	store.setUsedPatternLibrary(patternLibrary);
+	store.unsetClipboardItem();
 
 	if (patternLibrary) {
 		Sender.send({

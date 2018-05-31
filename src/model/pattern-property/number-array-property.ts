@@ -19,6 +19,7 @@ export class PatternNumberArrayProperty extends PatternPropertyBase<number[]> {
 			contextId: serialized.contextId,
 			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
+			example: serialized.example,
 			id: serialized.id,
 			label: serialized.label,
 			origin: deserializeOrigin(serialized.origin),
@@ -36,6 +37,7 @@ export class PatternNumberArrayProperty extends PatternPropertyBase<number[]> {
 			contextId: this.contextId,
 			defaultValue: this.defaultValue,
 			description: this.description,
+			example: this.example,
 			hidden: this.hidden,
 			id: this.id,
 			label: this.label,
@@ -49,6 +51,7 @@ export class PatternNumberArrayProperty extends PatternPropertyBase<number[]> {
 	public update(prop: PatternNumberArrayProperty): void {
 		this.contextId = prop.getContextId();
 		this.description = prop.getDescription();
+		this.example = prop.getExample();
 		this.hidden = prop.getHidden();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();

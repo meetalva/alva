@@ -20,6 +20,7 @@ export class PatternStringArrayProperty extends PatternPropertyBase<string[]> {
 			contextId: serialized.contextId,
 			defaultValue: serialized.defaultValue,
 			description: serialized.description,
+			example: serialized.example,
 			hidden: serialized.hidden,
 			id: serialized.id,
 			label: serialized.label,
@@ -40,6 +41,7 @@ export class PatternStringArrayProperty extends PatternPropertyBase<string[]> {
 			contextId: this.contextId,
 			defaultValue: this.defaultValue,
 			description: this.description,
+			example: this.example,
 			hidden: this.hidden,
 			id: this.id,
 			label: this.label,
@@ -53,6 +55,7 @@ export class PatternStringArrayProperty extends PatternPropertyBase<string[]> {
 	public update(prop: PatternStringArrayProperty): void {
 		this.contextId = prop.getContextId();
 		this.description = prop.getDescription();
+		this.example = prop.getExample();
 		this.hidden = prop.getHidden();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();

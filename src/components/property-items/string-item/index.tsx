@@ -12,6 +12,7 @@ export interface StringItemProps {
 	label: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	placeholder?: string;
 	value?: string;
 }
 
@@ -71,7 +72,7 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 					onBlur={onBlur}
 					type="text"
 					value={value || ''}
-					placeholder="…"
+					placeholder={props.placeholder}
 				/>
 			</StyledContainer>
 			{description && <PropertyDescription description={description || ''} />}

@@ -169,6 +169,8 @@ function deserializeType(input: Types.SerializedPatternType): Types.PatternType 
 			return Types.PatternType.SyntheticPlaceholder;
 		case 'synthetic:text':
 			return Types.PatternType.SyntheticText;
+		case 'synthetic:link':
+			return Types.PatternType.SyntheticLink;
 		case 'pattern':
 			return Types.PatternType.Pattern;
 	}
@@ -195,6 +197,8 @@ function serializeType(input: Types.PatternType): Types.SerializedPatternType {
 			return 'synthetic:placeholder';
 		case Types.PatternType.SyntheticText:
 			return 'synthetic:text';
+		case Types.PatternType.SyntheticLink:
+			return 'synthetic:link';
 		case Types.PatternType.Pattern:
 			return 'pattern';
 	}

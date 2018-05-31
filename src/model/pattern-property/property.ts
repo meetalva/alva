@@ -1,6 +1,7 @@
 import { PatternAssetProperty } from './asset-property';
 import { PatternBooleanProperty } from './boolean-property';
 import { PatternEnumProperty } from './enum-property';
+import { PatternHrefProperty } from './href-property';
 import { PatternNumberArrayProperty } from './number-array-property';
 import { PatternNumberProperty } from './number-property';
 import { PatternPropertyBase } from './property-base';
@@ -8,13 +9,7 @@ import { PatternStringArrayProperty } from './string-array-property';
 import { PatternStringProperty } from './string-property';
 import * as Types from '../types';
 
-export type PatternPropertyValueType =
-	| string
-	| boolean
-	| number
-	| number[]
-	| string[]
-	| undefined;
+export type PatternPropertyValueType = string | boolean | number | number[] | string[] | undefined;
 
 export type AnyPatternProperty = PatternPropertyBase<PatternPropertyValueType>;
 
@@ -33,9 +28,11 @@ export class PatternProperty {
 				return PatternNumberProperty.from(serialized);
 			case Types.PatternPropertyType.StringArray:
 				return PatternStringArrayProperty.from(serialized);
+			case Types.PatternPropertyType.Href:
+				return PatternHrefProperty.from(serialized);
 			case Types.PatternPropertyType.String:
-			default:
 				return PatternStringProperty.from(serialized);
 		}
+		throw new Error(`Unknown property type: ${serialized.type}`);
 	}
 }

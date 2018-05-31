@@ -6,6 +6,7 @@ export interface PatternPropertyInit<T> {
 	contextId: string;
 	defaultValue?: T;
 	description?: string;
+	example?: string;
 	hidden?: boolean;
 	id?: string;
 	label: string;
@@ -18,6 +19,7 @@ export abstract class PatternPropertyBase<T> {
 	@Mobx.observable protected contextId: string;
 	@Mobx.observable protected defaultValue: T;
 	@Mobx.observable protected description: string;
+	@Mobx.observable protected example: string;
 	@Mobx.observable protected hidden: boolean = false;
 	@Mobx.observable protected id: string;
 	@Mobx.observable protected label: string;
@@ -45,6 +47,7 @@ export abstract class PatternPropertyBase<T> {
 			this.required = init.required;
 		}
 
+		this.example = init.example || '';
 		this.defaultValue = this.coerceValue(init.defaultValue);
 	}
 
@@ -61,6 +64,10 @@ export abstract class PatternPropertyBase<T> {
 
 	public getDescription(): string {
 		return this.description;
+	}
+
+	public getExample(): string {
+		return this.example;
 	}
 
 	public getHidden(): boolean {
@@ -88,7 +95,6 @@ export abstract class PatternPropertyBase<T> {
 	}
 
 	public abstract toJSON(): Types.SerializedPatternProperty;
-
 	public abstract update(patternProperty: PatternPropertyBase<T>): void;
 }
 

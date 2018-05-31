@@ -18,7 +18,6 @@ export const Placeholder = (context: BuiltInContext): BuiltInResult => {
 	const properties = [
 		new PatternProperty.PatternAssetProperty({
 			contextId: SRC_CONTEXT_ID,
-			description: 'Lorem ipsum',
 			id: context.options.getGlobalPropertyId(patternId, SRC_CONTEXT_ID),
 			label: 'Source',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
@@ -47,7 +46,6 @@ export const Placeholder = (context: BuiltInContext): BuiltInResult => {
 		}),
 		new PatternProperty.PatternStringProperty({
 			contextId: MIN_HEIGHT_CONTEXT_ID,
-			description: 'The Height should be minimum this size.',
 			id: context.options.getGlobalPropertyId(patternId, MIN_HEIGHT_CONTEXT_ID),
 			label: 'Min Height',
 			origin: Types.PatternPropertyOrigin.BuiltIn,

@@ -100,7 +100,6 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		}),
 		new PatternEnumProperty({
 			contextId: ALIGN_ITEMS_CONTEXT_ID,
-			description: 'Lorem ipsum',
 			id: alignId,
 			label: 'Align',
 			origin: Types.PatternPropertyOrigin.BuiltIn,

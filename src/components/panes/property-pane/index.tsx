@@ -7,7 +7,7 @@ const StyledPropertyPane = styled.div`
 	flex-shrink: 0;
 	flex-basis: 40%;
 	padding: ${getSpace(SpaceSize.M)}px;
-	overflow: scroll;
+	overflow: auto;
 `;
 
 export const PropertyPane: React.StatelessComponent = props => (

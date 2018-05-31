@@ -27,7 +27,6 @@ export class ElementProperty {
 		this.patternPropertyId = init.patternPropertyId;
 		this.setDefault = init.setDefault;
 		this.value = init.value;
-
 		this.patternLibrary = context.patternLibrary;
 
 		const patternProperty = this.patternLibrary.getPatternPropertyById(this.patternPropertyId);

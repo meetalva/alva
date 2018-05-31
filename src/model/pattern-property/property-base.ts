@@ -5,6 +5,7 @@ import * as uuid from 'uuid';
 export interface PatternPropertyInit<T> {
 	contextId: string;
 	defaultValue?: T;
+	description?: string;
 	hidden?: boolean;
 	id?: string;
 	label: string;
@@ -16,6 +17,7 @@ export interface PatternPropertyInit<T> {
 export abstract class PatternPropertyBase<T> {
 	@Mobx.observable protected contextId: string;
 	@Mobx.observable protected defaultValue: T;
+	@Mobx.observable protected description: string;
 	@Mobx.observable protected hidden: boolean = false;
 	@Mobx.observable protected id: string;
 	@Mobx.observable protected label: string;
@@ -30,6 +32,10 @@ export abstract class PatternPropertyBase<T> {
 		this.label = init.label;
 		this.origin = init.origin;
 		this.propertyName = init.propertyName;
+
+		if (typeof init.description !== 'undefined') {
+			this.description = init.description;
+		}
 
 		if (typeof init.hidden !== 'undefined') {
 			this.hidden = init.hidden;
@@ -51,6 +57,10 @@ export abstract class PatternPropertyBase<T> {
 
 	public getDefaultValue(): T | undefined {
 		return this.defaultValue;
+	}
+
+	public getDescription(): string {
+		return this.description;
 	}
 
 	public getHidden(): boolean {

@@ -19,6 +19,7 @@ const StringItemDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				onChange={NOOP}
 				label="Text"
 				value="this is a very long example text to test text overflow and stuff"
+				description="Lorem ipsum doloret"
 			/>
 		</StyledDemo>
 	</div>

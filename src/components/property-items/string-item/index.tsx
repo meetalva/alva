@@ -1,5 +1,6 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
+import { PropertyDescription } from '../property-description';
 import { PropertyLabel } from '../property-label';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../../space';
@@ -7,6 +8,7 @@ import styled from 'styled-components';
 
 export interface StringItemProps {
 	className?: string;
+	description?: string;
 	label: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
@@ -14,10 +16,15 @@ export interface StringItemProps {
 }
 
 const StyledStringItem = styled.label`
+	display: block;
+	margin-bottom: ${getSpace(SpaceSize.S)}px;
+`;
+
+const StyledContainer = styled.div`
 	display: flex;
 	align-items: center;
 	width: 100%;
-	margin-bottom: ${getSpace(SpaceSize.S)}px;
+	box-sizing: border-box;
 `;
 
 const StyledInput = styled.input`
@@ -53,18 +60,21 @@ const StyledInput = styled.input`
 `;
 
 export const StringItem: React.StatelessComponent<StringItemProps> = props => {
-	const { className, onChange, onBlur, label, value } = props;
+	const { className, description, onChange, onBlur, label, value } = props;
 
 	return (
 		<StyledStringItem className={className}>
-			<PropertyLabel label={label} />
-			<StyledInput
-				onChange={onChange}
-				onBlur={onBlur}
-				type="text"
-				value={value || ''}
-				placeholder="…"
-			/>
+			<StyledContainer>
+				<PropertyLabel label={label} />
+				<StyledInput
+					onChange={onChange}
+					onBlur={onBlur}
+					type="text"
+					value={value || ''}
+					placeholder="…"
+				/>
+			</StyledContainer>
+			{description && <PropertyDescription description={description || ''} />}
 		</StyledStringItem>
 	);
 };

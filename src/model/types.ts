@@ -162,6 +162,7 @@ export type SerializedPatternProperty =
 
 export interface SerializedPropertyBase {
 	contextId: string;
+	description: string;
 	hidden: boolean;
 	id: string;
 	label: string;

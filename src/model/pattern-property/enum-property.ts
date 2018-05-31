@@ -5,6 +5,7 @@ import * as Types from '../types';
 export interface PatternEnumPropertyInit {
 	contextId: string;
 	defaultOptionId?: string;
+	description?: string;
 	hidden: boolean;
 	id: string;
 	label: string;
@@ -31,8 +32,9 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 	public static from(serialized: Types.SerializedPatternEnumProperty): PatternEnumProperty {
 		return new PatternEnumProperty({
 			contextId: serialized.contextId,
-			hidden: serialized.hidden,
 			defaultOptionId: serialized.defaultOptionId,
+			description: serialized.description,
+			hidden: serialized.hidden,
 			id: serialized.id,
 			label: serialized.label,
 			options: serialized.options.map(serializedOption =>
@@ -91,6 +93,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		return {
 			contextId: this.contextId,
 			defaultOptionId: this.defaultOptionId,
+			description: this.description,
 			hidden: this.hidden,
 			id: this.id,
 			label: this.label,

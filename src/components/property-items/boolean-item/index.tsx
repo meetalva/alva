@@ -1,5 +1,6 @@
 import { colors } from '../../colors';
 import { Icon, IconName, IconSize } from '../../icons';
+import { PropertyDescription } from '../property-description';
 import { PropertyLabel } from '../property-label';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../../space';
@@ -8,6 +9,7 @@ import styled from 'styled-components';
 export interface BooleanItemProps {
 	checked?: boolean;
 	className?: string;
+	description?: string;
 	label: string;
 	onChange?: React.ChangeEventHandler<HTMLElement>;
 }
@@ -17,10 +19,15 @@ interface IndicatorProps {
 }
 
 const StyledBooleanItem = styled.label`
+	display: block;
+	margin-bottom: ${getSpace(SpaceSize.S)}px;
+`;
+
+const StyledContainer = styled.div`
 	display: flex;
 	align-items: center;
 	width: 100%;
-	margin-bottom: ${getSpace(SpaceSize.S)}px;
+	box-sizing: border-box;
 `;
 
 const indicatorWidth = 48;
@@ -98,20 +105,22 @@ const StyledInput = styled.input`
 `;
 
 export const BooleanItem: React.StatelessComponent<BooleanItemProps> = props => {
-	const { className, label, children, checked, onChange } = props;
+	const { className, description, label, checked, onChange } = props;
 	const icon = checked ? IconName.Check : IconName.Uncheck;
 	const color = checked ? colors.blue40 : colors.grey60;
 
 	return (
 		<StyledBooleanItem className={className}>
-			<PropertyLabel label={label} />
-			<StyledInput onChange={onChange} checked={checked} type="checkbox" />
-			<StyledIndicator checked={checked}>
-				<StyledIndicatorKnob checked={checked}>
-					<StyledIcon name={icon} size={IconSize.XS} color={color} />
-				</StyledIndicatorKnob>
-			</StyledIndicator>
-			{children}
+			<StyledContainer>
+				<PropertyLabel label={label} />
+				<StyledInput onChange={onChange} checked={checked} type="checkbox" />
+				<StyledIndicator checked={checked}>
+					<StyledIndicatorKnob checked={checked}>
+						<StyledIcon name={icon} size={IconSize.XS} color={color} />
+					</StyledIndicatorKnob>
+				</StyledIndicator>
+			</StyledContainer>
+			{description && <PropertyDescription description={description || ''} />}
 		</StyledBooleanItem>
 	);
 };

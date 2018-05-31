@@ -4,8 +4,8 @@ import * as Types from '../types';
 
 export interface PatternEnumPropertyInit {
 	contextId: string;
-	description: string;
 	defaultOptionId?: string;
+	description: string;
 	hidden: boolean;
 	id: string;
 	label: string;

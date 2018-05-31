@@ -161,7 +161,7 @@ export type SerializedPatternProperty =
 
 export interface SerializedPropertyBase {
 	contextId: string;
-	description?: string;
+	description: string;
 	hidden: boolean;
 	id: string;
 	label: string;
@@ -236,7 +236,6 @@ export enum SlotType {
 }
 
 export interface SerializedElementProperty {
-	description: string;
 	id: string;
 	patternPropertyId: string;
 	setDefault: boolean;

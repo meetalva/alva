@@ -5,7 +5,6 @@ import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface ElementPropertyInit {
-	description: string;
 	id: string;
 	patternPropertyId: string;
 	setDefault: boolean;
@@ -17,7 +16,6 @@ export interface ElementPropertyContext {
 }
 
 export class ElementProperty {
-	@Mobx.observable private description: string;
 	@Mobx.observable private id: string;
 	@Mobx.observable private patternLibrary: PatternLibrary;
 	@Mobx.observable private patternPropertyId: string;
@@ -28,9 +26,7 @@ export class ElementProperty {
 		this.id = init.id;
 		this.patternPropertyId = init.patternPropertyId;
 		this.setDefault = init.setDefault;
-		this.description = init.description;
 		this.value = init.value;
-
 		this.patternLibrary = context.patternLibrary;
 
 		const patternProperty = this.patternLibrary.getPatternPropertyById(this.patternPropertyId);
@@ -47,7 +43,6 @@ export class ElementProperty {
 		return new ElementProperty(
 			{
 				id: serialized.id,
-				description: serialized.description,
 				patternPropertyId: serialized.patternPropertyId,
 				setDefault: serialized.setDefault,
 				value: serialized.value
@@ -60,7 +55,6 @@ export class ElementProperty {
 		return new ElementProperty(
 			{
 				id: uuid.v4(),
-				description: this.description,
 				patternPropertyId: this.patternPropertyId,
 				setDefault: this.setDefault,
 				value: this.value
@@ -114,7 +108,6 @@ export class ElementProperty {
 	public toJSON(): Types.SerializedElementProperty {
 		return {
 			id: this.id,
-			description: this.description,
 			patternPropertyId: this.patternPropertyId,
 			setDefault: this.setDefault,
 			value: this.value

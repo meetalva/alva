@@ -14,9 +14,9 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 	public static from(serialized: Types.SerializedStringProperty): PatternStringProperty {
 		return new PatternStringProperty({
 			contextId: serialized.contextId,
-			hidden: serialized.hidden,
 			defaultValue: serialized.defaultValue,
 			description: serialized.description,
+			hidden: serialized.hidden,
 			id: serialized.id,
 			label: serialized.label,
 			origin: deserializeOrigin(serialized.origin),
@@ -37,8 +37,8 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 	public toJSON(): Types.SerializedStringProperty {
 		return {
 			contextId: this.contextId,
-			description: this.description,
 			defaultValue: this.defaultValue,
+			description: this.description,
 			hidden: this.hidden,
 			id: this.id,
 			label: this.label,
@@ -51,8 +51,8 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 
 	public update(prop: PatternStringProperty): void {
 		this.contextId = prop.getContextId();
-		this.defaultValue = prop.getDefaultValue();
 		this.description = prop.getDescription();
+		this.defaultValue = prop.getDefaultValue();
 		this.hidden = prop.getHidden();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();

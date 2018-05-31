@@ -14,9 +14,9 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 	public static from(serialized: Types.SerializedPatternNumberProperty): PatternNumberProperty {
 		return new PatternNumberProperty({
 			contextId: serialized.contextId,
+			defaultValue: serialized.defaultValue,
 			description: serialized.description,
 			hidden: serialized.hidden,
-			defaultValue: serialized.defaultValue,
 			id: serialized.id,
 			label: serialized.label,
 			origin: deserializeOrigin(serialized.origin),
@@ -34,9 +34,9 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 	public toJSON(): Types.SerializedPatternNumberProperty {
 		return {
 			contextId: this.contextId,
+			defaultValue: this.defaultValue,
 			description: this.description,
 			hidden: this.hidden,
-			defaultValue: this.defaultValue,
 			id: this.id,
 			label: this.label,
 			origin: serializeOrigin(this.origin),
@@ -48,10 +48,11 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 
 	public update(prop: PatternNumberProperty): void {
 		this.contextId = prop.getContextId();
+		this.defaultValue = prop.getDefaultValue();
+		this.description = prop.getDescription();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();
 		this.hidden = prop.getHidden();
 		this.required = prop.getRequired();
-		this.defaultValue = prop.getDefaultValue();
 	}
 }

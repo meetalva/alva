@@ -285,6 +285,7 @@ function setPropertyMetaData(init: {
 
 	property.required = (symbol.flags & Ts.SymbolFlags.Optional) !== Ts.SymbolFlags.Optional;
 	property.label = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'name') || property.label;
+	property.description = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'description') || '';
 	property.hidden = TypescriptUtils.symbolHasJsDocTag(symbol, 'ignore');
 
 	switch (property.type) {

@@ -42,7 +42,6 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 		}),
 		new PatternEnumProperty({
 			contextId: LANG_CONTEXT_ID,
-			description: 'Lorem ipsum',
 			defaultOptionId: defaultLanguage ? defaultLanguage.getId() : undefined,
 			hidden: false,
 			id: langEnumId,

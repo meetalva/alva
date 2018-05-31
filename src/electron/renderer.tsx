@@ -218,7 +218,7 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.PasteElementInside: {
-			store.executeElementPasteAfterById(message.payload);
+			store.executeElementPasteInsideById(message.payload);
 			break;
 		}
 		case ServerMessageType.Duplicate: {

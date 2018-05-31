@@ -389,7 +389,7 @@ export class ViewStore {
 		}
 
 		this.insertElementInside({ element: clipboardElement, targetElement: element });
-		this.setSelectedElement(element);
+		this.setSelectedElement(clipboardElement);
 		this.commit();
 
 		return element;

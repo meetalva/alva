@@ -22,7 +22,7 @@ export function elementMenu(element: Element, store: ViewStore): void {
 		},
 		{
 			label: 'Paste Inside',
-			enabled: store.hasApplicableClipboardItem(),
+			enabled: store.hasApplicableClipboardItem() && element.acceptsChildren(),
 			click: () => {
 				Sender.send({
 					id: uuid.v4(),

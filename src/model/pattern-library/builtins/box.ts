@@ -148,7 +148,6 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		}),
 		new PatternEnumProperty({
 			contextId: JUSTIFY_CONTENT_CONTEXT_ID,
-			description: 'Lorem ipsum',
 			id: justifyId,
 			label: 'Justify',
 			origin: Types.PatternPropertyOrigin.BuiltIn,

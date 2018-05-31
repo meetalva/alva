@@ -1,5 +1,6 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
+import { PropertyDescription } from '../property-description';
 import { PropertyLabel } from '../property-label';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../../space';
@@ -130,7 +131,7 @@ export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 				<StyledButton onClick={props.onChooseClick}>Choose ...</StyledButton>
 			</>
 		)}
-		{props.description}
+		<PropertyDescription description={props.description || ''} />
 	</StyledAssetItem>
 );
 

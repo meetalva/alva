@@ -1,6 +1,7 @@
 import { colors } from '../../colors';
 import { fonts } from '../../fonts';
 import { Icon, IconName, IconSize } from '../../icons';
+import { PropertyDescription } from '../property-description';
 import { PropertyLabel } from '../property-label';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../../space';
@@ -22,10 +23,15 @@ export interface EnumItemProps {
 }
 
 const StyledEnumItem = styled.label`
+	display: block;
+	margin-bottom: ${getSpace(SpaceSize.S)}px;
+`;
+
+const StyledContainer = styled.div`
 	display: flex;
 	align-items: center;
 	width: 100%;
-	margin-bottom: ${getSpace(SpaceSize.S)}px;
+	box-sizing: border-box;
 `;
 
 const StyledSelectWrapper = styled.div`
@@ -83,23 +89,29 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 
 	return (
 		<StyledEnumItem className={className}>
-			<PropertyLabel label={label} />
-			<StyledSelectWrapper>
-				<StyledSelect
-					className={className}
-					onChange={onChange}
-					value={selectedValue ? selectedValue : ''}
-				>
-					{!required && <option key="empty" value="" />}
-					{values.map(value => (
-						<option key={value.id} value={value.id}>
-							{value.name}
-						</option>
-					))}
-				</StyledSelect>
-				<StyledIcon name={IconName.ArrowFillRight} size={IconSize.XXS} color={colors.grey60} />
-			</StyledSelectWrapper>
-			{description}
+			<StyledContainer>
+				<PropertyLabel label={label} />
+				<StyledSelectWrapper>
+					<StyledSelect
+						className={className}
+						onChange={onChange}
+						value={selectedValue ? selectedValue : ''}
+					>
+						{!required && <option key="empty" value="" />}
+						{values.map(value => (
+							<option key={value.id} value={value.id}>
+								{value.name}
+							</option>
+						))}
+					</StyledSelect>
+					<StyledIcon
+						name={IconName.ArrowFillRight}
+						size={IconSize.XXS}
+						color={colors.grey60}
+					/>
+				</StyledSelectWrapper>
+			</StyledContainer>
+			{description !== '' && <PropertyDescription description={description || ''} />}
 		</StyledEnumItem>
 	);
 };

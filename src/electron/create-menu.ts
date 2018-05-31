@@ -135,7 +135,7 @@ export function createMenu(ctx: MenuContext): void {
 								});
 
 								if (path) {
-									const sketchExporter = new SketchExporter();
+									const sketchExporter = new SketchExporter(ctx.store);
 									sketchExporter.execute(path);
 								}
 							}
@@ -156,7 +156,7 @@ export function createMenu(ctx: MenuContext): void {
 								});
 
 								if (path) {
-									const pdfExporter = new PdfExporter();
+									const pdfExporter = new PdfExporter(ctx.store);
 									pdfExporter.execute(path);
 								}
 							}
@@ -177,7 +177,7 @@ export function createMenu(ctx: MenuContext): void {
 								});
 
 								if (path) {
-									const pngExporter = new PngExporter();
+									const pngExporter = new PngExporter(ctx.store);
 									pngExporter.execute(path);
 								}
 							}
@@ -201,7 +201,7 @@ export function createMenu(ctx: MenuContext): void {
 								});
 
 								if (path) {
-									const htmlExporter = new HtmlExporter();
+									const htmlExporter = new HtmlExporter(ctx.store);
 									htmlExporter.execute(path);
 								}
 							}

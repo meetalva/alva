@@ -4,10 +4,11 @@ import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as Types from '../../model/types';
 
+@MobxReact.inject('store')
 @MobxReact.observer
 export class OverviewSwitchContainer extends React.Component {
 	public render(): JSX.Element | null {
-		const store = ViewStore.getInstance();
+		const { store } = this.props as { store: ViewStore };
 		const project = store.getProject();
 		const page = store.getCurrentPage();
 
@@ -16,13 +17,13 @@ export class OverviewSwitchContainer extends React.Component {
 		}
 
 		const title =
-			store.getActiveView() === Types.AlvaView.Pages ? `Show "${page.getName()}"` : 'Pages';
+			store.getActiveAppView() === Types.AlvaView.Pages ? `Show "${page.getName()}"` : 'Pages';
 
 		const next =
-			store.getActiveView() === Types.AlvaView.Pages
+			store.getActiveAppView() === Types.AlvaView.Pages
 				? Types.AlvaView.PageDetail
 				: Types.AlvaView.Pages;
 
-		return <ViewButton onClick={() => store.setActiveView(next)} title={title} />;
+		return <ViewButton onClick={() => store.setActiveAppView(next)} title={title} />;
 	}
 }

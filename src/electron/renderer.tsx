@@ -4,7 +4,8 @@ import { createMenu } from './create-menu';
 import { webFrame } from 'electron';
 import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
-import { PatternLibrary, Project } from '../model';
+import * as MobxReact from 'mobx-react';
+import { AlvaApp, EditHistory, PatternLibrary, Project } from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
@@ -15,7 +16,17 @@ import * as uuid from 'uuid';
 webFrame.setVisualZoomLevelLimits(1, 1);
 webFrame.setLayoutZoomLevelLimits(0, 0);
 
-const store = ViewStore.getInstance();
+const app = new AlvaApp();
+const history = new EditHistory();
+const store = new ViewStore({ app, history });
+
+const id = `s${uuid
+	.v4()
+	.split('-')
+	.join('')}`;
+// tslint:disable-next-line:no-any
+(window as any)[id] = store;
+console.log(`Access ViewStore at ${id}`);
 
 Sender.send({
 	id: uuid.v4(),
@@ -23,15 +34,17 @@ Sender.send({
 	payload: undefined
 });
 
+// Init messages
 Sender.receive(message => {
-	// Initilazing messages
 	switch (message.type) {
 		case ServerMessageType.StartApp: {
-			store.setAppState(Types.AppState.Started);
+			app.setState(Types.AppState.Started);
 			store.setServerPort(Number(message.payload));
+			store.commit();
 			break;
 		}
 		case ServerMessageType.OpenFileResponse: {
+			history.clear();
 			const newProject = Project.from(message.payload.contents);
 			newProject.setPath(message.payload.path);
 			store.setProject(newProject);
@@ -39,7 +52,7 @@ Sender.receive(message => {
 			const view =
 				newProject.getPages().length === 0 ? Types.AlvaView.Pages : Types.AlvaView.PageDetail;
 
-			store.setActiveView(view);
+			app.setActiveView(view);
 
 			const patternLibrary = newProject.getPatternLibrary();
 
@@ -51,16 +64,20 @@ Sender.receive(message => {
 				});
 			}
 
+			store.commit();
 			break;
 		}
 		case ServerMessageType.CreateNewFileResponse: {
+			history.clear();
 			const newProject = Project.from(message.payload.contents);
 			store.setProject(newProject);
-			store.setActiveView(Types.AlvaView.PageDetail);
+			app.setActiveView(Types.AlvaView.PageDetail);
+			store.commit();
 		}
 	}
 });
 
+// Project-dependent messages
 Sender.receive(message => {
 	const project = store.getProject();
 
@@ -70,7 +87,7 @@ Sender.receive(message => {
 
 	switch (message.type) {
 		case ServerMessageType.CreateNewPage: {
-			const page = store.addNewPage();
+			const page = store.executePageAddNew();
 
 			if (!page) {
 				return;
@@ -78,7 +95,7 @@ Sender.receive(message => {
 
 			store.setActivePage(page);
 
-			if (store.getActiveView() === Types.AlvaView.Pages) {
+			if (app.getActiveView() === Types.AlvaView.Pages) {
 				page.setNameState(Types.EditState.Editing);
 			}
 			break;
@@ -128,6 +145,7 @@ Sender.receive(message => {
 	}
 });
 
+// Edit messages
 // tslint:disable-next-line:cyclomatic-complexity
 Sender.receive(message => {
 	// Do not perform custom operations when an input is selected
@@ -145,38 +163,38 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Cut: {
-			if (store.getActiveView() === Types.AlvaView.Pages) {
+			if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.cutSelectedPage();
 			}
-			if (store.getActiveView() === Types.AlvaView.PageDetail) {
-				store.cutSelectedElement();
+			if (app.getActiveView() === Types.AlvaView.PageDetail) {
+				store.executeElementCutSelected();
 			}
 			break;
 		}
 		case ServerMessageType.CutElement: {
-			store.cutElementById(message.payload);
+			store.executeElementCutById(message.payload);
 			break;
 		}
 		case ServerMessageType.Delete: {
-			if (store.getActiveView() === Types.AlvaView.Pages) {
-				store.removeSelectedPage();
+			if (app.getActiveView() === Types.AlvaView.Pages) {
+				store.executePageRemoveSelected();
 			}
-			if (store.getActiveView() === Types.AlvaView.PageDetail) {
-				store.removeSelectedElement();
+			if (app.getActiveView() === Types.AlvaView.PageDetail) {
+				store.executeElementRemoveSelected();
 			}
 			break;
 		}
 		case ServerMessageType.DeleteElement: {
-			store.removeElementById(message.payload);
+			store.executeElementRemoveById(message.payload);
 			break;
 		}
 		case ServerMessageType.Copy: {
-			if (store.getActiveView() === Types.AlvaView.Pages) {
+			if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.copySelectedPage();
 			}
-			if (store.getActiveView() === Types.AlvaView.PageDetail) {
+			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.copySelectedElement();
 			}
 			break;
@@ -186,39 +204,47 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Paste: {
-			if (store.getActiveView() === Types.AlvaView.Pages) {
+			if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.pasteAfterSelectedPage();
 			}
-			if (store.getActiveView() === Types.AlvaView.PageDetail) {
-				store.pasteAfterSelectedElement();
+			if (app.getActiveView() === Types.AlvaView.PageDetail) {
+				store.executeElementPasteAfterSelected();
 			}
 			break;
 		}
 		case ServerMessageType.PasteElementBelow: {
-			store.pasteAfterElementById(message.payload);
+			store.executeElementPasteAfterById(message.payload);
 			break;
 		}
 		case ServerMessageType.PasteElementInside: {
-			store.pasteInsideElementById(message.payload);
+			store.executeElementPasteAfterById(message.payload);
 			break;
 		}
 		case ServerMessageType.Duplicate: {
-			if (store.getActiveView() === Types.AlvaView.PageDetail) {
-				store.duplicateSelectedElement();
+			if (app.getActiveView() === Types.AlvaView.PageDetail) {
+				store.executeElementDuplicateSelected();
 			}
 			break;
 		}
 		case ServerMessageType.DuplicateElement: {
-			if (store.getActiveView() === Types.AlvaView.PageDetail) {
-				store.duplicateElementById(message.payload);
+			if (app.getActiveView() === Types.AlvaView.PageDetail) {
+				store.executeElementDuplicateById(message.payload);
 			}
 		}
 	}
 });
 
 Mobx.autorunAsync(() => {
+	const usedLibrary = store.getUsedPatternLibrary();
 	const patternLibrary = store.getPatternLibrary();
+
+	if (patternLibrary && usedLibrary && PatternLibrary.isEqual(patternLibrary, usedLibrary)) {
+		return;
+	}
+
+	store.setUsedPatternLibrary(patternLibrary);
+	store.unsetClipboardItem();
 
 	if (patternLibrary) {
 		Sender.send({
@@ -302,7 +328,12 @@ Mobx.autorunAsync(() => {
 	}
 });
 
-ReactDom.render(React.createElement(App), document.getElementById('app'));
+ReactDom.render(
+	<MobxReact.Provider app={app} store={store}>
+		<App />
+	</MobxReact.Provider>,
+	document.getElementById('app')
+);
 
 // Disable drag and drop from outside the application
 document.addEventListener(

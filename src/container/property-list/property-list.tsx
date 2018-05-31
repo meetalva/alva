@@ -8,10 +8,12 @@ import { ViewStore } from '../../store';
 import * as Types from '../../model/types';
 import * as uuid from 'uuid';
 
+@MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyListContainer extends React.Component {
 	public render(): React.ReactNode {
-		const selectedElement = ViewStore.getInstance().getSelectedElement();
+		const { store } = this.props as { store: ViewStore };
+		const selectedElement = store.getSelectedElement();
 
 		if (!selectedElement) {
 			return null;
@@ -33,18 +35,32 @@ interface PropertyViewContainerProps {
 	property: ElementProperty;
 }
 
+interface StoreInjection {
+	store: ViewStore;
+}
+
+@MobxReact.inject('store')
 @MobxReact.observer
 class PropertyViewContainer extends React.Component<PropertyViewContainerProps> {
 	private handleCheckboxChange(e: React.ChangeEvent<HTMLElement>): void {
+		const props = this.props as PropertyViewContainerProps & StoreInjection;
 		const target = e.target as HTMLInputElement;
-		this.props.property.setValue(target.checked);
+		props.property.setValue(target.checked);
+		props.store.commit();
 	}
 
 	private handleEnumChange(e: React.ChangeEvent<HTMLSelectElement>): void {
-		const patternProperty = this.props.property.getPatternProperty() as PatternEnumProperty;
+		const props = this.props as PropertyViewContainerProps & StoreInjection;
+		const patternProperty = props.property.getPatternProperty() as PatternEnumProperty;
 		const selectedOption = patternProperty.getOptionById(e.target.value);
 		const selectedValue = selectedOption ? selectedOption.getValue() : undefined;
 		this.props.property.setValue(selectedValue);
+		props.store.commit();
+	}
+
+	private handleInputBlur(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void {
+		const props = this.props as PropertyViewContainerProps & StoreInjection;
+		props.store.commit();
 	}
 
 	private handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void {
@@ -52,7 +68,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 	}
 
 	public render(): React.ReactNode {
-		const { props } = this;
+		const props = this.props as PropertyViewContainerProps & StoreInjection;
 		const { property } = props;
 
 		const patternProperty = property.getPatternProperty();
@@ -92,8 +108,12 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 						imageSrc={imageSrc}
 						inputType={inputType}
 						inputValue={inputValue}
+						onInputBlur={e => this.handleInputBlur(e)}
 						onInputChange={e => this.handleInputChange(e)}
-						onClearClick={() => property.setValue('')}
+						onClearClick={() => {
+							property.setValue('');
+							props.store.commit();
+						}}
 						onChooseClick={() => {
 							const transactionId = uuid.v4();
 
@@ -103,6 +123,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 									message.id === transactionId
 								) {
 									property.setValue(message.payload);
+									props.store.commit();
 								}
 							});
 
@@ -149,6 +170,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 					<Component.StringItem
 						{...base}
 						value={value}
+						onBlur={e => this.handleInputBlur(e)}
 						onChange={e => this.handleInputChange(e)}
 					/>
 				);
@@ -159,6 +181,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 						<Component.StringItem
 							{...base}
 							value={property.getValue() as string}
+							onBlur={e => this.handleInputBlur(e)}
 							onChange={e => this.handleInputChange(e)}
 						/>
 					</div>

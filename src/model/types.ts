@@ -3,12 +3,12 @@ export enum AppState {
 	Started = 'started'
 }
 
+export type SerializedAppState = 'starting' | 'started';
+
 export interface SavedProject {
 	elementContents: SerializedElementContent[];
 	elements: SerializedElement[];
 	id: string;
-	lastChangedAuthor: string;
-	lastChangedDate?: string;
 	name: string;
 	pages: SerializedPage[];
 	patternLibrary: SerializedPatternLibrary;
@@ -19,6 +19,7 @@ export interface SerializedProject extends SavedProject {
 }
 
 export interface SerializedPage {
+	active: boolean;
 	id: string;
 	name: string;
 	rootId: string;
@@ -219,6 +220,8 @@ export enum AlvaView {
 	SplashScreen = 'SplashScreen'
 }
 
+export type SerializedAlvaView = 'Pages' | 'PageDetail' | 'SplashScreen';
+
 export enum RightPane {
 	Patterns = 'Patterns',
 	Properties = 'Properties'
@@ -380,4 +383,15 @@ export interface SelectPayload {
 export enum ElementRole {
 	Root = 'root',
 	Node = 'node'
+}
+
+export interface SerializedAlvaApp {
+	activeView: SerializedAlvaView;
+	searchTerm: string;
+	state: SerializedAppState;
+}
+
+export interface EditHistoryItem {
+	app: SerializedAlvaApp;
+	project: SerializedProject;
 }

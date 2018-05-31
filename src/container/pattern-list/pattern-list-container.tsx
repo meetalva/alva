@@ -5,10 +5,11 @@ import { PatternItemContainer } from './pattern-item-container';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 
+@MobxReact.inject('store')
 @MobxReact.observer
 export class PatternListContainer extends React.Component {
 	public render(): JSX.Element | null {
-		const store = ViewStore.getInstance();
+		const { store } = this.props as { store: ViewStore };
 		const patternLibrary = store.getPatternLibrary();
 
 		if (!patternLibrary) {

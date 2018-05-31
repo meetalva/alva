@@ -6,9 +6,7 @@ import { ViewStore } from '../store';
 import * as Types from '../model/types';
 import * as uuid from 'uuid';
 
-const store = ViewStore.getInstance();
-
-export function elementMenu(element: Element): void {
+export function elementMenu(element: Element, store: ViewStore): void {
 	const defaultPasteItems = [
 		{
 			label: 'Paste Below',

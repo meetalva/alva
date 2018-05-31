@@ -10,6 +10,12 @@ import * as Types from '../model/types';
 export class PngExporter implements Types.Exporter {
 	public contents: Buffer;
 
+	private store: ViewStore;
+
+	public constructor(store: ViewStore) {
+		this.store = store;
+	}
+
 	private async createPngExport(): Promise<Buffer> {
 		return new Promise<Buffer>(resolve => {
 			const id = uuid.v4();
@@ -21,7 +27,6 @@ export class PngExporter implements Types.Exporter {
 			webview.webpreferences = 'useContentSize=yes, javascript=no';
 			document.body.insertBefore(webview, document.body.firstChild);
 
-			const store = ViewStore.getInstance();
 			const scaleFactor = remote.screen.getPrimaryDisplay().scaleFactor;
 
 			let config;
@@ -45,7 +50,7 @@ export class PngExporter implements Types.Exporter {
 				const payload = message.payload;
 				const parsed = Url.parse(payload.location);
 
-				if (parsed.host !== `localhost:${store.getServerPort()}`) {
+				if (parsed.host !== `localhost:${this.store.getServerPort()}`) {
 					return;
 				}
 

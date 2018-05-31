@@ -10,6 +10,7 @@ export interface PageTileContainerProps {
 	page: Page;
 }
 
+@MobxReact.inject('store')
 @MobxReact.observer
 export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	private onKeyDown: (e: KeyboardEvent) => void;
@@ -26,14 +27,23 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	}
 
 	protected handleBlur(): void {
+		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
+
 		if (!this.props.page.getName()) {
 			this.props.page.setName(this.props.page.getName({ unedited: true }));
 			this.props.page.setNameState(Types.EditState.Editable);
 			return;
 		}
 
+		const name = this.props.page.getName();
+		const editedName = this.props.page.getEditedName();
+
 		this.props.page.setNameState(Types.EditState.Editable);
 		this.props.page.setName(this.props.page.getEditedName());
+
+		if (editedName !== name) {
+			store.commit();
+		}
 	}
 
 	protected handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -41,7 +51,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	}
 
 	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
-		const store = ViewStore.getInstance();
+		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
 
 		const target = e.target as HTMLElement;
 
@@ -59,14 +69,15 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 			return;
 		}
 
-		const store = ViewStore.getInstance();
+		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
+
 		const next =
-			store.getActiveView() === Types.AlvaView.Pages
+			store.getActiveAppView() === Types.AlvaView.Pages
 				? Types.AlvaView.PageDetail
 				: Types.AlvaView.Pages;
 
 		store.setActivePage(this.props.page);
-		store.setActiveView(next);
+		store.setActiveAppView(next);
 	}
 
 	protected handleFocus(): void {
@@ -74,6 +85,8 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	}
 
 	protected handleKeyDown(e: KeyboardEvent): void {
+		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
+
 		switch (e.key) {
 			case 'Escape':
 				this.props.page.setNameState(Types.EditState.Editable);
@@ -89,6 +102,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 
 					this.props.page.setNameState(Types.EditState.Editable);
 					this.props.page.setName(this.props.page.getEditedName());
+					store.commit();
 					return;
 				}
 				if (

@@ -13,6 +13,7 @@ export interface AssetItemProps {
 	label: string;
 	onChooseClick?: React.MouseEventHandler<HTMLButtonElement>;
 	onClearClick?: React.MouseEventHandler<HTMLButtonElement>;
+	onInputBlur?: React.ChangeEventHandler<HTMLInputElement>;
 	onInputChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
@@ -108,6 +109,7 @@ export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 				</StyledImageBoxContainer>
 				{props.inputType === AssetPropertyInputType.Url && (
 					<StyledInput
+						onBlur={props.onInputBlur}
 						onChange={props.onInputChange}
 						type="textarea"
 						value={props.inputValue}

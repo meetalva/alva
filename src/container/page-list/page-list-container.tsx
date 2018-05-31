@@ -5,9 +5,9 @@ import { PageTileContainer } from './page-tile-container';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 
-export const PageListContainer: React.StatelessComponent = MobxReact.observer(
-	(): JSX.Element | null => {
-		const store = ViewStore.getInstance();
+export const PageListContainer: React.StatelessComponent = MobxReact.inject('store')(
+	MobxReact.observer((props): JSX.Element | null => {
+		const { store } = props as { store: ViewStore };
 		const project = store.getProject();
 		const currentPage = store.getCurrentPage();
 		const currentPageId = currentPage ? currentPage.getId() : undefined;
@@ -32,5 +32,5 @@ export const PageListContainer: React.StatelessComponent = MobxReact.observer(
 				</Layout>
 			</Space>
 		);
-	}
+	})
 );

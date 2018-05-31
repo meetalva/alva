@@ -8,12 +8,16 @@ import * as Types from '../model/types';
 
 export class HtmlExporter implements Types.Exporter {
 	public contents: Buffer;
+	private store: ViewStore;
+
+	public constructor(store: ViewStore) {
+		this.store = store;
+	}
 
 	public async execute(path: string): Promise<void> {
-		const store = ViewStore.getInstance();
-		const project = store.getProject();
+		const project = this.store.getProject();
 		const patternLibrary = project.getPatternLibrary();
-		const currentPage = store.getCurrentPage();
+		const currentPage = this.store.getCurrentPage();
 		const id = uuid.v4();
 
 		const componentScript = {

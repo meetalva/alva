@@ -1,5 +1,5 @@
 import * as Sender from '../message/client';
-import * as Command from '../command';
+import { isEqual } from 'lodash';
 import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
@@ -35,86 +35,23 @@ export class ViewStore {
 		Model.ElementContent[]
 	> = new WeakMap();
 
-	/**
-	 * The store singleton instance.
-	 */
-	private static INSTANCE: ViewStore;
+	@Mobx.observable private app: Model.AlvaApp;
 
-	/**
-	 * The page that is currently being displayed in the preview, and edited in the elements
-	 * and properties panes. May be undefined if there is none.
-	 */
-	@Mobx.observable private activePage?: number = 0;
-
-	/**
-	 * The current state of the Page Overview
-	 */
-	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
-
-	/**
-	 * The name of the analyzer that should be used for the open styleguide.
-	 */
-	@Mobx.observable private analyzerName: string;
-
-	@Mobx.observable private appState: Types.AppState = Types.AppState.Starting;
-
-	/**
-	 * The element currently in the clipboard, or undefined if there is none.
-	 * Note: The element is cloned lazily, so it may represent a still active element.
-	 * When adding the clipboard element to paste it, clone it first.
-	 */
 	@Mobx.observable private clipboardItem?: ClipBoardItem;
 
-	/**
-	 * The currently name-editable element in the element list.
-	 */
-	@Mobx.observable private nameEditableElement?: Model.Element;
-
-	/**
-	 * The current search term in the patterns list, or an empty string if there is none.
-	 */
-	@Mobx.observable private patternSearchTerm: string = '';
+	private editHistory: Model.EditHistory;
 
 	@Mobx.observable private project: Model.Project;
 
-	/**
-	 * The most recent undone user commands (user operations) to provide a redo feature.
-	 * Note that operations that close or open a page clear this buffer.
-	 * The last command in the list is the most recent undone.
-	 */
-	@Mobx.observable private redoBuffer: Command.Command[] = [];
-
 	private savedProjects: Types.SavedProject[] = [];
 
-	/**
-	 * http port the preview server is listening on
-	 */
 	@Mobx.observable private serverPort: number;
 
-	/**
-	 * The most recent user commands (user operations) to provide an undo feature.
-	 * Note that operations that close or open a page clear this buffer.
-	 * The last command in the list is the most recent executed one.
-	 */
-	@Mobx.observable private undoBuffer: Command.Command[] = [];
+	@Mobx.observable private usedPatternLibrary: Model.PatternLibrary | undefined;
 
-	/**
-	 * Creates a new store.
-	 */
-	private constructor() {}
-
-	/**
-	 * Returns (or creates) the one global store instance.
-	 * @return The one global store instance.
-	 */
-	public static getInstance(): ViewStore {
-		if (!ViewStore.INSTANCE) {
-			ViewStore.INSTANCE = new ViewStore();
-			// tslint:disable-next-line:no-any
-			(global as any).viewStore = ViewStore.INSTANCE;
-		}
-
-		return ViewStore.INSTANCE;
+	public constructor(init: { app: Model.AlvaApp; history: Model.EditHistory }) {
+		this.app = init.app;
+		this.editHistory = init.history;
 	}
 
 	@Mobx.action
@@ -130,38 +67,19 @@ export class ViewStore {
 		ViewStore.EPHEMERAL_CONTENTS.delete(element);
 	}
 
-	@Mobx.action
-	public addNewPage(): Model.Page | undefined {
-		const patternLibrary = this.project.getPatternLibrary();
-		const name = 'Untitled Page';
-
-		const count = this.project.getPages().filter(p => p.getName().startsWith(name)).length;
-
-		const page = Model.Page.create(
-			{
-				id: uuid.v4(),
-				name: `${name} ${count + 1}`,
-				patternLibrary: this.project.getPatternLibrary()
-			},
-			{ project: this.project, patternLibrary }
-		);
-
-		this.execute(Command.PageAddCommand.create({ page, project: this.project }));
-		return page;
-	}
-
 	public addSavedProject(project: Model.Project): void {
 		this.savedProjects.push(project.toDisk());
 	}
 
-	/**
-	 * Clears the undo and redo buffers (e.g. if a page is loaded or the page state get
-	 * incompatible with the buffers).
-	 */
-	@Mobx.action
-	public clearUndoRedoBuffers(): void {
-		this.undoBuffer = [];
-		this.redoBuffer = [];
+	public commit(): void {
+		if (!this.project || !this.app) {
+			return;
+		}
+
+		this.editHistory.push({
+			app: this.app.toJSON(),
+			project: this.project.toJSON()
+		});
 	}
 
 	public connectPatternLibrary(): void {
@@ -246,110 +164,139 @@ export class ViewStore {
 		return element;
 	}
 
-	/**
-	 * Remove the given element from its page and add it to clipboard
-	 * @param element
-	 */
 	@Mobx.action
-	public cutElement(element: Model.Element): void {
+	public duplicateElement(element: Model.Element): Model.Element | undefined {
+		const clone = this.insertElementAfter({ element: element.clone(), targetElement: element });
+
+		if (!clone) {
+			return;
+		}
+
+		return clone;
+	}
+
+	@Mobx.action
+	public executeElementCut(element: Model.Element): void {
 		if (element.getRole() === Types.ElementRole.Root) {
 			return;
 		}
 
 		this.setClipboardItem(element);
-		this.execute(new Command.ElementRemoveCommand({ element }));
+		const selectNext = this.removeElement(element);
+		this.commit();
+		selectNext();
 	}
 
 	@Mobx.action
-	public cutElementById(id: string): void {
+	public executeElementCutById(id: string): void {
 		const element = this.getElementById(id);
 		if (!element) {
 			return;
 		}
 
-		this.cutElement(element);
+		this.setClipboardItem(element);
+		const selectNext = this.removeElement(element);
+		this.commit();
+		selectNext();
 	}
 
 	@Mobx.action
-	public cutSelectedElement(): Model.Element | undefined {
+	public executeElementCutSelected(): Model.Element | undefined {
 		const selectedElement = this.getSelectedElement();
 
 		if (!selectedElement) {
 			return;
 		}
 
-		this.cutElement(selectedElement);
+		this.setClipboardItem(selectedElement);
+		const selectNext = this.removeElement(selectedElement);
+		this.commit();
+		selectNext();
+
 		return selectedElement;
 	}
 
 	@Mobx.action
-	public duplicateElement(element: Model.Element): Model.Element | undefined {
-		const clone = this.insertAfterElement({ element: element.clone(), targetElement: element });
+	public executeElementDuplicate(element: Model.Element): Model.Element | undefined {
+		const clone = this.duplicateElement(element);
 
 		if (!clone) {
 			return;
 		}
 
 		this.setSelectedElement(clone);
+		this.commit();
 		return clone;
 	}
 
 	@Mobx.action
-	public duplicateElementById(id: string): Model.Element | undefined {
+	public executeElementDuplicateById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
 		if (!element) {
 			return;
 		}
 
-		return this.duplicateElement(element);
+		const clone = this.duplicateElement(element);
+
+		if (!clone) {
+			return;
+		}
+
+		this.commit();
+		this.setSelectedElement(clone);
+		return clone;
 	}
 
 	@Mobx.action
-	public duplicateSelectedElement(): Model.Element | undefined {
+	public executeElementDuplicateSelected(): Model.Element | undefined {
 		const selectedElement = this.getSelectedElement();
 
 		if (!selectedElement) {
 			return;
 		}
 
-		return this.duplicateElement(selectedElement);
-	}
+		const clone = this.duplicateElement(selectedElement);
 
-	/**
-	 * Executes a user command (user operation) and registers it as undoable command.
-	 * @param command The command to execute and register.
-	 */
-	@Mobx.action
-	public execute(command: Command.Command): void {
-		const successful: boolean = command.execute();
-		if (!successful) {
-			// The state and the undo/redo buffers are out of sync.
-			// This may be the case if not all store operations are proper command implementations.
-			// In that case, the store is correct and we drop the undo/redo buffers.
-			this.clearUndoRedoBuffers();
+		if (!clone) {
 			return;
 		}
 
-		// The command was processed successfully, now memorize it to provide an undo stack.
+		this.commit();
+		this.setSelectedElement(clone);
+		return clone;
+	}
 
-		// But first, we give the command the chance to indicate that the previous undo command
-		// and the current one are too similar to keep both. If so, the newer command
-		// incorporates both commands' changes into itself, and we keep only that newer one
-		// on the undo stack.
+	@Mobx.action
+	public executeElementInsertAfter(init: {
+		element: Model.Element;
+		targetElement: Model.Element;
+	}): Model.Element | undefined {
+		const element = this.insertElementAfter(init);
 
-		const previousCommand = this.undoBuffer[this.undoBuffer.length - 1];
-		const wasMerged = previousCommand && command.maybeMergeWith(previousCommand);
-		if (wasMerged) {
-			// The newer command now contains both changes, so we drop the previous one
-			this.undoBuffer.pop();
+		if (!element) {
+			return;
 		}
 
-		// Now memorize the new command
-		this.undoBuffer.push(command);
+		this.commit();
+		this.setSelectedElement(element);
+		return element;
+	}
 
-		// All previously undone commands (the redo stack) are invalid after a forward command
-		this.redoBuffer = [];
+	@Mobx.action
+	public executeElementInsertInside(init: {
+		element: Model.Element;
+		targetElement: Model.Element;
+	}): Model.Element | undefined {
+		if (init.element.getRole() === Types.ElementRole.Root) {
+			return;
+		}
+
+		this.insertElementInside(init);
+		this.commit();
+		this.setSelectedElement(init.element);
+
+		return init.element;
 	}
 
 	public executeElementMove(init: {
@@ -357,33 +304,206 @@ export class ViewStore {
 		element: Model.Element;
 		index: number;
 	}): void {
-		this.execute(
-			Command.ElementLocationCommand.addChild({
-				childId: init.element.getId(),
-				contentId: init.content.getId(),
-				index: init.index
-			})
-		);
+		this.moveElement(init);
+		this.commit();
 	}
 
+	@Mobx.action
+	public executeElementPasteAfter(targetElement: Model.Element): Model.Element | undefined {
+		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
+
+		if (!clipboardElement) {
+			return;
+		}
+
+		const element = this.insertElementAfter({ element: clipboardElement, targetElement });
+
+		if (!element) {
+			return;
+		}
+
+		this.setSelectedElement(element);
+		this.commit();
+		return element;
+	}
+
+	@Mobx.action
+	public executeElementPasteAfterById(id: string): Model.Element | undefined {
+		const element = this.getElementById(id);
+
+		if (!element) {
+			return;
+		}
+
+		return this.executeElementPasteAfter(element);
+	}
+
+	@Mobx.action
+	public executeElementPasteAfterSelected(): Model.Element | undefined {
+		const selectedElement = this.getSelectedElement();
+		const page = this.getCurrentPage();
+		const rootElement = page ? page.getRoot() : undefined;
+
+		if (!selectedElement && !rootElement) {
+			return;
+		}
+
+		if (selectedElement) {
+			return this.executeElementPasteAfter(selectedElement);
+		}
+
+		if (rootElement) {
+			return this.executeElementPasteInside(rootElement);
+		}
+
+		return;
+	}
+
+	@Mobx.action
+	public executeElementPasteInside(element: Model.Element): Model.Element | undefined {
+		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
+
+		if (!clipboardElement) {
+			return;
+		}
+
+		this.insertElementInside({ element: clipboardElement, targetElement: element });
+		this.setSelectedElement(clipboardElement);
+		this.commit();
+
+		return clipboardElement;
+	}
+
+	@Mobx.action
+	public executeElementPasteInsideById(id: string): Model.Element | undefined {
+		const element = this.getElementById(id);
+
+		if (!element) {
+			return;
+		}
+
+		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
+
+		if (!clipboardElement) {
+			return;
+		}
+
+		this.insertElementInside({ element: clipboardElement, targetElement: element });
+		this.setSelectedElement(element);
+		this.commit();
+
+		return element;
+	}
+
+	@Mobx.action
+	public executeElementPasteInsideSelected(): Model.Element | undefined {
+		const selectedElement = this.getSelectedElement();
+
+		if (!selectedElement) {
+			return;
+		}
+
+		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
+
+		if (!clipboardElement) {
+			return;
+		}
+
+		this.insertElementInside({ element: clipboardElement, targetElement: selectedElement });
+		this.setSelectedElement(clipboardElement);
+		this.commit();
+
+		return clipboardElement;
+	}
+
+	@Mobx.action
+	public executeElementRemove(element: Model.Element): void {
+		const selectNext = this.removeElement(element);
+		this.commit();
+		selectNext();
+	}
+
+	@Mobx.action
+	public executeElementRemoveById(id: string): void {
+		const element = this.getElementById(id);
+
+		if (element) {
+			const selectNext = this.removeElement(element);
+			this.commit();
+			selectNext();
+		}
+	}
+
+	@Mobx.action
+	public executeElementRemoveSelected(): Model.Element | undefined {
+		const selectedElement = this.getSelectedElement();
+
+		if (!selectedElement) {
+			return;
+		}
+
+		const selectNext = this.removeElement(selectedElement);
+		this.commit();
+		selectNext();
+		return selectedElement;
+	}
+
+	@Mobx.action
 	public executeElementRename(editableElement: Model.Element): void {
-		this.execute(new Command.ElementNameCommand(editableElement, editableElement.getName()));
+		editableElement.setName(editableElement.getName());
+		this.commit();
 	}
 
-	public getActiveView(): Types.AlvaView {
-		return this.activeView;
+	@Mobx.action
+	public executePageAddNew(): Model.Page | undefined {
+		const patternLibrary = this.project.getPatternLibrary();
+		const name = 'Untitled Page';
+
+		const count = this.project.getPages().filter(p => p.getName().startsWith(name)).length;
+
+		const page = Model.Page.create(
+			{
+				active: false,
+				id: uuid.v4(),
+				name: `${name} ${count + 1}`,
+				patternLibrary: this.project.getPatternLibrary()
+			},
+			{ project: this.project, patternLibrary }
+		);
+
+		this.project.addPage(page);
+		this.commit();
+		this.setActivePage(page);
+
+		return page;
 	}
 
-	/**
-	 * Returns the name of the analyzer that should be used for the open styleguide.
-	 * @return The name of the analyzer that should be used for the open styleguide.
-	 */
-	public getAnalyzerName(): string {
-		return this.analyzerName;
+	@Mobx.action
+	public executePageRemove(page: Model.Page): void {
+		this.removePage(page);
+		this.commit();
+	}
+
+	@Mobx.action
+	public executePageRemoveSelected(): Model.Page | undefined {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		this.removePage(page);
+		this.commit();
+
+		return page;
+	}
+
+	public getActiveAppView(): Types.AlvaView {
+		return this.app.getActiveView();
 	}
 
 	public getAppState(): Types.AppState {
-		return this.appState;
+		return this.app.getState();
 	}
 
 	public getClipboardItem(type: ClipBoardType.Element): Model.Element | undefined;
@@ -423,21 +543,7 @@ export class ViewStore {
 			return;
 		}
 
-		if (typeof this.activePage === 'undefined') {
-			return;
-		}
-
-		const pages = this.project.getPages();
-
-		if (pages.length === 0) {
-			return;
-		}
-
-		if (pages.length - 1 < this.activePage) {
-			return;
-		}
-
-		return this.project.getPages()[this.activePage];
+		return this.project.getPages().find(page => page.getActive());
 	}
 
 	public getDraggedElement(): Model.Element | undefined {
@@ -462,7 +568,7 @@ export class ViewStore {
 	}
 
 	public getNameEditableElement(): Model.Element | undefined {
-		return this.nameEditableElement;
+		return this.project.getElements().find(e => e.getNameEditable());
 	}
 
 	public getPageById(id: string): Model.Page | undefined {
@@ -512,7 +618,7 @@ export class ViewStore {
 	}
 
 	public getPatternSearchTerm(): string {
-		return this.patternSearchTerm;
+		return this.app.getSearchTerm();
 	}
 
 	public getProject(): Model.Project {
@@ -535,8 +641,12 @@ export class ViewStore {
 		return this.serverPort;
 	}
 
+	public getUsedPatternLibrary(): Model.PatternLibrary | undefined {
+		return this.usedPatternLibrary;
+	}
+
 	public hasApplicableClipboardItem(): boolean {
-		const view = this.getActiveView();
+		const view = this.app.getActiveView();
 
 		if (view === Types.AlvaView.PageDetail) {
 			return this.hasClipboardItem(ClipBoardType.Element);
@@ -559,26 +669,7 @@ export class ViewStore {
 		return item.type === type;
 	}
 
-	/**
-	 * Returns whether there is a user comment (user operation) to redo.
-	 * @return Whether there is a user comment (user operation) to redo.
-	 * @see redo
-	 */
-	public hasRedoCommand(): boolean {
-		return this.redoBuffer.length > 0;
-	}
-
-	/**
-	 * Returns whether there is a user comment (user operation) to undo.
-	 * @return Whether there is a user comment (user operation) to undo.
-	 * @see undo
-	 */
-	public hasUndoCommand(): boolean {
-		return this.undoBuffer.length > 0;
-	}
-
-	@Mobx.action
-	public insertAfterElement(init: {
+	public insertElementAfter(init: {
 		element: Model.Element;
 		targetElement: Model.Element;
 	}): Model.Element | undefined {
@@ -587,7 +678,7 @@ export class ViewStore {
 		}
 
 		if (init.targetElement.getRole() === Types.ElementRole.Root) {
-			return this.insertInsideElement(init);
+			return this.insertElementInside(init);
 		}
 
 		const container = init.targetElement.getContainer();
@@ -596,260 +687,143 @@ export class ViewStore {
 			return;
 		}
 
-		this.execute(
-			Command.ElementLocationCommand.addChild({
-				index: init.targetElement.getIndex() + 1,
-				contentId: container.getId(),
-				childId: init.element.getId()
-			})
-		);
+		this.moveElement({
+			element: init.element,
+			content: container,
+			index: init.targetElement.getIndex() + 1
+		});
 
-		this.setSelectedElement(init.element);
 		return init.element;
 	}
 
-	@Mobx.action
-	public insertInsideElement(init: {
+	public insertElementInside(init: {
 		element: Model.Element;
 		targetElement: Model.Element;
 	}): Model.Element | undefined {
-		if (init.element.getRole() === Types.ElementRole.Root) {
-			return;
-		}
-
 		const contents = init.targetElement.getContentBySlotType(Types.SlotType.Children);
 
 		if (!contents) {
 			return;
 		}
 
-		this.execute(
-			Command.ElementLocationCommand.addChild({
-				contentId: contents.getId(),
-				childId: init.element.getId(),
-				index: contents.getElements().length
-			})
-		);
-
-		this.setSelectedElement(init.element);
+		this.moveElement({
+			element: init.element,
+			content: contents,
+			index: contents.getElements().length
+		});
 
 		return init.element;
 	}
 
-	public isElementSelectedById(id: string): boolean {
-		const selectedElement = this.getSelectedElement();
+	public moveElement(init: {
+		content: Model.ElementContent;
+		element: Model.Element;
+		index: number;
+	}): void {
+		const previousContainer = init.element.getContainer();
 
-		if (selectedElement) {
-			return selectedElement.getId() === id;
+		if (previousContainer) {
+			previousContainer.remove({ element: init.element });
 		}
 
-		return false;
+		init.content.insert({ element: init.element, at: init.index });
+		init.element.setContainer(init.content);
 	}
 
 	@Mobx.action
-	public pasteAfterElement(targetElement: Model.Element): Model.Element | undefined {
-		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
+	public redo(): void {
+		const item = this.editHistory.forward();
 
-		if (!clipboardElement) {
+		if (!item) {
 			return;
 		}
 
-		return this.insertAfterElement({ element: clipboardElement, targetElement });
-	}
+		const project = Model.Project.from(item.project);
 
-	@Mobx.action
-	public pasteAfterElementById(id: string): Model.Element | undefined {
-		const element = this.getElementById(id);
-
-		if (!element) {
+		if (this.project && isEqual(project.toJSON(), this.project.toJSON())) {
 			return;
 		}
 
-		return this.pasteAfterElement(element);
+		this.setApp(Model.AlvaApp.from(item.app));
+		this.setProject(project);
 	}
 
 	@Mobx.action
-	public pasteAfterSelectedElement(): Model.Element | undefined {
-		const selectedElement = this.getSelectedElement();
-		const page = this.getCurrentPage();
-		const rootElement = page ? page.getRoot() : undefined;
-
-		if (!selectedElement && !rootElement) {
-			return;
-		}
-
-		if (selectedElement) {
-			return this.pasteAfterElement(selectedElement);
-		}
-
-		if (rootElement) {
-			return this.pasteInsideElement(rootElement);
-		}
-
-		return;
-	}
-
-	@Mobx.action
-	public pasteInsideElement(element: Model.Element): Model.Element | undefined {
-		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
-
-		if (!clipboardElement) {
-			return;
-		}
-
-		this.insertInsideElement({ element: clipboardElement, targetElement: element });
-
-		return clipboardElement;
-	}
-
-	@Mobx.action
-	public pasteInsideElementById(id: string): Model.Element | undefined {
-		const element = this.getElementById(id);
-
-		if (!element) {
-			return;
-		}
-
-		return this.pasteInsideElement(element);
-	}
-
-	@Mobx.action
-	public pasteInsideSelectedElement(): Model.Element | undefined {
-		const selectedElement = this.getSelectedElement();
-
-		if (!selectedElement) {
-			return;
-		}
-
-		return this.pasteInsideElement(selectedElement);
-	}
-
-	@Mobx.action
-	public redo(): boolean {
-		const command = this.redoBuffer.pop();
-		if (!command) {
-			return false;
-		}
-
-		const successful: boolean = command.execute();
-		if (!successful) {
-			// The state and the undo/redo buffers are out of sync.
-			// This may be the case if not all store operations are proper command implementations.
-			// In that case, the store is correct and we drop the undo/redo buffers.
-			this.clearUndoRedoBuffers();
-			return false;
-		}
-
-		this.undoBuffer.push(command);
-		return true;
-	}
-
-	@Mobx.action
-	public removeElement(element: Model.Element): void {
+	public removeElement(element: Model.Element): () => void {
 		if (element.getRole() === Types.ElementRole.Root) {
-			return;
+			return () => undefined;
+		}
+
+		const elementContainer = element.getContainer();
+
+		if (!elementContainer) {
+			return () => undefined;
 		}
 
 		const index = element.getIndex();
+		const container = element.getContainer();
 
-		const getNextSelected = (): Model.Element | undefined => {
+		const selectNext = () => {
 			if (typeof index !== 'number') {
 				return;
 			}
 
-			const nextIndex = index > 0 ? Math.max(index - 1, 0) : 1;
-			const container = element.getContainer();
+			const nextIndex = index > 0 ? Math.max(index - 1, 0) : 0;
 
 			if (!container) {
 				return;
 			}
 
-			return container.getElements()[nextIndex];
+			const elementBefore = container.getElements()[nextIndex];
+
+			if (elementBefore) {
+				this.setSelectedElement(elementBefore);
+			} else {
+				this.unsetSelectedElement();
+			}
 		};
 
-		const elementBefore = getNextSelected();
+		elementContainer.remove({ element });
 
-		this.execute(new Command.ElementRemoveCommand({ element }));
-
-		if (elementBefore) {
-			this.setSelectedElement(elementBefore);
-		} else {
-			this.unsetSelectedElement();
-		}
-	}
-
-	@Mobx.action
-	public removeElementById(id: string): void {
-		const element = this.getElementById(id);
-
-		if (element) {
-			this.execute(new Command.ElementRemoveCommand({ element }));
-		}
+		return selectNext;
 	}
 
 	@Mobx.action
 	public removePage(page: Model.Page): void {
-		const project = this.getProject();
+		const index = this.project.getPageIndex(page);
 
-		if (!project) {
-			return;
+		if (index === 0) {
+			this.unsetActivePage();
+			this.setActiveAppView(Types.AlvaView.Pages);
+		} else {
+			this.setActivePageByIndex(index - 1);
 		}
 
-		this.execute(
-			Command.PageRemoveCommand.create({
-				page,
-				project
-			})
-		);
+		this.project.removePage(page);
 	}
 
 	@Mobx.action
-	public removeSelectedElement(): Model.Element | undefined {
-		const selectedElement = this.getSelectedElement();
-
-		if (!selectedElement) {
-			return;
-		}
-
-		this.removeElement(selectedElement);
-		return selectedElement;
+	public setActiveAppView(appView: Types.AlvaView): void {
+		this.app.setActiveView(appView);
+		this.commit();
 	}
 
 	@Mobx.action
-	public removeSelectedPage(): Model.Page | undefined {
-		const page = this.getCurrentPage();
-
-		if (!page) {
-			return;
-		}
-
-		this.removePage(page);
-		return page;
-	}
-
-	@Mobx.action
-	public setActivePage(page: Model.Page): boolean {
+	public setActivePage(page: Model.Page): void {
 		if (!this.project) {
-			return false;
+			return;
 		}
 
-		const pages = this.project.getPages();
-		const index = pages.indexOf(page);
-
-		if (index === -1) {
-			return false;
-		}
-
-		this.setActivePageByIndex(index);
-		return true;
+		this.unsetActivePage();
+		page.setActive(true);
 	}
 
 	@Mobx.action
-	public setActivePageById(id: string): boolean {
+	public setActivePageById(id: string): void {
 		const page = this.getPageById(id);
 
 		if (!this.project || !page) {
-			return false;
+			return;
 		}
 
 		return this.setActivePage(page);
@@ -857,18 +831,22 @@ export class ViewStore {
 
 	@Mobx.action
 	public setActivePageByIndex(index: number): void {
-		this.unsetSelectedElement();
-		this.activePage = index;
+		const page = this.project.getPages()[index];
+
+		if (!page) {
+			return;
+		}
+
+		this.setActivePage(page);
 	}
 
 	@Mobx.action
-	public setActiveView(view: Types.AlvaView): void {
-		this.activeView = view;
-	}
+	public setApp(app: Model.AlvaApp): void {
+		if (isEqual(app.toJSON(), this.app.toJSON())) {
+			return;
+		}
 
-	@Mobx.action
-	public setAppState(state: Types.AppState): void {
-		this.appState = state;
+		this.app = app;
 	}
 
 	@Mobx.action
@@ -894,32 +872,26 @@ export class ViewStore {
 
 	@Mobx.action
 	public setNameEditableElement(editableElement?: Model.Element): void {
-		if (this.nameEditableElement && this.nameEditableElement !== editableElement) {
-			this.nameEditableElement.setNameEditable(false);
+		const previousElement = this.project.getElements().find(element => element.getNameEditable());
+
+		if (previousElement && previousElement !== editableElement) {
+			previousElement.setNameEditable(false);
 		}
 
 		if (editableElement) {
 			editableElement.setNameEditable(true);
 		}
-
-		this.nameEditableElement = editableElement;
 	}
 
 	@Mobx.action
 	public setPatternSearchTerm(patternSearchTerm: string): void {
-		this.patternSearchTerm = patternSearchTerm;
+		this.app.setSearchTerm(patternSearchTerm);
 	}
 
 	@Mobx.action
 	public setProject(project: Model.Project): void {
 		this.project = project;
-		const pages = this.project.getPages();
-
-		if (pages.length > 0) {
-			this.setActivePageByIndex(0);
-		} else {
-			this.unsetActivePage();
-		}
+		this.unsetHighlightedElement();
 
 		const patternLibrary = project.getPatternLibrary();
 
@@ -957,36 +929,56 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public undo(): boolean {
-		const command = this.undoBuffer.pop();
-		if (!command) {
-			return false;
+	public setUsedPatternLibrary(usedPatternLibrary: Model.PatternLibrary | undefined): void {
+		this.usedPatternLibrary = usedPatternLibrary;
+	}
+
+	@Mobx.action
+	public undo(): void {
+		const item = this.editHistory.back();
+
+		if (!item) {
+			return;
 		}
 
-		const successful: boolean = command.undo();
-		if (!successful) {
-			// The state and the undo/redo buffers are out of sync.
-			// This may be the case if not all store operations are proper command implementations.
-			// In that case, the store is correct and we drop the undo/redo buffers.
-			this.clearUndoRedoBuffers();
-			return false;
+		const project = Model.Project.from(item.project);
+		const app = Model.AlvaApp.from(item.app);
+
+		if (this.project && isEqual(project.toJSON(), this.project.toJSON())) {
+			return;
 		}
 
-		this.redoBuffer.push(command);
-		return true;
+		this.setApp(app);
+		this.setProject(project);
 	}
 
 	@Mobx.action
 	public unsetActivePage(): void {
-		this.activePage = undefined;
+		if (!this.project) {
+			return;
+		}
+
+		this.project.getPages().forEach(page => page.setActive(false));
+	}
+
+	@Mobx.action
+	public unsetClipboardItem(): void {
+		this.clipboardItem = undefined;
 	}
 
 	@Mobx.action
 	public unsetDraggedElement(): void {
+		this.unsetHighlightedElement();
+		this.project.getElements().forEach(e => {
+			e.setDragged(false);
+		});
+	}
+
+	@Mobx.action
+	public unsetHighlightedElement(): void {
 		this.project.getElements().forEach(e => {
 			e.setHighlighted(false);
 			e.setPlaceholderHighlighted(false);
-			e.setDragged(false);
 		});
 	}
 

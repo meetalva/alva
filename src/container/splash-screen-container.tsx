@@ -27,8 +27,8 @@ export function SplashScreenContainer(props: SplashScreenProps): JSX.Element {
 			</Space>
 			<Space sizeBottom={SpaceSize.XXXL}>
 				<Copy size={CopySize.M} textColor={colors.grey20}>
-					You can open an existing Alva space or create a new one based on our designkit
-					including some basic components to kickstart your project.
+					You can open an existing Alva file or create a new one. An .alva file includes the
+					connected component library, so you can easily share it with everyone.
 				</Copy>
 			</Space>
 			<Space sizeBottom={SpaceSize.S}>

@@ -11,7 +11,7 @@ export const ConnectPaneContainer: React.SFC<ConnectPaneProps> = props => (
 		headline="Connect to a Library"
 		description={`
 			To build prototypes with already existing components,
-			connect to your React component	library first.
+			connect to your React & Typescript component library first.
 		`}
 		primaryButton="Connect"
 		secondaryButton="Download Alva Example"

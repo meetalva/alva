@@ -105,7 +105,7 @@ const StyledInput = styled.input`
 `;
 
 export const BooleanItem: React.StatelessComponent<BooleanItemProps> = props => {
-	const { className, description, label, children, checked, onChange } = props;
+	const { className, description, label, checked, onChange } = props;
 	const icon = checked ? IconName.Check : IconName.Uncheck;
 	const color = checked ? colors.blue40 : colors.grey60;
 

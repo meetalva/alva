@@ -5,7 +5,7 @@ import styled from 'styled-components';
 const StyledElementPane = styled.div`
 	position: relative;
 	flex: 1;
-	overflow: scroll;
+	overflow: auto;
 	padding-top: ${getSpace(SpaceSize.M)}px;
 	padding-bottom: ${getSpace(SpaceSize.XL)}px;
 `;

@@ -567,7 +567,6 @@ export class ViewStore {
 		return result;
 	}
 
-	@Mobx.action
 	public getHighlightedElement(): Model.Element | undefined {
 		if (!this.project) {
 			return;

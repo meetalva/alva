@@ -285,7 +285,17 @@ Mobx.autorunAsync(() => {
 	Sender.send({
 		id: uuid.v4(),
 		payload: selectedElement ? selectedElement.getId() : undefined,
-		type: ServerMessageType.ElementChange
+		type: ServerMessageType.ChangeSelectedElement
+	});
+});
+
+Mobx.autorunAsync(() => {
+	const highlightedElement = store.getHighlightedElement();
+
+	Sender.send({
+		id: uuid.v4(),
+		payload: highlightedElement ? highlightedElement.getId() : undefined,
+		type: ServerMessageType.ChangeHighlightedElement
 	});
 });
 

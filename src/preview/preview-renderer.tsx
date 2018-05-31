@@ -184,7 +184,7 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 				for (let i = 0; i < mutation.addedNodes.length; i++) {
 					const addedNode = mutation.addedNodes[i];
 					const id = ELEMENT_REGISTRY.get(addedNode as HTMLElement);
-					if (id === this.props.store.elementId) {
+					if (id === this.props.store.selectedElementId) {
 						this.updateSelection();
 					}
 				}
@@ -276,15 +276,21 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 	}
 
 	private updateHighlight(): void {
-		const currentElement = this.props.store.elements.find(element => element.highlighted);
+		const currentElement = this.props.store.elements.find(
+			e => e.id === this.props.store.highlightedElementId
+		);
+
 		if (!currentElement) {
 			this.props.highlight.hide();
 			return;
 		}
+
 		const node = getNodeByElementId(currentElement.id);
+
 		if (!node) {
 			return;
 		}
+
 		if (!currentElement.selected) {
 			this.props.highlight.setSize(node);
 			this.props.highlight.show();
@@ -292,7 +298,13 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 	}
 
 	private updateSelection(elementId?: string): void {
-		const id = elementId || this.props.store.elementId;
+		const id = elementId || this.props.store.selectedElementId;
+
+		if (typeof id === 'undefined') {
+			this.props.selection.hide();
+			return;
+		}
+
 		const node = getNodeByElementId(id);
 
 		if (node) {
@@ -381,7 +393,7 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 			ID_REGISTRY.set(this.props.id, node);
 		}
 
-		if (props.store.elementId === this.props.id && node && node.nodeType === 1) {
+		if (props.store.selectedElementId === this.props.id && node && node.nodeType === 1) {
 			props.updateSelection(node as HTMLElement);
 		}
 	}

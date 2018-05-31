@@ -369,10 +369,11 @@ export interface RenderSelectArea {
 }
 
 export interface RenderPreviewStore {
-	elementId: string;
 	elements: SerializedElement[];
+	highlightedElementId?: string;
 	pageId: string;
 	pages: SerializedPage[];
+	selectedElementId?: string;
 }
 
 export interface RenderInit {

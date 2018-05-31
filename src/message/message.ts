@@ -4,7 +4,8 @@ export enum PreviewMessageType {
 	ClickElement = 'click-element',
 	ContentRequest = 'content-request',
 	ContentResponse = 'content-response',
-	ElementChange = 'element-change',
+	ChangeHighlightedElement = 'change-highlighted-element',
+	ChangeSelectedElement = 'change-selected-element',
 	Reload = 'reload',
 	SelectElement = 'select-element',
 	SketchExportRequest = 'sketch-export-request',
@@ -40,7 +41,8 @@ export enum ServerMessageType {
 	DeleteElement = 'delete-page-element',
 	Duplicate = 'duplicate',
 	DuplicateElement = 'duplicate-page-element',
-	ElementChange = 'element-change',
+	ChangeHighlightedElement = 'change-highlighted-element',
+	ChangeSelectedElement = 'change-selected-element',
 	ExportHTML = 'export-html',
 	ExportPDF = 'export-pdf',
 	ExportPNG = 'export-png',
@@ -88,7 +90,8 @@ export type ServerMessage =
 	| CreateNewPage
 	| CreateScriptBundleRequest
 	| CreateScriptBundleResponse
-	| ElementChange
+	| ChangeHighlightedElement
+	| ChangeSelectedElement
 	| NewFileRequest
 	| NewFileResponse
 	| Copy
@@ -123,6 +126,14 @@ export type ServerMessage =
 export type AppLoaded = EmptyEnvelope<ServerMessageType.AppLoaded>;
 export type AssetReadRequest = EmptyEnvelope<ServerMessageType.AssetReadRequest>;
 export type AssetReadResponse = Envelope<ServerMessageType.AssetReadResponse, string>;
+export type ChangeHighlightedElement = Envelope<
+	ServerMessageType.ChangeHighlightedElement,
+	string | undefined
+>;
+export type ChangeSelectedElement = Envelope<
+	ServerMessageType.ChangeSelectedElement,
+	string | undefined
+>;
 export type CheckForUpdatesRequest = EmptyEnvelope<ServerMessageType.CheckForUpdatesRequest>;
 export type CheckLibraryRequest = Envelope<
 	ServerMessageType.CheckLibraryRequest,
@@ -159,7 +170,6 @@ export type CreateScriptBundleResponse = Envelope<
 >;
 export type Cut = EmptyEnvelope<ServerMessageType.Cut>;
 export type Delete = EmptyEnvelope<ServerMessageType.Delete>;
-export type ElementChange = Envelope<ServerMessageType.ElementChange, string | undefined>;
 export type ExportHTML = Envelope<ServerMessageType.ExportHTML, Types.ExportPayload>;
 export type ExportPDF = Envelope<ServerMessageType.ExportPDF, Types.ExportPayload>;
 export type ExportPNG = Envelope<ServerMessageType.ExportPNG, Types.ExportPayload>;

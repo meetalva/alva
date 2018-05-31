@@ -77,19 +77,19 @@ export interface SerializedPatternFolder {
 export enum PatternType {
 	Pattern = 'pattern',
 	SyntheticBox = 'synthetic:box',
+	SyntheticImage = 'synthetic:image',
 	SyntheticLink = 'synthetic:link',
 	SyntheticPage = 'synthetic:page',
-	SyntheticPlaceholder = 'synthetic:placeholder',
 	SyntheticText = 'synthetic:text'
 }
 
 export type SerializedPatternType =
 	| 'pattern'
 	| 'synthetic:box'
+	| 'synthetic:image'
+	| 'synthetic:link'
 	| 'synthetic:page'
-	| 'synthetic:placeholder'
-	| 'synthetic:text'
-	| 'synthetic:link';
+	| 'synthetic:text';
 
 export enum PatternOrigin {
 	BuiltIn = 'built-in',

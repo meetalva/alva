@@ -3,7 +3,7 @@ import { BuiltInContext, BuiltInResult } from '../pattern-library';
 import * as PatternProperty from '../../pattern-property';
 import * as Types from '../../types';
 
-const PATTERN_CONTEXT_ID = 'synthetic:placeholder';
+const PATTERN_CONTEXT_ID = 'synthetic:image';
 const SRC_CONTEXT_ID = 'src';
 const WIDTH_CONTEXT_ID = 'width';
 const HEIGHT_CONTEXT_ID = 'height';
@@ -12,7 +12,7 @@ const MAX_WIDTH_CONTEXT_ID = 'max-width';
 const MIN_HEIGHT_CONTEXT_ID = 'min-height';
 const MAX_HEIGHT_CONTEXT_ID = 'max-height';
 
-export const Placeholder = (context: BuiltInContext): BuiltInResult => {
+export const Image = (context: BuiltInContext): BuiltInResult => {
 	const patternId = context.options.getGlobalPatternId(PATTERN_CONTEXT_ID);
 
 	const properties = [
@@ -73,11 +73,11 @@ export const Placeholder = (context: BuiltInContext): BuiltInResult => {
 			description: 'for Design Drafts',
 			exportName: 'default',
 			id: patternId,
-			name: 'Placeholder',
+			name: 'Image',
 			origin: Types.PatternOrigin.BuiltIn,
 			propertyIds: properties.map(p => p.getId()),
 			slots: [],
-			type: Types.PatternType.SyntheticPlaceholder
+			type: Types.PatternType.SyntheticImage
 		},
 		context
 	);

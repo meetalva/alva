@@ -448,8 +448,8 @@ function createComponentGetter(store: PreviewStore): (props: any, synthetics: an
 				return component[pattern.exportName];
 			case 'synthetic:page':
 				return synthetics.page;
-			case 'synthetic:placeholder':
-				return synthetics.placeholder;
+			case 'synthetic:image':
+				return synthetics.image;
 			case 'synthetic:text':
 				return synthetics.text;
 			case 'synthetic:box':

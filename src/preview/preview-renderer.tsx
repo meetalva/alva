@@ -1,17 +1,23 @@
+import { HighlightArea } from './highlight-area';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Helmet } from 'react-helmet';
 import { SelectArea } from './select-area';
+
 import * as Types from '../model/types';
 
 // TODO: Produces a deprecation warning, find a way
 // to dedupe MobX when upgrading to 4.x
 Mobx.extras.shareGlobalState();
 
+export interface PreviewSelectProps {
+	selectedArea: SelectArea;
+}
+
 export interface PreviewHighlightProps {
-	highlight: SelectArea;
+	highlight: HighlightArea;
 }
 
 interface PreviewComponentProps {
@@ -124,6 +130,7 @@ const ID_REGISTRY = new Map<string, Element | Text>();
 
 export function render(init: Types.RenderInit, container: HTMLElement): void {
 	const selection = new SelectArea();
+	const highlight = new HighlightArea();
 
 	ReactDom.render(
 		<MobxReact.Provider
@@ -135,6 +142,7 @@ export function render(init: Types.RenderInit, container: HTMLElement): void {
 			updateSelection={node => selection.setSize(node)}
 		>
 			<PreviewApplication
+				highlight={highlight}
 				onElementClick={init.onElementClick}
 				onOutsideClick={init.onOutsideClick}
 				onElementSelect={init.onElementSelect}
@@ -147,6 +155,7 @@ export function render(init: Types.RenderInit, container: HTMLElement): void {
 }
 
 interface PreviewApplicationProps {
+	highlight: HighlightArea;
 	onElementClick: Types.RenderInit['onElementClick'];
 	onElementSelect: Types.RenderInit['onElementSelect'];
 	onOutsideClick: Types.RenderInit['onOutsideClick'];
@@ -175,7 +184,7 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 				for (let i = 0; i < mutation.addedNodes.length; i++) {
 					const addedNode = mutation.addedNodes[i];
 					const id = ELEMENT_REGISTRY.get(addedNode as HTMLElement);
-					if (id === this.props.store.elementId) {
+					if (id === this.props.store.selectedElementId) {
 						this.updateSelection();
 					}
 				}
@@ -186,9 +195,11 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 
 		this.disposer = Mobx.autorun(() => {
 			this.updateSelection();
+			this.updateHighlight();
 		});
 
 		this.updateSelection();
+		this.updateHighlight();
 	}
 
 	public componentWillUnmount(): void {
@@ -258,13 +269,42 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 					patternId={element.patternId}
 					properties={element.properties}
 				/>
-				<PreviewHighlight highlight={props.selection} />
+				<PreviewHighlight highlight={props.highlight} />
+				<PreviewSelect selectedArea={props.selection} />
 			</>
 		);
 	}
 
+	private updateHighlight(): void {
+		const currentElement = this.props.store.elements.find(
+			e => e.id === this.props.store.highlightedElementId
+		);
+
+		if (!currentElement) {
+			this.props.highlight.hide();
+			return;
+		}
+
+		const node = getNodeByElementId(currentElement.id);
+
+		if (!node) {
+			return;
+		}
+
+		if (!currentElement.selected) {
+			this.props.highlight.setSize(node);
+			this.props.highlight.show();
+		}
+	}
+
 	private updateSelection(elementId?: string): void {
-		const id = elementId || this.props.store.elementId;
+		const id = elementId || this.props.store.selectedElementId;
+
+		if (typeof id === 'undefined') {
+			this.props.selection.hide();
+			return;
+		}
+
 		const node = getNodeByElementId(id);
 
 		if (node) {
@@ -353,7 +393,7 @@ class PreviewComponent extends React.Component<PreviewComponentProps> {
 			ID_REGISTRY.set(this.props.id, node);
 		}
 
-		if (props.store.elementId === this.props.id && node && node.nodeType === 1) {
+		if (props.store.selectedElementId === this.props.id && node && node.nodeType === 1) {
 			props.updateSelection(node as HTMLElement);
 		}
 	}
@@ -410,16 +450,41 @@ class PreviewHighlight extends React.Component<PreviewHighlightProps> {
 		return (
 			<div
 				style={{
+					boxSizing: 'border-box',
+					position: 'absolute',
+					top: highlight.top,
+					right: highlight.right,
+					bottom: highlight.bottom,
+					left: highlight.left,
+					width: highlight.width,
+					height: highlight.height,
+					border: '2px solid #42BFFE',
+					opacity: highlight.opacity
+				}}
+			/>
+		);
+	}
+}
+
+@MobxReact.observer
+class PreviewSelect extends React.Component<PreviewSelectProps> {
+	public render(): JSX.Element {
+		const props = this.props;
+		const { selectedArea } = props;
+
+		return (
+			<div
+				style={{
 					position: 'absolute',
 					boxSizing: 'border-box',
 					border: '1px solid rgba(255, 255, 255, 0.5)',
-					bottom: highlight.bottom,
-					height: highlight.height,
-					left: highlight.left,
-					opacity: highlight.opacity,
-					right: highlight.right,
-					top: highlight.top,
-					width: highlight.width,
+					bottom: selectedArea.bottom,
+					height: selectedArea.height,
+					left: selectedArea.left,
+					opacity: selectedArea.opacity,
+					right: selectedArea.right,
+					top: selectedArea.top,
+					width: selectedArea.width,
 					pointerEvents: 'none',
 					mixBlendMode: 'difference'
 				}}

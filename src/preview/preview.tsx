@@ -32,14 +32,14 @@ const PRESENTATIONAL_KEYS = [
 
 export class PreviewStore implements Types.RenderPreviewStore {
 	@Mobx.observable public elementContents: Types.SerializedElementContent[] = [];
-
-	@Mobx.observable public elementId: string = '';
 	@Mobx.observable public elements: Types.SerializedElement[] = [];
+	@Mobx.observable public highlightedElementId: string = '';
 	@Mobx.observable public mode: PreviewDocumentMode = PreviewDocumentMode.Live;
 	@Mobx.observable public pageId: string = '';
 	@Mobx.observable public pages: Types.SerializedPage[] = [];
 	@Mobx.observable public patternProperties: Types.SerializedPatternProperty[] = [];
 	@Mobx.observable public patterns: Types.SerializedPattern[] = [];
+	@Mobx.observable public selectedElementId: string = '';
 
 	private constructor() {}
 
@@ -348,8 +348,12 @@ function listen(
 
 				break;
 			}
-			case PreviewMessageType.ElementChange: {
-				store.elementId = payload;
+			case PreviewMessageType.ChangeHighlightedElement: {
+				store.highlightedElementId = payload;
+				break;
+			}
+			case PreviewMessageType.ChangeSelectedElement: {
+				store.selectedElementId = payload;
 				break;
 			}
 			case PreviewMessageType.ContentRequest: {

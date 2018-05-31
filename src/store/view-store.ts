@@ -567,6 +567,14 @@ export class ViewStore {
 		return result;
 	}
 
+	public getHighlightedElement(): Model.Element | undefined {
+		if (!this.project) {
+			return;
+		}
+
+		return this.project.getElements().find(element => element.getHighlighted());
+	}
+
 	public getNameEditableElement(): Model.Element | undefined {
 		return this.project.getElements().find(e => e.getNameEditable());
 	}
@@ -868,6 +876,17 @@ export class ViewStore {
 				item
 			};
 		}
+	}
+
+	@Mobx.action
+	public setHighlightedElement(highlightedElement: Model.Element): void {
+		const previousHighlightedElement = this.getHighlightedElement();
+
+		if (previousHighlightedElement) {
+			previousHighlightedElement.setHighlighted(false);
+		}
+
+		highlightedElement.setHighlighted(true);
 	}
 
 	@Mobx.action

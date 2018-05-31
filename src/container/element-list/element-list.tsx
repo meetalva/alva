@@ -425,7 +425,7 @@ function contentFromTarget(
 	return base.getContentBySlotType(Types.SlotType.Children);
 }
 
-function elementFromTarget(
+export function elementFromTarget(
 	target: EventTarget,
 	options: { sibling: boolean; store: Store.ViewStore }
 ): Model.Element | undefined {

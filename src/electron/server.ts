@@ -24,12 +24,13 @@ interface State {
 	payload: {
 		bundle?: string;
 		elementContents?: Types.SerializedElementContent[];
-		elementId?: string;
 		elements?: Types.SerializedElement[];
+		highlightedElementId?: string;
 		pageId?: string;
 		pages?: Types.SerializedPage[];
 		patternProperties?: Types.SerializedPatternProperty[];
 		patterns?: Types.SerializedPattern[];
+		selectedElementId?: string;
 	};
 	type: 'state';
 }
@@ -269,8 +270,13 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 
 				break;
 			}
-			case ServerMessageType.ElementChange: {
-				state.payload.elementId = message.payload;
+			case ServerMessageType.ChangeSelectedElement: {
+				state.payload.selectedElementId = message.payload;
+				send(message);
+				break;
+			}
+			case ServerMessageType.ChangeHighlightedElement: {
+				state.payload.highlightedElementId = message.payload;
 				send(message);
 				break;
 			}

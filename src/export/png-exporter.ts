@@ -53,7 +53,6 @@ export class PngExporter implements Types.Exporter {
 				webview.style.height = `${payload.height}px`;
 
 				config = payload;
-
 				webview.loadURL(
 					`data:text/html;charset=utf-8,${encodeURIComponent(payload.document)}`,
 					{
@@ -63,10 +62,13 @@ export class PngExporter implements Types.Exporter {
 			};
 
 			// (3) Wait for webview to be ready and capture the page
-			const createPng = () => {
+			const createPng = (isSecondTry?: boolean) => {
 				if (!config) {
 					return;
 				}
+
+				// because of a bug in electron the second capture will only be triggered if we set the focus on this webview
+				webview.focus();
 
 				webview.capturePage(
 					{
@@ -79,6 +81,13 @@ export class PngExporter implements Types.Exporter {
 						height: Math.round(config.height * scaleFactor)
 					},
 					capture => {
+						const captureSize = capture.getSize();
+						if (captureSize.width === 0 && captureSize.height === 0 && !isSecondTry) {
+							// If the captured image is of size 0 try the capture again
+							createPng(true);
+							return;
+						}
+
 						// resize the capture to the original screen size
 						const resizedCapture = capture.resize({
 							width: capture.getSize().width / scaleFactor
@@ -98,6 +107,7 @@ export class PngExporter implements Types.Exporter {
 				if (webview.src === initial) {
 					return;
 				}
+
 				createPng();
 			});
 

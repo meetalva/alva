@@ -109,11 +109,6 @@ export function createMenu(ctx: MenuContext): void {
 					}
 				},
 				{
-					label: '&Rename',
-					enabled: typeof ctx.project !== 'undefined',
-					role: 'rename'
-				},
-				{
 					type: 'separator'
 				},
 				{

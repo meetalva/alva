@@ -73,6 +73,14 @@ Sender.receive(message => {
 			store.setProject(newProject);
 			app.setActiveView(Types.AlvaView.PageDetail);
 			store.commit();
+			break;
+		}
+		case ServerMessageType.Log: {
+			if (Array.isArray(message.payload)) {
+				console.log(...message.payload);
+			} else {
+				console.log(message.payload);
+			}
 		}
 	}
 });

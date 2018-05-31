@@ -1,3 +1,4 @@
+// tslint:disable:no-bitwise
 import * as ReactUtils from '../typescript/react-utils';
 import * as Types from '../../model/types';
 import * as Ts from 'typescript';
@@ -20,9 +21,18 @@ export function analyzeSlots(
 			const declaration = TypescriptUtils.findTypeDeclaration(memberSymbol, {
 				typechecker: ctx.program.getTypeChecker()
 			});
+
 			const memberType = typechecker.getTypeAtLocation(declaration as Ts.Declaration);
 
-			if (!memberType || !ReactUtils.isSlotType(ctx.program, memberType)) {
+			const mayBeChildren =
+				memberSymbol.name === 'children' &&
+				(memberType.flags & Ts.TypeFlags.Any) === Ts.TypeFlags.Any;
+
+			const isImplicitSlot = memberType && ReactUtils.isSlotType(ctx.program, memberType);
+
+			const isExplicitSlot = memberSymbol.getJsDocTags().some(tag => tag.name === 'slot');
+
+			if (!mayBeChildren && !isImplicitSlot && !isExplicitSlot) {
 				return;
 			}
 

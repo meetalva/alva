@@ -45,6 +45,7 @@ export enum ServerMessageType {
 	ExportPDF = 'export-pdf',
 	ExportPNG = 'export-png',
 	ExportSketch = 'export-sketch',
+	Log = 'log',
 	OpenFileRequest = 'open-file-request',
 	OpenFileResponse = 'open-file-response',
 	PageChange = 'page-change',
@@ -102,6 +103,7 @@ export type ServerMessage =
 	| ExportPDF
 	| ExportPNG
 	| ExportSketch
+	| Log
 	| OpenFileRequest
 	| OpenFileResponse
 	| PageChange
@@ -173,6 +175,8 @@ export type CutPageElement = Envelope<ServerMessageType.CutElement, string>;
 export type DeletePageElement = Envelope<ServerMessageType.DeleteElement, string>;
 export type Duplicate = EmptyEnvelope<ServerMessageType.Duplicate>;
 export type DuplicatePageElement = Envelope<ServerMessageType.DuplicateElement, string>;
+// tslint:disable-next-line:no-any
+export type Log = Envelope<ServerMessageType.Log, any>;
 export type OpenFileRequest = EmptyEnvelope<ServerMessageType.OpenFileRequest>;
 export type OpenFileResponse = Envelope<ServerMessageType.OpenFileResponse, Types.ProjectPayload>;
 export type PageChange = Envelope<ServerMessageType.PageChange, Types.PageChangePayload>;

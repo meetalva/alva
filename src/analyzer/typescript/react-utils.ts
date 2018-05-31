@@ -1,6 +1,5 @@
 // tslint:disable:no-bitwise
-
-import * as ts from 'typescript';
+import * as TypeScript from 'typescript';
 import { TypeScriptType } from './typescript-type';
 
 const REACT_COMPONENT_TYPES = [
@@ -20,7 +19,7 @@ const REACT_SLOT_TYPES = ['Element', 'ReactNode', 'ReactChild'];
  * @return The well-known (Alva supported) React component type, or undefined if the given type cannot be resolved to one.
  */
 export function findReactComponentType(
-	program: ts.Program,
+	program: TypeScript.Program,
 	type: TypeScriptType
 ): TypeScriptType | undefined {
 	if (isReactComponentType(program, type.type)) {
@@ -38,15 +37,10 @@ export function findReactComponentType(
 	return;
 }
 
-export function hasDeclarationInReactTypingsFile(declarations: ts.Declaration[]): boolean {
-	for (const declaration of declarations) {
-		const sourceFile = declaration.getSourceFile();
-		if (sourceFile && sourceFile.fileName.includes('react/index.d.ts')) {
-			return true;
-		}
-	}
-
-	return false;
+export function hasDeclarationInReactTypingsFile(declarations: TypeScript.Declaration[]): boolean {
+	return declarations
+		.map(decl => decl.getSourceFile())
+		.some(sourceFile => sourceFile.fileName.endsWith('react/index.d.ts'));
 }
 
 /**
@@ -56,18 +50,24 @@ export function hasDeclarationInReactTypingsFile(declarations: ts.Declaration[])
  * @param type The type to analyze.
  * @return Whether a given type is a well-known (Alva supported) React component type,
  */
-function isReactComponentType(program: ts.Program, type: ts.Type): boolean {
-	const symbol = type.symbol;
-	if (!symbol || !symbol.declarations) {
+function isReactComponentType(program: TypeScript.Program, type: TypeScript.Type): boolean {
+	const symbol = type.getSymbol();
+
+	if (!symbol) {
 		return false;
 	}
 
-	const isWellKnownType: boolean = REACT_COMPONENT_TYPES.indexOf(symbol.name) >= 0;
-	if (!isWellKnownType) {
+	if (!REACT_COMPONENT_TYPES.includes(symbol.name)) {
 		return false;
 	}
 
-	return hasDeclarationInReactTypingsFile(symbol.declarations);
+	const declarations = symbol.getDeclarations();
+
+	if (!declarations) {
+		return false;
+	}
+
+	return hasDeclarationInReactTypingsFile(declarations);
 }
 
 /**
@@ -75,28 +75,28 @@ function isReactComponentType(program: ts.Program, type: ts.Type): boolean {
  * @param program The TypeScript program.
  * @param type The type to test against react node type.
  */
-export function isSlotType(program: ts.Program, type: ts.Type): boolean {
-	const typeSymbols: (ts.Symbol | undefined)[] =
-		type.symbol || type.aliasSymbol
-			? [type.symbol || type.aliasSymbol]
-			: type.flags & ts.TypeFlags.Union
-				? (type as ts.UnionType).types.map(value => value.aliasSymbol || value.symbol)
-				: [];
+export function isSlotType(program: TypeScript.Program, type: TypeScript.Type): boolean {
+	const typechecker = program.getTypeChecker();
+	const symbol = type.aliasSymbol || type.symbol || type.getSymbol();
 
-	for (const typeSymbol of typeSymbols) {
-		if (!typeSymbol || !typeSymbol.declarations) {
-			continue;
-		}
-
-		const isWellKnownType: boolean = REACT_SLOT_TYPES.indexOf(typeSymbol.name) >= 0;
-		if (!isWellKnownType) {
-			continue;
-		}
-
-		if (hasDeclarationInReactTypingsFile(typeSymbol.declarations)) {
-			return true;
-		}
+	if (!symbol) {
+		return false;
 	}
 
-	return false;
+	const resolvedSymbol =
+		symbol.flags & TypeScript.SymbolFlags.AliasExcludes
+			? typechecker.getAliasedSymbol(symbol)
+			: symbol;
+
+	if (!REACT_SLOT_TYPES.includes(resolvedSymbol.name)) {
+		return false;
+	}
+
+	const decls = resolvedSymbol.getDeclarations();
+
+	if (!decls) {
+		return false;
+	}
+
+	return hasDeclarationInReactTypingsFile(decls);
 }

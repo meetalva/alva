@@ -744,6 +744,7 @@ export class ViewStore {
 			return;
 		}
 
+		this.unsetDraggedElement();
 		this.setApp(Model.AlvaApp.from(item.app));
 		this.setProject(project);
 	}
@@ -948,6 +949,7 @@ export class ViewStore {
 			return;
 		}
 
+		this.unsetDraggedElement();
 		this.setApp(app);
 		this.setProject(project);
 	}

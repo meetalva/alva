@@ -98,7 +98,7 @@ const Box: React.SFC = (props: any) => {
 const SYNTHETICS = {
 	box: Box,
 	page: Page,
-	placeholder: props =>
+	image: props =>
 		props.src ? (
 			<img
 				src={props.src}

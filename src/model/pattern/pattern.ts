@@ -165,8 +165,8 @@ function deserializeType(input: Types.SerializedPatternType): Types.PatternType 
 			return Types.PatternType.SyntheticPage;
 		case 'synthetic:box':
 			return Types.PatternType.SyntheticBox;
-		case 'synthetic:placeholder':
-			return Types.PatternType.SyntheticPlaceholder;
+		case 'synthetic:image':
+			return Types.PatternType.SyntheticImage;
 		case 'synthetic:text':
 			return Types.PatternType.SyntheticText;
 		case 'pattern':
@@ -191,8 +191,8 @@ function serializeType(input: Types.PatternType): Types.SerializedPatternType {
 			return 'synthetic:page';
 		case Types.PatternType.SyntheticBox:
 			return 'synthetic:box';
-		case Types.PatternType.SyntheticPlaceholder:
-			return 'synthetic:placeholder';
+		case Types.PatternType.SyntheticImage:
+			return 'synthetic:image';
 		case Types.PatternType.SyntheticText:
 			return 'synthetic:text';
 		case Types.PatternType.Pattern:

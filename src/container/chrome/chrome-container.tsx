@@ -32,9 +32,18 @@ export const ChromeContainer = MobxReact.inject('store')(
 			return null;
 		}
 
-		const previous = index > 0 ? () => store.setActivePageByIndex(index - 1) : AlvaUtil.noop;
-		const next =
-			index < pages.length ? () => store.setActivePageByIndex(index + 1) : AlvaUtil.noop;
+		const toPreviousPage = () => {
+			store.setActivePageByIndex(index - 1);
+			store.unsetSelectedElement();
+		};
+
+		const toNextPage = () => {
+			store.setActivePageByIndex(index + 1);
+			store.unsetSelectedElement();
+		};
+
+		const previous = index > 0 ? toPreviousPage : AlvaUtil.noop;
+		const next = index < pages.length ? toNextPage : AlvaUtil.noop;
 
 		return (
 			<Chrome>

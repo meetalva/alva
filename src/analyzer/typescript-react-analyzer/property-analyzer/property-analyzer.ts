@@ -129,6 +129,7 @@ function createArrayProperty(
 			contextId: args.symbol.name,
 			defaultValue: [],
 			description: '',
+			example: '',
 			hidden: false,
 			id: ctx.getPropertyId(args.symbol.name),
 			label: args.symbol.name,
@@ -144,6 +145,7 @@ function createArrayProperty(
 			contextId: args.symbol.name,
 			defaultValue: [],
 			description: '',
+			example: '',
 			hidden: false,
 			id: ctx.getPropertyId(args.symbol.name),
 			label: args.symbol.name,
@@ -164,6 +166,7 @@ function createBooleanProperty(
 	return {
 		contextId: args.symbol.name,
 		description: '',
+		example: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		label: args.symbol.name,
@@ -199,6 +202,7 @@ function createEnumProperty(
 	return {
 		contextId: args.symbol.name,
 		description: '',
+		example: '',
 		hidden: false,
 		id: enumId,
 		label: args.symbol.name,
@@ -232,6 +236,7 @@ function createNumberProperty(
 	return {
 		contextId: args.symbol.name,
 		description: '',
+		example: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		label: args.symbol.name,
@@ -250,6 +255,7 @@ function createStringProperty(
 		return {
 			contextId: args.symbol.name,
 			description: '',
+			example: '',
 			hidden: false,
 			id: ctx.getPropertyId(args.symbol.name),
 			label: args.symbol.name,
@@ -263,6 +269,7 @@ function createStringProperty(
 	return {
 		contextId: args.symbol.name,
 		description: '',
+		example: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		label: args.symbol.name,
@@ -283,13 +290,14 @@ function setPropertyMetaData(init: {
 
 	const { property, symbol } = init;
 
+	property.example = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'example') || '';
 	property.required = (symbol.flags & Ts.SymbolFlags.Optional) !== Ts.SymbolFlags.Optional;
 	property.label = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'name') || property.label;
 	property.description = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'description') || '';
 	property.hidden = TypescriptUtils.symbolHasJsDocTag(symbol, 'ignore');
 
 	switch (property.type) {
-		case Types.PatternPropertyType.Enum:
+		case 'enum':
 			const defaultOption = property.options.find(
 				option => option.name === TypescriptUtils.getJsDocValueFromSymbol(symbol, 'default')
 			);

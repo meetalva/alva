@@ -61,6 +61,9 @@ interface ErrorMessageProps {
 }
 
 // tslint:disable-next-line:no-any
+const Link: React.SFC = (props: any) => <a href={props.href}>{props.children}</a>;
+
+// tslint:disable-next-line:no-any
 const Page: React.SFC = (props: any) => (
 	<>
 		<Helmet>
@@ -112,6 +115,7 @@ const SYNTHETICS = {
 				}}
 			/>
 		) : null,
+  link: Link,
 	text: props => <span>{props.text}</span>
 };
 
@@ -133,6 +137,7 @@ export function render(init: Types.RenderInit, container: HTMLElement): void {
 			<PreviewApplication
 				onElementClick={init.onElementClick}
 				onOutsideClick={init.onOutsideClick}
+				onElementSelect={init.onElementSelect}
 				selection={selection}
 				store={init.store}
 			/>
@@ -143,6 +148,7 @@ export function render(init: Types.RenderInit, container: HTMLElement): void {
 
 interface PreviewApplicationProps {
 	onElementClick: Types.RenderInit['onElementClick'];
+	onElementSelect: Types.RenderInit['onElementSelect'];
 	onOutsideClick: Types.RenderInit['onOutsideClick'];
 	selection: SelectArea;
 	store: Types.RenderInit['store'];
@@ -201,16 +207,27 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 	private handleClick(e: MouseEvent): void {
 		const id = getElementIdByNode(e.target as HTMLElement);
 
-		if (e.metaKey) {
-			return;
-		}
-
 		if (!id) {
 			this.props.onOutsideClick(e);
 			return;
 		}
 
-		this.props.onElementClick(e, { id });
+		this.props.onElementSelect(e, { id });
+
+		const clickedIds = new Set();
+		let node: HTMLElement | null = e.target as HTMLElement;
+
+		while (node) {
+			const clickedId = getElementIdByNode(node);
+
+			if (clickedId) {
+				clickedIds.add(clickedId);
+			}
+
+			node = node.parentElement;
+		}
+
+		clickedIds.forEach(clickedId => this.props.onElementClick(e, { id: clickedId }));
 	}
 
 	private handleResize(): void {

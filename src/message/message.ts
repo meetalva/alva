@@ -1,6 +1,7 @@
 import * as Types from '../model/types';
 
 export enum PreviewMessageType {
+	ClickElement = 'click-element',
 	ContentRequest = 'content-request',
 	ContentResponse = 'content-response',
 	ElementChange = 'element-change',

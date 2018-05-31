@@ -1,4 +1,5 @@
 import { createCompiler } from '../compiler/create-compiler';
+import * as Electron from 'electron';
 import { EventEmitter } from 'events';
 import * as express from 'express';
 import * as Http from 'http';
@@ -6,6 +7,7 @@ import { isEqual } from 'lodash';
 import { ServerMessage, ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
 import * as Types from '../model/types';
+import * as Url from 'url';
 import * as uuid from 'uuid';
 import { Compiler } from 'webpack';
 import { OPEN, Server as WebsocketServer } from 'ws';
@@ -74,7 +76,51 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 			console.error(err);
 		});
 
-		ws.on('message', message => emitter.emit('client-message', message));
+		ws.on('message', envelope => {
+			emitter.emit('client-message', envelope);
+
+			try {
+				const message = JSON.parse(String(envelope));
+
+				switch (message.type) {
+					case 'click-element': {
+						const element = (state.payload.elements || []).find(
+							e => e.id === message.payload.id
+						);
+
+						if (!element) {
+							return;
+						}
+
+						const hrefPatternProp = (state.payload.patternProperties || []).find(
+							p => p.type === 'href'
+						);
+
+						if (!hrefPatternProp) {
+							return;
+						}
+
+						const hrefElementProp = element.properties.find(
+							p => p.patternPropertyId === hrefPatternProp.id
+						);
+
+						if (
+							hrefElementProp &&
+							typeof hrefElementProp.value === 'string' &&
+							hrefElementProp.value
+						) {
+							const parsed = Url.parse(hrefElementProp.value);
+
+							if (['http:', 'https:'].includes(parsed.protocol || '')) {
+								Electron.shell.openExternal(hrefElementProp.value);
+							}
+						}
+					}
+				}
+			} catch (err) {
+				console.error(err);
+			}
+		});
 		ws.send(JSON.stringify(state));
 	});
 

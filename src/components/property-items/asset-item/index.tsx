@@ -17,6 +17,7 @@ export interface AssetItemProps {
 	onClearClick?: React.MouseEventHandler<HTMLButtonElement>;
 	onInputBlur?: React.ChangeEventHandler<HTMLInputElement>;
 	onInputChange?: React.ChangeEventHandler<HTMLInputElement>;
+	placeholder?: string;
 }
 
 export enum AssetPropertyInputType {
@@ -115,7 +116,7 @@ export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 						onChange={props.onInputChange}
 						type="textarea"
 						value={props.inputValue}
-						placeholder="Enter external URL"
+						placeholder={props.placeholder}
 					/>
 				)}
 				{props.inputType === AssetPropertyInputType.File && (

@@ -1,18 +1,11 @@
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../types';
 
-/**
- * A string property is a property that supports text only.
- * As designer content value (raw value), the string property accepts
- * numbers, undefined, and null, as well (see coerceValue()),
- * but everything is converted into a proper string (never undefined or null).
- * @see Property
- */
-export class PatternStringProperty extends PatternPropertyBase<string | undefined> {
-	public readonly type = Types.PatternPropertyType.String;
+export class PatternHrefProperty extends PatternPropertyBase<string | undefined> {
+	public readonly type = Types.PatternPropertyType.Href;
 
-	public static from(serialized: Types.SerializedStringProperty): PatternStringProperty {
-		return new PatternStringProperty({
+	public static from(serialized: Types.SerializedHrefProperty): PatternHrefProperty {
+		return new PatternHrefProperty({
 			contextId: serialized.contextId,
 			defaultValue: serialized.defaultValue,
 			description: serialized.description,
@@ -35,7 +28,7 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 		}
 	}
 
-	public toJSON(): Types.SerializedStringProperty {
+	public toJSON(): Types.SerializedHrefProperty {
 		return {
 			contextId: this.contextId,
 			defaultValue: this.defaultValue,
@@ -51,7 +44,7 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 		};
 	}
 
-	public update(prop: PatternStringProperty): void {
+	public update(prop: PatternHrefProperty): void {
 		this.contextId = prop.getContextId();
 		this.description = prop.getDescription();
 		this.defaultValue = prop.getDefaultValue();

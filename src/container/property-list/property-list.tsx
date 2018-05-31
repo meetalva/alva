@@ -87,6 +87,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 		}
 
 		const base = { key: id, description, label };
+		const example = patternProperty.getExample();
 
 		// TODO: Split ElementProperty into type-specific classes for better type safety
 		// TODO: Implement inputs for
@@ -134,6 +135,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 								type: ServerMessageType.AssetReadRequest
 							});
 						}}
+						placeholder={example ? `e.g.: ${example}` : ''}
 					/>
 				);
 			}
@@ -173,6 +175,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 						value={value}
 						onBlur={e => this.handleInputBlur(e)}
 						onChange={e => this.handleInputChange(e)}
+						placeholder={example ? `e.g.: ${example}` : ''}
 					/>
 				);
 			}
@@ -184,6 +187,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 							value={property.getValue() as string}
 							onBlur={e => this.handleInputBlur(e)}
 							onChange={e => this.handleInputChange(e)}
+							placeholder={example ? `e.g.: ${example}` : ''}
 						/>
 					</div>
 				);

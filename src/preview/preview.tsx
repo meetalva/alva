@@ -174,11 +174,11 @@ function main(): void {
 	};
 
 	const onElementMouseOver = (e, payload) => {
-		store.highlightedElementId = payload.id;
-
 		if (!connection) {
 			return;
 		}
+
+		store.highlightedElementId = payload.id;
 
 		connection.send(
 			JSON.stringify({

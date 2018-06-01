@@ -212,19 +212,21 @@ function createEnumProperty(
 		label: args.symbol.name,
 		origin: 'user-provided',
 		options: enumDeclaration.members.map((enumMember, index) => {
-			const enumMemberOrdinal = enumMember.initializer
-				? parseInt(enumMember.initializer.getText(), 10)
-				: index;
+			const init = enumMember.initializer
+				? String(enumMember.initializer.getText())
+				: String(index);
+
+			const value = init.charAt(0) === '"' ? init.slice(1, -1) : init;
 
 			const name =
 				TypescriptUtils.getJsDocValueFromNode(enumMember, 'name') || enumMember.name.getText();
 
 			return {
-				contextId: String(enumMemberOrdinal),
+				contextId: init,
 				id: ctx.getEnumOptionId(enumId, name),
 				name,
-				ordinal: enumMemberOrdinal,
-				value: enumMemberOrdinal
+				ordinal: init,
+				value
 			};
 		}),
 		propertyName: args.symbol.name,

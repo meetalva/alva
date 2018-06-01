@@ -23,7 +23,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 				contextId: language.value,
 				id: context.options.getGloablEnumOptionId(langEnumId, language.value),
 				name: language.name,
-				ordinal: index,
+				ordinal: '1',
 				value: language.value
 			})
 	);

@@ -72,7 +72,6 @@ const StyledButton = styled.button`
 				background: ${Color.White};
 			`
 			: ''};
-
 	${(props: ButtonProps) =>
 		typeof props.textColor !== 'undefined'
 			? `

@@ -198,8 +198,8 @@ export interface SerializedEnumOption {
 	contextId: string;
 	id: string;
 	name: string;
-	ordinal: number;
-	value: string | number;
+	ordinal: string;
+	value: string;
 }
 
 export interface SerializedPatternNumberArrayProperty extends SerializedPropertyBase {

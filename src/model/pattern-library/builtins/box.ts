@@ -113,35 +113,35 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 					id: context.options.getGloablEnumOptionId(alignId, 'flex-start'),
 					name: 'Start',
 					value: 'flex-start',
-					ordinal: 0
+					ordinal: '0'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'flex-end',
 					id: context.options.getGloablEnumOptionId(alignId, 'flex-end'),
 					name: 'End',
 					value: 'flex-end',
-					ordinal: 1
+					ordinal: '1'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'center',
 					id: defaultAlign,
 					name: 'Center',
 					value: 'center',
-					ordinal: 2
+					ordinal: '2'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'stretch',
 					id: context.options.getGloablEnumOptionId(alignId, 'stretch'),
 					name: 'Stretch',
 					value: 'stretch',
-					ordinal: 3
+					ordinal: '3'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'baseline',
 					id: context.options.getGloablEnumOptionId(alignId, 'baseline'),
 					name: 'Baseline',
 					value: 'baseline',
-					ordinal: 4
+					ordinal: '4'
 				})
 			]
 		}),
@@ -160,42 +160,42 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 					id: context.options.getGloablEnumOptionId(justifyId, 'flex-start'),
 					name: 'Start',
 					value: 'flex-start',
-					ordinal: 0
+					ordinal: '0'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'flex-end',
 					id: context.options.getGloablEnumOptionId(justifyId, 'flex-end'),
 					name: 'End',
 					value: 'flex-end',
-					ordinal: 1
+					ordinal: '1'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'center',
 					id: defaultJustify,
 					name: 'Center',
 					value: 'center',
-					ordinal: 2
+					ordinal: '2'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'space-between',
 					id: context.options.getGloablEnumOptionId(justifyId, 'space-between'),
 					name: 'Space Between',
 					value: 'space-between',
-					ordinal: 3
+					ordinal: '3'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'space-around',
 					id: context.options.getGloablEnumOptionId(justifyId, 'space-around'),
 					name: 'Space Around',
 					value: 'space-around',
-					ordinal: 4
+					ordinal: '4'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'space-evenly',
 					id: context.options.getGloablEnumOptionId(justifyId, 'space-evenly'),
 					name: 'Space Evenly',
 					value: 'space-evenly',
-					ordinal: 5
+					ordinal: '5'
 				})
 			]
 		}),

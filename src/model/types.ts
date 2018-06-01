@@ -387,12 +387,14 @@ export interface RenderInit {
 	// tslint:disable-next-line:no-any
 	getSlots(slots: any, render: (props: any) => any): any;
 	onElementClick(e: MouseEvent, payload: { id: string }): void;
+	onElementMouseOver(e: MouseEvent, payload: { id: string | undefined }): void;
 	onElementSelect(e: MouseEvent, payload: { id: string }): void;
 	onOutsideClick(e: MouseEvent): void;
 }
 
-export interface SelectPayload {
+export interface PatternIdPayload {
 	id: string;
+	metaDown: boolean;
 }
 
 export enum ElementRole {

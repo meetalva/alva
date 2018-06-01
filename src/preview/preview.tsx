@@ -34,6 +34,7 @@ export class PreviewStore implements Types.RenderPreviewStore {
 	@Mobx.observable public elementContents: Types.SerializedElementContent[] = [];
 	@Mobx.observable public elements: Types.SerializedElement[] = [];
 	@Mobx.observable public highlightedElementId: string = '';
+	@Mobx.observable public metaDown: boolean = false;
 	@Mobx.observable public mode: PreviewDocumentMode = PreviewDocumentMode.Live;
 	@Mobx.observable public pageId: string = '';
 	@Mobx.observable public pages: Types.SerializedPage[] = [];
@@ -104,6 +105,14 @@ function main(): void {
 			? new WebSocket(`ws://${window.location.host}`)
 			: undefined;
 
+	window.addEventListener('keydown', e => {
+		store.metaDown = e.metaKey;
+	});
+
+	window.addEventListener('keyup', e => {
+		store.metaDown = false;
+	});
+
 	const onElementClick = (e: MouseEvent, payload) => {
 		if (!connection) {
 			return;
@@ -133,11 +142,16 @@ function main(): void {
 
 		e.preventDefault();
 
+		store.selectedElementId = payload.id;
+
 		connection.send(
 			JSON.stringify({
 				type: PreviewMessageType.SelectElement,
 				id: uuid.v4(),
-				payload
+				payload: {
+					id: payload.id,
+					metaDown: store.metaDown
+				}
 			})
 		);
 	};
@@ -149,10 +163,31 @@ function main(): void {
 
 		e.preventDefault();
 
+		store.selectedElementId = '';
+
 		connection.send(
 			JSON.stringify({
 				type: PreviewMessageType.UnselectElement,
 				id: uuid.v4()
+			})
+		);
+	};
+
+	const onElementMouseOver = (e, payload) => {
+		store.highlightedElementId = payload.id;
+
+		if (!connection) {
+			return;
+		}
+
+		connection.send(
+			JSON.stringify({
+				type: PreviewMessageType.HighlightElement,
+				id: uuid.v4(),
+				payload: {
+					id: payload.id,
+					metaDown: store.metaDown
+				}
 			})
 		);
 	};
@@ -165,6 +200,7 @@ function main(): void {
 				getProperties: createPropertiesGetter(store),
 				getSlots: createSlotGetter(store),
 				onElementClick,
+				onElementMouseOver,
 				onElementSelect,
 				onOutsideClick,
 				store

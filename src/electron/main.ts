@@ -403,6 +403,14 @@ async function createWindow(): Promise<void> {
 						payload: undefined,
 						type: ServerMessageType.UnselectElement
 					});
+					break;
+				}
+				case PreviewMessageType.HighlightElement: {
+					Sender.send({
+						id: message.id,
+						payload: message.payload,
+						type: ServerMessageType.HighlightElement
+					});
 				}
 			}
 		} catch (err) {

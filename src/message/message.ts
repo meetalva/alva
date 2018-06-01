@@ -6,6 +6,7 @@ export enum PreviewMessageType {
 	ContentResponse = 'content-response',
 	ChangeHighlightedElement = 'change-highlighted-element',
 	ChangeSelectedElement = 'change-selected-element',
+	HighlightElement = 'highlight-element',
 	Reload = 'reload',
 	SelectElement = 'select-element',
 	SketchExportRequest = 'sketch-export-request',
@@ -47,6 +48,7 @@ export enum ServerMessageType {
 	ExportPDF = 'export-pdf',
 	ExportPNG = 'export-png',
 	ExportSketch = 'export-sketch',
+	HighlightElement = 'highlight-element',
 	Log = 'log',
 	OpenFileRequest = 'open-file-request',
 	OpenFileResponse = 'open-file-response',
@@ -106,6 +108,7 @@ export type ServerMessage =
 	| ExportPDF
 	| ExportPNG
 	| ExportSketch
+	| HighlightElement
 	| Log
 	| OpenFileRequest
 	| OpenFileResponse
@@ -176,6 +179,7 @@ export type ExportHTML = Envelope<ServerMessageType.ExportHTML, Types.ExportPayl
 export type ExportPDF = Envelope<ServerMessageType.ExportPDF, Types.ExportPayload>;
 export type ExportPNG = Envelope<ServerMessageType.ExportPNG, Types.ExportPayload>;
 export type ExportSketch = Envelope<ServerMessageType.ExportSketch, Types.ExportPayload>;
+export type HighlightElement = Envelope<ServerMessageType.HighlightElement, Types.PatternIdPayload>;
 export type NewFileRequest = EmptyEnvelope<ServerMessageType.CreateNewFileRequest>;
 export type NewFileResponse = Envelope<
 	ServerMessageType.CreateNewFileResponse,
@@ -196,7 +200,7 @@ export type PastePageElementBelow = Envelope<ServerMessageType.PasteElementBelow
 export type PastePageElementInside = Envelope<ServerMessageType.PasteElementInside, string>;
 export type Redo = EmptyEnvelope<ServerMessageType.Redo>;
 export type Save = Envelope<ServerMessageType.Save, Types.SavePayload>;
-export type SelectElement = Envelope<ServerMessageType.SelectElement, Types.SelectPayload>;
+export type SelectElement = Envelope<ServerMessageType.SelectElement, Types.PatternIdPayload>;
 export type SketchExportRequest = Envelope<
 	ServerMessageType.SketchExportRequest,
 	Types.SketchExportPayload

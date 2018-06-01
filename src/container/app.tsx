@@ -3,12 +3,12 @@ import * as Sender from '../message/client';
 import {
 	ElementPane,
 	globalStyles,
-	IconName,
 	IconRegistry,
 	Layout,
 	LayoutBorder,
 	LayoutDirection,
 	LayoutSide,
+	FixedArea,
 	MainArea,
 	PatternsPane,
 	PropertyPane,
@@ -49,7 +49,9 @@ export class App extends React.Component {
 
 		return (
 			<Layout direction={LayoutDirection.Column}>
-				<ChromeContainer />
+				<FixedArea top={0} right={0} left={0}>
+					<ChromeContainer />
+				</FixedArea>
 				<MainArea>
 					{props.store.getActiveAppView() === Types.AlvaView.SplashScreen && (
 						<SplashScreenContainer
@@ -132,7 +134,7 @@ export class App extends React.Component {
 						</React.Fragment>
 					)}
 				</MainArea>
-				<IconRegistry names={IconName} />
+				<IconRegistry />
 			</Layout>
 		);
 	}

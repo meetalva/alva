@@ -1,5 +1,6 @@
 {
 	"name": "element",
+	"description": "Node in element tree",
 	"displayName": "Element",
 	"flag": "alpha",
 	"version": "1.0.0",

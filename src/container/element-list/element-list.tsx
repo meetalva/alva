@@ -1,4 +1,4 @@
-import { colors, ElementAnchors } from '../../components';
+import { Color, ElementAnchors } from '../../components';
 import { elementMenu } from '../../electron/context-menus';
 import { ElementContainer } from './element-container';
 import * as Mobx from 'mobx';
@@ -12,8 +12,8 @@ import * as Types from '../../model/types';
 const DRAG_IMG_STYLE = `
 	position: fixed;
 	top: 100vh;
-	background-color: ${colors.white.toString()};
-	color: ${colors.black.toString()};
+	background-color: ${Color.White};
+	color: ${Color.Black};
 	padding: 6px 18px;
 	border-radius: 3px;
 	font-size: 12px;

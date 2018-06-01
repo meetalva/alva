@@ -5,6 +5,7 @@ import styled from 'styled-components';
 export interface CopyProps {
 	size?: CopySize;
 	textColor?: Color;
+	children?: React.ReactNode;
 }
 
 export interface StyledCopyProps {
@@ -21,9 +22,9 @@ const StyledCopy = styled.p`
 	margin: 0;
 	line-height: 1.5;
 	${(props: StyledCopyProps) =>
-		typeof props.size !== 'undefined' ? `font-size: ${props.size}px;` : `font-size: 12px`};
+		typeof props.size !== 'undefined' ? `font-size: ${props.size}px;` : 'font-size: 12px'};
 	${(props: StyledCopyProps) =>
-		typeof props.textColor !== 'undefined' ? `color: ${props.textColor.toString()};` : ''};
+		typeof props.textColor !== 'undefined' ? `color: ${props.textColor};` : ''};
 `;
 
 export const Copy: React.StatelessComponent<CopyProps> = props => (
@@ -31,5 +32,3 @@ export const Copy: React.StatelessComponent<CopyProps> = props => (
 		{props.children}
 	</StyledCopy>
 );
-
-export default Copy;

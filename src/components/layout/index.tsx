@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -28,6 +28,7 @@ export interface LayoutProps {
 	direction?: LayoutDirection;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	side?: LayoutSide;
+	children?: React.ReactNode;
 }
 
 export interface MainAreaProps {
@@ -35,6 +36,7 @@ export interface MainAreaProps {
 	className?: string;
 	direction?: LayoutDirection;
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	children?: React.ReactNode;
 }
 
 export interface SideBarProps {
@@ -43,6 +45,7 @@ export interface SideBarProps {
 	direction?: LayoutDirection;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	side?: LayoutSide;
+	children?: React.ReactNode;
 }
 
 export interface LayoutProps {
@@ -51,6 +54,7 @@ export interface LayoutProps {
 	direction?: LayoutDirection;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	wrap?: LayoutWrap;
+	children?: React.ReactNode;
 }
 
 const StyledLayout = styled.div`
@@ -62,7 +66,7 @@ const StyledLayout = styled.div`
 	flex-wrap: ${(props: LayoutProps) => (props.wrap === LayoutWrap.Wrap ? 'wrap' : 'nowrap')};
 	border-width: 0;
 	border-style: solid;
-	border-color: ${colors.black.toString('rgb', { alpha: 0.1 })};
+	border-color: ${Color.BlackAlpha13};
 	border-right-width: ${props =>
 		props.side === LayoutSide.Left && props.border === LayoutBorder.Side ? 1 : 0}px;
 	border-left-width: ${props =>
@@ -88,6 +92,27 @@ const StyledSideBar = styled(StyledLayout)`
 	height: 100%;
 	overflow-y: hidden;
 `;
+
+export interface FixedAreaProps {
+	top?: number;
+	right?: number;
+	bottom?: number;
+	left?: number;
+	children?: React.ReactNode;
+}
+
+const StyledFixedArea = styled.div`
+	position: fixed;
+	top: ${(props: FixedAreaProps) => (typeof props.top === 'undefined' ? 'auto' : props.top)};
+	right: ${(props: FixedAreaProps) => (typeof props.right === 'undefined' ? 'auto' : props.right)};
+	bottom: ${(props: FixedAreaProps) =>
+		typeof props.bottom === 'undefined' ? 'auto' : props.bottom};
+	left: ${(props: FixedAreaProps) => (typeof props.left === 'undefined' ? 'auto' : props.left)};
+`;
+
+export const FixedArea: React.StatelessComponent<FixedAreaProps> = props => (
+	<StyledFixedArea {...props} />
+);
 
 export const MainArea: React.StatelessComponent<MainAreaProps> = props => (
 	<StyledMainArea className={props.className} direction={props.direction} border={props.border}>
@@ -118,5 +143,3 @@ export const Layout: React.StatelessComponent<LayoutProps> = props => (
 		{props.children}
 	</StyledLayout>
 );
-
-export default Layout;

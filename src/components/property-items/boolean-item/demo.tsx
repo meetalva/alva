@@ -1,11 +1,6 @@
-import BooleanItem from './index';
+import { BooleanItem } from '.';
 import * as React from 'react';
-import styled from 'styled-components';
-
-const StyledDemo = styled.div`
-	width: 200px;
-	margin-bottom: 20px;
-`;
+import DemoContainer from '../../demo-container';
 
 export interface BooleanItemDemoState {
 	checked?: boolean;
@@ -24,22 +19,18 @@ export class BooleanItemDemo extends React.Component<{}, BooleanItemDemoState> {
 
 	public render(): JSX.Element {
 		return (
-			<div>
-				<StyledDemo>
-					<BooleanItem
-						label="Visibility"
-						checked={this.state.checked}
-						onChange={this.handleChange}
-					/>
-				</StyledDemo>
-				<StyledDemo>
-					<BooleanItem
-						label="Spacing"
-						checked={!this.state.checked}
-						onChange={this.handleChange}
-					/>
-				</StyledDemo>
-			</div>
+			<DemoContainer title="Boolean Item">
+				<BooleanItem
+					label="Visibility"
+					checked={this.state.checked}
+					onChange={e => this.handleChange(e)}
+				/>
+				<BooleanItem
+					label="Spacing"
+					checked={!this.state.checked}
+					onChange={e => this.handleChange(e)}
+				/>
+			</DemoContainer>
 		);
 	}
 }

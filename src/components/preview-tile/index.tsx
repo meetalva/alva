@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { getSpace, SpaceSize } from '../space';
@@ -56,10 +56,10 @@ const StyledPreviewTile = styled.div`
 	height: 340px;
 	border: 4px solid;
 	border-color: ${(props: StyledPreviewTileProps) =>
-		props.focused ? colors.blue40.toString() : 'transparent'};
+		props.focused ? Color.Blue40 : 'transparent'};
 	border-radius: 6px;
-	box-shadow: 0 3px 12px ${colors.blackAlpha13.toString()};
-	background-color: ${colors.white.toString()};
+	box-shadow: 0 3px 12px ${Color.BlackAlpha13};
+	background-color: ${Color.White};
 	overflow: hidden;
 `;
 
@@ -105,7 +105,7 @@ const StyledContainer = styled.div`
 	left: 0;
 	width: 100%;
 	padding: ${getSpace(SpaceSize.S)}px 0;
-	background: ${colors.white.toString()};
+	background: ${Color.White};
 `;
 
 class EditableTitle extends React.Component<EditableTitleProps> {
@@ -145,21 +145,21 @@ export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): 
 	<StyledPreview data-id={props.id} onClick={props.onClick} onDoubleClick={props.onDoubleClick}>
 		<StyledPreviewTile focused={props.focused}>
 			<StyledContainer>
-			{props.nameState === EditState.Editing ? (
-				<EditableTitle
-					autoFocus
-					autoSelect
-					data-title={true}
-					focused={props.focused}
-					onBlur={props.onBlur}
-					onChange={props.onChange}
-					onFocus={props.onFocus}
-					onKeyDown={props.onKeyDown}
-					value={props.name}
-				/>
-			) : (
-				<StyledTitle editable={props.focused}>{props.name}</StyledTitle>
-			)}
+				{props.nameState === EditState.Editing ? (
+					<EditableTitle
+						autoFocus
+						autoSelect
+						data-title={true}
+						focused={props.focused}
+						onBlur={props.onBlur}
+						onChange={props.onChange}
+						onFocus={props.onFocus}
+						onKeyDown={props.onKeyDown}
+						value={props.name}
+					/>
+				) : (
+					<StyledTitle editable={props.focused}>{props.name}</StyledTitle>
+				)}
 			</StyledContainer>
 		</StyledPreviewTile>
 	</StyledPreview>

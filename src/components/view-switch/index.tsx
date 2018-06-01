@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import { CopySize } from '../copy';
 import { Icon, IconName, IconProps, IconSize } from '../icons';
 import * as React from 'react';
@@ -62,7 +62,7 @@ const StyledViewButton: any = styled.div`
 	font-size: ${`${CopySize.S}px`};
 	border-radius: ${getSpace(SpaceSize.XXS)}px;
 	&:hover {
-		background: ${colors.grey90.toString()};
+		background: ${Color.Grey90};
 	}
 `;
 
@@ -73,7 +73,7 @@ const StyledTitle = styled.strong`
 	width: ${(props: StyledTitleProps) => (props.grow ? 'auto' : '130px')};
 	margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
 	overflow: hidden;
-	color: ${colors.grey36.toString()};
+	color: ${Color.Grey36};
 	font-size: inherit;
 	font-weight: normal;
 	text-align: center;
@@ -89,7 +89,7 @@ const StyledIcons = styled(Icon)`
 	pointer-events: auto;
 
 	&:hover {
-		background: ${colors.grey90.toString()};
+		background: ${Color.Grey90};
 	}
 `;
 
@@ -102,7 +102,7 @@ export const ViewTitle: React.SFC<ViewTitleProps> = (props): JSX.Element => (
 export const ViewButton: React.SFC<ViewButtonProps> = (props): JSX.Element => (
 	<StyledViewButton onClick={props.onClick}>
 		<StyledIcons
-			color={colors.grey60}
+			color={Color.Grey60}
 			size={IconSize.XS}
 			name={IconName.ArrowLeft}
 			visible={true}
@@ -114,7 +114,7 @@ export const ViewButton: React.SFC<ViewButtonProps> = (props): JSX.Element => (
 export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 	<StyledViewSwitch justify={props.justify} fontSize={props.fontSize}>
 		<StyledIcons
-			color={colors.grey60}
+			color={Color.Grey60}
 			onClick={props.onLeftClick}
 			size={IconSize.XS}
 			name={IconName.ArrowLeft}
@@ -122,7 +122,7 @@ export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 		/>
 		<StyledTitle>{props.title}</StyledTitle>
 		<StyledIcons
-			color={colors.grey60}
+			color={Color.Grey60}
 			onClick={props.onRightClick}
 			size={IconSize.XS}
 			name={IconName.ArrowRight}

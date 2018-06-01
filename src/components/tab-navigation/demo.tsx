@@ -1,11 +1,14 @@
-import TabNavigation, { TabNavigationItem } from './index';
+import DemoContainer from '../demo-container';
+import { TabNavigation, TabNavigationItem } from '.';
 import * as React from 'react';
 
 const TabNavigationDemo = () => (
-	<TabNavigation>
-		<TabNavigationItem active={true} tabText="Patterns" />
-		<TabNavigationItem active={false} tabText="Properties" />
-	</TabNavigation>
+	<DemoContainer title="Tab Navigation">
+		<TabNavigation>
+			<TabNavigationItem active={true} tabText="Patterns" />
+			<TabNavigationItem active={false} tabText="Properties" />
+		</TabNavigation>
+	</DemoContainer>
 );
 
 export default TabNavigationDemo;

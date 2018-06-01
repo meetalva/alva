@@ -10,8 +10,10 @@ const StyledPropertyPane = styled.div`
 	overflow: auto;
 `;
 
-export const PropertyPane: React.StatelessComponent = props => (
+export interface PropertyPaneProps {
+	children: React.ReactNode;
+}
+
+export const PropertyPane: React.StatelessComponent<PropertyPaneProps> = props => (
 	<StyledPropertyPane>{props.children}</StyledPropertyPane>
 );
-
-export default PropertyPane;

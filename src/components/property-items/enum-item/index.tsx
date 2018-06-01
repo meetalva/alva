@@ -1,4 +1,4 @@
-import { colors } from '../../colors';
+import { Color } from '../../colors';
 import { fonts } from '../../fonts';
 import { Icon, IconName, IconSize } from '../../icons';
 import { PropertyDescription } from '../property-description';
@@ -41,7 +41,7 @@ const StyledSelectWrapper = styled.div`
 	display: inline-block;
 	box-sizing: border-box;
 	border-radius: 3px;
-	background-color: ${colors.white.toString()};
+	background-color: ${Color.White};
 `;
 
 const StyledSelect = styled.select`
@@ -50,33 +50,33 @@ const StyledSelect = styled.select`
 	width: 100%;
 	height: 30px;
 	padding: 0 ${getSpace(SpaceSize.XL)}px 0 ${getSpace(SpaceSize.S)}px;
-	border: 1px solid ${colors.grey90.toString()};
+	border: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-width: 0.5px;
 	}
 	background: none;
 	border-radius: 3px;
-	color: ${colors.grey20.toString()};
+	color: ${Color.Grey20};
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 15px;
 	text-overflow: ellipsis;
 	transition: border-color 0.1s, box-shadow 0.1s, color 0.1s;
 	&:hover {
-		color: ${colors.black.toString()};
-		border-color: ${colors.grey60.toString()};
+		color: ${Color.Black};
+		border-color: ${Color.Grey60};
 	}
 	&:focus {
 		outline: none;
-		color: ${colors.black.toString()};
-		border-color: ${colors.blue40.toString()};
-		box-shadow: 0 0 3px ${colors.blue.toString('rgb', { alpha: 0.4 })};
+		color: ${Color.Black};
+		border-color: ${Color.Blue40};
+		box-shadow: 0 0 3px ${Color.BlueAlpha40};
 	}
 `;
 
 const StyledIcon = styled(Icon)`
 	position: absolute;
 	right: 0;
-	fill: ${colors.grey60.toString()};
+	fill: ${Color.Grey60};
 	width: 12px;
 	height: 12px;
 	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px;
@@ -107,7 +107,7 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 					<StyledIcon
 						name={IconName.ArrowFillRight}
 						size={IconSize.XXS}
-						color={colors.grey60}
+						color={Color.Grey60}
 					/>
 				</StyledSelectWrapper>
 			</StyledContainer>
@@ -115,5 +115,3 @@ export const EnumItem: React.StatelessComponent<EnumItemProps> = props => {
 		</StyledEnumItem>
 	);
 };
-
-export default EnumItem;

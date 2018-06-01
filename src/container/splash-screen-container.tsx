@@ -1,7 +1,7 @@
 import {
 	Button,
 	ButtonOrder,
-	colors,
+	Color,
 	Copy,
 	CopySize,
 	Headline,
@@ -21,12 +21,12 @@ export function SplashScreenContainer(props: SplashScreenProps): JSX.Element {
 	return (
 		<SplashScreen>
 			<Space sizeBottom={SpaceSize.L}>
-				<Headline textColor={colors.grey20} order={2}>
+				<Headline textColor={Color.Grey20} order={2}>
 					Getting started with Alva
 				</Headline>
 			</Space>
 			<Space sizeBottom={SpaceSize.XXXL}>
-				<Copy size={CopySize.M} textColor={colors.grey20}>
+				<Copy size={CopySize.M} textColor={Color.Grey20}>
 					You can open an existing Alva file or create a new one. An .alva file includes the
 					connected component library, so you can easily share it with everyone.
 				</Copy>
@@ -36,7 +36,7 @@ export function SplashScreenContainer(props: SplashScreenProps): JSX.Element {
 					Create New Alva File
 				</Button>
 			</Space>
-			<Link color={colors.grey50} onClick={props.onSecondaryButtonClick}>
+			<Link color={Color.Grey50} onClick={props.onSecondaryButtonClick}>
 				<Copy size={CopySize.S}>Open Existing Alva File</Copy>
 			</Link>
 		</SplashScreen>

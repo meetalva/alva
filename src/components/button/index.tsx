@@ -1,12 +1,16 @@
-import { Color, colors } from '../colors';
+import { Color } from '../colors';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled, { css } from 'styled-components';
 
 export interface ButtonProps {
+	children?: React.ReactNode;
+	/** @description For dark backgrounds */
 	inverted?: boolean;
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	/** @description Visual weight @default Primary */
 	order?: ButtonOrder;
+	/** @description Spatial weight @default */
 	size?: ButtonSize;
 	textColor?: Color;
 }
@@ -33,14 +37,14 @@ const StyledButton = styled.button`
 		switch (props.order) {
 			case ButtonOrder.Secondary:
 				return css`
-					background: ${colors.black.toString()};
-					color: ${colors.white.toString()};
+					background: ${Color.Black};
+					color: ${Color.White};
 				`;
 			case ButtonOrder.Primary:
 			default:
 				return css`
-					background: ${colors.blue.toString()};
-					color: ${colors.white.toString()};
+					background: ${Color.Blue};
+					color: ${Color.White};
 				`;
 		}
 	}};
@@ -65,14 +69,14 @@ const StyledButton = styled.button`
 	${(props: ButtonProps) =>
 		props.inverted
 			? `
-				background: ${colors.white.toString()};
+				background: ${Color.White};
 			`
 			: ''};
 
 	${(props: ButtonProps) =>
 		typeof props.textColor !== 'undefined'
 			? `
-				color: ${props.textColor.toString()};
+				color: ${props.textColor};
 			`
 			: ''};
 `;
@@ -88,5 +92,3 @@ export const Button: React.StatelessComponent<ButtonProps> = props => (
 		{props.children}
 	</StyledButton>
 );
-
-export default Button;

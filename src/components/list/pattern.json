@@ -1,5 +1,6 @@
 {
 	"name": "list",
+	"description": "Base list",
 	"displayName": "List",
 	"flag": "alpha",
 	"version": "1.0.0",

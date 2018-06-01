@@ -1,4 +1,4 @@
-import { colors } from '../../colors';
+import { Color } from '../../colors';
 import { fonts } from '../../fonts';
 import { PropertyDescription } from '../property-description';
 import { PropertyLabel } from '../property-label';
@@ -46,29 +46,29 @@ const StyledInput = styled.input`
 	background: transparent;
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 15px;
-	color: ${colors.grey36.toString()};
+	color: ${Color.Grey36};
 	transition: all 0.2s;
 
 	::-webkit-input-placeholder {
-		color: ${colors.grey60.toString()};
+		color: ${Color.Grey60};
 	}
 
 	&:hover {
-		color: ${colors.black.toString()};
-		border-color: ${colors.grey60.toString()};
+		color: ${Color.Black};
+		border-color: ${Color.Grey60};
 	}
 
 	&:focus {
 		outline: none;
-		border-color: ${colors.blue40.toString()};
-		color: ${colors.black.toString()};
+		border-color: ${Color.Blue40};
+		color: ${Color.Black};
 	}
 `;
 
 const StyledImageBoxContainer = styled.div`
-	background-color: ${colors.white.toString()};
+	background-color: ${Color.White};
 	border-radius: 3px;
-	border: 0.5px solid ${colors.grey90.toString()};
+	border: 0.5px solid ${Color.Grey90};
 	box-sizing: border-box;
 	flex-shrink: 0;
 	height: 42px;
@@ -94,9 +94,9 @@ const StyledImage = styled.img`
 const StyledButton = styled.button`
 	max-width: 50%;
 	margin-right: 3px;
-	border: 0.5px solid ${colors.grey90.toString()};
+	border: 0.5px solid ${Color.Grey90};
 	border-radius: 3px;
-	background-color: ${colors.white.toString()};
+	background-color: ${Color.White};
 	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.S)}px;
 `;
 
@@ -137,5 +137,3 @@ export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 		{props.description && <PropertyDescription description={props.description || ''} />}
 	</StyledAssetItem>
 );
-
-export default AssetItem;

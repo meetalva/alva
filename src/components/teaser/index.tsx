@@ -1,13 +1,12 @@
-import Button, { ButtonOrder, ButtonSize } from '../button';
-import { colors } from '../colors';
+import { Button, ButtonOrder, ButtonSize } from '../button';
+import { Color } from '../colors';
 import { Copy } from '../copy';
 import { Headline } from '../headline';
-// import Link from '../link';
 import * as React from 'react';
-import Space, { getSpace, SpaceSize } from '../space';
+import { Space, getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
-export interface ConnectLibraryProps {
+export interface TeaserProps {
 	description?: string;
 	headline?: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
@@ -17,18 +16,16 @@ export interface ConnectLibraryProps {
 	secondaryButton?: string;
 }
 
+const OrangeToRed = `linear-gradient(to bottom right, ${Color.Orange}, ${Color.Red});`;
+
 const StyledConnectLibrary = styled.div`
-	background: linear-gradient(
-		to bottom right,
-		${colors.orange.toString()},
-		${colors.red.toString()}
-	);
+	background: ${OrangeToRed};
 	box-sizing: border-box;
 	padding: ${getSpace(SpaceSize.XL)}px ${getSpace(SpaceSize.L)}px;
-	color: ${colors.white.toString()};
+	color: ${Color.White};
 `;
 
-export const ConnectLibrary: React.SFC<ConnectLibraryProps> = props => (
+export const Teaser: React.SFC<TeaserProps> = props => (
 	<StyledConnectLibrary>
 		<Space sizeBottom={SpaceSize.S}>
 			<Headline order={3}>{props.headline}</Headline>
@@ -38,7 +35,7 @@ export const ConnectLibrary: React.SFC<ConnectLibraryProps> = props => (
 		</Space>
 		<Space sizeBottom={SpaceSize.XS}>
 			<Button
-				textColor={colors.red}
+				textColor={Color.Red}
 				order={ButtonOrder.Primary}
 				size={ButtonSize.Small}
 				onClick={props.onPrimaryButtonClick}

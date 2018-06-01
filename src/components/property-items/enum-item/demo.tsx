@@ -1,12 +1,6 @@
-import EnumItem, { EnumItemValues } from './index';
+import { EnumItem, EnumItemValues } from './index';
 import * as React from 'react';
-import styled from 'styled-components';
-
-const StyledDemo = styled.div`
-	width: 200px;
-	padding-top: 32px;
-	margin-bottom: 20px;
-`;
+import DemoContainer from '../../demo-container';
 
 export interface EnumItemDemoState {
 	selectedItem: string;
@@ -31,20 +25,15 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 
 	public render(): JSX.Element {
 		return (
-			<div>
-				<StyledDemo>
-					<EnumItem label="Label" values={this.state.values} />
-				</StyledDemo>
-				<StyledDemo>
-					Required
-					<EnumItem
-						label="Label"
-						values={this.state.values}
-						selectedValue={this.state.selectedItem}
-						required
-					/>
-				</StyledDemo>
-			</div>
+			<DemoContainer title="Enum Item">
+				<EnumItem label="Label" values={this.state.values} />
+				<EnumItem
+					label="Label"
+					values={this.state.values}
+					selectedValue={this.state.selectedItem}
+					required
+				/>
+			</DemoContainer>
 		);
 	}
 }

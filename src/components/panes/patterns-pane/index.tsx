@@ -1,4 +1,4 @@
-import { colors } from '../../colors';
+import { Color } from '../../colors';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../../space';
 import styled from 'styled-components';
@@ -9,15 +9,17 @@ const StyledPatternsPane = styled.div`
 	padding: 0 ${getSpace(SpaceSize.M)}px;
 	overflow-y: auto;
 	height: 100%;
-	border-top: 1px solid ${colors.black.toString('rgb', { alpha: 0.1 })};
+	border-top: 1px solid ${Color.BlackAlpha13};
 
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-top-width: 0.5px;
 	}
 `;
 
-export const PatternsPane: React.StatelessComponent = props => (
+export interface PatternsPaneProps {
+	children?: React.ReactNode;
+}
+
+export const PatternsPane: React.StatelessComponent<PatternsPaneProps> = props => (
 	<StyledPatternsPane>{props.children}</StyledPatternsPane>
 );
-
-export default PatternsPane;

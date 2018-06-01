@@ -2,6 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export interface SpaceProps {
+	children?: React.ReactNode;
 	className?: string;
 	inside?: boolean;
 	size?: SpaceSize | SpaceSize[];
@@ -108,5 +109,3 @@ export const Space: React.StatelessComponent<SpaceProps> = props => {
 		</StyledSpace>
 	);
 };
-
-export default Space;

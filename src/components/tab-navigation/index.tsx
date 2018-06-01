@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import { fonts } from '../fonts';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 export interface TabNavigationProps {
 	active?: boolean;
+	children?: React.ReactNode;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	tabText?: string;
 }
@@ -20,7 +21,7 @@ const StyledTabNavigation = styled.div`
 	display: flex;
 	flex-wrap: wrap;
 	width: 100%;
-	border: 1px solid ${colors.grey60.toString()};
+	border: 1px solid ${Color.Grey60};
 	border-radius: 3px;
 `;
 
@@ -29,10 +30,10 @@ const StyledTabNavigationItem = styled.div`
 	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.M)}px;
 	${(props: TabNavigationItemProps) =>
 		props.active
-			? `background: ${colors.grey60.toString()};
-			color: ${colors.white.toString()};`
-			: `background: ${colors.white.toString()};
-			color: ${colors.grey60.toString()};`}
+			? `background: ${Color.Grey60};
+			color: ${Color.White};`
+			: `background: ${Color.White};
+			color: ${Color.Grey60};`}
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 12px;
 	text-align: center;

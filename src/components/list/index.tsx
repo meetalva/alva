@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import { Headline } from '../headline';
 import * as React from 'react';
 import styled from 'styled-components';
@@ -45,17 +45,16 @@ const StyledLi = styled.li`
 	line-height: 25px;
 	list-style: none;
 	${(props: StyledListItemProps) => (props.onClick ? 'cursor: pointer;' : '')};
-	${(props: StyledListItemProps) =>
-		props.active ? `background: ${colors.blue80.toString()}` : ''};
+	${(props: StyledListItemProps) => (props.active ? `background: ${Color.Blue80}` : '')};
 `;
 
 const StyledLabel = styled.span`
-	color: ${colors.black.toString()};
+	color: ${Color.Black};
 	padding-right: 4px;
 `;
 
 const StyledValue = styled.span`
-	color: ${colors.black.toString()};
+	color: ${Color.Black};
 `;
 
 export class Ul extends React.Component {
@@ -96,7 +95,7 @@ export class Value extends React.Component {
 	}
 }
 
-export default class List extends React.Component<ListProps> {
+export class List extends React.Component<ListProps> {
 	public constructor(props: ListProps) {
 		super(props);
 	}

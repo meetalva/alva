@@ -1,13 +1,17 @@
+import DemoContainer from '../demo-container';
 import { Image } from './index';
 import * as React from 'react';
 
 const ImageDemo = () => {
-	// example with srcset and props in object
 	const image = {
 		alt: 'Gourgeously crafted alternate text',
-		src: 'https://media.giphy.com/media/13CoXDiaCcCoyk/giphy.gif'
+		src: 'https://meetalva.github.io/media/alva.svg'
 	};
-	return <Image alt={image.alt} src={image.src} />;
+	return (
+		<DemoContainer title="Image">
+			<Image alt={image.alt} src={image.src} />
+		</DemoContainer>
+	);
 };
 
 export default ImageDemo;

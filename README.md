@@ -1,8 +1,3 @@
----
-options:
-  order: 0
----
-
 <p align="center">
 <img src="https://meetalva.github.io/media/alva.svg" width="300">
 </p>

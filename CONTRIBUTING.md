@@ -1,11 +1,18 @@
-# Welcome contributors to Alva
+---
+options:
+  order: 0
+tags:
+  - contributing
+---
+
+# Welcome Contributors
 
 💓 First of all, we'd love for you to contribute to our source code. 💓
 
 ## Code of Conduct
 
 We believe in a welcoming and inclusive environment / community, that's why we enforce our Code of Conduct.
-For more information -> [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
+See the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) for more information.
 
 ## Table of Contents
 

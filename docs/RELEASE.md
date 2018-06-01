@@ -1,4 +1,11 @@
-# Building and delivering of new releases
+---
+options:
+  order: 2
+tags:
+  - contributing
+---
+
+# Release
 
 ## Build requirements:
 - For signing the executable for OSX the build needs to be run on OSX

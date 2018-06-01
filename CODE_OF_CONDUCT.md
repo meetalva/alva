@@ -1,3 +1,11 @@
+---
+options:
+  order: 1
+displayName: Code of Conduct
+tags:
+  - contributing
+---
+
 # Contributor Covenant Code of Conduct
 
 ## Our Pledge

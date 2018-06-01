@@ -10,8 +10,11 @@ spaces_around_brackets = false
 spaces_around_operators = true
 trim_trailing_whitespace = true
 
-[*.{yaml,yml}]
+[*.{yaml,yml,md}]
 indent_style = space
+
+[*.md]
+trim_trailing_whitespace = false
 
 [package.json]
 indent_style = space

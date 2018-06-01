@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -11,7 +11,7 @@ const StyledFloatingButton = styled.button`
 	background: transparent;
 	border: none;
 	box-sizing: border-box;
-	color: ${colors.white.toString()};
+	color: ${Color.White};
 	cursor: pointer;
 	margin: 0;
 	min-width: 56px;
@@ -22,7 +22,7 @@ const StyledFloatingButton = styled.button`
 		content: '';
 		display: block;
 		padding-top: 100%;
-		background: ${colors.blue.toString()};
+		background: ${Color.Blue};
 		border-radius: 50%;
 	}
 	&:focus {
@@ -33,7 +33,7 @@ const StyledFloatingButton = styled.button`
 			content: '';
 			display: block;
 			padding-top: 100%;
-			background: ${colors.blue20.toString()};
+			background: ${Color.Blue20};
 			border-radius: 50%;
 		}
 	}

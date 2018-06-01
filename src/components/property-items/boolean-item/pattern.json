@@ -1,5 +1,9 @@
 {
 	"name": "boolean-item",
+	"description": "Input for boolean values",
 	"displayName": "Boolean Item",
-	"version": "1.0.0"
+	"version": "1.0.0",
+	"tags": [
+		"property"
+	]
 }

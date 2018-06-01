@@ -1,9 +1,9 @@
-import { IconName, IconRegistry } from '../icons';
+import DemoContainer from '../demo-container';
 import { ViewSwitch } from './index';
 import * as React from 'react';
 
 const DemoViewSwitch: React.StatelessComponent = (): JSX.Element => (
-	<div>
+	<DemoContainer title="View Switch">
 		<ViewSwitch
 			onLeftClick={() => null}
 			onRightClick={() => null}
@@ -11,8 +11,7 @@ const DemoViewSwitch: React.StatelessComponent = (): JSX.Element => (
 			rightVisible={true}
 			title="Page Name"
 		/>
-		<IconRegistry names={IconName} />
-	</div>
+	</DemoContainer>
 );
 
 export default DemoViewSwitch;

@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -22,13 +22,13 @@ export const Led: React.SFC<LedProps> = props => (
 const COLOR = (props: LedProps): string => {
 	switch (props.ledColor) {
 		case LedColor.Green:
-			return colors.green.toString();
+			return Color.Green;
 		case LedColor.Orange:
-			return colors.orange.toString();
+			return Color.Orange;
 		case LedColor.Red:
-			return colors.red.toString();
+			return Color.Red;
 		case LedColor.Grey:
-			return colors.grey50.toString();
+			return Color.Grey50;
 	}
 };
 

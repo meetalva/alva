@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
@@ -22,6 +22,7 @@ export enum ElementState {
 }
 
 export interface ElementProps {
+	children?: React.ReactNode;
 	draggable: boolean;
 	dragging: boolean;
 	id: string;
@@ -61,9 +62,9 @@ const LABEL_COLOR = (props: StyledElementLabelProps): string => {
 	switch (props.state) {
 		case ElementState.Active:
 		case ElementState.Editable:
-			return colors.blue.toString();
+			return Color.Blue;
 		case ElementState.Disabled:
-			return colors.grey60.toString();
+			return Color.Grey60;
 		default:
 			return 'inherit';
 	}
@@ -73,9 +74,9 @@ const LABEL_BACKGROUND = (props: StyledElementLabelProps): string => {
 	switch (props.state) {
 		case ElementState.Active:
 		case ElementState.Editable:
-			return colors.blue80.toString();
+			return Color.Blue80;
 		case ElementState.Highlighted:
-			return colors.grey90.toString();
+			return Color.Grey90;
 		default:
 			return 'transparent';
 	}
@@ -85,7 +86,7 @@ const StyledElementLabel = styled(div)`
 	position: relative;
 	display: flex;
 	align-items: center;
-	color: ${colors.grey20.toString()};
+	color: ${Color.Grey20};
 	position: relative;
 	font-size: 15px;
 	line-height: 21px;
@@ -128,7 +129,7 @@ const StyledPlaceholder = styled.div`
 		left: 0;
 		top: 3px;
 		border-radius: 3px;
-		background: ${colors.blue40.toString()};
+		background: ${Color.Blue40};
 		transform: scale(${PLACEHOLDER_SCALE});
 		transition: transform 0.2s;
 		z-index: 20;
@@ -142,7 +143,7 @@ const StyledPlaceholder = styled.div`
 		width: calc(100% - 6px);
 		left: ${getSpace(SpaceSize.XS)};
 		top: 5px;
-		background: ${colors.blue40.toString()};
+		background: ${Color.Blue40};
 		transform: scaleY(${PLACEHOLDER_SCALE});
 		transition: transform 0.2s;
 		z-index: 20;
@@ -159,14 +160,14 @@ const StyledElementChildren = styled(elementDiv)`
 const StyledIcon = styled(Icon)`
 	position: absolute;
 	left: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px;
-	fill: ${colors.grey60.toString()};
+	fill: ${Color.Grey60};
 	width: ${getSpace(SpaceSize.S)}px;
 	height: ${getSpace(SpaceSize.S)}px;
 	padding: ${getSpace(SpaceSize.XS)}px;
 	transition: transform 0.2s;
 
 	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
-	${(props: StyledIconProps) => (props.active ? `fill: ${colors.blue20.toString()}` : '')};
+	${(props: StyledIconProps) => (props.active ? `fill: ${Color.Blue20}` : '')};
 `;
 
 const LabelContent = styled.div`
@@ -183,7 +184,7 @@ const LabelContent = styled.div`
 const StyledSeamlessInput = styled.input`
 	box-sizing: border-box;
 	width: 100%;
-	color: ${colors.grey20.toString()};
+	color: ${Color.Grey20};
 	font-size: inherit;
 	line-height: inherit;
 	padding: ${getSpace(SpaceSize.XS - 1)}px ${getSpace(SpaceSize.L - 1)}px
@@ -239,7 +240,7 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 					dataIcon={props.id}
 					name={IconName.ArrowFillRight}
 					size={IconSize.XXS}
-					color={colors.grey60}
+					color={Color.Grey60}
 					open={props.open}
 					active={props.state === ElementState.Active}
 				/>
@@ -266,5 +267,3 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 		) : null}
 	</StyledElement>
 );
-
-export default Element;

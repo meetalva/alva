@@ -1,4 +1,4 @@
-import { colors } from '../../colors';
+import { Color } from '../../colors';
 import { Icon, IconName, IconSize } from '../../icons';
 import { PropertyDescription } from '../property-description';
 import { PropertyLabel } from '../property-label';
@@ -43,10 +43,10 @@ const StyledIndicatorKnob = styled.div`
 	margin: -1px 0 0 -1px;
 	transform: translateX(0);
 	border-radius: 100%;
-	background: ${colors.white.toString()};
+	background: ${Color.White};
 	transition: transform 0.1s, border-color 0.1s, box-shadow 0.1s;
 	box-sizing: border-box;
-	border: 1px solid ${colors.grey60.toString()};
+	border: 1px solid ${Color.Grey60};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-width: 0.5px;
 	}
@@ -55,8 +55,8 @@ const StyledIndicatorKnob = styled.div`
 		props.checked
 			? `
 		transform: translateX(${indicatorWidth - indicatorHeight}px);
-		background: ${colors.white.toString()};
-		border-color: ${colors.blue40.toString()};
+		background: ${Color.White};
+		border-color: ${Color.Blue40};
 	`
 			: ''};
 `;
@@ -68,20 +68,20 @@ const StyledIndicator = styled.span`
 	height: ${indicatorHeight}px;
 	border-radius: ${indicatorHeight / 2}px;
 	box-sizing: border-box;
-	border: 1px solid ${colors.grey80.toString()};
+	border: 1px solid ${Color.Grey80};
 	transition: background 0.1s, box-shadow 0.1s;
 	user-select: none;
 
 	&:hover {
 		${StyledIndicatorKnob} {
-			border-color: ${colors.grey60.toString()};
-			box-shadow: 0.5px 0.5px 3px ${colors.grey60.toString()};
+			border-color: ${Color.Grey60};
+			box-shadow: 0.5px 0.5px 3px ${Color.Grey60};
 
 			${(props: IndicatorProps) =>
 				props.checked
 					? `
-				border-color: ${colors.blue40.toString()};
-				box-shadow: 0.5px 0.5px 3px ${colors.blue40.toString()};
+				border-color: ${Color.Blue40};
+				box-shadow: 0.5px 0.5px 3px ${Color.Blue40};
 			`
 					: ''};
 		}
@@ -90,8 +90,8 @@ const StyledIndicator = styled.span`
 	${(props: IndicatorProps) =>
 		props.checked
 			? `
-		background: ${colors.blue80.toString()};
-		border-color: ${colors.blue40.toString()};
+		background: ${Color.Blue80};
+		border-color: ${Color.Blue40};
 	`
 			: ''};
 `;
@@ -107,7 +107,7 @@ const StyledInput = styled.input`
 export const BooleanItem: React.StatelessComponent<BooleanItemProps> = props => {
 	const { className, description, label, checked, onChange } = props;
 	const icon = checked ? IconName.Check : IconName.Uncheck;
-	const color = checked ? colors.blue40 : colors.grey60;
+	const color = checked ? Color.Blue40 : Color.Grey60;
 
 	return (
 		<StyledBooleanItem className={className}>
@@ -124,5 +124,3 @@ export const BooleanItem: React.StatelessComponent<BooleanItemProps> = props => 
 		</StyledBooleanItem>
 	);
 };
-
-export default BooleanItem;

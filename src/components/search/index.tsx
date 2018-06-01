@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
@@ -34,7 +34,7 @@ const StyledSearch = styled.input`
 	box-sizing: border-box;
 	display: block;
 	width: 100%;
-	color: ${colors.black.toString()};
+	color: ${Color.Black};
 	padding: ${getSpace(SpaceSize.S)}px 0 ${getSpace(SpaceSize.S)}px
 		${getSpace(SpaceSize.L) + getSpace(SpaceSize.XXS)}px;
 
@@ -42,14 +42,14 @@ const StyledSearch = styled.input`
 	transition: color 0.2s;
 
 	::placeholder {
-		color: ${colors.grey50.toString()};
+		color: ${Color.Grey50};
 		transition: color 0.2s;
 		user-select: none;
 	}
 
 	:hover {
 		::placeholder {
-			color: ${colors.black.toString()};
+			color: ${Color.Black};
 		}
 	}
 
@@ -67,7 +67,7 @@ const StyledIcon = styled(Icon)`
 
 export const Search: React.StatelessComponent<SearchProps> = props => (
 	<StyledContainer>
-		<StyledIcon name={IconName.Search} size={IconSize.XS} color={colors.grey36} />
+		<StyledIcon name={IconName.Search} size={IconSize.XS} color={Color.Grey36} />
 		<StyledSearch
 			autoFocus={props.focused}
 			className={props.className}
@@ -83,5 +83,3 @@ export const Search: React.StatelessComponent<SearchProps> = props => (
 		/>
 	</StyledContainer>
 );
-
-export default Search;

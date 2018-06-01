@@ -1,12 +1,17 @@
 import DemoContainer from '../demo-container';
-import { IconName, IconRegistry } from '../icons';
-import PatternList from './index';
+import * as PatternList from '.';
 import * as React from 'react';
 
 const PatternListItemDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer title="Pattern List Item">
-		<PatternList>Copy</PatternList>
-		<IconRegistry names={IconName} />
+		<PatternList.PatternList>
+			<PatternList.PatternFolderView name="Folde Name">
+				<PatternList.PatternListItem>
+					<PatternList.PatternItemLabel>Label</PatternList.PatternItemLabel>
+					<PatternList.PatternItemDescription>Description</PatternList.PatternItemDescription>
+				</PatternList.PatternListItem>
+			</PatternList.PatternFolderView>
+		</PatternList.PatternList>
 	</DemoContainer>
 );
 

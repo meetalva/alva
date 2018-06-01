@@ -1,5 +1,6 @@
 {
 	"name": "enum-item",
+	"description": "Input for enum values",
 	"displayName": "Enum Item",
 	"version": "1.0.0",
 	"tags": ["property"]

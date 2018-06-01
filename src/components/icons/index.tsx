@@ -14,9 +14,6 @@ export enum IconName {
 	Pattern,
 	Search
 }
-export interface IconRegistryProps {
-	names: typeof IconName;
-}
 
 export interface IconProps {
 	className?: string;
@@ -115,7 +112,7 @@ const StyledIcon = styled.svg`
 	width: ${(props: StyledIconProps) => props.size || IconSize.S}px;
 	height: ${(props: StyledIconProps) => props.size || IconSize.S}px;
 
-	color: ${(props: StyledIconProps) => (props.iconColor ? props.iconColor.toString() : 'inherit')};
+	color: ${(props: StyledIconProps) => (props.iconColor ? props.iconColor : 'inherit')};
 	fill: currentColor;
 	stroke: none;
 	stroke-miterlimit: 10;
@@ -127,9 +124,9 @@ const IconRegistrySymbol: React.StatelessComponent<IconRegistrySymbolProps> = pr
 	</symbol>
 );
 
-export const IconRegistry: React.StatelessComponent<IconRegistryProps> = (props): JSX.Element => (
+export const IconRegistry: React.StatelessComponent = (): JSX.Element => (
 	<StyledIconRegistry>
-		{reduce(props.names, (name, e) => {
+		{reduce(IconName, (name, e) => {
 			const iconReg = icons[e];
 
 			return [

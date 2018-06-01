@@ -1,5 +1,6 @@
 {
 	"name": "floating-button",
+	"description": "Always available interaction target",
 	"displayName": "Floating Button",
 	"version": "1.0.0",
 	"tags": ["atom", "button"],

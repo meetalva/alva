@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
@@ -11,7 +11,7 @@ const StyledDescription = styled.span`
 	flex: none;
 	display: block;
 	font-size: 12px;
-	color: ${colors.grey50.toString()};
+	color: ${Color.Grey50};
 	user-select: none;
 	cursor: default;
 	box-sizing: border-box;
@@ -26,5 +26,3 @@ export const PropertyDescription: React.StatelessComponent<PropertyDescriptionPr
 
 	return <StyledDescription title={description}>{description}</StyledDescription>;
 };
-
-export default PropertyDescription;

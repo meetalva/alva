@@ -17,7 +17,11 @@ const StyledLeftSection = styled.div`
 	flex-basis: 45%;
 `;
 
-export const SplashScreen: React.StatelessComponent = props => (
+export interface SplashScreenProps {
+	children?: React.ReactNode;
+}
+
+export const SplashScreen: React.StatelessComponent<SplashScreenProps> = props => (
 	<StyledSplashScreen>
 		<StyledLeftSection>{props.children}</StyledLeftSection>
 	</StyledSplashScreen>

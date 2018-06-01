@@ -1,12 +1,8 @@
-import { Color, colors } from '../colors';
+import { Color } from '../colors';
 import DemoContainer from '../demo-container';
-import Space, { SpaceSize } from './index';
+import { Space, SpaceSize } from './index';
 import * as React from 'react';
 import styled from 'styled-components';
-
-const blue40: Color = new Color({ displayName: 'Demo Blue', rgb: [91, 177, 255] });
-const green: Color = new Color({ displayName: 'Demo Green', rgb: [91, 255, 151] });
-const violet: Color = new Color({ displayName: 'Demo Violet', rgb: [181, 91, 255] });
 
 const DemoTileSpace = styled(Space)`
 	display: flex;
@@ -21,21 +17,21 @@ const DemoRowSpace = styled(Space)`
 `;
 
 const InsetSpace = styled(Space)`
-	background-color: ${blue40.toString()};
+	background-color: ${Color.Blue40};
 	width: 250px;
 	height: 250px;
 `;
 
 const StackSpace = styled(Space)`
-	background-color: ${green.toString()};
+	background-color: ${Color.Orange};
 `;
 
 const InlineSpace = styled(Space)`
-	background-color: ${violet.toString()};
+	background-color: ${Color.Green};
 `;
 
 const Content = styled.div`
-	background-color: ${colors.white.toString()};
+	background-color: ${Color.White};
 	width: 100%;
 	height: 100%;
 	text-align: center;

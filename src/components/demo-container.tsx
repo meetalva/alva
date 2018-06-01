@@ -1,6 +1,8 @@
 import globalStyles from './global-styles';
 import { Headline } from './headline';
+import * as Icon from './icons';
 import * as React from 'react';
+import { Space, SpaceSize } from './space';
 import styled from 'styled-components';
 
 globalStyles();
@@ -18,8 +20,9 @@ const StyledDemoContainer = styled.div`
 
 const DemoContainer: React.StatelessComponent<DemoContainerProps> = props => (
 	<StyledDemoContainer className={props.className}>
-		{props.title && <Headline>{props.title}</Headline>}
-		{props.children}
+		<Space size={SpaceSize.L}>{props.title && <Headline>{props.title}</Headline>}</Space>
+		{React.Children.map(props.children, child => <Space size={SpaceSize.L}>{child}</Space>)}
+		<Icon.IconRegistry />
 	</StyledDemoContainer>
 );
 

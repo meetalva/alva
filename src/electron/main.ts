@@ -1,6 +1,6 @@
 import * as Analyzer from '../analyzer';
 import { checkForUpdates } from './auto-updater';
-import { colors } from '../components';
+import { Color } from '../components';
 import { createCompiler } from '../compiler/create-compiler';
 import { app, BrowserWindow, dialog, screen } from 'electron';
 import * as electronIsDev from 'electron-is-dev';
@@ -61,7 +61,7 @@ async function createWindow(): Promise<void> {
 		minWidth: 780,
 		minHeight: 380,
 		titleBarStyle: 'hiddenInset',
-		backgroundColor: colors.grey97.toString('hex'),
+		backgroundColor: Color.Grey97,
 		title: 'Alva'
 	});
 

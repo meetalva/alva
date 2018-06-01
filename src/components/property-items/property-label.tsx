@@ -1,4 +1,4 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import { fonts } from '../fonts';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
@@ -12,7 +12,7 @@ const StyledLabel = styled.span`
 	display: inline-block;
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
-	color: ${colors.grey50.toString()};
+	color: ${Color.Grey50};
 	width: 30%;
 	white-space: nowrap;
 	overflow: hidden;
@@ -28,5 +28,3 @@ export const PropertyLabel: React.StatelessComponent<PropertyLabelProps> = props
 
 	return <StyledLabel title={label}>{label}</StyledLabel>;
 };
-
-export default PropertyLabel;

@@ -4,6 +4,7 @@ import * as React from 'react';
 import styled, { css, StyledComponentClass } from 'styled-components';
 
 export interface HeadlineProps {
+	children?: React.ReactNode;
 	className?: string;
 	order?: 1 | 2 | 3;
 	tagName?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div';
@@ -20,8 +21,7 @@ const StyledHeadline = styled.div`
 	margin-top: 0;
 	font-family: ${fonts().NORMAL_FONT};
 	font-weight: 500;
-	${(props: StyledHeadlineProps) =>
-		props.textColor ? `color: ${props.textColor.toString()};` : ''};
+	${(props: StyledHeadlineProps) => (props.textColor ? `color: ${props.textColor};` : '')};
 
 	${(props: HeadlineProps) => {
 		switch (props.order) {

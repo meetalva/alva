@@ -1,6 +1,7 @@
 {
 	"name": "viewswitch",
 	"displayName": "View Switch",
+	"description": "Cycle through a list",
 	"version": "1.0.0",
 	"flag": "alpha"
 }

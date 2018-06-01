@@ -1,28 +1,20 @@
-import { colors } from '../colors';
-import Link from './index';
+import { Color } from '../colors';
+import DemoContainer from '../demo-container';
+import { Link } from './index';
 import * as React from 'react';
-import Space, { SpaceSize } from '../space';
 
 const clickHandler = (event: React.MouseEvent<HTMLElement>): void => console.log(event);
 const LinkDemo: React.StatelessComponent<void> = (): JSX.Element => (
-	<Space size={SpaceSize.L}>
-		<Space size={SpaceSize.L}>
-			<Link>Link</Link>
-		</Space>
-		<Space size={SpaceSize.L}>
-			<Link color={colors.blue40}>Link with color</Link>
-		</Space>
-		<Space size={SpaceSize.L}>
-			<Link color={colors.blue40} onClick={clickHandler}>
-				Link with clickHandler
-			</Link>
-		</Space>
-		<Space size={SpaceSize.L}>
-			<Link color={colors.blue40} onClick={clickHandler} uppercase={true}>
-				Link with uppercase
-			</Link>
-		</Space>
-	</Space>
+	<DemoContainer title="Link">
+		<Link>Link</Link>
+		<Link color={Color.Blue40}>Link with color</Link>
+		<Link color={Color.Blue40} onClick={clickHandler}>
+			Link with clickHandler
+		</Link>
+		<Link color={Color.Blue40} onClick={clickHandler} uppercase={true}>
+			Link with uppercase
+		</Link>
+	</DemoContainer>
 );
 
 export default LinkDemo;

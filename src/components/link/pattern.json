@@ -1,5 +1,6 @@
 {
 	"name": "link",
+	"description": "Navigating / tertiary interaction target",
 	"displayName": "Link",
 	"flag": "alpha",
 	"version": "1.0.0",

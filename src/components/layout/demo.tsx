@@ -1,16 +1,16 @@
-import { colors } from '../colors';
+import { Color } from '../colors';
 import DemoContainer from '../demo-container';
-import Layout, { LayoutBorder, LayoutDirection } from './index';
+import { Layout, LayoutBorder, LayoutDirection } from './index';
 import * as React from 'react';
 import styled from 'styled-components';
 
 const StyledTestDiv = styled.div`
 	flex-grow: 1;
 	padding: 20px 10px;
-	background: ${colors.grey90.toString()};
+	background: ${Color.Grey90};
 
 	&:nth-child(odd) {
-		background: ${colors.grey60.toString()};
+		background: ${Color.Grey60};
 	}
 `;
 

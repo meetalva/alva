@@ -4,6 +4,7 @@ import * as React from 'react';
 import styled, { StyledComponentClass } from 'styled-components';
 
 export interface LinkProps {
+	children?: React.ReactNode;
 	className?: string;
 	color?: Color;
 	disabled?: boolean;
@@ -13,7 +14,7 @@ export interface LinkProps {
 
 const StyledLink: StyledComponentClass<LinkProps, {}> = styled.a`
 	font-family: ${fonts().NORMAL_FONT};
-	${(props: LinkProps) => (props.color ? `color: ${props.color.toString()}` : 'color: inherit')};
+	${(props: LinkProps) => (props.color ? `color: ${props.color}` : 'color: inherit')};
 	${(props: LinkProps) => (props.onClick ? 'cursor: pointer;' : 'cursor: auto;')} ${(
 		props: LinkProps
 	) => (props.uppercase ? 'text-transform: uppercase;' : '')};
@@ -30,5 +31,3 @@ export const Link: React.StatelessComponent<LinkProps> = props => (
 		{props.children}
 	</StyledLink>
 );
-
-export default Link;

@@ -1,4 +1,4 @@
-import { colors, Headline, Space, SpaceSize } from '../../components';
+import { Color, Headline, Space, SpaceSize } from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewStore } from '../../store';
@@ -15,7 +15,7 @@ export const PageListPreview: React.StatelessComponent = MobxReact.inject('store
 			<StyledPageListPreview>
 				<Space size={[SpaceSize.XXL * 3]}>
 					<Space size={[SpaceSize.S, SpaceSize.S, SpaceSize.XXXL]}>
-						<Headline order={1} tagName="h1" textColor={colors.grey20}>
+						<Headline order={1} tagName="h1" textColor={Color.Grey20}>
 							{project.getName()}
 						</Headline>
 					</Space>

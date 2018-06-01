@@ -1,4 +1,4 @@
-import { colors } from '../../colors';
+import { Color } from '../../colors';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -13,7 +13,7 @@ const StyledPreviewPane = styled.div`
 	position: relative;
 	flex-grow: 1;
 	overflow: hidden;
-	background: ${colors.white.toString()};
+	background: ${Color.White};
 `;
 
 const StyledFrame = styled.iframe`
@@ -33,6 +33,7 @@ export interface PreviewFrameProps {
 const PreviewFrame: React.SFC<PreviewFrameProps> = props => <StyledFrame {...props} />;
 
 export interface PreviewPaneProps {
+	children?: React.ReactNode;
 	id?: string;
 	onMouseDownLeft?: React.MouseEventHandler<HTMLElement>;
 	onMouseDownRight?: React.MouseEventHandler<HTMLElement>;
@@ -54,5 +55,4 @@ class PreviewPane extends React.Component<PreviewPaneProps> {
 	}
 }
 
-export default PreviewPane;
 export { PreviewPane, PreviewFrame };

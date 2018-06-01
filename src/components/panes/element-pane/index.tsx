@@ -10,8 +10,10 @@ const StyledElementPane = styled.div`
 	padding-bottom: ${getSpace(SpaceSize.XL)}px;
 `;
 
-export const ElementPane: React.StatelessComponent = props => (
+export interface ElementPaneProps {
+	children?: React.ReactNode;
+}
+
+export const ElementPane: React.StatelessComponent<ElementPaneProps> = props => (
 	<StyledElementPane>{props.children}</StyledElementPane>
 );
-
-export default ElementPane;

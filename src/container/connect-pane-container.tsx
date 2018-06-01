@@ -1,4 +1,4 @@
-import { ConnectLibrary } from '../components/connect-library';
+import { Teaser } from '../components';
 import * as React from 'react';
 
 export interface ConnectPaneProps {
@@ -7,7 +7,7 @@ export interface ConnectPaneProps {
 }
 
 export const ConnectPaneContainer: React.SFC<ConnectPaneProps> = props => (
-	<ConnectLibrary
+	<Teaser
 		headline="Connect to a Library"
 		description={`
 			To build prototypes with already existing components,

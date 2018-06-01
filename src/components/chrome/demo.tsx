@@ -1,11 +1,12 @@
 import { CopySize } from '../copy';
-import { IconName, IconRegistry } from '../icons';
-import Chrome from './index';
+import DemoContainer from '../demo-container';
+import { IconRegistry } from '../icons';
+import { Chrome } from './index';
 import * as React from 'react';
 import { ViewSwitch } from '../view-switch';
 
 const DemoChrome: React.StatelessComponent<void> = () => (
-	<div>
+	<DemoContainer title="Chrome">
 		<Chrome>
 			<ViewSwitch
 				onLeftClick={() => null}
@@ -23,8 +24,8 @@ const DemoChrome: React.StatelessComponent<void> = () => (
 				title="Page Title"
 			/>
 		</Chrome>
-		<IconRegistry names={IconName} />
-	</div>
+		<IconRegistry />
+	</DemoContainer>
 );
 
 export default DemoChrome;

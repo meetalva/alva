@@ -1,4 +1,4 @@
-import { colors } from '../../colors';
+import { Color } from '../../colors';
 import { fonts } from '../../fonts';
 import { PropertyDescription } from '../property-description';
 import { PropertyLabel } from '../property-label';
@@ -34,29 +34,29 @@ const StyledInput = styled.input`
 	width: 70%;
 	height: 30px;
 	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.S)}px;
-	border: 1px solid ${colors.grey90.toString()};
+	border: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-width: 0.5px;
 	}
 	border-radius: 3px;
-	background: ${colors.white.toString()};
-	color: ${colors.grey20.toString()};
+	background: ${Color.White};
+	color: ${Color.Grey20};
 	font-family: ${fonts().NORMAL_FONT};
 	font-size: 15px;
 	text-overflow: ellipsis;
 	transition: border-color 0.1s, box-shadow 0.1s, color 0.1s;
 	::-webkit-input-placeholder {
-		color: ${colors.grey60.toString()};
+		color: ${Color.Grey60};
 	}
 	&:hover {
-		color: ${colors.black.toString()};
-		border-color: ${colors.grey60.toString()};
+		color: ${Color.Black};
+		border-color: ${Color.Grey60};
 	}
 	&:focus {
 		outline: none;
-		border-color: ${colors.blue40.toString()};
-		color: ${colors.black.toString()};
-		box-shadow: 0 0 3px ${colors.blue.toString('rgb', { alpha: 0.4 })};
+		border-color: ${Color.Blue40};
+		color: ${Color.Black};
+		box-shadow: 0 0 3px ${Color.BlueAlpha40};
 	}
 `;
 
@@ -79,5 +79,3 @@ export const StringItem: React.StatelessComponent<StringItemProps> = props => {
 		</StyledStringItem>
 	);
 };
-
-export default StringItem;

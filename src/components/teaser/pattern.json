@@ -1,6 +1,7 @@
 {
-	"name": "connect-library",
-	"displayName": "Connect Library",
+	"name": "teaser",
+	"displayName": "Teaser",
+	"description": "Catch, convince, click",
 	"version": "1.0.0",
 	"tags": ["molecule", "connect", "library", "status"],
 	"flag": "alpha"

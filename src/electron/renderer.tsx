@@ -28,6 +28,14 @@ const id = `s${uuid
 (window as any)[id] = store;
 console.log(`Access ViewStore at ${id}`);
 
+window.addEventListener('keydown', e => {
+	store.setMetaDown(e.metaKey);
+});
+
+window.addEventListener('keyup', e => {
+	store.setMetaDown(false);
+});
+
 Sender.send({
 	id: uuid.v4(),
 	type: ServerMessageType.AppLoaded,
@@ -149,6 +157,13 @@ Sender.receive(message => {
 		}
 		case ServerMessageType.UnselectElement: {
 			store.unsetSelectedElement();
+			break;
+		}
+		case ServerMessageType.HighlightElement: {
+			const element = store.getElementById(message.payload.id);
+			if (element && (message.payload.metaDown || store.getMetaDown())) {
+				store.setHighlightedElement(element);
+			}
 		}
 	}
 });

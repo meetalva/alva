@@ -143,6 +143,7 @@ export function render(init: Types.RenderInit, container: HTMLElement): void {
 		>
 			<PreviewApplication
 				highlight={highlight}
+				onElementMouseOver={init.onElementMouseOver}
 				onElementClick={init.onElementClick}
 				onOutsideClick={init.onOutsideClick}
 				onElementSelect={init.onElementSelect}
@@ -157,6 +158,7 @@ export function render(init: Types.RenderInit, container: HTMLElement): void {
 interface PreviewApplicationProps {
 	highlight: HighlightArea;
 	onElementClick: Types.RenderInit['onElementClick'];
+	onElementMouseOver: Types.RenderInit['onElementMouseOver'];
 	onElementSelect: Types.RenderInit['onElementSelect'];
 	onOutsideClick: Types.RenderInit['onOutsideClick'];
 	selection: SelectArea;
@@ -171,10 +173,12 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 	public constructor(props: PreviewApplicationProps) {
 		super(props);
 		this.handleClick = this.handleClick.bind(this);
+		this.handleMouseOver = this.handleMouseOver.bind(this);
 		this.handleResize = this.handleResize.bind(this);
 	}
 
 	public componentDidMount(): void {
+		document.addEventListener('mouseover', this.handleMouseOver);
 		document.addEventListener('click', this.handleClick);
 		window.addEventListener('resize', this.handleResize);
 
@@ -203,6 +207,7 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 	}
 
 	public componentWillUnmount(): void {
+		document.removeEventListener('mouseover', this.handleMouseOver);
 		document.removeEventListener('click', this.handleClick);
 		window.removeEventListener('resize', this.handleResize);
 
@@ -241,8 +246,16 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 		clickedIds.forEach(clickedId => this.props.onElementClick(e, { id: clickedId }));
 	}
 
+	private handleMouseOver(e: MouseEvent): void {
+		const id = getElementIdByNode(e.target as HTMLElement);
+		this.props.onElementMouseOver(e, { id });
+	}
+
 	private handleResize(): void {
-		window.requestAnimationFrame(() => this.updateSelection());
+		window.requestAnimationFrame(() => {
+			this.updateSelection();
+			this.updateHighlight();
+		});
 	}
 
 	public render(): JSX.Element | null {
@@ -459,7 +472,8 @@ class PreviewHighlight extends React.Component<PreviewHighlightProps> {
 					width: highlight.width,
 					height: highlight.height,
 					border: '2px solid #42BFFE',
-					opacity: highlight.opacity
+					opacity: highlight.opacity,
+					pointerEvents: 'none'
 				}}
 			/>
 		);

@@ -41,6 +41,8 @@ export class ViewStore {
 
 	private editHistory: Model.EditHistory;
 
+	@Mobx.observable private metaDown: boolean = false;
+
 	@Mobx.observable private project: Model.Project;
 
 	private savedProjects: Types.SavedProject[] = [];
@@ -575,6 +577,10 @@ export class ViewStore {
 		return this.project.getElements().find(element => element.getHighlighted());
 	}
 
+	public getMetaDown(): boolean {
+		return this.metaDown;
+	}
+
 	public getNameEditableElement(): Model.Element | undefined {
 		return this.project.getElements().find(e => e.getNameEditable());
 	}
@@ -885,9 +891,25 @@ export class ViewStore {
 
 		if (previousHighlightedElement) {
 			previousHighlightedElement.setHighlighted(false);
+
+			previousHighlightedElement.getAncestors().forEach(ancestor => {
+				const descendants = ancestor.getDescendants();
+				if (!descendants.some(d => d.getSelected() || d.getHighlighted())) {
+					ancestor.setForcedOpen(false);
+				}
+			});
 		}
 
 		highlightedElement.setHighlighted(true);
+
+		highlightedElement.getAncestors().forEach(ancestor => {
+			ancestor.setForcedOpen(true);
+		});
+	}
+
+	@Mobx.action
+	public setMetaDown(metaDown: boolean): void {
+		this.metaDown = metaDown;
 	}
 
 	@Mobx.action
@@ -932,7 +954,10 @@ export class ViewStore {
 			previousSelectedElement.setSelected(false);
 
 			previousSelectedElement.getAncestors().forEach(ancestor => {
-				ancestor.setForcedOpen(false);
+				const descendants = ancestor.getDescendants();
+				if (!descendants.some(d => d.getSelected() || d.getHighlighted())) {
+					ancestor.setForcedOpen(false);
+				}
 			});
 		}
 

@@ -74,7 +74,16 @@ async function analyzePatterns(context: {
 }): Promise<Types.PatternAnalysis[]> {
 	const patternCandidates = await findPatternCandidates(context.cwd);
 	const declarationPaths = patternCandidates.map(p => p.declarationPath || p.sourcePath);
-	const program = ts.createProgram(declarationPaths, {});
+
+	const optionsPath = ts.findConfigFile(context.cwd, Fs.existsSync);
+	const options = optionsPath
+		? ts.readConfigFile(optionsPath, path => String(Fs.readFileSync(path)))
+		: { config: {} };
+
+	const compilerHost = ts.createCompilerHost(options.config);
+	compilerHost.getCurrentDirectory = () => context.cwd;
+
+	const program = ts.createProgram(declarationPaths, options.config, compilerHost);
 
 	const analyzePattern = getPatternAnalyzer(program, context.options);
 	return patternCandidates.reduce(

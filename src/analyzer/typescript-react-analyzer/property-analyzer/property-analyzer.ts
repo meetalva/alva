@@ -44,6 +44,10 @@ export function analyze(
 				return;
 			}
 
+			if (symbol.getJsDocTags().some(tag => tag.name === 'slot')) {
+				return;
+			}
+
 			const symbolType = getSymbolType(symbol, { typechecker });
 
 			if (!symbolType) {
@@ -250,7 +254,10 @@ function createNumberProperty(
 function createStringProperty(
 	args: PropertyInit,
 	ctx: PropertyAnalyzeContext
-): Types.SerializedPatternAssetProperty | Types.SerializedStringProperty {
+):
+	| Types.SerializedPatternAssetProperty
+	| Types.SerializedHrefProperty
+	| Types.SerializedStringProperty {
 	if (TypescriptUtils.symbolHasJsDocTag(args.symbol, 'asset')) {
 		return {
 			contextId: args.symbol.name,
@@ -263,6 +270,21 @@ function createStringProperty(
 			propertyName: args.symbol.name,
 			required: false,
 			type: Types.PatternPropertyType.Asset
+		};
+	}
+
+	if (TypescriptUtils.symbolHasJsDocTag(args.symbol, 'href')) {
+		return {
+			contextId: args.symbol.name,
+			description: '',
+			example: '',
+			hidden: false,
+			id: ctx.getPropertyId(args.symbol.name),
+			label: args.symbol.name,
+			origin: 'user-provided',
+			propertyName: args.symbol.name,
+			required: false,
+			type: Types.PatternPropertyType.Href
 		};
 	}
 

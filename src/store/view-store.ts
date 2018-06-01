@@ -1,5 +1,5 @@
 import * as Sender from '../message/client';
-import { isEqual } from 'lodash';
+import { debounce, isEqual } from 'lodash';
 import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
@@ -54,6 +54,8 @@ export class ViewStore {
 	public constructor(init: { app: Model.AlvaApp; history: Model.EditHistory }) {
 		this.app = init.app;
 		this.editHistory = init.history;
+
+		this.save = debounce(this.save, 1000);
 	}
 
 	@Mobx.action
@@ -82,6 +84,9 @@ export class ViewStore {
 			app: this.app.toJSON(),
 			project: this.project.toJSON()
 		});
+
+		// tslint:disable-next-line:no-any
+		(window as any).requestIdleCallback(() => this.save());
 	}
 
 	public connectPatternLibrary(): void {
@@ -815,6 +820,32 @@ export class ViewStore {
 		}
 
 		this.project.removePage(page);
+	}
+
+	@Mobx.action
+	public save(): void {
+		const savedProjects = this.getSavedProjects();
+		const savedProject = savedProjects[savedProjects.length - 1];
+
+		if (savedProject && Model.Project.isEqual(savedProject, this.project.toDisk())) {
+			return;
+		}
+
+		if (this.project) {
+			const serializedProject = this.project.toJSON();
+			this.addSavedProject(this.project);
+
+			const payload = {
+				path: this.project.getPath(),
+				project: serializedProject
+			};
+
+			Sender.send({
+				id: uuid.v4(),
+				payload,
+				type: ServerMessageType.Save
+			});
+		}
 	}
 
 	@Mobx.action

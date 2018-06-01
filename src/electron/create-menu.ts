@@ -97,15 +97,7 @@ export function createMenu(ctx: MenuContext): void {
 						if (!project) {
 							return;
 						}
-
-						Sender.send({
-							type: ServerMessageType.Save,
-							id: uuid.v4(),
-							payload: {
-								path: project.getPath(),
-								project: project.toJSON()
-							}
-						});
+						ctx.store.save();
 					}
 				},
 				{

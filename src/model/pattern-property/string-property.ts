@@ -1,5 +1,5 @@
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
-import * as Types from '../types';
+import * as Types from '../../types';
 
 /**
  * A string property is a property that supports text only.

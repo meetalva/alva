@@ -1,3 +1,5 @@
+import * as PatternProperty from './pattern-property';
+
 export enum AppState {
 	Starting = 'starting',
 	Started = 'started'
@@ -60,7 +62,7 @@ export enum PatternLibraryState {
 export interface SerializedPatternLibrary {
 	bundle: string;
 	id: string;
-	patternProperties: SerializedPatternProperty[];
+	patternProperties: PatternProperty.SerializedPatternProperty[];
 	patterns: SerializedPattern[];
 	root: SerializedPatternFolder;
 	state: PatternLibraryState;
@@ -118,115 +120,6 @@ export interface SerializedPatternSlot {
 	type: string;
 }
 
-export enum PatternPropertyType {
-	Asset = 'asset',
-	Boolean = 'boolean',
-	Enum = 'enum',
-	Href = 'href',
-	NumberArray = 'number[]',
-	Number = 'number',
-	StringArray = 'string[]',
-	String = 'string'
-}
-
-export type SerializedPatternPropertyType =
-	| 'asset'
-	| 'boolean'
-	| 'enum'
-	| 'href'
-	| 'number[]'
-	| 'number'
-	| 'string[]'
-	| 'string';
-
-export enum PatternPropertyOrigin {
-	BuiltIn = 'built-in',
-	UserProvided = 'user-provided'
-}
-
-export type SerializedPatternPropertyOrigin = 'built-in' | 'user-provided';
-
-export type ElementPropertyValue =
-	| undefined
-	| boolean
-	| number
-	| number[]
-	| object
-	| string
-	| string[];
-
-export type SerializedPatternProperty =
-	| SerializedPatternAssetProperty
-	| SerializedPatternBooleanProperty
-	| SerializedPatternEnumProperty
-	| SerializedPatternNumberArrayProperty
-	| SerializedPatternNumberProperty
-	| SerializedPatternStringArrayProperty
-	| SerializedStringProperty
-	| SerializedHrefProperty;
-
-export interface SerializedPropertyBase {
-	contextId: string;
-	description: string;
-	example: string;
-	hidden: boolean;
-	id: string;
-	label: string;
-	origin: SerializedPatternPropertyOrigin;
-	propertyName: string;
-	required: boolean;
-	type: SerializedPatternPropertyType;
-}
-
-export interface SerializedPatternAssetProperty extends SerializedPropertyBase {
-	defaultValue?: string;
-	type: 'asset';
-}
-
-export interface SerializedPatternBooleanProperty extends SerializedPropertyBase {
-	defaultValue?: boolean;
-	type: 'boolean';
-}
-
-export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
-	defaultOptionId?: string;
-	options: SerializedEnumOption[];
-	type: 'enum';
-}
-
-export interface SerializedEnumOption {
-	contextId: string;
-	id: string;
-	name: string;
-	ordinal: string;
-	value: string;
-}
-
-export interface SerializedPatternNumberArrayProperty extends SerializedPropertyBase {
-	defaultValue: number[];
-	type: 'number[]';
-}
-
-export interface SerializedPatternNumberProperty extends SerializedPropertyBase {
-	defaultValue?: number;
-	type: 'number';
-}
-
-export interface SerializedPatternStringArrayProperty extends SerializedPropertyBase {
-	defaultValue: string[];
-	type: 'string[]';
-}
-
-export interface SerializedStringProperty extends SerializedPropertyBase {
-	defaultValue?: string;
-	type: 'string';
-}
-
-export interface SerializedHrefProperty extends SerializedPropertyBase {
-	defaultValue?: string;
-	type: 'href';
-}
-
 export enum AlvaView {
 	Pages = 'Pages',
 	PageDetail = 'PageDetail',
@@ -273,7 +166,7 @@ export interface LibraryAnalysis {
 export interface PatternAnalysis {
 	path: string;
 	pattern: SerializedPattern;
-	properties: SerializedPatternProperty[];
+	properties: PatternProperty.SerializedPatternProperty[];
 }
 
 export interface ExportWriteResult {
@@ -412,3 +305,12 @@ export interface EditHistoryItem {
 	app: SerializedAlvaApp;
 	project: SerializedProject;
 }
+
+export type ElementPropertyValue =
+	| undefined
+	| boolean
+	| number
+	| number[]
+	| object
+	| string
+	| string[];

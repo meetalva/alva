@@ -4,7 +4,7 @@ import * as uuid from 'uuid';
 import * as Sender from '../message/client';
 import { ServerMessageType } from '../message';
 import { ViewStore } from '../store';
-import * as Types from '../model/types';
+import * as Types from '../types';
 
 export class PdfExporter implements Types.Exporter {
 	public contents: Buffer;

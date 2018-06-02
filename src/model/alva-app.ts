@@ -1,5 +1,5 @@
 import * as Mobx from 'mobx';
-import * as Types from '../model/types';
+import * as Types from '../types';
 
 export interface AlvaAppInit {
 	activeView: Types.AlvaView;

@@ -15,7 +15,7 @@ import * as Path from 'path';
 import { Persistence, PersistenceState } from '../persistence';
 import * as Sender from '../message/server';
 import { createServer } from './server';
-import * as Types from '../model/types';
+import * as Types from '../types';
 import * as Util from 'util';
 import * as uuid from 'uuid';
 

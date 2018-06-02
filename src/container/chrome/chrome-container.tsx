@@ -4,7 +4,7 @@ import * as MobxReact from 'mobx-react';
 import { OverviewSwitchContainer } from './overview-switch-container';
 import * as React from 'react';
 import { ViewStore } from '../../store';
-import * as Types from '../../model/types';
+import * as Types from '../../types';
 
 interface InjectedChromeContainerProps {
 	store: ViewStore;

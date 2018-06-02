@@ -6,7 +6,7 @@ import {
 	PatternEnumProperty,
 	PatternEnumPropertyOption
 } from '../../pattern-property';
-import * as Types from '../../types';
+import * as Types from '../../../types';
 
 const PATTERN_CONTEXT_ID = 'synthetic:page';
 const SLOT_CONTEXT_ID = 'children';

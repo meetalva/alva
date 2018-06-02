@@ -7,7 +7,7 @@ import * as Model from '../../model';
 import * as React from 'react';
 import * as Store from '../../store';
 import styled from 'styled-components';
-import * as Types from '../../model/types';
+import * as Types from '../../types';
 
 const DRAG_IMG_STYLE = `
 	position: fixed;

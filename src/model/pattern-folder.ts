@@ -1,7 +1,7 @@
 import * as Mobx from 'mobx';
 import { Pattern } from './pattern';
 import { PatternLibrary } from './pattern-library';
-import * as Types from './types';
+import * as Types from '../types';
 import * as uuid from 'uuid';
 
 export interface PatternFolderInit {

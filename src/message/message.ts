@@ -1,4 +1,4 @@
-import * as Types from '../model/types';
+import * as Types from '../types';
 
 export enum PreviewMessageType {
 	ClickElement = 'click-element',

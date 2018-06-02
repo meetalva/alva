@@ -1,5 +1,5 @@
 import * as MobX from 'mobx';
-import * as Types from '../model/types';
+import * as Types from '../types';
 
 export class SelectArea implements Types.RenderSelectArea {
 	@MobX.observable public bottom: number = 0;

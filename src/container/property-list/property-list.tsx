@@ -5,7 +5,7 @@ import * as MobxReact from 'mobx-react';
 import { ElementProperty, PatternEnumProperty } from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
-import * as Types from '../../model/types';
+import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 @MobxReact.inject('store')

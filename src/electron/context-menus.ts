@@ -3,7 +3,7 @@ import { MenuItemConstructorOptions, remote } from 'electron';
 import { ServerMessageType } from '../message';
 import { Element } from '../model';
 import { ViewStore } from '../store';
-import * as Types from '../model/types';
+import * as Types from '../types';
 import * as uuid from 'uuid';
 
 export function elementMenu(element: Element, store: ViewStore): void {

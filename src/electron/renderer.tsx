@@ -9,7 +9,7 @@ import { AlvaApp, EditHistory, PatternLibrary, Project } from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
-import * as Types from '../model/types';
+import * as Types from '../types';
 import * as uuid from 'uuid';
 
 // prevent app zooming

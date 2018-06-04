@@ -79,7 +79,7 @@
     "@commitlint/cli": "6.1.3",
     "@commitlint/config-conventional": "6.1.3",
     "@commitlint/prompt-cli": "6.1.3",
-    "@commitlint/travis-cli": "6.1.3",
+    "@commitlint/travis-cli": "7.0.0",
     "@patternplate/cli": "2.5.11",
     "@patternplate/render-styled-components": "2.1.6",
     "@types/chokidar": "1.7.5",

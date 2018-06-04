@@ -49,7 +49,8 @@
     "copyright": "Copyright (c) 2017-2018 SinnerSchrader Deutschland GmbH",
     "files": [
       "build/**/*",
-      "package.json"
+      "package.json",
+      "build/icon.*"
     ],
     "directories": {
       "buildResources": "src/resources",
@@ -68,6 +69,13 @@
     "linux": {
       "artifactName": "${productName}-${version}.${ext}",
       "executableName": "Alva"
+    },
+    "fileAssociations": {
+      "ext": "alva",
+      "name": "Alva",
+      "icon": "document.icns",
+      "role": "Editor",
+      "isPackage": true
     }
   },
   "standard-version": {

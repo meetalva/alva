@@ -78,7 +78,7 @@
   "devDependencies": {
     "@commitlint/cli": "6.1.3",
     "@commitlint/config-conventional": "6.1.3",
-    "@commitlint/prompt-cli": "6.1.3",
+    "@commitlint/prompt-cli": "7.0.0",
     "@commitlint/travis-cli": "6.1.3",
     "@patternplate/cli": "2.5.11",
     "@patternplate/render-styled-components": "2.1.6",

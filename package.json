@@ -49,8 +49,7 @@
     "copyright": "Copyright (c) 2017-2018 SinnerSchrader Deutschland GmbH",
     "files": [
       "build/**/*",
-      "package.json",
-      "build/icon.*"
+      "package.json"
     ],
     "directories": {
       "buildResources": "src/resources",

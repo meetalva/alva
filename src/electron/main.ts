@@ -51,28 +51,6 @@ let projectPath: string | undefined;
 
 const userStore = new ElectronStore();
 
-app.on('open-file', async (event, path) => {
-	event.preventDefault();
-
-	if (path) {
-		const result = await Persistence.read<Types.SavedProject>(path);
-
-		if (result.state === PersistenceState.Error) {
-			// TODO: Show user facing error here
-		} else {
-			const contents = result.contents as Types.SerializedProject;
-
-			Sender.send({
-				type: ServerMessageType.OpenFileResponse,
-				id: uuid.v4(),
-				payload: { path, contents }
-			});
-
-			dialog.showMessageBox({ message: 'Finished a file', buttons: ['OK'] });
-		}
-	}
-});
-
 async function createWindow(): Promise<void> {
 	const { width = 1280, height = 800 } = screen.getPrimaryDisplay().workAreaSize;
 
@@ -478,6 +456,30 @@ async function createWindow(): Promise<void> {
 
 const log = require('electron-log');
 log.info('App starting...');
+
+app.on('will-finish-launching', () => {
+	app.on('open-file', async (event, path) => {
+		event.preventDefault();
+
+		if (path) {
+			const result = await Persistence.read<Types.SavedProject>(path);
+
+			if (result.state === PersistenceState.Error) {
+				// TODO: Show user facing error here
+			} else {
+				const contents = result.contents as Types.SerializedProject;
+
+				Sender.send({
+					type: ServerMessageType.OpenFileResponse,
+					id: uuid.v4(),
+					payload: { path, contents }
+				});
+
+				dialog.showMessageBox({ message: 'Finished a file', buttons: ['OK'] });
+			}
+		}
+	});
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

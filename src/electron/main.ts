@@ -47,6 +47,8 @@ const writeFile = Util.promisify(Fs.writeFile);
 // be closed automatically when the JavaScript object is garbage collected.
 let win: BrowserWindow | undefined;
 
+let openedFile: string | undefined;
+
 let projectPath: string | undefined;
 
 const userStore = new ElectronStore();
@@ -96,20 +98,24 @@ async function createWindow(): Promise<void> {
 				break;
 			}
 			case ServerMessageType.AppLoaded: {
-				// Load last known file automatically in development
-				if (electronIsDev && projectPath) {
-					const result = await Persistence.read<Types.SavedProject>(projectPath);
+				const pathToOpen = projectPath || openedFile;
+
+				// Load one of either
+				// (1) last known file automatically in development
+				// (2) file passed to electron main process
+				if (((electronIsDev && projectPath) || openedFile) && pathToOpen) {
+					const result = await Persistence.read<Types.SavedProject>(pathToOpen);
 
 					if (result.state === PersistenceState.Error) {
 						// TODO: Show user facing error here
 					} else {
 						const contents = result.contents as Types.SerializedProject;
-						contents.path = projectPath;
+						contents.path = pathToOpen;
 
 						send({
 							type: ServerMessageType.OpenFileResponse,
 							id: message.id,
-							payload: { path: projectPath, contents }
+							payload: { path: pathToOpen, contents }
 						});
 					}
 				}
@@ -456,6 +462,29 @@ async function createWindow(): Promise<void> {
 
 const log = require('electron-log');
 log.info('App starting...');
+
+app.on('will-finish-launching', () => {
+	app.on('open-file', async (event, path) => {
+		event.preventDefault();
+		if (path) {
+			openedFile = path;
+
+			const result = await Persistence.read<Types.SavedProject>(path);
+
+			if (result.state === PersistenceState.Error) {
+				// TODO: Show user facing error here
+			} else {
+				const contents = result.contents as Types.SerializedProject;
+
+				Sender.send({
+					type: ServerMessageType.OpenFileResponse,
+					id: uuid.v4(),
+					payload: { path, contents }
+				});
+			}
+		}
+	});
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

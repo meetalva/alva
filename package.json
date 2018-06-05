@@ -68,6 +68,13 @@
     "linux": {
       "artifactName": "${productName}-${version}.${ext}",
       "executableName": "Alva"
+    },
+    "fileAssociations": {
+      "ext": "alva",
+      "name": "Alva",
+      "icon": "document.icns",
+      "role": "Editor",
+      "isPackage": true
     }
   },
   "standard-version": {

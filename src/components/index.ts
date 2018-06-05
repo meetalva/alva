@@ -19,7 +19,6 @@ export * from './property-items';
 export * from './search';
 export * from './space';
 export * from './splash-screen';
-export * from './tab-navigation';
 export * from './teaser';
 export * from './tag';
 export * from './view-switch';

@@ -2,7 +2,7 @@ import * as Analyzer from '../analyzer';
 import { checkForUpdates } from './auto-updater';
 import { Color } from '../components';
 import { createCompiler } from '../compiler/create-compiler';
-import { app, BrowserWindow, dialog, screen } from 'electron';
+import { app, BrowserWindow, dialog, screen, shell } from 'electron';
 import * as electronIsDev from 'electron-is-dev';
 import * as Fs from 'fs';
 import * as getPort from 'get-port';
@@ -369,6 +369,12 @@ async function createWindow(): Promise<void> {
 						});
 					});
 				});
+
+				break;
+			}
+
+			case ServerMessageType.OpenExternalURL: {
+				shell.openExternal(message.payload);
 			}
 		}
 	});

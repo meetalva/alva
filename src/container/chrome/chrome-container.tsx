@@ -1,11 +1,13 @@
 import * as AlvaUtil from '../../alva-util';
 import { BugReport, Chrome, CopySize, ViewSwitch, ViewTitle } from '../../components';
-import * as Electron from 'electron';
+import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { OverviewSwitchContainer } from './overview-switch-container';
 import * as React from 'react';
+import * as Sender from '../../message/client';
 import { ViewStore } from '../../store';
 import * as Types from '../../model/types';
+import * as uuid from 'uuid';
 
 interface InjectedChromeContainerProps {
 	store: ViewStore;
@@ -74,9 +76,12 @@ export const ChromeContainer = MobxReact.inject('store')(
 				<BugReport
 					title="Found a bug?"
 					onClick={() => {
-						Electron.shell.openExternal(
-							'https://github.com/meetalva/alva/labels/type%3A%20bug'
-						);
+						console.log('chrome-container started');
+						Sender.send({
+							type: ServerMessageType.OpenExternalURL,
+							id: uuid.v4(),
+							payload: 'https://github.com/meetalva/alva/labels/type%3A%20bug'
+						});
 					}}
 				/>
 				{props.children}

@@ -71,6 +71,36 @@ const StyledImage = styled.img`
 	user-select: none;
 `;
 
+const StyledInput = styled.input`
+	display: inline-block;
+	box-sizing: border-box;
+	width: 100%;
+	text-overflow: ellipsis;
+	border: none;
+	padding: 0 ${getSpace(SpaceSize.S)}px;
+	background: transparent;
+	font-family: ${fonts().NORMAL_FONT};
+	font-size: 12px;
+	color: ${Color.Grey36};
+	transition: all 0.2s;
+	text-align: center;
+
+	::-webkit-input-placeholder {
+		color: ${Color.Grey60};
+	}
+
+	&:hover {
+		color: ${Color.Black};
+		border-color: ${Color.Grey60};
+	}
+
+	&:focus {
+		outline: none;
+		border-color: ${Color.Blue40};
+		color: ${Color.Black};
+	}
+`;
+
 const StyledButtonGroup = styled.div`
 	width: 100%;
 	margin-top: ${getSpace(SpaceSize.XS)}px;
@@ -110,6 +140,14 @@ export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
 					<StyledImageBox>
 						{props.imageSrc && <StyledImage src={props.imageSrc} />}
 					</StyledImageBox>
+
+					<StyledInput
+						onBlur={props.onInputBlur}
+						onChange={props.onInputChange}
+						type="text"
+						value={props.inputValue}
+						placeholder={props.placeholder}
+					/>
 
 					<StyledButtonGroup>
 						<StyledButton onClick={props.onChooseClick}>Choose</StyledButton>

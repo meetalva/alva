@@ -11,6 +11,8 @@ const StyledSplashScreen = styled.div`
 	justify-content: center;
 	padding: 0 ${PageInset.XL}px;
 	transform: translateY(-54px);
+	user-select: none;
+	cursor: default;
 `;
 
 const StyledLeftSection = styled.div`

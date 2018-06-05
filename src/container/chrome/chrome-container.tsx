@@ -1,5 +1,6 @@
 import * as AlvaUtil from '../../alva-util';
-import { Chrome, CopySize, ViewSwitch, ViewTitle } from '../../components';
+import { BugReport, Chrome, CopySize, ViewSwitch, ViewTitle } from '../../components';
+import * as Electron from 'electron';
 import * as MobxReact from 'mobx-react';
 import { OverviewSwitchContainer } from './overview-switch-container';
 import * as React from 'react';
@@ -70,6 +71,14 @@ export const ChromeContainer = MobxReact.inject('store')(
 						title={project ? project.getName() : 'Alva'}
 					/>
 				)}
+				<BugReport
+					title="Found a bug?"
+					onClick={() => {
+						Electron.shell.openExternal(
+							'https://github.com/meetalva/alva/labels/type%3A%20bug'
+						);
+					}}
+				/>
 				{props.children}
 			</Chrome>
 		);

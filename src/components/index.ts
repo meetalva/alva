@@ -1,3 +1,4 @@
+export * from './bug-report';
 export * from './button';
 export * from './chrome';
 export * from './colors';

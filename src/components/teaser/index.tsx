@@ -37,7 +37,7 @@ export const Teaser: React.SFC<TeaserProps> = props => (
 			<Button
 				textColor={Color.Red}
 				order={ButtonOrder.Primary}
-				size={ButtonSize.Small}
+				size={ButtonSize.Medium}
 				onClick={props.onPrimaryButtonClick}
 				inverted={true}
 			>

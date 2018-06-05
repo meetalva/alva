@@ -21,6 +21,7 @@ export enum ButtonOrder {
 }
 
 export enum ButtonSize {
+	Large,
 	Medium,
 	Small
 }
@@ -35,8 +36,8 @@ const StyledButton = styled.button`
 			case ButtonOrder.Secondary:
 				return css`
 					background: transparent;
-					border: 1px solid ${Color.Blue};
-					color: ${Color.Blue};
+					border: 1px solid ${Color.Grey50};
+					color: ${Color.Grey50};
 				`;
 			case ButtonOrder.Primary:
 			default:
@@ -53,10 +54,16 @@ const StyledButton = styled.button`
 			case ButtonSize.Small:
 				return css`
 					font-size: 12px;
-					padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.L)}px;
+					padding: ${getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.M)}px;
 				`;
 
 			case ButtonSize.Medium:
+				return css`
+					font-size: 12px;
+					padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.L)}px;
+				`;
+
+			case ButtonSize.Large:
 			default:
 				return css`
 					font-size: 15px;

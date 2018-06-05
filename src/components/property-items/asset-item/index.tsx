@@ -58,7 +58,6 @@ const StyledImageBox = styled.div`
 	box-sizing: border-box;
 	align-items: center;
 	justify-content: center;
-	width: 100%;
 	height: 60px;
 `;
 

@@ -21,7 +21,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Device (please complete the following information):**
- - OS: [e.g. macOS]
+ - OS & Version: [e.g. macOS 10.13.4]
  - Version of Alva [e.g. 1.0.0]
 
 **Additional context**

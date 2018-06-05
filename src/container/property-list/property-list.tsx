@@ -137,7 +137,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 								type: ServerMessageType.AssetReadRequest
 							});
 						}}
-						placeholder={example ? `e.g.: ${example}` : ''}
+						placeholder={`Or enter URL`}
 					/>
 				);
 			}

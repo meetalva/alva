@@ -1,5 +1,6 @@
 import { Color } from '../colors';
 import { fonts } from '../fonts';
+import { PropertyItem } from '../property-item';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
@@ -22,35 +23,53 @@ export enum PropertyItemAssetInputType {
 	File,
 	Url
 }
-
-const StyledAssetItemContainer = styled.div`
-	width: 100%;
-	box-sizing: border-box;
-	border-radius: 3px;
-	margin-bottom: ${getSpace(SpaceSize.M)}px;
-	padding: ${getSpace(SpaceSize.S)}px;
-	background: ${Color.White};
-	border: 0.5px solid ${Color.Grey90};
+const StyledPreview = styled.div`
+	font-family: ${fonts().NORMAL_FONT};
 `;
 
-const StyledPreview = styled.div`
+const StyledAsset = styled.div`
+	display: block;
+	box-sizing: border-box;
+	width: 70%;
+	border: 1px solid ${Color.Grey90};
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-width: 0.5px;
+	}
+	border-radius: 3px;
+	background: ${Color.White};
+`;
+
+const StyledImageBox = styled.div`
 	display: flex;
-	flex-direction: row;
+	margin: ${getSpace(SpaceSize.XS)}px;
+	box-sizing: border-box;
 	align-items: center;
+	justify-content: center;
+	height: 60px;
+`;
+
+const StyledImage = styled.img`
+	max-height: 100%;
+	max-width: 100%;
+	object-fit: cover;
+	object-position: center;
+	user-drag: none;
+	user-select: none;
 `;
 
 const StyledInput = styled.input`
 	display: inline-block;
 	box-sizing: border-box;
-	max-width: 75%;
+	width: 100%;
 	text-overflow: ellipsis;
 	border: none;
-	border-bottom: 1px solid transparent;
+	padding: 0 ${getSpace(SpaceSize.S)}px;
 	background: transparent;
 	font-family: ${fonts().NORMAL_FONT};
-	font-size: 15px;
+	font-size: 12px;
 	color: ${Color.Grey36};
 	transition: all 0.2s;
+	text-align: center;
 
 	::-webkit-input-placeholder {
 		color: ${Color.Grey60};
@@ -68,71 +87,59 @@ const StyledInput = styled.input`
 	}
 `;
 
-const StyledImageBoxContainer = styled.div`
-	background-color: ${Color.White};
-	border-radius: 3px;
-	border: 0.5px solid ${Color.Grey90};
-	box-sizing: border-box;
-	flex-shrink: 0;
-	height: 42px;
-	margin-right: 6px;
-	padding: 3px;
-	width: 42px;
-`;
-
-const StyledImageBox = styled.div`
-	display: flex;
-	box-sizing: border-box;
-	overflow: hidden;
+const StyledButtonGroup = styled.div`
 	width: 100%;
-	height: 100%;
-`;
+	margin-top: ${getSpace(SpaceSize.XS)}px;
 
-const StyledImage = styled.img`
-	width: 100%;
-	object-fit: cover;
-	object-position: center;
+	border-top: 1px solid ${Color.Grey90};
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-top-width: 0.5px;
+	}
 `;
 
 const StyledButton = styled.button`
-	max-width: 50%;
-	margin-right: 3px;
-	border: 0.5px solid ${Color.Grey90};
-	border-radius: 3px;
-	background-color: ${Color.White};
-	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.S)}px;
+	display: inline-block;
+	width: 50%;
+	border: none;
+	outline: none;
+	color: ${Color.Grey36};
+	background: transparent;
+	padding: ${getSpace(SpaceSize.XS)}px 0;
+	box-sizing: border-box;
+
+	border-right: 1px solid ${Color.Grey90};
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-right-width: 0.5px;
+	}
+
+	&:last-of-type {
+		border-right-color: transparent;
+	}
 `;
 
 export const PropertyItemAsset: React.StatelessComponent<PropertyItemAssetProps> = props => (
-	<StyledAssetItemContainer>
-		<StyledPreview>
-			<StyledImageBoxContainer>
+	<PropertyItem description={props.description} label={props.label}>
+		<StyledAsset>
+			<StyledPreview>
 				<StyledImageBox>
 					{props.imageSrc && <StyledImage src={props.imageSrc} />}
 				</StyledImageBox>
-			</StyledImageBoxContainer>
-			{props.inputType === PropertyItemAssetInputType.Url && (
+
 				<StyledInput
 					onBlur={props.onInputBlur}
 					onChange={props.onInputChange}
-					type="textarea"
+					type="text"
 					value={props.inputValue}
 					placeholder={props.placeholder}
 				/>
-			)}
-			{props.inputType === PropertyItemAssetInputType.File && (
-				<>
-					<StyledButton onClick={props.onChooseClick}>Choose ...</StyledButton>
+
+				<StyledButtonGroup>
+					<StyledButton onClick={props.onChooseClick}>Choose</StyledButton>
 					<StyledButton disabled={props.imageSrc.length === 0} onClick={props.onClearClick}>
 						Clear
 					</StyledButton>
-				</>
-			)}
-		</StyledPreview>
-		{props.inputType === PropertyItemAssetInputType.Url && (
-			<>
-				<StyledButton onClick={props.onChooseClick}>Choose ...</StyledButton>
-			</>
-		)}
-	</StyledAssetItemContainer>
+				</StyledButtonGroup>
+			</StyledPreview>
+		</StyledAsset>
+	</PropertyItem>
 );

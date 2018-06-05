@@ -24,6 +24,7 @@ const StyledConnectLibrary = styled.div`
 	padding: ${getSpace(SpaceSize.XL)}px ${getSpace(SpaceSize.L)}px;
 	color: ${Color.White};
 	user-select: none;
+	cursor: default;
 `;
 
 export const Teaser: React.SFC<TeaserProps> = props => (

@@ -1,10 +1,10 @@
-import { EnumItem, EnumItemValues } from './index';
+import { PropertyItemEnum, PropertyItemEnumValues } from './index';
 import * as React from 'react';
-import DemoContainer from '../../demo-container';
+import DemoContainer from '../demo-container';
 
 export interface EnumItemDemoState {
 	selectedItem: string;
-	values: EnumItemValues[];
+	values: PropertyItemEnumValues[];
 }
 
 export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
@@ -26,8 +26,8 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 	public render(): JSX.Element {
 		return (
 			<DemoContainer title="Enum Item">
-				<EnumItem label="Label" values={this.state.values} />
-				<EnumItem
+				<PropertyItemEnum label="Label" values={this.state.values} />
+				<PropertyItemEnum
 					label="Label"
 					values={this.state.values}
 					selectedValue={this.state.selectedItem}

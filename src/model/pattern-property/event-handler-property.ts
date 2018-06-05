@@ -1,3 +1,4 @@
+import * as AlvaUtil from '../../alva-util';
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../../types';
 
@@ -14,7 +15,7 @@ export interface PatternEventHandlerPropertyInit {
 	required: boolean;
 }
 
-export class PatternEventHandlerProperty extends PatternPropertyBase<string | undefined> {
+export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 	public readonly type = Types.PatternPropertyType.EventHandler;
 	private event: PatternEvent;
 
@@ -39,13 +40,10 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string | un
 		});
 	}
 
-	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
-		if (typeof value === 'string') {
-			return value;
-		}
-
-		return undefined;
+	public coerceValue<T>(value: T): string[] {
+		return AlvaUtil.ensureArray(value).map(
+			item => (typeof item === 'string' ? item : item.toString())
+		);
 	}
 
 	public toJSON(): Types.SerializedPatternEventHandlerProperty {

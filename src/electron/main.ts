@@ -411,6 +411,14 @@ async function createWindow(): Promise<void> {
 						payload: message.payload,
 						type: ServerMessageType.HighlightElement
 					});
+					break;
+				}
+				case PreviewMessageType.ChangeActivePage: {
+					Sender.send({
+						id: message.id,
+						payload: message.payload,
+						type: ServerMessageType.ActivatePage
+					});
 				}
 			}
 		} catch (err) {

@@ -1,5 +1,6 @@
 import * as Sender from '../../message/client';
 import * as Component from '../../components';
+import { EventHandlerPropertyView } from './event-handler-property-view';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { ElementProperty, PatternEnumProperty } from '../../model';
@@ -49,10 +50,10 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 		props.store.commit();
 	}
 
-	private handleEnumChange(e: React.ChangeEvent<HTMLSelectElement>): void {
+	private handleEnumChange(e: React.ChangeEvent<HTMLElement>): void {
 		const props = this.props as PropertyViewContainerProps & StoreInjection;
 		const patternProperty = props.property.getPatternProperty() as PatternEnumProperty;
-		const selectedOption = patternProperty.getOptionById(e.target.value);
+		const selectedOption = patternProperty.getOptionById((e.target as HTMLSelectElement).value);
 		const selectedValue = selectedOption ? selectedOption.getValue() : undefined;
 		this.props.property.setValue(selectedValue);
 		props.store.commit();
@@ -67,6 +68,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 		this.props.property.setValue(e.target.value);
 	}
 
+	// tslint:disable-next-line:cyclomatic-complexity
 	public render(): React.ReactNode {
 		const props = this.props as PropertyViewContainerProps & StoreInjection;
 		const { property } = props;
@@ -101,11 +103,11 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 				const inputValue = imageSrc && !imageSrc.startsWith('data:') ? imageSrc : '';
 				const inputType =
 					imageSrc && imageSrc.startsWith('data:')
-						? Component.AssetPropertyInputType.File
-						: Component.AssetPropertyInputType.Url;
+						? Component.PropertyItemAssetInputType.File
+						: Component.PropertyItemAssetInputType.Url;
 
 				return (
-					<Component.AssetItem
+					<Component.PropertyItemAsset
 						{...base}
 						imageSrc={imageSrc}
 						inputType={inputType}
@@ -142,7 +144,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 			case Types.PatternPropertyType.Boolean: {
 				const value = property.getValue() as boolean;
 				return (
-					<Component.BooleanItem
+					<Component.PropertyItemBoolean
 						{...base}
 						checked={value}
 						onChange={e => this.handleCheckboxChange(e)}
@@ -156,7 +158,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 				const selectedValue = selectedOption ? selectedOption.getId() : undefined;
 
 				return (
-					<Component.EnumItem
+					<Component.PropertyItemEnum
 						{...base}
 						selectedValue={selectedValue}
 						values={enumProp.getOptions().map(option => ({
@@ -167,29 +169,31 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 					/>
 				);
 			}
-			case Types.PatternPropertyType.String: {
-				const value = property.getValue() as string | undefined;
+			case Types.PatternPropertyType.EventHandler: {
+				return <EventHandlerPropertyView elementProperty={property} />;
+			}
+			case Types.PatternPropertyType.Number:
 				return (
-					<Component.StringItem
+					<Component.PropertyItemNumber
 						{...base}
-						value={value}
+						key={id}
+						value={property.getValue() as string}
 						onBlur={e => this.handleInputBlur(e)}
 						onChange={e => this.handleInputChange(e)}
 						placeholder={example ? `e.g.: ${example}` : ''}
 					/>
 				);
-			}
+			case Types.PatternPropertyType.String:
 			default: {
 				return (
-					<div key={id}>
-						<Component.StringItem
-							{...base}
-							value={property.getValue() as string}
-							onBlur={e => this.handleInputBlur(e)}
-							onChange={e => this.handleInputChange(e)}
-							placeholder={example ? `e.g.: ${example}` : ''}
-						/>
-					</div>
+					<Component.PropertyItemString
+						{...base}
+						key={id}
+						value={property.getValue() as string}
+						onBlur={e => this.handleInputBlur(e)}
+						onChange={e => this.handleInputChange(e)}
+						placeholder={example ? `e.g.: ${example}` : ''}
+					/>
 				);
 			}
 		}

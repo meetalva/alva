@@ -31,6 +31,7 @@ const PRESENTATIONAL_KEYS = [
 ];
 
 export class PreviewStore implements Types.RenderPreviewStore {
+	@Mobx.observable public elementActions: Types.SerializedElementAction[] = [];
 	@Mobx.observable public elementContents: Types.SerializedElementContent[] = [];
 	@Mobx.observable public elements: Types.SerializedElement[] = [];
 	@Mobx.observable public highlightedElementId: string = '';
@@ -41,6 +42,7 @@ export class PreviewStore implements Types.RenderPreviewStore {
 	@Mobx.observable public patternProperties: Types.SerializedPatternProperty[] = [];
 	@Mobx.observable public patterns: Types.SerializedPattern[] = [];
 	@Mobx.observable public selectedElementId: string = '';
+	@Mobx.observable public userStore: Types.SerializedUserStore;
 
 	private constructor() {}
 
@@ -88,6 +90,14 @@ export class PreviewStore implements Types.RenderPreviewStore {
 
 		if (payload.patterns) {
 			store.patterns = payload.patterns;
+		}
+
+		if (payload.userStore) {
+			store.userStore = payload.userStore;
+		}
+
+		if (payload.elementActions) {
+			store.elementActions = payload.elementActions;
 		}
 
 		return store;
@@ -213,6 +223,30 @@ function main(): void {
 		listen(store, connection, {
 			onReplacement(): void {
 				render();
+			}
+		});
+
+		Mobx.autorun(() => {
+			if (!store.userStore) {
+				return;
+			}
+
+			const userPageProperty = store.userStore.properties.find(p => p.type === 'page');
+			const userPageId = userPageProperty ? userPageProperty.payload : undefined;
+
+			if (userPageId) {
+				store.pageId = userPageId;
+
+				return connection.send(
+					JSON.stringify({
+						type: PreviewMessageType.ChangeActivePage,
+						id: uuid.v4(),
+						payload: {
+							id: userPageId,
+							metaDown: store.metaDown
+						}
+					})
+				);
 			}
 		});
 	}
@@ -365,8 +399,16 @@ function listen(
 						store.elementContents = payload.elementContents;
 					}
 
+					if (Array.isArray(payload.elementActions)) {
+						store.elementActions = payload.elementActions;
+					}
+
 					if (typeof payload.pageId === 'string') {
 						store.pageId = payload.pageId;
+					}
+
+					if (payload.userStore) {
+						store.userStore = payload.userStore;
 					}
 
 					if (Array.isArray(payload.pages)) {
@@ -438,7 +480,6 @@ function listen(
 function startRouter(store: PreviewStore): void {
 	const performRouting = () => {
 		const hash = window.location.hash ? window.location.hash.slice(1) : '';
-
 		const previousPage = store.pages.find(page => page.id === store.pageId) || store.pages[0];
 
 		const nextPage = hash.startsWith('page-')
@@ -547,6 +588,40 @@ function createPropertiesGetter(
 				case 'enum': {
 					const option = patternProperty.options.find(o => o.value === elementProperty.value);
 					acc[propertyName] = option ? option.value : undefined;
+					break;
+				}
+				case 'EventHandler': {
+					const elementAction = store.elementActions.find(a => a.id === elementProperty.value);
+
+					if (!elementAction) {
+						return;
+					}
+
+					const storeAction = store.userStore.actions.find(
+						a => a.id === elementAction.storeActionId
+					);
+					const storeProperty = store.userStore.properties.find(
+						p => p.id === elementAction.storePropertyId
+					);
+
+					if (!storeAction || !storeProperty) {
+						return;
+					}
+
+					switch (storeAction.type) {
+						case 'set':
+							acc[propertyName] = () => {
+								if (!store.metaDown && store.mode === PreviewDocumentMode.Live) {
+									return;
+								}
+
+								storeProperty.payload = elementAction.payload;
+							};
+							break;
+						case 'noop':
+							// tslint:disable-next-line:no-empty
+							acc[propertyName] = () => {};
+					}
 					break;
 				}
 				default:

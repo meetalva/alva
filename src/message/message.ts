@@ -4,6 +4,7 @@ export enum PreviewMessageType {
 	ClickElement = 'click-element',
 	ContentRequest = 'content-request',
 	ContentResponse = 'content-response',
+	ChangeActivePage = 'change-active-page',
 	ChangeHighlightedElement = 'change-highlighted-element',
 	ChangeSelectedElement = 'change-selected-element',
 	HighlightElement = 'highlight-element',
@@ -17,6 +18,7 @@ export enum PreviewMessageType {
 }
 
 export enum ServerMessageType {
+	ActivatePage = 'activate-page',
 	AppLoaded = 'app-loaded',
 	AssetReadRequest = 'asset-read-request',
 	AssetReadResponse = 'asset-read-response',
@@ -78,6 +80,7 @@ export interface Envelope<V, T> {
 export type EmptyEnvelope<V> = Envelope<V, undefined>;
 
 export type ServerMessage =
+	| ActivatePage
 	| AppLoaded
 	| AssetReadRequest
 	| AssetReadResponse
@@ -128,6 +131,10 @@ export type ServerMessage =
 	| UnselectElement
 	| UpdatePatternLibraryRequest;
 
+export type ActivatePage = Envelope<
+	ServerMessageType.ActivatePage,
+	{ id: string; metaDown: boolean }
+>;
 export type AppLoaded = EmptyEnvelope<ServerMessageType.AppLoaded>;
 export type AssetReadRequest = EmptyEnvelope<ServerMessageType.AssetReadRequest>;
 export type AssetReadResponse = Envelope<ServerMessageType.AssetReadResponse, string>;

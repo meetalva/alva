@@ -67,7 +67,11 @@ interface ErrorMessageProps {
 }
 
 // tslint:disable-next-line:no-any
-const Link: React.SFC = (props: any) => <a href={props.href}>{props.children}</a>;
+const Link: React.SFC = (props: any) => (
+	<a href={props.href} onClick={props.onClick}>
+		{props.children}
+	</a>
+);
 
 // tslint:disable-next-line:no-any
 const Page: React.SFC = (props: any) => (

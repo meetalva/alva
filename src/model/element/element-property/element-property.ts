@@ -1,6 +1,7 @@
 import * as Mobx from 'mobx';
 import { PatternLibrary } from '../../pattern-library';
 import { AnyPatternProperty } from '../../pattern-property';
+import { Project } from '../../project';
 import * as Types from '../../../types';
 import * as uuid from 'uuid';
 
@@ -12,6 +13,7 @@ export interface ElementPropertyInit {
 }
 
 export interface ElementPropertyContext {
+	project: Project;
 	patternLibrary: PatternLibrary;
 }
 
@@ -19,6 +21,7 @@ export class ElementProperty {
 	@Mobx.observable private id: string;
 	@Mobx.observable private patternLibrary: PatternLibrary;
 	@Mobx.observable private patternPropertyId: string;
+	private project: Project;
 	@Mobx.observable private setDefault: boolean;
 	@Mobx.observable private value: Types.ElementPropertyValue;
 
@@ -28,6 +31,7 @@ export class ElementProperty {
 		this.setDefault = init.setDefault;
 		this.value = init.value;
 		this.patternLibrary = context.patternLibrary;
+		this.project = context.project;
 
 		const patternProperty = this.patternLibrary.getPatternPropertyById(this.patternPropertyId);
 
@@ -52,15 +56,39 @@ export class ElementProperty {
 	}
 
 	public clone(): ElementProperty {
+		const cloneElementAction = (): string | undefined => {
+			const patternProperty = this.getPatternProperty();
+
+			if (
+				!patternProperty ||
+				patternProperty.getType() !== Types.PatternPropertyType.EventHandler
+			) {
+				return;
+			}
+
+			const elementAction = this.project.getElementActionById(this.value as string);
+
+			if (!elementAction) {
+				return;
+			}
+
+			const clonedAction = elementAction.clone();
+			this.project.addElementAction(clonedAction);
+			return clonedAction.getId();
+		};
+
+		const clonedActionId = cloneElementAction();
+
 		return new ElementProperty(
 			{
 				id: uuid.v4(),
 				patternPropertyId: this.patternPropertyId,
 				setDefault: this.setDefault,
-				value: this.value
+				value: clonedActionId || this.value
 			},
 			{
-				patternLibrary: this.patternLibrary
+				patternLibrary: this.patternLibrary,
+				project: this.project
 			}
 		);
 	}

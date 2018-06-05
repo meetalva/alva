@@ -1,4 +1,5 @@
 import * as PatternProperty from './pattern-property';
+import * as UserStore from './user-store';
 
 export enum AppState {
 	Starting = 'starting',
@@ -8,12 +9,14 @@ export enum AppState {
 export type SerializedAppState = 'starting' | 'started';
 
 export interface SavedProject {
+	elementActions: SerializedElementAction[];
 	elementContents: SerializedElementContent[];
 	elements: SerializedElement[];
 	id: string;
 	name: string;
 	pages: SerializedPage[];
 	patternLibrary: SerializedPatternLibrary;
+	userStore: UserStore.SerializedUserStore;
 }
 
 export interface SerializedProject extends SavedProject {
@@ -185,10 +188,12 @@ export interface FilePayload {
 }
 
 export interface PageChangePayload {
+	elementActions: SerializedElementAction[];
 	elementContents: SerializedElementContent[];
 	elements: SerializedElement[];
 	pageId: string;
 	pages: SerializedPage[];
+	userStore: UserStore.SerializedUserStore;
 }
 
 export interface ProjectPayload {
@@ -314,3 +319,10 @@ export type ElementPropertyValue =
 	| object
 	| string
 	| string[];
+
+export interface SerializedElementAction {
+	id: string;
+	payload: string;
+	storeActionId: string;
+	storePropertyId: string;
+}

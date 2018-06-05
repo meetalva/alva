@@ -164,6 +164,13 @@ Sender.receive(message => {
 			if (element && (message.payload.metaDown || store.getMetaDown())) {
 				store.setHighlightedElement(element);
 			}
+			break;
+		}
+		case ServerMessageType.ActivatePage: {
+			const page = project.getPageById(message.payload.id);
+			if (page && (message.payload.metaDown || store.getMetaDown())) {
+				store.setActivePage(page);
+			}
 		}
 	}
 });
@@ -286,10 +293,12 @@ Mobx.autorunAsync(() => {
 		const payload = {
 			pageId: currentPage.getId(),
 			pages: project.getPages().map(page => page.toJSON()),
+			elementActions: project.getElementActions().map(elementAction => elementAction.toJSON()),
 			elementContents: project
 				.getElementContents()
 				.map(elementContent => elementContent.toJSON()),
-			elements: project.getElements().map(element => element.toJSON())
+			elements: project.getElements().map(element => element.toJSON()),
+			userStore: project.getUserStore().toJSON()
 		};
 
 		// tslint:disable-next-line:no-any
@@ -305,6 +314,7 @@ Mobx.autorunAsync(() => {
 
 Mobx.autorunAsync(() => {
 	const selectedElement = store.getSelectedElement();
+
 	Sender.send({
 		id: uuid.v4(),
 		payload: selectedElement ? selectedElement.getId() : undefined,

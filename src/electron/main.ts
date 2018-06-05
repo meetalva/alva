@@ -456,6 +456,8 @@ async function createWindow(): Promise<void> {
 		await installDevTool(REACT_PERF);
 		await installDevTool(MOBX_DEVTOOLS);
 	}
+
+	checkForUpdates(win);
 }
 
 const log = require('electron-log');

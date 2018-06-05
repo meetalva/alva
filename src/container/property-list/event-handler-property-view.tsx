@@ -30,8 +30,9 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 
 		const elementAction = new Model.ElementAction({
 			id: uuid.v4(),
+			payload: '',
 			storeActionId: selectedAction.getId(),
-			storePropertyId: selectedAction.getUserStorePropertyId()
+			storePropertyId: selectedAction.getUserStorePropertyId() || ''
 		});
 
 		project.addElementAction(elementAction);

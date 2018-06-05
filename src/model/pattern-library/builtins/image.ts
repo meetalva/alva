@@ -19,7 +19,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 		new PatternProperty.PatternAssetProperty({
 			contextId: SRC_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, SRC_CONTEXT_ID),
-			label: 'Source',
+			label: 'Image',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'src'
 		}),

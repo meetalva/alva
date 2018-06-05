@@ -25,7 +25,6 @@ const StyledBooleanItem = styled.label`
 
 const StyledContainer = styled.div`
 	display: flex;
-	align-items: center;
 	width: 100%;
 	box-sizing: border-box;
 `;

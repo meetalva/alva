@@ -4,6 +4,7 @@ import { ElementContentContainer } from './element-content-container';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
+import { ElementRole } from '../../model/types';
 import { ViewStore } from '../../store';
 
 export interface ElementContainerProps {
@@ -30,7 +31,9 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 				draggable={true}
 				dragging={store.getDragging()}
 				id={props.element.getId()}
-				mayOpen={props.element.acceptsChildren()}
+				mayOpen={
+					props.element.acceptsChildren() && props.element.getRole() !== ElementRole.Root
+				}
 				open={open}
 				onChange={AlvaUtil.noop}
 				placeholderHighlighted={props.element.getPlaceholderHighlighted()}

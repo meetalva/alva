@@ -20,6 +20,7 @@ const StyledLabel = styled.span`
 	user-select: none;
 	cursor: default;
 	box-sizing: border-box;
+	padding-top: ${getSpace(SpaceSize.XS + SpaceSize.XXS)}px;
 	padding-right: ${getSpace(SpaceSize.XS)}px;
 `;
 

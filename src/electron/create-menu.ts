@@ -114,9 +114,12 @@ export function createMenu(ctx: MenuContext): void {
 									return;
 								}
 
-								alert(
-									'Before you can open an exported Sketch-File:\n\n(1) Download & Install "Almost Sketch Plugin": https://github.com/brainly/html-sketchapp/releases/latest\n\n(2) Open Sketch, run "Plugins > From Almost Sketch to Sketch" and select exported file\n\nWe are currently working on a smoother experience.'
-								);
+								dialog.showMessageBox({
+									type: 'info',
+									message:
+										'Before you can open an exported Sketch-File:\n\n(1) Download & Install "Almost Sketch Plugin": https://github.com/brainly/html-sketchapp/releases/latest\n\n(2) Open Sketch, run "Plugins > From Almost Sketch to Sketch" and select exported file\n\nWe are currently working on a smoother experience.',
+									buttons: ['ok', 'get more info']
+								});
 
 								const path = await queryPath({
 									title: 'Export Sketch as',

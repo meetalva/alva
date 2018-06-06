@@ -124,6 +124,7 @@
     "electron": "2.0.2",
     "electron-builder": "20.8.1",
     "electron-devtools-installer": "2.2.4",
+    "fixturez": "1.1.0",
     "husky": "0.14.3",
     "isomorphic-fetch": "2.2.1",
     "jest": "22.4.3",

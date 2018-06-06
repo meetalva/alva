@@ -124,7 +124,7 @@ function analyzePatternExport(
 	ex: TypeScriptUtils.TypescriptExport,
 	ctx: AnalyzeContext
 ): Types.PatternAnalysis | undefined {
-	const reactType = ReactUtils.findReactComponentType(ctx.program, ex.type);
+	const reactType = ReactUtils.findReactComponentType(ex.type, { program: ctx.program });
 
 	if (!reactType) {
 		return;

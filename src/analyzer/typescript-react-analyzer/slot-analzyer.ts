@@ -29,7 +29,7 @@ export function analyzeSlots(
 				(memberType.flags & Ts.TypeFlags.Any) === Ts.TypeFlags.Any;
 
 			const isImplicitSlot =
-				memberType && ReactUtils.isSlotType(memberType, { program: ctx.program });
+				memberType && ReactUtils.isReactSlotType(memberType, { program: ctx.program });
 
 			const isExplicitSlot = memberSymbol.getJsDocTags().some(tag => tag.name === 'slot');
 

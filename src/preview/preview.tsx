@@ -585,7 +585,7 @@ function createPropertiesGetter(
 					const elementAction = store.elementActions.find(a => a.id === elementProperty.value);
 
 					if (!elementAction) {
-						return;
+						return acc;
 					}
 
 					const storeAction = store.userStore.actions.find(
@@ -596,7 +596,7 @@ function createPropertiesGetter(
 					);
 
 					if (!storeAction || !storeProperty) {
-						return;
+						return acc;
 					}
 
 					switch (storeAction.type) {

@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 export interface ChromeProps {
 	children?: React.ReactNode;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 const StyledChrome = styled.div`
@@ -29,5 +30,5 @@ const StyledChrome = styled.div`
 `;
 
 export const Chrome: React.StatelessComponent<ChromeProps> = props => (
-	<StyledChrome>{props.children}</StyledChrome>
+	<StyledChrome onDoubleClick={props.onDoubleClick}>{props.children}</StyledChrome>
 );

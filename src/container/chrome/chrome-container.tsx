@@ -76,7 +76,6 @@ export const ChromeContainer = MobxReact.inject('store')(
 				<BugReport
 					title="Found a bug?"
 					onClick={() => {
-						console.log('chrome-container started');
 						Sender.send({
 							type: ServerMessageType.OpenExternalURL,
 							id: uuid.v4(),

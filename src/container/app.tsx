@@ -106,6 +106,7 @@ export class App extends React.Component {
 								</SideBar>
 							</Resizeable>
 							<PreviewPaneWrapper
+								isDragging={props.store.getDragging()}
 								key="center"
 								previewFrame={`http://localhost:${props.store.getServerPort()}/preview.html`}
 							/>

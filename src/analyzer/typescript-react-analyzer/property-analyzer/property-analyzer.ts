@@ -216,7 +216,7 @@ function createEnumProperty(
 				? String(enumMember.initializer.getText())
 				: String(index);
 
-			const value = init.charAt(0) === '"' ? init.slice(1, -1) : parseInt(init);
+			const value = init.charAt(0) === '"' ? init.slice(1, -1) : parseInt(init, 10);
 
 			const name =
 				TypescriptUtils.getJsDocValueFromNode(enumMember, 'name') || enumMember.name.getText();

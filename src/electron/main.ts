@@ -375,6 +375,13 @@ async function createWindow(): Promise<void> {
 
 			case ServerMessageType.OpenExternalURL: {
 				shell.openExternal(message.payload);
+
+				break;
+			}
+			case ServerMessageType.Maximize: {
+				if (win) {
+					win.isMaximized() ? win.unmaximize() : win.maximize();
+				}
 			}
 		}
 	});

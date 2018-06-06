@@ -49,7 +49,15 @@ export const ChromeContainer = MobxReact.inject('store')(
 		const next = index < pages.length ? toNextPage : AlvaUtil.noop;
 
 		return (
-			<Chrome>
+			<Chrome
+				onDoubleClick={() => {
+					Sender.send({
+						type: ServerMessageType.Maximize,
+						id: uuid.v4(),
+						payload: undefined
+					});
+				}}
+			>
 				{store.getActiveAppView() === Types.AlvaView.PageDetail ? (
 					<OverviewSwitchContainer />
 				) : (

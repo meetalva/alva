@@ -199,7 +199,7 @@ export interface SerializedEnumOption {
 	id: string;
 	name: string;
 	ordinal: string;
-	value: string;
+	value: string | number;
 }
 
 export interface SerializedPatternNumberArrayProperty extends SerializedPropertyBase {

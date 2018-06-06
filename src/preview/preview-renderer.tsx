@@ -304,10 +304,8 @@ class PreviewApplication extends React.Component<PreviewApplicationProps> {
 			return;
 		}
 
-		if (!currentElement.selected) {
-			this.props.highlight.setSize(node);
-			this.props.highlight.show();
-		}
+		this.props.highlight.setSize(node);
+		this.props.highlight.show();
 	}
 
 	private updateSelection(elementId?: string): void {
@@ -463,17 +461,15 @@ class PreviewHighlight extends React.Component<PreviewHighlightProps> {
 		return (
 			<div
 				style={{
+					border: '2px solid #42BFFE',
 					boxSizing: 'border-box',
+					height: highlight.height,
+					left: highlight.left,
+					opacity: highlight.opacity,
+					pointerEvents: 'none',
 					position: 'absolute',
 					top: highlight.top,
-					right: highlight.right,
-					bottom: highlight.bottom,
-					left: highlight.left,
-					width: highlight.width,
-					height: highlight.height,
-					border: '2px solid #42BFFE',
-					opacity: highlight.opacity,
-					pointerEvents: 'none'
+					width: highlight.width
 				}}
 			/>
 		);
@@ -492,13 +488,11 @@ class PreviewSelect extends React.Component<PreviewSelectProps> {
 					position: 'absolute',
 					boxSizing: 'border-box',
 					border: '1px solid rgba(255, 255, 255, 0.5)',
-					bottom: selectedArea.bottom,
-					height: selectedArea.height,
+					height: Math.max(selectedArea.height, 1),
 					left: selectedArea.left,
 					opacity: selectedArea.opacity,
-					right: selectedArea.right,
 					top: selectedArea.top,
-					width: selectedArea.width,
+					width: Math.max(selectedArea.width, 1),
 					pointerEvents: 'none',
 					mixBlendMode: 'difference'
 				}}

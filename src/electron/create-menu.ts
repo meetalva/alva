@@ -114,6 +114,8 @@ export function createMenu(ctx: MenuContext): void {
 									return;
 								}
 
+								alert('Tidilüüüüüü');
+
 								const path = await queryPath({
 									title: 'Export Sketch as',
 									typeName: 'Almost Sketch JSON',

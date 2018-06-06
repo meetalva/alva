@@ -31,6 +31,8 @@ const PRESENTATIONAL_KEYS = [
 ];
 
 export class PreviewStore implements Types.RenderPreviewStore {
+	private connection?: WebSocket;
+
 	@Mobx.observable public elementActions: Types.SerializedElementAction[] = [];
 	@Mobx.observable public elementContents: Types.SerializedElementContent[] = [];
 	@Mobx.observable public elements: Types.SerializedElement[] = [];
@@ -102,6 +104,46 @@ export class PreviewStore implements Types.RenderPreviewStore {
 
 		return store;
 	}
+
+	public setConnection(connection: WebSocket): void {
+		this.connection = connection;
+	}
+
+	public navigateTo(pageId: string): void {
+		if (!this.userStore) {
+			return;
+		}
+
+		if (!this.metaDown && this.mode === PreviewDocumentMode.Live) {
+			return;
+		}
+
+		const page = this.pages.find(p => p.id === pageId);
+
+		if (!page) {
+			return;
+		}
+
+		this.pages.filter(p => p.active && p.id !== pageId).forEach(p => p.active === false);
+
+		page.active = true;
+		this.pageId = page.id;
+
+		if (!this.connection) {
+			return;
+		}
+
+		this.connection.send(
+			JSON.stringify({
+				type: PreviewMessageType.ChangeActivePage,
+				id: uuid.v4(),
+				payload: {
+					id: pageId,
+					metaDown: this.metaDown
+				}
+			})
+		);
+	}
 }
 
 function main(): void {
@@ -114,6 +156,12 @@ function main(): void {
 		store.mode === PreviewDocumentMode.Live
 			? new WebSocket(`ws://${window.location.host}`)
 			: undefined;
+
+	if (connection) {
+		connection.addEventListener('open', () => {
+			store.setConnection(connection);
+		});
+	}
 
 	window.addEventListener('keydown', e => {
 		store.metaDown = e.metaKey;
@@ -225,33 +273,9 @@ function main(): void {
 				render();
 			}
 		});
-
-		Mobx.autorun(() => {
-			if (!store.userStore) {
-				return;
-			}
-
-			const userPageProperty = store.userStore.properties.find(p => p.type === 'page');
-			const userPageId = userPageProperty ? userPageProperty.payload : undefined;
-
-			if (userPageId) {
-				store.pageId = userPageId;
-
-				return connection.send(
-					JSON.stringify({
-						type: PreviewMessageType.ChangeActivePage,
-						id: uuid.v4(),
-						payload: {
-							id: userPageId,
-							metaDown: store.metaDown
-						}
-					})
-				);
-			}
-		});
 	}
 
-	startRouter(store);
+	// startRouter(store);
 	render();
 }
 
@@ -345,10 +369,6 @@ function listen(
 				break;
 			}
 			case PreviewMessageType.State: {
-				if (window.location.hash && store.pageId !== payload.pageId) {
-					window.location.hash = '';
-				}
-
 				Mobx.transaction(() => {
 					if (Array.isArray(payload.elements)) {
 						const els = payload.elements as Types.SerializedElement[];
@@ -477,35 +497,6 @@ function listen(
 	});
 }
 
-function startRouter(store: PreviewStore): void {
-	const performRouting = () => {
-		const hash = window.location.hash ? window.location.hash.slice(1) : '';
-		const previousPage = store.pages.find(page => page.id === store.pageId) || store.pages[0];
-
-		const nextPage = hash.startsWith('page-')
-			? store.pages[Number(hash.replace('page-', '')) - 1]
-			: store.pages.find(page => page.id === hash);
-
-		if (!nextPage) {
-			return;
-		}
-
-		store.pageId = nextPage.id;
-
-		if (document.title === '' || document.title === previousPage.name) {
-			document.title = nextPage.name;
-		}
-	};
-
-	performRouting();
-
-	if (store.mode === PreviewDocumentMode.Static && !window.location.hash) {
-		window.location.hash = '#page-1';
-	}
-
-	window.addEventListener('hashchange', performRouting);
-}
-
 // tslint:disable-next-line:no-any
 function createComponentGetter(store: PreviewStore): (props: any, synthetics: any) => any {
 	return (props, synthetics) => {
@@ -610,8 +601,12 @@ function createPropertiesGetter(
 
 					switch (storeAction.type) {
 						case 'set':
-							acc[propertyName] = () => {
-								if (!store.metaDown && store.mode === PreviewDocumentMode.Live) {
+							acc[propertyName] = e => {
+								e.preventDefault();
+
+								if (storeProperty.type === 'page') {
+									storeProperty.payload = elementAction.payload;
+									store.navigateTo(elementAction.payload);
 									return;
 								}
 

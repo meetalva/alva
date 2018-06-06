@@ -267,6 +267,7 @@ export interface RenderSelectArea {
 }
 
 export interface RenderPreviewStore {
+	mode: 'static' | 'live' | 'live-mirror';
 	elements: SerializedElement[];
 	highlightedElementId?: string;
 	pageId: string;

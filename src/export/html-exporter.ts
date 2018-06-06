@@ -56,13 +56,15 @@ export class HtmlExporter implements Types.Exporter {
 				id: uuid.v4(),
 				type: 'state',
 				payload: {
+					elementActions: project.getElementActions().map(a => a.toJSON()),
 					elementContents: project.getElementContents().map(e => e.toJSON()),
 					elements: project.getElements().map(e => e.toJSON()),
 					mode: PreviewDocumentMode.Static,
 					pageId: currentPage.getId(),
 					pages: project.getPages().map(page => page.toJSON()),
 					patternProperties: patternLibrary.getPatternProperties().map(p => p.toJSON()),
-					patterns: patternLibrary.getPatterns().map(p => p.toJSON())
+					patterns: patternLibrary.getPatterns().map(p => p.toJSON()),
+					userStore: project.getUserStore().toJSON()
 				}
 			};
 

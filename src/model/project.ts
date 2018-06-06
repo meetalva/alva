@@ -90,17 +90,18 @@ export class Project {
 			type: Types.UserStoreActionType.Set
 		});
 
-		const setPropertyAction = new UserStoreAction({
+		// TODO: Reenable when implementing full variable support
+		/* const setPropertyAction = new UserStoreAction({
 			acceptsProperty: true,
 			id: uuid.v4(),
 			name: 'Set Variable',
 			type: Types.UserStoreActionType.Set
-		});
+		}); */
 
 		const userStore = new UserStore({
 			id: uuid.v4(),
 			properties: [currentPageProperty],
-			actions: [noopAction, navigatePageAction, setPropertyAction]
+			actions: [noopAction, navigatePageAction /*, setPropertyAction*/]
 		});
 
 		const project = new Project({

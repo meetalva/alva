@@ -1,8 +1,8 @@
 // tslint:disable:no-bitwise
-import * as ReactUtils from '../../typescript/react-utils';
+import * as ReactUtils from '../../react-utils';
 import * as Types from '../../../types';
 import * as Ts from 'typescript';
-import * as TypescriptUtils from '../../typescript/typescript-utils';
+import * as TypescriptUtils from '../../typescript-utils';
 
 export interface PropertyAnalyzeContext {
 	program: Ts.Program;
@@ -40,7 +40,7 @@ export function analyze(
 			}) as Ts.Declaration;
 			const memberType = typechecker.getTypeAtLocation(declaration);
 
-			if (ReactUtils.isSlotType(ctx.program, memberType)) {
+			if (ReactUtils.isSlotType(memberType, { program: ctx.program })) {
 				return;
 			}
 

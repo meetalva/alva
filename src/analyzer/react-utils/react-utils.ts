@@ -1,6 +1,6 @@
 // tslint:disable:no-bitwise
 import * as TypeScript from 'typescript';
-import { TypeScriptType } from './typescript-type';
+import { TypeScriptType } from '../typescript-utils';
 
 const REACT_COMPONENT_TYPES = [
 	'Component',
@@ -70,13 +70,15 @@ function isReactComponentType(program: TypeScript.Program, type: TypeScript.Type
 	return hasDeclarationInReactTypingsFile(declarations);
 }
 
-/**
- * Test if the provided type is assignable to a react node.
- * @param program The TypeScript program.
- * @param type The type to test against react node type.
- */
-export function isSlotType(program: TypeScript.Program, type: TypeScript.Type): boolean {
-	const typechecker = program.getTypeChecker();
+export function isEventHandlerType(
+	type: TypeScript.Type,
+	ctx: { program: TypeScript.Program }
+): boolean {
+	return false;
+}
+
+export function isSlotType(type: TypeScript.Type, ctx: { program: TypeScript.Program }): boolean {
+	const typechecker = ctx.program.getTypeChecker();
 	const symbol = type.aliasSymbol || type.symbol || type.getSymbol();
 
 	if (!symbol) {

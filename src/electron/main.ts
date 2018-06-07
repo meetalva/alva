@@ -53,23 +53,7 @@ let projectPath: string | undefined;
 
 const userStore = new ElectronStore();
 
-async function createWindow(): Promise<void> {
-	const { width = 1280, height = 800 } = screen.getPrimaryDisplay().workAreaSize;
-
-	// Create the browser window.
-	win = new BrowserWindow({
-		width,
-		height,
-		minWidth: 780,
-		minHeight: 380,
-		titleBarStyle: 'hiddenInset',
-		backgroundColor: Color.Grey97,
-		title: 'Alva'
-	});
-
-	// and load the index.html of the app.
-	win.loadURL('data:text/html;charset=utf-8,' + encodeURI(RENDERER_DOCUMENT));
-
+(async () => {
 	// Cast getPort return type from PromiseLike<number> to Promise<number>
 	// to avoid async-promise tslint rule to produce errors here
 	const port = await (getPort({ port: 1879 }) as Promise<number>);
@@ -437,6 +421,24 @@ async function createWindow(): Promise<void> {
 			console.error(err);
 		}
 	});
+})();
+
+async function createWindow(): Promise<void> {
+	const { width = 1280, height = 800 } = screen.getPrimaryDisplay().workAreaSize;
+
+	// Create the browser window.
+	win = new BrowserWindow({
+		width,
+		height,
+		minWidth: 780,
+		minHeight: 380,
+		titleBarStyle: 'hiddenInset',
+		backgroundColor: Color.Grey97,
+		title: 'Alva'
+	});
+
+	// and load the index.html of the app.
+	win.loadURL('data:text/html;charset=utf-8,' + encodeURI(RENDERER_DOCUMENT));
 
 	// Open the DevTools.
 	// win.webContents.openDevTools();

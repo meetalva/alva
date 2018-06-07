@@ -7,7 +7,7 @@ export interface PropertyDescriptionProps {
 	description: string;
 }
 
-const StyledDescription = styled.span`
+const StyledDescription = styled.div`
 	flex: none;
 	display: block;
 	font-size: 12px;

@@ -1,9 +1,0 @@
-{
-	"name": "asset-item",
-	"description": "Image url or source input",
-	"displayName": "Asset Item",
-	"version": "1.0.0",
-	"tags": [
-		"property"
-	]
-}

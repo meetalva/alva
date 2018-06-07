@@ -101,11 +101,11 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 				const inputValue = imageSrc && !imageSrc.startsWith('data:') ? imageSrc : '';
 				const inputType =
 					imageSrc && imageSrc.startsWith('data:')
-						? Component.AssetPropertyInputType.File
-						: Component.AssetPropertyInputType.Url;
+						? Component.PropertyItemAssetInputType.File
+						: Component.PropertyItemAssetInputType.Url;
 
 				return (
-					<Component.AssetItem
+					<Component.PropertyItemAsset
 						{...base}
 						imageSrc={imageSrc}
 						inputType={inputType}
@@ -135,14 +135,14 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 								type: ServerMessageType.AssetReadRequest
 							});
 						}}
-						placeholder={`Or enter URL`}
+						placeholder={'Or enter URL'}
 					/>
 				);
 			}
 			case Types.PatternPropertyType.Boolean: {
 				const value = property.getValue() as boolean;
 				return (
-					<Component.BooleanItem
+					<Component.PropertyItemBoolean
 						{...base}
 						checked={value}
 						onChange={e => this.handleCheckboxChange(e)}
@@ -156,7 +156,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 				const selectedValue = selectedOption ? selectedOption.getId() : undefined;
 
 				return (
-					<Component.EnumItem
+					<Component.PropertyItemEnum
 						{...base}
 						selectedValue={selectedValue}
 						values={enumProp.getOptions().map(option => ({
@@ -170,7 +170,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 			case Types.PatternPropertyType.String: {
 				const value = property.getValue() as string | undefined;
 				return (
-					<Component.StringItem
+					<Component.PropertyItemString
 						{...base}
 						value={value}
 						onBlur={e => this.handleInputBlur(e)}
@@ -182,7 +182,7 @@ class PropertyViewContainer extends React.Component<PropertyViewContainerProps> 
 			default: {
 				return (
 					<div key={id}>
-						<Component.StringItem
+						<Component.PropertyItemString
 							{...base}
 							value={property.getValue() as string}
 							onBlur={e => this.handleInputBlur(e)}

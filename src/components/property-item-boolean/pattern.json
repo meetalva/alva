@@ -1,0 +1,9 @@
+{
+	"name": "property-item-boolean",
+	"displayName": "Property Item: boolean",
+	"description": "Input field for boolean values",
+	"version": "1.0.0",
+	"tags": [
+		"property"
+	]
+}

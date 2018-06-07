@@ -1,0 +1,7 @@
+{
+	"name": "property-item-enum",
+	"displayName": "Property Item: Enum",
+	"description": "Input field for enum values",
+	"version": "1.0.0",
+	"tags": ["property"]
+}

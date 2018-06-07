@@ -1,6 +1,6 @@
-import { BooleanItem } from '.';
+import { PropertyItemBoolean } from '.';
 import * as React from 'react';
-import DemoContainer from '../../demo-container';
+import DemoContainer from '../demo-container';
 
 export interface BooleanItemDemoState {
 	checked?: boolean;
@@ -20,12 +20,12 @@ export class BooleanItemDemo extends React.Component<{}, BooleanItemDemoState> {
 	public render(): JSX.Element {
 		return (
 			<DemoContainer title="Boolean Item">
-				<BooleanItem
+				<PropertyItemBoolean
 					label="Visibility"
 					checked={this.state.checked}
 					onChange={e => this.handleChange(e)}
 				/>
-				<BooleanItem
+				<PropertyItemBoolean
 					label="Spacing"
 					checked={!this.state.checked}
 					onChange={e => this.handleChange(e)}

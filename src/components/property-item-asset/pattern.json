@@ -1,0 +1,9 @@
+{
+	"name": "property-item-asset",
+	"displayName": "Property Item: Asset",
+	"description": "Input field for asset values",
+	"version": "1.0.0",
+	"tags": [
+		"property"
+	]
+}

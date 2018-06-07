@@ -1,16 +1,15 @@
-import { Color } from '../../colors';
-import { fonts } from '../../fonts';
-import { PropertyDescription } from '../property-description';
-import { PropertyLabel } from '../property-label';
+import { Color } from '../colors';
+import { fonts } from '../fonts';
+import { PropertyItem } from '../property-item';
 import * as React from 'react';
-import { getSpace, SpaceSize } from '../../space';
+import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
-export interface AssetItemProps {
+export interface PropertyItemAssetProps {
 	className?: string;
 	description?: string;
 	imageSrc: string;
-	inputType: AssetPropertyInputType;
+	inputType: PropertyItemAssetInputType;
 	inputValue?: string;
 	label: string;
 	onChooseClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -20,22 +19,10 @@ export interface AssetItemProps {
 	placeholder?: string;
 }
 
-export enum AssetPropertyInputType {
+export enum PropertyItemAssetInputType {
 	File,
 	Url
 }
-
-const StyledAssetItem = styled.div`
-	display: block;
-	margin-bottom: ${getSpace(SpaceSize.S)}px;
-`;
-
-const StyledContainer = styled.div`
-	display: flex;
-	width: 100%;
-	box-sizing: border-box;
-`;
-
 const StyledPreview = styled.div`
 	font-family: ${fonts().NORMAL_FONT};
 `;
@@ -130,33 +117,29 @@ const StyledButton = styled.button`
 	}
 `;
 
-export const AssetItem: React.StatelessComponent<AssetItemProps> = props => (
-	<StyledAssetItem className={props.className}>
-		<StyledContainer>
-			<PropertyLabel label={props.label} />
-			<StyledAsset>
-				<StyledPreview>
-					<StyledImageBox>
-						{props.imageSrc && <StyledImage src={props.imageSrc} />}
-					</StyledImageBox>
+export const PropertyItemAsset: React.StatelessComponent<PropertyItemAssetProps> = props => (
+	<PropertyItem description={props.description} label={props.label}>
+		<StyledAsset>
+			<StyledPreview>
+				<StyledImageBox>
+					{props.imageSrc && <StyledImage src={props.imageSrc} />}
+				</StyledImageBox>
 
-					<StyledInput
-						onBlur={props.onInputBlur}
-						onChange={props.onInputChange}
-						type="text"
-						value={props.inputValue}
-						placeholder={props.placeholder}
-					/>
+				<StyledInput
+					onBlur={props.onInputBlur}
+					onChange={props.onInputChange}
+					type="text"
+					value={props.inputValue}
+					placeholder={props.placeholder}
+				/>
 
-					<StyledButtonGroup>
-						<StyledButton onClick={props.onChooseClick}>Choose</StyledButton>
-						<StyledButton disabled={props.imageSrc.length === 0} onClick={props.onClearClick}>
-							Clear
-						</StyledButton>
-					</StyledButtonGroup>
-				</StyledPreview>
-			</StyledAsset>
-		</StyledContainer>
-		{props.description && <PropertyDescription description={props.description || ''} />}
-	</StyledAssetItem>
+				<StyledButtonGroup>
+					<StyledButton onClick={props.onChooseClick}>Choose</StyledButton>
+					<StyledButton disabled={props.imageSrc.length === 0} onClick={props.onClearClick}>
+						Clear
+					</StyledButton>
+				</StyledButtonGroup>
+			</StyledPreview>
+		</StyledAsset>
+	</PropertyItem>
 );

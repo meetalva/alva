@@ -2,7 +2,7 @@ import { Element, ElementContent } from '../element';
 import * as Mobx from 'mobx';
 import { PatternLibrary } from '../pattern-library';
 import { Project } from '../project';
-import * as Types from '../types';
+import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface PageInit {

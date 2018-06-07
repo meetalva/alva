@@ -1,5 +1,5 @@
 import * as Mobx from 'mobx';
-import * as Types from '../types';
+import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface PatternPropertyInit<T> {

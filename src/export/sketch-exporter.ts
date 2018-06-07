@@ -4,7 +4,7 @@ import * as Sender from '../message/client';
 import { ServerMessageType } from '../message';
 import { Page } from '../model';
 import { ViewStore } from '../store';
-import * as Types from '../model/types';
+import * as Types from '../types';
 
 export class SketchExporter implements Types.Exporter {
 	public contents: Buffer;

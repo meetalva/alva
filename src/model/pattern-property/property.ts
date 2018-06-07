@@ -7,7 +7,7 @@ import { PatternNumberProperty } from './number-property';
 import { PatternPropertyBase } from './property-base';
 import { PatternStringArrayProperty } from './string-array-property';
 import { PatternStringProperty } from './string-property';
-import * as Types from '../types';
+import * as Types from '../../types';
 
 export type PatternPropertyValueType = string | boolean | number | number[] | string[] | undefined;
 

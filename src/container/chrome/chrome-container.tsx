@@ -6,7 +6,7 @@ import { OverviewSwitchContainer } from './overview-switch-container';
 import * as React from 'react';
 import * as Sender from '../../message/client';
 import { ViewStore } from '../../store';
-import * as Types from '../../model/types';
+import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 interface InjectedChromeContainerProps {

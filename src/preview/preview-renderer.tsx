@@ -6,7 +6,7 @@ import * as ReactDom from 'react-dom';
 import { Helmet } from 'react-helmet';
 import { SelectArea } from './select-area';
 
-import * as Types from '../model/types';
+import * as Types from '../types';
 
 // TODO: Produces a deprecation warning, find a way
 // to dedupe MobX when upgrading to 4.x

@@ -5,7 +5,7 @@ import * as Mobx from 'mobx';
 import { Pattern, PatternSlot } from '../pattern';
 import { PatternFolder } from '../pattern-folder';
 import { AnyPatternProperty, PatternEnumProperty, PatternProperty } from '../pattern-property';
-import * as Types from '../types';
+import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface PatternLibraryInit {

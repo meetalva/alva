@@ -5,7 +5,7 @@ import { Page } from '../page';
 import { Pattern } from '../pattern';
 import { PatternLibrary } from '../pattern-library';
 import { Project } from '../project';
-import * as Types from '../types';
+import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface ElementInit {

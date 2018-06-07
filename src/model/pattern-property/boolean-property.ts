@@ -1,5 +1,5 @@
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
-import * as Types from '../types';
+import * as Types from '../../types';
 
 /**
  * A boolean property is a property that supports the values true and false only.

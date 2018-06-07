@@ -1,6 +1,6 @@
 // tslint:disable:no-bitwise
 import * as ReactUtils from '../../typescript/react-utils';
-import * as Types from '../../../model/types';
+import * as Types from '../../../types';
 import * as Ts from 'typescript';
 import * as TypescriptUtils from '../../typescript/typescript-utils';
 

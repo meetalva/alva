@@ -5,7 +5,7 @@ import * as PropertyAnalyzer from './property-analyzer';
 import * as ReactUtils from '../typescript/react-utils';
 import * as readPkg from 'read-pkg';
 import * as SlotAnalyzer from './slot-analzyer';
-import * as Types from '../../model/types';
+import * as Types from '../../types';
 import * as TypeScript from '../typescript';
 import * as ts from 'typescript';
 import * as TypescriptUtils from '../typescript/typescript-utils';

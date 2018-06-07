@@ -52,6 +52,8 @@ export enum ServerMessageType {
 	ExportSketch = 'export-sketch',
 	HighlightElement = 'highlight-element',
 	Log = 'log',
+	Maximize = 'maximize',
+	OpenExternalURL = 'open-external-url',
 	OpenFileRequest = 'open-file-request',
 	OpenFileResponse = 'open-file-response',
 	PageChange = 'page-change',
@@ -113,6 +115,8 @@ export type ServerMessage =
 	| ExportSketch
 	| HighlightElement
 	| Log
+	| Maximize
+	| OpenExternalURL
 	| OpenFileRequest
 	| OpenFileResponse
 	| PageChange
@@ -198,6 +202,8 @@ export type Duplicate = EmptyEnvelope<ServerMessageType.Duplicate>;
 export type DuplicatePageElement = Envelope<ServerMessageType.DuplicateElement, string>;
 // tslint:disable-next-line:no-any
 export type Log = Envelope<ServerMessageType.Log, any>;
+export type Maximize = EmptyEnvelope<ServerMessageType.Maximize>;
+export type OpenExternalURL = Envelope<ServerMessageType.OpenExternalURL, string>;
 export type OpenFileRequest = EmptyEnvelope<ServerMessageType.OpenFileRequest>;
 export type OpenFileResponse = Envelope<ServerMessageType.OpenFileResponse, Types.ProjectPayload>;
 export type PageChange = Envelope<ServerMessageType.PageChange, Types.PageChangePayload>;

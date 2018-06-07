@@ -123,7 +123,7 @@ export interface PatternEnumPropertyOptionInit {
 	id: string;
 	name: string;
 	ordinal: string;
-	value: string;
+	value: string | number;
 }
 
 export class PatternEnumPropertyOption {
@@ -131,7 +131,7 @@ export class PatternEnumPropertyOption {
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
 	@Mobx.observable private ordinal: string;
-	@Mobx.observable private value: string;
+	@Mobx.observable private value: string | number;
 
 	public constructor(init: PatternEnumPropertyOptionInit) {
 		this.id = init.id;

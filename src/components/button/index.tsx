@@ -21,6 +21,7 @@ export enum ButtonOrder {
 }
 
 export enum ButtonSize {
+	Large,
 	Medium,
 	Small
 }
@@ -28,22 +29,21 @@ export enum ButtonSize {
 const StyledButton = styled.button`
 	border: none;
 	border-radius: 3px;
-
-	&:hover {
-		opacity: 0.9;
-	}
+	outline: none;
 
 	${(props: ButtonProps) => {
 		switch (props.order) {
 			case ButtonOrder.Secondary:
 				return css`
-					background: ${Color.Black};
-					color: ${Color.White};
+					background: transparent;
+					border: 1px solid ${Color.Grey50};
+					color: ${Color.Grey50};
 				`;
 			case ButtonOrder.Primary:
 			default:
 				return css`
 					background: ${Color.Blue};
+					border: 1px solid ${Color.Blue};
 					color: ${Color.White};
 				`;
 		}
@@ -54,10 +54,16 @@ const StyledButton = styled.button`
 			case ButtonSize.Small:
 				return css`
 					font-size: 12px;
-					padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.L)}px;
+					padding: ${getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.M)}px;
 				`;
 
 			case ButtonSize.Medium:
+				return css`
+					font-size: 12px;
+					padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.L)}px;
+				`;
+
+			case ButtonSize.Large:
 			default:
 				return css`
 					font-size: 15px;
@@ -70,6 +76,7 @@ const StyledButton = styled.button`
 		props.inverted
 			? `
 				background: ${Color.White};
+				border-color: ${Color.White};
 			`
 			: ''};
 	${(props: ButtonProps) =>

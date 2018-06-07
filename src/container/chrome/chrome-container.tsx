@@ -1,10 +1,13 @@
 import * as AlvaUtil from '../../alva-util';
-import { Chrome, CopySize, ViewSwitch, ViewTitle } from '../../components';
+import { BugReport, Chrome, CopySize, ViewSwitch, ViewTitle } from '../../components';
+import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { OverviewSwitchContainer } from './overview-switch-container';
 import * as React from 'react';
+import * as Sender from '../../message/client';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
+import * as uuid from 'uuid';
 
 interface InjectedChromeContainerProps {
 	store: ViewStore;
@@ -46,7 +49,15 @@ export const ChromeContainer = MobxReact.inject('store')(
 		const next = index < pages.length ? toNextPage : AlvaUtil.noop;
 
 		return (
-			<Chrome>
+			<Chrome
+				onDoubleClick={() => {
+					Sender.send({
+						type: ServerMessageType.Maximize,
+						id: uuid.v4(),
+						payload: undefined
+					});
+				}}
+			>
 				{store.getActiveAppView() === Types.AlvaView.PageDetail ? (
 					<OverviewSwitchContainer />
 				) : (
@@ -70,6 +81,16 @@ export const ChromeContainer = MobxReact.inject('store')(
 						title={project ? project.getName() : 'Alva'}
 					/>
 				)}
+				<BugReport
+					title="Found a bug?"
+					onClick={() => {
+						Sender.send({
+							type: ServerMessageType.OpenExternalURL,
+							id: uuid.v4(),
+							payload: 'https://github.com/meetalva/alva/labels/type%3A%20bug'
+						});
+					}}
+				/>
 				{props.children}
 			</Chrome>
 		);

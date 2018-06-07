@@ -6,12 +6,14 @@ import styled from 'styled-components';
 
 export interface ChromeProps {
 	children?: React.ReactNode;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 const StyledChrome = styled.div`
 	box-sizing: border-box;
 	display: grid;
 	grid-template-columns: 33.333% 33.333% 33.333%;
+	align-items: center;
 	width: 100%;
 	height: 40px;
 	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXL) * 3}px;
@@ -28,5 +30,5 @@ const StyledChrome = styled.div`
 `;
 
 export const Chrome: React.StatelessComponent<ChromeProps> = props => (
-	<StyledChrome>{props.children}</StyledChrome>
+	<StyledChrome onDoubleClick={props.onDoubleClick}>{props.children}</StyledChrome>
 );

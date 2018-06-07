@@ -1,8 +1,0 @@
-{
-	"name": "tab-navigation",
-	"displayName": "Tab Navigation",
-	"description": "Step through a set of items",
-	"flag": "alpha",
-	"version": "1.0.0",
-	"tags": ["tab-navigation"]
-}

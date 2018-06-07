@@ -232,18 +232,32 @@ function main(): void {
 	};
 
 	const onElementMouseOver = (e, payload) => {
-		if (!connection) {
+		if (store.mode === 'static') {
 			return;
 		}
 
-		store.highlightedElementId = payload.id;
+		const previous = store.elements.filter(el => el.highlighted && el.id !== payload.id);
+		previous.forEach(p => (p.highlighted = false));
+
+		const element = store.elements.find(el => el.id === payload.id);
+
+		if (element && element.role !== 'root') {
+			element.highlighted = true;
+			store.highlightedElementId = element.id;
+		} else {
+			store.highlightedElementId = '';
+		}
+
+		if (!connection) {
+			return;
+		}
 
 		connection.send(
 			JSON.stringify({
 				type: PreviewMessageType.HighlightElement,
 				id: uuid.v4(),
 				payload: {
-					id: payload.id,
+					id: element ? element.id : undefined,
 					metaDown: store.metaDown
 				}
 			})

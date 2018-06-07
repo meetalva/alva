@@ -26,7 +26,7 @@ import { PropertyListContainer } from './property-list';
 import * as React from 'react';
 import { SplashScreenContainer } from './splash-screen-container';
 import { ViewStore } from '../store';
-import * as Types from '../model/types';
+import * as Types from '../types';
 import * as uuid from 'uuid';
 
 const Resizeable = require('re-resizable');

@@ -1,4 +1,4 @@
-import * as Types from './types';
+import * as Types from '../types';
 
 export class EditHistory {
 	private items: Types.EditHistoryItem[] = [];

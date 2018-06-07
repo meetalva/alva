@@ -1,6 +1,6 @@
 import * as AlvaUtil from '../../alva-util';
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
-import * as Types from '../types';
+import * as Types from '../../types';
 
 /**
  * A number array property is a property that supports a list of numbers only.

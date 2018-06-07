@@ -4,7 +4,7 @@ import { PatternFolder } from '../pattern-folder';
 import { PatternLibrary } from '../pattern-library';
 import * as PatternProperty from '../pattern-property';
 import { PatternSlot } from './pattern-slot';
-import * as Types from '../types';
+import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface PatternInit {

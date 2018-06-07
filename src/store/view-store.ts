@@ -3,7 +3,7 @@ import { debounce, isEqual } from 'lodash';
 import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
-import * as Types from '../model/types';
+import * as Types from '../types';
 
 import * as uuid from 'uuid';
 

@@ -4,7 +4,7 @@ import * as Sender from '../message/client';
 import { CreateScriptBundleResponse, ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
 import { ViewStore } from '../store';
-import * as Types from '../model/types';
+import * as Types from '../types';
 
 export class HtmlExporter implements Types.Exporter {
 	public contents: Buffer;

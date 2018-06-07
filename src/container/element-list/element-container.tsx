@@ -4,7 +4,7 @@ import { ElementContentContainer } from './element-content-container';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
-import { ElementRole } from '../../model/types';
+import { ElementRole } from '../../types';
 import { ViewStore } from '../../store';
 
 export interface ElementContainerProps {

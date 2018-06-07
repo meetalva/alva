@@ -4,7 +4,7 @@ import { PreviewMessageType } from '../message';
 import * as Mobx from 'mobx';
 import { PreviewDocumentMode } from './preview-document';
 import * as SmoothscrollPolyfill from 'smoothscroll-polyfill';
-import * as Types from '../model/types';
+import * as Types from '../types';
 import * as uuid from 'uuid';
 
 // TODO: Produces a deprecation warning, find a way

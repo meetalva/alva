@@ -6,7 +6,7 @@ import * as Http from 'http';
 import { isEqual } from 'lodash';
 import { ServerMessage, ServerMessageType } from '../message';
 import { previewDocument, PreviewDocumentMode } from '../preview/preview-document';
-import * as Types from '../model/types';
+import * as Types from '../types';
 import * as Url from 'url';
 import * as uuid from 'uuid';
 import { Compiler } from 'webpack';

@@ -7,7 +7,7 @@ import { PdfExporter } from '../export/pdf-exporter';
 import { PngExporter } from '../export/png-exporter';
 import { SketchExporter } from '../export/sketch-exporter';
 import { ViewStore } from '../store';
-import * as Types from '../model/types';
+import * as Types from '../types';
 import * as uuid from 'uuid';
 
 const { Menu, shell, app, dialog } = remote;

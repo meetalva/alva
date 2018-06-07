@@ -7,7 +7,7 @@ import {
 	PatternNumberProperty,
 	PatternStringProperty
 } from '../../pattern-property';
-import * as Types from '../../types';
+import * as Types from '../../../types';
 
 const CONTEXT_ID = 'synthetic:box';
 const FLEX_CONTEXT_ID = 'flex';

@@ -3,7 +3,7 @@ import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Page } from './page';
 import { PatternLibrary } from './pattern-library';
-import * as Types from './types';
+import * as Types from '../types';
 import * as uuid from 'uuid';
 
 export interface ProjectProperties {

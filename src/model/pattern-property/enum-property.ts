@@ -1,6 +1,6 @@
 import * as Mobx from 'mobx';
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
-import * as Types from '../types';
+import * as Types from '../../types';
 
 export interface PatternEnumPropertyInit {
 	contextId: string;

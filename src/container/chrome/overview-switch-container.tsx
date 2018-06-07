@@ -2,7 +2,7 @@ import { ViewButton } from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewStore } from '../../store';
-import * as Types from '../../model/types';
+import * as Types from '../../types';
 
 @MobxReact.inject('store')
 @MobxReact.observer

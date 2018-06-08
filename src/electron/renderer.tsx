@@ -71,8 +71,6 @@ Sender.receive(message => {
 					type: ServerMessageType.CheckLibraryRequest
 				});
 			}
-
-			store.commit();
 			break;
 		}
 		case ServerMessageType.CreateNewFileResponse: {
@@ -80,7 +78,6 @@ Sender.receive(message => {
 			const newProject = Project.from(message.payload.contents);
 			store.setProject(newProject);
 			app.setActiveView(Types.AlvaView.PageDetail);
-			store.commit();
 			break;
 		}
 		case ServerMessageType.Log: {

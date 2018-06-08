@@ -36,11 +36,27 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Jest All",
+			"name": "Run Tests",
 			"program": "${workspaceFolder}/node_modules/jest/bin/jest",
-			"args": ["--runInBand"],
+			"args": ["--runInBand", "--watchAll"],
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen"
-		  }
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Debug Tests",
+			"program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+			"runtimeArgs": [
+				"--inspect-brk"
+			],
+			"args": [
+				"--runInBand",
+				"--collectCoverage=false"
+			],
+			"sourceMaps": true,
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen"
+		}
 	]
 }

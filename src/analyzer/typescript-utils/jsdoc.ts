@@ -1,4 +1,3 @@
-// tslint:disable:no-bitwise
 import * as TypeScript from 'typescript';
 
 export function getJsDocValueFromNode(node: TypeScript.Node, tagName: string): string | undefined {

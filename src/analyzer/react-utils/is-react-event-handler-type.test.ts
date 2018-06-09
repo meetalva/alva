@@ -1,4 +1,3 @@
-// tslint:disable:no-bitwise
 import * as TestUtils from '../test-utils';
 import { isReactEventHandlerType } from './is-react-event-handler-type';
 

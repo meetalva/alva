@@ -1,4 +1,3 @@
-// tslint:disable:no-bitwise
 import { isReactComponentType } from './is-react-component-type';
 import * as TypeScript from 'typescript';
 import { TypeScriptType } from '../typescript-utils';

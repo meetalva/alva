@@ -1,9 +1,13 @@
 import { Element, ElementContent } from './element';
+import { ElementAction } from './element-action';
 import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Page } from './page';
 import { PatternLibrary } from './pattern-library';
 import * as Types from '../types';
+import { UserStore } from './user-store';
+import { UserStoreAction } from './user-store-action';
+import { UserStoreProperty } from './user-store-property';
 import * as uuid from 'uuid';
 
 export interface ProjectProperties {
@@ -14,6 +18,7 @@ export interface ProjectProperties {
 	pages: Page[];
 	path: string;
 	patternLibrary: PatternLibrary;
+	userStore: UserStore;
 }
 
 export interface ProjectCreateInit {
@@ -22,9 +27,11 @@ export interface ProjectCreateInit {
 }
 
 export class Project {
-	@Mobx.observable private elementContents: ElementContent[] = [];
-
 	@Mobx.observable private elements: Element[] = [];
+
+	@Mobx.observable private elementActions: ElementAction[] = [];
+
+	@Mobx.observable private elementContents: ElementContent[] = [];
 
 	@Mobx.observable private id: string;
 
@@ -36,18 +43,21 @@ export class Project {
 
 	@Mobx.observable private patternLibrary: PatternLibrary;
 
+	@Mobx.observable private userStore: UserStore;
+
 	/**
 	 * Creates a new project.
 	 * @param id The technical (internal) ID of the project.
 	 * @param name The human-friendly name of the project.
 	 */
-	public constructor(properties: ProjectProperties) {
-		this.patternLibrary = properties.patternLibrary;
-		this.name = properties.name;
+	public constructor(init: ProjectProperties) {
+		this.patternLibrary = init.patternLibrary;
+		this.name = init.name;
 
-		this.id = properties.id ? properties.id : uuid.v4();
-		this.pages = properties.pages ? properties.pages : [];
-		this.path = properties.path;
+		this.id = init.id ? init.id : uuid.v4();
+		this.pages = init.pages ? init.pages : [];
+		this.path = init.path;
+		this.userStore = init.userStore;
 	}
 
 	public static create(init: ProjectCreateInit): Project {
@@ -58,11 +68,48 @@ export class Project {
 			getGlobalSlotId: () => uuid.v4()
 		});
 
+		const currentPageProperty = new UserStoreProperty({
+			id: uuid.v4(),
+			name: 'Current Page',
+			payload: '',
+			type: Types.UserStorePropertyType.Page
+		});
+
+		const noopAction = new UserStoreAction({
+			acceptsProperty: false,
+			id: uuid.v4(),
+			name: 'No Interaction',
+			type: Types.UserStoreActionType.Noop
+		});
+
+		const navigatePageAction = new UserStoreAction({
+			acceptsProperty: false,
+			id: uuid.v4(),
+			name: 'Switch Page',
+			userStorePropertyId: currentPageProperty.getId(),
+			type: Types.UserStoreActionType.Set
+		});
+
+		// TODO: Reenable when implementing full variable support
+		/* const setPropertyAction = new UserStoreAction({
+			acceptsProperty: true,
+			id: uuid.v4(),
+			name: 'Set Variable',
+			type: Types.UserStoreActionType.Set
+		}); */
+
+		const userStore = new UserStore({
+			id: uuid.v4(),
+			properties: [currentPageProperty],
+			actions: [noopAction, navigatePageAction /*, setPropertyAction*/]
+		});
+
 		const project = new Project({
 			name: init.name,
 			pages: [],
 			path: init.path,
-			patternLibrary
+			patternLibrary,
+			userStore
 		});
 
 		project.addPage(
@@ -87,13 +134,15 @@ export class Project {
 	 */
 	public static from(serialized: Types.SerializedProject): Project {
 		const patternLibrary = PatternLibrary.from(serialized.patternLibrary);
+		const userStore = UserStore.from(serialized.userStore);
 
 		const project = new Project({
 			id: serialized.id,
 			name: serialized.name,
 			path: serialized.path,
 			pages: [],
-			patternLibrary
+			patternLibrary,
+			userStore
 		});
 
 		serialized.pages.forEach(page =>
@@ -107,6 +156,10 @@ export class Project {
 		serialized.elementContents.forEach(elementContent =>
 			project.addElementContent(ElementContent.from(elementContent, { patternLibrary, project }))
 		);
+
+		serialized.elementActions.forEach(elementAction => {
+			project.addElementAction(ElementAction.from(elementAction));
+		});
 
 		return project;
 	}
@@ -124,12 +177,24 @@ export class Project {
 		this.elements.push(element);
 	}
 
+	public addElementAction(action: ElementAction): void {
+		this.elementActions.push(action);
+	}
+
 	public addElementContent(elementContent: ElementContent): void {
 		this.elementContents.push(elementContent);
 	}
 
 	public addPage(page: Page): void {
 		this.pages.push(page);
+	}
+
+	public getElementActionById(id: string): undefined | ElementAction {
+		return this.elementActions.find(e => e.getId() === id);
+	}
+
+	public getElementActions(): ElementAction[] {
+		return this.elementActions;
 	}
 
 	public getElementById(id: string): undefined | Element {
@@ -176,6 +241,10 @@ export class Project {
 		return this.patternLibrary;
 	}
 
+	public getUserStore(): UserStore {
+		return this.userStore;
+	}
+
 	public removePage(page: Page): boolean {
 		const index = this.pages.indexOf(page);
 
@@ -211,30 +280,27 @@ export class Project {
 	@Mobx.action
 	public setPatternLibrary(patternLibrary: PatternLibrary): void {
 		this.patternLibrary = patternLibrary;
-		this.elements.forEach(e => e.setPatternLibrary(this.patternLibrary));
+		this.elements.forEach(e => e.setPatternLibrary({ patternLibrary, project: this }));
 		this.elementContents.forEach(e => e.setPatternLibrary(this.patternLibrary));
 	}
 
 	public toDisk(): Types.SavedProject {
-		return {
-			elementContents: this.elementContents.map(e => e.toJSON()),
-			elements: this.elements.map(e => e.toDisk()),
-			id: this.id,
-			name: this.name,
-			pages: this.pages.map(p => p.toJSON()),
-			patternLibrary: this.patternLibrary.toJSON()
-		};
+		const data = this.toJSON();
+		data.elements = this.elements.map(e => e.toDisk());
+		return data;
 	}
 
 	public toJSON(): Types.SerializedProject {
 		return {
 			elements: this.elements.map(e => e.toJSON()),
+			elementActions: this.elementActions.map(e => e.toJSON()),
 			elementContents: this.elementContents.map(e => e.toJSON()),
 			id: this.id,
 			name: this.name,
 			pages: this.pages.map(p => p.toJSON()),
 			path: this.path,
-			patternLibrary: this.patternLibrary.toJSON()
+			patternLibrary: this.patternLibrary.toJSON(),
+			userStore: this.userStore.toJSON()
 		};
 	}
 

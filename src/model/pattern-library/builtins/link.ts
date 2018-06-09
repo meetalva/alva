@@ -6,6 +6,7 @@ import * as Types from '../../../types';
 const PATTERN_CONTEXT_ID = 'synthetic:link';
 const SLOT_CONTEXT_ID = 'children';
 const HREF_CONTEXT_ID = 'href';
+const ONCLICK_CONTEXT_ID = 'onClick';
 
 export const Link = (context: BuiltInContext): BuiltInResult => {
 	const patternId = context.options.getGlobalPatternId(PATTERN_CONTEXT_ID);
@@ -18,6 +19,18 @@ export const Link = (context: BuiltInContext): BuiltInResult => {
 			label: 'Link target',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'href'
+		}),
+		new PatternProperty.PatternEventHandlerProperty({
+			contextId: ONCLICK_CONTEXT_ID,
+			event: new PatternProperty.PatternEvent({
+				type: Types.PatternEventType.MouseEvent
+			}),
+			hidden: false,
+			id: context.options.getGlobalPropertyId(patternId, ONCLICK_CONTEXT_ID),
+			label: 'On Click',
+			origin: Types.PatternPropertyOrigin.BuiltIn,
+			propertyName: 'onClick',
+			required: false
 		})
 	];
 

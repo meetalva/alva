@@ -414,6 +414,14 @@ const userStore = new ElectronStore();
 						payload: message.payload,
 						type: ServerMessageType.HighlightElement
 					});
+					break;
+				}
+				case PreviewMessageType.ChangeActivePage: {
+					Sender.send({
+						id: message.id,
+						payload: message.payload,
+						type: ServerMessageType.ActivatePage
+					});
 				}
 			}
 		} catch (err) {

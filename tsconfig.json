@@ -28,6 +28,14 @@
 			"dom"
 		],
 		"moduleResolution": "node",
+		"plugins": [
+			{
+				"name": "typescript-styled-plugin",
+				"lint": {
+					"unknownProperties": "ignore"
+				}
+			}
+		],
 		"outDir": "build",
 		"noEmit": false,
 		"noEmitOnError": false,

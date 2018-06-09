@@ -7,6 +7,11 @@ import * as Types from '../types';
 
 import * as uuid from 'uuid';
 
+export interface ViewStoreInit {
+	app: Model.AlvaApp;
+	history: Model.EditHistory;
+}
+
 export enum ClipBoardType {
 	Page = 'Page',
 	Element = 'Element'
@@ -51,7 +56,7 @@ export class ViewStore {
 
 	@Mobx.observable private usedPatternLibrary: Model.PatternLibrary | undefined;
 
-	public constructor(init: { app: Model.AlvaApp; history: Model.EditHistory }) {
+	public constructor(init: ViewStoreInit) {
 		this.app = init.app;
 		this.editHistory = init.history;
 

@@ -2,13 +2,12 @@ import { createCompiler } from '../../compiler';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import * as PropertyAnalyzer from './property-analyzer';
-import * as ReactUtils from '../typescript/react-utils';
+import * as ReactUtils from '../react-utils';
 import * as readPkg from 'read-pkg';
 import * as SlotAnalyzer from './slot-analzyer';
 import * as Types from '../../types';
-import * as TypeScript from '../typescript';
+import * as TypeScriptUtils from '../typescript-utils';
 import * as ts from 'typescript';
-import * as TypescriptUtils from '../typescript/typescript-utils';
 import * as Util from 'util';
 import { Compiler } from 'webpack';
 
@@ -42,7 +41,7 @@ type PatternAnalyzer = (
 	predicate: PatternAnalyzerPredicate
 ) => Types.PatternAnalysis[];
 type PatternAnalyzerPredicate = (
-	ex: TypeScript.TypescriptExport,
+	ex: TypeScriptUtils.TypescriptExport,
 	ctx: AnalyzeContext
 ) => Types.PatternAnalysis | undefined;
 
@@ -115,17 +114,17 @@ function getPatternAnalyzer(program: ts.Program, options: AnalyzeOptions): Patte
 			return [];
 		}
 
-		return TypescriptUtils.getExports(sourceFile, program)
+		return TypeScriptUtils.getExports(sourceFile, program)
 			.map(ex => predicate(ex, { program, candidate, options }))
 			.filter((p): p is Types.PatternAnalysis => typeof p !== 'undefined');
 	};
 }
 
 function analyzePatternExport(
-	ex: TypeScript.TypescriptExport,
+	ex: TypeScriptUtils.TypescriptExport,
 	ctx: AnalyzeContext
 ): Types.PatternAnalysis | undefined {
-	const reactType = ReactUtils.findReactComponentType(ctx.program, ex.type);
+	const reactType = ReactUtils.findReactComponentType(ex.type, { program: ctx.program });
 
 	if (!reactType) {
 		return;

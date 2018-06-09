@@ -115,7 +115,8 @@ export class Element {
 						value: undefined
 					},
 					{
-						patternLibrary: this.patternLibrary
+						patternLibrary: this.patternLibrary,
+						project: this.project
 					}
 				);
 			});
@@ -137,9 +138,7 @@ export class Element {
 				contentIds: serialized.contentIds,
 				open: serialized.open,
 				forcedOpen: serialized.forcedOpen,
-				properties: serialized.properties.map(p =>
-					ElementProperty.from(p, { patternLibrary: context.patternLibrary })
-				),
+				properties: serialized.properties.map(p => ElementProperty.from(p, context)),
 				role: deserializeRole(serialized.role),
 				selected: serialized.selected
 			},
@@ -488,8 +487,9 @@ export class Element {
 	}
 
 	@Mobx.action
-	public setPatternLibrary(patternLibrary: PatternLibrary): void {
-		this.patternLibrary = patternLibrary;
+	public setPatternLibrary(ctx: { patternLibrary: PatternLibrary; project: Project }): void {
+		this.patternLibrary = ctx.patternLibrary;
+
 		const pattern = this.getPattern();
 
 		if (pattern) {
@@ -505,7 +505,7 @@ export class Element {
 						setDefault: true,
 						value: previous ? previous.getValue() : undefined // copy previous values
 					},
-					{ patternLibrary }
+					ctx
 				);
 			});
 		}

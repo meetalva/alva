@@ -1,8 +1,8 @@
 // tslint:disable:no-bitwise
-import * as ReactUtils from '../../typescript/react-utils';
+import * as ReactUtils from '../../react-utils';
 import * as Types from '../../../types';
 import * as Ts from 'typescript';
-import * as TypescriptUtils from '../../typescript/typescript-utils';
+import * as TypescriptUtils from '../../typescript-utils';
 
 export interface PropertyAnalyzeContext {
 	program: Ts.Program;
@@ -40,7 +40,7 @@ export function analyze(
 			}) as Ts.Declaration;
 			const memberType = typechecker.getTypeAtLocation(declaration);
 
-			if (ReactUtils.isSlotType(ctx.program, memberType)) {
+			if (ReactUtils.isReactSlotType(memberType, { program: ctx.program })) {
 				return;
 			}
 
@@ -108,6 +108,10 @@ function createProperty(
 
 	if (init.typechecker.isArrayLikeType(init.type)) {
 		return createArrayProperty(init, ctx);
+	}
+
+	if (ReactUtils.isReactEventHandlerType(init.type, { program: ctx.program })) {
+		return createEventHandlerProperty(init, ctx);
 	}
 
 	return;
@@ -260,7 +264,7 @@ function createStringProperty(
 	| Types.SerializedPatternAssetProperty
 	| Types.SerializedHrefProperty
 	| Types.SerializedStringProperty {
-	if (TypescriptUtils.symbolHasJsDocTag(args.symbol, 'asset')) {
+	if (TypescriptUtils.hasJsDocTagFromSymbol(args.symbol, 'asset')) {
 		return {
 			contextId: args.symbol.name,
 			description: '',
@@ -275,7 +279,7 @@ function createStringProperty(
 		};
 	}
 
-	if (TypescriptUtils.symbolHasJsDocTag(args.symbol, 'href')) {
+	if (TypescriptUtils.hasJsDocTagFromSymbol(args.symbol, 'href')) {
 		return {
 			contextId: args.symbol.name,
 			description: '',
@@ -304,6 +308,26 @@ function createStringProperty(
 	};
 }
 
+function createEventHandlerProperty(
+	args: PropertyInit,
+	ctx: PropertyAnalyzeContext
+): Types.SerializedPatternEventHandlerProperty {
+	return {
+		contextId: args.symbol.name,
+		description: '',
+		example: '',
+		// TODO: Determine event type from static information, allow TSDoc override
+		event: { type: 'MouseEvent' },
+		hidden: false,
+		id: ctx.getPropertyId(args.symbol.name),
+		label: args.symbol.name,
+		origin: 'user-provided',
+		propertyName: args.symbol.name,
+		required: false,
+		type: Types.PatternPropertyType.EventHandler
+	};
+}
+
 function setPropertyMetaData(init: {
 	property?: Types.SerializedPatternProperty;
 	symbol?: Ts.Symbol;
@@ -318,7 +342,7 @@ function setPropertyMetaData(init: {
 	property.required = (symbol.flags & Ts.SymbolFlags.Optional) !== Ts.SymbolFlags.Optional;
 	property.label = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'name') || property.label;
 	property.description = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'description') || '';
-	property.hidden = TypescriptUtils.symbolHasJsDocTag(symbol, 'ignore');
+	property.hidden = TypescriptUtils.hasJsDocTagFromSymbol(symbol, 'ignore');
 
 	switch (property.type) {
 		case 'enum':
@@ -326,6 +350,8 @@ function setPropertyMetaData(init: {
 				option => option.name === TypescriptUtils.getJsDocValueFromSymbol(symbol, 'default')
 			);
 			property.defaultOptionId = defaultOption ? defaultOption.id : undefined;
+			break;
+		case 'EventHandler':
 			break;
 		default:
 			const defaultValue =

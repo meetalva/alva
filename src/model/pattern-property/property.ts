@@ -1,6 +1,7 @@
 import { PatternAssetProperty } from './asset-property';
 import { PatternBooleanProperty } from './boolean-property';
 import { PatternEnumProperty } from './enum-property';
+import { PatternEventHandlerProperty } from './event-handler-property';
 import { PatternHrefProperty } from './href-property';
 import { PatternNumberArrayProperty } from './number-array-property';
 import { PatternNumberProperty } from './number-property';
@@ -22,6 +23,8 @@ export class PatternProperty {
 				return PatternBooleanProperty.from(serialized);
 			case Types.PatternPropertyType.Enum:
 				return PatternEnumProperty.from(serialized);
+			case Types.PatternPropertyType.EventHandler:
+				return PatternEventHandlerProperty.from(serialized);
 			case Types.PatternPropertyType.NumberArray:
 				return PatternNumberArrayProperty.from(serialized);
 			case Types.PatternPropertyType.Number:

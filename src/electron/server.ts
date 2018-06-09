@@ -23,6 +23,7 @@ interface State {
 	path?: string;
 	payload: {
 		bundle?: string;
+		elementActions?: Types.SerializedElementAction[];
 		elementContents?: Types.SerializedElementContent[];
 		elements?: Types.SerializedElement[];
 		highlightedElementId?: string;
@@ -31,6 +32,7 @@ interface State {
 		patternProperties?: Types.SerializedPatternProperty[];
 		patterns?: Types.SerializedPattern[];
 		selectedElementId?: string;
+		userStore?: Types.SerializedUserStore;
 	};
 	type: 'state';
 }
@@ -243,6 +245,10 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 				// tslint:disable-next-line:no-any
 				const diff: any = {};
 
+				if (!isEqual(state.payload.elementActions, message.payload.elementActions)) {
+					diff.elementActions = message.payload.elementActions;
+				}
+
 				if (!isEqual(state.payload.elementContents, message.payload.elementContents)) {
 					diff.elementContents = message.payload.elementContents;
 				}
@@ -257,6 +263,10 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 
 				if (state.payload.pageId !== message.payload.pageId) {
 					diff.pageId = message.payload.pageId;
+				}
+
+				if (!isEqual(state.payload.userStore, message.payload.userStore)) {
+					diff.userStore = message.payload.userStore;
 				}
 
 				Object.assign(state.payload, diff);

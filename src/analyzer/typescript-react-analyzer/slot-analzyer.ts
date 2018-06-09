@@ -1,8 +1,8 @@
 // tslint:disable:no-bitwise
-import * as ReactUtils from '../typescript/react-utils';
+import * as ReactUtils from '../react-utils';
 import * as Types from '../../types';
 import * as Ts from 'typescript';
-import * as TypescriptUtils from '../typescript/typescript-utils';
+import * as TypescriptUtils from '../typescript-utils';
 
 export interface SlotAnalyzeContext {
 	program: Ts.Program;
@@ -28,7 +28,8 @@ export function analyzeSlots(
 				memberSymbol.name === 'children' &&
 				(memberType.flags & Ts.TypeFlags.Any) === Ts.TypeFlags.Any;
 
-			const isImplicitSlot = memberType && ReactUtils.isSlotType(ctx.program, memberType);
+			const isImplicitSlot =
+				memberType && ReactUtils.isReactSlotType(memberType, { program: ctx.program });
 
 			const isExplicitSlot = memberSymbol.getJsDocTags().some(tag => tag.name === 'slot');
 

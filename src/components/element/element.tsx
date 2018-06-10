@@ -278,7 +278,7 @@ export class Element extends React.Component<ElementProps> {
 					)}
 				</StyledElementLabel>
 				<StyledElementChildren>
-					{containered(props.children, Element.ElementSlots)}
+					{props.open && containered(props.children, Element.ElementSlots)}
 					{props.open && containered(props.children, Element.ElementChildren)}
 				</StyledElementChildren>
 			</StyledElement>

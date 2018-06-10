@@ -22,8 +22,10 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 		const { props } = this;
 		const open = props.element.getOpen() || props.element.getForcedOpen();
 
+		const contents = props.element.getContents();
+
 		const [[childContent], slotContents] = partition(
-			props.element.getContents(),
+			contents,
 			(content: Model.ElementContent): boolean =>
 				content.getSlotType() === Types.SlotType.Children
 		);
@@ -35,7 +37,8 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 				id={props.element.getId()}
 				contentId={childContent ? childContent.getId() : ''}
 				mayOpen={
-					props.element.acceptsChildren() && props.element.getRole() !== Types.ElementRole.Root
+					contents.some(content => content.acceptsChildren()) &&
+					props.element.getRole() !== Types.ElementRole.Root
 				}
 				open={open}
 				onChange={AlvaUtil.noop}

@@ -50,8 +50,10 @@ export interface SerializedElement {
 
 export interface SerializedElementContent {
 	elementIds: string[];
+	forcedOpen: boolean;
 	id: string;
 	name: string;
+	open: boolean;
 	parentElementId?: string;
 	slotId: string;
 }

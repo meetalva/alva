@@ -8,10 +8,12 @@ const NOOP = () => {};
 const CHILD = (
 	<Element
 		id="1"
+		contentId="1"
 		state={ElementState.Default}
 		draggable={false}
 		mayOpen={false}
 		open={false}
+		placeholder={true}
 		onChange={NOOP}
 		title="Child Element"
 		dragging={false}
@@ -24,11 +26,13 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			Default
 			<Element
 				id="1"
+				contentId="1"
 				state={ElementState.Default}
 				draggable={false}
 				mayOpen={false}
 				open={false}
 				onChange={NOOP}
+				placeholder={true}
 				title="Element"
 				dragging={false}
 			/>
@@ -37,10 +41,12 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			Active
 			<Element
 				id="2"
+				contentId="2"
 				draggable={false}
 				mayOpen={false}
 				open={false}
 				onChange={NOOP}
+				placeholder={true}
 				state={ElementState.Active}
 				title="Element"
 				dragging={false}
@@ -50,10 +56,12 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			Highlighted
 			<Element
 				id="2"
+				contentId="2"
 				draggable={false}
 				mayOpen={false}
 				open={false}
 				onChange={NOOP}
+				placeholder={true}
 				state={ElementState.Highlighted}
 				title="Element"
 				dragging={false}
@@ -63,10 +71,12 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			Placeholder Highlighted
 			<Element
 				id="2"
+				contentId="2"
 				draggable={false}
 				mayOpen={false}
 				open={false}
 				onChange={NOOP}
+				placeholder={true}
 				placeholderHighlighted={true}
 				state={ElementState.Default}
 				title="Element"
@@ -77,10 +87,12 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			Editable
 			<Element
 				id="2"
+				contentId="2"
 				draggable={false}
 				mayOpen={false}
 				open={false}
 				onChange={NOOP}
+				placeholder={true}
 				state={ElementState.Editable}
 				title="Element"
 				dragging={false}
@@ -90,10 +102,12 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			May open, closed
 			<Element
 				id="3"
+				contentId="3"
 				draggable={false}
 				mayOpen={true}
 				onChange={NOOP}
 				open={false}
+				placeholder={true}
 				title="Element"
 				state={ElementState.Default}
 				dragging={false}
@@ -105,10 +119,12 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			May open, opened
 			<Element
 				id="3"
+				contentId="3"
 				draggable={false}
 				mayOpen={true}
 				onChange={NOOP}
 				open
+				placeholder={true}
 				title="Element"
 				state={ElementState.Default}
 				dragging={false}
@@ -120,10 +136,12 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			With child, active and open
 			<Element
 				id="4"
+				contentId="4"
 				draggable={false}
 				mayOpen={true}
 				onChange={NOOP}
 				open
+				placeholder={true}
 				title="Element"
 				state={ElementState.Active}
 				dragging={false}

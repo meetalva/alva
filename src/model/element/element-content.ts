@@ -13,16 +13,21 @@ export interface ElementContentContext {
 
 export interface ElementContentInit {
 	elementIds: string[];
+	forcedOpen: boolean;
 	id: string;
 	name: string;
+	open: boolean;
 	parentElementId?: string;
 	slotId: string;
 }
 
 export class ElementContent {
 	@Mobx.observable private elementIds: string[] = [];
+	@Mobx.observable private forcedOpen: boolean;
+	@Mobx.observable private highlighted: boolean;
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
+	@Mobx.observable private open: boolean;
 	@Mobx.observable private parentElementId?: string;
 	@Mobx.observable private patternLibrary: PatternLibrary;
 	private project: Project;
@@ -30,8 +35,10 @@ export class ElementContent {
 	@Mobx.observable private slotId: string;
 
 	public constructor(init: ElementContentInit, context: ElementContentContext) {
+		this.forcedOpen = init.forcedOpen;
 		this.id = init.id;
 		this.name = init.name;
+		this.open = init.open;
 		this.elementIds = init.elementIds;
 		this.slotId = init.slotId;
 
@@ -50,13 +57,29 @@ export class ElementContent {
 		return new ElementContent(
 			{
 				elementIds: serialized.elementIds,
+				forcedOpen: serialized.forcedOpen,
 				id: serialized.id,
 				name: serialized.name,
+				open: serialized.open,
 				parentElementId: serialized.parentElementId,
 				slotId: serialized.slotId
 			},
 			context
 		);
+	}
+
+	public accepts(child: Element): boolean {
+		const parentElementId = this.getParentElementId();
+
+		if (!parentElementId) {
+			return false;
+		}
+
+		return !child.isAncestorOfById(parentElementId) && this.acceptsChildren();
+	}
+
+	public acceptsChildren(): boolean {
+		return true;
 	}
 
 	@Mobx.action
@@ -69,8 +92,10 @@ export class ElementContent {
 		const clone = new ElementContent(
 			{
 				elementIds: clonedElements.map(e => e.getId()),
+				forcedOpen: false,
 				id: uuid.v4(),
 				name: this.name,
+				open: false,
 				slotId: this.slotId
 			},
 			{
@@ -104,8 +129,20 @@ export class ElementContent {
 			.filter((element): element is Element => typeof element !== 'undefined');
 	}
 
+	public getForcedOpen(): boolean {
+		return this.forcedOpen;
+	}
+
+	public getHighlighted(): boolean {
+		return this.highlighted;
+	}
+
 	public getId(): string {
 		return this.id;
+	}
+
+	public getOpen(): boolean {
+		return this.open;
 	}
 
 	public getParentElement(): Element | undefined {
@@ -160,6 +197,21 @@ export class ElementContent {
 	}
 
 	@Mobx.action
+	public setForcedOpen(forcedOpen: boolean): void {
+		this.forcedOpen = forcedOpen;
+	}
+
+	@Mobx.action
+	public setHighlighted(highlighted: boolean): void {
+		this.highlighted = highlighted;
+	}
+
+	@Mobx.action
+	public setOpen(open: boolean): void {
+		this.open = open;
+	}
+
+	@Mobx.action
 	public setParentElement(element: Element): void {
 		this.parentElementId = element.getId();
 	}
@@ -169,11 +221,19 @@ export class ElementContent {
 		this.patternLibrary = patternLibrary;
 	}
 
+	@Mobx.action
+	public toggleOpen(): void {
+		this.setOpen(!this.getOpen() && !this.getForcedOpen());
+		this.setForcedOpen(false);
+	}
+
 	public toJSON(): Types.SerializedElementContent {
 		return {
 			elementIds: Array.from(this.elementIds),
+			forcedOpen: this.forcedOpen,
 			id: this.id,
 			name: this.name,
+			open: this.open,
 			parentElementId: this.parentElementId,
 			slotId: this.slotId
 		};

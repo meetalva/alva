@@ -38,13 +38,23 @@ const StyledButton = styled.button`
 					background: transparent;
 					border: 1px solid ${Color.Grey50};
 					color: ${Color.Grey50};
+
+					&:active {
+						border-color: ${Color.Black};
+						color: ${Color.Black};
+					}
 				`;
 			case ButtonOrder.Primary:
 			default:
 				return css`
-					background: ${Color.Blue};
-					border: 1px solid ${Color.Blue};
+					background: ${Color.Blue20};
+					border: 1px solid ${Color.Blue20};
 					color: ${Color.White};
+
+					&:active {
+						background: ${Color.Blue};
+						border-color: ${Color.Blue};
+					}
 				`;
 		}
 	}};
@@ -77,6 +87,12 @@ const StyledButton = styled.button`
 			? `
 				background: ${Color.White};
 				border-color: ${Color.White};
+
+				&:active {
+					background: ${Color.White};
+					border-color: ${Color.White};
+					opacity: 0.8;
+				}
 			`
 			: ''};
 	${(props: ButtonProps) =>

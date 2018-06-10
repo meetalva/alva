@@ -52,6 +52,10 @@ export class ViewStore {
 
 	private savedProjects: Types.SavedProject[] = [];
 
+	@Mobx.observable private showElementPane: boolean = true;
+
+	@Mobx.observable private showPropertyPane: boolean = true;
+
 	@Mobx.observable private serverPort: number;
 
 	@Mobx.observable private usedPatternLibrary: Model.PatternLibrary | undefined;
@@ -851,6 +855,22 @@ export class ViewStore {
 				type: ServerMessageType.Save
 			});
 		}
+	}
+
+	public getShowElementPane() {
+		return this.showElementPane;
+	}
+
+	public setShowElementPane(show: boolean) {
+		this.showElementPane = show;
+	}
+
+	public getShowPropertyPane() {
+		return this.showPropertyPane;
+	}
+
+	public setShowPropertyPane(show: boolean) {
+		this.showPropertyPane = show;
 	}
 
 	@Mobx.action

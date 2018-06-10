@@ -366,6 +366,30 @@ export function createMenu(ctx: MenuContext): void {
 					}
 				},
 				{
+					type: 'separator'
+				},
+				{
+					label: '&Show Elements',
+					type: 'checkbox',
+					checked: true,
+					accelerator: 'CmdOrCtrl+E',
+					click: (item, checked) => {
+						ctx.store.setShowElementPane(item.checked);
+					}
+				},
+				{
+					label: '&Show Properties',
+					type: 'checkbox',
+					checked: true,
+					accelerator: 'CmdOrCtrl+P',
+					click: (item, checked) => {
+						ctx.store.setShowPropertyPane(item.checked);
+					}
+				},
+				{
+					type: 'separator'
+				},
+				{
 					label: 'Toggle &Developer Tools',
 					accelerator: (() => {
 						if (process.platform === 'darwin') {

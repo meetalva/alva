@@ -131,11 +131,6 @@ export enum AlvaView {
 
 export type SerializedAlvaView = 'Pages' | 'PageDetail' | 'SplashScreen';
 
-export enum RightPane {
-	Patterns = 'Patterns',
-	Properties = 'Properties'
-}
-
 export enum EditState {
 	Editable = 'Editable',
 	Editing = 'Editing'

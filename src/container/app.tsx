@@ -78,7 +78,7 @@ export class App extends React.Component {
 					)}
 					{props.store.getActiveAppView() === Types.AlvaView.PageDetail && (
 						<React.Fragment>
-							{props.store.getShowElementPane() === true && (
+							{props.store.getShowLeftSidebar() && (
 								<Resizeable
 									handleStyles={{ right: { zIndex: 1 } }}
 									defaultSize={{ width: 240, height: '100%' }}
@@ -113,7 +113,7 @@ export class App extends React.Component {
 								previewFrame={`http://localhost:${props.store.getServerPort()}/preview.html`}
 							/>
 
-							{props.store.getShowPropertyPane() === true && (
+							{props.store.getShowRightSidebar() && (
 								<Resizeable
 									handleStyles={{ left: { zIndex: 1 } }}
 									defaultSize={{ width: 240, height: '100%' }}

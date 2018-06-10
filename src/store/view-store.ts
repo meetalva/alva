@@ -52,9 +52,9 @@ export class ViewStore {
 
 	private savedProjects: Types.SavedProject[] = [];
 
-	@Mobx.observable private showElementPane: boolean = true;
+	@Mobx.observable private showLeftSidebar: boolean = true;
 
-	@Mobx.observable private showPropertyPane: boolean = true;
+	@Mobx.observable private showRightSidebar: boolean = true;
 
 	@Mobx.observable private serverPort: number;
 
@@ -857,20 +857,20 @@ export class ViewStore {
 		}
 	}
 
-	public getShowElementPane(): boolean {
-		return this.showElementPane;
+	public getShowLeftSidebar(): boolean {
+		return this.showLeftSidebar;
 	}
 
-	public setShowElementPane(show: boolean): void {
-		this.showElementPane = show;
+	public setShowLeftSidebar(show: boolean): void {
+		this.showLeftSidebar = show;
 	}
 
-	public getShowPropertyPane(): boolean {
-		return this.showPropertyPane;
+	public getShowRightSidebar(): boolean {
+		return this.showRightSidebar;
 	}
 
-	public setShowPropertyPane(show: boolean): void {
-		this.showPropertyPane = show;
+	public setShowRightSidebar(show: boolean): void {
+		this.showRightSidebar = show;
 	}
 
 	@Mobx.action

@@ -369,21 +369,21 @@ export function createMenu(ctx: MenuContext): void {
 					type: 'separator'
 				},
 				{
-					label: '&Show Elements',
+					label: '&Show Left Sidebar',
 					type: 'checkbox',
 					checked: true,
-					accelerator: 'CmdOrCtrl+E',
+					accelerator: 'CmdOrCtrl+1',
 					click: (item, checked) => {
-						ctx.store.setShowElementPane(item.checked);
+						ctx.store.setShowLeftSidebar(item.checked);
 					}
 				},
 				{
-					label: '&Show Properties',
+					label: '&Show Right Sidebar',
 					type: 'checkbox',
 					checked: true,
-					accelerator: 'CmdOrCtrl+P',
+					accelerator: 'CmdOrCtrl+2',
 					click: (item, checked) => {
-						ctx.store.setShowPropertyPane(item.checked);
+						ctx.store.setShowRightSidebar(item.checked);
 					}
 				},
 				{

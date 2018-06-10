@@ -53,7 +53,19 @@ Sender.receive(message => {
 		}
 		case ServerMessageType.OpenFileResponse: {
 			history.clear();
-			const newProject = Project.from(message.payload.contents);
+			let newProject;
+
+			try {
+				newProject = Project.from(message.payload.contents);
+			} catch (e) {
+				Sender.send({
+					id: uuid.v4(),
+					payload:
+						'Sorry, we had trouble while opening that file. It may help to update your version of Alva.',
+					type: ServerMessageType.ShowError
+				});
+			}
+
 			newProject.setPath(message.payload.path);
 			store.setProject(newProject);
 

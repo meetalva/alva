@@ -366,6 +366,11 @@ const userStore = new ElectronStore();
 				if (win) {
 					win.isMaximized() ? win.unmaximize() : win.maximize();
 				}
+
+				break;
+			}
+			case ServerMessageType.ShowError: {
+				dialog.showErrorBox('We run into a problem!', message.payload);
 			}
 		}
 	});

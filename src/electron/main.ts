@@ -308,7 +308,7 @@ const userStore = new ElectronStore();
 				let analysis;
 
 				try {
-					analysis = await Analyzer.analyze(path, {
+					analysis = await Analyzer.analyze(connection.path, {
 						getGobalEnumOptionId: (patternId, contextId) =>
 							library.assignEnumOptionId(patternId, contextId),
 						getGlobalPatternId: contextId => library.assignPatternId(contextId),

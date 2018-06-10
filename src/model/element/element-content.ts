@@ -15,7 +15,6 @@ export interface ElementContentInit {
 	elementIds: string[];
 	forcedOpen: boolean;
 	id: string;
-	name: string;
 	open: boolean;
 	parentElementId?: string;
 	slotId: string;
@@ -26,7 +25,6 @@ export class ElementContent {
 	@Mobx.observable private forcedOpen: boolean;
 	@Mobx.observable private highlighted: boolean;
 	@Mobx.observable private id: string;
-	@Mobx.observable private name: string;
 	@Mobx.observable private open: boolean;
 	@Mobx.observable private parentElementId?: string;
 	@Mobx.observable private patternLibrary: PatternLibrary;
@@ -37,7 +35,6 @@ export class ElementContent {
 	public constructor(init: ElementContentInit, context: ElementContentContext) {
 		this.forcedOpen = init.forcedOpen;
 		this.id = init.id;
-		this.name = init.name;
 		this.open = init.open;
 		this.elementIds = init.elementIds;
 		this.slotId = init.slotId;
@@ -59,7 +56,6 @@ export class ElementContent {
 				elementIds: serialized.elementIds,
 				forcedOpen: serialized.forcedOpen,
 				id: serialized.id,
-				name: serialized.name,
 				open: serialized.open,
 				parentElementId: serialized.parentElementId,
 				slotId: serialized.slotId
@@ -94,7 +90,6 @@ export class ElementContent {
 				elementIds: clonedElements.map(e => e.getId()),
 				forcedOpen: false,
 				id: uuid.v4(),
-				name: this.name,
 				open: false,
 				slotId: this.slotId
 			},
@@ -232,7 +227,6 @@ export class ElementContent {
 			elementIds: Array.from(this.elementIds),
 			forcedOpen: this.forcedOpen,
 			id: this.id,
-			name: this.name,
 			open: this.open,
 			parentElementId: this.parentElementId,
 			slotId: this.slotId

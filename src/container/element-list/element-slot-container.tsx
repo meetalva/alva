@@ -15,6 +15,10 @@ export class ElementSlotContainer extends React.Component<ElementSlotContainerPr
 	public render(): JSX.Element | null {
 		const props = this.props as ElementSlotContainerProps & { store: ViewStore };
 
+		if (props.content.getSlot().getHidden()) {
+			return null;
+		}
+
 		return (
 			<Components.ElementSlot
 				id={props.content.getId()}

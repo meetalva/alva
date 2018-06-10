@@ -52,7 +52,6 @@ export interface SerializedElementContent {
 	elementIds: string[];
 	forcedOpen: boolean;
 	id: string;
-	name: string;
 	open: boolean;
 	parentElementId?: string;
 	slotId: string;
@@ -119,9 +118,13 @@ export interface SerializedPattern {
 
 export interface SerializedPatternSlot {
 	contextId: string;
-	displayName: string;
+	description: string;
+	example: string;
+	hidden: boolean;
 	id: string;
+	label: string;
 	propertyName: string;
+	required: boolean;
 	type: string;
 }
 

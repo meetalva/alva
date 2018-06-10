@@ -38,8 +38,12 @@ export const Link = (context: BuiltInContext): BuiltInResult => {
 		new PatternSlot({
 			contextId: SLOT_CONTEXT_ID,
 			displayName: 'Children',
+			description: '',
+			example: '',
+			hidden: false,
 			propertyName: 'children',
 			id: context.options.getGlobalSlotId(patternId, SLOT_CONTEXT_ID),
+			required: false,
 			type: Types.SlotType.Children
 		})
 	];

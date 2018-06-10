@@ -147,7 +147,6 @@ export class ViewStore {
 						elementIds: [],
 						forcedOpen: false,
 						id: uuid.v4(),
-						name: slot.getName(),
 						open: false,
 						slotId: slot.getId()
 					},

@@ -35,10 +35,14 @@ const RENDERER_DOCUMENT = `<!doctype html>
 </html>`;
 
 const showOpenDialog = (options: Electron.OpenDialogOptions): Promise<string[]> =>
-	new Promise(resolve => dialog.showOpenDialog(options, resolve));
+	new Promise(resolve =>
+		dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), options, resolve)
+	);
 
 const showSaveDialog = (options: Electron.SaveDialogOptions): Promise<string | undefined> =>
-	new Promise(resolve => dialog.showSaveDialog(options, resolve));
+	new Promise(resolve =>
+		dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), options, resolve)
+	);
 
 const readFile = Util.promisify(Fs.readFile);
 const writeFile = Util.promisify(Fs.writeFile);

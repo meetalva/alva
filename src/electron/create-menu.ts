@@ -372,7 +372,7 @@ export function createMenu(ctx: MenuContext): void {
 					label: '&Show Left Sidebar',
 					type: 'checkbox',
 					checked: true,
-					accelerator: 'CmdOrCtrl+1',
+					accelerator: 'CmdOrCtrl+Alt+1',
 					click: (item, checked) => {
 						ctx.store.setShowLeftSidebar(item.checked);
 					}
@@ -381,7 +381,7 @@ export function createMenu(ctx: MenuContext): void {
 					label: '&Show Right Sidebar',
 					type: 'checkbox',
 					checked: true,
-					accelerator: 'CmdOrCtrl+2',
+					accelerator: 'CmdOrCtrl+Alt+2',
 					click: (item, checked) => {
 						ctx.store.setShowRightSidebar(item.checked);
 					}

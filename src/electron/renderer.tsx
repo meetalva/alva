@@ -57,7 +57,7 @@ Sender.receive(message => {
 
 			try {
 				newProject = Project.from(message.payload.contents);
-			} catch (e) {
+			} catch {
 				Sender.send({
 					id: uuid.v4(),
 					payload:

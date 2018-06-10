@@ -305,14 +305,34 @@ const userStore = new ElectronStore();
 					return;
 				}
 
-				const analysis = await Analyzer.analyze(connection.path, {
-					getGobalEnumOptionId: (patternId, contextId) =>
-						library.assignEnumOptionId(patternId, contextId),
-					getGlobalPatternId: contextId => library.assignPatternId(contextId),
-					getGlobalPropertyId: (patternId, contextId) =>
-						library.assignPropertyId(patternId, contextId),
-					getGlobalSlotId: (patternId, contextId) => library.assignSlotId(patternId, contextId)
-				});
+				let analysis;
+
+				try {
+					analysis = await Analyzer.analyze(path, {
+						getGobalEnumOptionId: (patternId, contextId) =>
+							library.assignEnumOptionId(patternId, contextId),
+						getGlobalPatternId: contextId => library.assignPatternId(contextId),
+						getGlobalPropertyId: (patternId, contextId) =>
+							library.assignPropertyId(patternId, contextId),
+						getGlobalSlotId: (patternId, contextId) =>
+							library.assignSlotId(patternId, contextId)
+					});
+				} catch {
+					dialog.showMessageBox(
+						{
+							message:
+								'Sorry, this seems to be an uncompatible library. Learn more about supported component libraries on github.com/meetalva',
+							buttons: ['OK', 'Learn more']
+						},
+						response => {
+							if (response === 1) {
+								shell.openExternal(
+									'https://github.com/meetalva/alva#pattern-library-requirements'
+								);
+							}
+						}
+					);
+				}
 
 				send({
 					type: ServerMessageType.ConnectPatternLibraryResponse,

@@ -21,6 +21,7 @@ const StyledHeadline = styled.div`
 	margin-top: 0;
 	font-family: ${fonts().NORMAL_FONT};
 	font-weight: 500;
+	user-select: none;
 	${(props: StyledHeadlineProps) => (props.textColor ? `color: ${props.textColor};` : '')};
 
 	${(props: HeadlineProps) => {

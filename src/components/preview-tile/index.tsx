@@ -47,6 +47,7 @@ interface StyledPreviewTitleProps {
 const StyledPreview = styled.section`
 	width: 245px;
 	text-align: center;
+	user-select: none;
 `;
 
 const StyledPreviewTile = styled.div`

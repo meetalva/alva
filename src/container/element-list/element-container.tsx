@@ -22,12 +22,6 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 		const { props } = this;
 		const open = props.element.getOpen() || props.element.getForcedOpen();
 
-		// Ensure mobx registers
-		// props.element.getSelected();
-		// props.element.getNameEditable();
-		// props.element.getHighlighted();
-		// props.element.acceptsChildren();
-
 		const [[childContent], slotContents] = partition(
 			props.element.getContents(),
 			(content: Model.ElementContent): boolean =>

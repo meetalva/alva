@@ -92,7 +92,7 @@ const userStore = new ElectronStore();
 
 					if (result.state === PersistenceState.Error) {
 						dialog.showErrorBox(
-							'We run into a problem!',
+							'We ran into a problem!',
 							'Sorry, we had trouble while opening that file. It may help to update your version of Alva.'
 						);
 					} else {
@@ -173,7 +173,7 @@ const userStore = new ElectronStore();
 
 					if (result.state === PersistenceState.Error) {
 						dialog.showErrorBox(
-							'We run into a problem!',
+							'We ran into a problem!',
 							'Sorry, we had trouble while opening that file. It may help to update your version of Alva.'
 						);
 					} else {
@@ -376,7 +376,7 @@ const userStore = new ElectronStore();
 				break;
 			}
 			case ServerMessageType.ShowError: {
-				dialog.showErrorBox('We run into a problem!', message.payload);
+				dialog.showErrorBox('We ran into a problem!', message.payload);
 			}
 		}
 	});

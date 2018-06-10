@@ -11,6 +11,7 @@ const StyledSplashScreen = styled.div`
 	justify-content: center;
 	padding: 0 ${PageInset.XL}px;
 	transform: translateY(-54px);
+	-webkit-app-region: drag;
 `;
 
 const StyledLeftSection = styled.div`

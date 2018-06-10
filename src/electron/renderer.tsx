@@ -60,8 +60,7 @@ Sender.receive(message => {
 			} catch {
 				Sender.send({
 					id: uuid.v4(),
-					payload:
-						'Sorry, we had trouble while opening that file. It may help to update your version of Alva.',
+					payload: message.payload.path,
 					type: ServerMessageType.ShowError
 				});
 			}

@@ -43,6 +43,22 @@ const showSaveDialog = (options: Electron.SaveDialogOptions): Promise<string | u
 const readFile = Util.promisify(Fs.readFile);
 const writeFile = Util.promisify(Fs.writeFile);
 
+const showError = (path: string) => {
+	const filename = path.substring(path.lastIndexOf('/') + 1);
+	dialog.showMessageBox(
+		BrowserWindow.getFocusedWindow(),
+		{
+			message: 'Sorry, we had trouble opening the file "' + filename + '".',
+			buttons: ['OK', 'Report a bug']
+		},
+		response => {
+			if (response === 1) {
+				shell.openExternal('https://github.com/meetalva/alva/labels/type%3A%20bug');
+			}
+		}
+	);
+};
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win: BrowserWindow | undefined;
@@ -91,10 +107,7 @@ const userStore = new ElectronStore();
 					const result = await Persistence.read<Types.SavedProject>(pathToOpen);
 
 					if (result.state === PersistenceState.Error) {
-						dialog.showErrorBox(
-							'We ran into a problem!',
-							'Sorry, we had trouble while opening that file. It may help to update your version of Alva.'
-						);
+						await showError(pathToOpen);
 					} else {
 						const contents = result.contents as Types.SerializedProject;
 						contents.path = pathToOpen;
@@ -172,10 +185,7 @@ const userStore = new ElectronStore();
 					const result = await Persistence.read<Types.SavedProject>(path);
 
 					if (result.state === PersistenceState.Error) {
-						dialog.showErrorBox(
-							'We ran into a problem!',
-							'Sorry, we had trouble while opening that file. It may help to update your version of Alva.'
-						);
+						await showError(path);
 					} else {
 						const contents = result.contents as Types.SerializedProject;
 						contents.path = path;
@@ -376,7 +386,7 @@ const userStore = new ElectronStore();
 				break;
 			}
 			case ServerMessageType.ShowError: {
-				dialog.showErrorBox('We ran into a problem!', message.payload);
+				showError(message.payload);
 			}
 		}
 	});
@@ -506,7 +516,7 @@ app.on('will-finish-launching', () => {
 			const result = await Persistence.read<Types.SavedProject>(path);
 
 			if (result.state === PersistenceState.Error) {
-				// TODO: Show user facing error here
+				showError(openedFile);
 			} else {
 				const contents = result.contents as Types.SerializedProject;
 

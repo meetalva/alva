@@ -857,19 +857,19 @@ export class ViewStore {
 		}
 	}
 
-	public getShowElementPane() {
+	public getShowElementPane(): boolean {
 		return this.showElementPane;
 	}
 
-	public setShowElementPane(show: boolean) {
+	public setShowElementPane(show: boolean): void {
 		this.showElementPane = show;
 	}
 
-	public getShowPropertyPane() {
+	public getShowPropertyPane(): boolean {
 		return this.showPropertyPane;
 	}
 
-	public setShowPropertyPane(show: boolean) {
+	public setShowPropertyPane(show: boolean): void {
 		this.showPropertyPane = show;
 	}
 

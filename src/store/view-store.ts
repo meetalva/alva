@@ -52,6 +52,10 @@ export class ViewStore {
 
 	private savedProjects: Types.SavedProject[] = [];
 
+	@Mobx.observable private showLeftSidebar: boolean = true;
+
+	@Mobx.observable private showRightSidebar: boolean = true;
+
 	@Mobx.observable private serverPort: number;
 
 	@Mobx.observable private usedPatternLibrary: Model.PatternLibrary | undefined;
@@ -851,6 +855,22 @@ export class ViewStore {
 				type: ServerMessageType.Save
 			});
 		}
+	}
+
+	public getShowLeftSidebar(): boolean {
+		return this.showLeftSidebar;
+	}
+
+	public setShowLeftSidebar(show: boolean): void {
+		this.showLeftSidebar = show;
+	}
+
+	public getShowRightSidebar(): boolean {
+		return this.showRightSidebar;
+	}
+
+	public setShowRightSidebar(show: boolean): void {
+		this.showRightSidebar = show;
 	}
 
 	@Mobx.action

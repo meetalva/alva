@@ -78,60 +78,65 @@ export class App extends React.Component {
 					)}
 					{props.store.getActiveAppView() === Types.AlvaView.PageDetail && (
 						<React.Fragment>
-							<Resizeable
-								handleStyles={{ right: { zIndex: 1 } }}
-								defaultSize={{ width: 240, height: '100%' }}
-								enable={{ right: true }}
-								minWidth={240}
-							>
-								<SideBar
-									side={LayoutSide.Left}
-									direction={LayoutDirection.Column}
-									border={LayoutBorder.Side}
+							{props.store.getShowLeftSidebar() && (
+								<Resizeable
+									handleStyles={{ right: { zIndex: 1 } }}
+									defaultSize={{ width: 240, height: '100%' }}
+									enable={{ right: true }}
+									minWidth={240}
 								>
-									<ElementPane>
-										<ElementList />
-									</ElementPane>
-
-									<Resizeable
-										handleStyles={{ top: { zIndex: 1 } }}
-										defaultSize={{ height: 500, width: '100%' }}
-										enable={{ top: true }}
-										minHeight={240}
+									<SideBar
+										side={LayoutSide.Left}
+										direction={LayoutDirection.Column}
+										border={LayoutBorder.Side}
 									>
-										<PatternsPane>
-											<PatternListContainer />
-										</PatternsPane>
-									</Resizeable>
-								</SideBar>
-							</Resizeable>
+										<ElementPane>
+											<ElementList />
+										</ElementPane>
+
+										<Resizeable
+											handleStyles={{ top: { zIndex: 1 } }}
+											defaultSize={{ height: 500, width: '100%' }}
+											enable={{ top: true }}
+											minHeight={240}
+										>
+											<PatternsPane>
+												<PatternListContainer />
+											</PatternsPane>
+										</Resizeable>
+									</SideBar>
+								</Resizeable>
+							)}
 							<PreviewPaneWrapper
 								isDragging={props.store.getDragging()}
 								key="center"
 								previewFrame={`http://localhost:${props.store.getServerPort()}/preview.html`}
 							/>
-							<Resizeable
-								handleStyles={{ left: { zIndex: 1 } }}
-								defaultSize={{ width: 240, height: '100%' }}
-								enable={{ left: true }}
-								minWidth={240}
-							>
-								<SideBar
-									side={LayoutSide.Right}
-									direction={LayoutDirection.Column}
-									border={LayoutBorder.Side}
+
+							{props.store.getShowRightSidebar() && (
+								<Resizeable
+									handleStyles={{ left: { zIndex: 1 } }}
+									defaultSize={{ width: 240, height: '100%' }}
+									enable={{ left: true }}
+									minWidth={240}
 								>
-									{props.store.getPatternLibraryState() ===
-										Types.PatternLibraryState.Pristine && (
-										<ConnectPaneContainer
-											onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
-										/>
-									)}
-									<PropertyPane>
-										<PropertyListContainer />
-									</PropertyPane>
-								</SideBar>
-							</Resizeable>
+									<SideBar
+										side={LayoutSide.Right}
+										direction={LayoutDirection.Column}
+										border={LayoutBorder.Side}
+									>
+										{props.store.getPatternLibraryState() ===
+											Types.PatternLibraryState.Pristine && (
+											<ConnectPaneContainer
+												onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
+											/>
+										)}
+										<PropertyPane>
+											<PropertyListContainer />
+										</PropertyPane>
+									</SideBar>
+								</Resizeable>
+							)}
 						</React.Fragment>
 					)}
 				</MainArea>

@@ -371,7 +371,7 @@ export class ElementList extends React.Component {
 				targetElement.setHighlighted(true);
 			}
 
-			if (targetContent && targetContent.getSlotType() === Types.SlotType.Children) {
+			if (label && targetContent && targetContent.getSlotType() === Types.SlotType.Children) {
 				targetContent.setHighlighted(true);
 			}
 		});
@@ -391,10 +391,17 @@ export class ElementList extends React.Component {
 			return null;
 		}
 
+		const anchors = {
+			[ElementAnchors.content]: (rootElement.getContentBySlotType(
+				Types.SlotType.Children
+			) as Model.ElementContent).getId(),
+			[ElementAnchors.element]: rootElement.getId()
+		};
+
 		return (
 			<StyledDragRoot
 				data-drag-root
-				{...{ [ElementAnchors.element]: rootElement.getId() }}
+				{...anchors}
 				onBlur={e => this.handleBlur(e)}
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}

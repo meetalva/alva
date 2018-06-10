@@ -60,16 +60,17 @@ export class Persistence {
 	public static read<T>(path: string): Promise<PersistenceReadResult<T>> {
 		return new Promise(resolve => {
 			Fs.readFile(path, (error, contents) => {
-				if (error) {
+				try {
+					resolve({
+						state: PersistenceState.Success,
+						contents: Yaml.load(String(contents)) as T
+					});
+				} catch {
 					return resolve({
 						state: PersistenceState.Error,
 						error
 					});
 				}
-				resolve({
-					state: PersistenceState.Success,
-					contents: Yaml.load(String(contents)) as T
-				});
 			});
 		});
 	}

@@ -91,7 +91,10 @@ const userStore = new ElectronStore();
 					const result = await Persistence.read<Types.SavedProject>(pathToOpen);
 
 					if (result.state === PersistenceState.Error) {
-						// TODO: Show user facing error here
+						dialog.showErrorBox(
+							'We run into a problem!',
+							'Sorry, we had trouble while opening that file. It may help to update your version of Alva.'
+						);
 					} else {
 						const contents = result.contents as Types.SerializedProject;
 						contents.path = pathToOpen;
@@ -169,7 +172,10 @@ const userStore = new ElectronStore();
 					const result = await Persistence.read<Types.SavedProject>(path);
 
 					if (result.state === PersistenceState.Error) {
-						// TODO: Show user facing error here
+						dialog.showErrorBox(
+							'We run into a problem!',
+							'Sorry, we had trouble while opening that file. It may help to update your version of Alva.'
+						);
 					} else {
 						const contents = result.contents as Types.SerializedProject;
 						contents.path = path;

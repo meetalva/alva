@@ -372,6 +372,7 @@ export function createMenu(ctx: MenuContext): void {
 					label: '&Show Left Sidebar',
 					type: 'checkbox',
 					checked: true,
+					enabled: ctx.store.getActiveAppView() === Types.AlvaView.PageDetail,
 					accelerator: 'CmdOrCtrl+Alt+1',
 					click: (item, checked) => {
 						ctx.store.setShowLeftSidebar(item.checked);
@@ -381,6 +382,7 @@ export function createMenu(ctx: MenuContext): void {
 					label: '&Show Right Sidebar',
 					type: 'checkbox',
 					checked: true,
+					enabled: ctx.store.getActiveAppView() === Types.AlvaView.PageDetail,
 					accelerator: 'CmdOrCtrl+Alt+2',
 					click: (item, checked) => {
 						ctx.store.setShowRightSidebar(item.checked);

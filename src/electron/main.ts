@@ -48,7 +48,7 @@ const showError = (path: string) => {
 	dialog.showMessageBox(
 		BrowserWindow.getFocusedWindow(),
 		{
-			message: 'Sorry, we had trouble opening the file "' + filename + '".',
+			message: `Sorry, we had trouble opening the file "${filename}".`,
 			buttons: ['OK', 'Report a bug']
 		},
 		response => {

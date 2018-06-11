@@ -2,10 +2,24 @@ import { Color } from '../colors';
 import { CopySize } from '../copy';
 import { Icon, IconName, IconProps, IconSize } from '../icons';
 import * as React from 'react';
+import { EditState } from '../../types';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export type JustifyType = 'start' | 'center' | 'end' | 'stretch';
+
+export interface ViewEditableTitleProps {
+	fontSize?: CopySize;
+	nameState: EditState;
+	title: string;
+	value: string;
+	onBlur?: React.FocusEventHandler<HTMLInputElement>;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
+	onFocus?: React.FocusEventHandler<HTMLInputElement>;
+	onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+}
 
 export interface ViewSwitchProps {
 	fontSize?: CopySize;
@@ -14,7 +28,6 @@ export interface ViewSwitchProps {
 	onLeftClick?: React.MouseEventHandler<SVGElement>;
 	onRightClick?: React.MouseEventHandler<SVGElement>;
 	rightVisible: boolean;
-	title: string;
 }
 
 export interface StyledViewButtonProps {
@@ -93,6 +106,30 @@ const StyledIcons = styled(Icon)`
 	}
 `;
 
+const StyledInput = styled.input`
+	border: 0;
+	/* text-align: center; */
+	font-size: ${(props: StyledViewSwitchProps) =>
+		props.fontSize ? `${props.fontSize}px` : `${CopySize.S}px`};
+`;
+
+export const ViewEditableTitle: React.SFC<ViewEditableTitleProps> = (props): JSX.Element => (
+	<StyledViewSwitch fontSize={props.fontSize} onClick={props.onClick}>
+		{props.nameState === EditState.Editing ? (
+			<StyledInput
+				onBlur={props.onBlur}
+				onChange={props.onChange}
+				onFocus={props.onFocus}
+				onKeyDown={props.onKeyDown}
+				type="text"
+				value={props.value}
+			/>
+		) : (
+			<StyledTitle>{props.title}</StyledTitle>
+		)}
+	</StyledViewSwitch>
+);
+
 export const ViewTitle: React.SFC<ViewTitleProps> = (props): JSX.Element => (
 	<StyledViewSwitch justify={props.justify} fontSize={props.fontSize}>
 		<StyledTitle>{props.title}</StyledTitle>
@@ -120,7 +157,7 @@ export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 			name={IconName.ArrowLeft}
 			visible={props.leftVisible}
 		/>
-		<StyledTitle>{props.title}</StyledTitle>
+		{props.children}
 		<StyledIcons
 			color={Color.Grey60}
 			onClick={props.onRightClick}

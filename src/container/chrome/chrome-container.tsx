@@ -1,8 +1,16 @@
 import * as AlvaUtil from '../../alva-util';
-import { BugReport, Chrome, CopySize, ViewSwitch, ViewTitle } from '../../components';
+import {
+	BugReport,
+	Chrome,
+	CopySize,
+	ViewTitle,
+	ViewSwitch,
+	ViewEditableTitle
+} from '../../components';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { OverviewSwitchContainer } from './overview-switch-container';
+import { Page } from '../../model';
 import * as React from 'react';
 import * as Sender from '../../message/client';
 import { ViewStore } from '../../store';
@@ -10,6 +18,7 @@ import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 interface InjectedChromeContainerProps {
+	page: Page;
 	store: ViewStore;
 }
 
@@ -47,7 +56,6 @@ export const ChromeContainer = MobxReact.inject('store')(
 
 		const previous = index > 0 ? toPreviousPage : AlvaUtil.noop;
 		const next = index < pages.length ? toNextPage : AlvaUtil.noop;
-
 		return (
 			<Chrome
 				onDoubleClick={() => {
@@ -71,8 +79,13 @@ export const ChromeContainer = MobxReact.inject('store')(
 						rightVisible={index < pages.length - 1}
 						onLeftClick={previous}
 						onRightClick={next}
-						title={page ? page.getName() : ''}
-					/>
+					>
+						<ViewEditableTitle
+							fontSize={CopySize.M}
+							nameState={page.getNameState()}
+							title={page ? page.getName() : ''}
+						/>
+					</ViewSwitch>
 				)}
 				{store.getActiveAppView() === Types.AlvaView.Pages && (
 					<ViewTitle

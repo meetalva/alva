@@ -22,6 +22,7 @@ export class ElementSlotContainer extends React.Component<ElementSlotContainerPr
 		return (
 			<Components.ElementSlot
 				id={props.content.getId()}
+				description={'Slot'}
 				open={props.content.getOpen() || props.content.getForcedOpen()}
 				state={getSlotState(props.content, props.store)}
 				title={props.content.getSlot().getName()}

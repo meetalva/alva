@@ -14,6 +14,7 @@ export enum ElementSlotState {
 
 export interface ElementSlotProps {
 	children?: React.ReactNode;
+	description: string;
 	id: string;
 	open: boolean;
 	state: ElementSlotState;
@@ -90,10 +91,18 @@ const StyledElementSlotLabelContent = styled.div`
 	box-sizing: border-box;
 	margin-left: ${getSpace(SpaceSize.XXL) - 3}px;
 	overflow: hidden;
-	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.L)}px ${getSpace(SpaceSize.XS)}px 3px;
+	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.XS)}px
+		${getSpace(SpaceSize.XXS)}px;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	width: 100%;
+`;
+
+const StyledElementSlotLabelDescription = styled.div`
+	box-sizing: border-box;
+	padding: 0 ${getSpace(SpaceSize.M)}px 0 ${getSpace(SpaceSize.XS)}px;
+	font-size: 12px;
+	justify-self: flex-end;
 `;
 
 export class ElementSlot extends React.Component<ElementSlotProps> {
@@ -113,6 +122,9 @@ export class ElementSlot extends React.Component<ElementSlotProps> {
 					<StyledElementSlotLabelContent {...{ [ElementAnchors.label]: true }}>
 						{props.title}
 					</StyledElementSlotLabelContent>
+					<StyledElementSlotLabelDescription>
+						{props.description}
+					</StyledElementSlotLabelDescription>
 				</StyledElementSlotLabel>
 				<StyledElementChildren>{props.open && props.children}</StyledElementChildren>
 			</StyledElementSlot>

@@ -10,8 +10,8 @@ export enum EditState {
 }
 
 export interface PageTileProps {
-	focus: boolean;
-	highlight: boolean;
+	focused: boolean;
+	highlighted: boolean;
 	id?: string;
 	name: string;
 	nameState: EditState;
@@ -25,7 +25,7 @@ export interface PageTileProps {
 interface EditableTitleProps {
 	autoFocus: boolean;
 	autoSelect: boolean;
-	highlight: boolean;
+	highlighted: boolean;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
@@ -36,8 +36,8 @@ interface EditableTitleProps {
 }
 
 interface StyledPageTileProps {
-	highlight: boolean;
-	focus: boolean;
+	highlighted: boolean;
+	focused: boolean;
 }
 
 interface StyledPageTitleProps {
@@ -45,7 +45,7 @@ interface StyledPageTitleProps {
 	editable: boolean;
 }
 
-const BORDER_COLOR = (props: StyledPageTileProps) => (props.focus ? Color.Yellow : Color.Blue40);
+const BORDER_COLOR = (props: StyledPageTileProps) => (props.focused ? Color.Yellow : Color.Blue40);
 
 const StyledPageTile = styled.div`
 	position: relative;
@@ -54,7 +54,7 @@ const StyledPageTile = styled.div`
 	width: 100%;
 	border: 3px solid;
 	border-color: ${(props: StyledPageTileProps) =>
-		props.highlight ? BORDER_COLOR : 'transparent'};
+		props.highlighted ? BORDER_COLOR : 'transparent'};
 	border-radius: 6px;
 	box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.15);
 	background-color: ${Color.White};
@@ -148,8 +148,8 @@ class EditableTitle extends React.Component<EditableTitleProps> {
 export const PageTile: React.StatelessComponent<PageTileProps> = (props): JSX.Element => (
 	<StyledPageTile
 		data-id={props.id}
-		highlight={props.highlight}
-		focus={props.focus}
+		highlighted={props.highlighted}
+		focused={props.focused}
 		onClick={props.onClick}
 	>
 		{props.nameState === EditState.Editing ? (
@@ -157,7 +157,7 @@ export const PageTile: React.StatelessComponent<PageTileProps> = (props): JSX.El
 				autoFocus
 				autoSelect
 				data-title={true}
-				highlight={props.highlight}
+				highlighted={props.highlighted}
 				onBlur={props.onBlur}
 				onChange={props.onChange}
 				onFocus={props.onFocus}
@@ -165,7 +165,7 @@ export const PageTile: React.StatelessComponent<PageTileProps> = (props): JSX.El
 				value={props.name}
 			/>
 		) : (
-			<StyledTitle editable={props.highlight}>{props.name}</StyledTitle>
+			<StyledTitle editable={props.highlighted}>{props.name}</StyledTitle>
 		)}
 	</StyledPageTile>
 );

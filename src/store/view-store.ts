@@ -168,6 +168,7 @@ export class ViewStore {
 			{
 				contentIds: elementContents.map(e => e.getId()),
 				dragged: init.dragged || false,
+				focused: false,
 				highlighted: false,
 				forcedOpen: false,
 				open: false,

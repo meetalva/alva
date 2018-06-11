@@ -103,8 +103,8 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		const { props } = this;
 		return (
 			<PageTile
-				focus={props.focus}
-				highlight={props.highlight}
+				focused={props.focus}
+				highlighted={props.highlight}
 				id={props.page.getId()}
 				onBlur={e => this.handleBlur()}
 				onChange={e => this.handleChange(e)}

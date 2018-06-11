@@ -24,6 +24,7 @@ export default (): JSX.Element => (
 				<Space size={SpaceSize.S}>
 					<PageTile
 						focused={false}
+						highlighted={false}
 						onChange={handleChange}
 						name="Editable"
 						nameState={EditState.Editable}
@@ -32,6 +33,7 @@ export default (): JSX.Element => (
 				<Space size={SpaceSize.S}>
 					<PageTile
 						focused={true}
+						highlighted={false}
 						onChange={handleChange}
 						name="Page Name"
 						nameState={EditState.Editable}
@@ -40,6 +42,7 @@ export default (): JSX.Element => (
 				<Space size={SpaceSize.S}>
 					<PageTile
 						focused={true}
+						highlighted={false}
 						onChange={handleChange}
 						name="Editable Page Name"
 						nameState={EditState.Editable}
@@ -48,6 +51,7 @@ export default (): JSX.Element => (
 				<Space size={SpaceSize.S}>
 					<PageTile
 						focused={false}
+						highlighted={false}
 						onChange={handleChange}
 						name="Editable Page Name"
 						nameState={EditState.Editable}
@@ -56,6 +60,7 @@ export default (): JSX.Element => (
 				<Space size={SpaceSize.S}>
 					<PageTile
 						focused={false}
+						highlighted={false}
 						onChange={handleChange}
 						name="Editable Page Name"
 						nameState={EditState.Editable}

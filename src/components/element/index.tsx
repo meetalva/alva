@@ -18,7 +18,8 @@ export enum ElementState {
 	Editable = 'editable',
 	Active = 'active',
 	Disabled = 'disabled',
-	Highlighted = 'highlighted'
+	Highlighted = 'highlighted',
+	Focused = 'focused'
 }
 
 export interface ElementProps {
@@ -77,6 +78,8 @@ const LABEL_BACKGROUND = (props: StyledElementLabelProps): string => {
 			return Color.Blue80;
 		case ElementState.Highlighted:
 			return Color.Grey90;
+		case ElementState.Focused:
+			return Color.Yellow;
 		default:
 			return 'transparent';
 	}

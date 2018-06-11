@@ -36,6 +36,7 @@ export interface SerializedElement {
 	containerId?: string;
 	contentIds: string[];
 	dragged: boolean;
+	focused: boolean;
 	forcedOpen: boolean;
 	highlighted: boolean;
 	id: string;

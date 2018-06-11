@@ -1,0 +1,7 @@
+{
+	"name": "editable-tile",
+	"displayName": "Editable Tile",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": ["atom"]
+ }

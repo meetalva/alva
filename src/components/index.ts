@@ -5,6 +5,7 @@ export * from './colors';
 export * from './copy';
 export * from './create-select';
 export * from './element';
+export * from './editable-title';
 export * from './floating-button';
 export * from './fonts';
 export * from './global-styles';

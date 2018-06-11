@@ -1,4 +1,4 @@
-import { PageTile, Space, SpaceSize } from '../../components';
+import { PageTile } from '../../components';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
@@ -119,23 +119,21 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	public render(): JSX.Element {
 		const { props } = this;
 		return (
-			<Space size={SpaceSize.S}>
-				<PageTile
-					focused={props.focused}
-					id={props.page.getId()}
-					onBlur={e => this.handleBlur()}
-					onChange={e => this.handleChange(e)}
-					onClick={e => this.handleClick(e)}
-					onDoubleClick={e => this.handleDoubleClick(e)}
-					onFocus={e => this.handleFocus()}
-					onKeyDown={e => {
-						e.stopPropagation();
-						this.handleKeyDown(e.nativeEvent);
-					}}
-					nameState={props.page.getNameState()}
-					name={props.page.getName()}
-				/>
-			</Space>
+			<PageTile
+				focused={props.focused}
+				id={props.page.getId()}
+				onBlur={e => this.handleBlur()}
+				onChange={e => this.handleChange(e)}
+				onClick={e => this.handleClick(e)}
+				onDoubleClick={e => this.handleDoubleClick(e)}
+				onFocus={e => this.handleFocus()}
+				onKeyDown={e => {
+					e.stopPropagation();
+					this.handleKeyDown(e.nativeEvent);
+				}}
+				nameState={props.page.getNameState()}
+				name={props.page.getName()}
+			/>
 		);
 	}
 }

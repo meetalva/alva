@@ -44,22 +44,18 @@ interface StyledPageTitleProps {
 	editable: boolean;
 }
 
-const StyledPage = styled.section`
-	width: 245px;
-	text-align: center;
-`;
-
 const StyledPageTile = styled.div`
 	position: relative;
 	box-sizing: border-box;
-	width: inherit;
-	height: 340px;
+	height: 90px;
+	width: 100%;
 	border: 4px solid;
 	border-color: ${(props: StyledPageTileProps) => (props.focused ? Color.Blue40 : 'transparent')};
 	border-radius: 6px;
 	box-shadow: 0 3px 12px ${Color.BlackAlpha13};
 	background-color: ${Color.White};
 	overflow: hidden;
+	margin: ${getSpace(SpaceSize.S)}px;
 `;
 
 const StyledTitle = (props: StyledPageTitleProps): JSX.Element => {
@@ -141,25 +137,28 @@ class EditableTitle extends React.Component<EditableTitleProps> {
 }
 
 export const PageTile: React.StatelessComponent<PageTileProps> = (props): JSX.Element => (
-	<StyledPage data-id={props.id} onClick={props.onClick} onDoubleClick={props.onDoubleClick}>
-		<StyledPageTile focused={props.focused}>
-			<StyledContainer>
-				{props.nameState === EditState.Editing ? (
-					<EditableTitle
-						autoFocus
-						autoSelect
-						data-title={true}
-						focused={props.focused}
-						onBlur={props.onBlur}
-						onChange={props.onChange}
-						onFocus={props.onFocus}
-						onKeyDown={props.onKeyDown}
-						value={props.name}
-					/>
-				) : (
-					<StyledTitle editable={props.focused}>{props.name}</StyledTitle>
-				)}
-			</StyledContainer>
-		</StyledPageTile>
-	</StyledPage>
+	<StyledPageTile
+		data-id={props.id}
+		focused={props.focused}
+		onClick={props.onClick}
+		onDoubleClick={props.onDoubleClick}
+	>
+		<StyledContainer>
+			{props.nameState === EditState.Editing ? (
+				<EditableTitle
+					autoFocus
+					autoSelect
+					data-title={true}
+					focused={props.focused}
+					onBlur={props.onBlur}
+					onChange={props.onChange}
+					onFocus={props.onFocus}
+					onKeyDown={props.onKeyDown}
+					value={props.name}
+				/>
+			) : (
+				<StyledTitle editable={props.focused}>{props.name}</StyledTitle>
+			)}
+		</StyledContainer>
+	</StyledPageTile>
 );

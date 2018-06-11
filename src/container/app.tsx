@@ -19,7 +19,6 @@ import { ElementList } from './element-list';
 import { ServerMessageType } from '../message';
 import * as MobxReact from 'mobx-react';
 import { PageListContainer } from './page-list/page-list-container';
-import { PageListPreview } from './page-list/page-list-preview';
 import { PatternListContainer } from './pattern-list';
 import { PreviewPaneWrapper } from './preview-pane-wrapper';
 import { PropertyListContainer } from './property-list';
@@ -71,41 +70,52 @@ export class App extends React.Component {
 							}}
 						/>
 					)}
-					{props.store.getActiveAppView() === Types.AlvaView.Pages && (
-						<PageListPreview>
-							<PageListContainer />
-						</PageListPreview>
-					)}
 					{props.store.getActiveAppView() === Types.AlvaView.PageDetail && (
 						<React.Fragment>
 							{props.store.getShowLeftSidebar() && (
-								<Resizeable
-									handleStyles={{ right: { zIndex: 1 } }}
-									defaultSize={{ width: 240, height: '100%' }}
-									enable={{ right: true }}
-									minWidth={240}
-								>
-									<SideBar
-										side={LayoutSide.Left}
-										direction={LayoutDirection.Column}
-										border={LayoutBorder.Side}
+								<React.Fragment>
+									<Resizeable
+										handleStyles={{ right: { zIndex: 1 } }}
+										defaultSize={{ width: 140, height: '100%' }}
+										enable={{ right: true }}
+										minWidth={140}
 									>
-										<ElementPane>
-											<ElementList />
-										</ElementPane>
-
-										<Resizeable
-											handleStyles={{ top: { zIndex: 1 } }}
-											defaultSize={{ height: 500, width: '100%' }}
-											enable={{ top: true }}
-											minHeight={240}
+										<SideBar
+											side={LayoutSide.Left}
+											direction={LayoutDirection.Column}
+											border={LayoutBorder.Side}
 										>
-											<PatternsPane>
-												<PatternListContainer />
-											</PatternsPane>
-										</Resizeable>
-									</SideBar>
-								</Resizeable>
+											<PageListContainer />
+										</SideBar>
+									</Resizeable>
+									<Resizeable
+										handleStyles={{ right: { zIndex: 1 } }}
+										defaultSize={{ width: 240, height: '100%' }}
+										enable={{ right: true }}
+										minWidth={240}
+									>
+										<SideBar
+											side={LayoutSide.Left}
+											direction={LayoutDirection.Column}
+											border={LayoutBorder.Side}
+										>
+											<ElementPane>
+												<ElementList />
+											</ElementPane>
+
+											<Resizeable
+												handleStyles={{ top: { zIndex: 1 } }}
+												defaultSize={{ height: 500, width: '100%' }}
+												enable={{ top: true }}
+												minHeight={240}
+											>
+												<PatternsPane>
+													<PatternListContainer />
+												</PatternsPane>
+											</Resizeable>
+										</SideBar>
+									</Resizeable>
+								</React.Fragment>
 							)}
 							<PreviewPaneWrapper
 								isDragging={props.store.getDragging()}

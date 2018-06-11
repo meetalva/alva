@@ -4,11 +4,13 @@ import * as React from 'react';
 import { Page } from '../../model';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
-import { EditableTitle } from '../../components';
+import { EditableTitle, CopySize } from '../../components';
 
 export interface EditableTitleContainerProps {
+	fontSize?: CopySize;
 	focused: boolean;
 	page: Page;
+	secondary?: boolean;
 	value: string;
 }
 
@@ -44,9 +46,8 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 			if (target) {
 				target.focus();
 			}
-			if (this.props.focused && target.matches('[data-title]')) {
-				this.props.page.setNameState(Types.EditState.Editing);
-			}
+
+			this.props.page.setNameState(Types.EditState.Editing);
 		}
 	}
 
@@ -92,6 +93,7 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 			<EditableTitle
 				data-title={true}
 				focused={props.focused}
+				fontSize={props.fontSize}
 				onBlur={e => this.handleBlur()}
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}
@@ -102,6 +104,7 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 				}}
 				name={props.page.getName()}
 				nameState={props.page.getNameState()}
+				secondary={props.secondary}
 				value={props.page.getName()}
 			/>
 		);

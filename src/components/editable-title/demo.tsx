@@ -10,8 +10,6 @@ export default (): JSX.Element => (
 		<Space size={[SpaceSize.L, SpaceSize.XXXL]}>
 			<Headline order={2}>Editable Title</Headline>
 			<EditableTitle
-				autoFocus
-				autoSelect
 				focused={true}
 				name="Well crafted title"
 				nameState={EditState.Editable}

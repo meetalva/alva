@@ -1,3 +1,4 @@
+export * from './add-page';
 export * from './bug-report';
 export * from './button';
 export * from './chrome';
@@ -5,7 +6,6 @@ export * from './colors';
 export * from './copy';
 export * from './create-select';
 export * from './element';
-export * from './floating-button';
 export * from './fonts';
 export * from './global-styles';
 export * from './headline';

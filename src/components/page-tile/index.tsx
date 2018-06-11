@@ -46,7 +46,7 @@ interface StyledPageTitleProps {
 const StyledPageTile = styled.div`
 	position: relative;
 	box-sizing: border-box;
-	height: 90px;
+	height: 72px;
 	width: 100%;
 	border: 3px solid;
 	border-color: ${(props: StyledPageTileProps) => (props.focused ? Color.Blue40 : 'transparent')};
@@ -55,7 +55,7 @@ const StyledPageTile = styled.div`
 	background-color: ${Color.White};
 	overflow: hidden;
 	margin: ${getSpace(SpaceSize.S)}px;
-	margin-bottom: 0;
+	margin-top: 0;
 	font-size: 15px;
 	display: flex;
 	align-items: center;
@@ -83,6 +83,7 @@ const StyledTitle = (props: StyledPageTitleProps): JSX.Element => {
 		text-overflow: ellipsis;
 		padding: 0;
 		color: inherit;
+		user-select: none;
 	`;
 	return <Strong data-title={true}>{props.children}</Strong>;
 };

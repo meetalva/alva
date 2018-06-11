@@ -12,13 +12,17 @@ export interface ViewEditableTitleProps {
 	fontSize?: CopySize;
 	nameState: EditState;
 	title: string;
-	value: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
-	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 	onFocus?: React.FocusEventHandler<HTMLInputElement>;
 	onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+}
+
+interface ViewEditableInputProps {
+	autofocus: boolean;
+	fontSize?: CopySize;
+	justify?: 'start' | 'center' | 'end' | 'stretch';
 }
 
 export interface ViewSwitchProps {
@@ -107,9 +111,13 @@ const StyledIcons = styled(Icon)`
 `;
 
 const StyledInput = styled.input`
+	width: 130px;
+	padding: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
 	border: 0;
-	/* text-align: center; */
-	font-size: ${(props: StyledViewSwitchProps) =>
+	margin: 0;
+	background-color: ${Color.White};
+	text-align: center;
+	font-size: ${(props: ViewEditableInputProps) =>
 		props.fontSize ? `${props.fontSize}px` : `${CopySize.S}px`};
 `;
 
@@ -117,12 +125,13 @@ export const ViewEditableTitle: React.SFC<ViewEditableTitleProps> = (props): JSX
 	<StyledViewSwitch fontSize={props.fontSize} onClick={props.onClick}>
 		{props.nameState === EditState.Editing ? (
 			<StyledInput
+				autofocus
+				fontSize={props.fontSize}
 				onBlur={props.onBlur}
 				onChange={props.onChange}
 				onFocus={props.onFocus}
 				onKeyDown={props.onKeyDown}
-				type="text"
-				value={props.value}
+				value={props.title}
 			/>
 		) : (
 			<StyledTitle>{props.title}</StyledTitle>

@@ -5,7 +5,8 @@ import {
 	CopySize,
 	ViewTitle,
 	ViewSwitch,
-	ViewEditableTitle
+	ViewEditableTitle,
+	EditState
 } from '../../components';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
@@ -17,7 +18,7 @@ import { ViewStore } from '../../store';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
-interface InjectedChromeContainerProps {
+export interface InjectedChromeContainerProps {
 	page: Page;
 	store: ViewStore;
 }
@@ -36,6 +37,42 @@ export const ChromeContainer = MobxReact.inject('store')(
 		if (!page) {
 			return null;
 		}
+
+		const handleClick = (e: React.MouseEvent<HTMLElement>): void => {
+			if (page.getNameState() === EditState.Editable) {
+				page.setNameState(Types.EditState.Editing);
+			}
+		};
+
+		const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+			page.setName(e.target.value);
+		};
+
+		const handleBlur = (e: React.ChangeEvent<HTMLInputElement>): void => {
+			if (page.getNameState() === EditState.Editing) {
+				page.setNameState(Types.EditState.Editable);
+			}
+		};
+
+		const handleKeyDown = (e: React.KeyboardEvent<{}>): void => {
+			switch (e.key) {
+				case 'Escape':
+					page.setNameState(Types.EditState.Editable);
+					page.setName(page.getName({ unedited: true }));
+					break;
+				case 'Enter':
+					if (page.getNameState() === EditState.Editing) {
+						if (!page.getName()) {
+							page.setName(page.getName({ unedited: true }));
+						}
+						page.setNameState(Types.EditState.Editable);
+						page.setName(page.getEditedName());
+						store.commit();
+					} else {
+						return;
+					}
+			}
+		};
 
 		const index = project.getPageIndex(page);
 		const pages = project.getPages();
@@ -83,6 +120,10 @@ export const ChromeContainer = MobxReact.inject('store')(
 						<ViewEditableTitle
 							fontSize={CopySize.M}
 							nameState={page.getNameState()}
+							onBlur={handleBlur}
+							onClick={handleClick}
+							onChange={handleChange}
+							onKeyDown={handleKeyDown}
 							title={page ? page.getName() : ''}
 						/>
 					</ViewSwitch>

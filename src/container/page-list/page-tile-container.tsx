@@ -64,22 +64,6 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		}
 	}
 
-	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
-		if (this.props.page.getNameState() === Types.EditState.Editing) {
-			return;
-		}
-
-		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
-
-		const next =
-			store.getActiveAppView() === Types.AlvaView.Pages
-				? Types.AlvaView.PageDetail
-				: Types.AlvaView.Pages;
-
-		store.setActivePage(this.props.page);
-		store.setActiveAppView(next);
-	}
-
 	protected handleFocus(): void {
 		this.props.page.setNameState(Types.EditState.Editing);
 	}
@@ -125,7 +109,6 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 				onBlur={e => this.handleBlur()}
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}
-				onDoubleClick={e => this.handleDoubleClick(e)}
 				onFocus={e => this.handleFocus()}
 				onKeyDown={e => {
 					e.stopPropagation();

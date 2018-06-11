@@ -1,4 +1,4 @@
-import { PreviewTile, Space, SpaceSize } from '../../components';
+import { PageTile, Space, SpaceSize } from '../../components';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
@@ -120,7 +120,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		const { props } = this;
 		return (
 			<Space size={SpaceSize.S}>
-				<PreviewTile
+				<PageTile
 					focused={props.focused}
 					id={props.page.getId()}
 					onBlur={e => this.handleBlur()}

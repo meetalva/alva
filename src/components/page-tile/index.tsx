@@ -9,7 +9,7 @@ export enum EditState {
 	Editing = 'Editing'
 }
 
-export interface PreviewTileProps {
+export interface PageTileProps {
 	focused: boolean;
 	id?: string;
 	name: string;
@@ -35,35 +35,34 @@ interface EditableTitleProps {
 	value: string;
 }
 
-interface StyledPreviewTileProps {
+interface StyledPageTileProps {
 	focused: boolean;
 }
 
-interface StyledPreviewTitleProps {
+interface StyledPageTitleProps {
 	children: React.ReactNode;
 	editable: boolean;
 }
 
-const StyledPreview = styled.section`
+const StyledPage = styled.section`
 	width: 245px;
 	text-align: center;
 `;
 
-const StyledPreviewTile = styled.div`
+const StyledPageTile = styled.div`
 	position: relative;
 	box-sizing: border-box;
 	width: inherit;
 	height: 340px;
 	border: 4px solid;
-	border-color: ${(props: StyledPreviewTileProps) =>
-		props.focused ? Color.Blue40 : 'transparent'};
+	border-color: ${(props: StyledPageTileProps) => (props.focused ? Color.Blue40 : 'transparent')};
 	border-radius: 6px;
 	box-shadow: 0 3px 12px ${Color.BlackAlpha13};
 	background-color: ${Color.White};
 	overflow: hidden;
 `;
 
-const StyledTitle = (props: StyledPreviewTitleProps): JSX.Element => {
+const StyledTitle = (props: StyledPageTitleProps): JSX.Element => {
 	const Strong = styled.strong`
 		display: inline-block;
 		width: 100%;
@@ -141,9 +140,9 @@ class EditableTitle extends React.Component<EditableTitleProps> {
 	}
 }
 
-export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): JSX.Element => (
-	<StyledPreview data-id={props.id} onClick={props.onClick} onDoubleClick={props.onDoubleClick}>
-		<StyledPreviewTile focused={props.focused}>
+export const PageTile: React.StatelessComponent<PageTileProps> = (props): JSX.Element => (
+	<StyledPage data-id={props.id} onClick={props.onClick} onDoubleClick={props.onDoubleClick}>
+		<StyledPageTile focused={props.focused}>
 			<StyledContainer>
 				{props.nameState === EditState.Editing ? (
 					<EditableTitle
@@ -161,6 +160,6 @@ export const PreviewTile: React.StatelessComponent<PreviewTileProps> = (props): 
 					<StyledTitle editable={props.focused}>{props.name}</StyledTitle>
 				)}
 			</StyledContainer>
-		</StyledPreviewTile>
-	</StyledPreview>
+		</StyledPageTile>
+	</StyledPage>
 );

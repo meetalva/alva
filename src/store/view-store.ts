@@ -518,10 +518,6 @@ export class ViewStore {
 		return this.app.getActiveView();
 	}
 
-	public getActiveAppFocus(): Types.AppFocus {
-		return this.app.getActiveFocus();
-	}
-
 	public getAppState(): Types.AppState {
 		return this.app.getState();
 	}
@@ -593,6 +589,23 @@ export class ViewStore {
 		}
 
 		return this.project.getElements().find(element => element.getHighlighted());
+	}
+
+	public getFocusedElement(): Model.Element | Model.Page | undefined {
+		if (!this.project) {
+			return;
+		}
+
+		const findInElement = this.project.getElements().find(element => element.getFocused());
+		const findInPage = this.project.getPages().find(page => page.getFocused());
+
+		if (findInElement) {
+			return findInElement;
+		} else if (findInPage) {
+			return findInPage;
+		} else {
+			return undefined;
+		}
 	}
 
 	public getMetaDown(): boolean {
@@ -883,11 +896,6 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public setActiveAppFocus(appView: Types.AppFocus): void {
-		this.app.setAppFocus(appView);
-	}
-
-	@Mobx.action
 	public setActivePage(page: Model.Page): void {
 		if (!this.project) {
 			return;
@@ -895,9 +903,9 @@ export class ViewStore {
 
 		this.unsetActivePage();
 		page.setActive(true);
+		this.setFocusedElement(page);
 
 		this.unsetSelectedElement();
-		this.setActiveAppFocus(Types.AppFocus.Page);
 	}
 
 	@Mobx.action
@@ -975,6 +983,17 @@ export class ViewStore {
 	}
 
 	@Mobx.action
+	public setFocusedElement(highlightedElement: Model.Element | Model.Page): void {
+		const previousHighlightedElement = this.getFocusedElement();
+
+		if (previousHighlightedElement) {
+			previousHighlightedElement.setFocused(false);
+		}
+
+		highlightedElement.setFocused(true);
+	}
+
+	@Mobx.action
 	public setMetaDown(metaDown: boolean): void {
 		this.metaDown = metaDown;
 	}
@@ -1029,12 +1048,11 @@ export class ViewStore {
 		}
 
 		selectedElement.setSelected(true);
+		this.setFocusedElement(selectedElement);
 
 		selectedElement.getAncestors().forEach(ancestor => {
 			ancestor.setForcedOpen(true);
 		});
-
-		this.setActiveAppFocus(Types.AppFocus.Element);
 	}
 
 	@Mobx.action

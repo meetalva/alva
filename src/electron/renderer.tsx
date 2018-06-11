@@ -6,6 +6,7 @@ import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import { AlvaApp, EditHistory, PatternLibrary, Project } from '../model';
+import * as Model from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
@@ -103,8 +104,8 @@ Sender.receive(message => {
 				return;
 			}
 
-			store.setActiveAppFocus(Types.AppFocus.Page);
 			store.setActivePage(page);
+			store.setFocusedElement(page);
 			page.setNameState(Types.EditState.Editing);
 
 			break;
@@ -144,7 +145,6 @@ Sender.receive(message => {
 		case ServerMessageType.SelectElement: {
 			const element = store.getElementById(message.payload.id);
 			if (element) {
-				store.setActiveAppFocus(Types.AppFocus.Element);
 				store.setSelectedElement(element);
 			}
 			break;
@@ -203,13 +203,13 @@ Sender.receive(message => {
 		case ServerMessageType.Delete: {
 			if (
 				app.getActiveView() === Types.AlvaView.PageDetail &&
-				app.getActiveFocus() === Types.AppFocus.Page
+				store.getFocusedElement() instanceof Model.Page
 			) {
 				store.executePageRemoveSelected();
 			}
 			if (
 				app.getActiveView() === Types.AlvaView.PageDetail &&
-				app.getActiveFocus() === Types.AppFocus.Element
+				store.getFocusedElement() instanceof Model.Element
 			) {
 				store.executeElementRemoveSelected();
 			}

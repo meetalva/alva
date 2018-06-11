@@ -9,7 +9,6 @@ export interface AlvaAppInit {
 
 export class AlvaApp {
 	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
-	@Mobx.observable private activeFocus: Types.AppFocus = Types.AppFocus.Page;
 	@Mobx.observable private searchTerm: string = '';
 	@Mobx.observable private state: Types.AppState = Types.AppState.Starting;
 
@@ -33,10 +32,6 @@ export class AlvaApp {
 		return this.activeView;
 	}
 
-	public getActiveFocus(): Types.AppFocus {
-		return this.activeFocus;
-	}
-
 	public getSearchTerm(): string {
 		return this.searchTerm;
 	}
@@ -48,11 +43,6 @@ export class AlvaApp {
 	@Mobx.action
 	public setActiveView(view: Types.AlvaView): void {
 		this.activeView = view;
-	}
-
-	@Mobx.action
-	public setAppFocus(focus: Types.AppFocus): void {
-		this.activeFocus = focus;
 	}
 
 	@Mobx.action

@@ -123,11 +123,6 @@ export interface SerializedPatternSlot {
 	type: string;
 }
 
-export enum AppFocus {
-	Page = 'Page',
-	Element = 'Element'
-}
-
 export enum AlvaView {
 	PageDetail = 'PageDetail',
 	SplashScreen = 'SplashScreen'

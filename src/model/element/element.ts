@@ -39,6 +39,8 @@ export class Element {
 
 	@Mobx.observable private editedName: string;
 
+	@Mobx.observable private focused: boolean;
+
 	@Mobx.observable private forcedOpen: boolean;
 
 	@Mobx.observable private highlighted: boolean;
@@ -313,6 +315,10 @@ export class Element {
 		return this.highlighted;
 	}
 
+	public getFocused(): boolean {
+		return this.focused;
+	}
+
 	public getId(): string {
 		return this.id;
 	}
@@ -423,6 +429,11 @@ export class Element {
 	@Mobx.action
 	public setHighlighted(highlighted: boolean): void {
 		this.highlighted = highlighted;
+	}
+
+	@Mobx.action
+	public setFocused(focused: boolean): void {
+		this.focused = focused;
 	}
 
 	@Mobx.action

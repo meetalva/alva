@@ -27,7 +27,8 @@ export const PageListContainer: React.StatelessComponent = MobxReact.inject('sto
 					.getPages()
 					.map((page, i) => (
 						<PageTileContainer
-							focused={page.getId() === currentPageId}
+							highlight={page.getId() === currentPageId}
+							focus={page === store.getFocusedItem()}
 							key={page.getId()}
 							page={page}
 						/>

@@ -518,6 +518,10 @@ export class ViewStore {
 		return this.app.getActiveView();
 	}
 
+	public getActiveAppFocus(): Types.AppFocus {
+		return this.app.getActiveFocus();
+	}
+
 	public getAppState(): Types.AppState {
 		return this.app.getState();
 	}
@@ -879,6 +883,11 @@ export class ViewStore {
 	}
 
 	@Mobx.action
+	public setActiveAppFocus(appView: Types.AppFocus): void {
+		this.app.setAppFocus(appView);
+	}
+
+	@Mobx.action
 	public setActivePage(page: Model.Page): void {
 		if (!this.project) {
 			return;
@@ -886,6 +895,9 @@ export class ViewStore {
 
 		this.unsetActivePage();
 		page.setActive(true);
+
+		this.unsetSelectedElement();
+		this.setActiveAppFocus(Types.AppFocus.Page);
 	}
 
 	@Mobx.action
@@ -1021,6 +1033,8 @@ export class ViewStore {
 		selectedElement.getAncestors().forEach(ancestor => {
 			ancestor.setForcedOpen(true);
 		});
+
+		this.setActiveAppFocus(Types.AppFocus.Element);
 	}
 
 	@Mobx.action

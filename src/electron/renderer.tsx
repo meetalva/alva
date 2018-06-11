@@ -105,6 +105,7 @@ Sender.receive(message => {
 				return;
 			}
 
+			store.setActiveAppFocus(Types.AppFocus.Page);
 			store.setActivePage(page);
 			page.setNameState(Types.EditState.Editing);
 
@@ -145,6 +146,7 @@ Sender.receive(message => {
 		case ServerMessageType.SelectElement: {
 			const element = store.getElementById(message.payload.id);
 			if (element) {
+				store.setActiveAppFocus(Types.AppFocus.Element);
 				store.setSelectedElement(element);
 			}
 			break;
@@ -201,10 +203,16 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Delete: {
-			/*if (app.getActiveView() === Types.AlvaView.Pages) {
+			if (
+				app.getActiveView() === Types.AlvaView.PageDetail &&
+				app.getActiveFocus() === Types.AppFocus.Page
+			) {
 				store.executePageRemoveSelected();
-			}*/
-			if (app.getActiveView() === Types.AlvaView.PageDetail) {
+			}
+			if (
+				app.getActiveView() === Types.AlvaView.PageDetail &&
+				app.getActiveFocus() === Types.AppFocus.Element
+			) {
 				store.executeElementRemoveSelected();
 			}
 			break;

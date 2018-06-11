@@ -55,9 +55,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 
 		const target = e.target as HTMLElement;
 
-		if (!this.props.focused) {
-			store.setActivePage(this.props.page);
-		}
+		store.setActivePage(this.props.page);
 
 		if (this.props.focused && target.matches('[data-title]')) {
 			this.props.page.setNameState(Types.EditState.Editing);

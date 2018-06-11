@@ -133,7 +133,7 @@ export enum AlvaView {
 	SplashScreen = 'SplashScreen'
 }
 
-export type SerializedAlvaView = 'Pages' | 'PageDetail' | 'SplashScreen';
+export type SerializedAlvaView = 'PageDetail' | 'SplashScreen';
 
 export enum EditState {
 	Editable = 'Editable',

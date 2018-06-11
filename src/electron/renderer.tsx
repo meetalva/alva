@@ -57,9 +57,7 @@ Sender.receive(message => {
 			newProject.setPath(message.payload.path);
 			store.setProject(newProject);
 
-			const view = Types.AlvaView.PageDetail;
-
-			app.setActiveView(view);
+			app.setActiveView(Types.AlvaView.PageDetail);
 
 			const patternLibrary = newProject.getPatternLibrary();
 

@@ -824,14 +824,14 @@ export class ViewStore {
 	@Mobx.action
 	public removePage(page: Model.Page): void {
 		const index = this.project.getPageIndex(page);
+		const last = this.project.getPages().slice(-1)[0];
+		const lastID = this.project.getPageIndex(last);
+		console.log(lastID);
 
-		if (index === 0) {
-			this.unsetActivePage();
-		} else {
+		if (lastID !== 0) {
 			this.setActivePageByIndex(index - 1);
+			this.project.removePage(page);
 		}
-
-		this.project.removePage(page);
 	}
 
 	@Mobx.action

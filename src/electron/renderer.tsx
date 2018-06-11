@@ -6,10 +6,9 @@ import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import { AlvaApp, EditHistory, PatternLibrary, Project } from '../model';
-import * as Model from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { ViewStore } from '../store';
+import { FocusedItemType, ViewStore } from '../store';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
@@ -105,7 +104,6 @@ Sender.receive(message => {
 			}
 
 			store.setActivePage(page);
-			store.setFocusedElement(page);
 			page.setNameState(Types.EditState.Editing);
 
 			break;
@@ -203,13 +201,14 @@ Sender.receive(message => {
 		case ServerMessageType.Delete: {
 			if (
 				app.getActiveView() === Types.AlvaView.PageDetail &&
-				store.getFocusedElement() instanceof Model.Page
+				store.getFocusedItemType() === FocusedItemType.Page
 			) {
 				store.executePageRemoveSelected();
 			}
+
 			if (
 				app.getActiveView() === Types.AlvaView.PageDetail &&
-				store.getFocusedElement() instanceof Model.Element
+				store.getFocusedItemType() === FocusedItemType.Element
 			) {
 				store.executeElementRemoveSelected();
 			}

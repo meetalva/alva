@@ -29,6 +29,11 @@ export interface ClipboardElement {
 	type: ClipBoardType.Element;
 }
 
+export enum FocusedItemType {
+	Page,
+	Element
+}
+
 /**
  * The central entry-point for all view-related application state, managed by MobX.
  * Use this object and its properties in your React components,
@@ -45,6 +50,8 @@ export class ViewStore {
 	@Mobx.observable private clipboardItem?: ClipBoardItem;
 
 	private editHistory: Model.EditHistory;
+
+	@Mobx.observable private focusedItemType: FocusedItemType;
 
 	@Mobx.observable private metaDown: boolean = false;
 
@@ -591,21 +598,22 @@ export class ViewStore {
 		return this.project.getElements().find(element => element.getHighlighted());
 	}
 
-	public getFocusedElement(): Model.Element | Model.Page | undefined {
+	public getFocusedItem(): Model.Element | Model.Page | undefined {
 		if (!this.project) {
 			return;
 		}
 
-		const findInElement = this.project.getElements().find(element => element.getFocused());
-		const findInPage = this.project.getPages().find(page => page.getFocused());
-
-		if (findInElement) {
-			return findInElement;
-		} else if (findInPage) {
-			return findInPage;
+		if (this.focusedItemType === FocusedItemType.Element) {
+			return this.project.getElements().find(element => element.getFocused());
+		} else if (this.focusedItemType === FocusedItemType.Page) {
+			return this.project.getPages().find(page => page.getFocused());
 		} else {
 			return undefined;
 		}
+	}
+
+	public getFocusedItemType(): FocusedItemType {
+		return this.focusedItemType;
 	}
 
 	public getMetaDown(): boolean {
@@ -837,12 +845,14 @@ export class ViewStore {
 	@Mobx.action
 	public removePage(page: Model.Page): void {
 		const index = this.project.getPageIndex(page);
-		const last = this.project.getPages().slice(-1)[0];
-		const lastID = this.project.getPageIndex(last);
-		console.log(lastID);
 
-		if (lastID !== 0) {
-			this.setActivePageByIndex(index - 1);
+		if (this.project.getPages().length > 1) {
+			if (index !== 0) {
+				this.setActivePageByIndex(index - 1);
+			} else {
+				this.setActivePageByIndex(index + 1);
+			}
+
 			this.project.removePage(page);
 		}
 	}
@@ -903,7 +913,7 @@ export class ViewStore {
 
 		this.unsetActivePage();
 		page.setActive(true);
-		this.setFocusedElement(page);
+		this.setFocusedItem(FocusedItemType.Page, page);
 
 		this.unsetSelectedElement();
 	}
@@ -983,14 +993,14 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public setFocusedElement(highlightedElement: Model.Element | Model.Page): void {
-		const previousHighlightedElement = this.getFocusedElement();
+	public setFocusedItem(type: FocusedItemType, payload: Model.Element | Model.Page): void {
+		const previousFocusItem = this.getFocusedItem();
 
-		if (previousHighlightedElement) {
-			previousHighlightedElement.setFocused(false);
+		if (previousFocusItem) {
+			previousFocusItem.setFocused(false);
 		}
-
-		highlightedElement.setFocused(true);
+		this.focusedItemType = type;
+		payload.setFocused(true);
 	}
 
 	@Mobx.action
@@ -1048,7 +1058,7 @@ export class ViewStore {
 		}
 
 		selectedElement.setSelected(true);
-		this.setFocusedElement(selectedElement);
+		this.setFocusedItem(FocusedItemType.Element, selectedElement);
 
 		selectedElement.getAncestors().forEach(ancestor => {
 			ancestor.setForcedOpen(true);

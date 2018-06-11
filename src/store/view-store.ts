@@ -680,9 +680,9 @@ export class ViewStore {
 			return this.hasClipboardItem(ClipBoardType.Element);
 		}
 
-		if (view === Types.AlvaView.Pages) {
+		/*if (view === Types.AlvaView.Pages) {
 			return this.hasClipboardItem(ClipBoardType.Element);
-		}
+		}*/
 
 		return false;
 	}
@@ -823,7 +823,6 @@ export class ViewStore {
 
 		if (index === 0) {
 			this.unsetActivePage();
-			this.setActiveAppView(Types.AlvaView.Pages);
 		} else {
 			this.setActivePageByIndex(index - 1);
 		}

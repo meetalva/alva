@@ -57,8 +57,7 @@ Sender.receive(message => {
 			newProject.setPath(message.payload.path);
 			store.setProject(newProject);
 
-			const view =
-				newProject.getPages().length === 0 ? Types.AlvaView.Pages : Types.AlvaView.PageDetail;
+			const view = Types.AlvaView.PageDetail;
 
 			app.setActiveView(view);
 
@@ -107,10 +106,8 @@ Sender.receive(message => {
 			}
 
 			store.setActivePage(page);
+			page.setNameState(Types.EditState.Editing);
 
-			if (app.getActiveView() === Types.AlvaView.Pages) {
-				page.setNameState(Types.EditState.Editing);
-			}
 			break;
 		}
 		case ServerMessageType.ConnectPatternLibraryResponse: {
@@ -190,10 +187,10 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Cut: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			/*if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.cutSelectedPage();
-			}
+			}*/
 			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.executeElementCutSelected();
 			}
@@ -204,9 +201,9 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Delete: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			/*if (app.getActiveView() === Types.AlvaView.Pages) {
 				store.executePageRemoveSelected();
-			}
+			}*/
 			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.executeElementRemoveSelected();
 			}
@@ -217,10 +214,10 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Copy: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			/*if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.copySelectedPage();
-			}
+			}*/
 			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.copySelectedElement();
 			}
@@ -231,10 +228,10 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Paste: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			/*if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.pasteAfterSelectedPage();
-			}
+			}*/
 			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.executeElementPasteAfterSelected();
 			}

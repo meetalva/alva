@@ -1,5 +1,5 @@
 import * as AlvaUtil from '../../alva-util';
-import { BugReport, Chrome, CopySize, ViewSwitch, ViewTitle } from '../../components';
+import { BugReport, Chrome, CopySize, ViewSwitch } from '../../components';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { OverviewSwitchContainer } from './overview-switch-container';
@@ -72,13 +72,6 @@ export const ChromeContainer = MobxReact.inject('store')(
 						onLeftClick={previous}
 						onRightClick={next}
 						title={page ? page.getName() : ''}
-					/>
-				)}
-				{store.getActiveAppView() === Types.AlvaView.Pages && (
-					<ViewTitle
-						fontSize={CopySize.M}
-						justify="center"
-						title={project ? project.getName() : 'Alva'}
 					/>
 				)}
 				<BugReport

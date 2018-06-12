@@ -47,6 +47,7 @@ interface StyledIconProps {
 
 interface LabelContentProps {
 	active: boolean;
+	editable?: boolean;
 }
 
 export interface StyledElementChildProps {
@@ -180,7 +181,7 @@ const LabelContent = styled.div`
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	width: 100%;
-	cursor: ${(props: LabelContentProps) => (props.active ? 'text' : 'default')};
+	cursor: ${(props: LabelContentProps) => (props.active && props.editable ? 'text' : 'default')};
 `;
 
 const StyledSeamlessInput = styled.input`
@@ -258,6 +259,7 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 			) : (
 				<LabelContent
 					active={props.state === ElementState.Active}
+					editable={props.editable}
 					{...{ [ElementAnchors.label]: true }}
 				>
 					{props.title}

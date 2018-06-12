@@ -15,6 +15,16 @@ export class OverviewSwitchContainer extends React.Component {
 			return null;
 		}
 
-		return <ViewButton title={'Pages'} />;
+		const title = store.getShowPages() ? 'Hide Pages' : 'Show Pages';
+
+		const next = store.getShowPages() ? false : true;
+
+		return (
+			<ViewButton
+				title={title}
+				onClick={() => store.setShowPages(next)}
+				rotateIcon={!store.getShowPages()}
+			/>
+		);
 	}
 }

@@ -72,50 +72,50 @@ export class App extends React.Component {
 					)}
 					{props.store.getActiveAppView() === Types.AlvaView.PageDetail && (
 						<React.Fragment>
+							{props.store.getShowPages() && (
+								<Resizeable
+									handleStyles={{ right: { zIndex: 1 } }}
+									defaultSize={{ width: 140, height: '100%' }}
+									enable={{ right: true }}
+									minWidth={140}
+								>
+									<SideBar
+										side={LayoutSide.Left}
+										direction={LayoutDirection.Column}
+										border={LayoutBorder.Side}
+									>
+										<PageListContainer />
+									</SideBar>
+								</Resizeable>
+							)}
 							{props.store.getShowLeftSidebar() && (
-								<React.Fragment>
-									<Resizeable
-										handleStyles={{ right: { zIndex: 1 } }}
-										defaultSize={{ width: 140, height: '100%' }}
-										enable={{ right: true }}
-										minWidth={140}
+								<Resizeable
+									handleStyles={{ right: { zIndex: 1 } }}
+									defaultSize={{ width: 240, height: '100%' }}
+									enable={{ right: true }}
+									minWidth={240}
+								>
+									<SideBar
+										side={LayoutSide.Left}
+										direction={LayoutDirection.Column}
+										border={LayoutBorder.Side}
 									>
-										<SideBar
-											side={LayoutSide.Left}
-											direction={LayoutDirection.Column}
-											border={LayoutBorder.Side}
-										>
-											<PageListContainer />
-										</SideBar>
-									</Resizeable>
-									<Resizeable
-										handleStyles={{ right: { zIndex: 1 } }}
-										defaultSize={{ width: 240, height: '100%' }}
-										enable={{ right: true }}
-										minWidth={240}
-									>
-										<SideBar
-											side={LayoutSide.Left}
-											direction={LayoutDirection.Column}
-											border={LayoutBorder.Side}
-										>
-											<ElementPane>
-												<ElementList />
-											</ElementPane>
+										<ElementPane>
+											<ElementList />
+										</ElementPane>
 
-											<Resizeable
-												handleStyles={{ top: { zIndex: 1 } }}
-												defaultSize={{ height: 500, width: '100%' }}
-												enable={{ top: true }}
-												minHeight={240}
-											>
-												<PatternsPane>
-													<PatternListContainer />
-												</PatternsPane>
-											</Resizeable>
-										</SideBar>
-									</Resizeable>
-								</React.Fragment>
+										<Resizeable
+											handleStyles={{ top: { zIndex: 1 } }}
+											defaultSize={{ height: 500, width: '100%' }}
+											enable={{ top: true }}
+											minHeight={240}
+										>
+											<PatternsPane>
+												<PatternListContainer />
+											</PatternsPane>
+										</Resizeable>
+									</SideBar>
+								</Resizeable>
 							)}
 							<PreviewPaneWrapper
 								isDragging={props.store.getDragging()}

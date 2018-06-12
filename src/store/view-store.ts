@@ -61,6 +61,8 @@ export class ViewStore {
 
 	@Mobx.observable private showLeftSidebar: boolean = true;
 
+	@Mobx.observable private showPages: boolean = true;
+
 	@Mobx.observable private showRightSidebar: boolean = true;
 
 	@Mobx.observable private serverPort: number;
@@ -898,6 +900,14 @@ export class ViewStore {
 
 	public setShowRightSidebar(show: boolean): void {
 		this.showRightSidebar = show;
+	}
+
+	public getShowPages(): boolean {
+		return this.showPages;
+	}
+
+	public setShowPages(show: boolean): void {
+		this.showPages = show;
 	}
 
 	@Mobx.action

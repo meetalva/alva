@@ -78,8 +78,6 @@ const LABEL_BACKGROUND = (props: StyledElementLabelProps): string => {
 			return Color.Blue80;
 		case ElementState.Highlighted:
 			return Color.Grey90;
-		case ElementState.Focused:
-			return Color.Yellow;
 		default:
 			return 'transparent';
 	}

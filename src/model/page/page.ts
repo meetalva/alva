@@ -100,6 +100,7 @@ export class Page {
 				dragged: false,
 				open: true,
 				forcedOpen: false,
+				focused: false,
 				patternId: rootPattern.getId(),
 				placeholderHighlighted: false,
 				properties: [],

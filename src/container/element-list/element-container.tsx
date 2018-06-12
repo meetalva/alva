@@ -30,6 +30,7 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 			<Components.Element
 				draggable={true}
 				dragging={store.getDragging()}
+				editable={props.element.getRole() === ElementRole.Root ? false : true}
 				id={props.element.getId()}
 				mayOpen={
 					props.element.acceptsChildren() && props.element.getRole() !== ElementRole.Root
@@ -38,7 +39,7 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 				onChange={AlvaUtil.noop}
 				placeholderHighlighted={props.element.getPlaceholderHighlighted()}
 				state={getState(props.element, store)}
-				title={props.element.getName()}
+				title={props.element.getRole() === ElementRole.Root ? 'Page' : props.element.getName()}
 			>
 				{open
 					? props.element

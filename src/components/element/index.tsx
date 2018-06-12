@@ -26,6 +26,7 @@ export interface ElementProps {
 	children?: React.ReactNode;
 	draggable: boolean;
 	dragging: boolean;
+	editable?: boolean;
 	id: string;
 	mayOpen: boolean;
 	onChange: React.FormEventHandler<HTMLInputElement>;
@@ -246,7 +247,7 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 					active={props.state === ElementState.Active}
 				/>
 			)}
-			{props.state === ElementState.Editable ? (
+			{props.state === ElementState.Editable && props.editable ? (
 				<SeamlessInput
 					{...{ [ElementAnchors.label]: true }}
 					value={props.title}

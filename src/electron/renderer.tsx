@@ -6,6 +6,7 @@ import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import { AlvaApp, EditHistory, PatternLibrary, Project } from '../model';
+import * as Path from 'path';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
@@ -75,10 +76,12 @@ Sender.receive(message => {
 						type: ServerMessageType.CheckLibraryRequest
 					});
 				}
-			} catch {
+			} catch (err) {
 				Sender.send({
 					id: uuid.v4(),
-					payload: message.payload.path,
+					payload: `Sorry, we had trouble opening the file "${Path.basename(
+						message.payload.path
+					)}".\n Parsing the project failed with: ${err.message}`,
 					type: ServerMessageType.ShowError
 				});
 			}

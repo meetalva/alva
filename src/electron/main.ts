@@ -20,6 +20,8 @@ import * as Util from 'util';
 import * as uuid from 'uuid';
 
 const ElectronStore = require('electron-store');
+const log = require('electron-log');
+const URLSearchParams = require('url-search-params');
 
 const APP_ENTRY = require.resolve('./renderer');
 
@@ -43,17 +45,46 @@ const showSaveDialog = (options: Electron.SaveDialogOptions): Promise<string | u
 const readFile = Util.promisify(Fs.readFile);
 const writeFile = Util.promisify(Fs.writeFile);
 
-const showError = (path: string) => {
-	const filename = path.substring(path.lastIndexOf('/') + 1);
+const readProjectOrError = async <T>(path: string): Promise<Types.SavedProject | undefined> => {
+	const result = await Persistence.read<Types.SavedProject>(path);
+
+	if (result.state === PersistenceState.Error) {
+		result.error.message = [
+			`Sorry, we had trouble opening the file "${Path.basename(path)}".`,
+			result.error.message
+		].join('\n');
+		showError(result.error);
+		return;
+	}
+
+	return result.contents;
+};
+
+const showError = (error: Error) => {
+	const params = new URLSearchParams();
+	params.set('title', 'New bug report');
+	params.set(
+		'body',
+		`Hey there, I just encountered the following error with Alva ${app.getVersion()}:\n\n\`\`\`\n${
+			error.message
+		}\n\`\`\``
+	);
+	params.append('labels', 'type: bug');
+
+	const url = `https://github.com/meetalva/alva/issues/new?${params}`;
+	const lines = error.message.split('\n');
+
 	dialog.showMessageBox(
 		BrowserWindow.getFocusedWindow(),
 		{
-			message: `Sorry, we had trouble opening the file "${filename}".`,
+			type: 'error',
+			message: lines[0],
+			detail: lines.slice(1).join('\n'),
 			buttons: ['OK', 'Report a bug']
 		},
 		response => {
 			if (response === 1) {
-				shell.openExternal('https://github.com/meetalva/alva/labels/type%3A%20bug');
+				shell.openExternal(url);
 			}
 		}
 	);
@@ -104,20 +135,19 @@ const userStore = new ElectronStore();
 				// (1) last known file automatically in development
 				// (2) file passed to electron main process
 				if (((electronIsDev && projectPath) || openedFile) && pathToOpen) {
-					const result = await Persistence.read<Types.SavedProject>(pathToOpen);
+					const project = (await readProjectOrError(pathToOpen)) as Types.SerializedProject;
 
-					if (result.state === PersistenceState.Error) {
-						await showError(pathToOpen);
-					} else {
-						const contents = result.contents as Types.SerializedProject;
-						contents.path = pathToOpen;
-
-						send({
-							type: ServerMessageType.OpenFileResponse,
-							id: message.id,
-							payload: { path: pathToOpen, contents }
-						});
+					if (!project) {
+						return;
 					}
+
+					project.path = pathToOpen;
+
+					send({
+						type: ServerMessageType.OpenFileResponse,
+						id: message.id,
+						payload: { path: pathToOpen, contents: project }
+					});
 				}
 
 				send({
@@ -182,20 +212,19 @@ const userStore = new ElectronStore();
 				}
 
 				if (path) {
-					const result = await Persistence.read<Types.SavedProject>(path);
+					const project = (await readProjectOrError(path)) as Types.SerializedProject;
 
-					if (result.state === PersistenceState.Error) {
-						await showError(path);
-					} else {
-						const contents = result.contents as Types.SerializedProject;
-						contents.path = path;
-
-						send({
-							type: ServerMessageType.OpenFileResponse,
-							id: message.id,
-							payload: { path, contents }
-						});
+					if (!project) {
+						return;
 					}
+
+					project.path = path;
+
+					send({
+						type: ServerMessageType.OpenFileResponse,
+						id: message.id,
+						payload: { path, contents: project }
+					});
 				}
 				break;
 			}
@@ -386,7 +415,7 @@ const userStore = new ElectronStore();
 				break;
 			}
 			case ServerMessageType.ShowError: {
-				showError(message.payload);
+				showError(new Error(message.payload));
 			}
 		}
 	});
@@ -504,29 +533,30 @@ async function createWindow(): Promise<void> {
 	checkForUpdates(win);
 }
 
-const log = require('electron-log');
 log.info('App starting...');
 
 app.on('will-finish-launching', () => {
 	app.on('open-file', async (event, path) => {
 		event.preventDefault();
-		if (path) {
-			openedFile = path;
 
-			const result = await Persistence.read<Types.SavedProject>(path);
-
-			if (result.state === PersistenceState.Error) {
-				showError(openedFile);
-			} else {
-				const contents = result.contents as Types.SerializedProject;
-
-				Sender.send({
-					type: ServerMessageType.OpenFileResponse,
-					id: uuid.v4(),
-					payload: { path, contents }
-				});
-			}
+		if (!path) {
+			return;
 		}
+
+		const project = (await readProjectOrError(path)) as Types.SerializedProject;
+
+		if (!project) {
+			return;
+		}
+
+		project.path = path;
+		openedFile = path;
+
+		Sender.send({
+			type: ServerMessageType.OpenFileResponse,
+			id: uuid.v4(),
+			payload: { path, contents: project }
+		});
 	});
 });
 

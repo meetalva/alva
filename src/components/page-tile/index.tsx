@@ -45,7 +45,7 @@ interface StyledPageTitleProps {
 	editable: boolean;
 }
 
-const BORDER_COLOR = (props: StyledPageTileProps) => (props.focused ? Color.Yellow : Color.Blue40);
+const BORDER_COLOR = (props: StyledPageTileProps) => (props.focused ? Color.Blue20 : Color.Blue60);
 
 const StyledPageTile = styled.div`
 	position: relative;

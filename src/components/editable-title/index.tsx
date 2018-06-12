@@ -52,37 +52,38 @@ interface StyledInputProps {
 
 const StyledTitle = (props: StyledEditableTitleProps): JSX.Element => {
 	const Strong = styled.strong`
+		box-sizing: border-box;
 		display: inline-block;
 		width: ${props.secondary ? '130px' : '100%'};
-		margin: ${props.secondary ? `0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px` : 0}
+		padding: 0;
+		margin: ${props.secondary ? `0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px` : 0};
 		font-size: ${props.fontSize ? `${props.fontSize}px` : `${CopySize.S}px`};
 		color: ${props.secondary ? Color.Grey36 : Color.Black};
 		font-weight: normal;
 		text-align: center;
 		cursor: ${props.editable ? 'text' : 'default'};
-		overflow: hidden;
+		overflow: ${props.secondary ? 'none' : 'hidden'};
 		white-space: nowrap;
 		text-overflow: ellipsis;
-		padding: 0;
 	`;
 	return <Strong data-title={true}>{props.children}</Strong>;
 };
 
 const StyledEditableTitle = styled.input`
+	box-sizing: border-box;
 	display: inline-block;
 	width: ${(props: StyledInputProps) => (props.secondary ? '130px' : '100%')};
+	border: 0;
+	padding: 0;
+	margin: ${(props: StyledInputProps) =>
+		props.secondary ? `0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px` : '3px 0px'};
 	font-size: ${(props: StyledInputProps) =>
 		props.fontSize ? `${props.fontSize}px` : `${CopySize.S}px`};
-	padding: ${(props: StyledInputProps) =>
-		props.secondary ? `0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px` : '3px 0px'};
-	border: 0;
-	margin: 0;
-	line-height: inherit;
-	font-weight: normal;
 	text-align: center;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+	outline-offset: 0;
 
 	:focus {
 		outline: none;
@@ -113,6 +114,7 @@ class EditableInput extends React.Component<EditableInputProps> {
 				onChange={props.onChange}
 				onFocus={props.onFocus}
 				onKeyDown={props.onKeyDown}
+				secondary={props.secondary}
 				value={props.value}
 			/>
 		);

@@ -79,8 +79,8 @@ export const ChromeContainer = MobxReact.inject('store')(
 							fontSize={CopySize.M}
 							focused={props.focused}
 							page={page}
-							secondary
 							value={page ? page.getName() : ''}
+							secondary
 						/>
 					</ViewSwitch>
 				)}

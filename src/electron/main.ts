@@ -88,6 +88,12 @@ const userStore = new ElectronStore();
 			case ServerMessageType.AppLoaded: {
 				const pathToOpen = projectPath || openedFile;
 
+				send({
+					id: uuid.v4(),
+					type: ServerMessageType.StartApp,
+					payload: String(port)
+				});
+
 				// Load one of either
 				// (1) last known file automatically in development
 				// (2) file passed to electron main process
@@ -107,12 +113,6 @@ const userStore = new ElectronStore();
 						});
 					}
 				}
-
-				send({
-					id: uuid.v4(),
-					type: ServerMessageType.StartApp,
-					payload: String(port)
-				});
 
 				break;
 			}

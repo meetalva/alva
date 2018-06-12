@@ -1,5 +1,5 @@
 import * as Sender from '../../message/client';
-import { AddPage, Copy, CopySize, Layout, LayoutWrap, Space, SpaceSize } from '../../components';
+import { AddPage, Layout, LayoutWrap } from '../../components';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { PageTileContainer } from './page-tile-container';
@@ -20,9 +20,6 @@ export const PageListContainer: React.StatelessComponent = MobxReact.inject('sto
 
 		return (
 			<Layout wrap={LayoutWrap.Wrap}>
-				<Space size={SpaceSize.M}>
-					<Copy size={CopySize.M}>Pages</Copy>
-				</Space>
 				{project
 					.getPages()
 					.map((page, i) => (

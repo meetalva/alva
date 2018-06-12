@@ -50,7 +50,7 @@ const BORDER_COLOR = (props: StyledPageTileProps) => (props.focused ? Color.Blue
 const StyledPageTile = styled.div`
 	position: relative;
 	box-sizing: border-box;
-	height: 72px;
+	height: 60px;
 	width: 100%;
 	border: 3px solid;
 	border-color: ${(props: StyledPageTileProps) =>
@@ -60,8 +60,8 @@ const StyledPageTile = styled.div`
 	background-color: ${Color.White};
 	overflow: hidden;
 	margin: ${getSpace(SpaceSize.S)}px;
-	margin-top: 0;
-	font-size: 15px;
+	margin-bottom: 0;
+	font-size: 12px;
 	display: flex;
 	align-items: center;
 	justify-content: center;

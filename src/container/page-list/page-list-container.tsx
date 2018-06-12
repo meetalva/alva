@@ -1,5 +1,5 @@
 import * as Sender from '../../message/client';
-import { AddPage, Layout, LayoutWrap } from '../../components';
+import { AddPageButton, Layout, LayoutWrap } from '../../components';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { PageTileContainer } from './page-tile-container';
@@ -30,7 +30,7 @@ export const PageListContainer: React.StatelessComponent = MobxReact.inject('sto
 							page={page}
 						/>
 					))}
-				<AddPage
+				<AddPageButton
 					onClick={() =>
 						Sender.send({
 							id: uuid.v4(),

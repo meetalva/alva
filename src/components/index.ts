@@ -1,4 +1,4 @@
-export * from './add-page';
+export * from './add-page-button';
 export * from './bug-report';
 export * from './button';
 export * from './chrome';

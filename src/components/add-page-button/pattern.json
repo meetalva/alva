@@ -1,7 +1,7 @@
 {
-	"name": "add-page",
+	"name": "add-page-button",
 	"description": "Button to add pages",
-	"displayName": "Add Page",
+	"displayName": "Add Page Button",
 	"version": "1.0.0",
 	"tags": ["atom", "button"],
 	"flag": "alpha"

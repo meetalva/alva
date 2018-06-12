@@ -30,7 +30,7 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 			<Components.Element
 				draggable={true}
 				dragging={store.getDragging()}
-				editable={props.element.getRole() === ElementRole.Root ? false : true}
+				editable={props.element.getRole() !== ElementRole.Root}
 				id={props.element.getId()}
 				mayOpen={
 					props.element.acceptsChildren() && props.element.getRole() !== ElementRole.Root

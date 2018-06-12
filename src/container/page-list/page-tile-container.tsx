@@ -6,8 +6,8 @@ import { ViewStore } from '../../store';
 import * as Types from '../../types';
 
 export interface PageTileContainerProps {
-	focus: boolean;
-	highlight: boolean;
+	focused: boolean;
+	highlighted: boolean;
 	page: Page;
 }
 
@@ -58,7 +58,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 
 		store.setActivePage(this.props.page);
 
-		if (this.props.highlight && target.matches('[data-title]')) {
+		if (this.props.highlighted && target.matches('[data-title]')) {
 			this.props.page.setNameState(Types.EditState.Editing);
 		}
 	}
@@ -90,7 +90,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 				}
 				if (
 					e.target === document.body &&
-					this.props.highlight &&
+					this.props.highlighted &&
 					this.props.page.getNameState() === Types.EditState.Editable
 				) {
 					this.props.page.setNameState(Types.EditState.Editing);
@@ -103,8 +103,8 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		const { props } = this;
 		return (
 			<PageTile
-				focused={props.focus}
-				highlighted={props.highlight}
+				focused={props.focused}
+				highlighted={props.highlighted}
 				id={props.page.getId()}
 				onBlur={e => this.handleBlur()}
 				onChange={e => this.handleChange(e)}

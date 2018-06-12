@@ -927,6 +927,8 @@ export class ViewStore {
 		this.setFocusedItem(FocusedItemType.Page, page);
 
 		this.unsetSelectedElement();
+
+		console.log('setActivePage');
 	}
 
 	@Mobx.action
@@ -1004,14 +1006,19 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public setFocusedItem(type: FocusedItemType, payload: Model.Element | Model.Page): void {
+	public setFocusedItem(
+		type: FocusedItemType,
+		payload: Model.Element | Model.Page | undefined
+	): void {
 		const previousFocusItem = this.getFocusedItem();
 
 		if (previousFocusItem) {
 			previousFocusItem.setFocused(false);
 		}
 		this.focusedItemType = type;
-		payload.setFocused(true);
+		if (payload) {
+			payload.setFocused(true);
+		}
 	}
 
 	@Mobx.action

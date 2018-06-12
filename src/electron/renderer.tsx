@@ -58,6 +58,7 @@ Sender.receive(message => {
 			store.setProject(newProject);
 
 			app.setActiveView(Types.AlvaView.PageDetail);
+			store.setFocusedItem(FocusedItemType.Page, store.getCurrentPage());
 
 			const patternLibrary = newProject.getPatternLibrary();
 

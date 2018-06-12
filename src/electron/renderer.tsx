@@ -53,10 +53,28 @@ Sender.receive(message => {
 		}
 		case ServerMessageType.OpenFileResponse: {
 			history.clear();
-			let newProject;
 
 			try {
-				newProject = Project.from(message.payload.contents);
+				const newProject = Project.from(message.payload.contents);
+				newProject.setPath(message.payload.path);
+				store.setProject(newProject);
+
+				const view =
+					newProject.getPages().length === 0
+						? Types.AlvaView.Pages
+						: Types.AlvaView.PageDetail;
+
+				app.setActiveView(view);
+
+				const patternLibrary = newProject.getPatternLibrary();
+
+				if (patternLibrary.getState() !== Types.PatternLibraryState.Pristine) {
+					Sender.send({
+						id: uuid.v4(),
+						payload: newProject.toJSON(),
+						type: ServerMessageType.CheckLibraryRequest
+					});
+				}
 			} catch {
 				Sender.send({
 					id: uuid.v4(),
@@ -65,23 +83,6 @@ Sender.receive(message => {
 				});
 			}
 
-			newProject.setPath(message.payload.path);
-			store.setProject(newProject);
-
-			const view =
-				newProject.getPages().length === 0 ? Types.AlvaView.Pages : Types.AlvaView.PageDetail;
-
-			app.setActiveView(view);
-
-			const patternLibrary = newProject.getPatternLibrary();
-
-			if (patternLibrary.getState() !== Types.PatternLibraryState.Pristine) {
-				Sender.send({
-					id: uuid.v4(),
-					payload: newProject.toJSON(),
-					type: ServerMessageType.CheckLibraryRequest
-				});
-			}
 			break;
 		}
 		case ServerMessageType.CreateNewFileResponse: {

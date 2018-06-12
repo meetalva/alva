@@ -88,8 +88,6 @@ const StyledElementLabel = styled(div)`
 	position: relative;
 	display: flex;
 	align-items: center;
-	color: ${Color.Grey20};
-	position: relative;
 	font-size: 15px;
 	line-height: 21px;
 	z-index: 1;

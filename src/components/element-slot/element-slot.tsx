@@ -60,8 +60,6 @@ const StyledElementSlotLabel = styled(div)`
 	position: relative;
 	display: flex;
 	align-items: center;
-	color: ${Color.Grey20};
-	position: relative;
 	font-size: 15px;
 	line-height: 21px;
 	z-index: 1;
@@ -91,8 +89,7 @@ const StyledElementSlotLabelContent = styled.div`
 	box-sizing: border-box;
 	margin-left: ${getSpace(SpaceSize.XXL) - 3}px;
 	overflow: hidden;
-	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.XS)}px
-		${getSpace(SpaceSize.XXS)}px;
+	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	width: 100%;

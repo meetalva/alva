@@ -6,6 +6,7 @@ import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import { AlvaApp, EditHistory, PatternLibrary, Project } from '../model';
+import * as Path from 'path';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
@@ -52,26 +53,42 @@ Sender.receive(message => {
 		}
 		case ServerMessageType.OpenFileResponse: {
 			history.clear();
-			const newProject = Project.from(message.payload.contents);
-			newProject.setPath(message.payload.path);
-			store.setProject(newProject);
 
-			const view =
-				newProject.getPages().length === 0 ? Types.AlvaView.Pages : Types.AlvaView.PageDetail;
+			try {
+				const newProject = Project.from(message.payload.contents);
+				newProject.setPath(message.payload.path);
+				store.setProject(newProject);
 
-			app.setActiveView(view);
+				const view =
+					newProject.getPages().length === 0
+						? Types.AlvaView.Pages
+						: Types.AlvaView.PageDetail;
 
-			const patternLibrary = newProject.getPatternLibrary();
+				app.setActiveView(view);
+        store.commit();
+        
+				const patternLibrary = newProject.getPatternLibrary();
 
-			if (patternLibrary.getState() !== Types.PatternLibraryState.Pristine) {
+				if (patternLibrary.getState() !== Types.PatternLibraryState.Pristine) {
+					Sender.send({
+						id: uuid.v4(),
+						payload: newProject.toJSON(),
+						type: ServerMessageType.CheckLibraryRequest
+					});
+				}
+			} catch (err) {
 				Sender.send({
 					id: uuid.v4(),
-					payload: newProject.toJSON(),
-					type: ServerMessageType.CheckLibraryRequest
+					payload: {
+						message: `Sorry, we had trouble opening the file "${Path.basename(
+							message.payload.path
+						)}".\n Parsing the project failed with: ${err.message}`,
+						stack: err.stack
+					},
+					type: ServerMessageType.ShowError
 				});
 			}
 
-			store.commit();
 			break;
 		}
 		case ServerMessageType.CreateNewFileResponse: {

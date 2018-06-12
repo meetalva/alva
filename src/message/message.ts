@@ -216,7 +216,7 @@ export type PastePageElementInside = Envelope<ServerMessageType.PasteElementInsi
 export type Redo = EmptyEnvelope<ServerMessageType.Redo>;
 export type Save = Envelope<ServerMessageType.Save, Types.SavePayload>;
 export type SelectElement = Envelope<ServerMessageType.SelectElement, Types.PatternIdPayload>;
-export type ShowError = Envelope<ServerMessageType.ShowError, string>;
+export type ShowError = Envelope<ServerMessageType.ShowError, { message: string; stack: string }>;
 export type SketchExportRequest = Envelope<
 	ServerMessageType.SketchExportRequest,
 	Types.SketchExportPayload

@@ -65,7 +65,7 @@ export class Persistence {
 						state: PersistenceState.Success,
 						contents: Yaml.load(String(contents)) as T
 					});
-				} catch {
+				} catch (error) {
 					return resolve({
 						state: PersistenceState.Error,
 						error

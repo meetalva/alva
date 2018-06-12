@@ -79,9 +79,12 @@ Sender.receive(message => {
 			} catch (err) {
 				Sender.send({
 					id: uuid.v4(),
-					payload: `Sorry, we had trouble opening the file "${Path.basename(
-						message.payload.path
-					)}".\n Parsing the project failed with: ${err.message}`,
+					payload: {
+						message: `Sorry, we had trouble opening the file "${Path.basename(
+							message.payload.path
+						)}".\n Parsing the project failed with: ${err.message}`,
+						stack: err.stack
+					},
 					type: ServerMessageType.ShowError
 				});
 			}

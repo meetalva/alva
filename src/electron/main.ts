@@ -71,12 +71,17 @@ const showError = (error: Error) => {
 		'body',
 		`Hey there, I just encountered the following error with Alva ${app.getVersion()}:\n\n\`\`\`\n${
 			error.message
-		}\n\`\`\``
+		}\n\`\`\`\n\n<details><summary>Stack Trace</summary>\n\n\`\`\`\n${
+			error.stack
+		}\n\`\`\`\n\n</details>`
 	);
 	params.append('labels', 'type: bug');
 
 	const url = `https://github.com/meetalva/alva/issues/new?${params}`;
 	const lines = error.message.split('\n');
+
+	projectPath = undefined;
+	openedFile = undefined;
 
 	dialog.showMessageBox(
 		BrowserWindow.getFocusedWindow(),
@@ -145,13 +150,16 @@ const userStore = new ElectronStore();
 				// (1) last known file automatically in development
 				// (2) file passed to electron main process
 				if (((electronIsDev && projectPath) || openedFile) && pathToOpen) {
-					const project = (await readProjectOrError(pathToOpen)) as Types.SerializedProject;
+					// tslint:disable-next-line:no-any
+					const project = (await readProjectOrError(pathToOpen)) as any;
 
 					if (!project) {
 						return;
 					}
 
-					project.path = pathToOpen;
+					if (typeof project === 'object') {
+						project.path = pathToOpen;
+					}
 
 					send({
 						type: ServerMessageType.OpenFileResponse,
@@ -216,13 +224,16 @@ const userStore = new ElectronStore();
 				}
 
 				if (path) {
-					const project = (await readProjectOrError(path)) as Types.SerializedProject;
+					// tslint:disable-next-line:no-any
+					const project = (await readProjectOrError(path)) as any;
 
 					if (!project) {
 						return;
 					}
 
-					project.path = path;
+					if (typeof project === 'object') {
+						project.path = path;
+					}
 
 					send({
 						type: ServerMessageType.OpenFileResponse,
@@ -419,7 +430,9 @@ const userStore = new ElectronStore();
 				break;
 			}
 			case ServerMessageType.ShowError: {
-				showError(new Error(message.payload));
+				const error = new Error(message.payload.message);
+				error.stack = message.payload.stack;
+				showError(error);
 			}
 		}
 	});
@@ -547,13 +560,17 @@ app.on('will-finish-launching', () => {
 			return;
 		}
 
-		const project = (await readProjectOrError(path)) as Types.SerializedProject;
+		// tslint:disable-next-line:no-any
+		const project = (await readProjectOrError(path)) as any;
 
 		if (!project) {
 			return;
 		}
 
-		project.path = path;
+		if (typeof project === 'object') {
+			project.path = path;
+		}
+
 		openedFile = path;
 
 		Sender.send({

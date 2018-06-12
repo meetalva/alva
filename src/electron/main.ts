@@ -37,10 +37,14 @@ const RENDERER_DOCUMENT = `<!doctype html>
 </html>`;
 
 const showOpenDialog = (options: Electron.OpenDialogOptions): Promise<string[]> =>
-	new Promise(resolve => dialog.showOpenDialog(options, resolve));
+	new Promise(resolve =>
+		dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), options, resolve)
+	);
 
 const showSaveDialog = (options: Electron.SaveDialogOptions): Promise<string | undefined> =>
-	new Promise(resolve => dialog.showSaveDialog(options, resolve));
+	new Promise(resolve =>
+		dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), options, resolve)
+	);
 
 const readFile = Util.promisify(Fs.readFile);
 const writeFile = Util.promisify(Fs.writeFile);
@@ -131,6 +135,12 @@ const userStore = new ElectronStore();
 			case ServerMessageType.AppLoaded: {
 				const pathToOpen = projectPath || openedFile;
 
+				send({
+					id: uuid.v4(),
+					type: ServerMessageType.StartApp,
+					payload: String(port)
+				});
+
 				// Load one of either
 				// (1) last known file automatically in development
 				// (2) file passed to electron main process
@@ -149,12 +159,6 @@ const userStore = new ElectronStore();
 						payload: { path: pathToOpen, contents: project }
 					});
 				}
-
-				send({
-					id: uuid.v4(),
-					type: ServerMessageType.StartApp,
-					payload: String(port)
-				});
 
 				break;
 			}

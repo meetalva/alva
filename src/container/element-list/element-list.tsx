@@ -1,4 +1,5 @@
-import { Color, ElementAnchors } from '../../components';
+import { ElementAnchors } from '../../components';
+import { ElementDragImage } from '../element-drag-image';
 import { elementMenu } from '../../electron/context-menus';
 import { ElementContainer } from './element-container';
 import * as Mobx from 'mobx';
@@ -9,21 +10,10 @@ import * as Store from '../../store';
 import styled from 'styled-components';
 import * as Types from '../../types';
 
-const DRAG_IMG_STYLE = `
-	position: fixed;
-	top: 100vh;
-	background-color: ${Color.White};
-	color: ${Color.Black};
-	padding: 6px 18px;
-	border-radius: 3px;
-	font-size: 12px;
-	opacity: 1;
-`;
-
 @MobxReact.inject('store')
 @MobxReact.observer
 export class ElementList extends React.Component {
-	private dragImg?: HTMLElement;
+	private dragImg: HTMLElement | null;
 	private globalDragEndListener?: (e: DragEvent) => void;
 	private globalDropListener?: (e: DragEvent) => void;
 	private globalKeyDownListener?: (e: KeyboardEvent) => void;
@@ -115,12 +105,6 @@ export class ElementList extends React.Component {
 		}
 	}
 
-	private handleDragEnd(e: React.DragEvent<HTMLElement>): void {
-		if (this.dragImg && this.dragImg.parentNode) {
-			this.dragImg.parentNode.removeChild(this.dragImg);
-		}
-	}
-
 	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const targetElement = elementFromTarget(e.target, { sibling: false, store });
@@ -182,26 +166,17 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		const dragImg = document.createElement('div');
-		dragImg.textContent = draggedElement.getName();
-		dragImg.setAttribute('style', DRAG_IMG_STYLE);
-		document.body.appendChild(dragImg);
+		draggedElement.setDragged(true);
+		store.setSelectedElement(draggedElement);
 
-		e.dataTransfer.effectAllowed = 'copy';
-		e.dataTransfer.setDragImage(dragImg, 75, 15);
-		this.dragImg = dragImg;
-
-		// tslint:disable-next-line:no-any
-		(window as any).requestIdleCallback(() => {
-			draggedElement.setDragged(true);
-			store.setSelectedElement(draggedElement);
-		});
+		if (this.dragImg) {
+			e.dataTransfer.effectAllowed = 'copy';
+			e.dataTransfer.setDragImage(this.dragImg, 75, 15);
+		}
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
-
-		this.handleDragEnd(e);
 
 		const target = e.target as HTMLElement;
 		const isSiblingDrop = target.getAttribute(ElementAnchors.placeholder) === 'true';
@@ -348,7 +323,6 @@ export class ElementList extends React.Component {
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
-				onDragEnd={e => this.handleDragEnd(e)}
 				onDragLeave={e => this.handleDragLeave(e)}
 				onDragOver={e => this.handleDragOver(e)}
 				onDragStart={e => this.handleDragStart(e)}
@@ -359,6 +333,10 @@ export class ElementList extends React.Component {
 				innerRef={ref => (this.ref = ref)}
 			>
 				<ElementContainer element={rootElement} />
+				<ElementDragImage
+					element={store.getDraggedElement()}
+					innerRef={ref => (this.dragImg = ref)}
+				/>
 			</StyledDragRoot>
 		);
 	}

@@ -49,7 +49,6 @@ Sender.receive(message => {
 		case ServerMessageType.StartApp: {
 			app.setState(Types.AppState.Started);
 			store.setServerPort(Number(message.payload));
-			store.commit();
 			break;
 		}
 		case ServerMessageType.OpenFileResponse: {
@@ -66,7 +65,8 @@ Sender.receive(message => {
 						: Types.AlvaView.PageDetail;
 
 				app.setActiveView(view);
-
+        store.commit();
+        
 				const patternLibrary = newProject.getPatternLibrary();
 
 				if (patternLibrary.getState() !== Types.PatternLibraryState.Pristine) {
@@ -93,6 +93,7 @@ Sender.receive(message => {
 			const newProject = Project.from(message.payload.contents);
 			store.setProject(newProject);
 			app.setActiveView(Types.AlvaView.PageDetail);
+			store.commit();
 			break;
 		}
 		case ServerMessageType.Log: {

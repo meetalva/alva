@@ -1,9 +1,4 @@
-import {
-	PatternAnchor,
-	PatternItemDescription,
-	PatternItemLabel,
-	PatternListItem
-} from '../../components';
+import * as Components from '../../components';
 import * as MobxReact from 'mobx-react';
 import { Pattern } from '../../model';
 import * as React from 'react';
@@ -46,32 +41,25 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as PatternItemContainerContainerProps & { store: ViewStore };
-
 		const element = store.createElement({ pattern: this.props.pattern, dragged: true });
 		store.addElement(element);
-
-		e.dataTransfer.effectAllowed = 'copy';
-
-		e.dataTransfer.setDragImage(
-			e.currentTarget.querySelector(`[${PatternAnchor.icon}]`) as Element,
-			12,
-			12
-		);
 	}
 
 	public render(): JSX.Element | null {
 		const { props } = this;
 
 		return (
-			<PatternListItem
+			<Components.PatternListItem
 				key={props.pattern.getId()}
 				draggable
 				onDoubleClick={e => this.handleDoubleClick(e)}
 				onDragStart={e => this.handleDragStart(e)}
 			>
-				<PatternItemLabel>{props.pattern.getName()}</PatternItemLabel>
-				<PatternItemDescription>{props.pattern.getDescription()}</PatternItemDescription>
-			</PatternListItem>
+				<Components.PatternItemLabel>{props.pattern.getName()}</Components.PatternItemLabel>
+				<Components.PatternItemDescription>
+					{props.pattern.getDescription()}
+				</Components.PatternItemDescription>
+			</Components.PatternListItem>
 		);
 	}
 }

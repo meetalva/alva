@@ -1,5 +1,6 @@
 import * as AlvaUtil from '../../alva-util';
 import * as Components from '../../components';
+import { ElementCapability } from '../../components';
 import { ElementContentContainer } from './element-content-container';
 import { ElementSlotContainer } from './element-slot-container';
 import { partition } from 'lodash';
@@ -32,20 +33,24 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 
 		return (
 			<Components.Element
-				draggable={true}
+				capabilities={[
+					ElementCapability.Draggable,
+					props.element.getRole() !== Types.ElementRole.Root && ElementCapability.Editable,
+					contents.some(content => content.acceptsChildren()) &&
+						props.element.getRole() !== Types.ElementRole.Root &&
+						ElementCapability.Openable
+				].filter((item): item is ElementCapability => Boolean(item))}
 				dragging={store.getDragging()}
 				id={props.element.getId()}
 				contentId={childContent ? childContent.getId() : ''}
-				mayOpen={
-					contents.some(content => content.acceptsChildren()) &&
-					props.element.getRole() !== Types.ElementRole.Root
-				}
 				open={open}
 				onChange={AlvaUtil.noop}
 				placeholder={props.element.getRole() !== Types.ElementRole.Root}
 				placeholderHighlighted={props.element.getPlaceholderHighlighted()}
 				state={getElementState(props.element, store)}
-				title={props.element.getName()}
+				title={
+					props.element.getRole() === Types.ElementRole.Root ? 'Page' : props.element.getName()
+				}
 			>
 				<Components.Element.ElementSlots>
 					{slotContents.map(slotContent => (

@@ -1,5 +1,5 @@
 import DemoContainer from '../demo-container';
-import { Element, ElementState } from './index';
+import { Element, ElementCapability, ElementState } from './index';
 import * as React from 'react';
 
 // tslint:disable-next-line:no-empty
@@ -10,8 +10,7 @@ const CHILD = (
 		id="1"
 		contentId="1"
 		state={ElementState.Default}
-		draggable={false}
-		mayOpen={false}
+		capabilities={[ElementCapability.Editable]}
 		open={false}
 		placeholder={true}
 		onChange={NOOP}
@@ -28,8 +27,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				id="1"
 				contentId="1"
 				state={ElementState.Default}
-				draggable={false}
-				mayOpen={false}
+				capabilities={[ElementCapability.Editable]}
 				open={false}
 				onChange={NOOP}
 				placeholder={true}
@@ -42,8 +40,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<Element
 				id="2"
 				contentId="2"
-				draggable={false}
-				mayOpen={false}
+				capabilities={[ElementCapability.Editable]}
 				open={false}
 				onChange={NOOP}
 				placeholder={true}
@@ -57,8 +54,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<Element
 				id="2"
 				contentId="2"
-				draggable={false}
-				mayOpen={false}
+				capabilities={[ElementCapability.Editable]}
 				open={false}
 				onChange={NOOP}
 				placeholder={true}
@@ -72,8 +68,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<Element
 				id="2"
 				contentId="2"
-				draggable={false}
-				mayOpen={false}
+				capabilities={[ElementCapability.Editable]}
 				open={false}
 				onChange={NOOP}
 				placeholder={true}
@@ -88,8 +83,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<Element
 				id="2"
 				contentId="2"
-				draggable={false}
-				mayOpen={false}
+				capabilities={[ElementCapability.Editable]}
 				open={false}
 				onChange={NOOP}
 				placeholder={true}
@@ -103,8 +97,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<Element
 				id="3"
 				contentId="3"
-				draggable={false}
-				mayOpen={true}
+				capabilities={[ElementCapability.Editable, ElementCapability.Openable]}
 				onChange={NOOP}
 				open={false}
 				placeholder={true}
@@ -120,8 +113,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<Element
 				id="3"
 				contentId="3"
-				draggable={false}
-				mayOpen={true}
+				capabilities={[ElementCapability.Editable, ElementCapability.Openable]}
 				onChange={NOOP}
 				open
 				placeholder={true}
@@ -137,8 +129,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			<Element
 				id="4"
 				contentId="4"
-				draggable={false}
-				mayOpen={true}
+				capabilities={[ElementCapability.Editable, ElementCapability.Openable]}
 				onChange={NOOP}
 				open
 				placeholder={true}

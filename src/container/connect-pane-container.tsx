@@ -14,7 +14,7 @@ export const ConnectPaneContainer: React.SFC<ConnectPaneProps> = props => (
 			connect to your React & Typescript component library first.
 		`}
 		primaryButton="Connect"
-		secondaryButton="Download Alva Example"
+		secondaryButton="Download Example File with Library "
 		onPrimaryButtonClick={props.onPrimaryButtonClick}
 		onSecondaryButtonClick={props.onSecondaryButtonClick}
 	/>

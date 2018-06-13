@@ -20,6 +20,8 @@ import * as Util from 'util';
 import * as uuid from 'uuid';
 
 const ElectronStore = require('electron-store');
+const log = require('electron-log');
+const URLSearchParams = require('url-search-params');
 
 const APP_ENTRY = require.resolve('./renderer');
 
@@ -35,13 +37,67 @@ const RENDERER_DOCUMENT = `<!doctype html>
 </html>`;
 
 const showOpenDialog = (options: Electron.OpenDialogOptions): Promise<string[]> =>
-	new Promise(resolve => dialog.showOpenDialog(options, resolve));
+	new Promise(resolve =>
+		dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), options, resolve)
+	);
 
 const showSaveDialog = (options: Electron.SaveDialogOptions): Promise<string | undefined> =>
-	new Promise(resolve => dialog.showSaveDialog(options, resolve));
+	new Promise(resolve =>
+		dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), options, resolve)
+	);
 
 const readFile = Util.promisify(Fs.readFile);
 const writeFile = Util.promisify(Fs.writeFile);
+
+const readProjectOrError = async <T>(path: string): Promise<Types.SavedProject | undefined> => {
+	const result = await Persistence.read<Types.SavedProject>(path);
+
+	if (result.state === PersistenceState.Error) {
+		result.error.message = [
+			`Sorry, we had trouble opening the file "${Path.basename(path)}".`,
+			result.error.message
+		].join('\n');
+		showError(result.error);
+		return;
+	}
+
+	return result.contents;
+};
+
+const showError = (error: Error) => {
+	const params = new URLSearchParams();
+	params.set('title', 'New bug report');
+	params.set(
+		'body',
+		`Hey there, I just encountered the following error with Alva ${app.getVersion()}:\n\n\`\`\`\n${
+			error.message
+		}\n\`\`\`\n\n<details><summary>Stack Trace</summary>\n\n\`\`\`\n${
+			error.stack
+		}\n\`\`\`\n\n</details>`
+	);
+	params.append('labels', 'type: bug');
+
+	const url = `https://github.com/meetalva/alva/issues/new?${params}`;
+	const lines = error.message.split('\n');
+
+	projectPath = undefined;
+	openedFile = undefined;
+
+	dialog.showMessageBox(
+		BrowserWindow.getFocusedWindow(),
+		{
+			type: 'error',
+			message: lines[0],
+			detail: lines.slice(1).join('\n'),
+			buttons: ['OK', 'Report a bug']
+		},
+		response => {
+			if (response === 1) {
+				shell.openExternal(url);
+			}
+		}
+	);
+};
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -84,31 +140,33 @@ const userStore = new ElectronStore();
 			case ServerMessageType.AppLoaded: {
 				const pathToOpen = projectPath || openedFile;
 
-				// Load one of either
-				// (1) last known file automatically in development
-				// (2) file passed to electron main process
-				if (((electronIsDev && projectPath) || openedFile) && pathToOpen) {
-					const result = await Persistence.read<Types.SavedProject>(pathToOpen);
-
-					if (result.state === PersistenceState.Error) {
-						// TODO: Show user facing error here
-					} else {
-						const contents = result.contents as Types.SerializedProject;
-						contents.path = pathToOpen;
-
-						send({
-							type: ServerMessageType.OpenFileResponse,
-							id: message.id,
-							payload: { path: pathToOpen, contents }
-						});
-					}
-				}
-
 				send({
 					id: uuid.v4(),
 					type: ServerMessageType.StartApp,
 					payload: String(port)
 				});
+
+				// Load one of either
+				// (1) last known file automatically in development
+				// (2) file passed to electron main process
+				if (((electronIsDev && projectPath) || openedFile) && pathToOpen) {
+					// tslint:disable-next-line:no-any
+					const project = (await readProjectOrError(pathToOpen)) as any;
+
+					if (!project) {
+						return;
+					}
+
+					if (typeof project === 'object') {
+						project.path = pathToOpen;
+					}
+
+					send({
+						type: ServerMessageType.OpenFileResponse,
+						id: message.id,
+						payload: { path: pathToOpen, contents: project }
+					});
+				}
 
 				break;
 			}
@@ -166,20 +224,22 @@ const userStore = new ElectronStore();
 				}
 
 				if (path) {
-					const result = await Persistence.read<Types.SavedProject>(path);
+					// tslint:disable-next-line:no-any
+					const project = (await readProjectOrError(path)) as any;
 
-					if (result.state === PersistenceState.Error) {
-						// TODO: Show user facing error here
-					} else {
-						const contents = result.contents as Types.SerializedProject;
-						contents.path = path;
-
-						send({
-							type: ServerMessageType.OpenFileResponse,
-							id: message.id,
-							payload: { path, contents }
-						});
+					if (!project) {
+						return;
 					}
+
+					if (typeof project === 'object') {
+						project.path = path;
+					}
+
+					send({
+						type: ServerMessageType.OpenFileResponse,
+						id: message.id,
+						payload: { path, contents: project }
+					});
 				}
 				break;
 			}
@@ -366,6 +426,13 @@ const userStore = new ElectronStore();
 				if (win) {
 					win.isMaximized() ? win.unmaximize() : win.maximize();
 				}
+
+				break;
+			}
+			case ServerMessageType.ShowError: {
+				const error = new Error(message.payload.message);
+				error.stack = message.payload.stack;
+				showError(error);
 			}
 		}
 	});
@@ -483,29 +550,34 @@ async function createWindow(): Promise<void> {
 	checkForUpdates(win);
 }
 
-const log = require('electron-log');
 log.info('App starting...');
 
 app.on('will-finish-launching', () => {
 	app.on('open-file', async (event, path) => {
 		event.preventDefault();
-		if (path) {
-			openedFile = path;
 
-			const result = await Persistence.read<Types.SavedProject>(path);
-
-			if (result.state === PersistenceState.Error) {
-				// TODO: Show user facing error here
-			} else {
-				const contents = result.contents as Types.SerializedProject;
-
-				Sender.send({
-					type: ServerMessageType.OpenFileResponse,
-					id: uuid.v4(),
-					payload: { path, contents }
-				});
-			}
+		if (!path) {
+			return;
 		}
+
+		// tslint:disable-next-line:no-any
+		const project = (await readProjectOrError(path)) as any;
+
+		if (!project) {
+			return;
+		}
+
+		if (typeof project === 'object') {
+			project.path = path;
+		}
+
+		openedFile = path;
+
+		Sender.send({
+			type: ServerMessageType.OpenFileResponse,
+			id: uuid.v4(),
+			payload: { path, contents: project }
+		});
 	});
 });
 

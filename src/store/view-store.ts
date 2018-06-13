@@ -601,6 +601,11 @@ export class ViewStore {
 		return this.project.getElements().find(element => element.getHighlighted());
 	}
 
+	@Mobx.action
+	public getFirstPage(): Model.Page {
+		return this.project.getPages()[0];
+	}
+
 	public getFocusedItem(): Model.Element | Model.Page | undefined {
 		if (!this.project) {
 			return;
@@ -617,6 +622,11 @@ export class ViewStore {
 
 	public getFocusedItemType(): FocusedItemType {
 		return this.focusedItemType;
+	}
+
+	@Mobx.action
+	public getLastPage(): Model.Page {
+		return this.project.getPages()[this.project.getPages().length - 1];
 	}
 
 	public getMetaDown(): boolean {
@@ -1040,8 +1050,42 @@ export class ViewStore {
 	}
 
 	@Mobx.action
+	public setNextPage(): void {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		this.setActivePageByIndex(index + 1);
+	}
+
+	@Mobx.action
 	public setPatternSearchTerm(patternSearchTerm: string): void {
 		this.app.setSearchTerm(patternSearchTerm);
+	}
+
+	@Mobx.action
+	public setPreviousPage(): void {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		this.setActivePageByIndex(index - 1);
 	}
 
 	@Mobx.action
@@ -1170,49 +1214,5 @@ export class ViewStore {
 			id: uuid.v4(),
 			payload: project.toJSON()
 		});
-	}
-
-	@Mobx.action
-	public setNextPage(): void {
-		const page = this.getCurrentPage();
-
-		if (!page) {
-			return;
-		}
-
-		const index = this.project.getPageIndex(page);
-
-		if (typeof index !== 'number') {
-			return;
-		}
-
-		this.setActivePageByIndex(index + 1);
-	}
-
-	@Mobx.action
-	public setPreviousPage(): void {
-		const page = this.getCurrentPage();
-
-		if (!page) {
-			return;
-		}
-
-		const index = this.project.getPageIndex(page);
-
-		if (typeof index !== 'number') {
-			return;
-		}
-
-		this.setActivePageByIndex(index - 1);
-	}
-
-	@Mobx.action
-	public getFirstPage(): Model.Page {
-		return this.project.getPages()[0];
-	}
-
-	@Mobx.action
-	public getLastPage(): Model.Page {
-		return this.project.getPages()[this.project.getPages().length - 1];
 	}
 }

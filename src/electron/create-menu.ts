@@ -385,7 +385,7 @@ export function createMenu(ctx: MenuContext): void {
 					type: 'separator'
 				},
 				{
-					label: 'Next Page',
+					label: 'Previous Page',
 					accelerator: 'CmdOrCtrl+Alt+Left',
 					click: () => {
 						ctx.store.setPreviousPage();

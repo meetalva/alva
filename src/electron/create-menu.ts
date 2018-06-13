@@ -405,6 +405,15 @@ export function createMenu(ctx: MenuContext): void {
 					}
 				},
 				{
+					label: '&Show Pages',
+					type: 'checkbox',
+					checked: true,
+					accelerator: 'CmdOrCtrl+Alt+3',
+					click: (item, checked) => {
+						ctx.store.setShowPages(item.checked);
+					}
+				},
+				{
 					type: 'separator'
 				},
 				{

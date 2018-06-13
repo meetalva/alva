@@ -1,0 +1,9 @@
+{
+    "name": "element-slot",
+    "main": "./element-slot",
+	"description": "Slot in element tree",
+	"displayName": "Element Slot",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": []
+}

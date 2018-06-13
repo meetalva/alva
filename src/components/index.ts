@@ -6,6 +6,7 @@ export * from './colors';
 export * from './copy';
 export * from './create-select';
 export * from './element';
+export * from './element-slot';
 export * from './fonts';
 export * from './global-styles';
 export * from './headline';

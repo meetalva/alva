@@ -82,8 +82,9 @@ export class Page {
 				new ElementContent(
 					{
 						elementIds: [],
+						forcedOpen: false,
 						id: uuid.v4(),
-						name: slot.getName(),
+						open: false,
 						slotId: slot.getId()
 					},
 					context

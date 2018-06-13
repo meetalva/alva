@@ -158,8 +158,9 @@ export class ViewStore {
 				new Model.ElementContent(
 					{
 						elementIds: [],
+						forcedOpen: false,
 						id: uuid.v4(),
-						name: slot.getName(),
+						open: false,
 						slotId: slot.getId()
 					},
 					{ project, patternLibrary }
@@ -1149,12 +1150,15 @@ export class ViewStore {
 			return;
 		}
 
-		this.project.getElements().forEach(element => {
-			element.setSelected(false);
-			element.getAncestors().forEach(ancestor => {
-				ancestor.setForcedOpen(false);
+		this.project
+			.getElements()
+			.filter(element => element.getSelected())
+			.forEach(element => {
+				element.setSelected(false);
+				element.getAncestors().forEach(ancestor => {
+					ancestor.setForcedOpen(false);
+				});
 			});
-		});
 	}
 
 	@Mobx.action

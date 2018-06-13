@@ -385,6 +385,20 @@ export function createMenu(ctx: MenuContext): void {
 					type: 'separator'
 				},
 				{
+					label: 'Next Page',
+					accelerator: 'CmdOrCtrl+Alt+Left',
+					click: () => {
+						ctx.store.setPreviousPage();
+					}
+				},
+				{
+					label: 'Next Page',
+					accelerator: 'CmdOrCtrl+Alt+Right',
+					click: () => {
+						ctx.store.setNextPage();
+					}
+				},
+				{
 					label: '&Show Elements & Components',
 					type: 'checkbox',
 					checked: true,

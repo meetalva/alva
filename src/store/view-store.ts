@@ -1171,4 +1171,38 @@ export class ViewStore {
 			payload: project.toJSON()
 		});
 	}
+
+	@Mobx.action
+	public setNextPage(): void {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		this.setActivePageByIndex(index + 1);
+	}
+
+	@Mobx.action
+	public setPreviousPage(): void {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		this.setActivePageByIndex(index - 1);
+	}
 }

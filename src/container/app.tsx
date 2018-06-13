@@ -139,6 +139,13 @@ export class App extends React.Component {
 											Types.PatternLibraryState.Pristine && (
 											<ConnectPaneContainer
 												onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
+												onSecondaryButtonClick={() =>
+													Sender.send({
+														type: ServerMessageType.OpenExternalURL,
+														id: uuid.v4(),
+														payload: 'http://meetalva.github.io/example/example.alva'
+													})
+												}
 											/>
 										)}
 										<PropertyPane>

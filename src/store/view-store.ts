@@ -1205,4 +1205,9 @@ export class ViewStore {
 
 		this.setActivePageByIndex(index - 1);
 	}
+
+	@Mobx.action
+	public getFirstPage(): Model.Page {
+		return this.project.getPages()[0];
+	}
 }

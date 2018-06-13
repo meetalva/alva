@@ -59,15 +59,10 @@ Sender.receive(message => {
 				newProject.setPath(message.payload.path);
 				store.setProject(newProject);
 
-				const view =
-					newProject.getPages().length === 0
-						? Types.AlvaView.Pages
-						: Types.AlvaView.PageDetail;
+				app.setActiveView(Types.AlvaView.PageDetail);
+				store.setFocusedItem(FocusedItemType.Page, store.getCurrentPage());
+				store.commit();
 
-				app.setActiveView(view);
-        store.setFocusedItem(FocusedItemType.Page, store.getCurrentPage());
-        store.commit();
-        
 				const patternLibrary = newProject.getPatternLibrary();
 
 				if (patternLibrary.getState() !== Types.PatternLibraryState.Pristine) {

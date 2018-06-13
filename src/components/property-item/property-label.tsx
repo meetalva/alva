@@ -6,30 +6,7 @@ import styled from 'styled-components';
 
 export interface PropertyLabelProps {
 	label: string;
-	width?: WithWidth['width'];
 }
-
-export interface WithWidth {
-	width: PropertyLabelWidth;
-}
-
-export enum PropertyLabelWidth {
-	Sixth,
-	Third,
-	Full
-}
-
-const LABEL_WIDTH = (props: WithWidth) => {
-	switch (props.width) {
-		case PropertyLabelWidth.Full:
-			return '100%';
-		case PropertyLabelWidth.Sixth:
-			return '15%';
-		case PropertyLabelWidth.Third:
-		default:
-			return '30%';
-	}
-};
 
 const StyledLabel = styled.span`
 	display: inline-block;
@@ -37,7 +14,7 @@ const StyledLabel = styled.span`
 	font-size: 12px;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${Color.Grey50};
-	width: ${LABEL_WIDTH};
+	width: 30%;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -50,5 +27,5 @@ const StyledLabel = styled.span`
 export const PropertyLabel: React.StatelessComponent<PropertyLabelProps> = props => {
 	const { label } = props;
 
-	return <StyledLabel width={props.width || PropertyLabelWidth.Third}>{label}</StyledLabel>;
+	return <StyledLabel>{label}</StyledLabel>;
 };

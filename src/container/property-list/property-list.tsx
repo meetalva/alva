@@ -27,7 +27,7 @@ export class PropertyListContainer extends React.Component {
 				{regularProps.map(elementProperty => (
 					<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
 				))}
-				<div style={{ marginTop: 'auto' }}>
+				<div style={{ paddingTop: '30px' }}>
 					{eventHandlerProps.map(elementProperty => (
 						<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
 					))}

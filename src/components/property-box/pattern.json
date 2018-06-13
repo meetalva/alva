@@ -1,0 +1,7 @@
+{
+	"name": "box-item",
+	"displayName": "Box Item",
+	"description": "Box for property groups",
+	"version": "1.0.0",
+	"tags": ["property"]
+}

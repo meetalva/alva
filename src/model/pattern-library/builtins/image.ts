@@ -11,6 +11,7 @@ const MIN_WIDTH_CONTEXT_ID = 'min-width';
 const MAX_WIDTH_CONTEXT_ID = 'max-width';
 const MIN_HEIGHT_CONTEXT_ID = 'min-height';
 const MAX_HEIGHT_CONTEXT_ID = 'max-height';
+const ONCLICK_CONTEXT_ID = 'onClick';
 
 export const Image = (context: BuiltInContext): BuiltInResult => {
 	const patternId = context.options.getGlobalPatternId(PATTERN_CONTEXT_ID);
@@ -64,6 +65,19 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 			label: 'Max Height',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'maxHeight'
+		}),
+		new PatternProperty.PatternEventHandlerProperty({
+			contextId: ONCLICK_CONTEXT_ID,
+			description: 'You can set an interaction that happens on Click.',
+			event: new PatternProperty.PatternEvent({
+				type: Types.PatternEventType.MouseEvent
+			}),
+			hidden: false,
+			id: context.options.getGlobalPropertyId(patternId, ONCLICK_CONTEXT_ID),
+			label: 'Interaction',
+			origin: Types.PatternPropertyOrigin.BuiltIn,
+			propertyName: 'onClick',
+			required: false
 		})
 	];
 

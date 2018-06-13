@@ -18,6 +18,7 @@ export * from './overlay';
 export * from './panes';
 export * from './pattern-list';
 export * from './preview-tile';
+export * from './property-box';
 export * from './property-input';
 export * from './property-item';
 export * from './property-item-asset';

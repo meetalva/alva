@@ -10,6 +10,7 @@ const logo = `
 `;
 
 module.exports = {
+	cover: './website',
 	docs: [
 		'*.md',
 		'docs/*.md'

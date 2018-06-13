@@ -22,13 +22,17 @@ export enum ElementState {
 	Focused = 'focused'
 }
 
+export enum ElementCapability {
+	Draggable = 'draggable',
+	Editable = 'editable',
+	Openable = 'openable'
+}
+
 export interface ElementProps {
+	capabilities: ElementCapability[];
 	children?: React.ReactNode;
-	draggable: boolean;
 	dragging: boolean;
-	editable?: boolean;
 	id: string;
-	mayOpen: boolean;
 	onChange: React.FormEventHandler<HTMLInputElement>;
 	open: boolean;
 	placeholderHighlighted?: boolean;
@@ -182,6 +186,7 @@ const LabelContent = styled.div`
 	white-space: nowrap;
 	width: 100%;
 	cursor: ${(props: LabelContentProps) => (props.active && props.editable ? 'text' : 'default')};
+	user-select: none;
 `;
 
 const StyledSeamlessInput = styled.input`
@@ -230,7 +235,10 @@ class SeamlessInput extends React.Component<SeamlessInputProps> {
 }
 
 export const Element: React.StatelessComponent<ElementProps> = props => (
-	<StyledElement {...{ [ElementAnchors.element]: props.id }} draggable={props.draggable}>
+	<StyledElement
+		{...{ [ElementAnchors.element]: props.id }}
+		draggable={props.capabilities.includes(ElementCapability.Draggable)}
+	>
 		{props.dragging && (
 			<StyledPlaceholder
 				{...{ [ElementAnchors.placeholder]: true }}
@@ -238,7 +246,7 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 			/>
 		)}
 		<StyledElementLabel state={props.state}>
-			{props.mayOpen && (
+			{props.capabilities.includes(ElementCapability.Openable) && (
 				<StyledIcon
 					dataIcon={props.id}
 					name={IconName.ArrowFillRight}
@@ -248,7 +256,8 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 					active={props.state === ElementState.Active}
 				/>
 			)}
-			{props.state === ElementState.Editable && props.editable ? (
+			{props.state === ElementState.Editable &&
+			props.capabilities.includes(ElementCapability.Editable) ? (
 				<SeamlessInput
 					{...{ [ElementAnchors.label]: true }}
 					value={props.title}
@@ -259,7 +268,7 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 			) : (
 				<LabelContent
 					active={props.state === ElementState.Active}
-					editable={props.editable}
+					editable={props.capabilities.includes(ElementCapability.Editable)}
 					{...{ [ElementAnchors.label]: true }}
 				>
 					{props.title}

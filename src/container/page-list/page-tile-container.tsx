@@ -1,4 +1,4 @@
-import { PreviewTile, Space, SpaceSize } from '../../components';
+import { PageTile } from '../../components';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
@@ -7,6 +7,7 @@ import * as Types from '../../types';
 
 export interface PageTileContainerProps {
 	focused: boolean;
+	highlighted: boolean;
 	page: Page;
 }
 
@@ -55,29 +56,11 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 
 		const target = e.target as HTMLElement;
 
-		if (!this.props.focused) {
-			store.setActivePage(this.props.page);
-		}
+		store.setActivePage(this.props.page);
 
-		if (this.props.focused && target.matches('[data-title]')) {
+		if (this.props.highlighted && target.matches('[data-title]')) {
 			this.props.page.setNameState(Types.EditState.Editing);
 		}
-	}
-
-	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
-		if (this.props.page.getNameState() === Types.EditState.Editing) {
-			return;
-		}
-
-		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
-
-		const next =
-			store.getActiveAppView() === Types.AlvaView.Pages
-				? Types.AlvaView.PageDetail
-				: Types.AlvaView.Pages;
-
-		store.setActivePage(this.props.page);
-		store.setActiveAppView(next);
 	}
 
 	protected handleFocus(): void {
@@ -107,7 +90,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 				}
 				if (
 					e.target === document.body &&
-					this.props.focused &&
+					this.props.highlighted &&
 					this.props.page.getNameState() === Types.EditState.Editable
 				) {
 					this.props.page.setNameState(Types.EditState.Editing);
@@ -119,23 +102,21 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	public render(): JSX.Element {
 		const { props } = this;
 		return (
-			<Space size={SpaceSize.S}>
-				<PreviewTile
-					focused={props.focused}
-					id={props.page.getId()}
-					onBlur={e => this.handleBlur()}
-					onChange={e => this.handleChange(e)}
-					onClick={e => this.handleClick(e)}
-					onDoubleClick={e => this.handleDoubleClick(e)}
-					onFocus={e => this.handleFocus()}
-					onKeyDown={e => {
-						e.stopPropagation();
-						this.handleKeyDown(e.nativeEvent);
-					}}
-					nameState={props.page.getNameState()}
-					name={props.page.getName()}
-				/>
-			</Space>
+			<PageTile
+				focused={props.focused}
+				highlighted={props.highlighted}
+				id={props.page.getId()}
+				onBlur={e => this.handleBlur()}
+				onChange={e => this.handleChange(e)}
+				onClick={e => this.handleClick(e)}
+				onFocus={e => this.handleFocus()}
+				onKeyDown={e => {
+					e.stopPropagation();
+					this.handleKeyDown(e.nativeEvent);
+				}}
+				nameState={props.page.getNameState()}
+				name={props.page.getName()}
+			/>
 		);
 	}
 }

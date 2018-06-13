@@ -23,6 +23,7 @@ export interface StyledViewButtonProps {
 
 export interface ViewButtonProps {
 	onClick?: React.MouseEventHandler<SVGElement>;
+	rotateIcon?: boolean;
 	title: string;
 }
 
@@ -33,6 +34,7 @@ export interface ViewTitleProps {
 }
 
 interface StyledIconProps extends IconProps {
+	rotate?: boolean;
 	visible: boolean;
 }
 
@@ -64,6 +66,9 @@ const StyledViewButton: any = styled.div`
 	&:hover {
 		background: ${Color.Grey90};
 	}
+	&:active {
+		background: ${Color.Grey80};
+	}
 `;
 
 const StyledTitle = styled.strong`
@@ -87,9 +92,14 @@ const StyledIcons = styled(Icon)`
 	visibility: ${(props: StyledIconProps) => (props.visible ? 'visible' : 'hidden')};
 	cursor: pointer;
 	pointer-events: auto;
+	transform: rotate(${(props: StyledIconProps) => (props.rotate ? '180deg' : '0')});
+	transition: transform 0.2s;
 
 	&:hover {
 		background: ${Color.Grey90};
+	}
+	&:active {
+		background: ${Color.Grey80};
 	}
 `;
 
@@ -105,6 +115,7 @@ export const ViewButton: React.SFC<ViewButtonProps> = (props): JSX.Element => (
 			color={Color.Grey60}
 			size={IconSize.XS}
 			name={IconName.ArrowLeft}
+			rotate={props.rotateIcon}
 			visible={true}
 		/>
 		<StyledTitle grow>{props.title}</StyledTitle>

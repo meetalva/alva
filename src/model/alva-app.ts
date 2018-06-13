@@ -78,8 +78,6 @@ function deserializeView(state: Types.SerializedAlvaView): Types.AlvaView {
 	switch (state) {
 		case 'SplashScreen':
 			return Types.AlvaView.SplashScreen;
-		case 'Pages':
-			return Types.AlvaView.Pages;
 		case 'PageDetail':
 			return Types.AlvaView.PageDetail;
 	}
@@ -100,8 +98,6 @@ function serializeView(view: Types.AlvaView): Types.SerializedAlvaView {
 	switch (view) {
 		case Types.AlvaView.SplashScreen:
 			return 'SplashScreen';
-		case Types.AlvaView.Pages:
-			return 'Pages';
 		case Types.AlvaView.PageDetail:
 			return 'PageDetail';
 	}

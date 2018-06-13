@@ -9,7 +9,7 @@ import { AlvaApp, EditHistory, PatternLibrary, Project } from '../model';
 import * as Path from 'path';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { ViewStore } from '../store';
+import { FocusedItemType, ViewStore } from '../store';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
@@ -59,14 +59,10 @@ Sender.receive(message => {
 				newProject.setPath(message.payload.path);
 				store.setProject(newProject);
 
-				const view =
-					newProject.getPages().length === 0
-						? Types.AlvaView.Pages
-						: Types.AlvaView.PageDetail;
+				app.setActiveView(Types.AlvaView.PageDetail);
+				store.setFocusedItem(FocusedItemType.Page, store.getCurrentPage());
+				store.commit();
 
-				app.setActiveView(view);
-        store.commit();
-        
 				const patternLibrary = newProject.getPatternLibrary();
 
 				if (patternLibrary.getState() !== Types.PatternLibraryState.Pristine) {
@@ -126,10 +122,8 @@ Sender.receive(message => {
 			}
 
 			store.setActivePage(page);
+			page.setNameState(Types.EditState.Editing);
 
-			if (app.getActiveView() === Types.AlvaView.Pages) {
-				page.setNameState(Types.EditState.Editing);
-			}
 			break;
 		}
 		case ServerMessageType.ConnectPatternLibraryResponse: {
@@ -209,10 +203,10 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Cut: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			/*if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.cutSelectedPage();
-			}
+			}*/
 			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.executeElementCutSelected();
 			}
@@ -223,10 +217,17 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Delete: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			if (
+				app.getActiveView() === Types.AlvaView.PageDetail &&
+				store.getFocusedItemType() === FocusedItemType.Page
+			) {
 				store.executePageRemoveSelected();
 			}
-			if (app.getActiveView() === Types.AlvaView.PageDetail) {
+
+			if (
+				app.getActiveView() === Types.AlvaView.PageDetail &&
+				store.getFocusedItemType() === FocusedItemType.Element
+			) {
 				store.executeElementRemoveSelected();
 			}
 			break;
@@ -236,10 +237,10 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Copy: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			/*if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.copySelectedPage();
-			}
+			}*/
 			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.copySelectedElement();
 			}
@@ -250,10 +251,10 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Paste: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			/*if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.pasteAfterSelectedPage();
-			}
+			}*/
 			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.executeElementPasteAfterSelected();
 			}

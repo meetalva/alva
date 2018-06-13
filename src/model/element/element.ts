@@ -12,6 +12,7 @@ export interface ElementInit {
 	containerId?: string;
 	contentIds: string[];
 	dragged: boolean;
+	focused: boolean;
 	forcedOpen: boolean;
 	highlighted: boolean;
 	id?: string;
@@ -38,6 +39,8 @@ export class Element {
 	@Mobx.observable private dragged: boolean;
 
 	@Mobx.observable private editedName: string;
+
+	@Mobx.observable private focused: boolean;
 
 	@Mobx.observable private forcedOpen: boolean;
 
@@ -71,6 +74,7 @@ export class Element {
 
 	public constructor(init: ElementInit, context: ElementContext) {
 		this.dragged = init.dragged;
+		this.focused = init.focused;
 		this.highlighted = init.highlighted;
 		this.id = init.id ? init.id : uuid.v4();
 		this.patternId = init.patternId;
@@ -129,6 +133,7 @@ export class Element {
 		return new Element(
 			{
 				dragged: serialized.dragged,
+				focused: serialized.focused,
 				highlighted: serialized.highlighted,
 				id: serialized.id,
 				name: serialized.name,
@@ -173,6 +178,7 @@ export class Element {
 		const clone = new Element(
 			{
 				dragged: false,
+				focused: false,
 				highlighted: false,
 				id: uuid.v4(),
 				containerId: undefined,
@@ -313,6 +319,10 @@ export class Element {
 		return this.highlighted;
 	}
 
+	public getFocused(): boolean {
+		return this.focused;
+	}
+
 	public getId(): string {
 		return this.id;
 	}
@@ -423,6 +433,11 @@ export class Element {
 	@Mobx.action
 	public setHighlighted(highlighted: boolean): void {
 		this.highlighted = highlighted;
+	}
+
+	@Mobx.action
+	public setFocused(focused: boolean): void {
+		this.focused = focused;
 	}
 
 	@Mobx.action
@@ -553,6 +568,7 @@ export class Element {
 			containerId: this.containerId,
 			contentIds: Array.from(this.contentIds),
 			dragged: this.dragged,
+			focused: this.focused,
 			highlighted: this.highlighted,
 			id: this.id,
 			name: this.name,

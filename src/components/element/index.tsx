@@ -18,15 +18,21 @@ export enum ElementState {
 	Editable = 'editable',
 	Active = 'active',
 	Disabled = 'disabled',
-	Highlighted = 'highlighted'
+	Highlighted = 'highlighted',
+	Focused = 'focused'
+}
+
+export enum ElementCapability {
+	Draggable = 'draggable',
+	Editable = 'editable',
+	Openable = 'openable'
 }
 
 export interface ElementProps {
+	capabilities: ElementCapability[];
 	children?: React.ReactNode;
-	draggable: boolean;
 	dragging: boolean;
 	id: string;
-	mayOpen: boolean;
 	onChange: React.FormEventHandler<HTMLInputElement>;
 	open: boolean;
 	placeholderHighlighted?: boolean;
@@ -45,6 +51,7 @@ interface StyledIconProps {
 
 interface LabelContentProps {
 	active: boolean;
+	editable?: boolean;
 }
 
 export interface StyledElementChildProps {
@@ -178,7 +185,8 @@ const LabelContent = styled.div`
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	width: 100%;
-	cursor: ${(props: LabelContentProps) => (props.active ? 'text' : 'default')};
+	cursor: ${(props: LabelContentProps) => (props.active && props.editable ? 'text' : 'default')};
+	user-select: none;
 `;
 
 const StyledSeamlessInput = styled.input`
@@ -227,7 +235,10 @@ class SeamlessInput extends React.Component<SeamlessInputProps> {
 }
 
 export const Element: React.StatelessComponent<ElementProps> = props => (
-	<StyledElement {...{ [ElementAnchors.element]: props.id }} draggable={props.draggable}>
+	<StyledElement
+		{...{ [ElementAnchors.element]: props.id }}
+		draggable={props.capabilities.includes(ElementCapability.Draggable)}
+	>
 		{props.dragging && (
 			<StyledPlaceholder
 				{...{ [ElementAnchors.placeholder]: true }}
@@ -235,7 +246,7 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 			/>
 		)}
 		<StyledElementLabel state={props.state}>
-			{props.mayOpen && (
+			{props.capabilities.includes(ElementCapability.Openable) && (
 				<StyledIcon
 					dataIcon={props.id}
 					name={IconName.ArrowFillRight}
@@ -245,7 +256,8 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 					active={props.state === ElementState.Active}
 				/>
 			)}
-			{props.state === ElementState.Editable ? (
+			{props.state === ElementState.Editable &&
+			props.capabilities.includes(ElementCapability.Editable) ? (
 				<SeamlessInput
 					{...{ [ElementAnchors.label]: true }}
 					value={props.title}
@@ -256,6 +268,7 @@ export const Element: React.StatelessComponent<ElementProps> = props => (
 			) : (
 				<LabelContent
 					active={props.state === ElementState.Active}
+					editable={props.capabilities.includes(ElementCapability.Editable)}
 					{...{ [ElementAnchors.label]: true }}
 				>
 					{props.title}

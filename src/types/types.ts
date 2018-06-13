@@ -36,6 +36,7 @@ export interface SerializedElement {
 	containerId?: string;
 	contentIds: string[];
 	dragged: boolean;
+	focused: boolean;
 	forcedOpen: boolean;
 	highlighted: boolean;
 	id: string;
@@ -124,12 +125,11 @@ export interface SerializedPatternSlot {
 }
 
 export enum AlvaView {
-	Pages = 'Pages',
 	PageDetail = 'PageDetail',
 	SplashScreen = 'SplashScreen'
 }
 
-export type SerializedAlvaView = 'Pages' | 'PageDetail' | 'SplashScreen';
+export type SerializedAlvaView = 'PageDetail' | 'SplashScreen';
 
 export enum EditState {
 	Editable = 'Editable',

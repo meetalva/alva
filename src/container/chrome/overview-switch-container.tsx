@@ -2,7 +2,6 @@ import { ViewButton } from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewStore } from '../../store';
-import * as Types from '../../types';
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -16,14 +15,14 @@ export class OverviewSwitchContainer extends React.Component {
 			return null;
 		}
 
-		const title =
-			store.getActiveAppView() === Types.AlvaView.Pages ? `Show "${page.getName()}"` : 'Pages';
+		const title = store.getShowPages() ? 'Hide Pages' : 'Show Pages';
 
-		const next =
-			store.getActiveAppView() === Types.AlvaView.Pages
-				? Types.AlvaView.PageDetail
-				: Types.AlvaView.Pages;
-
-		return <ViewButton onClick={() => store.setActiveAppView(next)} title={title} />;
+		return (
+			<ViewButton
+				title={title}
+				onClick={() => store.setShowPages(!store.getShowPages())}
+				rotateIcon={!store.getShowPages()}
+			/>
+		);
 	}
 }

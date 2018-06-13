@@ -385,7 +385,7 @@ export function createMenu(ctx: MenuContext): void {
 					type: 'separator'
 				},
 				{
-					label: '&Show Left Sidebar',
+					label: '&Show Elements & Components',
 					type: 'checkbox',
 					checked: true,
 					enabled: ctx.store.getActiveAppView() === Types.AlvaView.PageDetail,
@@ -395,7 +395,7 @@ export function createMenu(ctx: MenuContext): void {
 					}
 				},
 				{
-					label: '&Show Right Sidebar',
+					label: '&Show Properties',
 					type: 'checkbox',
 					checked: true,
 					enabled: ctx.store.getActiveAppView() === Types.AlvaView.PageDetail,

@@ -1,5 +1,6 @@
 import * as AlvaUtil from '../../alva-util';
 import * as Components from '../../components';
+import { ElementCapability } from '../../components';
 import { ElementContentContainer } from './element-content-container';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
@@ -28,17 +29,20 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 
 		return (
 			<Components.Element
-				draggable={true}
+				capabilities={[
+					ElementCapability.Draggable,
+					props.element.getRole() !== ElementRole.Root && ElementCapability.Editable,
+					props.element.acceptsChildren() &&
+						props.element.getRole() !== ElementRole.Root &&
+						ElementCapability.Openable
+				].filter((item): item is ElementCapability => Boolean(item))}
 				dragging={store.getDragging()}
 				id={props.element.getId()}
-				mayOpen={
-					props.element.acceptsChildren() && props.element.getRole() !== ElementRole.Root
-				}
 				open={open}
 				onChange={AlvaUtil.noop}
 				placeholderHighlighted={props.element.getPlaceholderHighlighted()}
 				state={getState(props.element, store)}
-				title={props.element.getName()}
+				title={props.element.getRole() === ElementRole.Root ? 'Page' : props.element.getName()}
 			>
 				{open
 					? props.element

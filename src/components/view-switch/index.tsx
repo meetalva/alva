@@ -17,22 +17,6 @@ export interface ViewSwitchProps {
 	title: string;
 }
 
-export interface StyledViewButtonProps {
-	onClick?: React.MouseEventHandler<SVGElement>;
-}
-
-export interface ViewButtonProps {
-	onClick?: React.MouseEventHandler<SVGElement>;
-	rotateIcon?: boolean;
-	title: string;
-}
-
-export interface ViewTitleProps {
-	fontSize?: CopySize;
-	justify?: JustifyType;
-	title: string;
-}
-
 interface StyledIconProps extends IconProps {
 	rotate?: boolean;
 	visible: boolean;
@@ -54,21 +38,6 @@ const StyledViewSwitch = styled.div`
 	justify-self: ${(props: StyledViewSwitchProps) => props.justify || 'start'};
 	font-size: ${(props: StyledViewSwitchProps) =>
 		props.fontSize ? `${props.fontSize}px` : `${CopySize.S}px`};
-`;
-
-// tslint:disable-next-line:no-any
-const StyledViewButton: any = styled.div`
-	display: flex;
-	align-self: center;
-	justify-self: start;
-	font-size: ${`${CopySize.S}px`};
-	border-radius: ${getSpace(SpaceSize.XXS)}px;
-	&:hover {
-		background: ${Color.Grey90};
-	}
-	&:active {
-		background: ${Color.Grey80};
-	}
 `;
 
 const StyledTitle = styled.strong`
@@ -102,25 +71,6 @@ const StyledIcons = styled(Icon)`
 		background: ${Color.Grey80};
 	}
 `;
-
-export const ViewTitle: React.SFC<ViewTitleProps> = (props): JSX.Element => (
-	<StyledViewSwitch justify={props.justify} fontSize={props.fontSize}>
-		<StyledTitle>{props.title}</StyledTitle>
-	</StyledViewSwitch>
-);
-
-export const ViewButton: React.SFC<ViewButtonProps> = (props): JSX.Element => (
-	<StyledViewButton onClick={props.onClick}>
-		<StyledIcons
-			color={Color.Grey60}
-			size={IconSize.XS}
-			name={IconName.ArrowLeft}
-			rotate={props.rotateIcon}
-			visible={true}
-		/>
-		<StyledTitle grow>{props.title}</StyledTitle>
-	</StyledViewButton>
-);
 
 export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 	<StyledViewSwitch justify={props.justify} fontSize={props.fontSize}>

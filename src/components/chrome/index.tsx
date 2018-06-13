@@ -16,7 +16,7 @@ const StyledChrome = styled.div`
 	align-items: center;
 	width: 100%;
 	height: 40px;
-	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXL) * 3}px;
+	padding: 0 ${getSpace(SpaceSize.XXL) * 2 + getSpace(SpaceSize.S)}px;
 	border-bottom: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-bottom-width: 0.5px;

@@ -2,11 +2,10 @@ import * as AlvaUtil from '../../alva-util';
 import { BugReport, Chrome, CopySize, ViewSwitch } from '../../components';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
-import { OverviewSwitchContainer } from './overview-switch-container';
+import { ChromeSwitch } from './chrome-switch';
 import * as React from 'react';
 import * as Sender from '../../message/client';
 import { ViewStore } from '../../store';
-import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 interface InjectedChromeContainerProps {
@@ -58,22 +57,16 @@ export const ChromeContainer = MobxReact.inject('store')(
 					});
 				}}
 			>
-				{store.getActiveAppView() === Types.AlvaView.PageDetail ? (
-					<OverviewSwitchContainer />
-				) : (
-					<div />
-				)}
-				{store.getActiveAppView() === Types.AlvaView.PageDetail && (
-					<ViewSwitch
-						fontSize={CopySize.M}
-						justify="center"
-						leftVisible={index > 0}
-						rightVisible={index < pages.length - 1}
-						onLeftClick={previous}
-						onRightClick={next}
-						title={page ? page.getName() : ''}
-					/>
-				)}
+				<ChromeSwitch />
+				<ViewSwitch
+					fontSize={CopySize.M}
+					justify="center"
+					leftVisible={index > 0}
+					rightVisible={index < pages.length - 1}
+					onLeftClick={previous}
+					onRightClick={next}
+					title={page ? page.getName() : ''}
+				/>
 				<BugReport
 					title="Found a bug?"
 					onClick={() => {

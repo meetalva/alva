@@ -29,6 +29,7 @@ export * from './search';
 export * from './select';
 export * from './space';
 export * from './splash-screen';
+export * from './tab-switch';
 export * from './teaser';
 export * from './tag';
 export * from './view-switch';

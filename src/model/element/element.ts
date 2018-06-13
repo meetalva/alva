@@ -12,6 +12,7 @@ export interface ElementInit {
 	containerId?: string;
 	contentIds: string[];
 	dragged: boolean;
+	focused: boolean;
 	forcedOpen: boolean;
 	highlighted: boolean;
 	id?: string;
@@ -38,6 +39,8 @@ export class Element {
 	@Mobx.observable private dragged: boolean;
 
 	@Mobx.observable private editedName: string;
+
+	@Mobx.observable private focused: boolean;
 
 	@Mobx.observable private forcedOpen: boolean;
 
@@ -71,6 +74,7 @@ export class Element {
 
 	public constructor(init: ElementInit, context: ElementContext) {
 		this.dragged = init.dragged;
+		this.focused = init.focused;
 		this.highlighted = init.highlighted;
 		this.id = init.id ? init.id : uuid.v4();
 		this.patternId = init.patternId;
@@ -129,6 +133,7 @@ export class Element {
 		return new Element(
 			{
 				dragged: serialized.dragged,
+				focused: serialized.focused,
 				highlighted: serialized.highlighted,
 				id: serialized.id,
 				name: serialized.name,
@@ -147,7 +152,13 @@ export class Element {
 	}
 
 	public accepts(child: Element): boolean {
-		return !child.isAncestorOfById(this.getId()) && child !== this && this.acceptsChildren();
+		const childrenContent = this.getContentBySlotType(Types.SlotType.Children);
+
+		if (!childrenContent) {
+			return false;
+		}
+
+		return childrenContent.accepts(child);
 	}
 
 	public acceptsChildren(): boolean {
@@ -173,6 +184,7 @@ export class Element {
 		const clone = new Element(
 			{
 				dragged: false,
+				focused: false,
 				highlighted: false,
 				id: uuid.v4(),
 				containerId: undefined,
@@ -201,14 +213,16 @@ export class Element {
 		return clone;
 	}
 
-	public getAncestors(init: Element[] = []): Element[] {
+	public getAncestors(init: (Element | ElementContent)[] = []): (Element | ElementContent)[] {
 		const parent = this.getParent();
+		const container = this.getContainer();
 
-		if (!parent) {
+		if (!parent || !container) {
 			return init;
 		}
 
 		init.push(parent);
+		init.push(container);
 		parent.getAncestors(init);
 
 		return init;
@@ -313,6 +327,10 @@ export class Element {
 		return this.highlighted;
 	}
 
+	public getFocused(): boolean {
+		return this.focused;
+	}
+
 	public getId(): string {
 		return this.id;
 	}
@@ -358,7 +376,7 @@ export class Element {
 	public getParent(): Element | undefined {
 		const container = this.getContainer();
 
-		if (!container) {
+		if (!container || this.role === Types.ElementRole.Root) {
 			return;
 		}
 
@@ -423,6 +441,11 @@ export class Element {
 	@Mobx.action
 	public setHighlighted(highlighted: boolean): void {
 		this.highlighted = highlighted;
+	}
+
+	@Mobx.action
+	public setFocused(focused: boolean): void {
+		this.focused = focused;
 	}
 
 	@Mobx.action
@@ -553,6 +576,7 @@ export class Element {
 			containerId: this.containerId,
 			contentIds: Array.from(this.contentIds),
 			dragged: this.dragged,
+			focused: this.focused,
 			highlighted: this.highlighted,
 			id: this.id,
 			name: this.name,

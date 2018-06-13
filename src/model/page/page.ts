@@ -27,6 +27,8 @@ export interface PageContext {
 export class Page {
 	@Mobx.observable private active: boolean;
 
+	@Mobx.observable private focused: boolean;
+
 	/**
 	 * Intermediary edited name
 	 */
@@ -80,8 +82,9 @@ export class Page {
 				new ElementContent(
 					{
 						elementIds: [],
+						forcedOpen: false,
 						id: uuid.v4(),
-						name: slot.getName(),
+						open: false,
 						slotId: slot.getId()
 					},
 					context
@@ -98,6 +101,7 @@ export class Page {
 				dragged: false,
 				open: true,
 				forcedOpen: false,
+				focused: false,
 				patternId: rootPattern.getId(),
 				placeholderHighlighted: false,
 				properties: [],
@@ -166,6 +170,10 @@ export class Page {
 		return rootElement.getContentById(id);
 	}
 
+	public getFocused(): boolean {
+		return this.focused;
+	}
+
 	public getEditedName(): string {
 		return this.editedName;
 	}
@@ -220,6 +228,11 @@ export class Page {
 	@Mobx.action
 	public setActive(active: boolean): void {
 		this.active = active;
+	}
+
+	@Mobx.action
+	public setFocused(focused: boolean): void {
+		this.focused = focused;
 	}
 
 	@Mobx.action

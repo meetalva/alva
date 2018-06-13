@@ -19,7 +19,6 @@ import { ElementList } from './element-list';
 import { ServerMessageType } from '../message';
 import * as MobxReact from 'mobx-react';
 import { PageListContainer } from './page-list/page-list-container';
-import { PageListPreview } from './page-list/page-list-preview';
 import { PatternListContainer } from './pattern-list';
 import { PreviewPaneWrapper } from './preview-pane-wrapper';
 import { PropertyListContainer } from './property-list';
@@ -71,13 +70,24 @@ export class App extends React.Component {
 							}}
 						/>
 					)}
-					{props.store.getActiveAppView() === Types.AlvaView.Pages && (
-						<PageListPreview>
-							<PageListContainer />
-						</PageListPreview>
-					)}
 					{props.store.getActiveAppView() === Types.AlvaView.PageDetail && (
 						<React.Fragment>
+							{props.store.getShowPages() && (
+								<Resizeable
+									handleStyles={{ right: { zIndex: 1 } }}
+									defaultSize={{ width: 140, height: '100%' }}
+									enable={{ right: true }}
+									minWidth={140}
+								>
+									<SideBar
+										side={LayoutSide.Left}
+										direction={LayoutDirection.Column}
+										border={LayoutBorder.Side}
+									>
+										<PageListContainer />
+									</SideBar>
+								</Resizeable>
+							)}
 							{props.store.getShowLeftSidebar() && (
 								<Resizeable
 									handleStyles={{ right: { zIndex: 1 } }}

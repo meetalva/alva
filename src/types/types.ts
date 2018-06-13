@@ -36,6 +36,7 @@ export interface SerializedElement {
 	containerId?: string;
 	contentIds: string[];
 	dragged: boolean;
+	focused: boolean;
 	forcedOpen: boolean;
 	highlighted: boolean;
 	id: string;
@@ -50,8 +51,9 @@ export interface SerializedElement {
 
 export interface SerializedElementContent {
 	elementIds: string[];
+	forcedOpen: boolean;
 	id: string;
-	name: string;
+	open: boolean;
 	parentElementId?: string;
 	slotId: string;
 }
@@ -117,19 +119,22 @@ export interface SerializedPattern {
 
 export interface SerializedPatternSlot {
 	contextId: string;
-	displayName: string;
+	description: string;
+	example: string;
+	hidden: boolean;
 	id: string;
+	label: string;
 	propertyName: string;
+	required: boolean;
 	type: string;
 }
 
 export enum AlvaView {
-	Pages = 'Pages',
 	PageDetail = 'PageDetail',
 	SplashScreen = 'SplashScreen'
 }
 
-export type SerializedAlvaView = 'Pages' | 'PageDetail' | 'SplashScreen';
+export type SerializedAlvaView = 'PageDetail' | 'SplashScreen';
 
 export enum EditState {
 	Editable = 'Editable',

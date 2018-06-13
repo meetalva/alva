@@ -1210,4 +1210,9 @@ export class ViewStore {
 	public getFirstPage(): Model.Page {
 		return this.project.getPages()[0];
 	}
+
+	@Mobx.action
+	public getLastPage(): Model.Page {
+		return this.project.getPages()[this.project.getPages().length - 1];
+	}
 }

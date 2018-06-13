@@ -395,6 +395,7 @@ export function createMenu(ctx: MenuContext): void {
 				{
 					label: 'Next Page',
 					accelerator: 'CmdOrCtrl+Alt+Right',
+					enabled: ctx.store.getLastPage() !== ctx.store.getCurrentPage(),
 					click: () => {
 						ctx.store.setNextPage();
 					}

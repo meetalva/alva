@@ -1,5 +1,7 @@
 import * as Analyzer from '../analyzer';
 import { checkForUpdates } from './auto-updater';
+import * as ConvertColor from 'color';
+import { Color } from '../components/colors';
 import { createCompiler } from '../compiler/create-compiler';
 import { app, BrowserWindow, dialog, screen, shell } from 'electron';
 import * as electronIsDev from 'electron-is-dev';
@@ -507,7 +509,9 @@ async function createWindow(): Promise<void> {
 		minWidth: 780,
 		minHeight: 380,
 		titleBarStyle: 'hiddenInset',
-		backgroundColor: '#f7f7f7',
+		backgroundColor: ConvertColor(Color.Grey97)
+			.hex()
+			.toString(),
 		title: 'Alva'
 	});
 

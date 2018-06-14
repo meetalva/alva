@@ -47,6 +47,7 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 
 	public render(): JSX.Element | null {
 		const { props } = this;
+
 		return (
 			<Components.PatternListItem
 				key={props.pattern.getId()}

@@ -152,7 +152,13 @@ export class Element {
 	}
 
 	public accepts(child: Element): boolean {
-		return !child.isAncestorOfById(this.getId()) && child !== this && this.acceptsChildren();
+		const childrenContent = this.getContentBySlotType(Types.SlotType.Children);
+
+		if (!childrenContent) {
+			return false;
+		}
+
+		return childrenContent.accepts(child);
 	}
 
 	public acceptsChildren(): boolean {
@@ -207,14 +213,16 @@ export class Element {
 		return clone;
 	}
 
-	public getAncestors(init: Element[] = []): Element[] {
+	public getAncestors(init: (Element | ElementContent)[] = []): (Element | ElementContent)[] {
 		const parent = this.getParent();
+		const container = this.getContainer();
 
-		if (!parent) {
+		if (!parent || !container) {
 			return init;
 		}
 
 		init.push(parent);
+		init.push(container);
 		parent.getAncestors(init);
 
 		return init;
@@ -368,7 +376,7 @@ export class Element {
 	public getParent(): Element | undefined {
 		const container = this.getContainer();
 
-		if (!container) {
+		if (!container || this.role === Types.ElementRole.Root) {
 			return;
 		}
 

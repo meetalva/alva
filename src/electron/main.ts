@@ -195,6 +195,8 @@ const userStore = new ElectronStore();
 
 					await Persistence.persist(path, project);
 
+					app.addRecentDocument(path);
+
 					send({
 						type: ServerMessageType.CreateNewFileResponse,
 						id: message.id,
@@ -235,6 +237,8 @@ const userStore = new ElectronStore();
 					if (typeof project === 'object') {
 						project.path = path;
 					}
+
+					app.addRecentDocument(path);
 
 					send({
 						type: ServerMessageType.OpenFileResponse,

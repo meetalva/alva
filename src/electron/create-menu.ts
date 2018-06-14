@@ -384,7 +384,7 @@ export function createMenu(ctx: MenuContext): void {
 				{
 					type: 'separator'
 				},
-				{
+        {
 					label: 'Previous Page',
 					accelerator: 'CmdOrCtrl+Alt+Left',
 					enabled: typeof ctx.store.getPreviousPage() !== 'undefined',
@@ -409,21 +409,31 @@ export function createMenu(ctx: MenuContext): void {
 					}
 				},
 				{
-					label: '&Show Elements & Components',
+					label: 'Show Pages',
 					type: 'checkbox',
-					checked: true,
+					checked: ctx.store.getShowPages(),
 					enabled: ctx.store.getActiveAppView() === Types.AlvaView.PageDetail,
 					accelerator: 'CmdOrCtrl+Alt+1',
+					click: (item, checked) => {
+						ctx.store.setShowPages(item.checked);
+					}
+				},
+				{
+					label: 'Show Elements and Library',
+					type: 'checkbox',
+					checked: ctx.store.getShowLeftSidebar(),
+					enabled: ctx.store.getActiveAppView() === Types.AlvaView.PageDetail,
+					accelerator: 'CmdOrCtrl+Alt+2',
 					click: (item, checked) => {
 						ctx.store.setShowLeftSidebar(item.checked);
 					}
 				},
 				{
-					label: '&Show Properties',
+					label: 'Show Properties',
 					type: 'checkbox',
-					checked: true,
+					checked: ctx.store.getShowRightSidebar(),
 					enabled: ctx.store.getActiveAppView() === Types.AlvaView.PageDetail,
-					accelerator: 'CmdOrCtrl+Alt+2',
+					accelerator: 'CmdOrCtrl+Alt+3',
 					click: (item, checked) => {
 						ctx.store.setShowRightSidebar(item.checked);
 					}

@@ -8,11 +8,13 @@ export enum IconName {
 	ArrowFillRight,
 	ArrowFillLeft,
 	Check,
-	Uncheck,
-	Robo,
+	Element,
+	Page,
 	Plus,
 	Pattern,
-	Search
+	Robo,
+	Search,
+	Uncheck
 }
 
 export interface IconProps {
@@ -99,6 +101,22 @@ const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
 			<path
 				key="check"
 				d="M14.89 13.477l6.024 6.023-1.414 1.414-6.023-6.023a6 6 0 1 1 1.414-1.414zm-1.649-1.132a4 4 0 1 0-.896.896l.896-.896z"
+			/>
+		]
+	],
+	[IconName.Page]: [
+		[
+			<path
+				key="page"
+				d="M6 6h10c.552 0 1 .418 1 .933v12.134c0 .515-.448.933-1 .933H6c-.552 0-1-.418-1-.933V6.933C5 6.418 5.448 6 6 6zm1.5 4a.5.5 0 1 0 0 1h3a.5.5 0 1 0 0-1h-3zm0-2a.5.5 0 0 0 0 1h5a.5.5 0 1 0 0-1h-5zm0 4a.5.5 0 1 0 0 1h6a.5.5 0 1 0 0-1h-6zM19 4.5v13a.5.5 0 1 1-1 0V5H8.5a.5.5 0 0 1 0-1h10a.5.5 0 0 1 .5.5z"
+			/>
+		]
+	],
+	[IconName.Element]: [
+		[
+			<path
+				key="element"
+				d="M12.757 5.077l7.04 5.28a1 1 0 0 1 0 1.6l-7.04 5.28a1 1 0 0 1-1.2 0l-7.04-5.28a1 1 0 0 1 0-1.6l7.04-5.28a1 1 0 0 1 1.2 0zm7.127 8.63c.151.241.093.557-.133.729l-7.06 5.35a1 1 0 0 1-1.205.002l-7.29-5.494A.494.494 0 0 1 4.1 13.6l.003-.004a.506.506 0 0 1 .705-.095l6.677 5.035a1 1 0 0 0 1.207-.001l6.527-4.951a.459.459 0 0 1 .665.122z"
 			/>
 		]
 	]

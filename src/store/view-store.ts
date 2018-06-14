@@ -601,40 +601,6 @@ export class ViewStore {
 		return this.project.getElements().find(element => element.getHighlighted());
 	}
 
-	@Mobx.action
-	public getPreviousPage(): Model.Page | undefined {
-		const page = this.getCurrentPage();
-
-		if (!page) {
-			return;
-		}
-
-		const index = this.project.getPageIndex(page);
-
-		if (typeof index !== 'number') {
-			return;
-		}
-
-		return this.project.getPages()[index - 1];
-	}
-
-	@Mobx.action
-	public getNextPage(): Model.Page | undefined {
-		const page = this.getCurrentPage();
-
-		if (!page) {
-			return;
-		}
-
-		const index = this.project.getPageIndex(page);
-
-		if (typeof index !== 'number') {
-			return;
-		}
-
-		return this.project.getPages()[index + 1];
-	}
-
 	public getFocusedItem(): Model.Element | Model.Page | undefined {
 		if (!this.project) {
 			return;
@@ -659,6 +625,23 @@ export class ViewStore {
 
 	public getNameEditableElement(): Model.Element | undefined {
 		return this.project.getElements().find(e => e.getNameEditable());
+	}
+
+	@Mobx.action
+	public getNextPage(): Model.Page | undefined {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		return this.project.getPages()[index + 1];
 	}
 
 	public getPageById(id: string): Model.Page | undefined {
@@ -709,6 +692,23 @@ export class ViewStore {
 
 	public getPatternSearchTerm(): string {
 		return this.app.getSearchTerm();
+	}
+
+	@Mobx.action
+	public getPreviousPage(): Model.Page | undefined {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		return this.project.getPages()[index - 1];
 	}
 
 	public getProject(): Model.Project {

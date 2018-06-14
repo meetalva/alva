@@ -1,6 +1,6 @@
 {
-	"name": "box-item",
-	"displayName": "Box Item",
+	"name": "property-box",
+	"displayName": "Property Box",
 	"description": "Box for property groups",
 	"version": "1.0.0",
 	"tags": ["property"]

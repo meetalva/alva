@@ -19,8 +19,6 @@ const StyledTabSwitch = styled.div`
 	padding: 0 ${getSpace(SpaceSize.XS)}px;
 	color: ${(props: TabSwitchProps) => (props.active ? Color.Blue : Color.Grey50)};
 	height: 100%;
-	border-bottom: 3px solid;
-	border-bottom-color: ${(props: TabSwitchProps) => (props.active ? Color.Blue20 : 'transparent')};
 	align-items: center;
 
 	&:active {

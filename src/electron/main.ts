@@ -270,20 +270,38 @@ const userStore = new ElectronStore();
 				const project = Project.from(message.payload);
 				const library = project.getPatternLibrary();
 
-				const analysis = await Analyzer.analyze(path, {
-					getGobalEnumOptionId: (patternId, contextId) =>
-						library.assignEnumOptionId(patternId, contextId),
-					getGlobalPatternId: contextId => library.assignPatternId(contextId),
-					getGlobalPropertyId: (patternId, contextId) =>
-						library.assignPropertyId(patternId, contextId),
-					getGlobalSlotId: (patternId, contextId) => library.assignSlotId(patternId, contextId)
-				});
+				try {
+					const analysis = await Analyzer.analyze(path, {
+						getGobalEnumOptionId: (patternId, contextId) =>
+							library.assignEnumOptionId(patternId, contextId),
+						getGlobalPatternId: contextId => library.assignPatternId(contextId),
+						getGlobalPropertyId: (patternId, contextId) =>
+							library.assignPropertyId(patternId, contextId),
+						getGlobalSlotId: (patternId, contextId) =>
+							library.assignSlotId(patternId, contextId)
+					});
 
-				send({
-					type: ServerMessageType.ConnectPatternLibraryResponse,
-					id: message.id,
-					payload: analysis
-				});
+					send({
+						type: ServerMessageType.ConnectPatternLibraryResponse,
+						id: message.id,
+						payload: analysis
+					});
+				} catch {
+					dialog.showMessageBox(
+						{
+							message:
+								'Sorry, this seems to be an uncompatible library. Learn more about supported component libraries on github.com/meetalva',
+							buttons: ['OK', 'Learn more']
+						},
+						response => {
+							if (response === 1) {
+								shell.openExternal(
+									'https://github.com/meetalva/alva#pattern-library-requirements'
+								);
+							}
+						}
+					);
+				}
 
 				break;
 			}
@@ -305,10 +323,8 @@ const userStore = new ElectronStore();
 					return;
 				}
 
-				let analysis;
-
 				try {
-					analysis = await Analyzer.analyze(connection.path, {
+					const analysis = await Analyzer.analyze(connection.path, {
 						getGobalEnumOptionId: (patternId, contextId) =>
 							library.assignEnumOptionId(patternId, contextId),
 						getGlobalPatternId: contextId => library.assignPatternId(contextId),
@@ -316,6 +332,12 @@ const userStore = new ElectronStore();
 							library.assignPropertyId(patternId, contextId),
 						getGlobalSlotId: (patternId, contextId) =>
 							library.assignSlotId(patternId, contextId)
+					});
+
+					send({
+						type: ServerMessageType.ConnectPatternLibraryResponse,
+						id: message.id,
+						payload: analysis
 					});
 				} catch {
 					dialog.showMessageBox(
@@ -333,12 +355,6 @@ const userStore = new ElectronStore();
 						}
 					);
 				}
-
-				send({
-					type: ServerMessageType.ConnectPatternLibraryResponse,
-					id: message.id,
-					payload: analysis
-				});
 
 				break;
 			}

@@ -188,7 +188,6 @@ const userStore = new ElectronStore();
 
 				if (path) {
 					const project = Project.create({
-						name: 'Untitled Project',
 						path
 					});
 

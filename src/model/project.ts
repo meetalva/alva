@@ -14,7 +14,6 @@ export interface ProjectProperties {
 	id?: string;
 	lastChangedAuthor?: string;
 	lastChangedDate?: Date;
-	name: string;
 	pages: Page[];
 	path: string;
 	patternLibrary: PatternLibrary;
@@ -22,7 +21,6 @@ export interface ProjectProperties {
 }
 
 export interface ProjectCreateInit {
-	name: string;
 	path: string;
 }
 
@@ -52,8 +50,6 @@ export class Project {
 	 */
 	public constructor(init: ProjectProperties) {
 		this.patternLibrary = init.patternLibrary;
-		this.name = init.name;
-
 		this.id = init.id ? init.id : uuid.v4();
 		this.pages = init.pages ? init.pages : [];
 		this.path = init.path;
@@ -105,7 +101,6 @@ export class Project {
 		});
 
 		const project = new Project({
-			name: init.name,
 			pages: [],
 			path: init.path,
 			patternLibrary,
@@ -138,7 +133,6 @@ export class Project {
 
 		const project = new Project({
 			id: serialized.id,
-			name: serialized.name,
 			path: serialized.path,
 			pages: [],
 			patternLibrary,

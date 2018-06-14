@@ -6,8 +6,8 @@ import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface PropertyBoxProps {
-	headline?: string;
-	copy?: string;
+	headline: string;
+	copy: string;
 }
 
 const StyledPropertyBox = styled.div`

@@ -387,17 +387,25 @@ export function createMenu(ctx: MenuContext): void {
 				{
 					label: 'Previous Page',
 					accelerator: 'CmdOrCtrl+Alt+Left',
-					enabled: ctx.store.getFirstPage() !== ctx.store.getCurrentPage(),
+					enabled: typeof ctx.store.getPreviousPage() !== 'undefined',
 					click: () => {
-						ctx.store.setPreviousPage();
+						const nextPage = ctx.store.getPreviousPage();
+
+						if (nextPage) {
+							ctx.store.setActivePage(nextPage);
+						}
 					}
 				},
 				{
 					label: 'Next Page',
 					accelerator: 'CmdOrCtrl+Alt+Right',
-					enabled: ctx.store.getLastPage() !== ctx.store.getCurrentPage(),
+					enabled: typeof ctx.store.getNextPage() !== 'undefined',
 					click: () => {
-						ctx.store.setNextPage();
+						const nextPage = ctx.store.getNextPage();
+
+						if (nextPage) {
+							ctx.store.setActivePage(nextPage);
+						}
 					}
 				},
 				{

@@ -606,6 +606,40 @@ export class ViewStore {
 		return this.project.getPages()[0];
 	}
 
+	@Mobx.action
+	public getPreviousPage(): Model.Page | undefined {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		return this.project.getPages()[index - 1];
+	}
+
+	@Mobx.action
+	public getNextPage(): Model.Page | undefined {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		return this.project.getPages()[index + 1];
+	}
+
 	public getFocusedItem(): Model.Element | Model.Page | undefined {
 		if (!this.project) {
 			return;

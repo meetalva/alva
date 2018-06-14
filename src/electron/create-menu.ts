@@ -389,10 +389,10 @@ export function createMenu(ctx: MenuContext): void {
 					accelerator: 'CmdOrCtrl+Alt+Left',
 					enabled: typeof ctx.store.getPreviousPage() !== 'undefined',
 					click: () => {
-						const nextPage = ctx.store.getPreviousPage();
+						const previousPage = ctx.store.getPreviousPage();
 
-						if (nextPage) {
-							ctx.store.setActivePage(nextPage);
+						if (previousPage) {
+							ctx.store.setActivePage(previousPage);
 						}
 					}
 				},

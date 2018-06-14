@@ -6,18 +6,24 @@ import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface TabSwitchProps {
-	active?: boolean;
+	active?: TabSwitchState;
 	icon?: IconName;
 	label?: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	title: string;
 }
 
+export enum TabSwitchState {
+	Active,
+	Default
+}
+
 const StyledTabSwitch = styled.div`
 	display: flex;
 	box-sizing: border-box;
 	padding: 0 ${getSpace(SpaceSize.XS)}px;
-	color: ${(props: TabSwitchProps) => (props.active ? Color.Blue : Color.Grey50)};
+	color: ${(props: TabSwitchProps) =>
+		props.active === TabSwitchState.Active ? Color.Blue : Color.Grey50};
 	height: 100%;
 	align-items: center;
 

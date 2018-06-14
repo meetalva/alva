@@ -1,4 +1,4 @@
-import { IconName } from '../../components';
+import { IconName, TabSwitchState } from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { TabSwitch } from '../../components';
@@ -15,13 +15,13 @@ export class ChromeSwitch extends React.Component {
 				<TabSwitch
 					icon={IconName.Page}
 					title={'Pages'}
-					active={store.getShowPages()}
+					active={store.getShowPages() ? TabSwitchState.Active : TabSwitchState.Default}
 					onClick={() => store.setShowPages(!store.getShowPages())}
 				/>
 				<TabSwitch
 					icon={IconName.Element}
 					title={'Elements & Library'}
-					active={store.getShowLeftSidebar()}
+					active={store.getShowLeftSidebar() ? TabSwitchState.Active : TabSwitchState.Default}
 					onClick={() => store.setShowLeftSidebar(!store.getShowLeftSidebar())}
 				/>
 			</div>

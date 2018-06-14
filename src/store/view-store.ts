@@ -628,6 +628,23 @@ export class ViewStore {
 		return this.project.getElements().find(e => e.getNameEditable());
 	}
 
+	@Mobx.action
+	public getNextPage(): Model.Page | undefined {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		return this.project.getPages()[index + 1];
+	}
+
 	public getPageById(id: string): Model.Page | undefined {
 		const project = this.getProject();
 
@@ -676,6 +693,23 @@ export class ViewStore {
 
 	public getPatternSearchTerm(): string {
 		return this.app.getSearchTerm();
+	}
+
+	@Mobx.action
+	public getPreviousPage(): Model.Page | undefined {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		return this.project.getPages()[index - 1];
 	}
 
 	public getProject(): Model.Project {

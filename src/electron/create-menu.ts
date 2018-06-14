@@ -385,6 +385,30 @@ export function createMenu(ctx: MenuContext): void {
 					type: 'separator'
 				},
 				{
+					label: 'Previous Page',
+					accelerator: 'CmdOrCtrl+Alt+Left',
+					enabled: typeof ctx.store.getPreviousPage() !== 'undefined',
+					click: () => {
+						const previousPage = ctx.store.getPreviousPage();
+
+						if (previousPage) {
+							ctx.store.setActivePage(previousPage);
+						}
+					}
+				},
+				{
+					label: 'Next Page',
+					accelerator: 'CmdOrCtrl+Alt+Right',
+					enabled: typeof ctx.store.getNextPage() !== 'undefined',
+					click: () => {
+						const nextPage = ctx.store.getNextPage();
+
+						if (nextPage) {
+							ctx.store.setActivePage(nextPage);
+						}
+					}
+				},
+				{
 					label: '&Show Elements & Components',
 					type: 'checkbox',
 					checked: true,

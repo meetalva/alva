@@ -106,6 +106,7 @@ export function createMenu(ctx: MenuContext): void {
 							return;
 						}
 						ctx.store.save();
+						app.addRecentDocument(project.getPath());
 					}
 				},
 				{

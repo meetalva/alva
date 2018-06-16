@@ -1,4 +1,5 @@
-import { Color, ElementAnchors } from '../../components';
+import { ElementAnchors } from '../../components';
+import { ElementDragImage } from '../element-drag-image';
 import { elementMenu } from '../../electron/context-menus';
 import { ElementContainer } from './element-container';
 import * as Mobx from 'mobx';
@@ -9,21 +10,10 @@ import * as Store from '../../store';
 import styled from 'styled-components';
 import * as Types from '../../types';
 
-const DRAG_IMG_STYLE = `
-	position: fixed;
-	top: 100vh;
-	background-color: ${Color.White};
-	color: ${Color.Black};
-	padding: 6px 18px;
-	border-radius: 3px;
-	font-size: 12px;
-	opacity: 1;
-`;
-
 @MobxReact.inject('store')
 @MobxReact.observer
 export class ElementList extends React.Component {
-	private dragImg?: HTMLElement;
+	private dragImg: HTMLElement | null;
 	private globalDragEndListener?: (e: DragEvent) => void;
 	private globalDropListener?: (e: DragEvent) => void;
 	private globalKeyDownListener?: (e: KeyboardEvent) => void;
@@ -85,6 +75,7 @@ export class ElementList extends React.Component {
 		}
 
 		const element = elementFromTarget(e.target, { sibling: false, store });
+		const targetContent = elementContentFromTarget(e.target, { store });
 		const label = above(e.target, `[${ElementAnchors.label}]`);
 
 		if (!element) {
@@ -92,6 +83,11 @@ export class ElementList extends React.Component {
 		}
 
 		e.stopPropagation();
+
+		if (targetContent && targetContent.getSlotType() !== Types.SlotType.Children) {
+			targetContent.toggleOpen();
+			return;
+		}
 
 		if (icon) {
 			element.toggleOpen();
@@ -115,12 +111,6 @@ export class ElementList extends React.Component {
 		}
 	}
 
-	private handleDragEnd(e: React.DragEvent<HTMLElement>): void {
-		if (this.dragImg && this.dragImg.parentNode) {
-			this.dragImg.parentNode.removeChild(this.dragImg);
-		}
-	}
-
 	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const targetElement = elementFromTarget(e.target, { sibling: false, store });
@@ -135,35 +125,50 @@ export class ElementList extends React.Component {
 
 	private handleDragOver(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
+
 		const target = e.target as HTMLElement;
 		const isSibling = target.getAttribute(ElementAnchors.placeholder) === 'true';
+		const visualTargetElement = elementFromTarget(e.target, { sibling: false, store });
 
-		const targetParentElement = elementFromTarget(target, { sibling: isSibling, store });
-		const visualTargetElement = elementFromTarget(target, { sibling: false, store });
+		const targetContent = isSibling
+			? visualTargetElement && visualTargetElement.getContainer()
+			: elementContentFromTarget(e.target, { store });
 
 		const draggedElement = store.getDraggedElement();
 
-		if (!targetParentElement || !visualTargetElement) {
+		if (!targetContent || !visualTargetElement) {
 			return;
 		}
 
 		Mobx.transaction(() => {
 			if (!draggedElement) {
-				// e.dataTransfer.dropEffect = 'none';
-				visualTargetElement.setHighlighted(false);
+				targetContent.setHighlighted(false);
 				visualTargetElement.setPlaceholderHighlighted(false);
 				return;
 			}
 
-			const accepted = targetParentElement.accepts(draggedElement);
+			store
+				.getProject()
+				.getElementContents()
+				.filter(sec => sec.getHighlighted() && sec !== targetContent)
+				.forEach(se => se.setHighlighted(false));
+
+			store
+				.getProject()
+				.getElements()
+				.filter(se => se.getHighlighted() && se !== visualTargetElement)
+				.forEach(se => se.setHighlighted(false));
+
+			const accepted = targetContent.accepts(draggedElement);
 
 			if (!accepted) {
-				// e.dataTransfer.dropEffect = 'none';
+				targetContent.setHighlighted(false);
+				visualTargetElement.setPlaceholderHighlighted(false);
 				return;
 			}
 
 			e.dataTransfer.dropEffect = 'copy';
-			visualTargetElement.setHighlighted(!isSibling);
+			targetContent.setHighlighted(!isSibling);
 			visualTargetElement.setPlaceholderHighlighted(isSibling);
 		});
 	}
@@ -177,54 +182,52 @@ export class ElementList extends React.Component {
 			return;
 		}
 
+		if (draggedElement.getRole() === Types.ElementRole.Root) {
+			e.preventDefault();
+			return;
+		}
+
 		if (draggedElement.getNameEditable()) {
 			e.preventDefault();
 			return;
 		}
 
-		const dragImg = document.createElement('div');
-		dragImg.textContent = draggedElement.getName();
-		dragImg.setAttribute('style', DRAG_IMG_STYLE);
-		document.body.appendChild(dragImg);
+		draggedElement.setDragged(true);
+		store.setSelectedElement(draggedElement);
 
-		e.dataTransfer.effectAllowed = 'copy';
-		e.dataTransfer.setDragImage(dragImg, 75, 15);
-		this.dragImg = dragImg;
-
-		// tslint:disable-next-line:no-any
-		(window as any).requestIdleCallback(() => {
-			draggedElement.setDragged(true);
-			store.setSelectedElement(draggedElement);
-		});
+		if (this.dragImg) {
+			e.dataTransfer.effectAllowed = 'copy';
+			e.dataTransfer.setDragImage(this.dragImg, 75, 15);
+		}
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 
-		this.handleDragEnd(e);
-
 		const target = e.target as HTMLElement;
 		const isSiblingDrop = target.getAttribute(ElementAnchors.placeholder) === 'true';
 
-		const rawTargetElement = elementFromTarget(e.target, { sibling: false, store });
-		const dropTargetElement = elementFromTarget(e.target, { sibling: isSiblingDrop, store });
-		const dropTargetContent = contentFromTarget(e.target, { sibling: isSiblingDrop, store });
 		const draggedElement = store.getDraggedElement();
+		const visualTargetElement = elementFromTarget(e.target, { sibling: false, store });
 
-		if (!rawTargetElement || !dropTargetElement || !dropTargetContent || !draggedElement) {
+		if (!draggedElement || !visualTargetElement) {
 			return;
 		}
 
-		if (!dropTargetElement.accepts(draggedElement)) {
+		const targetContent = isSiblingDrop
+			? visualTargetElement.getContainer()
+			: elementContentFromTarget(e.target, { store });
+
+		if (!targetContent) {
 			return;
 		}
 
 		const getDropIndex = () => {
 			if (!isSiblingDrop) {
-				return dropTargetContent.getElements().length;
+				return targetContent.getElements().length;
 			}
 			return calculateDropIndex({
-				target: rawTargetElement,
+				target: visualTargetElement,
 				dragged: draggedElement
 			});
 		};
@@ -246,7 +249,7 @@ export class ElementList extends React.Component {
 
 		store.executeElementMove({
 			element: draggedElement,
-			content: dropTargetContent,
+			content: targetContent,
 			index
 		});
 
@@ -299,6 +302,11 @@ export class ElementList extends React.Component {
 	private handleMouseLeave(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const element = elementFromTarget(e.target as HTMLElement, { sibling: false, store });
+		const targetContent = elementContentFromTarget(e.target, { store });
+
+		if (targetContent) {
+			targetContent.setHighlighted(false);
+		}
 
 		if (element) {
 			element.setHighlighted(false);
@@ -307,23 +315,41 @@ export class ElementList extends React.Component {
 
 	private handleMouseOver(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
-		const element = elementFromTarget(e.target as HTMLElement, { sibling: false, store });
+		const targetElement = elementFromTarget(e.target as HTMLElement, { sibling: false, store });
+		const targetContent = elementContentFromTarget(e.target, { store });
 		const label = above(e.target, `[${ElementAnchors.label}]`);
 
-		if (
-			(label && element) ||
-			(!label && element && element.getRole() === Types.ElementRole.Root)
-		) {
-			store
-				.getProject()
-				.getElements()
-				.filter(se => se.getHighlighted())
-				.forEach(se => se.setHighlighted(false));
-		}
+		Mobx.transaction(() => {
+			if (
+				(label && targetElement) ||
+				(label && targetContent) ||
+				(!label && targetElement && targetElement.getRole() === Types.ElementRole.Root)
+			) {
+				store
+					.getProject()
+					.getElementContents()
+					.filter(sec => sec.getHighlighted())
+					.forEach(se => se.setHighlighted(false));
 
-		if (label && element) {
-			element.setHighlighted(true);
-		}
+				store
+					.getProject()
+					.getElements()
+					.filter(se => se.getHighlighted())
+					.forEach(se => se.setHighlighted(false));
+			}
+
+			if (
+				label &&
+				targetElement &&
+				targetContent === targetElement.getContentBySlotId(Types.SlotType.Children)
+			) {
+				targetElement.setHighlighted(true);
+			}
+
+			if (label && targetContent && targetContent.getSlotType() === Types.SlotType.Children) {
+				targetContent.setHighlighted(true);
+			}
+		});
 	}
 
 	public render(): JSX.Element | null {
@@ -340,15 +366,21 @@ export class ElementList extends React.Component {
 			return null;
 		}
 
+		const anchors = {
+			[ElementAnchors.content]: (rootElement.getContentBySlotType(
+				Types.SlotType.Children
+			) as Model.ElementContent).getId(),
+			[ElementAnchors.element]: rootElement.getId()
+		};
+
 		return (
 			<StyledDragRoot
 				data-drag-root
-				{...{ [ElementAnchors.element]: rootElement.getId() }}
+				{...anchors}
 				onBlur={e => this.handleBlur(e)}
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
-				onDragEnd={e => this.handleDragEnd(e)}
 				onDragLeave={e => this.handleDragLeave(e)}
 				onDragOver={e => this.handleDragOver(e)}
 				onDragStart={e => this.handleDragStart(e)}
@@ -359,6 +391,10 @@ export class ElementList extends React.Component {
 				innerRef={ref => (this.ref = ref)}
 			>
 				<ElementContainer element={rootElement} />
+				<ElementDragImage
+					element={store.getDraggedElement()}
+					innerRef={ref => (this.dragImg = ref)}
+				/>
 			</StyledDragRoot>
 		);
 	}
@@ -389,9 +425,9 @@ function above(node: EventTarget, selector: string): HTMLElement | null {
 	return ended ? null : el;
 }
 
-function contentFromTarget(
+function elementContentFromTarget(
 	target: EventTarget,
-	options: { sibling: boolean; store: Store.ViewStore }
+	options: { store: Store.ViewStore }
 ): Model.ElementContent | undefined {
 	const el = above(target, `[${ElementAnchors.content}]`);
 
@@ -399,30 +435,13 @@ function contentFromTarget(
 		return;
 	}
 
-	const id = el.getAttribute(ElementAnchors.element);
+	const id = el.getAttribute(ElementAnchors.content);
 
 	if (typeof id !== 'string') {
 		return;
 	}
 
-	const content = options.store.getContentById(id);
-	const element = options.store.getElementById(id);
-
-	if (content) {
-		return content;
-	}
-
-	if (!element) {
-		return;
-	}
-
-	const base = options.sibling ? element.getParent() : element;
-
-	if (!base) {
-		return;
-	}
-
-	return base.getContentBySlotType(Types.SlotType.Children);
+	return options.store.getContentById(id);
 }
 
 export function elementFromTarget(

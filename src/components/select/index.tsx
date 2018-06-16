@@ -22,7 +22,7 @@ const StyledSelect = styled.select`
 	box-sizing: border-box;
 	width: 100%;
 	height: 30px;
-	padding: 0 ${getSpace(SpaceSize.XL)}px 0 ${getSpace(SpaceSize.S)}px;
+	padding: 0 ${getSpace(SpaceSize.XL)}px 0 ${getSpace(SpaceSize.XS + SpaceSize.XXS)}px;
 	border: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-width: 0.5px;

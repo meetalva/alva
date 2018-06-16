@@ -6,14 +6,14 @@ import styled, { css, StyledComponentClass } from 'styled-components';
 export interface HeadlineProps {
 	children?: React.ReactNode;
 	className?: string;
-	order?: 1 | 2 | 3;
+	order?: 1 | 2 | 3 | 4;
 	tagName?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div';
 	textColor?: Color;
 }
 
 interface StyledHeadlineProps {
 	className?: string;
-	order?: 1 | 2 | 3;
+	order?: 1 | 2 | 3 | 4;
 	textColor?: Color;
 }
 
@@ -25,6 +25,13 @@ const StyledHeadline = styled.div`
 
 	${(props: HeadlineProps) => {
 		switch (props.order) {
+			case 4:
+				return css`
+					font-size: 15px;
+					line-height: 18px;
+					font-weight: 400;
+					margin-bottom: 0.3em;
+				`;
 			case 3:
 				return css`
 					font-size: 24px;

@@ -29,6 +29,11 @@ export interface ClipboardElement {
 	type: ClipBoardType.Element;
 }
 
+export enum FocusedItemType {
+	Page,
+	Element
+}
+
 /**
  * The central entry-point for all view-related application state, managed by MobX.
  * Use this object and its properties in your React components,
@@ -46,6 +51,8 @@ export class ViewStore {
 
 	private editHistory: Model.EditHistory;
 
+	@Mobx.observable private focusedItemType: FocusedItemType;
+
 	@Mobx.observable private metaDown: boolean = false;
 
 	@Mobx.observable private project: Model.Project;
@@ -53,6 +60,8 @@ export class ViewStore {
 	private savedProjects: Types.SavedProject[] = [];
 
 	@Mobx.observable private showLeftSidebar: boolean = true;
+
+	@Mobx.observable private showPages: boolean = true;
 
 	@Mobx.observable private showRightSidebar: boolean = true;
 
@@ -149,8 +158,9 @@ export class ViewStore {
 				new Model.ElementContent(
 					{
 						elementIds: [],
+						forcedOpen: false,
 						id: uuid.v4(),
-						name: slot.getName(),
+						open: false,
 						slotId: slot.getId()
 					},
 					{ project, patternLibrary }
@@ -161,6 +171,7 @@ export class ViewStore {
 			{
 				contentIds: elementContents.map(e => e.getId()),
 				dragged: init.dragged || false,
+				focused: false,
 				highlighted: false,
 				forcedOpen: false,
 				open: false,
@@ -591,12 +602,47 @@ export class ViewStore {
 		return this.project.getElements().find(element => element.getHighlighted());
 	}
 
+	public getFocusedItem(): Model.Element | Model.Page | undefined {
+		if (!this.project) {
+			return;
+		}
+
+		if (this.focusedItemType === FocusedItemType.Element) {
+			return this.project.getElements().find(element => element.getFocused());
+		} else if (this.focusedItemType === FocusedItemType.Page) {
+			return this.project.getPages().find(page => page.getFocused());
+		} else {
+			return undefined;
+		}
+	}
+
+	public getFocusedItemType(): FocusedItemType {
+		return this.focusedItemType;
+	}
+
 	public getMetaDown(): boolean {
 		return this.metaDown;
 	}
 
 	public getNameEditableElement(): Model.Element | undefined {
 		return this.project.getElements().find(e => e.getNameEditable());
+	}
+
+	@Mobx.action
+	public getNextPage(): Model.Page | undefined {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		return this.project.getPages()[index + 1];
 	}
 
 	public getPageById(id: string): Model.Page | undefined {
@@ -649,6 +695,23 @@ export class ViewStore {
 		return this.app.getSearchTerm();
 	}
 
+	@Mobx.action
+	public getPreviousPage(): Model.Page | undefined {
+		const page = this.getCurrentPage();
+
+		if (!page) {
+			return;
+		}
+
+		const index = this.project.getPageIndex(page);
+
+		if (typeof index !== 'number') {
+			return;
+		}
+
+		return this.project.getPages()[index - 1];
+	}
+
 	public getProject(): Model.Project {
 		return this.project;
 	}
@@ -680,9 +743,9 @@ export class ViewStore {
 			return this.hasClipboardItem(ClipBoardType.Element);
 		}
 
-		if (view === Types.AlvaView.Pages) {
+		/*if (view === Types.AlvaView.Pages) {
 			return this.hasClipboardItem(ClipBoardType.Element);
-		}
+		}*/
 
 		return false;
 	}
@@ -821,14 +884,15 @@ export class ViewStore {
 	public removePage(page: Model.Page): void {
 		const index = this.project.getPageIndex(page);
 
-		if (index === 0) {
-			this.unsetActivePage();
-			this.setActiveAppView(Types.AlvaView.Pages);
-		} else {
-			this.setActivePageByIndex(index - 1);
-		}
+		if (this.project.getPages().length > 1) {
+			if (index !== 0) {
+				this.setActivePageByIndex(index - 1);
+			} else {
+				this.setActivePageByIndex(index + 1);
+			}
 
-		this.project.removePage(page);
+			this.project.removePage(page);
+		}
 	}
 
 	@Mobx.action
@@ -873,6 +937,14 @@ export class ViewStore {
 		this.showRightSidebar = show;
 	}
 
+	public getShowPages(): boolean {
+		return this.showPages;
+	}
+
+	public setShowPages(show: boolean): void {
+		this.showPages = show;
+	}
+
 	@Mobx.action
 	public setActiveAppView(appView: Types.AlvaView): void {
 		this.app.setActiveView(appView);
@@ -887,6 +959,11 @@ export class ViewStore {
 
 		this.unsetActivePage();
 		page.setActive(true);
+		this.setFocusedItem(FocusedItemType.Page, page);
+
+		this.unsetSelectedElement();
+
+		console.log('setActivePage');
 	}
 
 	@Mobx.action
@@ -964,6 +1041,22 @@ export class ViewStore {
 	}
 
 	@Mobx.action
+	public setFocusedItem(
+		type: FocusedItemType,
+		payload: Model.Element | Model.Page | undefined
+	): void {
+		const previousFocusItem = this.getFocusedItem();
+
+		if (previousFocusItem) {
+			previousFocusItem.setFocused(false);
+		}
+		this.focusedItemType = type;
+		if (payload) {
+			payload.setFocused(true);
+		}
+	}
+
+	@Mobx.action
 	public setMetaDown(metaDown: boolean): void {
 		this.metaDown = metaDown;
 	}
@@ -1018,6 +1111,7 @@ export class ViewStore {
 		}
 
 		selectedElement.setSelected(true);
+		this.setFocusedItem(FocusedItemType.Element, selectedElement);
 
 		selectedElement.getAncestors().forEach(ancestor => {
 			ancestor.setForcedOpen(true);
@@ -1090,12 +1184,15 @@ export class ViewStore {
 			return;
 		}
 
-		this.project.getElements().forEach(element => {
-			element.setSelected(false);
-			element.getAncestors().forEach(ancestor => {
-				ancestor.setForcedOpen(false);
+		this.project
+			.getElements()
+			.filter(element => element.getSelected())
+			.forEach(element => {
+				element.setSelected(false);
+				element.getAncestors().forEach(ancestor => {
+					ancestor.setForcedOpen(false);
+				});
 			});
-		});
 	}
 
 	@Mobx.action

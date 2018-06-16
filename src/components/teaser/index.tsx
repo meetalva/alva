@@ -2,6 +2,7 @@ import { Button, ButtonOrder, ButtonSize } from '../button';
 import { Color } from '../colors';
 import { Copy } from '../copy';
 import { Headline } from '../headline';
+import { Link } from '../link';
 import * as React from 'react';
 import { Space, getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
@@ -44,10 +45,10 @@ export const Teaser: React.SFC<TeaserProps> = props => (
 				{props.primaryButton}
 			</Button>
 		</Space>
-		{/*
+		{
 			<Link onClick={props.onSecondaryButtonClick}>
 				<Copy>{props.secondaryButton}</Copy>
 			</Link>
-		*/}
+		}
 	</StyledConnectLibrary>
 );

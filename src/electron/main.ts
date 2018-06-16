@@ -1,6 +1,7 @@
 import * as Analyzer from '../analyzer';
 import { checkForUpdates } from './auto-updater';
-import { Color } from '../components';
+import * as ConvertColor from 'color';
+import { Color } from '../components/colors';
 import { createCompiler } from '../compiler/create-compiler';
 import { app, BrowserWindow, dialog, screen, shell } from 'electron';
 import * as electronIsDev from 'electron-is-dev';
@@ -20,6 +21,8 @@ import * as Util from 'util';
 import * as uuid from 'uuid';
 
 const ElectronStore = require('electron-store');
+const log = require('electron-log');
+const URLSearchParams = require('url-search-params');
 
 const APP_ENTRY = require.resolve('./renderer');
 
@@ -46,6 +49,56 @@ const showSaveDialog = (options: Electron.SaveDialogOptions): Promise<string | u
 
 const readFile = Util.promisify(Fs.readFile);
 const writeFile = Util.promisify(Fs.writeFile);
+
+const readProjectOrError = async <T>(path: string): Promise<Types.SavedProject | undefined> => {
+	const result = await Persistence.read<Types.SavedProject>(path);
+
+	if (result.state === PersistenceState.Error) {
+		result.error.message = [
+			`Sorry, we had trouble opening the file "${Path.basename(path)}".`,
+			result.error.message
+		].join('\n');
+		showError(result.error);
+		return;
+	}
+
+	return result.contents;
+};
+
+const showError = (error: Error) => {
+	const params = new URLSearchParams();
+	params.set('title', 'New bug report');
+	params.set(
+		'body',
+		`Hey there, I just encountered the following error with Alva ${app.getVersion()}:\n\n\`\`\`\n${
+			error.message
+		}\n\`\`\`\n\n<details><summary>Stack Trace</summary>\n\n\`\`\`\n${
+			error.stack
+		}\n\`\`\`\n\n</details>`
+	);
+	params.append('labels', 'type: bug');
+
+	const url = `https://github.com/meetalva/alva/issues/new?${params}`;
+	const lines = error.message.split('\n');
+
+	projectPath = undefined;
+	openedFile = undefined;
+
+	dialog.showMessageBox(
+		BrowserWindow.getFocusedWindow(),
+		{
+			type: 'error',
+			message: lines[0],
+			detail: lines.slice(1).join('\n'),
+			buttons: ['OK', 'Report a bug']
+		},
+		response => {
+			if (response === 1) {
+				shell.openExternal(url);
+			}
+		}
+	);
+};
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -88,31 +141,33 @@ const userStore = new ElectronStore();
 			case ServerMessageType.AppLoaded: {
 				const pathToOpen = projectPath || openedFile;
 
-				// Load one of either
-				// (1) last known file automatically in development
-				// (2) file passed to electron main process
-				if (((electronIsDev && projectPath) || openedFile) && pathToOpen) {
-					const result = await Persistence.read<Types.SavedProject>(pathToOpen);
-
-					if (result.state === PersistenceState.Error) {
-						// TODO: Show user facing error here
-					} else {
-						const contents = result.contents as Types.SerializedProject;
-						contents.path = pathToOpen;
-
-						send({
-							type: ServerMessageType.OpenFileResponse,
-							id: message.id,
-							payload: { path: pathToOpen, contents }
-						});
-					}
-				}
-
 				send({
 					id: uuid.v4(),
 					type: ServerMessageType.StartApp,
 					payload: String(port)
 				});
+
+				// Load one of either
+				// (1) last known file automatically in development
+				// (2) file passed to electron main process
+				if (((electronIsDev && projectPath) || openedFile) && pathToOpen) {
+					// tslint:disable-next-line:no-any
+					const project = (await readProjectOrError(pathToOpen)) as any;
+
+					if (!project) {
+						return;
+					}
+
+					if (typeof project === 'object') {
+						project.path = pathToOpen;
+					}
+
+					send({
+						type: ServerMessageType.OpenFileResponse,
+						id: message.id,
+						payload: { path: pathToOpen, contents: project }
+					});
+				}
 
 				break;
 			}
@@ -170,20 +225,22 @@ const userStore = new ElectronStore();
 				}
 
 				if (path) {
-					const result = await Persistence.read<Types.SavedProject>(path);
+					// tslint:disable-next-line:no-any
+					const project = (await readProjectOrError(path)) as any;
 
-					if (result.state === PersistenceState.Error) {
-						// TODO: Show user facing error here
-					} else {
-						const contents = result.contents as Types.SerializedProject;
-						contents.path = path;
-
-						send({
-							type: ServerMessageType.OpenFileResponse,
-							id: message.id,
-							payload: { path, contents }
-						});
+					if (!project) {
+						return;
 					}
+
+					if (typeof project === 'object') {
+						project.path = path;
+					}
+
+					send({
+						type: ServerMessageType.OpenFileResponse,
+						id: message.id,
+						payload: { path, contents: project }
+					});
 				}
 				break;
 			}
@@ -274,20 +331,38 @@ const userStore = new ElectronStore();
 				const project = Project.from(message.payload);
 				const library = project.getPatternLibrary();
 
-				const analysis = await Analyzer.analyze(path, {
-					getGobalEnumOptionId: (patternId, contextId) =>
-						library.assignEnumOptionId(patternId, contextId),
-					getGlobalPatternId: contextId => library.assignPatternId(contextId),
-					getGlobalPropertyId: (patternId, contextId) =>
-						library.assignPropertyId(patternId, contextId),
-					getGlobalSlotId: (patternId, contextId) => library.assignSlotId(patternId, contextId)
-				});
+				try {
+					const analysis = await Analyzer.analyze(path, {
+						getGobalEnumOptionId: (patternId, contextId) =>
+							library.assignEnumOptionId(patternId, contextId),
+						getGlobalPatternId: contextId => library.assignPatternId(contextId),
+						getGlobalPropertyId: (patternId, contextId) =>
+							library.assignPropertyId(patternId, contextId),
+						getGlobalSlotId: (patternId, contextId) =>
+							library.assignSlotId(patternId, contextId)
+					});
 
-				send({
-					type: ServerMessageType.ConnectPatternLibraryResponse,
-					id: message.id,
-					payload: analysis
-				});
+					send({
+						type: ServerMessageType.ConnectPatternLibraryResponse,
+						id: message.id,
+						payload: analysis
+					});
+				} catch {
+					dialog.showMessageBox(
+						{
+							message:
+								'Sorry, this seems to be an uncompatible library. Learn more about supported component libraries on github.com/meetalva',
+							buttons: ['OK', 'Learn more']
+						},
+						response => {
+							if (response === 1) {
+								shell.openExternal(
+									'https://github.com/meetalva/alva#pattern-library-requirements'
+								);
+							}
+						}
+					);
+				}
 
 				break;
 			}
@@ -309,20 +384,38 @@ const userStore = new ElectronStore();
 					return;
 				}
 
-				const analysis = await Analyzer.analyze(connection.path, {
-					getGobalEnumOptionId: (patternId, contextId) =>
-						library.assignEnumOptionId(patternId, contextId),
-					getGlobalPatternId: contextId => library.assignPatternId(contextId),
-					getGlobalPropertyId: (patternId, contextId) =>
-						library.assignPropertyId(patternId, contextId),
-					getGlobalSlotId: (patternId, contextId) => library.assignSlotId(patternId, contextId)
-				});
+				try {
+					const analysis = await Analyzer.analyze(connection.path, {
+						getGobalEnumOptionId: (patternId, contextId) =>
+							library.assignEnumOptionId(patternId, contextId),
+						getGlobalPatternId: contextId => library.assignPatternId(contextId),
+						getGlobalPropertyId: (patternId, contextId) =>
+							library.assignPropertyId(patternId, contextId),
+						getGlobalSlotId: (patternId, contextId) =>
+							library.assignSlotId(patternId, contextId)
+					});
 
-				send({
-					type: ServerMessageType.ConnectPatternLibraryResponse,
-					id: message.id,
-					payload: analysis
-				});
+					send({
+						type: ServerMessageType.ConnectPatternLibraryResponse,
+						id: message.id,
+						payload: analysis
+					});
+				} catch {
+					dialog.showMessageBox(
+						{
+							message:
+								'Sorry, this seems to be an uncompatible library. Learn more about supported component libraries on github.com/meetalva',
+							buttons: ['OK', 'Learn more']
+						},
+						response => {
+							if (response === 1) {
+								shell.openExternal(
+									'https://github.com/meetalva/alva#pattern-library-requirements'
+								);
+							}
+						}
+					);
+				}
 
 				break;
 			}
@@ -370,6 +463,13 @@ const userStore = new ElectronStore();
 				if (win) {
 					win.isMaximized() ? win.unmaximize() : win.maximize();
 				}
+
+				break;
+			}
+			case ServerMessageType.ShowError: {
+				const error = new Error(message.payload.message);
+				error.stack = message.payload.stack;
+				showError(error);
 			}
 		}
 	});
@@ -445,7 +545,9 @@ async function createWindow(): Promise<void> {
 		minWidth: 780,
 		minHeight: 380,
 		titleBarStyle: 'hiddenInset',
-		backgroundColor: Color.Grey97,
+		backgroundColor: ConvertColor(Color.Grey97)
+			.hex()
+			.toString(),
 		title: 'Alva'
 	});
 
@@ -487,29 +589,34 @@ async function createWindow(): Promise<void> {
 	checkForUpdates(win);
 }
 
-const log = require('electron-log');
 log.info('App starting...');
 
 app.on('will-finish-launching', () => {
 	app.on('open-file', async (event, path) => {
 		event.preventDefault();
-		if (path) {
-			openedFile = path;
 
-			const result = await Persistence.read<Types.SavedProject>(path);
-
-			if (result.state === PersistenceState.Error) {
-				// TODO: Show user facing error here
-			} else {
-				const contents = result.contents as Types.SerializedProject;
-
-				Sender.send({
-					type: ServerMessageType.OpenFileResponse,
-					id: uuid.v4(),
-					payload: { path, contents }
-				});
-			}
+		if (!path) {
+			return;
 		}
+
+		// tslint:disable-next-line:no-any
+		const project = (await readProjectOrError(path)) as any;
+
+		if (!project) {
+			return;
+		}
+
+		if (typeof project === 'object') {
+			project.path = path;
+		}
+
+		openedFile = path;
+
+		Sender.send({
+			type: ServerMessageType.OpenFileResponse,
+			id: uuid.v4(),
+			payload: { path, contents: project }
+		});
 	});
 });
 

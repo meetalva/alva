@@ -37,12 +37,25 @@ export function analyzeSlots(
 				return;
 			}
 
+			const propertyName = memberSymbol.getName();
+			const label = TypescriptUtils.getJsDocValueFromSymbol(memberSymbol, 'name');
+			const example = TypescriptUtils.getJsDocValueFromSymbol(memberSymbol, 'example') || '';
+			const required =
+				(memberSymbol.flags & Ts.SymbolFlags.Optional) !== Ts.SymbolFlags.Optional;
+			const description =
+				TypescriptUtils.getJsDocValueFromSymbol(memberSymbol, 'description') || '';
+			const hidden = TypescriptUtils.hasJsDocTagFromSymbol(memberSymbol, 'ignore');
+
 			return {
-				contextId: memberSymbol.getName(),
-				displayName: memberSymbol.getName(),
-				id: ctx.getSlotId(memberSymbol.getName()),
-				propertyName: memberSymbol.getName(),
-				type: memberSymbol.getName() === 'children' ? 'children' : 'property'
+				contextId: propertyName,
+				label: label || propertyName,
+				description,
+				example,
+				hidden,
+				id: ctx.getSlotId(propertyName),
+				propertyName,
+				required,
+				type: propertyName === 'children' && !isExplicitSlot ? 'children' : 'property'
 			};
 		})
 		.filter((slot): slot is Types.SerializedPatternSlot => typeof slot !== 'undefined');

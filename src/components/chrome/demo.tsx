@@ -3,7 +3,7 @@ import DemoContainer from '../demo-container';
 import { IconRegistry } from '../icons';
 import { Chrome } from './index';
 import * as React from 'react';
-import { ViewSwitch, ViewTitle } from '../view-switch';
+import { ViewSwitch } from '../view-switch';
 
 const DemoChrome: React.StatelessComponent<void> = () => (
 	<DemoContainer title="Chrome">
@@ -15,7 +15,7 @@ const DemoChrome: React.StatelessComponent<void> = () => (
 				leftVisible={true}
 				rightVisible={true}
 			>
-				<ViewTitle justify="center" title="Page name" />
+				Page Name
 			</ViewSwitch>
 			<ViewSwitch
 				fontSize={CopySize.M}
@@ -24,7 +24,7 @@ const DemoChrome: React.StatelessComponent<void> = () => (
 				leftVisible={true}
 				rightVisible={true}
 			>
-				<ViewTitle justify="center" title="Page name" />
+				Page Name
 			</ViewSwitch>
 		</Chrome>
 		<IconRegistry />

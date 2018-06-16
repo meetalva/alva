@@ -104,7 +104,6 @@ const StyledIcons = styled(Icon)`
 	visibility: ${(props: StyledIconProps) => (props.visible ? 'visible' : 'hidden')};
 	cursor: pointer;
 	pointer-events: auto;
-
 	&:hover {
 		background: ${Color.Grey90};
 	}

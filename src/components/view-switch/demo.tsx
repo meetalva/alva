@@ -1,5 +1,5 @@
 import DemoContainer from '../demo-container';
-import { ViewSwitch, ViewTitle } from './index';
+import { ViewSwitch } from './index';
 import * as React from 'react';
 
 const DemoViewSwitch: React.StatelessComponent = (): JSX.Element => (
@@ -10,7 +10,7 @@ const DemoViewSwitch: React.StatelessComponent = (): JSX.Element => (
 			leftVisible={true}
 			rightVisible={true}
 		>
-			<ViewTitle justify="center" title="Page name" />
+			Title
 		</ViewSwitch>
 	</DemoContainer>
 );

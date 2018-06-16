@@ -121,6 +121,22 @@ export function createMenu(ctx: MenuContext): void {
 									extname: 'json'
 								});
 
+								dialog.showMessageBox(
+									{
+										type: 'info',
+										message:
+											'Before you can open an exported Sketch-File:\n\n(1) Download & Install "Almost Sketch Plugin"\n\n(2) Open Sketch, run "Plugins > From Almost Sketch to Sketch" and select exported file\n\nWe are currently working on a smoother experience.',
+										buttons: ['OK', 'Download Plugin']
+									},
+									response => {
+										if (response === 1) {
+											shell.openExternal(
+												'https://github.com/brainly/html-sketchapp/releases/latest'
+											);
+										}
+									}
+								);
+
 								if (path) {
 									const sketchExporter = new SketchExporter(ctx.store);
 									sketchExporter.execute(path);
@@ -369,21 +385,55 @@ export function createMenu(ctx: MenuContext): void {
 					type: 'separator'
 				},
 				{
-					label: '&Show Left Sidebar',
+					label: 'Previous Page',
+					accelerator: 'CmdOrCtrl+Alt+Left',
+					enabled: typeof ctx.store.getPreviousPage() !== 'undefined',
+					click: () => {
+						const previousPage = ctx.store.getPreviousPage();
+
+						if (previousPage) {
+							ctx.store.setActivePage(previousPage);
+						}
+					}
+				},
+				{
+					label: 'Next Page',
+					accelerator: 'CmdOrCtrl+Alt+Right',
+					enabled: typeof ctx.store.getNextPage() !== 'undefined',
+					click: () => {
+						const nextPage = ctx.store.getNextPage();
+
+						if (nextPage) {
+							ctx.store.setActivePage(nextPage);
+						}
+					}
+				},
+				{
+					label: 'Show Pages',
 					type: 'checkbox',
-					checked: true,
+					checked: ctx.store.getShowPages(),
 					enabled: ctx.store.getActiveAppView() === Types.AlvaView.PageDetail,
 					accelerator: 'CmdOrCtrl+Alt+1',
+					click: (item, checked) => {
+						ctx.store.setShowPages(item.checked);
+					}
+				},
+				{
+					label: 'Show Elements and Library',
+					type: 'checkbox',
+					checked: ctx.store.getShowLeftSidebar(),
+					enabled: ctx.store.getActiveAppView() === Types.AlvaView.PageDetail,
+					accelerator: 'CmdOrCtrl+Alt+2',
 					click: (item, checked) => {
 						ctx.store.setShowLeftSidebar(item.checked);
 					}
 				},
 				{
-					label: '&Show Right Sidebar',
+					label: 'Show Properties',
 					type: 'checkbox',
-					checked: true,
+					checked: ctx.store.getShowRightSidebar(),
 					enabled: ctx.store.getActiveAppView() === Types.AlvaView.PageDetail,
-					accelerator: 'CmdOrCtrl+Alt+2',
+					accelerator: 'CmdOrCtrl+Alt+3',
 					click: (item, checked) => {
 						ctx.store.setShowRightSidebar(item.checked);
 					}

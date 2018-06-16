@@ -22,12 +22,13 @@ export const Link = (context: BuiltInContext): BuiltInResult => {
 		}),
 		new PatternProperty.PatternEventHandlerProperty({
 			contextId: ONCLICK_CONTEXT_ID,
+			description: 'You can set an interaction that happens on Click.',
 			event: new PatternProperty.PatternEvent({
 				type: Types.PatternEventType.MouseEvent
 			}),
 			hidden: false,
 			id: context.options.getGlobalPropertyId(patternId, ONCLICK_CONTEXT_ID),
-			label: 'On Click',
+			label: 'Interaction',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'onClick',
 			required: false
@@ -38,8 +39,12 @@ export const Link = (context: BuiltInContext): BuiltInResult => {
 		new PatternSlot({
 			contextId: SLOT_CONTEXT_ID,
 			displayName: 'Children',
+			description: '',
+			example: '',
+			hidden: false,
 			propertyName: 'children',
 			id: context.options.getGlobalSlotId(patternId, SLOT_CONTEXT_ID),
+			required: false,
 			type: Types.SlotType.Children
 		})
 	];

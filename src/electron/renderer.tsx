@@ -6,9 +6,10 @@ import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import { AlvaApp, EditHistory, PatternLibrary, Project } from '../model';
+import * as Path from 'path';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { ViewStore } from '../store';
+import { FocusedItemType, ViewStore } from '../store';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
@@ -48,29 +49,42 @@ Sender.receive(message => {
 		case ServerMessageType.StartApp: {
 			app.setState(Types.AppState.Started);
 			store.setServerPort(Number(message.payload));
-			store.commit();
 			break;
 		}
 		case ServerMessageType.OpenFileResponse: {
 			history.clear();
-			const newProject = Project.from(message.payload.contents);
-			newProject.setPath(message.payload.path);
-			store.setProject(newProject);
 
-			const view =
-				newProject.getPages().length === 0 ? Types.AlvaView.Pages : Types.AlvaView.PageDetail;
+			try {
+				const newProject = Project.from(message.payload.contents);
+				newProject.setPath(message.payload.path);
+				store.setProject(newProject);
 
-			app.setActiveView(view);
+				app.setActiveView(Types.AlvaView.PageDetail);
+				store.setFocusedItem(FocusedItemType.Page, store.getCurrentPage());
+				store.commit();
 
-			const patternLibrary = newProject.getPatternLibrary();
+				const patternLibrary = newProject.getPatternLibrary();
 
-			if (patternLibrary.getState() !== Types.PatternLibraryState.Pristine) {
+				if (patternLibrary.getState() !== Types.PatternLibraryState.Pristine) {
+					Sender.send({
+						id: uuid.v4(),
+						payload: newProject.toJSON(),
+						type: ServerMessageType.CheckLibraryRequest
+					});
+				}
+			} catch (err) {
 				Sender.send({
 					id: uuid.v4(),
-					payload: newProject.toJSON(),
-					type: ServerMessageType.CheckLibraryRequest
+					payload: {
+						message: `Sorry, we had trouble opening the file "${Path.basename(
+							message.payload.path
+						)}".\n Parsing the project failed with: ${err.message}`,
+						stack: err.stack
+					},
+					type: ServerMessageType.ShowError
 				});
 			}
+
 			break;
 		}
 		case ServerMessageType.CreateNewFileResponse: {
@@ -78,6 +92,7 @@ Sender.receive(message => {
 			const newProject = Project.from(message.payload.contents);
 			store.setProject(newProject);
 			app.setActiveView(Types.AlvaView.PageDetail);
+			store.commit();
 			break;
 		}
 		case ServerMessageType.Log: {
@@ -107,10 +122,8 @@ Sender.receive(message => {
 			}
 
 			store.setActivePage(page);
+			page.setNameState(Types.EditState.Editing);
 
-			if (app.getActiveView() === Types.AlvaView.Pages) {
-				page.setNameState(Types.EditState.Editing);
-			}
 			break;
 		}
 		case ServerMessageType.ConnectPatternLibraryResponse: {
@@ -190,10 +203,10 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Cut: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			/*if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.cutSelectedPage();
-			}
+			}*/
 			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.executeElementCutSelected();
 			}
@@ -204,10 +217,17 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Delete: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			if (
+				app.getActiveView() === Types.AlvaView.PageDetail &&
+				store.getFocusedItemType() === FocusedItemType.Page
+			) {
 				store.executePageRemoveSelected();
 			}
-			if (app.getActiveView() === Types.AlvaView.PageDetail) {
+
+			if (
+				app.getActiveView() === Types.AlvaView.PageDetail &&
+				store.getFocusedItemType() === FocusedItemType.Element
+			) {
 				store.executeElementRemoveSelected();
 			}
 			break;
@@ -217,10 +237,10 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Copy: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			/*if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.copySelectedPage();
-			}
+			}*/
 			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.copySelectedElement();
 			}
@@ -231,10 +251,10 @@ Sender.receive(message => {
 			break;
 		}
 		case ServerMessageType.Paste: {
-			if (app.getActiveView() === Types.AlvaView.Pages) {
+			/*if (app.getActiveView() === Types.AlvaView.Pages) {
 				// TODO: implement this
 				// store.pasteAfterSelectedPage();
-			}
+			}*/
 			if (app.getActiveView() === Types.AlvaView.PageDetail) {
 				store.executeElementPasteAfterSelected();
 			}

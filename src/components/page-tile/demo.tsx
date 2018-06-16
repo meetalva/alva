@@ -5,14 +5,14 @@ import DemoContainer from '../demo-container';
 import { Headline } from '../headline';
 import { Layout } from '../layout';
 import { Space, SpaceSize } from '../space';
-import { PreviewTile } from '.';
+import { PageTile } from '.';
 
 const handleChange = (e: React.ChangeEvent<HTMLInputElement>): string => e.target.value;
 
 const currentDate = new Date();
 
 export default (): JSX.Element => (
-	<DemoContainer title="Preview Tile">
+	<DemoContainer title="Page Tile">
 		<Space size={[SpaceSize.L, SpaceSize.XXXL]}>
 			<Space size={[0, 0, SpaceSize.S, 0]}>
 				<Headline order={2}>Project Name</Headline>
@@ -22,19 +22,25 @@ export default (): JSX.Element => (
 			</Space>
 			<Layout>
 				<Space size={SpaceSize.S}>
-					<PreviewTile focused={false} onChange={handleChange} />
+					<PageTile
+						focused={false}
+						highlighted={false}
+						onChange={handleChange}
+					/>
 				</Space>
 				<Space size={SpaceSize.S}>
-					<PreviewTile focused={true} onChange={handleChange} />
+					<PageTile
+						focused={false}
+						highlighted={true}
+						onChange={handleChange}
+					/>
 				</Space>
 				<Space size={SpaceSize.S}>
-					<PreviewTile focused={true} onChange={handleChange} />
-				</Space>
-				<Space size={SpaceSize.S}>
-					<PreviewTile focused={false} onChange={handleChange} />
-				</Space>
-				<Space size={SpaceSize.S}>
-					<PreviewTile focused={false} onChange={handleChange} />
+					<PageTile
+						focused={true}
+						highlighted={true}
+						onChange={handleChange}
+					/>
 				</Space>
 			</Layout>
 		</Space>

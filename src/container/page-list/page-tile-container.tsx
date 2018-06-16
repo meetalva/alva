@@ -1,4 +1,4 @@
-import { PreviewTile, Space, SpaceSize } from '../../components';
+import { PageTile } from '../../components';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
@@ -8,6 +8,7 @@ import { EditableTitleContainer } from '../editable-title/editable-title-contain
 
 export interface PageTileContainerProps {
 	focused: boolean;
+	highlighted: boolean;
 	page: Page;
 }
 
@@ -26,43 +27,32 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		}
 	}
 
+	protected handleFocus(): void {
+		this.props.page.setNameState(Types.EditState.Editing);
+	}
+
 	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
 		if (this.props.page.getNameState() === Types.EditState.Editing) {
 			return;
 		}
-
-		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
-
-		const next =
-			store.getActiveAppView() === Types.AlvaView.Pages
-				? Types.AlvaView.PageDetail
-				: Types.AlvaView.Pages;
-
-		store.setActivePage(this.props.page);
-		store.setActiveAppView(next);
 	}
 
-	protected handleFocus(): void {
-		this.props.page.setNameState(Types.EditState.Editing);
-	}
 	public render(): JSX.Element {
 		const { props } = this;
 		return (
-			<Space size={SpaceSize.S}>
-				<PreviewTile
+			<PageTile
+				focused={props.focused}
+				highlighted={props.highlighted}
+				id={props.page.getId()}
+				onClick={e => this.handleClick(e)}
+				onFocus={e => this.handleFocus()}
+			>
+				<EditableTitleContainer
 					focused={props.focused}
-					id={props.page.getId()}
-					onClick={e => this.handleClick(e)}
-					onDoubleClick={e => this.handleDoubleClick(e)}
-					onFocus={e => this.handleFocus()}
-				>
-					<EditableTitleContainer
-						focused={props.focused}
-						page={props.page}
-						value={props.page.getName()}
-					/>
-				</PreviewTile>
-			</Space>
+					page={props.page}
+					value={props.page.getName()}
+				/>
+			</PageTile>
 		);
 	}
 }

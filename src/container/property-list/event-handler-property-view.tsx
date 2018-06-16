@@ -107,116 +107,119 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 		return (
 			<div
 				key={props.elementProperty.getId()}
-				style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}
+				style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}
 			>
-				<Component.PropertyLabel
-					width={Component.PropertyLabelWidth.Full}
-					label={patternProperty.getLabel()}
-				/>
-				<div style={{ marginBottom: '6px', width: '100%' }}>
-					<Component.Select
-						onChange={e => this.handleActionChange(e)}
-						selectedValue={userAction.getId()}
+				<Component.PropertyBox
+					headline={patternProperty.getLabel()}
+					copy={patternProperty.getDescription()}
+				>
+					<div
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							flexWrap: 'nowrap',
+							marginTop: '12px'
+						}}
 					>
-						{userStore
-							.getActions()
-							.map(action => (
-								<Component.SelectOption
-									key={action.getId()}
-									label={action.getName()}
-									value={action.getId()}
+						<Component.PropertyLabel label={'Action'} />
+						<Component.Select
+							onChange={e => this.handleActionChange(e)}
+							selectedValue={userAction.getId()}
+						>
+							{userStore
+								.getActions()
+								.map(action => (
+									<Component.SelectOption
+										key={action.getId()}
+										label={action.getName()}
+										value={action.getId()}
+									/>
+								))}
+						</Component.Select>
+					</div>
+					{elementAction &&
+						userAction &&
+						userAction.getAcceptsProperty() && (
+							<div style={{ width: '100%', marginBottom: '6px' }}>
+								<Component.CreateSelect
+									options={project
+										.getUserStore()
+										.getProperties()
+										.map(p => ({
+											label: p.getName(),
+											value: p.getId()
+										}))}
+									placeholder="Select Variable"
+									onChange={(e, meta) => this.handlePropertyNameChange(e, meta)}
+									value={
+										userAction && userProperty
+											? { label: userProperty.getName(), value: userProperty.getId() }
+											: undefined
+									}
 								/>
-							))}
-					</Component.Select>
-				</div>
-				{elementAction &&
-					userAction &&
-					userAction.getAcceptsProperty() && (
-						<div style={{ width: '100%', marginBottom: '6px' }}>
-							<Component.CreateSelect
-								options={project
-									.getUserStore()
-									.getProperties()
-									.map(p => ({
-										label: p.getName(),
-										value: p.getId()
-									}))}
-								placeholder="Select Variable"
-								onChange={(e, meta) => this.handlePropertyNameChange(e, meta)}
-								value={
-									userAction && userProperty
-										? { label: userProperty.getName(), value: userProperty.getId() }
-										: undefined
-								}
-							/>
-						</div>
-					)}
-				{userProperty &&
-					(() => {
-						switch (userProperty.getType()) {
-							case Types.UserStorePropertyType.String:
-								return (
-									<div
-										style={{
-											display: 'flex',
-											alignItems: 'center',
-											flexWrap: 'wrap',
-											width: '100%'
-										}}
-									>
-										<Component.PropertyLabel
-											width={Component.PropertyLabelWidth.Sixth}
-											label="to"
-										/>
-										<Component.PropertyInput
-											type={Component.PropertyInputType.Text}
-											value={userProperty.getPayload()}
-											onBlur={() => props.store.commit()}
-											onChange={e => {
-												userProperty.setPayload(e.target.value);
+							</div>
+						)}
+					{userProperty &&
+						(() => {
+							switch (userProperty.getType()) {
+								case Types.UserStorePropertyType.String:
+									return (
+										<div
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												flexWrap: 'wrap',
+												width: '100%'
 											}}
-										/>
-									</div>
-								);
-							case Types.UserStorePropertyType.Page:
-								return (
-									<div
-										style={{
-											display: 'flex',
-											alignItems: 'center',
-											flexWrap: 'nowrap',
-											width: '100%'
-										}}
-									>
-										<Component.PropertyLabel
-											width={Component.PropertyLabelWidth.Sixth}
-											label="to"
-										/>
-										<Component.Select
-											onChange={e => {
-												if (elementAction) {
-													elementAction.setPayload(
-														(e.target as HTMLSelectElement).value
-													);
-													props.store.commit();
-												}
-											}}
-											selectedValue={elementAction && elementAction.getPayload()}
 										>
-											{project
-												.getPages()
-												.map(page => (
-													<Component.SelectOption
-														key={page.getId()}
-														value={page.getId()}
-														label={page.getName()}
-													/>
-												))}
-										</Component.Select>
-									</div>
-								);
-						}
-					})()}
+											<Component.PropertyLabel label="to" />
+											<Component.PropertyInput
+												type={Component.PropertyInputType.Text}
+												value={userProperty.getPayload()}
+												onBlur={() => props.store.commit()}
+												onChange={e => {
+													userProperty.setPayload(e.target.value);
+												}}
+											/>
+										</div>
+									);
+								case Types.UserStorePropertyType.Page:
+									return (
+										<div
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												flexWrap: 'nowrap',
+												marginTop: '6px'
+											}}
+										>
+											<Component.PropertyLabel label="to" />
+											<Component.Select
+												onChange={e => {
+													if (elementAction) {
+														elementAction.setPayload(
+															(e.target as HTMLSelectElement).value
+														);
+														props.store.commit();
+													}
+												}}
+												selectedValue={elementAction && elementAction.getPayload()}
+											>
+												{project
+													.getPages()
+													.map(page => (
+														<Component.SelectOption
+															key={page.getId()}
+															value={page.getId()}
+															label={page.getName()}
+														/>
+													))}
+											</Component.Select>
+										</div>
+									);
+							}
+						})()}
+				</Component.PropertyBox>
 			</div>
 		);
 	}

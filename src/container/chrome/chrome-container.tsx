@@ -1,13 +1,12 @@
 import * as AlvaUtil from '../../alva-util';
-import { BugReport, Chrome, CopySize, ViewTitle, ViewSwitch } from '../../components';
+import { ChromeSwitch } from './chrome-switch';
+import { BugReport, Chrome, CopySize, ViewSwitch } from '../../components';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
-import { OverviewSwitchContainer } from './overview-switch-container';
 import { Page } from '../../model';
 import * as React from 'react';
 import * as Sender from '../../message/client';
 import { ViewStore } from '../../store';
-import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 import { EditableTitleContainer } from '../editable-title/editable-title-container';
@@ -61,13 +60,8 @@ export const ChromeContainer = MobxReact.inject('store')(
 					});
 				}}
 			>
-				{store.getActiveAppView() === Types.AlvaView.PageDetail ? (
-					<OverviewSwitchContainer />
-				) : (
-					<div />
-				)}
-				{store.getActiveAppView() === Types.AlvaView.PageDetail && (
-					<ViewSwitch
+				<ChromeSwitch />
+				<ViewSwitch
 						fontSize={CopySize.M}
 						justify="center"
 						leftVisible={index > 0}
@@ -83,14 +77,6 @@ export const ChromeContainer = MobxReact.inject('store')(
 							secondary
 						/>
 					</ViewSwitch>
-				)}
-				{store.getActiveAppView() === Types.AlvaView.Pages && (
-					<ViewTitle
-						fontSize={CopySize.M}
-						justify="center"
-						title={project ? project.getName() : 'Alva'}
-					/>
-				)}
 				<BugReport
 					title="Found a bug?"
 					onClick={() => {

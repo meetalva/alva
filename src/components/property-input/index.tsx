@@ -16,7 +16,7 @@ const StyledInput = styled.input`
 	padding-top: ${getSpace(SpaceSize.XS)}px;
 	padding-right: ${INPUT_PADDING_RIGHT}px;
 	padding-bottom: ${getSpace(SpaceSize.XS)}px;
-	padding-left: ${getSpace(SpaceSize.S)}px;
+	padding-left: ${getSpace(SpaceSize.XS + SpaceSize.XXS)}px;
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-width: 0.5px;
 	}

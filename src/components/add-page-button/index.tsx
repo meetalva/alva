@@ -1,8 +1,9 @@
-import * as React from 'react';
 import { Color } from '../colors';
 import { Copy } from '../copy';
+import { IconSize } from '../icons';
+import * as React from 'react';
+import { Plus } from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
-import { Icon, IconName, IconSize } from '../icons';
 import styled from 'styled-components';
 
 export interface AddPageButtonProps {
@@ -33,13 +34,13 @@ const StyledAddPageButton = styled.button`
 	}
 `;
 
-const StyledIcon = styled(Icon)`
+const StyledIcon = styled(Plus)`
 	margin-right: ${getSpace(SpaceSize.XS)}px;
 `;
 
 export const AddPageButton: React.SFC<AddPageButtonProps> = props => (
 	<StyledAddPageButton onClick={props.onClick}>
-		<StyledIcon name={IconName.Plus} size={IconSize.XS} color={Color.Grey60} />
+		<StyledIcon size={IconSize.XS} color={Color.Grey50} />
 		<Copy textColor={Color.Grey50}>Add Page</Copy>
 	</StyledAddPageButton>
 );

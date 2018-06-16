@@ -178,6 +178,7 @@
     "react-docgen": "2.20.1",
     "react-docgen-typescript": "1.5.0",
     "react-dom": "16.3.1",
+    "react-feather": "1.1.0",
     "react-helmet": "5.2.0",
     "react-router": "4.2.0",
     "react-select": "2.0.0-beta.6",

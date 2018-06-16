@@ -1,6 +1,7 @@
 import { Color } from '../colors';
-import { Icon, IconName, IconSize } from '../icons';
+import { IconSize } from '../icons';
 import * as React from 'react';
+import * as Icon from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
@@ -58,7 +59,7 @@ const StyledSearch = styled.input`
 	}
 `;
 
-const StyledIcon = styled(Icon)`
+const StyledIcon = styled(Icon.Search)`
 	position: absolute;
 	left: 0;
 	top: ${getSpace(SpaceSize.M) - 1}px; // fix to propertly align icon
@@ -67,7 +68,7 @@ const StyledIcon = styled(Icon)`
 
 export const Search: React.StatelessComponent<SearchProps> = props => (
 	<StyledContainer>
-		<StyledIcon name={IconName.Search} size={IconSize.XS} color={Color.Grey36} />
+		<StyledIcon size={IconSize.XS} color={Color.Grey50} />
 		<StyledSearch
 			autoFocus={props.focused}
 			className={props.className}

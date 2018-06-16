@@ -1,11 +1,11 @@
 import { setSearch } from '../alva-util';
 import { PreviewFrame, PreviewPane } from '../components';
+import { Copy, CopySize } from '../components/copy';
+import { IconSize } from '../components/icons';
+import { Overlay } from '../components/overlay';
 import { PreviewDocumentMode } from '../preview';
 import * as React from 'react';
-
-import { Copy, CopySize } from '../components/copy';
-import { Icon, IconName, IconSize } from '../components/icons';
-import { Overlay } from '../components/overlay';
+import { Layout } from 'react-feather';
 import { Space, SpaceSize } from '../components/space';
 
 export interface PreviewPaneProps {
@@ -25,7 +25,7 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 				/>
 				<Overlay isVisisble={props.isDragging}>
 					<Space size={[0, 0, SpaceSize.L]}>
-						<Icon name={IconName.Robo} size={IconSize.S} />
+						<Layout size={IconSize.S} />
 					</Space>
 					<Copy size={CopySize.M}>Drop the component on the left element list</Copy>
 				</Overlay>

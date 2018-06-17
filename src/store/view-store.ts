@@ -1,4 +1,4 @@
-import * as Sender from '../message/client';
+import * as Sender from '../sender/client';
 import { debounce, isEqual } from 'lodash';
 import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
@@ -29,9 +29,8 @@ export interface ClipboardElement {
 	type: ClipBoardType.Element;
 }
 
-export enum FocusedItemType {
-	Page,
-	Element
+export interface WithStore {
+	store: ViewStore;
 }
 
 /**
@@ -51,23 +50,13 @@ export class ViewStore {
 
 	private editHistory: Model.EditHistory;
 
-	@Mobx.observable private focusedItemType: FocusedItemType;
-
 	@Mobx.observable private metaDown: boolean = false;
 
 	@Mobx.observable private project: Model.Project;
 
 	private savedProjects: Types.SavedProject[] = [];
 
-	@Mobx.observable private showLeftSidebar: boolean = true;
-
-	@Mobx.observable private showPages: boolean = true;
-
-	@Mobx.observable private showRightSidebar: boolean = true;
-
 	@Mobx.observable private serverPort: number;
-
-	@Mobx.observable private usedPatternLibrary: Model.PatternLibrary | undefined;
 
 	public constructor(init: ViewStoreInit) {
 		this.app = init.app;
@@ -107,17 +96,14 @@ export class ViewStore {
 		(window as any).requestIdleCallback(() => this.save());
 	}
 
-	public connectPatternLibrary(): void {
-		const project = this.project;
-
-		if (!project) {
-			return;
-		}
-
+	@Mobx.action
+	public connectPatternLibrary(library?: Model.PatternLibrary): void {
 		Sender.send({
 			type: ServerMessageType.ConnectPatternLibraryRequest,
 			id: uuid.v4(),
-			payload: project.toJSON()
+			payload: {
+				library: library ? library.getId() : undefined
+			}
 		});
 	}
 
@@ -151,7 +137,6 @@ export class ViewStore {
 	@Mobx.action
 	public createElement(init: { dragged?: boolean; pattern: Model.Pattern }): Model.Element {
 		const project = this.getProject();
-		const patternLibrary = project.getPatternLibrary();
 
 		const elementContents = init.pattern.getSlots().map(
 			slot =>
@@ -159,11 +144,12 @@ export class ViewStore {
 					{
 						elementIds: [],
 						forcedOpen: false,
+						highlighted: false,
 						id: uuid.v4(),
 						open: false,
 						slotId: slot.getId()
 					},
-					{ project, patternLibrary }
+					{ project }
 				)
 		);
 
@@ -182,7 +168,6 @@ export class ViewStore {
 				selected: false
 			},
 			{
-				patternLibrary,
 				project
 			}
 		);
@@ -368,7 +353,7 @@ export class ViewStore {
 	@Mobx.action
 	public executeElementPasteAfterSelected(): Model.Element | undefined {
 		const selectedElement = this.getSelectedElement();
-		const page = this.getCurrentPage();
+		const page = this.getActivePage();
 		const rootElement = page ? page.getRoot() : undefined;
 
 		if (!selectedElement && !rootElement) {
@@ -483,7 +468,6 @@ export class ViewStore {
 
 	@Mobx.action
 	public executePageAddNew(): Model.Page | undefined {
-		const patternLibrary = this.project.getPatternLibrary();
 		const name = 'Untitled Page';
 
 		const count = this.project.getPages().filter(p => p.getName().startsWith(name)).length;
@@ -492,15 +476,14 @@ export class ViewStore {
 			{
 				active: false,
 				id: uuid.v4(),
-				name: `${name} ${count + 1}`,
-				patternLibrary: this.project.getPatternLibrary()
+				name: `${name} ${count + 1}`
 			},
-			{ project: this.project, patternLibrary }
+			{ project: this.project }
 		);
 
 		this.project.addPage(page);
 		this.commit();
-		this.setActivePage(page);
+		this.project.setActivePage(page);
 
 		return page;
 	}
@@ -513,7 +496,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public executePageRemoveSelected(): Model.Page | undefined {
-		const page = this.getCurrentPage();
+		const page = this.getActivePage();
 
 		if (!page) {
 			return;
@@ -529,8 +512,16 @@ export class ViewStore {
 		return this.app.getActiveView();
 	}
 
-	public getAppState(): Types.AppState {
-		return this.app.getState();
+	public getActivePage(): Model.Page | undefined {
+		if (!this.project) {
+			return;
+		}
+
+		return this.project.getPages().find(page => page.getActive());
+	}
+
+	public getApp(): Model.AlvaApp {
+		return this.app;
 	}
 
 	public getClipboardItem(type: ClipBoardType.Element): Model.Element | undefined;
@@ -560,38 +551,40 @@ export class ViewStore {
 		return result;
 	}
 
-	/**
-	 * Returns the page content that is currently being displayed in the preview,
-	 * and edited in the elements and properties panes. May be undefined if there is none.
-	 * @return The page content that is currently being displayed in the preview, or undefined.
-	 */
-	public getCurrentPage(): Model.Page | undefined {
+	public getDraggedElement(): Model.Element | undefined {
 		if (!this.project) {
 			return;
 		}
 
-		return this.project.getPages().find(page => page.getActive());
-	}
-
-	public getDraggedElement(): Model.Element | undefined {
 		return this.project.getElements().find(e => e.getDragged());
 	}
 
 	public getDragging(): boolean {
+		if (!this.project) {
+			return false;
+		}
+
 		return this.project.getElements().some(e => e.getDragged());
 	}
 
+	public getElementContents(): Model.ElementContent[] {
+		if (!this.project) {
+			return [];
+		}
+
+		return this.project.getElementContents();
+	}
+
+	public getElements(): Model.Element[] {
+		if (!this.project) {
+			return [];
+		}
+
+		return this.project.getElements();
+	}
+
 	public getElementById(id: string): Model.Element | undefined {
-		const project = this.getProject();
-
-		let result;
-
-		project.getPages().some(page => {
-			result = page.getElementById(id);
-			return result;
-		});
-
-		return result;
+		return this.getElements().find(e => e.getId() === id);
 	}
 
 	public getHighlightedElement(): Model.Element | undefined {
@@ -602,22 +595,12 @@ export class ViewStore {
 		return this.project.getElements().find(element => element.getHighlighted());
 	}
 
-	public getFocusedItem(): Model.Element | Model.Page | undefined {
+	public getHighlightedElementContent(): Model.ElementContent | undefined {
 		if (!this.project) {
 			return;
 		}
 
-		if (this.focusedItemType === FocusedItemType.Element) {
-			return this.project.getElements().find(element => element.getFocused());
-		} else if (this.focusedItemType === FocusedItemType.Page) {
-			return this.project.getPages().find(page => page.getFocused());
-		} else {
-			return undefined;
-		}
-	}
-
-	public getFocusedItemType(): FocusedItemType {
-		return this.focusedItemType;
+		return this.project.getElementContents().find(c => c.getHighlighted());
 	}
 
 	public getMetaDown(): boolean {
@@ -626,23 +609,6 @@ export class ViewStore {
 
 	public getNameEditableElement(): Model.Element | undefined {
 		return this.project.getElements().find(e => e.getNameEditable());
-	}
-
-	@Mobx.action
-	public getNextPage(): Model.Page | undefined {
-		const page = this.getCurrentPage();
-
-		if (!page) {
-			return;
-		}
-
-		const index = this.project.getPageIndex(page);
-
-		if (typeof index !== 'number') {
-			return;
-		}
-
-		return this.project.getPages()[index + 1];
 	}
 
 	public getPageById(id: string): Model.Page | undefined {
@@ -655,6 +621,16 @@ export class ViewStore {
 		return project.getPageById(id);
 	}
 
+	public getPages(): Model.Page[] {
+		const project = this.getProject();
+
+		if (!project) {
+			return [];
+		}
+
+		return project.getPages();
+	}
+
 	public getPatternById(id: string): Model.Pattern | undefined {
 		const project = this.getProject();
 
@@ -662,54 +638,21 @@ export class ViewStore {
 			return;
 		}
 
-		const patternLibrary = project.getPatternLibrary();
-
-		if (!patternLibrary) {
-			return;
-		}
-
-		return patternLibrary.getPatternById(id);
+		return project.getPatternById(id);
 	}
 
-	public getPatternLibrary(): Model.PatternLibrary | undefined {
+	public getPatternLibraries(): Model.PatternLibrary[] {
 		const project = this.getProject();
 
 		if (!project) {
-			return;
+			return [];
 		}
 
-		return project.getPatternLibrary();
-	}
-
-	public getPatternLibraryState(): Types.PatternLibraryState | undefined {
-		const patternLibrary = this.getPatternLibrary();
-
-		if (!patternLibrary) {
-			return;
-		}
-
-		return patternLibrary.getState();
+		return project.getPatternLibraries();
 	}
 
 	public getPatternSearchTerm(): string {
 		return this.app.getSearchTerm();
-	}
-
-	@Mobx.action
-	public getPreviousPage(): Model.Page | undefined {
-		const page = this.getCurrentPage();
-
-		if (!page) {
-			return;
-		}
-
-		const index = this.project.getPageIndex(page);
-
-		if (typeof index !== 'number') {
-			return;
-		}
-
-		return this.project.getPages()[index - 1];
 	}
 
 	public getProject(): Model.Project {
@@ -730,10 +673,6 @@ export class ViewStore {
 
 	public getServerPort(): number {
 		return this.serverPort;
-	}
-
-	public getUsedPatternLibrary(): Model.PatternLibrary | undefined {
-		return this.usedPatternLibrary;
 	}
 
 	public hasApplicableClipboardItem(): boolean {
@@ -871,10 +810,11 @@ export class ViewStore {
 			if (elementBefore) {
 				this.setSelectedElement(elementBefore);
 			} else {
-				this.unsetSelectedElement();
+				this.project.unsetSelectedElement();
 			}
 		};
 
+		this.project.removeElement(element);
 		elementContainer.remove({ element });
 
 		return selectNext;
@@ -886,13 +826,22 @@ export class ViewStore {
 
 		if (this.project.getPages().length > 1) {
 			if (index !== 0) {
-				this.setActivePageByIndex(index - 1);
+				this.project.setActivePageByIndex(index - 1);
 			} else {
-				this.setActivePageByIndex(index + 1);
+				this.project.setActivePageByIndex(index + 1);
 			}
 
 			this.project.removePage(page);
 		}
+	}
+
+	@Mobx.action
+	public requestContextMenu(payload: Types.ContextMenuRequestPayload): void {
+		Sender.send({
+			id: uuid.v4(),
+			type: ServerMessageType.ContextMenuRequest,
+			payload
+		});
 	}
 
 	@Mobx.action
@@ -921,71 +870,10 @@ export class ViewStore {
 		}
 	}
 
-	public getShowLeftSidebar(): boolean {
-		return this.showLeftSidebar;
-	}
-
-	public setShowLeftSidebar(show: boolean): void {
-		this.showLeftSidebar = show;
-	}
-
-	public getShowRightSidebar(): boolean {
-		return this.showRightSidebar;
-	}
-
-	public setShowRightSidebar(show: boolean): void {
-		this.showRightSidebar = show;
-	}
-
-	public getShowPages(): boolean {
-		return this.showPages;
-	}
-
-	public setShowPages(show: boolean): void {
-		this.showPages = show;
-	}
-
 	@Mobx.action
 	public setActiveAppView(appView: Types.AlvaView): void {
 		this.app.setActiveView(appView);
 		this.commit();
-	}
-
-	@Mobx.action
-	public setActivePage(page: Model.Page): void {
-		if (!this.project) {
-			return;
-		}
-
-		this.unsetActivePage();
-		page.setActive(true);
-		this.setFocusedItem(FocusedItemType.Page, page);
-
-		this.unsetSelectedElement();
-
-		console.log('setActivePage');
-	}
-
-	@Mobx.action
-	public setActivePageById(id: string): void {
-		const page = this.getPageById(id);
-
-		if (!this.project || !page) {
-			return;
-		}
-
-		return this.setActivePage(page);
-	}
-
-	@Mobx.action
-	public setActivePageByIndex(index: number): void {
-		const page = this.project.getPages()[index];
-
-		if (!page) {
-			return;
-		}
-
-		this.setActivePage(page);
 	}
 
 	@Mobx.action
@@ -1019,7 +907,10 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public setHighlightedElement(highlightedElement: Model.Element): void {
+	public setHighlightedElement(
+		highlightedElement: Model.Element,
+		options?: { flat: boolean }
+	): void {
 		const previousHighlightedElement = this.getHighlightedElement();
 
 		if (previousHighlightedElement) {
@@ -1035,24 +926,10 @@ export class ViewStore {
 
 		highlightedElement.setHighlighted(true);
 
-		highlightedElement.getAncestors().forEach(ancestor => {
-			ancestor.setForcedOpen(true);
-		});
-	}
-
-	@Mobx.action
-	public setFocusedItem(
-		type: FocusedItemType,
-		payload: Model.Element | Model.Page | undefined
-	): void {
-		const previousFocusItem = this.getFocusedItem();
-
-		if (previousFocusItem) {
-			previousFocusItem.setFocused(false);
-		}
-		this.focusedItemType = type;
-		if (payload) {
-			payload.setFocused(true);
+		if (!options || !options.flat) {
+			highlightedElement.getAncestors().forEach(ancestor => {
+				ancestor.setForcedOpen(true);
+			});
 		}
 	}
 
@@ -1084,11 +961,7 @@ export class ViewStore {
 		this.project = project;
 		this.unsetHighlightedElement();
 
-		const patternLibrary = project.getPatternLibrary();
-
-		if (patternLibrary) {
-			patternLibrary.updateSearch();
-		}
+		project.getPatternLibraries().forEach(p => p.updateSearch());
 	}
 
 	@Mobx.action
@@ -1111,7 +984,9 @@ export class ViewStore {
 		}
 
 		selectedElement.setSelected(true);
-		this.setFocusedItem(FocusedItemType.Element, selectedElement);
+
+		this.app.setRightSidebarTab(Types.RightSidebarTab.Properties);
+		this.project.setFocusedItem(Types.FocusedItemType.Element, selectedElement);
 
 		selectedElement.getAncestors().forEach(ancestor => {
 			ancestor.setForcedOpen(true);
@@ -1121,11 +996,6 @@ export class ViewStore {
 	@Mobx.action
 	public setServerPort(port: number): void {
 		this.serverPort = port;
-	}
-
-	@Mobx.action
-	public setUsedPatternLibrary(usedPatternLibrary: Model.PatternLibrary | undefined): void {
-		this.usedPatternLibrary = usedPatternLibrary;
 	}
 
 	@Mobx.action
@@ -1146,15 +1016,6 @@ export class ViewStore {
 		this.unsetDraggedElement();
 		this.setApp(app);
 		this.setProject(project);
-	}
-
-	@Mobx.action
-	public unsetActivePage(): void {
-		if (!this.project) {
-			return;
-		}
-
-		this.project.getPages().forEach(page => page.setActive(false));
 	}
 
 	@Mobx.action
@@ -1179,34 +1040,19 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public unsetSelectedElement(): void {
-		if (!this.project) {
-			return;
-		}
-
-		this.project
-			.getElements()
-			.filter(element => element.getSelected())
-			.forEach(element => {
-				element.setSelected(false);
-				element.getAncestors().forEach(ancestor => {
-					ancestor.setForcedOpen(false);
-				});
-			});
+	public unsetHighlightedElementContent(): void {
+		this.project.getElementContents().forEach(e => {
+			e.setHighlighted(false);
+		});
 	}
 
-	@Mobx.action
-	public updatePatternLibrary(): void {
-		const project = this.project;
-
-		if (!project) {
-			return;
-		}
-
+	public updatePatternLibrary(library: Model.PatternLibrary): void {
 		Sender.send({
 			type: ServerMessageType.UpdatePatternLibraryRequest,
-			id: uuid.v4(),
-			payload: project.toJSON()
+			payload: {
+				id: library.getId()
+			},
+			id: uuid.v4()
 		});
 	}
 }

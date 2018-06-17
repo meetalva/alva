@@ -1,7 +1,6 @@
-import { ElementAnchors } from '../../components';
+import * as Components from '../../components';
 import { ElementDragImage } from '../element-drag-image';
-import { elementMenu } from '../../electron/context-menus';
-import { ElementContainer } from './element-container';
+import { ElementContentContainer } from './element-content-container';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
@@ -66,17 +65,17 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 
 		const target = e.target as HTMLElement;
-		const icon = above(target, `svg[${ElementAnchors.icon}]`);
+		const icon = above(target, `svg[${Components.ElementAnchors.icon}]`);
 
 		// Skip and deselect elements if the root itself is clicked
 		if (target.getAttribute('data-drag-root')) {
-			store.unsetSelectedElement();
+			store.getProject().unsetSelectedElement();
 			return;
 		}
 
 		const element = elementFromTarget(e.target, { sibling: false, store });
 		const targetContent = elementContentFromTarget(e.target, { store });
-		const label = above(e.target, `[${ElementAnchors.label}]`);
+		const label = above(e.target, `[${Components.ElementAnchors.label}]`);
 
 		if (!element) {
 			return;
@@ -106,8 +105,17 @@ export class ElementList extends React.Component {
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const element = elementFromTarget(e.target, { sibling: false, store });
+		const clipboardItem = store.getClipboardItem(Store.ClipBoardType.Element);
+
 		if (element) {
-			elementMenu(element, store);
+			store.requestContextMenu({
+				menu: Types.ContextMenuType.ElementMenu,
+				data: {
+					element: element.toJSON(),
+					project: store.getProject().toJSON(),
+					clipboardItem: clipboardItem ? clipboardItem.toJSON() : undefined
+				}
+			});
 		}
 	}
 
@@ -127,7 +135,7 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 
 		const target = e.target as HTMLElement;
-		const isSibling = target.getAttribute(ElementAnchors.placeholder) === 'true';
+		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
 		const visualTargetElement = elementFromTarget(e.target, { sibling: false, store });
 
 		const targetContent = isSibling
@@ -205,7 +213,7 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 
 		const target = e.target as HTMLElement;
-		const isSiblingDrop = target.getAttribute(ElementAnchors.placeholder) === 'true';
+		const isSiblingDrop = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
 
 		const draggedElement = store.getDraggedElement();
 		const visualTargetElement = elementFromTarget(e.target, { sibling: false, store });
@@ -252,8 +260,6 @@ export class ElementList extends React.Component {
 			content: targetContent,
 			index
 		});
-
-		store.setSelectedElement(draggedElement);
 	}
 
 	private handleKeyDown(e: KeyboardEvent): void {
@@ -317,7 +323,7 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 		const targetElement = elementFromTarget(e.target as HTMLElement, { sibling: false, store });
 		const targetContent = elementContentFromTarget(e.target, { store });
-		const label = above(e.target, `[${ElementAnchors.label}]`);
+		const label = above(e.target, `[${Components.ElementAnchors.label}]`);
 
 		Mobx.transaction(() => {
 			if (
@@ -325,17 +331,8 @@ export class ElementList extends React.Component {
 				(label && targetContent) ||
 				(!label && targetElement && targetElement.getRole() === Types.ElementRole.Root)
 			) {
-				store
-					.getProject()
-					.getElementContents()
-					.filter(sec => sec.getHighlighted())
-					.forEach(se => se.setHighlighted(false));
-
-				store
-					.getProject()
-					.getElements()
-					.filter(se => se.getHighlighted())
-					.forEach(se => se.setHighlighted(false));
+				store.unsetHighlightedElement();
+				store.unsetHighlightedElementContent();
 			}
 
 			if (
@@ -354,7 +351,7 @@ export class ElementList extends React.Component {
 
 	public render(): JSX.Element | null {
 		const { store } = this.props as { store: Store.ViewStore };
-		const page: Model.Page | undefined = store.getCurrentPage();
+		const page: Model.Page | undefined = store.getActivePage();
 
 		if (!page) {
 			return null;
@@ -367,11 +364,13 @@ export class ElementList extends React.Component {
 		}
 
 		const anchors = {
-			[ElementAnchors.content]: (rootElement.getContentBySlotType(
+			[Components.ElementAnchors.content]: (rootElement.getContentBySlotType(
 				Types.SlotType.Children
 			) as Model.ElementContent).getId(),
-			[ElementAnchors.element]: rootElement.getId()
+			[Components.ElementAnchors.element]: rootElement.getId()
 		};
+
+		const childContent = rootElement.getContentBySlotType(Types.SlotType.Children);
 
 		return (
 			<StyledDragRoot
@@ -390,7 +389,9 @@ export class ElementList extends React.Component {
 				onMouseOver={e => this.handleMouseOver(e)}
 				innerRef={ref => (this.ref = ref)}
 			>
-				<ElementContainer element={rootElement} />
+				<Components.Element.ElementChildren>
+					{childContent && <ElementContentContainer content={childContent} />}
+				</Components.Element.ElementChildren>
 				<ElementDragImage
 					element={store.getDraggedElement()}
 					innerRef={ref => (this.dragImg = ref)}
@@ -429,13 +430,13 @@ function elementContentFromTarget(
 	target: EventTarget,
 	options: { store: Store.ViewStore }
 ): Model.ElementContent | undefined {
-	const el = above(target, `[${ElementAnchors.content}]`);
+	const el = above(target, `[${Components.ElementAnchors.content}]`);
 
 	if (!el) {
 		return;
 	}
 
-	const id = el.getAttribute(ElementAnchors.content);
+	const id = el.getAttribute(Components.ElementAnchors.content);
 
 	if (typeof id !== 'string') {
 		return;
@@ -448,13 +449,13 @@ export function elementFromTarget(
 	target: EventTarget,
 	options: { sibling: boolean; store: Store.ViewStore }
 ): Model.Element | undefined {
-	const el = above(target, `[${ElementAnchors.element}]`);
+	const el = above(target, `[${Components.ElementAnchors.element}]`);
 
 	if (!el) {
 		return;
 	}
 
-	const id = el.getAttribute(ElementAnchors.element);
+	const id = el.getAttribute(Components.ElementAnchors.element);
 
 	if (typeof id !== 'string') {
 		return;

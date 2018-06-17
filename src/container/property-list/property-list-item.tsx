@@ -1,4 +1,4 @@
-import * as Sender from '../../message/client';
+import * as Sender from '../../sender/client';
 import * as Component from '../../components';
 import { EventHandlerPropertyView } from './event-handler-property-view';
 import { ServerMessageType } from '../../message';

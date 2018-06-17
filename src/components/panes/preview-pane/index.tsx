@@ -27,6 +27,8 @@ const StyledFrame = styled.iframe`
 
 export interface PreviewFrameProps {
 	offCanvas: boolean;
+	onMouseEnter?: React.MouseEventHandler<HTMLElement>;
+	onMouseLeave?: React.MouseEventHandler<HTMLElement>;
 	src: string;
 }
 
@@ -35,12 +37,6 @@ const PreviewFrame: React.SFC<PreviewFrameProps> = props => <StyledFrame {...pro
 export interface PreviewPaneProps {
 	children?: React.ReactNode;
 	id?: string;
-	onMouseDownLeft?: React.MouseEventHandler<HTMLElement>;
-	onMouseDownRight?: React.MouseEventHandler<HTMLElement>;
-	onMouseMove?: React.MouseEventHandler<HTMLElement>;
-	onMouseUp?: React.MouseEventHandler<HTMLElement>;
-	width?: number;
-	onPreviewWidthUpdate?(previewWidth: number): void;
 }
 
 class PreviewPane extends React.Component<PreviewPaneProps> {

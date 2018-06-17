@@ -4,12 +4,10 @@ import * as Path from 'path';
 import * as QueryString from 'query-string';
 import * as webpack from 'webpack';
 
+const LOADER_PATH = require.resolve('../preview/preview-loader');
+
 // memory-fs typings on @types are faulty
 const MemoryFs = require('memory-fs');
-
-const PREVIEW_PATH = require.resolve('../preview/preview');
-const LOADER_PATH = require.resolve('../preview/preview-loader');
-const RENDERER_PATH = require.resolve('../preview/preview-renderer');
 
 export interface CompilerPattern {
 	id: string;
@@ -18,14 +16,9 @@ export interface CompilerPattern {
 
 export function createCompiler(
 	patterns: CompilerPattern[],
-	options: { cwd: string; infrastructure: boolean }
+	options: { id: string; cwd: string; infrastructure: boolean }
 ): webpack.Compiler {
 	const entry: { [name: string]: string } = {};
-
-	if (options.infrastructure) {
-		entry.renderer = RENDERER_PATH;
-		entry.preview = PREVIEW_PATH;
-	}
 
 	const components = patterns.reduce((acc, pattern) => {
 		acc[compilerSafeName(pattern.id)] = `./${Path.relative(options.cwd, pattern.path)
@@ -34,7 +27,7 @@ export function createCompiler(
 		return acc;
 	}, {});
 
-	entry.components = `${LOADER_PATH}?${QueryString.stringify({
+	entry[options.id] = `${LOADER_PATH}?${QueryString.stringify({
 		cwd: options.cwd,
 		components: JSON.stringify(components)
 	})}!`;

@@ -22,7 +22,7 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 				return selectedElement;
 			}
 
-			const page = store.getCurrentPage();
+			const page = store.getActivePage();
 
 			if (page) {
 				return page.getRoot();

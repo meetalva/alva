@@ -15,19 +15,11 @@
 		"isolatedModules": false,
 		"jsx": "react",
 		"module": "commonjs",
-		"plugins": [
-			{
-				"name": "typescript-styled-plugin",
-				"lint": {
-					"unknownProperties": "ignore"
-				}
-			}
-		],
+		"moduleResolution": "node",
 		"lib": [
 			"es2017",
 			"dom"
 		],
-		"moduleResolution": "node",
 		"plugins": [
 			{
 				"name": "typescript-styled-plugin",

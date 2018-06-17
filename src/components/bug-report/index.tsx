@@ -1,6 +1,5 @@
 import { Button, ButtonOrder, ButtonSize } from '../button';
 import * as React from 'react';
-import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface BugReportProps {
@@ -10,7 +9,7 @@ export interface BugReportProps {
 
 const StyledBugReport = styled.div`
 	justify-self: right;
-	margin-right: -${getSpace(SpaceSize.XXL) * 2 + getSpace(SpaceSize.S - SpaceSize.L)}px; // align to top right corner
+	-webkit-app-region: no-drag;
 `;
 
 export const BugReport: React.StatelessComponent<BugReportProps> = props => (

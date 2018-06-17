@@ -1,7 +1,7 @@
 import { Color } from '../colors';
 import { IconSize } from '../icons';
 import * as React from 'react';
-import { Layout } from 'react-feather';
+import { Box } from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
@@ -52,7 +52,7 @@ const StyledPatternListItem = styled.div`
 		props.draggable ? 'cursor: move;' : props.onClick ? 'cursor: pointer;' : ''};
 `;
 
-const StyledIcon = styled(Layout)`
+const StyledIcon = styled(Box)`
 	margin-top: ${getSpace(SpaceSize.XS)}px;
 	margin-right: ${getSpace(SpaceSize.XS + SpaceSize.XXS)}px;
 	flex: 0 0 ${IconSize.XS}px;

@@ -1,0 +1,8 @@
+{
+	"name": "layout-switch",
+	"displayName": "Layout Switch",
+	"description": "Switch between Views",
+	"version": "1.0.0",
+	"tags": ["layout", "switch"],
+	"flag": "alpha"
+}

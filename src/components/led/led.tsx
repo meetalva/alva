@@ -1,5 +1,6 @@
 import { Color } from '../colors';
 import * as React from 'react';
+import * as Space from '../space';
 import styled from 'styled-components';
 
 export enum LedColor {
@@ -11,18 +12,22 @@ export enum LedColor {
 
 export interface LedProps {
 	ledColor: LedColor;
+	label?: string;
 }
 
 export const Led: React.SFC<LedProps> = props => (
-	<StyledLedContainer ledColor={props.ledColor}>
-		<StyledLed ledColor={props.ledColor} />
-	</StyledLedContainer>
+	<StyledLedOuterContainer>
+		<StyledLedContainer ledColor={props.ledColor}>
+			<StyledLed ledColor={props.ledColor} />
+		</StyledLedContainer>
+		{props.label && <StyledLedLabel ledColor={props.ledColor}>{props.label}</StyledLedLabel>}
+	</StyledLedOuterContainer>
 );
 
 const COLOR = (props: LedProps): string => {
 	switch (props.ledColor) {
 		case LedColor.Green:
-			return Color.Green;
+			return Color.SignalGreen;
 		case LedColor.Orange:
 			return Color.Orange;
 		case LedColor.Red:
@@ -31,6 +36,12 @@ const COLOR = (props: LedProps): string => {
 			return Color.Grey50;
 	}
 };
+
+const StyledLedOuterContainer = styled.div`
+	display: flex;
+	align-items: center;
+	margin: ${Space.getSpace(Space.SpaceSize.S)}px 0;
+`;
 
 const StyledLedContainer = styled.div`
 	position: relative;
@@ -53,6 +64,11 @@ const StyledLedContainer = styled.div`
 		background-color: ${COLOR};
 		mix-blend-mode: multiply;
 	}
+`;
+
+const StyledLedLabel = styled.div`
+	color: ${COLOR};
+	margin-left: ${Space.getSpace(Space.SpaceSize.XS)}px;
 `;
 
 const StyledLed = styled.div`

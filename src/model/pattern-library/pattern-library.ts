@@ -9,8 +9,12 @@ import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface PatternLibraryInit {
+	bundleId: string;
 	bundle: string;
+	description: string;
 	id: string;
+	name: string;
+	origin: Types.PatternLibraryOrigin;
 	patternProperties: AnyPatternProperty[];
 	patterns: Pattern[];
 	root?: PatternFolder;
@@ -35,17 +39,25 @@ export interface PatternLibraryCreateOptions {
 }
 
 export class PatternLibrary {
+	@Mobx.observable private bundleId: string;
 	@Mobx.observable private bundle: string;
+	@Mobx.observable private description: string;
 	@Mobx.observable private fuse: Fuse;
 	@Mobx.observable private id: string;
+	@Mobx.observable private name: string;
 	@Mobx.observable private patternProperties: AnyPatternProperty[] = [];
 	@Mobx.observable private patterns: Pattern[] = [];
+	@Mobx.observable private origin: Types.PatternLibraryOrigin;
 	@Mobx.observable private root: PatternFolder;
 	@Mobx.observable private state: Types.PatternLibraryState;
 
 	public constructor(init: PatternLibraryInit) {
+		this.bundleId = init.bundleId;
 		this.bundle = init.bundle;
+		this.description = init.description;
 		this.id = init.id || uuid.v4();
+		this.name = init.name;
+		this.origin = init.origin;
 		this.patterns = init.patterns;
 		this.patternProperties = init.patternProperties;
 		this.state = init.state;
@@ -56,14 +68,15 @@ export class PatternLibrary {
 		}
 	}
 
-	public static create(options: PatternLibraryCreateOptions): PatternLibrary {
-		const patternLibrary = new PatternLibrary({
-			bundle: '',
-			id: uuid.v4(),
-			patterns: [],
-			patternProperties: [],
-			state: Types.PatternLibraryState.Pristine
-		});
+	public static create(init: PatternLibraryInit): PatternLibrary {
+		const options = {
+			getGloablEnumOptionId: () => uuid.v4(),
+			getGlobalPatternId: () => uuid.v4(),
+			getGlobalPropertyId: () => uuid.v4(),
+			getGlobalSlotId: () => uuid.v4()
+		};
+
+		const patternLibrary = new PatternLibrary(init);
 
 		const root = new PatternFolder(
 			{
@@ -75,40 +88,42 @@ export class PatternLibrary {
 
 		patternLibrary.setRootFolder(root);
 
-		const syntheticFolder = new PatternFolder(
-			{
-				name: 'Built-In Components',
-				type: Types.PatternFolderType.Builtin
-			},
-			{ patternLibrary }
-		);
+		if (init.origin === Types.PatternLibraryOrigin.BuiltIn) {
+			const syntheticFolder = new PatternFolder(
+				{
+					name: 'Built-In Components',
+					type: Types.PatternFolderType.Builtin
+				},
+				{ patternLibrary }
+			);
 
-		root.addChild(syntheticFolder);
+			root.addChild(syntheticFolder);
 
-		const link = Link({ patternLibrary, options });
-		const page = Page({ patternLibrary, options });
-		const image = Image({ patternLibrary, options });
-		const text = Text({ patternLibrary, options });
-		const box = Box({ patternLibrary, options });
+			const link = Link({ options, patternLibrary });
+			const page = Page({ options, patternLibrary });
+			const image = Image({ options, patternLibrary });
+			const text = Text({ options, patternLibrary });
+			const box = Box({ options, patternLibrary });
 
-		syntheticFolder.addPattern(text.pattern);
-		syntheticFolder.addPattern(box.pattern);
-		syntheticFolder.addPattern(image.pattern);
-		syntheticFolder.addPattern(link.pattern);
+			syntheticFolder.addPattern(text.pattern);
+			syntheticFolder.addPattern(box.pattern);
+			syntheticFolder.addPattern(image.pattern);
+			syntheticFolder.addPattern(link.pattern);
 
-		[page.pattern, text.pattern, box.pattern, image.pattern, link.pattern].forEach(pattern => {
-			patternLibrary.addPattern(pattern);
-		});
+			[page.pattern, text.pattern, box.pattern, image.pattern, link.pattern].forEach(pattern => {
+				patternLibrary.addPattern(pattern);
+			});
 
-		[
-			...page.properties,
-			...image.properties,
-			...text.properties,
-			...box.properties,
-			...link.properties
-		].forEach(property => {
-			patternLibrary.addProperty(property);
-		});
+			[
+				...page.properties,
+				...image.properties,
+				...text.properties,
+				...box.properties,
+				...link.properties
+			].forEach(property => {
+				patternLibrary.addProperty(property);
+			});
+		}
 
 		return patternLibrary;
 	}
@@ -117,8 +132,12 @@ export class PatternLibrary {
 		const state = deserializeState(serialized.state);
 
 		const patternLibrary = new PatternLibrary({
+			bundleId: serialized.bundleId,
 			bundle: serialized.bundle,
+			description: serialized.description,
 			id: serialized.id,
+			name: serialized.name,
+			origin: deserializeOrigin(serialized.origin),
 			patterns: [],
 			patternProperties: serialized.patternProperties.map(p => PatternProperty.from(p)),
 			state
@@ -133,20 +152,27 @@ export class PatternLibrary {
 		return patternLibrary;
 	}
 
+	@Mobx.action
 	public static import(
 		analysis: Types.LibraryAnalysis,
 		previousLibrary?: PatternLibrary
 	): PatternLibrary {
-		const patternLibrary = PatternLibrary.create({
-			getGlobalEnumOptionId: (enumId, contextId) =>
-				previousLibrary ? previousLibrary.assignEnumOptionId(enumId, contextId) : uuid.v4(),
-			getGlobalPatternId: contextId =>
-				previousLibrary ? previousLibrary.assignPatternId(contextId) : uuid.v4(),
-			getGlobalPropertyId: (patternId, contextId) =>
-				previousLibrary ? previousLibrary.assignPropertyId(patternId, contextId) : uuid.v4(),
-			getGlobalSlotId: (patternId, contextId) =>
-				previousLibrary ? previousLibrary.assignSlotId(patternId, contextId) : uuid.v4()
-		});
+		const patternLibrary =
+			previousLibrary ||
+			PatternLibrary.create({
+				id: uuid.v4(),
+				name: analysis.name,
+				origin: Types.PatternLibraryOrigin.UserProvided,
+				patternProperties: [],
+				patterns: [],
+				bundle: analysis.bundle,
+				bundleId: analysis.id,
+				description: analysis.description,
+				state: Types.PatternLibraryState.Connected
+			});
+
+		const rootFolder = patternLibrary.getRoot();
+		rootFolder.getChildren().forEach(child => rootFolder.removeChild(child));
 
 		const folder = new PatternFolder(
 			{ name: analysis.name, type: Types.PatternFolderType.UserProvided },
@@ -168,15 +194,16 @@ export class PatternLibrary {
 
 		patternLibrary.getRoot().addChild(folder);
 		patternLibrary.setState(Types.PatternLibraryState.Connected);
-		patternLibrary.setBundle(analysis.bundle);
-
 		patternLibrary.updateSearch();
+
+		patternLibrary.setBundle(analysis.bundle);
+		patternLibrary.setBundleId(analysis.id);
 
 		return patternLibrary;
 	}
 
-	public static isEqual(a: PatternLibrary, b: PatternLibrary): boolean {
-		return isEqual(a.toJSON(), b.toJSON());
+	public equals(b: PatternLibrary): boolean {
+		return isEqual(this.toJSON(), b.toJSON());
 	}
 
 	public addPattern(pattern: Pattern): void {
@@ -222,12 +249,47 @@ export class PatternLibrary {
 		return slot ? slot.getId() : uuid.v4();
 	}
 
+	public getDescription(): string {
+		return this.description;
+	}
+
 	public getBundle(): string {
 		return this.bundle;
 	}
 
+	public getBundleId(): string {
+		return this.bundleId;
+	}
+
+	public getCapabilites(): Types.LibraryCapability[] {
+		const isUserProvided = this.origin === Types.PatternLibraryOrigin.UserProvided;
+
+		if (!isUserProvided) {
+			return [];
+		}
+
+		const isConnected = this.state === Types.PatternLibraryState.Connected;
+
+		return [
+			isConnected && Types.LibraryCapability.Disconnect,
+			isConnected && Types.LibraryCapability.Update,
+			isConnected && Types.LibraryCapability.SetPath,
+			Types.LibraryCapability.Reconnect
+		].filter(
+			(capability): capability is Types.LibraryCapability => typeof capability !== 'undefined'
+		);
+	}
+
 	public getId(): string {
 		return this.id;
+	}
+
+	public getName(): string {
+		return this.name;
+	}
+
+	public getOrigin(): Types.PatternLibraryOrigin {
+		return this.origin;
 	}
 
 	public getPatternByContextId(contextId: string): Pattern | undefined {
@@ -248,6 +310,10 @@ export class PatternLibrary {
 
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
 		return this.patternProperties.find(patternProperty => patternProperty.getId() === id);
+	}
+
+	public getPatternSlotById(id: string): PatternSlot | undefined {
+		return this.getSlots().find(slot => slot.getId() === id);
 	}
 
 	public getPatterns(): Pattern[] {
@@ -304,6 +370,21 @@ export class PatternLibrary {
 	}
 
 	@Mobx.action
+	public setBundleId(bundleId: string): void {
+		this.bundleId = bundleId;
+	}
+
+	@Mobx.action
+	public setDescription(description: string): void {
+		this.description = description;
+	}
+
+	@Mobx.action
+	public setName(name: string): void {
+		this.name = name;
+	}
+
+	@Mobx.action
 	public setRootFolder(root: PatternFolder): void {
 		this.root = root;
 	}
@@ -315,13 +396,31 @@ export class PatternLibrary {
 
 	public toJSON(): Types.SerializedPatternLibrary {
 		return {
+			bundleId: this.bundleId,
 			bundle: this.bundle,
+			description: this.description,
 			id: this.id,
+			name: this.name,
+			origin: serializeOrigin(this.origin),
 			patterns: this.patterns.map(p => p.toJSON()),
 			patternProperties: this.patternProperties.map(p => p.toJSON()),
 			root: this.root.toJSON(),
 			state: this.state
 		};
+	}
+
+	@Mobx.action
+	public update(b: PatternLibrary): void {
+		this.bundleId = b.bundleId;
+		this.bundle = b.bundle;
+		this.description = b.description;
+		this.id = b.id;
+		this.name = b.name;
+		this.origin = b.origin;
+		this.patterns = b.patterns;
+		this.patternProperties = b.patternProperties;
+		this.root = b.root;
+		this.state = this.state;
 	}
 
 	@Mobx.action
@@ -345,4 +444,26 @@ function deserializeState(
 		case 'disconnected':
 			return Types.PatternLibraryState.Disconnected;
 	}
+}
+
+function deserializeOrigin(
+	input: Types.SerializedPatternLibraryOrigin
+): Types.PatternLibraryOrigin {
+	switch (input) {
+		case 'built-in':
+			return Types.PatternLibraryOrigin.BuiltIn;
+		case 'user-provided':
+			return Types.PatternLibraryOrigin.UserProvided;
+	}
+	throw new Error(`Unknown pattern library origin: ${input}`);
+}
+
+function serializeOrigin(input: Types.PatternLibraryOrigin): Types.SerializedPatternLibraryOrigin {
+	switch (input) {
+		case Types.PatternLibraryOrigin.BuiltIn:
+			return 'built-in';
+		case Types.PatternLibraryOrigin.UserProvided:
+			return 'user-provided';
+	}
+	throw new Error(`Unknown pattern library origin: ${input}`);
 }

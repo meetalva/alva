@@ -1,6 +1,6 @@
 import { Element, ElementContent } from '../element';
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
-import { PatternLibrary } from '../pattern-library';
 import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
@@ -16,11 +16,9 @@ export interface PageCreateInit {
 	active: boolean;
 	id: string;
 	name: string;
-	patternLibrary: PatternLibrary;
 }
 
 export interface PageContext {
-	patternLibrary: PatternLibrary;
 	project: Project;
 }
 
@@ -50,8 +48,6 @@ export class Page {
 	 */
 	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Editable;
 
-	private patternLibrary: PatternLibrary;
-
 	private project: Project;
 
 	/**
@@ -75,7 +71,9 @@ export class Page {
 
 	@Mobx.action
 	public static create(init: PageCreateInit, context: PageContext): Page {
-		const rootPattern = context.patternLibrary.getPatternByType(Types.PatternType.SyntheticPage);
+		const patternLibrary = context.project.getBuiltinPatternLibrary();
+
+		const rootPattern = patternLibrary.getPatternByType(Types.PatternType.SyntheticPage);
 
 		const rootContents = rootPattern.getSlots().map(
 			slot =>
@@ -83,6 +81,7 @@ export class Page {
 					{
 						elementIds: [],
 						forcedOpen: false,
+						highlighted: false,
 						id: uuid.v4(),
 						open: false,
 						slotId: slot.getId()
@@ -110,7 +109,6 @@ export class Page {
 				selected: false
 			},
 			{
-				patternLibrary: context.patternLibrary,
 				project: context.project
 			}
 		);
@@ -151,9 +149,12 @@ export class Page {
 
 	public clone(): Page {
 		return Page.from(this.toJSON(), {
-			project: this.project,
-			patternLibrary: this.patternLibrary
+			project: this.project
 		});
+	}
+
+	public equals(b: Page): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
 	}
 
 	public getActive(): boolean {
@@ -264,5 +265,11 @@ export class Page {
 			name: this.getName(),
 			rootId: this.rootId
 		};
+	}
+
+	public update(b: Page): void {
+		this.active = b.active;
+		this.name = b.name;
+		this.rootId = b.rootId;
 	}
 }

@@ -1,5 +1,4 @@
 import * as Mobx from 'mobx';
-import { PatternLibrary } from '../../pattern-library';
 import { AnyPatternProperty } from '../../pattern-property';
 import { Project } from '../../project';
 import * as Types from '../../../types';
@@ -14,12 +13,10 @@ export interface ElementPropertyInit {
 
 export interface ElementPropertyContext {
 	project: Project;
-	patternLibrary: PatternLibrary;
 }
 
 export class ElementProperty {
 	@Mobx.observable private id: string;
-	@Mobx.observable private patternLibrary: PatternLibrary;
 	@Mobx.observable private patternPropertyId: string;
 	private project: Project;
 	@Mobx.observable private setDefault: boolean;
@@ -30,10 +27,9 @@ export class ElementProperty {
 		this.patternPropertyId = init.patternPropertyId;
 		this.setDefault = init.setDefault;
 		this.value = init.value;
-		this.patternLibrary = context.patternLibrary;
 		this.project = context.project;
 
-		const patternProperty = this.patternLibrary.getPatternPropertyById(this.patternPropertyId);
+		const patternProperty = this.project.getPatternPropertyById(this.patternPropertyId);
 
 		if (typeof this.value === 'undefined' && this.setDefault && patternProperty) {
 			this.value = patternProperty.getDefaultValue();
@@ -87,7 +83,6 @@ export class ElementProperty {
 				value: clonedActionId || this.value
 			},
 			{
-				patternLibrary: this.patternLibrary,
 				project: this.project
 			}
 		);
@@ -108,7 +103,7 @@ export class ElementProperty {
 	}
 
 	public getPatternProperty(): AnyPatternProperty | undefined {
-		return this.patternLibrary.getPatternPropertyById(this.patternPropertyId);
+		return this.project.getPatternPropertyById(this.patternPropertyId);
 	}
 
 	public getPatternPropertyId(): string {
@@ -121,11 +116,6 @@ export class ElementProperty {
 
 	public hasPatternProperty(patternProperty: AnyPatternProperty): boolean {
 		return this.patternPropertyId === patternProperty.getId();
-	}
-
-	@Mobx.action
-	public setPatternLibrary(patternLibrary: PatternLibrary): void {
-		this.patternLibrary = patternLibrary;
 	}
 
 	@Mobx.action

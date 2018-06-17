@@ -7,6 +7,8 @@ import { ChevronLeft, ChevronRight } from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
+const tag = require('tag-hoc').default;
+
 export type JustifyType = 'start' | 'center' | 'end' | 'stretch';
 
 export interface ViewEditableTitleProps {
@@ -87,22 +89,7 @@ const StyledTitle = styled.strong`
 	white-space: nowrap;
 `;
 
-const StyledLeftIcon = styled(ChevronLeft)`
-	padding: ${getSpace(SpaceSize.XXS)}px;
-	border-radius: ${getSpace(SpaceSize.XXS)}px;
-	visibility: ${(props: StyledIconProps) => (props.visible ? 'visible' : 'hidden')};
-	cursor: pointer;
-	pointer-events: auto;
-
-	&:hover {
-		background: ${Color.Grey90};
-	}
-	&:active {
-		background: ${Color.Grey80};
-	}
-`;
-
-const StyledRightIcon = styled(ChevronRight)`
+const StyledChevron = styled(tag(['visible'])('div'))`
 	padding: ${getSpace(SpaceSize.XXS)}px;
 	border-radius: ${getSpace(SpaceSize.XXS)}px;
 	visibility: ${(props: StyledIconProps) => (props.visible ? 'visible' : 'hidden')};
@@ -151,8 +138,9 @@ export const ViewTitle: React.SFC<ViewTitleProps> = (props): JSX.Element => (
 
 export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 	<StyledViewSwitch justify={props.justify} fontSize={props.fontSize}>
-		<StyledLeftIcon
+		<StyledChevron
 			color={Color.Grey60}
+			is={ChevronLeft}
 			onClick={props.onLeftClick}
 			onDoubleClick={event => {
 				event.stopPropagation();
@@ -160,9 +148,10 @@ export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 			size={IconSize.XS}
 			visible={props.leftVisible}
 		/>
-		{props.children}
-		<StyledRightIcon
+		<StyledTitle>{props.children}</StyledTitle>
+		<StyledChevron
 			color={Color.Grey60}
+			is={ChevronRight}
 			onClick={props.onRightClick}
 			onDoubleClick={event => {
 				event.stopPropagation();

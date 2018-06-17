@@ -1,20 +1,17 @@
-export enum PreviewDocumentMode {
-	Live = 'live',
-	LiveMirror = 'live-mirror',
-	Static = 'static'
-}
+import * as Types from '../types';
 
 export type PreviewDocumentConfig = LivePreviewDocumentConfig | StaticPreviewDocumentConfig;
 
 export interface LivePreviewDocumentConfig {
-	data: object;
-	mode: PreviewDocumentMode.Live | PreviewDocumentMode.LiveMirror;
+	data: Types.SerializedProject;
+	mode: Types.PreviewDocumentMode.Live | Types.PreviewDocumentMode.LiveMirror;
+	scripts: string;
 }
 
 export interface StaticPreviewDocumentConfig {
 	content: string;
-	data: object;
-	mode: PreviewDocumentMode.Static;
+	data: Types.SerializedProject;
+	mode: Types.PreviewDocumentMode.Static;
 	scripts: string;
 }
 
@@ -93,7 +90,6 @@ preview,
 
 const LIVE_SCRIPTS = `
 <script src="/scripts/renderer.js" data-script="renderer"><\/script>
-<script src="/scripts/components.js" data-script="components"><\/script>
 <script src="/scripts/preview.js" data-script="preview"><\/script>
 `;
 
@@ -110,21 +106,39 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 		#preview {
 			background: white;
 		}
+		#preview-highlight,
+		#preview-selection {
+			box-sizing: border-box;
+			pointer-events: none;
+			position: absolute;
+		}
+		#preview-highlight {
+			z-index: 100;
+			border: 2px solid #42BFFE;
+		}
+		#preview-selection {
+			z-index: 101;
+			border: 1px solid rgba(255, 255, 255, 0.5);
+			mix-blend-mode: difference;
+		}
 	</style>
 </head>
 <body>
 	<div id="preview">
-		${config.mode === PreviewDocumentMode.Static ? config.content : ''}
-		${config.mode === PreviewDocumentMode.Live ? PRELOADER : ''}
+		${config.mode === Types.PreviewDocumentMode.Static ? config.content : ''}
+		${config.mode === Types.PreviewDocumentMode.Live ? PRELOADER : ''}
 	</div>
+	<div id="preview-selection"></div>
+	<div id="preview-highlight"></div>
 	<textarea data-data="alva" style="display: none">${encodeURIComponent(
 		JSON.stringify({
 			data: config.data,
 			mode: config.mode
 		})
 	)}</textarea>
-	${config.mode === PreviewDocumentMode.Static ? config.scripts : ''}
-	${config.mode !== PreviewDocumentMode.Static ? LIVE_SCRIPTS : ''}
+	<script src="/scripts/Mobx.js"><\/script>
+	${config.scripts ? config.scripts : ''}
+	${config.mode !== Types.PreviewDocumentMode.Static ? LIVE_SCRIPTS : ''}
 </body>
 </html>
 `;

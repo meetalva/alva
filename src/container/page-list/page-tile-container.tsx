@@ -23,7 +23,22 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
 
 		if (!this.props.focused) {
-			store.setActivePage(this.props.page);
+			store.getProject().setActivePage(this.props.page);
+		}
+
+		const target = e.target as HTMLElement;
+
+		store.getProject().setActivePage(this.props.page);
+
+		if (this.props.highlighted && target.matches('[data-title]')) {
+			this.props.page.setNameState(Types.EditableTitleState.Editing);
+		}
+
+		const rootElement = this.props.page.getRoot();
+
+		if (rootElement) {
+			store.setSelectedElement(rootElement);
+			store.getProject().setFocusedItem(Types.FocusedItemType.Page, this.props.page);
 		}
 	}
 
@@ -51,7 +66,6 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 					focused={props.focused}
 					page={props.page}
 					secondary={Types.EditableTitleType.Primary}
-					value={props.page.getName()}
 				/>
 			</PageTile>
 		);

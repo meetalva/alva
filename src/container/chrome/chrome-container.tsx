@@ -5,8 +5,8 @@ import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
-import * as Sender from '../../message/client';
 import * as Types from '../../types';
+import * as Sender from '../../sender/client';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
 
@@ -26,31 +26,20 @@ export const ChromeContainer = MobxReact.inject('store')(
 			return null;
 		}
 
-		const page = store.getCurrentPage();
+		const page = store.getActivePage();
 
 		if (!page) {
 			return null;
 		}
 
-		const index = project.getPageIndex(page);
-		const pages = project.getPages();
+		const nextPage = project.getNextPage();
+		const previousPage = project.getPreviousPage();
 
-		if (typeof index !== 'number') {
-			return null;
-		}
+		const toPreviousPage = previousPage
+			? () => project.setActivePage(previousPage)
+			: AlvaUtil.noop;
+		const toNextPage = nextPage ? () => project.setActivePage(nextPage) : AlvaUtil.noop;
 
-		const toPreviousPage = () => {
-			store.setActivePageByIndex(index - 1);
-			store.unsetSelectedElement();
-		};
-
-		const toNextPage = () => {
-			store.setActivePageByIndex(index + 1);
-			store.unsetSelectedElement();
-		};
-
-		const previous = index > 0 ? toPreviousPage : AlvaUtil.noop;
-		const next = index < pages.length ? toNextPage : AlvaUtil.noop;
 		return (
 			<Chrome
 				onDoubleClick={() => {
@@ -65,16 +54,15 @@ export const ChromeContainer = MobxReact.inject('store')(
 				<ViewSwitch
 					fontSize={CopySize.M}
 					justify="center"
-					leftVisible={index > 0}
-					rightVisible={index < pages.length - 1}
-					onLeftClick={previous}
-					onRightClick={next}
+					leftVisible={typeof previousPage !== 'undefined'}
+					rightVisible={typeof nextPage !== 'undefined'}
+					onLeftClick={toPreviousPage}
+					onRightClick={toNextPage}
 				>
 					<EditableTitleContainer
 						focused={props.focused}
 						page={page}
 						secondary={Types.EditableTitleType.Secondary}
-						value={page ? page.getName() : ''}
 					/>
 				</ViewSwitch>
 				<BugReport

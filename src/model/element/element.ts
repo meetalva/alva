@@ -1,9 +1,9 @@
 import { ElementContent } from './element-content';
 import { ElementProperty } from './element-property';
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import { Page } from '../page';
 import { Pattern } from '../pattern';
-import { PatternLibrary } from '../pattern-library';
 import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
@@ -27,7 +27,6 @@ export interface ElementInit {
 }
 
 export interface ElementContext {
-	patternLibrary: PatternLibrary;
 	project: Project;
 }
 
@@ -60,8 +59,6 @@ export class Element {
 
 	private readonly patternId: string;
 
-	@Mobx.observable private patternLibrary: PatternLibrary;
-
 	@Mobx.observable private placeholderHighlighted: boolean;
 
 	private readonly project: Project;
@@ -81,12 +78,11 @@ export class Element {
 		this.containerId = init.containerId;
 		this.open = init.open;
 		this.forcedOpen = init.forcedOpen;
-		this.patternLibrary = context.patternLibrary;
 		this.project = context.project;
 		this.role = init.role || Types.ElementRole.Node;
 		this.selected = init.selected;
 
-		const pattern = this.patternLibrary.getPatternById(this.patternId);
+		const pattern = this.project.getPatternById(this.patternId);
 
 		this.contentIds = init.contentIds;
 
@@ -119,7 +115,6 @@ export class Element {
 						value: undefined
 					},
 					{
-						patternLibrary: this.patternLibrary,
 						project: this.project
 					}
 				);
@@ -199,7 +194,6 @@ export class Element {
 				selected: false
 			},
 			{
-				patternLibrary: this.patternLibrary,
 				project: this.project
 			}
 		);
@@ -211,6 +205,10 @@ export class Element {
 
 		this.project.addElement(clone);
 		return clone;
+	}
+
+	public equals(b: Element): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
 	}
 
 	public getAncestors(init: (Element | ElementContent)[] = []): (Element | ElementContent)[] {
@@ -390,7 +388,7 @@ export class Element {
 	}
 
 	public getPattern(): Pattern | undefined {
-		return this.patternLibrary.getPatternById(this.patternId);
+		return this.project.getPatternById(this.patternId);
 	}
 
 	public getPlaceholderHighlighted(): boolean {
@@ -509,10 +507,8 @@ export class Element {
 		}
 	}
 
-	@Mobx.action
+	/* @Mobx.action
 	public setPatternLibrary(ctx: { patternLibrary: PatternLibrary; project: Project }): void {
-		this.patternLibrary = ctx.patternLibrary;
-
 		const pattern = this.getPattern();
 
 		if (pattern) {
@@ -532,7 +528,7 @@ export class Element {
 				);
 			});
 		}
-	}
+	} */
 
 	@Mobx.action
 	public setPlaceholderHighlighted(placeholderHighlighted: boolean): void {
@@ -593,6 +589,20 @@ export class Element {
 	@Mobx.action
 	public unsetContainer(): void {
 		this.containerId = undefined;
+	}
+
+	@Mobx.action
+	public update(b: Element): void {
+		this.dragged = b.dragged;
+		this.focused = b.focused;
+		this.highlighted = b.highlighted;
+		this.containerId = b.containerId;
+		this.name = b.name;
+		this.open = b.open;
+		this.forcedOpen = b.forcedOpen;
+		this.placeholderHighlighted = b.placeholderHighlighted;
+		this.properties = b.properties;
+		this.selected = b.selected;
 	}
 }
 

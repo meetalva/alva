@@ -1,3 +1,4 @@
+import { ButtonGroup, ButtonGroupButton } from '../button-group';
 import { Color } from '../colors';
 import { fonts } from '../fonts';
 import { PropertyItem } from '../property-item';
@@ -87,36 +88,6 @@ const StyledInput = styled.input`
 	}
 `;
 
-const StyledButtonGroup = styled.div`
-	width: 100%;
-	margin-top: ${getSpace(SpaceSize.XS)}px;
-
-	border-top: 1px solid ${Color.Grey90};
-	@media screen and (-webkit-min-device-pixel-ratio: 2) {
-		border-top-width: 0.5px;
-	}
-`;
-
-const StyledButton = styled.button`
-	display: inline-block;
-	width: 50%;
-	border: none;
-	outline: none;
-	color: ${Color.Grey36};
-	background: transparent;
-	padding: ${getSpace(SpaceSize.XS)}px 0;
-	box-sizing: border-box;
-
-	border-right: 1px solid ${Color.Grey90};
-	@media screen and (-webkit-min-device-pixel-ratio: 2) {
-		border-right-width: 0.5px;
-	}
-
-	&:last-of-type {
-		border-right-color: transparent;
-	}
-`;
-
 export const PropertyItemAsset: React.StatelessComponent<PropertyItemAssetProps> = props => (
 	<PropertyItem description={props.description} label={props.label}>
 		<StyledAsset>
@@ -133,12 +104,19 @@ export const PropertyItemAsset: React.StatelessComponent<PropertyItemAssetProps>
 					placeholder={props.placeholder}
 				/>
 
-				<StyledButtonGroup>
-					<StyledButton onClick={props.onChooseClick}>Choose</StyledButton>
-					<StyledButton disabled={props.imageSrc.length === 0} onClick={props.onClearClick}>
-						Clear
-					</StyledButton>
-				</StyledButtonGroup>
+				<ButtonGroup>
+					<ButtonGroup.ButtonLeft>
+						<ButtonGroupButton onClick={props.onChooseClick}>Choose</ButtonGroupButton>
+					</ButtonGroup.ButtonLeft>
+					<ButtonGroup.ButtonRight>
+						<ButtonGroupButton
+							disabled={props.imageSrc.length === 0}
+							onClick={props.onClearClick}
+						>
+							Clear
+						</ButtonGroupButton>
+					</ButtonGroup.ButtonRight>
+				</ButtonGroup>
 			</StyledPreview>
 		</StyledAsset>
 	</PropertyItem>

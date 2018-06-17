@@ -1,4 +1,4 @@
-import * as Sender from '../../message/client';
+import * as Sender from '../../sender/client';
 import { AddPageButton, Layout, LayoutWrap } from '../../components';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
@@ -11,7 +11,7 @@ export const PageListContainer: React.StatelessComponent = MobxReact.inject('sto
 	MobxReact.observer((props): JSX.Element | null => {
 		const { store } = props as { store: ViewStore };
 		const project = store.getProject();
-		const currentPage = store.getCurrentPage();
+		const currentPage = store.getActivePage();
 		const currentPageId = currentPage ? currentPage.getId() : undefined;
 
 		if (!project) {
@@ -25,7 +25,7 @@ export const PageListContainer: React.StatelessComponent = MobxReact.inject('sto
 					.map(page => (
 						<PageTileContainer
 							highlighted={page.getId() === currentPageId}
-							focused={page === store.getFocusedItem()}
+							focused={page === store.getProject().getFocusedItem()}
 							key={page.getId()}
 							page={page}
 						/>

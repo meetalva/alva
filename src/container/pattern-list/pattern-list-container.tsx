@@ -20,14 +20,6 @@ export class PatternListContainer extends React.Component {
 
 	public render(): JSX.Element | null {
 		const { store } = this.props as { store: ViewStore };
-		const patternLibrary = store.getPatternLibrary();
-
-		if (!patternLibrary) {
-			return null;
-		}
-
-		const patternRoot = patternLibrary.getRoot();
-		const matches = patternLibrary.query(store.getPatternSearchTerm());
 
 		return (
 			<div onDragStart={e => this.handleDragStart(e)}>
@@ -38,12 +30,23 @@ export class PatternListContainer extends React.Component {
 						value={store.getPatternSearchTerm()}
 					/>
 				</Space>
-				<PatternFolderContainer
-					isRoot
-					folder={patternRoot}
-					matches={matches}
-					render={pattern => <PatternItemContainer key={pattern.getId()} pattern={pattern} />}
-				/>
+				{store.getPatternLibraries().map(library => {
+					const patternRoot = library.getRoot();
+					const matches = library.query(store.getPatternSearchTerm());
+
+					return (
+						<PatternFolderContainer
+							isRoot
+							folder={patternRoot}
+							matches={matches}
+							key={library.getId()}
+							render={pattern => (
+								<PatternItemContainer key={pattern.getId()} pattern={pattern} />
+							)}
+						/>
+					);
+				})}
+
 				<ElementDragImage
 					element={store.getDraggedElement()}
 					innerRef={ref => (this.dragImg = ref)}

@@ -11,7 +11,6 @@ export interface EditableTitleContainerProps {
 	focused: boolean;
 	page: Page;
 	secondary: Types.EditableTitleType;
-	value: string;
 }
 
 @MobxReact.inject('store')

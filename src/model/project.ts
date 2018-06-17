@@ -3,7 +3,9 @@ import { ElementAction } from './element-action';
 import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Page } from './page';
+import { Pattern, PatternSlot } from './pattern';
 import { PatternLibrary } from './pattern-library';
+import { AnyPatternProperty } from './pattern-property';
 import * as Types from '../types';
 import { UserStore } from './user-store';
 import { UserStoreAction } from './user-store-action';
@@ -17,7 +19,7 @@ export interface ProjectProperties {
 	name: string;
 	pages: Page[];
 	path: string;
-	patternLibrary: PatternLibrary;
+	patternLibraries: PatternLibrary[];
 	userStore: UserStore;
 }
 
@@ -33,6 +35,8 @@ export class Project {
 
 	@Mobx.observable private elementContents: ElementContent[] = [];
 
+	@Mobx.observable private focusedItemType: Types.FocusedItemType;
+
 	@Mobx.observable private id: string;
 
 	@Mobx.observable private name: string;
@@ -41,19 +45,13 @@ export class Project {
 
 	@Mobx.observable private path;
 
-	@Mobx.observable private patternLibrary: PatternLibrary;
+	@Mobx.observable private patternLibraries: PatternLibrary[];
 
 	@Mobx.observable private userStore: UserStore;
 
-	/**
-	 * Creates a new project.
-	 * @param id The technical (internal) ID of the project.
-	 * @param name The human-friendly name of the project.
-	 */
 	public constructor(init: ProjectProperties) {
-		this.patternLibrary = init.patternLibrary;
+		this.patternLibraries = init.patternLibraries;
 		this.name = init.name;
-
 		this.id = init.id ? init.id : uuid.v4();
 		this.pages = init.pages ? init.pages : [];
 		this.path = init.path;
@@ -62,10 +60,15 @@ export class Project {
 
 	public static create(init: ProjectCreateInit): Project {
 		const patternLibrary = PatternLibrary.create({
-			getGlobalEnumOptionId: () => uuid.v4(),
-			getGlobalPatternId: () => uuid.v4(),
-			getGlobalPropertyId: () => uuid.v4(),
-			getGlobalSlotId: () => uuid.v4()
+			bundle: '',
+			bundleId: '',
+			description: 'Basic building blocks available to every new Alva project',
+			id: uuid.v4(),
+			name: 'Built-In Components',
+			origin: Types.PatternLibraryOrigin.BuiltIn,
+			patternProperties: [],
+			patterns: [],
+			state: Types.PatternLibraryState.Connected
 		});
 
 		const currentPageProperty = new UserStoreProperty({
@@ -108,7 +111,7 @@ export class Project {
 			name: init.name,
 			pages: [],
 			path: init.path,
-			patternLibrary,
+			patternLibraries: [patternLibrary],
 			userStore
 		});
 
@@ -117,23 +120,16 @@ export class Project {
 				{
 					active: true,
 					id: uuid.v4(),
-					name: 'Untitled Page',
-					patternLibrary
+					name: 'Untitled Page'
 				},
-				{ project, patternLibrary }
+				{ project }
 			)
 		);
 
 		return project;
 	}
 
-	/**
-	 * Loads and returns a project from a given JSON object.
-	 * @param jsonObject The JSON object to load from.
-	 * @return A new project object containing the loaded data.
-	 */
 	public static from(serialized: Types.SerializedProject): Project {
-		const patternLibrary = PatternLibrary.from(serialized.patternLibrary);
 		const userStore = UserStore.from(serialized.userStore);
 
 		const project = new Project({
@@ -141,20 +137,18 @@ export class Project {
 			name: serialized.name,
 			path: serialized.path,
 			pages: [],
-			patternLibrary,
+			patternLibraries: serialized.patternLibraries.map(p => PatternLibrary.from(p)),
 			userStore
 		});
 
-		serialized.pages.forEach(page =>
-			project.addPage(Page.from(page, { patternLibrary, project }))
-		);
+		serialized.pages.forEach(page => project.addPage(Page.from(page, { project })));
 
 		serialized.elements.forEach(element =>
-			project.addElement(Element.from(element, { patternLibrary, project }))
+			project.addElement(Element.from(element, { project }))
 		);
 
 		serialized.elementContents.forEach(elementContent =>
-			project.addElementContent(ElementContent.from(elementContent, { patternLibrary, project }))
+			project.addElementContent(ElementContent.from(elementContent, { project }))
 		);
 
 		serialized.elementActions.forEach(elementAction => {
@@ -173,20 +167,38 @@ export class Project {
 		return isEqual(toData(a), toData(b));
 	}
 
+	@Mobx.action
 	public addElement(element: Element): void {
 		this.elements.push(element);
 	}
 
+	@Mobx.action
 	public addElementAction(action: ElementAction): void {
 		this.elementActions.push(action);
 	}
 
+	@Mobx.action
 	public addElementContent(elementContent: ElementContent): void {
 		this.elementContents.push(elementContent);
 	}
 
+	@Mobx.action
+	public addPatternLibrary(patternLibrary: PatternLibrary): void {
+		this.patternLibraries.push(patternLibrary);
+		// this.patternLibrary = patternLibrary;
+		// this.elements.forEach(e => e.setPatternLibrary({ patternLibrary, project: this }));
+		// this.elementContents.forEach(e => e.setPatternLibrary(this.patternLibrary));
+	}
+
+	@Mobx.action
 	public addPage(page: Page): void {
 		this.pages.push(page);
+	}
+
+	public getBuiltinPatternLibrary(): PatternLibrary {
+		return this.patternLibraries.find(
+			p => p.getOrigin() === Types.PatternLibraryOrigin.BuiltIn
+		) as PatternLibrary;
 	}
 
 	public getElementActionById(id: string): undefined | ElementAction {
@@ -213,12 +225,46 @@ export class Project {
 		return this.elements;
 	}
 
+	public getFocusedItem(): Element | Page | undefined {
+		if (this.focusedItemType === Types.FocusedItemType.Element) {
+			return this.getElements().find(element => element.getFocused());
+		} else if (this.focusedItemType === Types.FocusedItemType.Page) {
+			return this.getPages().find(page => page.getFocused());
+		} else {
+			return undefined;
+		}
+	}
+
+	public getFocusedItemType(): Types.FocusedItemType {
+		return this.focusedItemType;
+	}
+
 	public getId(): string {
 		return this.id;
 	}
 
 	public getName(): string {
 		return this.name;
+	}
+
+	public getNextPage(): Page | undefined {
+		const page = this.pages.find(p => p.getActive());
+
+		if (!page) {
+			return;
+		}
+
+		const nextIndex = this.getPageIndex(page) + 1;
+
+		if (typeof nextIndex !== 'number' || Number.isNaN(nextIndex)) {
+			return;
+		}
+
+		if (nextIndex < 0 || nextIndex > this.pages.length - 1) {
+			return;
+		}
+
+		return this.pages[nextIndex];
 	}
 
 	public getPageById(id: string): Page | undefined {
@@ -237,14 +283,96 @@ export class Project {
 		return this.path;
 	}
 
-	public getPatternLibrary(): PatternLibrary {
-		return this.patternLibrary;
+	public getPatternById(id: string): Pattern | undefined {
+		return this.getPatternLibraries().reduce((result, lib) => {
+			if (typeof result !== 'undefined') {
+				return result;
+			}
+			return lib.getPatternById(id);
+		}, undefined);
+	}
+
+	public getPatternLibraries(): PatternLibrary[] {
+		return this.patternLibraries;
+	}
+
+	public getPatternLibraryById(id: string): PatternLibrary | undefined {
+		return this.patternLibraries.find(library => library.getId() === id);
+	}
+
+	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
+		return this.getPatternLibraries().reduce((result, lib) => {
+			if (typeof result !== 'undefined') {
+				return result;
+			}
+			return lib.getPatternPropertyById(id);
+		}, undefined);
+	}
+
+	public getPatternSlotById(id: string): PatternSlot | undefined {
+		return this.getPatternLibraries().reduce((result, lib) => {
+			if (typeof result !== 'undefined') {
+				return result;
+			}
+			return lib.getPatternSlotById(id);
+		}, undefined);
+	}
+
+	public getPreviousPage(): Page | undefined {
+		const page = this.pages.find(p => p.getActive());
+
+		if (!page) {
+			return;
+		}
+
+		const previousIndex = this.getPageIndex(page) - 1;
+
+		if (typeof previousIndex !== 'number' || Number.isNaN(previousIndex)) {
+			return;
+		}
+
+		if (previousIndex < 0 || previousIndex > this.pages.length - 1) {
+			return;
+		}
+
+		return this.pages[previousIndex];
 	}
 
 	public getUserStore(): UserStore {
 		return this.userStore;
 	}
 
+	@Mobx.action
+	public removeElement(element: Element): void {
+		const index = this.elements.indexOf(element);
+
+		if (index === -1) {
+			return;
+		}
+
+		element.getContents().forEach(content => {
+			this.removeElementContent(content);
+		});
+
+		this.elements.splice(index, 1);
+	}
+
+	@Mobx.action
+	public removeElementContent(elementContent: ElementContent): void {
+		const index = this.elementContents.indexOf(elementContent);
+
+		if (index === -1) {
+			return;
+		}
+
+		elementContent.getElements().forEach(element => {
+			this.removeElement(element);
+		});
+
+		this.elementContents.splice(index, 1);
+	}
+
+	@Mobx.action
 	public removePage(page: Page): boolean {
 		const index = this.pages.indexOf(page);
 
@@ -255,6 +383,54 @@ export class Project {
 		this.pages.splice(index, 1);
 
 		return true;
+	}
+
+	@Mobx.action
+	public setActivePage(page: Page): void {
+		this.unsetActivePage();
+		this.unsetSelectedElement();
+
+		page.setActive(true);
+		this.setFocusedItem(Types.FocusedItemType.Page, page);
+	}
+
+	@Mobx.action
+	public setActivePageById(id: string): void {
+		const page = this.getPageById(id);
+
+		if (!page) {
+			return;
+		}
+
+		return this.setActivePage(page);
+	}
+
+	@Mobx.action
+	public setActivePageByIndex(index: number): void {
+		if (index < 0 || index > this.pages.length - 1) {
+			return;
+		}
+
+		const page = this.pages[index];
+
+		if (!page) {
+			return;
+		}
+
+		this.setActivePage(page);
+	}
+
+	@Mobx.action
+	public setFocusedItem(type: Types.FocusedItemType, payload: Element | Page | undefined): void {
+		const previousFocusItem = this.getFocusedItem();
+
+		if (previousFocusItem) {
+			previousFocusItem.setFocused(false);
+		}
+		this.focusedItemType = type;
+		if (payload) {
+			payload.setFocused(true);
+		}
 	}
 
 	@Mobx.action
@@ -277,13 +453,6 @@ export class Project {
 		this.path = path;
 	}
 
-	@Mobx.action
-	public setPatternLibrary(patternLibrary: PatternLibrary): void {
-		this.patternLibrary = patternLibrary;
-		this.elements.forEach(e => e.setPatternLibrary({ patternLibrary, project: this }));
-		this.elementContents.forEach(e => e.setPatternLibrary(this.patternLibrary));
-	}
-
 	public toDisk(): Types.SavedProject {
 		const data = this.toJSON();
 		data.elements = this.elements.map(e => e.toDisk());
@@ -299,12 +468,27 @@ export class Project {
 			name: this.name,
 			pages: this.pages.map(p => p.toJSON()),
 			path: this.path,
-			patternLibrary: this.patternLibrary.toJSON(),
+			patternLibraries: this.patternLibraries.map(p => p.toJSON()),
 			userStore: this.userStore.toJSON()
 		};
 	}
 
 	public toString(): string {
 		return JSON.stringify(this.toJSON());
+	}
+
+	@Mobx.action
+	public unsetActivePage(): void {
+		this.pages.forEach(page => page.setActive(false));
+	}
+
+	@Mobx.action
+	public unsetSelectedElement(): void {
+		this.elements.filter(element => element.getSelected()).forEach(element => {
+			element.setSelected(false);
+			element.getAncestors().forEach(ancestor => {
+				ancestor.setForcedOpen(false);
+			});
+		});
 	}
 }

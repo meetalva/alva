@@ -1,6 +1,5 @@
 import * as AlvaUtil from '../../alva-util';
 import * as Components from '../../components';
-import { ElementCapability } from '../../components';
 import { ElementContentContainer } from './element-content-container';
 import { ElementSlotContainer } from './element-slot-container';
 import { partition } from 'lodash';
@@ -34,12 +33,12 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 		return (
 			<Components.Element
 				capabilities={[
-					ElementCapability.Draggable,
-					props.element.getRole() !== Types.ElementRole.Root && ElementCapability.Editable,
+					Components.ElementCapability.Draggable,
+					Components.ElementCapability.Editable,
 					contents.some(content => content.acceptsChildren()) &&
-						props.element.getRole() !== Types.ElementRole.Root &&
-						ElementCapability.Openable
-				].filter((item): item is ElementCapability => Boolean(item))}
+						Components.ElementCapability.Openable
+					// tslint:disable-next-line:no-unnecessary-callback-wrapper
+				].filter((item): item is Components.ElementCapability => Boolean(item))}
 				dragging={store.getDragging()}
 				id={props.element.getId()}
 				contentId={childContent ? childContent.getId() : ''}

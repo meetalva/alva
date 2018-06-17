@@ -1,0 +1,494 @@
+import * as Analyzer from '../analyzer';
+import { checkForUpdates } from './auto-updater';
+import { createCompiler } from '../compiler/create-compiler';
+import { createGithubIssueUrl } from './create-github-issue-url';
+import * as Ephemeral from './ephemeral-store';
+import * as Electron from 'electron';
+import * as electronIsDev from 'electron-is-dev';
+import * as Events from 'events';
+import * as Export from '../export';
+import * as Fs from 'fs';
+import * as Message from '../message';
+import * as MimeTypes from 'mime-types';
+import * as Model from '../model';
+import * as Path from 'path';
+import { Persistence } from '../persistence';
+import { readProjectOrError } from './read-project-or-error';
+import { Sender } from '../sender/server';
+import { showContextMenu } from './show-context-menu';
+import { showError } from './show-error';
+import { showMainMenu } from './show-main-menu';
+import { showOpenDialog } from './show-open-dialog';
+import { showSaveDialog } from './show-save-dialog';
+import * as Types from '../types';
+import * as Util from 'util';
+import * as uuid from 'uuid';
+
+const readFile = Util.promisify(Fs.readFile);
+const writeFile = Util.promisify(Fs.writeFile);
+
+export interface ServerMessageHandlerContext {
+	port: undefined | number;
+	win: undefined | Electron.BrowserWindow;
+}
+
+export interface ServerMessageHandlerInjection {
+	emitter: Events.EventEmitter;
+	ephemeralStore: Ephemeral.EphemeralStore;
+	sender: Sender;
+	server: Events.EventEmitter;
+}
+
+export async function createServerMessageHandler(
+	ctx: ServerMessageHandlerContext,
+	injection: ServerMessageHandlerInjection
+): Promise<(message: Message.ServerMessage) => Promise<void>> {
+	return async function serverMessageHandler(message: Message.ServerMessage): Promise<void> {
+		if (!message) {
+			return;
+		}
+
+		injection.server.emit('message', message);
+
+		// Handle messages that require
+		// access to system / fs
+		// tslint:disable-next-line:cyclomatic-complexity
+		switch (message.type) {
+			case Message.ServerMessageType.CheckForUpdatesRequest: {
+				if (ctx.win) {
+					checkForUpdates(ctx.win, true);
+				}
+				break;
+			}
+			case Message.ServerMessageType.AppLoaded: {
+				const pathToOpen = await injection.ephemeralStore.getProjectPath();
+
+				injection.sender.send({
+					id: uuid.v4(),
+					type: Message.ServerMessageType.StartApp,
+					payload: {
+						app: await injection.ephemeralStore.getAppState(),
+						port: ctx.port as number
+					}
+				});
+
+				if (electronIsDev && pathToOpen) {
+					injection.sender.send({
+						id: uuid.v4(),
+						type: Message.ServerMessageType.OpenFileRequest,
+						payload: { path: pathToOpen }
+					});
+				}
+
+				break;
+			}
+			case Message.ServerMessageType.Reload: {
+				const lastMainMenuRequest = injection.sender.last(
+					Message.ServerMessageType.MainMenuRequest
+				);
+
+				if (lastMainMenuRequest) {
+					showMainMenu(lastMainMenuRequest.payload, { sender: injection.sender });
+				}
+
+				const focusedWindow = Electron.BrowserWindow.getFocusedWindow();
+				focusedWindow.reload();
+
+				injection.emitter.emit('reload');
+				break;
+			}
+			case Message.ServerMessageType.CreateNewFileRequest: {
+				const path = await showSaveDialog({
+					title: 'Create New Alva File',
+					defaultPath: 'Untitled Project.alva',
+					filters: [
+						{
+							name: 'Alva File',
+							extensions: ['alva']
+						}
+					]
+				});
+
+				if (path) {
+					const project = Model.Project.create({
+						name: 'Untitled Project',
+						path
+					});
+
+					await Persistence.persist(path, project);
+					injection.ephemeralStore.setProjectPath(path);
+
+					injection.sender.send({
+						type: Message.ServerMessageType.CreateNewFileResponse,
+						id: message.id,
+						payload: {
+							path,
+							contents: project.toJSON()
+						}
+					});
+				}
+				break;
+			}
+			case Message.ServerMessageType.OpenFileRequest: {
+				const path = await getPath(message.payload);
+
+				if (!path) {
+					return;
+				}
+
+				// tslint:disable-next-line:no-any
+				const project = (await readProjectOrError(path)) as any;
+
+				if (!project) {
+					return;
+				}
+
+				if (typeof project === 'object') {
+					project.path = path;
+				}
+
+				injection.sender.send({
+					type: Message.ServerMessageType.OpenFileResponse,
+					id: message.id,
+					payload: { path, contents: project }
+				});
+
+				injection.ephemeralStore.setProjectPath(path);
+
+				break;
+			}
+			case Message.ServerMessageType.AssetReadRequest: {
+				const paths = await showOpenDialog({
+					title: 'Select an image',
+					properties: ['openFile']
+				});
+
+				if (!paths) {
+					return;
+				}
+
+				const path = paths[0];
+
+				if (!path) {
+					return;
+				}
+
+				// TODO: Handle errors
+				const content = await readFile(path);
+				const mimeType = MimeTypes.lookup(path) || 'application/octet-stream';
+
+				injection.sender.send({
+					type: Message.ServerMessageType.AssetReadResponse,
+					id: message.id,
+					payload: `data:${mimeType};base64,${content.toString('base64')}`
+				});
+
+				break;
+			}
+			case Message.ServerMessageType.Save: {
+				const project = Model.Project.from(message.payload.project);
+
+				project.setPath(message.payload.path);
+				injection.ephemeralStore.setProjectPath(project.getPath());
+
+				await Persistence.persist(project.getPath(), project);
+				break;
+			}
+			case Message.ServerMessageType.CreateScriptBundleRequest: {
+				// TODO: Come up with a proper id
+				const compiler = createCompiler([], {
+					cwd: process.cwd(),
+					infrastructure: true,
+					id: 'components'
+				});
+
+				compiler.run(err => {
+					if (err) {
+						// TODO: Handle errrors
+						return;
+					}
+
+					const outputFileSystem = compiler.outputFileSystem;
+
+					injection.sender.send({
+						type: Message.ServerMessageType.CreateScriptBundleResponse,
+						id: message.id,
+						payload: ['renderer', 'preview']
+							.map(name => ({ name, path: Path.posix.join('/', `${name}.js`) }))
+							.map(({ name, path }) => ({
+								name,
+								path,
+								contents: outputFileSystem.readFileSync(path)
+							}))
+					});
+				});
+
+				break;
+			}
+			case Message.ServerMessageType.ExportHTML:
+			case Message.ServerMessageType.ExportPDF:
+			case Message.ServerMessageType.ExportPNG:
+			case Message.ServerMessageType.ExportSketch: {
+				const { path, content } = message.payload;
+				writeFile(path, content);
+				break;
+			}
+			case Message.ServerMessageType.ConnectedPatternLibraryNotification: {
+				const project = await requestProject(injection.sender);
+
+				await injection.ephemeralStore.addConnection({
+					projectId: project.getId(),
+					libraryId: message.payload.id,
+					libraryPath: message.payload.path
+				});
+
+				break;
+			}
+			case Message.ServerMessageType.ConnectPatternLibraryRequest: {
+				const project = await requestProject(injection.sender);
+
+				const paths = await showOpenDialog({
+					title: 'Connnect Pattern Library',
+					properties: ['openDirectory']
+				});
+
+				const path = Array.isArray(paths) ? paths[0] : undefined;
+
+				if (!path) {
+					return;
+				}
+
+				const connections = (await injection.ephemeralStore.getConnections()).filter(
+					c => c.libraryPath === path
+				);
+
+				const previousLibrary = message.payload.library
+					? project.getPatternLibraryById(message.payload.library)
+					: project
+							.getPatternLibraries()
+							.find(p => connections.some(c => c.libraryId === p.getId()));
+
+				if (message.payload.library && !previousLibrary) {
+					return;
+				}
+
+				const analysisResult = await performAnalysis(path, { previousLibrary });
+
+				// TODO: Expose errors to UI
+				if (analysisResult.type === Types.LibraryAnalysisResultType.Error) {
+					console.error(analysisResult.error);
+					showAnalysisError(analysisResult.error);
+					return;
+				}
+
+				if (typeof analysisResult === 'undefined') {
+					return;
+				}
+
+				if (!previousLibrary) {
+					injection.sender.send({
+						type: Message.ServerMessageType.ConnectPatternLibraryResponse,
+						id: message.id,
+						payload: {
+							analysis: analysisResult.result,
+							path,
+							previousLibraryId: undefined
+						}
+					});
+				} else {
+					injection.sender.send({
+						type: Message.ServerMessageType.UpdatePatternLibraryResponse,
+						id: message.id,
+						payload: {
+							analysis: analysisResult.result,
+							path,
+							previousLibraryId: previousLibrary.getId()
+						}
+					});
+				}
+
+				break;
+			}
+			case Message.ServerMessageType.UpdatePatternLibraryRequest: {
+				const project = await requestProject(injection.sender);
+				const library = project.getPatternLibraryById(message.payload.id);
+
+				if (!library || !library.getCapabilites().includes(Types.LibraryCapability.Update)) {
+					return;
+				}
+
+				const connections = await injection.ephemeralStore.getConnections();
+				const connection = connections.find(c => c.libraryId === library.getId());
+
+				if (!connection) {
+					return;
+				}
+
+				const analysisResult = await performAnalysis(connection.libraryPath, {
+					previousLibrary: library
+				});
+
+				// TODO: Expose errors to UI
+				if (analysisResult.type === Types.LibraryAnalysisResultType.Error) {
+					return;
+				}
+
+				injection.sender.send({
+					type: Message.ServerMessageType.UpdatePatternLibraryResponse,
+					id: message.id,
+					payload: {
+						analysis: analysisResult.result,
+						path: connection.libraryPath,
+						previousLibraryId: library.getId()
+					}
+				});
+
+				break;
+			}
+			case Message.ServerMessageType.CheckLibraryRequest: {
+				const connections = await injection.ephemeralStore.getConnections();
+
+				injection.sender.send({
+					id: message.id,
+					type: Message.ServerMessageType.CheckLibraryResponse,
+					payload: message.payload.libraries.map(lib => {
+						const connection = connections.find(c => c.libraryId === lib);
+
+						return {
+							id: lib,
+							path: connection ? connection.libraryPath : undefined,
+							connected: connection ? Fs.existsSync(connection.libraryPath) : false
+						};
+					})
+				});
+				break;
+			}
+			case Message.ServerMessageType.OpenExternalURL: {
+				Electron.shell.openExternal(message.payload);
+
+				break;
+			}
+			case Message.ServerMessageType.Maximize: {
+				if (ctx.win) {
+					ctx.win.isMaximized() ? ctx.win.unmaximize() : ctx.win.maximize();
+				}
+
+				break;
+			}
+			case Message.ServerMessageType.ShowError: {
+				const error = new Error(message.payload.message);
+				error.stack = message.payload.stack;
+				showError(error);
+				break;
+			}
+			case Message.ServerMessageType.ContextMenuRequest: {
+				showContextMenu(message.payload, { sender: injection.sender });
+				break;
+			}
+			case Message.ServerMessageType.MainMenuRequest: {
+				showMainMenu(message.payload, { sender: injection.sender });
+				break;
+			}
+			case Message.ServerMessageType.ChangeApp: {
+				injection.ephemeralStore.setAppState(message.payload.app);
+				break;
+			}
+			case Message.ServerMessageType.ExportSketchTask: {
+				const fs = await Export.exportHtmlProject({ sender: injection.sender });
+			}
+		}
+	};
+}
+
+const getPath = async (payload?: { path: string }): Promise<string | undefined> => {
+	if (payload) {
+		return payload.path;
+	}
+
+	const paths = await showOpenDialog({
+		title: 'Open Alva File',
+		properties: ['openFile'],
+		filters: [
+			{
+				name: 'Alva File',
+				extensions: ['alva']
+			}
+		]
+	});
+
+	return Array.isArray(paths) ? paths[0] : undefined;
+};
+
+async function performAnalysis(
+	path: string,
+	{ previousLibrary }: { previousLibrary: Model.PatternLibrary | undefined }
+): Promise<Types.LibraryAnalysisResult> {
+	const getGobalEnumOptionId = previousLibrary
+		? previousLibrary.assignEnumOptionId.bind(previousLibrary)
+		: () => uuid.v4();
+
+	const getGlobalPatternId = previousLibrary
+		? previousLibrary.assignPatternId.bind(previousLibrary)
+		: () => uuid.v4();
+
+	const getGlobalPropertyId = previousLibrary
+		? previousLibrary.assignPropertyId.bind(previousLibrary)
+		: () => uuid.v4();
+
+	const getGlobalSlotId = previousLibrary
+		? previousLibrary.assignSlotId.bind(previousLibrary)
+		: () => uuid.v4();
+
+	return Analyzer.analyze(path, {
+		getGobalEnumOptionId,
+		getGlobalPatternId,
+		getGlobalPropertyId,
+		getGlobalSlotId
+	});
+}
+
+async function requestProject(sender: Sender): Promise<Model.Project> {
+	const projectResponse = await sender.request<Message.ProjectRequestResponsePair>(
+		{
+			id: uuid.v4(),
+			type: Message.ServerMessageType.ProjectRequest,
+			payload: undefined
+		},
+		Message.ServerMessageType.ProjectResponse
+	);
+
+	if (projectResponse.payload.status === Types.ProjectStatus.None) {
+		throw new Error('There must be an opened project before oppening a library');
+	}
+
+	if (
+		projectResponse.payload.status === Types.ProjectStatus.Error ||
+		projectResponse.payload.status !== Types.ProjectStatus.Ok ||
+		typeof projectResponse.payload.data === 'undefined'
+	) {
+		throw new Error('Error while importing library');
+	}
+
+	return Model.Project.from(projectResponse.payload.data);
+}
+
+function showAnalysisError(error: Error): void {
+	Electron.dialog.showMessageBox(
+		{
+			message: 'Sorry, this seems to be an uncompatible library.',
+			detail: 'Learn more about supported component libraries on github.com/meetalva',
+			buttons: ['OK', 'Learn more', 'Report a Bug']
+		},
+		response => {
+			if (response === 1) {
+				Electron.shell.openExternal(
+					'https://github.com/meetalva/alva#pattern-library-requirements'
+				);
+			}
+
+			if (response === 2) {
+				Electron.shell.openExternal(createGithubIssueUrl(error));
+			}
+		}
+	);
+}

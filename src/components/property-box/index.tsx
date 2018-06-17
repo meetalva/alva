@@ -22,10 +22,24 @@ const StyledPropertyBox = styled.div`
 	margin-bottom: ${getSpace(SpaceSize.S)}px;
 `;
 
+const StyledPropertyBoxBar = styled.div`
+	height: ${getSpace(SpaceSize.M) * 2}px;
+	margin-top: ${getSpace(SpaceSize.M)}px;
+	margin-right: -${getSpace(SpaceSize.M)}px;
+	margin-bottom: -${getSpace(SpaceSize.M)}px;
+	margin-left: -${getSpace(SpaceSize.M)}px;
+`;
+
+export const PropertyAction: React.SFC = props => <>{props.children}</>;
+
 export const PropertyBox: React.SFC<PropertyBoxProps> = props => (
 	<StyledPropertyBox>
 		<Headline order={4}>{props.headline}</Headline>
 		<Copy textColor={Color.Grey50}>{props.copy}</Copy>
 		{props.children}
 	</StyledPropertyBox>
+);
+
+export const PropertyBoxBar: React.SFC = props => (
+	<StyledPropertyBoxBar>{props.children}</StyledPropertyBoxBar>
 );

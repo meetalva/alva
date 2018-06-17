@@ -15,7 +15,7 @@ export interface SavedProject {
 	id: string;
 	name: string;
 	pages: SerializedPage[];
-	patternLibrary: SerializedPatternLibrary;
+	patternLibraries: SerializedPatternLibrary[];
 	userStore: UserStore.SerializedUserStore;
 }
 
@@ -52,6 +52,7 @@ export interface SerializedElement {
 export interface SerializedElementContent {
 	elementIds: string[];
 	forcedOpen: boolean;
+	highlighted: boolean;
 	id: string;
 	open: boolean;
 	parentElementId?: string;
@@ -65,8 +66,12 @@ export enum PatternLibraryState {
 }
 
 export interface SerializedPatternLibrary {
+	bundleId: string;
 	bundle: string;
+	description: string;
 	id: string;
+	name: string;
+	origin: SerializedPatternLibraryOrigin;
 	patternProperties: PatternProperty.SerializedPatternProperty[];
 	patterns: SerializedPattern[];
 	root: SerializedPatternFolder;
@@ -163,12 +168,31 @@ export interface RenderPage {
 	name: string;
 }
 
+export type LibraryAnalysisResult = LibraryAnalysisSuccess | LibraryAnalysisError;
+
+export enum LibraryAnalysisResultType {
+	Success,
+	Error
+}
+
 export interface LibraryAnalysis {
 	bundle: string;
+	description: string;
+	id: string;
 	name: string;
 	path: string;
 	patterns: PatternAnalysis[];
 	version: string;
+}
+
+export interface LibraryAnalysisSuccess {
+	type: LibraryAnalysisResultType.Success;
+	result: LibraryAnalysis;
+}
+
+export interface LibraryAnalysisError {
+	type: LibraryAnalysisResultType.Error;
+	error: Error;
 }
 
 export interface PatternAnalysis {
@@ -223,6 +247,8 @@ export interface ExportPayload {
 
 export interface ImportPayload {
 	bundle: string;
+	description: string;
+	id: string;
 	name: string;
 	path: string;
 	patterns: PatternAnalysis[];
@@ -237,7 +263,7 @@ export interface LibraryNotificationPayload {
 export interface LibraryCheckPayload {
 	connected: boolean;
 	id: string;
-	path: string;
+	path: string | undefined;
 }
 
 export enum PatternFolderType {
@@ -249,10 +275,6 @@ export interface Watcher {
 	getPath(): string;
 	isActive(): boolean;
 	stop(): void;
-}
-
-export interface Renderer {
-	render(init: RenderInit, container: HTMLElement): void;
 }
 
 export interface RenderSelectArea {
@@ -280,25 +302,8 @@ export interface RenderPreviewStore {
 	selectedElementId?: string;
 }
 
-export interface RenderInit {
-	store: RenderPreviewStore;
-	// tslint:disable-next-line:no-any
-	getChildren(props: any, render: (props: any) => any): any;
-	// tslint:disable-next-line:no-any
-	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
-	// tslint:disable-next-line:no-any
-	getProperties(props: any): any;
-	// tslint:disable-next-line:no-any
-	getSlots(slots: any, render: (props: any) => any): any;
-	onElementClick(e: MouseEvent, payload: { id: string }): void;
-	onElementMouseOver(e: MouseEvent, payload: { id: string | undefined }): void;
-	onElementSelect(e: MouseEvent, payload: { id: string }): void;
-	onOutsideClick(e: MouseEvent): void;
-}
-
 export interface PatternIdPayload {
 	id: string;
-	metaDown: boolean;
 }
 
 export enum ElementRole {
@@ -308,6 +313,8 @@ export enum ElementRole {
 
 export interface SerializedAlvaApp {
 	activeView: SerializedAlvaView;
+	panes: SerializedAppPane[];
+	rightSidebarTab: SerializedRightSidebarTab;
 	searchTerm: string;
 	state: SerializedAppState;
 }
@@ -331,4 +338,93 @@ export interface SerializedElementAction {
 	payload: string;
 	storeActionId: string;
 	storePropertyId: string;
+}
+
+export enum RightSidebarTab {
+	Properties = 'properties',
+	ProjectSettings = 'project-settings'
+}
+
+export type SerializedRightSidebarTab = 'properties' | 'project-settings';
+
+export interface SerializedPatternLibraryFile {
+	content: Buffer;
+	id: string;
+	relativePath: string;
+}
+
+export enum PatternLibraryOrigin {
+	BuiltIn = 'built-in',
+	UserProvided = 'user-provided'
+}
+
+export type SerializedPatternLibraryOrigin = 'built-in' | 'user-provided';
+
+export enum ProjectStatus {
+	None = 'none',
+	Ok = 'ok',
+	Error = 'error'
+}
+
+export enum PreviewDocumentMode {
+	Live = 'live',
+	LiveMirror = 'live-mirror',
+	Static = 'static'
+}
+
+export enum ContextMenuType {
+	LayoutMenu = 'layout-menu',
+	ElementMenu = 'element-menu'
+}
+
+export type ContextMenuRequestPayload = ElementContextMenuRequest | LayoutContextMenuRequest;
+
+export interface ElementContextMenuRequest {
+	menu: ContextMenuType.ElementMenu;
+	data: ElementContextMenuRequestPayload;
+}
+
+export interface ElementContextMenuRequestPayload {
+	element: SerializedElement;
+	clipboardItem: SerializedElement | undefined;
+	project: SerializedProject;
+}
+
+export interface LayoutContextMenuRequest {
+	menu: ContextMenuType.LayoutMenu;
+	data: LayoutContextMenuRequestPayload;
+}
+
+export interface LayoutContextMenuRequestPayload {
+	app: SerializedAlvaApp;
+}
+
+export enum AppPane {
+	PagesPane = 'pages-pane',
+	ElementsPane = 'elements-pane',
+	PropertiesPane = 'properties-pane'
+}
+
+export type SerializedAppPane = 'pages-pane' | 'elements-pane' | 'properties-pane';
+
+export interface MainMenuContext {
+	app: SerializedAlvaApp;
+	project?: SerializedProject;
+}
+
+export enum FocusedItemType {
+	Page,
+	Element
+}
+
+export enum HoverArea {
+	Chrome,
+	Preview
+}
+
+export enum LibraryCapability {
+	Disconnect,
+	Update,
+	Reconnect,
+	SetPath
 }

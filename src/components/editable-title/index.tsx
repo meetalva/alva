@@ -11,11 +11,16 @@ export enum EditableTitleState {
 	Editing = 'Editing'
 }
 
+export enum EditableTitleType {
+	Primary,
+	Secondary
+}
+
 export interface EditableTitleProps {
+	category: EditableTitleType;
 	focused: boolean;
 	name: string;
 	nameState: EditableTitleState;
-	secondary?: boolean;
 	value: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
@@ -25,9 +30,9 @@ export interface EditableTitleProps {
 }
 
 interface EditableInputProps {
+	category: EditableTitleType;
 	autoFocus: boolean;
 	autoSelect: boolean;
-	secondary?: boolean;
 	value: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
@@ -39,48 +44,70 @@ interface StyledEditableTitleProps {
 	children: React.ReactNode;
 	editable: boolean;
 	focused?: boolean;
-	secondary?: boolean;
+	category: EditableTitleType;
 }
 
 interface StyledInputProps {
-	secondary?: boolean;
+	category: EditableTitleType;
 }
 
 const StyledTitle = styled.strong`
 	box-sizing: border-box;
 	display: inline-block;
-	width: ${(props: StyledEditableTitleProps) => (props.secondary ? '130px' : '100%')};
 	padding: 0;
-	margin: ${(props: StyledEditableTitleProps) =>
-		props.secondary ? `0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px` : 0};
-	font-size: ${(props: StyledEditableTitleProps) =>
-		props.secondary ? `${CopySize.M}px` : `${CopySize.S}px`};
-	color: ${(props: StyledEditableTitleProps) => (props.secondary ? Color.Grey36 : Color.Black)};
 	font-weight: normal;
 	text-align: center;
 	cursor: ${(props: StyledEditableTitleProps) => (props.editable ? 'text' : 'default')};
-	overflow: ${(props: StyledEditableTitleProps) => (props.secondary ? 'none' : 'hidden')};
 	white-space: nowrap;
 	text-overflow: ellipsis;
+
+	${(props: StyledEditableTitleProps) => {
+		if (EditableTitleType.Secondary) {
+			return `
+				width: 130px;
+				margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
+				overflow: none;
+				font-size: ${CopySize.M}px;
+				color: ${Color.Grey36};
+			`;
+		} else {
+			return `
+				width: 100%
+				margin: 0;
+				overflow: hidden;
+				font-size: ${CopySize.S}px;
+				color: ${Color.Black};
+			`;
+		}
+	}};
 `;
 
 const StyledEditableTitle = styled.input`
 	box-sizing: border-box;
 	display: inline-block;
-	width: ${(props: StyledInputProps) => (props.secondary ? '130px' : '100%')};
 	border: 0;
 	padding: 0;
-	margin: ${(props: StyledInputProps) =>
-		props.secondary ? `0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px` : '3px 0px'};
-	font-size: ${(props: StyledInputProps) =>
-		props.secondary ? `${CopySize.M}px` : `${CopySize.S}px`};
 	text-align: center;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	outline-offset: 0;
 
-	:focus {
+	${(props: StyledInputProps) => {
+		if (EditableTitleType.Secondary) {
+			return `
+				width: 130px;
+				margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
+				font-size: ${CopySize.M}px;
+			`;
+		} else {
+			return `
+				width: 100%;
+				margin: 3px 0px;
+				font-size: ${CopySize.S}px;
+			`;
+		}
+	}} :focus {
 		outline: none;
 	}
 `;
@@ -108,7 +135,7 @@ class EditableInput extends React.Component<EditableInputProps> {
 				onChange={props.onChange}
 				onFocus={props.onFocus}
 				onKeyDown={props.onKeyDown}
-				secondary={props.secondary}
+				category={props.category}
 				value={props.value}
 			/>
 		);
@@ -121,16 +148,16 @@ export const EditableTitle: React.SFC<EditableTitleProps> = (props): JSX.Element
 			<EditableInput
 				autoFocus
 				autoSelect
+				category={props.category}
 				data-title={true}
 				onBlur={props.onBlur}
 				onChange={props.onChange}
 				onFocus={props.onFocus}
 				onKeyDown={props.onKeyDown}
-				secondary={props.secondary}
 				value={props.name}
 			/>
 		) : (
-			<StyledTitle data-title={true} editable={props.focused} secondary={props.secondary}>
+			<StyledTitle category={props.category} data-title={true} editable={props.focused}>
 				{props.name}
 			</StyledTitle>
 		)}

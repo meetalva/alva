@@ -1,8 +1,9 @@
 import { Color } from '../colors';
 import { CopySize } from '../copy';
-import { Icon, IconName, IconProps, IconSize } from '../icons';
+import { IconProps, IconSize } from '../icons';
 import * as React from 'react';
 import { EditableTitleState } from '../../types';
+import { ChevronLeft, ChevronRight } from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
@@ -71,18 +72,6 @@ const StyledViewSwitch = styled.div`
 		props.fontSize ? `${props.fontSize}px` : `${CopySize.S}px`};
 `;
 
-// tslint:disable-next-line:no-any
-const StyledViewButton: any = styled.div`
-	display: flex;
-	align-self: center;
-	justify-self: start;
-	font-size: ${`${CopySize.S}px`};
-	border-radius: ${getSpace(SpaceSize.XXS)}px;
-	&:hover {
-		background: ${Color.Grey90};
-	}
-`;
-
 const StyledTitle = styled.strong`
 	position: relative;
 	align-self: center;
@@ -98,12 +87,28 @@ const StyledTitle = styled.strong`
 	white-space: nowrap;
 `;
 
-const StyledIcons = styled(Icon)`
+const StyledLeftIcon = styled(ChevronLeft)`
 	padding: ${getSpace(SpaceSize.XXS)}px;
 	border-radius: ${getSpace(SpaceSize.XXS)}px;
 	visibility: ${(props: StyledIconProps) => (props.visible ? 'visible' : 'hidden')};
 	cursor: pointer;
 	pointer-events: auto;
+
+	&:hover {
+		background: ${Color.Grey90};
+	}
+	&:active {
+		background: ${Color.Grey80};
+	}
+`;
+
+const StyledRightIcon = styled(ChevronRight)`
+	padding: ${getSpace(SpaceSize.XXS)}px;
+	border-radius: ${getSpace(SpaceSize.XXS)}px;
+	visibility: ${(props: StyledIconProps) => (props.visible ? 'visible' : 'hidden')};
+	cursor: pointer;
+	pointer-events: auto;
+
 	&:hover {
 		background: ${Color.Grey90};
 	}
@@ -144,33 +149,19 @@ export const ViewTitle: React.SFC<ViewTitleProps> = (props): JSX.Element => (
 	</StyledViewSwitch>
 );
 
-export const ViewButton: React.SFC<ViewButtonProps> = (props): JSX.Element => (
-	<StyledViewButton onClick={props.onClick}>
-		<StyledIcons
-			color={Color.Grey60}
-			size={IconSize.XS}
-			name={IconName.ArrowLeft}
-			visible={true}
-		/>
-		<StyledTitle grow>{props.title}</StyledTitle>
-	</StyledViewButton>
-);
-
 export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 	<StyledViewSwitch justify={props.justify} fontSize={props.fontSize}>
-		<StyledIcons
+		<StyledLeftIcon
 			color={Color.Grey60}
 			onClick={props.onLeftClick}
 			size={IconSize.XS}
-			name={IconName.ArrowLeft}
 			visible={props.leftVisible}
 		/>
 		{props.children}
-		<StyledIcons
+		<StyledRightIcon
 			color={Color.Grey60}
 			onClick={props.onRightClick}
 			size={IconSize.XS}
-			name={IconName.ArrowRight}
 			visible={props.rightVisible}
 		/>
 	</StyledViewSwitch>

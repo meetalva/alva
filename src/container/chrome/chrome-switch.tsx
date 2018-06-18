@@ -1,7 +1,7 @@
-import { IconName, TabSwitchState } from '../../components';
+import { layoutMenu } from '../../electron/context-menus';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
-import { TabSwitch } from '../../components';
+import { getSpace, SpaceSize, LayoutSwitch } from '../../components';
 import { ViewStore } from '../../store';
 
 @MobxReact.inject('store')
@@ -10,19 +10,23 @@ export class ChromeSwitch extends React.Component {
 	public render(): JSX.Element | null {
 		const { store } = this.props as { store: ViewStore };
 
+		const next =
+			store.getShowPages() && store.getShowLeftSidebar() && store.getShowRightSidebar()
+				? false
+				: true;
+
 		return (
-			<div style={{ display: 'flex', height: '100%' }}>
-				<TabSwitch
-					icon={IconName.Page}
-					title={'Pages'}
-					active={store.getShowPages() ? TabSwitchState.Active : TabSwitchState.Default}
-					onClick={() => store.setShowPages(!store.getShowPages())}
-				/>
-				<TabSwitch
-					icon={IconName.Element}
-					title={'Elements & Library'}
-					active={store.getShowLeftSidebar() ? TabSwitchState.Active : TabSwitchState.Default}
-					onClick={() => store.setShowLeftSidebar(!store.getShowLeftSidebar())}
+			<div style={{ marginLeft: getSpace(SpaceSize.XXL * 2) }}>
+				<LayoutSwitch
+					active={!next}
+					onPrimaryClick={() => {
+						store.setShowPages(next);
+						store.setShowLeftSidebar(next);
+						store.setShowRightSidebar(next);
+					}}
+					onSecondaryClick={() => {
+						layoutMenu(store);
+					}}
 				/>
 			</div>
 		);

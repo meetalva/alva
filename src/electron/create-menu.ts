@@ -409,6 +409,9 @@ export function createMenu(ctx: MenuContext): void {
 					}
 				},
 				{
+					type: 'separator'
+				},
+				{
 					label: 'Show Pages',
 					type: 'checkbox',
 					checked: ctx.store.getShowPages(),

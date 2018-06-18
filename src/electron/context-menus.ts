@@ -97,3 +97,37 @@ export function elementMenu(element: Element, store: ViewStore): void {
 
 	remote.Menu.buildFromTemplate(template).popup({});
 }
+
+export function layoutMenu(store: ViewStore): void {
+	const template: MenuItemConstructorOptions[] = [
+		{
+			label: 'Pages',
+			type: 'checkbox',
+			checked: store.getShowPages(),
+			enabled: store.getActiveAppView() === Types.AlvaView.PageDetail,
+			click: (item, checked) => {
+				store.setShowPages(item.checked);
+			}
+		},
+		{
+			label: 'Elements',
+			type: 'checkbox',
+			checked: store.getShowLeftSidebar(),
+			enabled: store.getActiveAppView() === Types.AlvaView.PageDetail,
+			click: (item, checked) => {
+				store.setShowLeftSidebar(item.checked);
+			}
+		},
+		{
+			label: 'Properties',
+			type: 'checkbox',
+			checked: store.getShowRightSidebar(),
+			enabled: store.getActiveAppView() === Types.AlvaView.PageDetail,
+			click: (item, checked) => {
+				store.setShowRightSidebar(item.checked);
+			}
+		}
+	];
+
+	remote.Menu.buildFromTemplate(template).popup({});
+}

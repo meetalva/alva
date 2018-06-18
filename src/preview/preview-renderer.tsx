@@ -115,6 +115,7 @@ const SYNTHETICS = {
 		props.src ? (
 			<img
 				src={props.src}
+				onClick={props.onClick}
 				style={{
 					width: props.width,
 					height: props.height,

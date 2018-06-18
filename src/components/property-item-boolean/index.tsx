@@ -1,7 +1,8 @@
 import { Color } from '../colors';
-import { Icon, IconName, IconSize } from '../icons';
+import { IconSize } from '../icons';
 import { PropertyItem } from '../property-item';
 import * as React from 'react';
+import { Check, X } from 'react-feather';
 import styled from 'styled-components';
 
 export interface PropertyItemBooleanProps {
@@ -81,7 +82,11 @@ const StyledIndicatorTrack = styled.div`
 			: ''};
 `;
 
-const StyledIcon = styled(Icon)`
+const StyledCheckIcon = styled(Check)`
+	transform: translate(-0.5px, -0.5px); // fix to align icon properly
+`;
+
+const StyledXIcon = styled(X)`
 	transform: translate(-0.5px, -0.5px); // fix to align icon properly
 `;
 
@@ -90,7 +95,6 @@ const StyledInput = styled.input`
 `;
 
 export const PropertyItemBoolean: React.StatelessComponent<PropertyItemBooleanProps> = props => {
-	const icon = props.checked ? IconName.Check : IconName.Uncheck;
 	const color = props.checked ? Color.Blue40 : Color.Grey60;
 
 	return (
@@ -98,7 +102,11 @@ export const PropertyItemBoolean: React.StatelessComponent<PropertyItemBooleanPr
 			<StyledInput onChange={props.onChange} checked={props.checked} type="checkbox" />
 			<StyledIndicatorTrack checked={props.checked || false}>
 				<StyledIndicatorKnob checked={props.checked || false}>
-					<StyledIcon name={icon} size={IconSize.XS} color={color} />
+					{props.checked ? (
+						<StyledCheckIcon size={IconSize.XS} color={color} />
+					) : (
+						<StyledXIcon size={IconSize.XS} color={color} />
+					)}
 				</StyledIndicatorKnob>
 			</StyledIndicatorTrack>
 		</PropertyItem>

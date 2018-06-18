@@ -1,6 +1,7 @@
 import { Color } from '../colors';
-import { Icon, IconName, IconSize } from '../icons';
+import { IconSize } from '../icons';
 import * as React from 'react';
+import { Box } from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
@@ -51,9 +52,10 @@ const StyledPatternListItem = styled.div`
 		props.draggable ? 'cursor: move;' : props.onClick ? 'cursor: pointer;' : ''};
 `;
 
-const StyledIcon = styled(Icon)`
-	margin-right: ${getSpace(SpaceSize.XS)}px;
-	flex: 0 0 ${IconSize.S}px;
+const StyledIcon = styled(Box)`
+	margin-top: ${getSpace(SpaceSize.XS)}px;
+	margin-right: ${getSpace(SpaceSize.XS + SpaceSize.XXS)}px;
+	flex: 0 0 ${IconSize.XS}px;
 `;
 
 const StyledPatternListItemContainer = styled.div`
@@ -101,12 +103,7 @@ export const PatternListItem: React.StatelessComponent<PatternListItemProps> = p
 			{icon ? (
 				<img {...{ [PatternAnchor.icon]: 'true' }} src={icon} />
 			) : (
-				<StyledIcon
-					dataIcon="true"
-					name={IconName.Pattern}
-					size={IconSize.S}
-					color={Color.Grey50}
-				/>
+				<StyledIcon size={IconSize.XS} color={Color.Grey50} />
 			)}
 			<StyledPatternListItemContainer>{props.children}</StyledPatternListItemContainer>
 		</StyledPatternListItem>

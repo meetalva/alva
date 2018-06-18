@@ -1,8 +1,0 @@
-{
-	"name": "tab-switch",
-	"displayName": "Tab Switch",
-	"description": "Tab to switch between Views",
-	"version": "1.0.0",
-	"tags": ["tab", "switch"],
-	"flag": "alpha"
-}

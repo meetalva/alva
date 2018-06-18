@@ -15,6 +15,11 @@
 		"isolatedModules": false,
 		"jsx": "react",
 		"module": "commonjs",
+		"moduleResolution": "node",
+		"lib": [
+			"es2017",
+			"dom"
+		],
 		"plugins": [
 			{
 				"name": "typescript-styled-plugin",
@@ -23,11 +28,6 @@
 				}
 			}
 		],
-		"lib": [
-			"es2017",
-			"dom"
-		],
-		"moduleResolution": "node",
 		"outDir": "build",
 		"noEmit": false,
 		"noEmitOnError": false,

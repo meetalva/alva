@@ -3,7 +3,7 @@ import * as React from 'react';
 import DemoContainer from '../demo-container';
 import { Headline } from '../headline';
 import { Space, SpaceSize } from '../space';
-import { EditableTitle, EditState } from '.';
+import { EditableTitle, EditableTitleState } from '.';
 
 export default (): JSX.Element => (
 	<DemoContainer title="Preview Tile">
@@ -12,7 +12,7 @@ export default (): JSX.Element => (
 			<EditableTitle
 				focused={true}
 				name="Well crafted title"
-				nameState={EditState.Editable}
+				nameState={EditableTitleState.Editable}
 				value="Well crafted title"
 			/>
 		</Space>

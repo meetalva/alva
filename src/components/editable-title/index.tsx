@@ -6,7 +6,7 @@ import { Color } from '../colors';
 import { CopySize } from '../copy';
 import { getSpace, SpaceSize } from '../space';
 
-export enum EditState {
+export enum EditableTitleState {
 	Editable = 'Editable',
 	Editing = 'Editing'
 }
@@ -15,7 +15,7 @@ export interface EditableTitleProps {
 	fontSize?: CopySize;
 	focused: boolean;
 	name: string;
-	nameState: EditState;
+	nameState: EditableTitleState;
 	secondary?: boolean;
 	value: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
@@ -123,7 +123,7 @@ class EditableInput extends React.Component<EditableInputProps> {
 
 export const EditableTitle: React.SFC<EditableTitleProps> = (props): JSX.Element => (
 	<div onClick={props.onClick}>
-		{props.nameState === EditState.Editing ? (
+		{props.nameState === EditableTitleState.Editing ? (
 			<EditableInput
 				autoFocus
 				autoSelect

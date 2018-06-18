@@ -28,7 +28,6 @@ export interface EditableTitleProps {
 interface EditableInputProps {
 	autoFocus: boolean;
 	autoSelect: boolean;
-	fontSize?: CopySize;
 	secondary?: boolean;
 	value: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
@@ -40,7 +39,6 @@ interface EditableInputProps {
 interface StyledEditableTitleProps {
 	children: React.ReactNode;
 	editable: boolean;
-	fontSize?: CopySize;
 	focused?: boolean;
 	secondary?: boolean;
 }
@@ -58,7 +56,7 @@ const StyledTitle = styled.strong`
 	margin: ${(props: StyledEditableTitleProps) =>
 		props.secondary ? `0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px` : 0};
 	font-size: ${(props: StyledEditableTitleProps) =>
-		props.fontSize ? `${props.fontSize}px` : `${CopySize.S}px`};
+		props.secondary ? `${CopySize.M}px` : `${CopySize.S}px`};
 	color: ${(props: StyledEditableTitleProps) => (props.secondary ? Color.Grey36 : Color.Black)};
 	font-weight: normal;
 	text-align: center;
@@ -77,7 +75,7 @@ const StyledEditableTitle = styled.input`
 	margin: ${(props: StyledInputProps) =>
 		props.secondary ? `0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px` : '3px 0px'};
 	font-size: ${(props: StyledInputProps) =>
-		props.fontSize ? `${props.fontSize}px` : `${CopySize.S}px`};
+		props.secondary ? `${CopySize.M}px` : `${CopySize.S}px`};
 	text-align: center;
 	overflow: hidden;
 	white-space: nowrap;
@@ -108,7 +106,6 @@ class EditableInput extends React.Component<EditableInputProps> {
 			<StyledEditableTitle
 				autoFocus
 				data-title={true}
-				fontSize={props.fontSize}
 				onBlur={props.onBlur}
 				onChange={props.onChange}
 				onFocus={props.onFocus}
@@ -127,7 +124,6 @@ export const EditableTitle: React.SFC<EditableTitleProps> = (props): JSX.Element
 				autoFocus
 				autoSelect
 				data-title={true}
-				fontSize={props.fontSize}
 				onBlur={props.onBlur}
 				onChange={props.onChange}
 				onFocus={props.onFocus}
@@ -136,12 +132,7 @@ export const EditableTitle: React.SFC<EditableTitleProps> = (props): JSX.Element
 				value={props.name}
 			/>
 		) : (
-			<StyledTitle
-				data-title={true}
-				editable={props.focused}
-				fontSize={props.fontSize}
-				secondary={props.secondary}
-			>
+			<StyledTitle data-title={true} editable={props.focused} secondary={props.secondary}>
 				{props.name}
 			</StyledTitle>
 		)}

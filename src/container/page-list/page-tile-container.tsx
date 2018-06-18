@@ -28,11 +28,11 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 	}
 
 	protected handleFocus(): void {
-		this.props.page.setNameState(Types.EditState.Editing);
+		this.props.page.setNameState(Types.EditableTitleState.Editing);
 	}
 
 	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
-		if (this.props.page.getNameState() === Types.EditState.Editing) {
+		if (this.props.page.getNameState() === Types.EditableTitleState.Editing) {
 			return;
 		}
 	}

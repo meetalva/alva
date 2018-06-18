@@ -22,14 +22,14 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 
 		if (!this.props.page.getName()) {
 			this.props.page.setName(this.props.page.getName({ unedited: true }));
-			this.props.page.setNameState(Types.EditState.Editable);
+			this.props.page.setNameState(Types.EditableTitleState.Editable);
 			return;
 		}
 
 		const name = this.props.page.getName();
 		const editedName = this.props.page.getEditedName();
 
-		this.props.page.setNameState(Types.EditState.Editable);
+		this.props.page.setNameState(Types.EditableTitleState.Editable);
 		this.props.page.setName(this.props.page.getEditedName());
 
 		if (editedName !== name) {
@@ -41,18 +41,18 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 		this.props.page.setName(e.target.value);
 	}
 	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
-		if (this.props.page.getNameState() === Types.EditState.Editable) {
+		if (this.props.page.getNameState() === Types.EditableTitleState.Editable) {
 			const target = e.target as HTMLElement;
 			if (target) {
 				target.focus();
 			}
 
-			this.props.page.setNameState(Types.EditState.Editing);
+			this.props.page.setNameState(Types.EditableTitleState.Editing);
 		}
 	}
 
 	protected handleFocus(): void {
-		this.props.page.setNameState(Types.EditState.Editing);
+		this.props.page.setNameState(Types.EditableTitleState.Editing);
 	}
 
 	protected handleKeyDown(e: KeyboardEvent): void {
@@ -60,18 +60,18 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 
 		switch (e.key) {
 			case 'Escape':
-				this.props.page.setNameState(Types.EditState.Editable);
+				this.props.page.setNameState(Types.EditableTitleState.Editable);
 				this.props.page.setName(this.props.page.getName({ unedited: true }));
 				return;
 			case 'Enter':
-				if (this.props.page.getNameState() === Types.EditState.Editing) {
+				if (this.props.page.getNameState() === Types.EditableTitleState.Editing) {
 					if (!this.props.page.getName()) {
 						this.props.page.setName(this.props.page.getName({ unedited: true }));
-						this.props.page.setNameState(Types.EditState.Editable);
+						this.props.page.setNameState(Types.EditableTitleState.Editable);
 						return;
 					}
 
-					this.props.page.setNameState(Types.EditState.Editable);
+					this.props.page.setNameState(Types.EditableTitleState.Editable);
 					this.props.page.setName(this.props.page.getEditedName());
 					store.commit();
 					return;
@@ -79,9 +79,9 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 				if (
 					e.target === document.body &&
 					this.props.focused &&
-					this.props.page.getNameState() === Types.EditState.Editable
+					this.props.page.getNameState() === Types.EditableTitleState.Editable
 				) {
-					this.props.page.setNameState(Types.EditState.Editing);
+					this.props.page.setNameState(Types.EditableTitleState.Editing);
 					return;
 				}
 		}
@@ -93,7 +93,6 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 			<EditableTitle
 				data-title={true}
 				focused={props.focused}
-				fontSize={props.fontSize}
 				onBlur={e => this.handleBlur()}
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}

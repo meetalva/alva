@@ -122,7 +122,7 @@ Sender.receive(message => {
 			}
 
 			store.setActivePage(page);
-			page.setNameState(Types.EditState.Editing);
+			page.setNameState(Types.EditableTitleState.Editing);
 
 			break;
 		}

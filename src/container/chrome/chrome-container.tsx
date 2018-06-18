@@ -62,21 +62,20 @@ export const ChromeContainer = MobxReact.inject('store')(
 			>
 				<ChromeSwitch />
 				<ViewSwitch
-						fontSize={CopySize.M}
-						justify="center"
-						leftVisible={index > 0}
-						rightVisible={index < pages.length - 1}
-						onLeftClick={previous}
-						onRightClick={next}
-					>
-						<EditableTitleContainer
-							fontSize={CopySize.M}
-							focused={props.focused}
-							page={page}
-							value={page ? page.getName() : ''}
-							secondary
-						/>
-					</ViewSwitch>
+					fontSize={CopySize.M}
+					justify="center"
+					leftVisible={index > 0}
+					rightVisible={index < pages.length - 1}
+					onLeftClick={previous}
+					onRightClick={next}
+				>
+					<EditableTitleContainer
+						focused={props.focused}
+						page={page}
+						value={page ? page.getName() : ''}
+						secondary
+					/>
+				</ViewSwitch>
 				<BugReport
 					title="Found a bug?"
 					onClick={() => {

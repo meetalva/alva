@@ -12,7 +12,6 @@ export enum EditableTitleState {
 }
 
 export interface EditableTitleProps {
-	fontSize?: CopySize;
 	focused: boolean;
 	name: string;
 	nameState: EditableTitleState;
@@ -44,7 +43,6 @@ interface StyledEditableTitleProps {
 }
 
 interface StyledInputProps {
-	fontSize?: CopySize;
 	secondary?: boolean;
 }
 

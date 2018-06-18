@@ -4,10 +4,9 @@ import * as React from 'react';
 import { Page } from '../../model';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
-import { EditableTitle, CopySize } from '../../components';
+import { EditableTitle } from '../../components';
 
 export interface EditableTitleContainerProps {
-	fontSize?: CopySize;
 	focused: boolean;
 	page: Page;
 	secondary?: boolean;

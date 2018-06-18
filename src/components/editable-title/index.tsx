@@ -50,24 +50,23 @@ interface StyledInputProps {
 	secondary?: boolean;
 }
 
-const StyledTitle = (props: StyledEditableTitleProps): JSX.Element => {
-	const Strong = styled.strong`
-		box-sizing: border-box;
-		display: inline-block;
-		width: ${props.secondary ? '130px' : '100%'};
-		padding: 0;
-		margin: ${props.secondary ? `0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px` : 0};
-		font-size: ${props.fontSize ? `${props.fontSize}px` : `${CopySize.S}px`};
-		color: ${props.secondary ? Color.Grey36 : Color.Black};
-		font-weight: normal;
-		text-align: center;
-		cursor: ${props.editable ? 'text' : 'default'};
-		overflow: ${props.secondary ? 'none' : 'hidden'};
-		white-space: nowrap;
-		text-overflow: ellipsis;
-	`;
-	return <Strong data-title={true}>{props.children}</Strong>;
-};
+const StyledTitle = styled.strong`
+	box-sizing: border-box;
+	display: inline-block;
+	width: ${(props: StyledEditableTitleProps) => (props.secondary ? '130px' : '100%')};
+	padding: 0;
+	margin: ${(props: StyledEditableTitleProps) =>
+		props.secondary ? `0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px` : 0};
+	font-size: ${(props: StyledEditableTitleProps) =>
+		props.fontSize ? `${props.fontSize}px` : `${CopySize.S}px`};
+	color: ${(props: StyledEditableTitleProps) => (props.secondary ? Color.Grey36 : Color.Black)};
+	font-weight: normal;
+	text-align: center;
+	cursor: ${(props: StyledEditableTitleProps) => (props.editable ? 'text' : 'default')};
+	overflow: ${(props: StyledEditableTitleProps) => (props.secondary ? 'none' : 'hidden')};
+	white-space: nowrap;
+	text-overflow: ellipsis;
+`;
 
 const StyledEditableTitle = styled.input`
 	box-sizing: border-box;
@@ -138,6 +137,7 @@ export const EditableTitle: React.SFC<EditableTitleProps> = (props): JSX.Element
 			/>
 		) : (
 			<StyledTitle
+				data-title={true}
 				editable={props.focused}
 				fontSize={props.fontSize}
 				secondary={props.secondary}

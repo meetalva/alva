@@ -51,6 +51,28 @@ interface StyledInputProps {
 	category: EditableTitleType;
 }
 
+const categorizedTitleStyles = (props: StyledEditableTitleProps) => {
+	switch (props.category) {
+		case EditableTitleType.Secondary:
+			return `
+			width: 130px;
+			margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
+			overflow: none;
+			font-size: ${CopySize.M}px;
+			color: ${Color.Grey36};
+		`;
+		case EditableTitleType.Primary:
+		default:
+			return `
+			width: 100%
+			margin: 0;
+			overflow: hidden;
+			font-size: ${CopySize.S}px;
+			color: ${Color.Black};
+		`;
+	}
+};
+
 const StyledTitle = styled.strong`
 	box-sizing: border-box;
 	display: inline-block;
@@ -61,26 +83,26 @@ const StyledTitle = styled.strong`
 	white-space: nowrap;
 	text-overflow: ellipsis;
 
-	${(props: StyledEditableTitleProps) => {
-		if (EditableTitleType.Secondary) {
+	${categorizedTitleStyles};
+`;
+
+const categorizedEditableTitleStyles = (props: StyledInputProps) => {
+	switch (props.category) {
+		case EditableTitleType.Secondary:
 			return `
 				width: 130px;
 				margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
-				overflow: none;
 				font-size: ${CopySize.M}px;
-				color: ${Color.Grey36};
-			`;
-		} else {
+		`;
+		case EditableTitleType.Primary:
+		default:
 			return `
-				width: 100%
-				margin: 0;
-				overflow: hidden;
+				width: 100%;
+				margin: 3px 0px;
 				font-size: ${CopySize.S}px;
-				color: ${Color.Black};
-			`;
-		}
-	}};
-`;
+		`;
+	}
+};
 
 const StyledEditableTitle = styled.input`
 	box-sizing: border-box;
@@ -93,21 +115,7 @@ const StyledEditableTitle = styled.input`
 	text-overflow: ellipsis;
 	outline-offset: 0;
 
-	${(props: StyledInputProps) => {
-		if (EditableTitleType.Secondary) {
-			return `
-				width: 130px;
-				margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
-				font-size: ${CopySize.M}px;
-			`;
-		} else {
-			return `
-				width: 100%;
-				margin: 3px 0px;
-				font-size: ${CopySize.S}px;
-			`;
-		}
-	}} :focus {
+	${categorizedEditableTitleStyles} :focus {
 		outline: none;
 	}
 `;

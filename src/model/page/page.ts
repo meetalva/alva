@@ -205,7 +205,6 @@ export class Page {
 		if ((!options || !options.unedited) && this.nameState === Types.EditableTitleState.Editing) {
 			return this.editedName;
 		}
-
 		return this.name;
 	}
 
@@ -236,12 +235,11 @@ export class Page {
 	}
 
 	@Mobx.action
-	public setName(name: string): void {
-		if (this.nameState === Types.EditableTitleState.Editing) {
+	public setName(name: string, editNameState?: Types.EditableTitleState): void {
+		if (editNameState === Types.EditableTitleState.Editing) {
 			this.editedName = name;
 			return;
 		}
-
 		this.name = name;
 	}
 
@@ -250,7 +248,6 @@ export class Page {
 		if (state === Types.EditableTitleState.Editing) {
 			this.editedName = this.name;
 		}
-
 		this.nameState = state;
 	}
 

@@ -56,20 +56,18 @@ const categorizedTitleStyles = (props: StyledEditableTitleProps) => {
 	switch (props.category) {
 		case EditableTitleType.Secondary:
 			return `
-			width: 130px;
-			margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
-			overflow: hidden;
-			font-size: ${CopySize.M}px;
-			color: ${Color.Grey36};
+				width: 200px;
+				margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
+				font-size: ${CopySize.M}px;
+				color: ${Color.Grey36};
 		`;
 		case EditableTitleType.Primary:
 		default:
 			return `
-			width: 100%
-			margin: 0;
-			overflow: hidden;
-			font-size: ${CopySize.S}px;
-			color: ${Color.Black};
+				width: 100%;
+				margin: 0;
+				font-size: ${CopySize.S}px;
+				color: ${Color.Black};
 		`;
 	}
 };
@@ -78,8 +76,9 @@ const StyledTitle = styled.strong`
 	box-sizing: border-box;
 	display: inline-block;
 	padding: 0;
+	overflow: hidden;
 	font-weight: normal;
-	/* text-align: center; */
+	text-align: center;
 	cursor: ${(props: StyledEditableTitleProps) => (props.editable ? 'text' : 'default')};
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -91,7 +90,7 @@ const categorizedEditableTitleStyles = (props: StyledInputProps) => {
 	switch (props.category) {
 		case EditableTitleType.Secondary:
 			return `
-				width: 130px;
+				width: 200px;
 				margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
 				font-size: ${CopySize.M}px;
 		`;
@@ -99,7 +98,7 @@ const categorizedEditableTitleStyles = (props: StyledInputProps) => {
 		default:
 			return `
 				width: 100%;
-				margin: 3px 0px;
+				margin: 0;
 				font-size: ${CopySize.S}px;
 		`;
 	}
@@ -110,11 +109,8 @@ const StyledEditableTitle = styled.input`
 	display: inline-block;
 	border: 0;
 	padding: 0;
-	text-align: center;
 	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	outline-offset: 0;
+	text-align: center;
 
 	${categorizedEditableTitleStyles} :focus {
 		outline: none;

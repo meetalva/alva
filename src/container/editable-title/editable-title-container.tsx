@@ -121,7 +121,7 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 				}}
 				name={props.page.getName()}
 				nameState={this.editNameState}
-				category={EditableTitleType.Secondary}
+				category={props.secondary ? EditableTitleType.Secondary : EditableTitleType.Primary}
 				value={props.page.getName()}
 			/>
 		);

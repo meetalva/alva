@@ -49,17 +49,14 @@ const StyledPageTile = styled.div`
 	}
 `;
 
-const StyledContainer = styled.div`
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	padding: ${getSpace(SpaceSize.S)}px 0;
-	background: ${Color.White};
-`;
-
 export const PageTile: React.StatelessComponent<PageTileProps> = (props): JSX.Element => (
-	<StyledPageTile focused={props.focused} highlighted={props.highlighted} data-id={props.id} onClick={props.onClick} onDoubleClick={props.onDoubleClick}>
-		<StyledContainer>{props.children}</StyledContainer>
+	<StyledPageTile
+		focused={props.focused}
+		highlighted={props.highlighted}
+		data-id={props.id}
+		onClick={props.onClick}
+		onDoubleClick={props.onDoubleClick}
+	>
+		{props.children}
 	</StyledPageTile>
 );

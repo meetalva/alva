@@ -36,6 +36,7 @@ interface EditableInputProps {
 	value: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	onClick?: React.MouseEventHandler<HTMLElement>;
 	onFocus?: React.FocusEventHandler<HTMLInputElement>;
 	onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 }
@@ -57,7 +58,7 @@ const categorizedTitleStyles = (props: StyledEditableTitleProps) => {
 			return `
 			width: 130px;
 			margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
-			overflow: none;
+			overflow: hidden;
 			font-size: ${CopySize.M}px;
 			color: ${Color.Grey36};
 		`;
@@ -78,7 +79,7 @@ const StyledTitle = styled.strong`
 	display: inline-block;
 	padding: 0;
 	font-weight: normal;
-	text-align: center;
+	/* text-align: center; */
 	cursor: ${(props: StyledEditableTitleProps) => (props.editable ? 'text' : 'default')};
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -151,7 +152,7 @@ class EditableInput extends React.Component<EditableInputProps> {
 }
 
 export const EditableTitle: React.SFC<EditableTitleProps> = (props): JSX.Element => (
-	<div onClick={props.onClick}>
+	<React.Fragment>
 		{props.nameState === EditableTitleState.Editing ? (
 			<EditableInput
 				autoFocus
@@ -159,15 +160,21 @@ export const EditableTitle: React.SFC<EditableTitleProps> = (props): JSX.Element
 				category={props.category}
 				data-title={true}
 				onBlur={props.onBlur}
+				onClick={props.onClick}
 				onChange={props.onChange}
 				onFocus={props.onFocus}
 				onKeyDown={props.onKeyDown}
 				value={props.name}
 			/>
 		) : (
-			<StyledTitle category={props.category} data-title={true} editable={props.focused}>
+			<StyledTitle
+				category={props.category}
+				data-title={true}
+				editable={props.focused}
+				onClick={props.onClick}
+			>
 				{props.name}
 			</StyledTitle>
 		)}
-	</div>
+	</React.Fragment>
 );

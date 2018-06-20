@@ -10,7 +10,7 @@ import { EditableTitle, EditableTitleType } from '../../components';
 export interface EditableTitleContainerProps {
 	focused: boolean;
 	page: Page;
-	secondary?: boolean;
+	secondary: EditableTitleType;
 	value: string;
 }
 
@@ -121,7 +121,7 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 				}}
 				name={props.page.getName()}
 				nameState={this.editNameState}
-				category={props.secondary ? EditableTitleType.Secondary : EditableTitleType.Primary}
+				category={props.secondary}
 				value={props.page.getName()}
 			/>
 		);

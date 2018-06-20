@@ -1,6 +1,6 @@
 import * as AlvaUtil from '../../alva-util';
 import { ChromeSwitch } from './chrome-switch';
-import { BugReport, Chrome, CopySize, ViewSwitch } from '../../components';
+import { BugReport, Chrome, CopySize, EditableTitleType, ViewSwitch } from '../../components';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
@@ -72,8 +72,8 @@ export const ChromeContainer = MobxReact.inject('store')(
 					<EditableTitleContainer
 						focused={props.focused}
 						page={page}
+						secondary={EditableTitleType.Secondary}
 						value={page ? page.getName() : ''}
-						secondary
 					/>
 				</ViewSwitch>
 				<BugReport

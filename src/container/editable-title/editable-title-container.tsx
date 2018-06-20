@@ -5,12 +5,12 @@ import * as React from 'react';
 import { Page } from '../../model';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
-import { EditableTitle, EditableTitleType } from '../../components';
+import { EditableTitle } from '../../components';
 
 export interface EditableTitleContainerProps {
 	focused: boolean;
 	page: Page;
-	secondary: EditableTitleType;
+	secondary: Types.EditableTitleType;
 	value: string;
 }
 

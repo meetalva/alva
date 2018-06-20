@@ -141,6 +141,11 @@ export enum EditableTitleState {
 	Editing = 'Editing'
 }
 
+export enum EditableTitleType {
+	Primary,
+	Secondary
+}
+
 export enum SlotType {
 	Children = 'children',
 	Property = 'property'

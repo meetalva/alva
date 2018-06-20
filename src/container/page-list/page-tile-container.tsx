@@ -1,4 +1,4 @@
-import { PageTile, EditableTitleType } from '../../components';
+import { PageTile } from '../../components';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
@@ -50,7 +50,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 				<EditableTitleContainer
 					focused={props.focused}
 					page={props.page}
-					secondary={EditableTitleType.Primary}
+					secondary={Types.EditableTitleType.Primary}
 					value={props.page.getName()}
 				/>
 			</PageTile>

@@ -51,6 +51,7 @@ const StyledPageTile = styled.div`
 
 export const PageTile: React.StatelessComponent<PageTileProps> = (props): JSX.Element => (
 	<StyledPageTile
+		draggable
 		focused={props.focused}
 		highlighted={props.highlighted}
 		data-id={props.id}

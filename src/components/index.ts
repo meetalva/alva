@@ -5,6 +5,7 @@ export * from './chrome';
 export * from './colors';
 export * from './copy';
 export * from './create-select';
+export * from './drag-area';
 export * from './editable-title';
 export * from './element';
 export * from './element-slot';

@@ -1,11 +1,12 @@
-import * as Sender from '../../message/client';
-import { AddPageButton, Layout, LayoutWrap } from '../../components';
-import { ServerMessageType } from '../../message';
-import * as MobxReact from 'mobx-react';
-import { PageTileContainer } from './page-tile-container';
 import * as React from 'react';
-import { ViewStore } from '../../store';
+import * as MobxReact from 'mobx-react';
 import * as uuid from 'uuid';
+
+import * as Sender from '../../message/client';
+import * as Component from '../../components';
+import { ServerMessageType } from '../../message';
+import { PageTileContainer } from './page-tile-container';
+import { ViewStore } from '../../store';
 
 export const PageListContainer: React.StatelessComponent = MobxReact.inject('store')(
 	MobxReact.observer((props): JSX.Element | null => {
@@ -19,27 +20,29 @@ export const PageListContainer: React.StatelessComponent = MobxReact.inject('sto
 		}
 
 		return (
-			<Layout wrap={LayoutWrap.Wrap}>
-				{project
-					.getPages()
-					.map(page => (
-						<PageTileContainer
-							highlighted={page.getId() === currentPageId}
-							focused={page === store.getFocusedItem()}
-							key={page.getId()}
-							page={page}
-						/>
-					))}
-				<AddPageButton
-					onClick={() =>
-						Sender.send({
-							id: uuid.v4(),
-							payload: undefined,
-							type: ServerMessageType.CreateNewPage
-						})
-					}
-				/>
-			</Layout>
+			<Component.DragArea onDragStart={e => console.log(e.target)}>
+				<Component.Layout wrap={Component.LayoutWrap.Wrap}>
+					{project
+						.getPages()
+						.map(page => (
+							<PageTileContainer
+								highlighted={page.getId() === currentPageId}
+								focused={page === store.getFocusedItem()}
+								key={page.getId()}
+								page={page}
+							/>
+						))}
+					<Component.AddPageButton
+						onClick={() =>
+							Sender.send({
+								id: uuid.v4(),
+								payload: undefined,
+								type: ServerMessageType.CreateNewPage
+							})
+						}
+					/>
+				</Component.Layout>
+			</Component.DragArea>
 		);
 	})
 );

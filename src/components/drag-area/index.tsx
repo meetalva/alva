@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export interface DragAreaProps {
-	innerRef?: React.Ref<HTMLElement>;
+	innerRef?: React.Ref<HTMLElement | null>;
 	onBlur?: React.FocusEventHandler<HTMLElement>;
 	onChange?: React.FormEventHandler<HTMLElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;

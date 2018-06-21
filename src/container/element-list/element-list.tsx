@@ -2,7 +2,6 @@ import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
-import styled from 'styled-components';
 
 import { ElementDragImage } from '../element-drag-image';
 import { elementMenu } from '../../electron/context-menus';
@@ -378,7 +377,7 @@ export class ElementList extends React.Component {
 		};
 
 		return (
-			<StyledDragRoot
+			<Components.DragArea
 				data-drag-root
 				{...anchors}
 				onBlur={e => this.handleBlur(e)}
@@ -399,12 +398,7 @@ export class ElementList extends React.Component {
 					element={store.getDraggedElement()}
 					innerRef={ref => (this.dragImg = ref)}
 				/>
-			</StyledDragRoot>
+			</Components.DragArea>
 		);
 	}
 }
-
-const StyledDragRoot = styled.div`
-	height: 100%;
-	width: 100%;
-`;

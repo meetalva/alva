@@ -8,6 +8,7 @@ export interface PatternEnumPropertyInit {
 	description?: string;
 	hidden: boolean;
 	id: string;
+	inputType: Types.PatternPropertyInputType;
 	label: string;
 	options: PatternEnumPropertyOption[];
 	origin: Types.PatternPropertyOrigin;
@@ -36,6 +37,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			description: serialized.description,
 			hidden: serialized.hidden,
 			id: serialized.id,
+			inputType: serialized.inputType,
 			label: serialized.label,
 			options: serialized.options.map(serializedOption =>
 				PatternEnumPropertyOption.from(serializedOption)
@@ -97,6 +99,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			description: this.description,
 			hidden: this.hidden,
 			id: this.id,
+			inputType: this.inputType,
 			label: this.label,
 			propertyName: this.propertyName,
 			options: this.options.map(option => option.toJSON()),

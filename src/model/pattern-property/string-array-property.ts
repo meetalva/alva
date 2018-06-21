@@ -44,6 +44,7 @@ export class PatternStringArrayProperty extends PatternPropertyBase<string[]> {
 			example: this.example,
 			hidden: this.hidden,
 			id: this.id,
+			inputType: this.inputType,
 			label: this.label,
 			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,

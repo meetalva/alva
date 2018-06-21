@@ -101,6 +101,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternEnumProperty({
 			contextId: ALIGN_ITEMS_CONTEXT_ID,
 			id: alignId,
+			inputType: Types.PatternPropertyInputType.RadioGroup,
 			label: 'Align',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'alignItems',
@@ -148,6 +149,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternEnumProperty({
 			contextId: JUSTIFY_CONTENT_CONTEXT_ID,
 			id: justifyId,
+			inputType: Types.PatternPropertyInputType.Select,
 			label: 'Justify',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'justifyContent',

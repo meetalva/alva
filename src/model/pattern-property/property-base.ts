@@ -22,6 +22,7 @@ export abstract class PatternPropertyBase<T> {
 	@Mobx.observable protected example: string;
 	@Mobx.observable protected hidden: boolean = false;
 	@Mobx.observable protected id: string;
+	@Mobx.observable protected inputType: Types.PatternPropertyInputType;
 	@Mobx.observable protected label: string;
 	@Mobx.observable protected origin: Types.PatternPropertyOrigin;
 	@Mobx.observable protected propertyName: string;

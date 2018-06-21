@@ -45,6 +45,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 			defaultOptionId: defaultLanguage ? defaultLanguage.getId() : undefined,
 			hidden: false,
 			id: langEnumId,
+			inputType: Types.PatternPropertyInputType.Select,
 			label: 'Language',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			options,

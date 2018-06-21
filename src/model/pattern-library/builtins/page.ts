@@ -35,6 +35,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 			contextId: VIEWPORT_CONTEXT_ID,
 			description: 'Adapt viewport to device',
 			id: context.options.getGlobalPropertyId(patternId, VIEWPORT_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Mobile Viewport',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'viewport',

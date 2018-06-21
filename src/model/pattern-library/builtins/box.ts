@@ -53,6 +53,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternBooleanProperty({
 			contextId: FLEX_CONTEXT_ID,
 			id: flexId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Flex',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'flex',
@@ -61,6 +62,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternNumberProperty({
 			contextId: FLEX_GROW_CONTEXT_ID,
 			id: growId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Grow',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'flexGrow',
@@ -69,6 +71,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternNumberProperty({
 			contextId: FLEX_SHRINK_CONTEXT_ID,
 			id: shrinkId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Shrink',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'flexShrink',
@@ -77,6 +80,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternStringProperty({
 			contextId: FLEX_BASIS_CONTEXT_ID,
 			id: basisId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Size',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'flexBasis',
@@ -85,6 +89,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternStringProperty({
 			contextId: WIDHT_CONTEXT_ID,
 			id: widthId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Width',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'width',
@@ -93,6 +98,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternStringProperty({
 			contextId: HEIGHT_CONTEXT_ID,
 			id: heightId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Height',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'height',
@@ -204,6 +210,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternBooleanProperty({
 			contextId: FLEX_DIRECTION_CONTEXT_ID,
 			id: flexDirectionId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Column',
 			propertyName: 'column',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
@@ -212,6 +219,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternBooleanProperty({
 			contextId: FLEX_WRAP_CONTEXT_ID,
 			id: flexWrapId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Wrap',
 			propertyName: 'wrap',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
@@ -220,6 +228,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternNumberProperty({
 			contextId: ORDER_CONTEXT_ID,
 			id: orderId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Order',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'order'
@@ -227,6 +236,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternStringProperty({
 			contextId: BACKGROUND_COLOR_CONTEXT_ID,
 			id: backgroundColorId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Background Color',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'backgroundColor'

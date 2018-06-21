@@ -19,6 +19,7 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 			example: serialized.example,
 			hidden: serialized.hidden,
 			id: serialized.id,
+			inputType: serialized.inputType,
 			label: serialized.label,
 			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,

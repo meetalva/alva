@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Select, SelectOption } from '../select';
 import { PropertyItem } from '../property-item';
+import { PatternPropertyInputType } from '../../types';
 
 export interface PropertyItemEnumValues {
 	id: string;
@@ -10,6 +11,7 @@ export interface PropertyItemEnumValues {
 export interface PropertyItemEnumProps {
 	className?: string;
 	description?: string;
+	inputType: PatternPropertyInputType;
 	label: string;
 	onChange?: React.ChangeEventHandler<HTMLSelectElement>;
 	required?: boolean;
@@ -25,5 +27,6 @@ export const PropertyItemEnum: React.StatelessComponent<PropertyItemEnumProps> =
 				<SelectOption key={value.id} value={value.id} label={value.name} />
 			))}
 		</Select>
+		{props.inputType === PatternPropertyInputType.RadioGroup ? 'Hello' : 'no'}
 	</PropertyItem>
 );

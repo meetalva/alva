@@ -21,6 +21,7 @@ export class PatternNumberArrayProperty extends PatternPropertyBase<number[]> {
 			defaultValue: serialized.defaultValue,
 			example: serialized.example,
 			id: serialized.id,
+			inputType: serialized.inputType,
 			label: serialized.label,
 			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,

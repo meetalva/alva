@@ -9,6 +9,7 @@ export interface PatternPropertyInit<T> {
 	example?: string;
 	hidden?: boolean;
 	id?: string;
+	inputType: Types.PatternPropertyInputType;
 	label: string;
 	origin: Types.PatternPropertyOrigin;
 	propertyName: string;
@@ -32,6 +33,7 @@ export abstract class PatternPropertyBase<T> {
 	public constructor(init: PatternPropertyInit<T>) {
 		this.contextId = init.contextId;
 		this.id = init.id || uuid.v4();
+		this.inputType = init.inputType;
 		this.label = init.label;
 		this.origin = init.origin;
 		this.propertyName = init.propertyName;
@@ -77,6 +79,10 @@ export abstract class PatternPropertyBase<T> {
 
 	public getId(): string {
 		return this.id;
+	}
+
+	public getInputType(): Types.PatternPropertyInputType {
+		return this.inputType;
 	}
 
 	public getLabel(): string {

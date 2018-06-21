@@ -13,6 +13,7 @@ export const Text = (context: BuiltInContext): BuiltInResult => {
 		new PatternProperty.PatternStringProperty({
 			contextId: 'text',
 			id: context.options.getGlobalPropertyId(patternId, TEXT_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Text',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'text',

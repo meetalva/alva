@@ -129,6 +129,7 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 				);
 			}
 			case Types.PatternPropertyType.Enum: {
+				const inputType = patternProperty.getInputType() as Types.PatternPropertyInputType;
 				const value = property.getValue() as string;
 				const enumProp = patternProperty as PatternEnumProperty;
 				const selectedOption = enumProp.getOptionByValue(value);
@@ -142,6 +143,7 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 							id: option.getId(),
 							name: option.getName()
 						}))}
+						inputType={inputType}
 						onChange={e => this.handleEnumChange(e)}
 					/>
 				);

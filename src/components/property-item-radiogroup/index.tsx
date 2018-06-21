@@ -4,19 +4,26 @@ import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
-export interface PropertyItemEnumRadiogroupValues {
+export interface PropertyItemRadiogroupValues {
 	id: string;
 	name: string;
 }
 
-export interface PropertyItemEnumProps {
+export interface PropertyItemRadiogroupProps {
 	className?: string;
 	description?: string;
 	label: string;
-	onChange?: React.ChangeEventHandler<HTMLSelectElement>;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	required?: boolean;
 	selectedValue?: string;
-	values: PropertyItemEnumRadiogroupValues[];
+	values: PropertyItemRadiogroupValues[];
+}
+
+export interface RadiogroupItemProps {
+	active: boolean;
+	name: string;
+	id: string;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
 const StyledRadioGroup = styled.div`
@@ -38,28 +45,26 @@ const StyledItem = styled.label`
 	overflow: hidden;
 	flex-grow: 1;
 	font-size: 5px;
-	background: lightblue;
-
-	&:active {
-		background: red;
-	}
+	background: ${(props: RadiogroupItemProps) => (props.active ? Color.Grey50 : 'transparent')};
 `;
 
 const StyledInput = styled.input`
-	//display: none;
+	display: none;
 `;
 
-export const PropertyItemEnumRadiogroup: React.StatelessComponent<
-	PropertyItemEnumProps
-> = props => (
+export const RadiogroupItem: React.StatelessComponent<RadiogroupItemProps> = props => (
+	<StyledItem id={props.id} active={props.active} name={props.name}>
+		{props.name}
+		<StyledInput type="radio" id={props.id} name="lala" value={props.id} onChange={props.onChange} />
+	</StyledItem>
+);
+
+
+export const PropertyItemRadiogroup: React.StatelessComponent<PropertyItemRadiogroupProps> = props => (
 	<PropertyItem description={props.description} label={props.label}>
 		<StyledRadioGroup>
 			{props.values.map(value => (
-				<StyledItem>
-					{value.id}
-					{value.name}
-					<StyledInput type="radio" id={value.id} name={value.id} value={value.id} />
-				</StyledItem>
+				<RadiogroupItem name={value.name} id={value.id} onChange={props.onChange} active={value.id === props.selectedValue} />
 			))}
 		</StyledRadioGroup>
 	</PropertyItem>

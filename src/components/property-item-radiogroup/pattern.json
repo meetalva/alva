@@ -1,0 +1,7 @@
+{
+	"name": "property-item-radiogroup",
+	"displayName": "Property Item: Radiogroup",
+	"description": "Input field for enum values displayed as radiogroup",
+	"version": "1.0.0",
+	"tags": ["property"]
+}

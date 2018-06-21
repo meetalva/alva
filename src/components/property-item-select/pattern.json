@@ -1,0 +1,7 @@
+{
+	"name": "property-item-select",
+	"displayName": "Property Item: Select",
+	"description": "Input field for enum values displayed as select",
+	"version": "1.0.0",
+	"tags": ["property"]
+}

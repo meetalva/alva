@@ -1,25 +1,25 @@
+import { PropertyItem } from '../property-item';
 import * as React from 'react';
 import { Select, SelectOption } from '../select';
-import { PropertyItem } from '../property-item';
-import { PatternPropertyInputType } from '../../types';
 
-export interface PropertyItemEnumValues {
+export interface PropertyItemEnumSelectValues {
 	id: string;
 	name: string;
 }
 
-export interface PropertyItemEnumProps {
+export interface PropertyItemEnumSelectProps {
 	className?: string;
 	description?: string;
-	inputType: PatternPropertyInputType;
 	label: string;
 	onChange?: React.ChangeEventHandler<HTMLSelectElement>;
 	required?: boolean;
 	selectedValue?: string;
-	values: PropertyItemEnumValues[];
+	values: PropertyItemEnumSelectValues[];
 }
 
-export const PropertyItemEnum: React.StatelessComponent<PropertyItemEnumProps> = props => (
+export const PropertyItemEnumSelect: React.StatelessComponent<
+	PropertyItemEnumSelectProps
+> = props => (
 	<PropertyItem description={props.description} label={props.label}>
 		<Select onChange={props.onChange} selectedValue={props.selectedValue}>
 			{!props.required && <SelectOption key="required" value="" label="" />}
@@ -27,6 +27,5 @@ export const PropertyItemEnum: React.StatelessComponent<PropertyItemEnumProps> =
 				<SelectOption key={value.id} value={value.id} label={value.name} />
 			))}
 		</Select>
-		{props.inputType === PatternPropertyInputType.RadioGroup ? 'Hello' : 'no'}
 	</PropertyItem>
 );

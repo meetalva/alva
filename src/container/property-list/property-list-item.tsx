@@ -130,23 +130,42 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 			}
 			case Types.PatternPropertyType.Enum: {
 				const inputType = patternProperty.getInputType() as Types.PatternPropertyInputType;
-				const value = property.getValue() as string;
-				const enumProp = patternProperty as PatternEnumProperty;
-				const selectedOption = enumProp.getOptionByValue(value);
-				const selectedValue = selectedOption ? selectedOption.getId() : undefined;
 
-				return (
-					<Component.PropertyItemEnum
-						{...base}
-						selectedValue={selectedValue}
-						values={enumProp.getOptions().map(option => ({
-							id: option.getId(),
-							name: option.getName()
-						}))}
-						inputType={inputType}
-						onChange={e => this.handleEnumChange(e)}
-					/>
-				);
+				if (inputType === Types.PatternPropertyInputType.RadioGroup) {
+					const value = property.getValue() as string;
+					const enumProp = patternProperty as PatternEnumProperty;
+					const selectedOption = enumProp.getOptionByValue(value);
+					const selectedValue = selectedOption ? selectedOption.getId() : undefined;
+
+					return (
+						<Component.PropertyItemEnumRadiogroup
+							{...base}
+							selectedValue={selectedValue}
+							values={enumProp.getOptions().map(option => ({
+								id: option.getId(),
+								name: option.getName()
+							}))}
+							onChange={e => this.handleEnumChange(e)}
+						/>
+					);
+				} else {
+					const value = property.getValue() as string;
+					const enumProp = patternProperty as PatternEnumProperty;
+					const selectedOption = enumProp.getOptionByValue(value);
+					const selectedValue = selectedOption ? selectedOption.getId() : undefined;
+
+					return (
+						<Component.PropertyItemEnumSelect
+							{...base}
+							selectedValue={selectedValue}
+							values={enumProp.getOptions().map(option => ({
+								id: option.getId(),
+								name: option.getName()
+							}))}
+							onChange={e => this.handleEnumChange(e)}
+						/>
+					);
+				}
 			}
 			case Types.PatternPropertyType.EventHandler: {
 				return <EventHandlerPropertyView elementProperty={property} />;

@@ -1,11 +1,10 @@
-import { PropertyItemEnum, PropertyItemEnumValues } from './index';
+import { PropertyItemEnumRadiogroup, PropertyItemEnumRadiogroupValues } from './index';
 import * as React from 'react';
 import DemoContainer from '../demo-container';
-import { PatternPropertyInputType } from '../../types';
 
 export interface EnumItemDemoState {
 	selectedItem: string;
-	values: PropertyItemEnumValues[];
+	values: PropertyItemEnumRadiogroupValues[];
 }
 
 export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
@@ -27,14 +26,9 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 	public render(): JSX.Element {
 		return (
 			<DemoContainer title="Enum Item">
-				<PropertyItemEnum
+				<PropertyItemEnumRadiogroup label="Label" values={this.state.values} />
+				<PropertyItemEnumRadiogroup
 					label="Label"
-					values={this.state.values}
-					inputType={PatternPropertyInputType.RadioGroup}
-				/>
-				<PropertyItemEnum
-					label="Label"
-					inputType={PatternPropertyInputType.Select}
 					values={this.state.values}
 					selectedValue={this.state.selectedItem}
 					required

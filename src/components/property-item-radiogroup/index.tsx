@@ -81,7 +81,7 @@ export const RadiogroupItem: React.StatelessComponent<RadiogroupItemProps> = pro
 		) : (
 			props.name
 		)}
-		<StyledInput type="radio" id={props.id} name="lala" value={props.id} onChange={props.onChange} />
+		<StyledInput type="radio" id={props.id} name="radiogroup" value={props.id} onChange={props.onChange} />
 	</StyledItem>
 );
 

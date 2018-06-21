@@ -27,7 +27,7 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 	public render(): JSX.Element {
 		return (
 			<DemoContainer title="Enum Item">
-				<PropertyItemRadiogroup label="Label" values={this.state.values} />
+				<PropertyItemRadiogroup label="Label" key="0" values={this.state.values} />
 				<PropertyItemRadiogroup
 					label="Label"
 					values={this.state.values}

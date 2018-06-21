@@ -1,13 +1,14 @@
-import { ElementAnchors } from '../../components';
-import { ElementDragImage } from '../element-drag-image';
-import { elementMenu } from '../../electron/context-menus';
-import { ElementContainer } from './element-container';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
-import * as Store from '../../store';
 import styled from 'styled-components';
+
+import { ElementDragImage } from '../element-drag-image';
+import { elementMenu } from '../../electron/context-menus';
+import { ElementContainer } from './element-container';
+import * as Components from '../../components';
+import * as Store from '../../store';
 import * as Types from '../../types';
 import * as utils from '../../utils';
 
@@ -66,7 +67,7 @@ export class ElementList extends React.Component {
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
-		const icon = utils.above(target, `svg[${ElementAnchors.icon}]`);
+		const icon = utils.above(target, `svg[${Components.ElementAnchors.icon}]`);
 
 		// Skip and deselect elements if the root itself is clicked
 		if (target.getAttribute('data-drag-root')) {
@@ -76,7 +77,7 @@ export class ElementList extends React.Component {
 
 		const element = utils.elementFromTarget(e.target, { sibling: false, store });
 		const targetContent = utils.elementContentFromTarget(e.target, { store });
-		const label = utils.above(e.target, `[${ElementAnchors.label}]`);
+		const label = utils.above(e.target, `[${Components.ElementAnchors.label}]`);
 
 		if (!element) {
 			return;
@@ -127,7 +128,7 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 
 		const target = e.target as HTMLElement;
-		const isSibling = target.getAttribute(ElementAnchors.placeholder) === 'true';
+		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
 		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		const targetContent = isSibling
@@ -205,7 +206,7 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 
 		const target = e.target as HTMLElement;
-		const isSiblingDrop = target.getAttribute(ElementAnchors.placeholder) === 'true';
+		const isSiblingDrop = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
 
 		const draggedElement = store.getDraggedElement();
 		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
@@ -320,7 +321,7 @@ export class ElementList extends React.Component {
 			store
 		});
 		const targetContent = utils.elementContentFromTarget(e.target, { store });
-		const label = utils.above(e.target, `[${ElementAnchors.label}]`);
+		const label = utils.above(e.target, `[${Components.ElementAnchors.label}]`);
 
 		Mobx.transaction(() => {
 			if (
@@ -370,10 +371,10 @@ export class ElementList extends React.Component {
 		}
 
 		const anchors = {
-			[ElementAnchors.content]: (rootElement.getContentBySlotType(
+			[Components.ElementAnchors.content]: (rootElement.getContentBySlotType(
 				Types.SlotType.Children
 			) as Model.ElementContent).getId(),
-			[ElementAnchors.element]: rootElement.getId()
+			[Components.ElementAnchors.element]: rootElement.getId()
 		};
 
 		return (

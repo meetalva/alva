@@ -20,7 +20,12 @@ export const PageListContainer: React.StatelessComponent = MobxReact.inject('sto
 		}
 
 		return (
-			<Component.DragArea onDragStart={e => console.log(e.target)}>
+			<Component.DragArea
+				onDragStart={e => console.log(e.target)}
+				onDragLeave={e => console.log(e)}
+				onDragOver={e => console.log(e)}
+				onDrop={e => console.log(e)}
+			>
 				<Component.Layout wrap={Component.LayoutWrap.Wrap}>
 					{project
 						.getPages()

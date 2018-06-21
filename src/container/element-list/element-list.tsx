@@ -258,15 +258,15 @@ export class ElementList extends React.Component {
 
 	private handleKeyDown(e: KeyboardEvent): void {
 		const { store } = this.props as { store: Store.ViewStore };
-		const node = e.target as Node;
-		const contains = (target: Node) => (this.ref ? this.ref.contains(target) : false);
+		// const node = e.target as Node;
+		// const contains = (target: Node) => (this.ref ? this.ref.contains(target) : false);
 
 		// Only handle key events if either
 		// (1) it is global, thus fires on body
 		// (2) is a node inside the page element list
-		if (e.target !== document.body && !contains(node)) {
-			return;
-		}
+		// if (e.target !== document.body && !contains(node)) {
+		// 	return;
+		// }
 
 		switch (e.keyCode) {
 			case 13: {

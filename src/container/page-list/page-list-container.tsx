@@ -8,16 +8,14 @@ import { ServerMessageType } from '../../message';
 import { PageTileContainer } from './page-tile-container';
 import { ViewStore } from '../../store';
 
-export const PageListContainer: React.StatelessComponent = MobxReact.inject('store')(
-	MobxReact.observer((props): JSX.Element | null => {
-		const { store } = props as { store: ViewStore };
+@MobxReact.inject('store')
+@MobxReact.observer
+export class PageListContainer extends React.Component {
+	public render(): JSX.Element {
+		const { store } = this.props as { store: ViewStore };
 		const project = store.getProject();
 		const currentPage = store.getCurrentPage();
 		const currentPageId = currentPage ? currentPage.getId() : undefined;
-
-		if (!project) {
-			return null;
-		}
 
 		return (
 			<Component.DragArea
@@ -49,5 +47,5 @@ export const PageListContainer: React.StatelessComponent = MobxReact.inject('sto
 				</Component.Layout>
 			</Component.DragArea>
 		);
-	})
-);
+	}
+}

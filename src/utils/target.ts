@@ -26,7 +26,12 @@ export function above(node: EventTarget, selector: string): HTMLElement | null {
 export function pageFromTarget(
 	target: EventTarget,
 	store: Store.ViewStore
-): Model.Page | undefined {
+):
+	| {
+			page: Model.Page;
+			pageTile: Model.PageTile;
+	  }
+	| undefined {
 	const nodeEl = above(target, `[${Components.ElementAnchors.element}]`);
 	if (!nodeEl) {
 		return;
@@ -38,11 +43,17 @@ export function pageFromTarget(
 	}
 
 	const page = store.getPageById(pageId);
-	if (!page) {
+	const pageTile = store.getPageTile(pageId);
+	console.log(pageTile, 'this is the page tile');
+
+	if (!page || !pageTile) {
 		return;
 	}
 
-	return page;
+	return {
+		page,
+		pageTile
+	};
 }
 
 // Model Element Utils

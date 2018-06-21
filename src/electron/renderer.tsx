@@ -5,7 +5,7 @@ import { webFrame } from 'electron';
 import { ServerMessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
-import { AlvaApp, EditHistory, PatternLibrary, Project } from '../model';
+import { AlvaApp, EditHistory, PatternLibrary, Project, PageTile } from '../model';
 import * as Path from 'path';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
@@ -19,7 +19,8 @@ webFrame.setLayoutZoomLevelLimits(0, 0);
 
 const app = new AlvaApp();
 const history = new EditHistory();
-const store = new ViewStore({ app, history });
+const pageTile = new PageTile();
+const store = new ViewStore({ app, history, pageTile });
 
 const id = `s${uuid
 	.v4()

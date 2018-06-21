@@ -6,13 +6,8 @@ export interface PageTileInit {
 }
 
 export class PageTile {
-	@Mobx.observable private isDragging: boolean;
-	@Mobx.observable private targetSignalIsHighlighted: boolean;
-
-	public constructor(init: PageTileInit) {
-		this.isDragging = init.isDragging;
-		this.targetSignalIsHighlighted = init.targetSignalIsHighlighted;
-	}
+	@Mobx.observable private isDragging: boolean = false;
+	@Mobx.observable private targetSignalIsHighlighted: boolean = false;
 
 	public getIsDragging(): boolean {
 		return this.isDragging;
@@ -25,6 +20,7 @@ export class PageTile {
 	@Mobx.action
 	public setIsDragging(isDragging: boolean): void {
 		this.isDragging = isDragging;
+		console.log(this.isDragging, 'page tile model');
 	}
 
 	@Mobx.action

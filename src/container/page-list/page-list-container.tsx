@@ -7,7 +7,6 @@ import { PageTileContainer } from './page-tile-container';
 import * as Sender from '../../message/client';
 import * as Component from '../../components';
 import * as Store from '../../store';
-// import * as Types from '../../types';
 import * as utils from '../../utils';
 
 @MobxReact.inject('store')
@@ -16,10 +15,13 @@ export class PageListContainer extends React.Component {
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const draggedPage = utils.pageFromTarget(e.target, store);
-		if (!draggedPage) {
-			e.preventDefault();
-			return;
-		}
+		console.log(draggedPage, '********');
+
+		// if (!draggedPage) {
+		// 	e.preventDefault();
+		// 	return;
+		// }
+		// draggedPage.setIsDragging(true);
 		e.dataTransfer.effectAllowed = 'copy';
 	}
 
@@ -46,6 +48,7 @@ export class PageListContainer extends React.Component {
 						.map(page => (
 							<PageTileContainer
 								highlighted={page.getId() === currentPageId}
+								isDragging={false}
 								focused={page === store.getFocusedItem()}
 								key={page.getId()}
 								page={page}

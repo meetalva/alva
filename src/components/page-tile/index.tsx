@@ -3,7 +3,12 @@ import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
+export const PageAnchors = {
+	page: 'data-id'
+};
+
 export interface PageTileProps {
+	isdragging: boolean;
 	focused: boolean;
 	highlighted: boolean;
 	id?: string;

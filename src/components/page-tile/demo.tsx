@@ -25,6 +25,7 @@ export default (): JSX.Element => (
 					<PageTile
 						focused={false}
 						highlighted={false}
+						isdragging={false}
 						onChange={handleChange}
 					/>
 				</Space>
@@ -32,6 +33,7 @@ export default (): JSX.Element => (
 					<PageTile
 						focused={false}
 						highlighted={true}
+						isdragging={false}
 						onChange={handleChange}
 					/>
 				</Space>
@@ -39,6 +41,7 @@ export default (): JSX.Element => (
 					<PageTile
 						focused={true}
 						highlighted={true}
+						isdragging={false}
 						onChange={handleChange}
 					/>
 				</Space>

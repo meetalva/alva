@@ -2,27 +2,43 @@ import * as React from 'react';
 import * as MobxReact from 'mobx-react';
 import * as uuid from 'uuid';
 
-import * as Sender from '../../message/client';
-import * as Component from '../../components';
 import { ServerMessageType } from '../../message';
 import { PageTileContainer } from './page-tile-container';
-import { ViewStore } from '../../store';
+import * as Sender from '../../message/client';
+import * as Component from '../../components';
+import * as Store from '../../store';
+// import * as Types from '../../types';
+import * as utils from '../../utils';
 
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PageListContainer extends React.Component {
+	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
+		const { store } = this.props as { store: Store.ViewStore };
+		const draggedPage = utils.pageFromTarget(e.target, store);
+		if (!draggedPage) {
+			e.preventDefault();
+			return;
+		}
+		e.dataTransfer.effectAllowed = 'copy';
+	}
+
+	private handleDragOver(e: React.DragEvent<HTMLElement>): void {
+		// const { store } = this.props as { store: Store.ViewStore };
+		// const target = e.target as HTMLElement;
+	}
 	public render(): JSX.Element {
-		const { store } = this.props as { store: ViewStore };
+		const { store } = this.props as { store: Store.ViewStore };
 		const project = store.getProject();
 		const currentPage = store.getCurrentPage();
 		const currentPageId = currentPage ? currentPage.getId() : undefined;
 
 		return (
 			<Component.DragArea
-				onDragStart={e => console.log(e.target)}
-				onDragLeave={e => console.log(e)}
-				onDragOver={e => console.log(e)}
-				onDrop={e => console.log(e)}
+				onDragStart={e => this.handleDragStart(e)}
+				onDragLeave={e => console.log('')}
+				onDragOver={e => this.handleDragOver(e)}
+				onDrop={e => console.log('')}
 			>
 				<Component.Layout wrap={Component.LayoutWrap.Wrap}>
 					{project

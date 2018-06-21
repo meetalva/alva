@@ -166,7 +166,6 @@ export class ElementList extends React.Component {
 				visualTargetElement.setPlaceholderHighlighted(false);
 				return;
 			}
-
 			e.dataTransfer.dropEffect = 'copy';
 			targetContent.setHighlighted(!isSibling);
 			visualTargetElement.setPlaceholderHighlighted(isSibling);

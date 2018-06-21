@@ -962,8 +962,6 @@ export class ViewStore {
 		this.setFocusedItem(FocusedItemType.Page, page);
 
 		this.unsetSelectedElement();
-
-		console.log('setActivePage');
 	}
 
 	@Mobx.action

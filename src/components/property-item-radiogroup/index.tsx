@@ -42,20 +42,25 @@ const StyledRadioGroup = styled.div`
 	}
 	background: ${Color.White};
 	border-radius: 3px;
+	//align-items: center;
 `;
 
 const StyledItem = styled.label`
 	box-sizing: border-box;
+	text-align: center;
 	flex-grow: 1;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	border-right: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-right-width: 0.5px;
 	}
-	background: ${(props: RadiogroupItemProps) => (props.active ? Color.Grey50 : 'transparent')};
+	background: ${(props: RadiogroupItemProps) => (props.active ? Color.Blue40 : 'transparent')};
 	color: ${(props: RadiogroupItemProps) => (props.active ? Color.White : Color.Grey50)};
 
 	&:first-of-type {
-		border-right: none;
 		border-radius: 3px 0 0 3px;
 	}
 
@@ -71,7 +76,11 @@ const StyledInput = styled.input`
 
 export const RadiogroupItem: React.StatelessComponent<RadiogroupItemProps> = props => (
 	<StyledItem icon={props.icon} id={props.id} active={props.active} name={props.name} title={props.name}>
-		<Icon name={props.icon ? props.icon : null} size={IconSize.S} />
+		{props.icon ? (
+			<Icon name={props.icon} size={IconSize.S} />
+		) : (
+			props.name
+		)}
 		<StyledInput type="radio" id={props.id} name="lala" value={props.id} onChange={props.onChange} />
 	</StyledItem>
 );

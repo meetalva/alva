@@ -142,7 +142,8 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 							selectedValue={selectedValue}
 							values={enumProp.getOptions().map(option => ({
 								id: option.getId(),
-								name: option.getName()
+								name: option.getName(),
+								icon: option.getIcon()
 							}))}
 							onChange={e => this.handleEnumChange(e)}
 						/>

@@ -1,5 +1,6 @@
 import { Color } from '../colors';
 import { PropertyItem } from '../property-item';
+import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
@@ -7,6 +8,7 @@ import styled from 'styled-components';
 export interface PropertyItemRadiogroupValues {
 	id: string;
 	name: string;
+	icon: IconName | undefined;
 }
 
 export interface PropertyItemRadiogroupProps {
@@ -23,6 +25,7 @@ export interface RadiogroupItemProps {
 	active: boolean;
 	name: string;
 	id: string;
+	icon: IconName | undefined;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
@@ -42,10 +45,24 @@ const StyledRadioGroup = styled.div`
 `;
 
 const StyledItem = styled.label`
-	overflow: hidden;
+	box-sizing: border-box;
 	flex-grow: 1;
-	font-size: 5px;
+	border-right: 1px solid ${Color.Grey90};
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-right-width: 0.5px;
+	}
 	background: ${(props: RadiogroupItemProps) => (props.active ? Color.Grey50 : 'transparent')};
+	color: ${(props: RadiogroupItemProps) => (props.active ? Color.White : Color.Grey50)};
+
+	&:first-of-type {
+		border-right: none;
+		border-radius: 3px 0 0 3px;
+	}
+
+	&:last-of-type {
+		border-right: none;
+		border-radius: 0 3px 3px 0;
+	}
 `;
 
 const StyledInput = styled.input`
@@ -53,8 +70,8 @@ const StyledInput = styled.input`
 `;
 
 export const RadiogroupItem: React.StatelessComponent<RadiogroupItemProps> = props => (
-	<StyledItem id={props.id} active={props.active} name={props.name}>
-		{props.name}
+	<StyledItem icon={props.icon} id={props.id} active={props.active} name={props.name} title={props.name}>
+		<Icon name={props.icon ? props.icon : null} size={IconSize.S} />
 		<StyledInput type="radio" id={props.id} name="lala" value={props.id} onChange={props.onChange} />
 	</StyledItem>
 );
@@ -64,7 +81,7 @@ export const PropertyItemRadiogroup: React.StatelessComponent<PropertyItemRadiog
 	<PropertyItem description={props.description} label={props.label}>
 		<StyledRadioGroup>
 			{props.values.map(value => (
-				<RadiogroupItem name={value.name} id={value.id} onChange={props.onChange} active={value.id === props.selectedValue} />
+				<RadiogroupItem name={value.name} icon={value.icon} id={value.id} onChange={props.onChange} active={value.id === props.selectedValue} />
 			))}
 		</StyledRadioGroup>
 	</PropertyItem>

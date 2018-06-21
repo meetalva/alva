@@ -1,3 +1,5 @@
+import { IconName } from '../components';
+
 export enum PatternPropertyType {
 	Asset = 'asset',
 	Boolean = 'boolean',
@@ -79,6 +81,7 @@ export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
 
 export interface SerializedEnumOption {
 	contextId: string;
+	icon: IconName | undefined;
 	id: string;
 	name: string;
 	ordinal: string;

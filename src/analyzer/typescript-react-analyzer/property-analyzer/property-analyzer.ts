@@ -231,6 +231,7 @@ function createEnumProperty(
 
 			return {
 				contextId: init,
+				icon: undefined,
 				id: ctx.getEnumOptionId(enumId, name),
 				name,
 				ordinal: init,

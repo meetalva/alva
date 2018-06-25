@@ -136,9 +136,14 @@ export enum AlvaView {
 
 export type SerializedAlvaView = 'PageDetail' | 'SplashScreen';
 
-export enum EditState {
+export enum EditableTitleState {
 	Editable = 'Editable',
 	Editing = 'Editing'
+}
+
+export enum EditableTitleType {
+	Primary,
+	Secondary
 }
 
 export enum SlotType {

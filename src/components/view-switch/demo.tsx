@@ -9,8 +9,9 @@ const DemoViewSwitch: React.StatelessComponent = (): JSX.Element => (
 			onRightClick={() => null}
 			leftVisible={true}
 			rightVisible={true}
-			title="Page Name"
-		/>
+		>
+			Title
+		</ViewSwitch>
 	</DemoContainer>
 );
 

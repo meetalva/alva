@@ -9,20 +9,23 @@ const DemoChrome: React.StatelessComponent<void> = () => (
 	<DemoContainer title="Chrome">
 		<Chrome>
 			<ViewSwitch
+				fontSize={CopySize.M}
 				onLeftClick={() => null}
 				onRightClick={() => null}
 				leftVisible={true}
 				rightVisible={true}
-				title="Page Title"
-			/>
+			>
+				Page Name
+			</ViewSwitch>
 			<ViewSwitch
 				fontSize={CopySize.M}
 				onLeftClick={() => null}
 				onRightClick={() => null}
 				leftVisible={true}
 				rightVisible={true}
-				title="Page Title"
-			/>
+			>
+				Page Name
+			</ViewSwitch>
 		</Chrome>
 		<IconRegistry />
 	</DemoContainer>

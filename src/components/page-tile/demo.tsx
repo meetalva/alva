@@ -5,7 +5,7 @@ import DemoContainer from '../demo-container';
 import { Headline } from '../headline';
 import { Layout } from '../layout';
 import { Space, SpaceSize } from '../space';
-import { EditState, PageTile } from '.';
+import { PageTile } from '.';
 
 const handleChange = (e: React.ChangeEvent<HTMLInputElement>): string => e.target.value;
 
@@ -26,44 +26,20 @@ export default (): JSX.Element => (
 						focused={false}
 						highlighted={false}
 						onChange={handleChange}
-						name="Editable"
-						nameState={EditState.Editable}
-					/>
-				</Space>
-				<Space size={SpaceSize.S}>
-					<PageTile
-						focused={true}
-						highlighted={false}
-						onChange={handleChange}
-						name="Page Name"
-						nameState={EditState.Editable}
-					/>
-				</Space>
-				<Space size={SpaceSize.S}>
-					<PageTile
-						focused={true}
-						highlighted={false}
-						onChange={handleChange}
-						name="Editable Page Name"
-						nameState={EditState.Editable}
 					/>
 				</Space>
 				<Space size={SpaceSize.S}>
 					<PageTile
 						focused={false}
-						highlighted={false}
+						highlighted={true}
 						onChange={handleChange}
-						name="Editable Page Name"
-						nameState={EditState.Editable}
 					/>
 				</Space>
 				<Space size={SpaceSize.S}>
 					<PageTile
-						focused={false}
-						highlighted={false}
+						focused={true}
+						highlighted={true}
 						onChange={handleChange}
-						name="Editable Page Name"
-						nameState={EditState.Editable}
 					/>
 				</Space>
 			</Layout>

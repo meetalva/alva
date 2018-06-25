@@ -1,14 +1,19 @@
 import * as AlvaUtil from '../../alva-util';
+import { ChromeSwitch } from './chrome-switch';
 import { BugReport, Chrome, CopySize, ViewSwitch } from '../../components';
 import { ServerMessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
-import { ChromeSwitch } from './chrome-switch';
+import { Page } from '../../model';
 import * as React from 'react';
 import * as Sender from '../../message/client';
+import * as Types from '../../types';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
 
-interface InjectedChromeContainerProps {
+import { EditableTitleContainer } from '../editable-title/editable-title-container';
+
+export interface InjectedChromeContainerProps {
+	page: Page;
 	store: ViewStore;
 }
 
@@ -46,7 +51,6 @@ export const ChromeContainer = MobxReact.inject('store')(
 
 		const previous = index > 0 ? toPreviousPage : AlvaUtil.noop;
 		const next = index < pages.length ? toNextPage : AlvaUtil.noop;
-
 		return (
 			<Chrome
 				onDoubleClick={() => {
@@ -65,8 +69,14 @@ export const ChromeContainer = MobxReact.inject('store')(
 					rightVisible={index < pages.length - 1}
 					onLeftClick={previous}
 					onRightClick={next}
-					title={page ? page.getName() : ''}
-				/>
+				>
+					<EditableTitleContainer
+						focused={props.focused}
+						page={page}
+						secondary={Types.EditableTitleType.Secondary}
+						value={page ? page.getName() : ''}
+					/>
+				</ViewSwitch>
 				<BugReport
 					title="Found a bug?"
 					onClick={() => {

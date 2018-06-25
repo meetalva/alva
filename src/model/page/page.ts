@@ -48,7 +48,7 @@ export class Page {
 	/**
 	 * Wether the name may be edited
 	 */
-	@Mobx.observable public nameState: Types.EditState = Types.EditState.Editable;
+	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Editable;
 
 	private patternLibrary: PatternLibrary;
 
@@ -202,10 +202,9 @@ export class Page {
 	 * @return The human-friendly name of the page.
 	 */
 	public getName(options?: { unedited: boolean }): string {
-		if ((!options || !options.unedited) && this.nameState === Types.EditState.Editing) {
+		if ((!options || !options.unedited) && this.nameState === Types.EditableTitleState.Editing) {
 			return this.editedName;
 		}
-
 		return this.name;
 	}
 
@@ -213,7 +212,7 @@ export class Page {
 	 * Get the editable state of the page name
 	 * @param state
 	 */
-	public getNameState(): Types.EditState {
+	public getNameState(): Types.EditableTitleState {
 		return this.nameState;
 	}
 
@@ -236,21 +235,19 @@ export class Page {
 	}
 
 	@Mobx.action
-	public setName(name: string): void {
-		if (this.nameState === Types.EditState.Editing) {
+	public setName(name: string, editNameState?: Types.EditableTitleState): void {
+		if (editNameState === Types.EditableTitleState.Editing) {
 			this.editedName = name;
 			return;
 		}
-
 		this.name = name;
 	}
 
 	@Mobx.action
-	public setNameState(state: Types.EditState): void {
-		if (state === Types.EditState.Editing) {
+	public setNameState(state: Types.EditableTitleState): void {
+		if (state === Types.EditableTitleState.Editing) {
 			this.editedName = this.name;
 		}
-
 		this.nameState = state;
 	}
 

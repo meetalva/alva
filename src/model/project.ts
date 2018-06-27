@@ -258,6 +258,17 @@ export class Project {
 	}
 
 	@Mobx.action
+	public reArrangePagesIndex(position: number, page: Page): boolean {
+		if (position > this.pages.length) {
+			return false;
+		}
+		this.removePage(page);
+		this.pages.splice(position, 0, page);
+		console.log('pages index', this.pages.length);
+		return true;
+	}
+
+	@Mobx.action
 	public setId(id: string): void {
 		this.id = name;
 	}

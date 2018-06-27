@@ -201,14 +201,13 @@ export class ElementList extends React.Component {
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
+		console.log('are you even working');
 		const { store } = this.props as { store: Store.ViewStore };
-
 		const target = e.target as HTMLElement;
 		const isSiblingDrop = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
 
 		const draggedElement = store.getDraggedElement();
 		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
-
 		if (!draggedElement || !visualTargetElement) {
 			return;
 		}
@@ -232,7 +231,6 @@ export class ElementList extends React.Component {
 		};
 
 		const index = getDropIndex();
-
 		if (index === -1) {
 			return;
 		}

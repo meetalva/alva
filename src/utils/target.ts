@@ -22,16 +22,15 @@ export function above(node: EventTarget, selector: string): HTMLElement | null {
 	return ended ? null : el;
 }
 
-// Model Page Utils
 export function pageFromTarget(
 	target: EventTarget,
 	store: Store.ViewStore
 ): Model.Page | undefined {
-	const nodeEl = above(target, `[${Components.ElementAnchors.element}]`);
-	if (!nodeEl) {
+	const el = above(target, `[${Components.PageAnchors.page}]`);
+	if (!el) {
 		return;
 	}
-	const pageId = nodeEl.getAttribute(Components.PageAnchors.page);
+	const pageId = el.getAttribute(Components.PageAnchors.page);
 
 	if (typeof pageId !== 'string') {
 		return;
@@ -46,7 +45,6 @@ export function pageFromTarget(
 	return page;
 }
 
-// Model Element Utils
 export function elementFromTarget(
 	target: EventTarget,
 	options: { sibling: boolean; store: Store.ViewStore }

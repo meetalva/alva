@@ -10,7 +10,6 @@ import * as uuid from 'uuid';
 export interface ViewStoreInit {
 	app: Model.AlvaApp;
 	history: Model.EditHistory;
-	pageTile: Model.PageTile;
 }
 
 export enum ClipBoardType {
@@ -56,8 +55,6 @@ export class ViewStore {
 
 	@Mobx.observable private metaDown: boolean = false;
 
-	private pageTile: Model.PageTile;
-
 	@Mobx.observable private project: Model.Project;
 
 	private savedProjects: Types.SavedProject[] = [];
@@ -75,7 +72,6 @@ export class ViewStore {
 	public constructor(init: ViewStoreInit) {
 		this.app = init.app;
 		this.editHistory = init.history;
-		this.pageTile = init.pageTile;
 
 		this.save = debounce(this.save, 1000);
 	}
@@ -657,11 +653,6 @@ export class ViewStore {
 		}
 
 		return project.getPageById(id);
-	}
-
-	public getPageTile(id: string): Model.PageTile | undefined {
-		console.log('111 store', this);
-		return this.pageTile;
 	}
 
 	public getPatternById(id: string): Model.Pattern | undefined {

@@ -1,14 +1,16 @@
-import { Color } from '../colors';
 import * as React from 'react';
-import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
+
+import { Color } from '../colors';
+import { getSpace, SpaceSize } from '../space';
+import { TargetSignal } from '../drag-area';
 
 export const PageAnchors = {
 	page: 'data-id'
 };
 
 export interface PageTileProps {
-	isdragging: boolean;
+	isdroppable: boolean;
 	focused: boolean;
 	highlighted: boolean;
 	id?: string;
@@ -39,8 +41,7 @@ const StyledPageTile = styled.div`
 	box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.15);
 	background-color: ${Color.White};
 	overflow: hidden;
-	margin: ${getSpace(SpaceSize.S)}px;
-	margin-bottom: 0;
+	margin: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.S)}px;
 	font-size: 12px;
 	display: flex;
 	align-items: center;
@@ -55,14 +56,17 @@ const StyledPageTile = styled.div`
 `;
 
 export const PageTile: React.StatelessComponent<PageTileProps> = (props): JSX.Element => (
-	<StyledPageTile
-		draggable
-		focused={props.focused}
-		highlighted={props.highlighted}
-		data-id={props.id}
-		onClick={props.onClick}
-		onDoubleClick={props.onDoubleClick}
-	>
-		{props.children}
-	</StyledPageTile>
+	<React.Fragment>
+		<TargetSignal visible={props.isdroppable} />
+		<StyledPageTile
+			draggable
+			focused={props.focused}
+			highlighted={props.highlighted}
+			data-id={props.id}
+			onClick={props.onClick}
+			onDoubleClick={props.onDoubleClick}
+		>
+			{props.children}
+		</StyledPageTile>
+	</React.Fragment>
 );

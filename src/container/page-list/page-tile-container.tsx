@@ -9,7 +9,7 @@ import { EditableTitleContainer } from '../editable-title/editable-title-contain
 export interface PageTileContainerProps {
 	focused: boolean;
 	highlighted: boolean;
-	isDragging: boolean;
+	isdroppable: boolean;
 	page: Page;
 }
 
@@ -44,7 +44,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 			<PageTile
 				focused={props.focused}
 				highlighted={props.highlighted}
-				isdragging={props.isDragging}
+				isdroppable={props.isdroppable}
 				id={props.page.getId()}
 				onClick={e => this.handleClick(e)}
 				onFocus={e => this.handleFocus()}

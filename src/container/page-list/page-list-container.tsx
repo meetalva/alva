@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as uuid from 'uuid';
 
@@ -14,12 +13,10 @@ import * as utils from '../../utils';
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PageListContainer extends React.Component {
-	@Mobx.observable private dropTargetIndex: number;
-	@Mobx.observable private draggedIndex: number;
-
+	private dropTargetIndex: number;
+	private draggedIndex: number;
 	private draggedPage: Page;
 
-	@Mobx.action
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const draggedPage = utils.pageFromTarget(e.target, store);
@@ -27,13 +24,23 @@ export class PageListContainer extends React.Component {
 			e.preventDefault();
 			return;
 		}
-		this.draggedIndex = store.getProject().getPageIndex(draggedPage);
+
 		this.draggedPage = draggedPage;
-		console.log('dragged index', this.draggedIndex);
+		this.draggedIndex = store.getProject().getPageIndex(draggedPage);
 		e.dataTransfer.effectAllowed = 'copy';
 	}
 
-	@Mobx.action
+	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
+		const { store } = this.props as { store: Store.ViewStore };
+		const validDropTarget = utils.pageFromTarget(e.target, store);
+		if (!validDropTarget) {
+			e.preventDefault();
+			return;
+		}
+
+		validDropTarget.setDroppableState(false);
+	}
+
 	private handleDragOver(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const validDropTarget = utils.pageFromTarget(e.target, store);
@@ -44,18 +51,18 @@ export class PageListContainer extends React.Component {
 		}
 		this.dropTargetIndex = store.getProject().getPageIndex(validDropTarget);
 
-		if (this.draggedIndex === this.dropTargetIndex) {
-			return;
+		if (this.draggedIndex !== this.dropTargetIndex) {
+			validDropTarget.setDroppableState(true);
+			e.dataTransfer.dropEffect = 'copy';
 		}
-
-		e.dataTransfer.dropEffect = 'copy';
 	}
 
-	@Mobx.action
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
+		const project = store.getProject();
 
-		store.getProject().reArrangePagesIndex(this.dropTargetIndex, this.draggedPage);
+		project.getPages().forEach((page: Page) => page.setDroppableState(false));
+		project.reArrangePagesIndex(this.dropTargetIndex, this.draggedPage);
 		store.save();
 	}
 
@@ -68,8 +75,8 @@ export class PageListContainer extends React.Component {
 		return (
 			<Component.DragArea
 				onDragStart={e => this.handleDragStart(e)}
-				onDragLeave={e => e}
 				onDragOver={e => this.handleDragOver(e)}
+				onDragLeave={e => this.handleDragLeave(e)}
 				onDrop={e => this.handleDrop(e)}
 			>
 				<Component.Layout wrap={Component.LayoutWrap.Wrap}>
@@ -78,7 +85,7 @@ export class PageListContainer extends React.Component {
 						.map(page => (
 							<PageTileContainer
 								highlighted={page.getId() === currentPageId}
-								isDragging={false}
+								isdroppable={page.getDroppableState()}
 								focused={page === store.getFocusedItem()}
 								key={page.getId()}
 								page={page}

@@ -50,6 +50,8 @@ export class Page {
 	 */
 	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Editable;
 
+	@Mobx.observable public isdroppable: boolean = false;
+
 	private patternLibrary: PatternLibrary;
 
 	private project: Project;
@@ -170,6 +172,10 @@ export class Page {
 		return rootElement.getContentById(id);
 	}
 
+	public getDroppableState(): boolean {
+		return this.isdroppable;
+	}
+
 	public getFocused(): boolean {
 		return this.focused;
 	}
@@ -227,6 +233,11 @@ export class Page {
 	@Mobx.action
 	public setActive(active: boolean): void {
 		this.active = active;
+	}
+
+	@Mobx.action
+	public setDroppableState(isdroppable: boolean): void {
+		this.isdroppable = isdroppable;
 	}
 
 	@Mobx.action

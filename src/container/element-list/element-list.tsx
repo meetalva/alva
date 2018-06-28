@@ -201,7 +201,6 @@ export class ElementList extends React.Component {
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
-		console.log('are you even working');
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
 		const isSiblingDrop = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';

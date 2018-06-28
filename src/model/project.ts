@@ -264,7 +264,6 @@ export class Project {
 		}
 		this.removePage(page);
 		this.pages.splice(position, 0, page);
-		console.log('pages index', this.pages.length);
 		return true;
 	}
 

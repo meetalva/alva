@@ -90,7 +90,7 @@ const StyledMainArea = styled(StyledLayout)`
 const StyledSideBar = styled(StyledLayout)`
 	flex-basis: 240px;
 	height: 100%;
-	overflow-y: hidden;
+	overflow-y: auto;
 `;
 
 export interface FixedAreaProps {

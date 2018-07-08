@@ -21,7 +21,7 @@ export interface AppContext {
 
 export async function startApp(ctx: AppContext): Promise<{ emitter: Events.EventEmitter }> {
 	log.info('App starting...');
-	ctx.win = ctx.win ? ctx.win : (await createWindow()).window;
+
 	const emitter = new Events.EventEmitter();
 
 	// Cast getPort return type from PromiseLike<number> to Promise<number>
@@ -69,12 +69,23 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 	});
 
 	await server.start();
-	log.info(`App started on port ${ctx.port}.`);
+	log.info(`Server started on port ${ctx.port}.`);
+
+	if (ctx.win) {
+		ctx.win.reload();
+	} else {
+		ctx.win = (await createWindow()).window;
+	}
 
 	startUpdater();
 
-	emitter.on('reload', async () => {
-		log.info('App reloading ...');
+	emitter.once('reload', async payload => {
+		log.info(`App reloading ${payload.forced ? 'forcefully' : ''}...`);
+
+		if (payload && payload !== null && payload.forced) {
+			ephemeralStore.clear();
+		}
+
 		await server.stop();
 		sender.stop();
 		server.removeAllListeners();
@@ -83,5 +94,6 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 		stopUpdater();
 	});
 
+	log.info('App started.');
 	return { emitter };
 }

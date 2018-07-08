@@ -28,6 +28,10 @@ export class EphemeralStore {
 		this.store.set('connections', [...connections]);
 	}
 
+	public async clear(): Promise<void> {
+		this.store.clear();
+	}
+
 	public async getConnections(): Promise<EphemeralConnection[]> {
 		const raw = this.store.get('connections');
 

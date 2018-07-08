@@ -78,18 +78,7 @@ export async function createServerMessageHandler(
 				break;
 			}
 			case Message.ServerMessageType.Reload: {
-				/* const lastMainMenuRequest = injection.sender.last(
-					Message.ServerMessageType.MainMenuRequest
-				);
-
-				if (lastMainMenuRequest) {
-					showMainMenu(lastMainMenuRequest.payload, { sender: injection.sender });
-				} */
-
-				const focusedWindow = Electron.BrowserWindow.getFocusedWindow();
-				focusedWindow.reload();
-
-				injection.emitter.emit('reload');
+				injection.emitter.emit('reload', message.payload || {});
 				break;
 			}
 			case Message.ServerMessageType.CreateNewFileRequest: {

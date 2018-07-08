@@ -258,7 +258,7 @@ export type ProjectResponse = Envelope<
 	{ data: Types.SerializedProject | undefined; status: Types.ProjectStatus }
 >;
 export type Redo = EmptyEnvelope<ServerMessageType.Redo>;
-export type Reload = EmptyEnvelope<ServerMessageType.Reload>;
+export type Reload = Envelope<ServerMessageType.Reload, { forced: boolean } | undefined>;
 export type Save = Envelope<ServerMessageType.Save, Types.SavePayload>;
 export type SelectElement = Envelope<ServerMessageType.SelectElement, Types.PatternIdPayload>;
 export type SetPane = Envelope<

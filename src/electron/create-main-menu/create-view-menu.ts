@@ -31,6 +31,19 @@ export function createViewMenu(
 				}
 			},
 			{
+				label: '&Force Reload',
+				accelerator: 'CmdOrCtrl+Shift+R',
+				click: (item: Electron.MenuItem, focusedWindow: Electron.BrowserWindow) => {
+					injection.sender.send({
+						id: uuid.v4(),
+						type: Message.ServerMessageType.Reload,
+						payload: {
+							forced: true
+						}
+					});
+				}
+			},
+			{
 				label: 'Toggle &Full Screen',
 				accelerator: process.platform === 'darwin' ? 'Ctrl+Command+F' : 'F11',
 				click: (item: Electron.MenuItem, focusedWindow: Electron.BrowserWindow) => {

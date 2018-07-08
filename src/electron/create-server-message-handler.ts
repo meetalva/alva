@@ -25,7 +25,6 @@ import * as Util from 'util';
 import * as uuid from 'uuid';
 
 const readFile = Util.promisify(Fs.readFile);
-const writeFile = Util.promisify(Fs.writeFile);
 
 export interface ServerMessageHandlerContext {
 	port: undefined | number;
@@ -44,10 +43,6 @@ export async function createServerMessageHandler(
 	injection: ServerMessageHandlerInjection
 ): Promise<(message: Message.ServerMessage) => Promise<void>> {
 	return async function serverMessageHandler(message: Message.ServerMessage): Promise<void> {
-		if (!message) {
-			return;
-		}
-
 		injection.server.emit('message', message);
 
 		// Handle messages that require
@@ -83,13 +78,13 @@ export async function createServerMessageHandler(
 				break;
 			}
 			case Message.ServerMessageType.Reload: {
-				const lastMainMenuRequest = injection.sender.last(
+				/* const lastMainMenuRequest = injection.sender.last(
 					Message.ServerMessageType.MainMenuRequest
 				);
 
 				if (lastMainMenuRequest) {
 					showMainMenu(lastMainMenuRequest.payload, { sender: injection.sender });
-				}
+				} */
 
 				const focusedWindow = Electron.BrowserWindow.getFocusedWindow();
 				focusedWindow.reload();
@@ -225,14 +220,6 @@ export async function createServerMessageHandler(
 
 				break;
 			}
-			case Message.ServerMessageType.ExportHTML:
-			case Message.ServerMessageType.ExportPDF:
-			case Message.ServerMessageType.ExportPNG:
-			case Message.ServerMessageType.ExportSketch: {
-				const { path, content } = message.payload;
-				writeFile(path, content);
-				break;
-			}
 			case Message.ServerMessageType.ConnectedPatternLibraryNotification: {
 				const project = await requestProject(injection.sender);
 
@@ -274,9 +261,7 @@ export async function createServerMessageHandler(
 
 				const analysisResult = await performAnalysis(path, { previousLibrary });
 
-				// TODO: Expose errors to UI
 				if (analysisResult.type === Types.LibraryAnalysisResultType.Error) {
-					console.error(analysisResult.error);
 					showAnalysisError(analysisResult.error);
 					return;
 				}
@@ -365,7 +350,6 @@ export async function createServerMessageHandler(
 			}
 			case Message.ServerMessageType.OpenExternalURL: {
 				Electron.shell.openExternal(message.payload);
-
 				break;
 			}
 			case Message.ServerMessageType.Maximize: {
@@ -385,16 +369,120 @@ export async function createServerMessageHandler(
 				showContextMenu(message.payload, { sender: injection.sender });
 				break;
 			}
-			case Message.ServerMessageType.MainMenuRequest: {
-				showMainMenu(message.payload, { sender: injection.sender });
-				break;
-			}
 			case Message.ServerMessageType.ChangeApp: {
 				injection.ephemeralStore.setAppState(message.payload.app);
+				const project = await requestProjectSafely(injection.sender);
+
+				showMainMenu(
+					{ app: message.payload.app, project: project ? project.toJSON() : undefined },
+					{ sender: injection.sender }
+				);
+
 				break;
 			}
-			case Message.ServerMessageType.ExportSketchTask: {
-				const fs = await Export.exportHtmlProject({ sender: injection.sender });
+			case Message.ServerMessageType.ExportHtmlProject: {
+				const project = await requestProject(injection.sender);
+
+				const path = await showSaveDialog({
+					defaultPath: `/${project.getName()}.html`,
+					title: `Export ${project.getName()} as HTML file`,
+					filters: [
+						{
+							name: project.getName(),
+							extensions: ['html', 'htm']
+						}
+					]
+				});
+
+				if (!path) {
+					return;
+				}
+
+				const htmlExport = await Export.exportHtmlProject({ project, port: ctx.port });
+
+				if (htmlExport.type === Types.ExportResultType.ExportError) {
+					showError(htmlExport.error);
+					return;
+				}
+
+				const fsResult = await dumpFirstFile(htmlExport.fs, path);
+
+				if (fsResult.type === FsResultType.FsError) {
+					showError(fsResult.error);
+				}
+
+				break;
+			}
+			case Message.ServerMessageType.ExportPngPage: {
+				const project = await requestProject(injection.sender);
+				const activePage = project.getPages().find(p => p.getActive());
+
+				if (!activePage) {
+					return;
+				}
+
+				const index = project.getPages().indexOf(activePage);
+
+				const path = await showSaveDialog({
+					defaultPath: `${project.getName()} - ${index}.png`,
+					title: `Export Page ${index} of ${project.getName()} as PNG`
+				});
+
+				if (!path) {
+					return;
+				}
+
+				const pngExport = await Export.exportPngPage({
+					port: ctx.port,
+					page: activePage
+				});
+
+				if (pngExport.type === Types.ExportResultType.ExportError) {
+					showError(pngExport.error);
+					return;
+				}
+
+				const fsResult = await dumpFirstFile(pngExport.fs, path);
+
+				if (fsResult.type === FsResultType.FsError) {
+					showError(fsResult.error);
+				}
+				break;
+			}
+			case Message.ServerMessageType.ExportSketchPage: {
+				const project = await requestProject(injection.sender);
+				const activePage = project.getPages().find(p => p.getActive());
+
+				if (!activePage) {
+					return;
+				}
+
+				const index = project.getPages().indexOf(activePage);
+
+				const path = await showSaveDialog({
+					defaultPath: `${project.getName()} - Page ${index}.asketch.json`,
+					title: `Export Page ${index} of ${project.getName()} as .asketch.json`
+				});
+
+				if (!path) {
+					return;
+				}
+
+				const sketchExport = await Export.exportSketchPage({
+					port: ctx.port,
+					page: activePage
+				});
+
+				if (sketchExport.type === Types.ExportResultType.ExportError) {
+					showError(sketchExport.error);
+					return;
+				}
+
+				const fsResult = await dumpFirstFile(sketchExport.fs, path);
+
+				if (fsResult.type === FsResultType.FsError) {
+					showError(fsResult.error);
+				}
 			}
 		}
 	};
@@ -472,7 +560,17 @@ async function requestProject(sender: Sender): Promise<Model.Project> {
 	return Model.Project.from(projectResponse.payload.data);
 }
 
+async function requestProjectSafely(sender: Sender): Promise<Model.Project | undefined> {
+	try {
+		return await requestProject(sender);
+	} catch (err) {
+		return;
+	}
+}
+
 function showAnalysisError(error: Error): void {
+	console.error(error);
+
 	Electron.dialog.showMessageBox(
 		{
 			message: 'Sorry, this seems to be an uncompatible library.',
@@ -491,4 +589,63 @@ function showAnalysisError(error: Error): void {
 			}
 		}
 	);
+}
+
+type FsResult<T> = FsError | FsSuccess<T>;
+
+interface FsError {
+	type: FsResultType.FsError;
+	error: Error;
+}
+
+interface FsSuccess<T> {
+	type: FsResultType.FsSuccess;
+	payload: T;
+}
+
+enum FsResultType {
+	FsError,
+	FsSuccess
+}
+
+async function getFirstFile(fs: typeof Fs): Promise<FsResult<Buffer>> {
+	try {
+		const [firstFile] = fs.readdirSync('/');
+		const firstFileContents = fs.readFileSync(`/${firstFile}`);
+
+		return {
+			type: FsResultType.FsSuccess,
+			payload: firstFileContents
+		};
+	} catch (err) {
+		return {
+			type: FsResultType.FsError,
+			error: err
+		};
+	}
+}
+
+async function dumpFirstFile(fs: typeof Fs, targetPath: string): Promise<FsResult<void>> {
+	const firstFileResult = await getFirstFile(fs);
+
+	if (firstFileResult.type === FsResultType.FsError) {
+		return firstFileResult;
+	}
+
+	return writeFile(targetPath, firstFileResult.payload);
+}
+
+function writeFile(path: string, contents: Buffer): Promise<FsResult<void>> {
+	return new Promise(resolve => {
+		Fs.writeFile(path, contents, err => {
+			if (err) {
+				return resolve({
+					type: FsResultType.FsError,
+					error: err
+				});
+			}
+
+			resolve({ type: FsResultType.FsSuccess, payload: undefined });
+		});
+	});
 }

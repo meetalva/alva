@@ -38,18 +38,16 @@ export enum ServerMessageType {
 	ChangeHighlightedElementContent = 'change-highlighted-element-content',
 	ChangePages = 'change-pages',
 	ChangePatternLibraries = 'change-pattern-library',
+	ChangeProject = 'change-project',
 	ChangeSelectedElement = 'change-selected-element',
 	ChangeSelectedElementContent = 'change-selected-element-content',
-	ExportHTML = 'export-html',
-	ExportPDF = 'export-pdf',
-	ExportPNG = 'export-png',
-	ExportSketch = 'export-sketch',
-	ExportSketchTask = 'export-sketch-task',
+	ExportPngPage = 'export-png-page',
+	ExportSketchPage = 'export-sketch-page',
+	ExportHtmlProject = 'export-html-project',
 	HighlightElement = 'highlight-element',
 	KeyboardChange = 'keyboard-change',
 	Log = 'log',
 	Maximize = 'maximize',
-	MainMenuRequest = 'main-menu-request',
 	OpenExternalURL = 'open-external-url',
 	OpenFileRequest = 'open-file-request',
 	OpenFileResponse = 'open-file-response',
@@ -105,6 +103,7 @@ export type ServerMessage =
 	| ChangeSelectedElementContent
 	| ChangePatternLibraries
 	| ChangePages
+	| ChangeProject
 	| NewFileRequest
 	| NewFileResponse
 	| Copy
@@ -114,16 +113,13 @@ export type ServerMessage =
 	| DeletePageElement
 	| Duplicate
 	| DuplicatePageElement
-	| ExportHTML
-	| ExportPDF
-	| ExportPNG
-	| ExportSketch
-	| ExportSketchTask
+	| ExportHtmlProject
+	| ExportPngPage
+	| ExportSketchPage
 	| HighlightElement
 	| KeyboardChange
 	| Log
 	| Maximize
-	| MainMenuRequest
 	| OpenExternalURL
 	| OpenFileRequest
 	| OpenFileResponse
@@ -231,10 +227,6 @@ export type CreateScriptBundleResponse = Envelope<
 >;
 export type Cut = EmptyEnvelope<ServerMessageType.Cut>;
 export type Delete = EmptyEnvelope<ServerMessageType.Delete>;
-export type ExportHTML = Envelope<ServerMessageType.ExportHTML, Types.ExportPayload>;
-export type ExportPDF = Envelope<ServerMessageType.ExportPDF, Types.ExportPayload>;
-export type ExportPNG = Envelope<ServerMessageType.ExportPNG, Types.ExportPayload>;
-export type ExportSketch = Envelope<ServerMessageType.ExportSketch, Types.ExportPayload>;
 export type HighlightElement = Envelope<ServerMessageType.HighlightElement, Types.PatternIdPayload>;
 export type KeyboardChange = Envelope<ServerMessageType.KeyboardChange, { metaDown: boolean }>;
 export type NewFileRequest = EmptyEnvelope<ServerMessageType.CreateNewFileRequest>;
@@ -249,10 +241,6 @@ export type DuplicatePageElement = Envelope<ServerMessageType.DuplicateElement, 
 // tslint:disable-next-line:no-any
 export type Log = Envelope<ServerMessageType.Log, any>;
 export type Maximize = EmptyEnvelope<ServerMessageType.Maximize>;
-export type MainMenuRequest = Envelope<
-	ServerMessageType.MainMenuRequest,
-	{ app: Types.SerializedAlvaApp; project?: Types.SerializedProject }
->;
 export type OpenExternalURL = Envelope<ServerMessageType.OpenExternalURL, string>;
 export type OpenFileRequest = Envelope<
 	ServerMessageType.OpenFileRequest,
@@ -314,4 +302,17 @@ export type UpdatePatternLibraryResponse = Envelope<
 >;
 export type UnHighlightElement = EmptyEnvelope<ServerMessageType.UnHighlightElement>;
 
-export type ExportSketchTask = Envelope<ServerMessageType.ExportSketchTask, { path: string }>;
+export type ExportHtmlProject = Envelope<
+	ServerMessageType.ExportHtmlProject,
+	{ path: string | undefined }
+>;
+export type ExportPngPage = Envelope<ServerMessageType.ExportPngPage, { path: string | undefined }>;
+export type ExportSketchPage = Envelope<
+	ServerMessageType.ExportSketchPage,
+	{ path: string | undefined }
+>;
+
+export type ChangeProject = Envelope<
+	ServerMessageType.ChangeProject,
+	{ project: Types.SerializedProject }
+>;

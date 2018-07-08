@@ -1,7 +1,10 @@
 import { createConnectionHandler } from './create-connection-handler';
 import { createLibrariesRoute } from './create-libraries-route';
 import { createPreviewRoute } from './create-preview-route';
+import { createScreenshotRoute } from './create-screenshot-route';
 import { createScriptsRoute } from './create-scripts-route';
+import { createSketchRoute } from './create-sketch-route';
+import { createStaticRoute } from './create-static-route';
 import { createServerMessageHandler } from './create-server-message-handler';
 import { EventEmitter } from 'events';
 import * as express from 'express';
@@ -14,22 +17,73 @@ export interface ServerOptions {
 	sender: Sender;
 }
 
-export function createServer(options: ServerOptions): Promise<EventEmitter> {
-	return new Promise((resolve, reject) => {
-		const emitter = new EventEmitter();
-		const app = express();
+export interface AlvaServerInit {
+	options: ServerOptions;
+	server: Http.Server;
+	app: express.Express;
+	webSocketServer: WS.Server;
+}
 
-		const server = Http.createServer(app);
-		const webSocketServer = new WS.Server({ server });
+export class AlvaServer extends EventEmitter {
+	private options: ServerOptions;
+	private app: express.Express;
+	private server: Http.Server;
+	private webSocketServer: WS.Server;
 
-		webSocketServer.on('connection', createConnectionHandler({ emitter }));
-		app.get('/preview.html', createPreviewRoute({ sender: options.sender }));
-		app.use('/scripts', createScriptsRoute());
-		app.use('/libraries', createLibrariesRoute({ sender: options.sender }));
+	public constructor(init: AlvaServerInit) {
+		super();
+		this.app = init.app;
+		this.options = init.options;
+		this.server = init.server;
+		this.webSocketServer = init.webSocketServer;
 
-		emitter.on('message', createServerMessageHandler({ webSocketServer }));
+		this.app.get('/preview.html', createPreviewRoute({ sender: this.options.sender }));
 
-		server.once('error', reject);
-		server.listen(options.port, () => resolve(emitter));
+		this.app.use('/static', createStaticRoute({ sender: this.options.sender }));
+
+		this.app.use(
+			'/sketch',
+			createSketchRoute({
+				previewLocation: `http://localhost:${this.options.port}/sketch`,
+				sender: this.options.sender
+			})
+		);
+
+		this.app.use(
+			'/screenshots',
+			createScreenshotRoute({
+				previewLocation: `http://localhost:${this.options.port}/static`,
+				sender: this.options.sender
+			})
+		);
+
+		this.app.use('/scripts', createScriptsRoute());
+		this.app.use('/libraries', createLibrariesRoute({ sender: this.options.sender }));
+
+		this.webSocketServer.on('connection', createConnectionHandler({ emitter: this }));
+		this.on('message', createServerMessageHandler({ webSocketServer: this.webSocketServer }));
+	}
+
+	public start(): Promise<void> {
+		return new Promise((resolve, reject) => {
+			this.server.once('error', reject);
+			this.server.listen(this.options.port, () => resolve());
+		});
+	}
+
+	public stop(): Promise<void> {
+		return new Promise(resolve => this.server.close(resolve));
+	}
+}
+
+export function createServer(options: ServerOptions): AlvaServer {
+	const app = express();
+	const server = Http.createServer(app);
+
+	return new AlvaServer({
+		options,
+		app,
+		server,
+		webSocketServer: new WS.Server({ server })
 	});
 }

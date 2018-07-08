@@ -17,7 +17,7 @@ export function createProjectMessageHandler({
 	store: ViewStore;
 }): ProjectMessageHandler {
 	// tslint:disable-next-line:cyclomatic-complexity
-	return function projectMessagehandler(message: Message.ServerMessage): void {
+	return async function projectMessagehandler(message: Message.ServerMessage): Promise<void> {
 		const project = store.getProject();
 
 		if (!project) {

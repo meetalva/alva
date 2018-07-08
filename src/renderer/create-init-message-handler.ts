@@ -20,6 +20,8 @@ export function createInitMessageHandler({
 	return function initMessageHandler(message: Message.ServerMessage): void {
 		switch (message.type) {
 			case Message.ServerMessageType.StartApp: {
+				store.setServerPort(Number(message.payload.port));
+
 				try {
 					if (message.payload.app) {
 						app.update(Model.AlvaApp.from(message.payload.app));
@@ -28,11 +30,10 @@ export function createInitMessageHandler({
 					console.error(err);
 					app.setState(Types.AppState.Started);
 				} finally {
-					console.log('App started.');
+					console.log(`App started on port ${store.getServerPort()}.`);
 					app.setState(Types.AppState.Started);
 				}
 
-				store.setServerPort(Number(message.payload.port));
 				break;
 			}
 			case Message.ServerMessageType.OpenFileResponse: {

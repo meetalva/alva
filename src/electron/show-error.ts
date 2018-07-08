@@ -2,6 +2,8 @@ import { createGithubIssueUrl } from './create-github-issue-url';
 import * as Electron from 'electron';
 
 export function showError(error: Error): void {
+	console.error(error);
+
 	const url = createGithubIssueUrl(error);
 	const lines = error.message.split('\n');
 

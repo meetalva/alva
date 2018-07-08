@@ -1,4 +1,5 @@
 import * as Express from 'express';
+import * as Path from 'path';
 import * as PreviewDocument from '../preview-document';
 import { ProjectRequestResponsePair, ServerMessageType } from '../message';
 import { Sender } from '../sender/server';
@@ -6,12 +7,12 @@ import * as Model from '../model';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
-export interface PreviewRouteOptions {
+export interface StaticRouteOptions {
 	sender: Sender;
 }
 
-export function createPreviewRoute(options: PreviewRouteOptions): Express.RequestHandler {
-	return async function previewRoute(req: Express.Request, res: Express.Response): Promise<void> {
+export function createStaticRoute(options: StaticRouteOptions): Express.RequestHandler {
+	return async function staticRoute(req: Express.Request, res: Express.Response): Promise<void> {
 		res.type('html');
 
 		const projectResponse = await options.sender.request<ProjectRequestResponsePair>(
@@ -42,16 +43,36 @@ export function createPreviewRoute(options: PreviewRouteOptions): Express.Reques
 		}
 
 		const project = Model.Project.from(projectResponse.payload.data);
+		const firstPage = project.getPages()[0];
+
+		const id = Path.basename(req.path, Path.extname(req.path));
+
+		if (!id && !firstPage) {
+			res.sendStatus(404);
+			return;
+		}
+
+		if (!id && firstPage) {
+			res.redirect(`${firstPage.getId()}.html`);
+			return;
+		}
+
+		const page = project.getPageById(id);
+
+		if (!page) {
+			res.sendStatus(404);
+			return;
+		}
+
+		project.getPages().forEach(p => p.setActive(false));
+		page.setActive(true);
 
 		res.send(
-			PreviewDocument.previewDocument({
-				data: projectResponse.payload.data,
+			PreviewDocument.staticDocument({
+				data: project.toJSON(),
 				scripts: project
 					.getPatternLibraries()
-					.map(
-						lib =>
-							`<script src="/libraries/${lib.getId()}.js" data-bundle="${lib.getBundleId()}"></script>`
-					)
+					.map(lib => `<script data-bundle="${lib.getBundleId()}">${lib.getBundle()}</script>`)
 			})
 		);
 	};

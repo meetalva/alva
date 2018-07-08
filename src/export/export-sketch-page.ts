@@ -5,18 +5,17 @@ import fetch from 'node-fetch';
 
 const MemoryFileSystem = require('memory-fs');
 
-export async function exportHtmlProject({
-	project,
+export async function exportSketchPage({
+	page,
 	port
 }: {
-	project: Model.Project;
-	port?: number;
+	page: Model.Page;
+	port: number | undefined;
 }): Promise<Types.ExportResult> {
 	const fs = new MemoryFileSystem() as typeof Fs;
-	const response = await fetch(`http://localhost:${port}/static/`);
-	const doc = await response.buffer();
-
-	fs.writeFileSync(`/${project.getId()}.html`, doc);
+	const response = await fetch(`http://localhost:${port}/sketch/${page.getId()}.json`);
+	const data = await response.json();
+	fs.writeFileSync(`/${page.getId()}.json`, JSON.stringify(data));
 
 	return {
 		type: Types.ExportResultType.ExportSuccess,

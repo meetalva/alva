@@ -1,3 +1,4 @@
+import { startUpdater, stopUpdater } from './auto-updater';
 import { createServerMessageHandler } from './create-server-message-handler';
 import { createClientMessageHandler } from './create-client-message-handler';
 import * as Electron from 'electron';
@@ -28,7 +29,7 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 	ctx.port = await (getPort({ port: 1879 }) as Promise<number>);
 
 	const sender = new Sender();
-	const server = await createServer({ port: ctx.port, sender });
+	const server = createServer({ port: ctx.port, sender });
 	const ephemeralStore = new Ephemeral.EphemeralStore();
 
 	const serverMessageHandler = await createServerMessageHandler(ctx, {
@@ -37,6 +38,7 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 		server,
 		sender
 	});
+
 	const clientMessageHandler = await createClientMessageHandler({ sender });
 
 	sender.use(message => server.emit('message', message));
@@ -66,14 +68,19 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 		}
 	});
 
-	log.info('App started.');
+	await server.start();
+	log.info(`App started on port ${ctx.port}.`);
 
-	emitter.on('reload', () => {
+	startUpdater();
+
+	emitter.on('reload', async () => {
 		log.info('App reloading ...');
+		await server.stop();
 		sender.stop();
 		server.removeAllListeners();
 		emitter.removeAllListeners();
 		Electron.app.removeAllListeners();
+		stopUpdater();
 	});
 
 	return { emitter };

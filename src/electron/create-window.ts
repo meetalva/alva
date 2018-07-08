@@ -28,7 +28,7 @@ export async function createWindow(): Promise<ElectronWindowContext> {
 	win.maximize();
 
 	// and load the index.html of the app.
-	win.loadURL('data:text/html;charset=utf-8,' + encodeURI(rendererDocument));
+	win.loadURL(`data:text/html;charset=utf-8,${encodeURI(rendererDocument)}`);
 
 	// Emitted when the window is closed.
 	win.on('closed', () => {

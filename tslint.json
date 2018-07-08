@@ -263,7 +263,6 @@
 		"no-trailing-whitespace": [
 			true
 		],
-		"no-unnecessary-callback-wrapper": true,
 		"no-unnecessary-initializer": true,
 		"number-literal-format": true,
 		"object-literal-key-quotes": [

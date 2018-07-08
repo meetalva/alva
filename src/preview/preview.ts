@@ -1,5 +1,6 @@
 import { computeDifference } from './compute-difference';
 import { ElementArea } from './element-area';
+import exportToSketchData from './export-to-sketch-data';
 import { getComponents } from './get-components';
 import { getInitialData } from './get-initial-data';
 import * as Message from '../message';
@@ -19,6 +20,11 @@ declare global {
 	interface Window {
 		// tslint:disable-next-line:no-any
 		renderer: Renderer<any>;
+		rpc: {
+			getDocumentSize(): Promise<{ width: number; height: number }>;
+			// tslint:disable-next-line:no-any
+			exportToSketchData(): Promise<any>;
+		};
 	}
 }
 
@@ -58,7 +64,10 @@ function main(): void {
 		}
 	});
 
-	// (3) Connect to the Alva server for updates
+	// (3) Render the preview application
+	window.renderer.render(store, document.getElementById('preview') as HTMLElement);
+
+	// (4) Connect to the Alva server for updates
 	// - when mode is "live", used for editable preview
 	if (mode === Types.PreviewDocumentMode.Live) {
 		const sender = new Sender({ endpoint: `ws://${window.location.host}` });
@@ -156,54 +165,60 @@ function main(): void {
 				}
 			});
 		});
-	}
 
-	// (4) Render the preview application
-	window.renderer.render(store, document.getElementById('preview') as HTMLElement);
+		// (5) Maintain selection area
+		Mobx.autorun(() => {
+			const selectedElement = store.getSelectedElement();
 
-	// (5) Maintain highlight / selection areas
-	Mobx.autorun(() => {
-		const selectedElement = store.getSelectedElement();
+			const selectionNode = document.getElementById('preview-selection') as HTMLElement;
+			const selectionArea = store.getSelectionArea();
 
-		const selectionNode = document.getElementById('preview-selection') as HTMLElement;
-		const selectionArea = store.getSelectionArea();
+			store.hasSelectedItem() ? selectionArea.show() : selectionArea.hide();
 
-		store.hasSelectedItem() ? selectionArea.show() : selectionArea.hide();
-
-		if (selectedElement && selectedElement.getRole() === Types.ElementRole.Root) {
-			selectionArea.hide();
-		}
-
-		selectionArea.write(selectionNode);
-	});
-
-	Mobx.autorun(() => {
-		const highlightNode = document.getElementById('preview-highlight') as HTMLElement;
-		const highlightArea = store.getHighlightArea();
-
-		store.hasHighlightedItem() ? highlightArea.show() : highlightArea.hide();
-		highlightArea.write(highlightNode);
-	});
-
-	// Notify sytem about meta keypress
-	Mobx.reaction(
-		() => store.getMetaDown(),
-		metaDown => {
-			const sender = store.getSender();
-
-			if (!sender) {
-				return;
+			if (selectedElement && selectedElement.getRole() === Types.ElementRole.Root) {
+				selectionArea.hide();
 			}
 
-			sender.send({
-				id: uuid.v4(),
-				payload: {
-					metaDown
-				},
-				type: Message.PreviewMessageType.KeyboardChange
-			});
-		}
-	);
+			selectionArea.write(selectionNode);
+		});
+
+		// (6) Maintain highlight area
+		Mobx.autorun(() => {
+			const highlightNode = document.getElementById('preview-highlight') as HTMLElement;
+			const highlightArea = store.getHighlightArea();
+
+			store.hasHighlightedItem() ? highlightArea.show() : highlightArea.hide();
+			highlightArea.write(highlightNode);
+		});
+
+		// (7) Notify sytem about meta keypress
+		Mobx.reaction(
+			() => store.getMetaDown(),
+			metaDown => {
+				if (!sender) {
+					return;
+				}
+
+				sender.send({
+					id: uuid.v4(),
+					payload: {
+						metaDown
+					},
+					type: Message.PreviewMessageType.KeyboardChange
+				});
+			}
+		);
+	}
 }
 
 main();
+
+window.rpc = {
+	exportToSketchData,
+	async getDocumentSize(): Promise<{ width: number; height: number }> {
+		return {
+			width: (document.scrollingElement || document.documentElement).scrollWidth,
+			height: (document.scrollingElement || document.documentElement).scrollHeight
+		};
+	}
+};

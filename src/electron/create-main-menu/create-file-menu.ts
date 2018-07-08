@@ -92,58 +92,11 @@ export function createFileMenu(
 								return;
 							}
 
-							const path = await queryPath({
-								title: 'Export Sketch as',
-								typeName: 'Almost Sketch JSON',
-								defaultName: `${activePage.getName()}.asketch`,
-								extname: 'json'
+							injection.sender.send({
+								id: uuid.v4(),
+								type: ServerMessageType.ExportSketchPage,
+								payload: { path: undefined }
 							});
-
-							Electron.dialog.showMessageBox(
-								{
-									type: 'info',
-									message:
-										'Before you can open an exported Sketch-File:\n\n(1) Download & Install "Almost Sketch Plugin"\n\n(2) Open Sketch, run "Plugins > From Almost Sketch to Sketch" and select exported file\n\nWe are currently working on a smoother experience.',
-									buttons: ['OK', 'Download Plugin']
-								},
-								response => {
-									if (response === 1) {
-										Electron.shell.openExternal(
-											'https://github.com/brainly/html-sketchapp/releases/latest'
-										);
-									}
-								}
-							);
-
-							if (path) {
-								injection.sender.send({
-									id: uuid.v4(),
-									type: ServerMessageType.ExportSketchTask,
-									payload: { path }
-								});
-							}
-						}
-					},
-					{
-						label: 'Export Page as PDF',
-						enabled: Boolean(activePage),
-						click: async () => {
-							if (!activePage) {
-								return;
-							}
-
-							const path = await queryPath({
-								title: 'Export PDF as',
-								typeName: 'PDF Document',
-								defaultName: activePage.getName(),
-								extname: 'pdf'
-							});
-
-							if (path) {
-								// TODO
-								// const pdfExporter = new PdfExporter(ctx.store);
-								// pdfExporter.execute(path);
-							}
 						}
 					},
 					{
@@ -154,18 +107,11 @@ export function createFileMenu(
 								return;
 							}
 
-							const path = await queryPath({
-								title: 'Export PNG as',
-								typeName: 'PNG Image',
-								defaultName: activePage.getName(),
-								extname: 'png'
+							injection.sender.send({
+								id: uuid.v4(),
+								type: ServerMessageType.ExportPngPage,
+								payload: { path: undefined }
 							});
-
-							if (path) {
-								// TODO
-								// const pngExporter = new PngExporter(ctx.store);
-								// pngExporter.execute(path);
-							}
 						}
 					},
 					{
@@ -174,23 +120,17 @@ export function createFileMenu(
 					{
 						label: 'Export Project as HTML',
 						enabled: Boolean(activePage),
+						accelerator: 'CmdOrCtrl+Shift+E',
 						click: async () => {
 							if (!project) {
 								return;
 							}
 
-							const path = await queryPath({
-								title: 'Export HTML as',
-								typeName: 'HTML File',
-								defaultName: project.getName(),
-								extname: 'html'
+							injection.sender.send({
+								id: uuid.v4(),
+								type: ServerMessageType.ExportHtmlProject,
+								payload: { path: undefined }
 							});
-
-							if (path) {
-								// TODO
-								// const htmlExporter = new HtmlExporter(ctx.store);
-								// htmlExporter.execute(path);
-							}
 						}
 					}
 				]
@@ -210,24 +150,4 @@ export function createFileMenu(
 			}
 		]
 	};
-}
-
-interface PathQuery {
-	defaultName: string;
-	extname: string;
-	title: string;
-	typeName: string;
-}
-
-function queryPath(options: PathQuery): Promise<string> {
-	return new Promise((resolve, reject) => {
-		Electron.dialog.showSaveDialog(
-			{
-				title: options.title,
-				defaultPath: `${options.defaultName}.${options.extname}`,
-				filters: [{ name: options.typeName, extensions: [options.extname] }]
-			},
-			resolve
-		);
-	});
 }

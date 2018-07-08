@@ -46,18 +46,6 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 	});
 
 	Mobx.autorun(() => {
-		const project = store.getProject();
-
-		send({
-			payload: {
-				app: app.toJSON(),
-				project: project ? project.toJSON() : undefined
-			},
-			type: Message.ServerMessageType.MainMenuRequest
-		});
-	}, opts);
-
-	Mobx.autorun(() => {
 		const metaDown = store.getMetaDown();
 
 		send({

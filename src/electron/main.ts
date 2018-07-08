@@ -11,14 +11,22 @@ const CONTEXT: AppContext = {
 	win: undefined
 };
 
+let restarting: Promise<void> = Promise.resolve();
+
 async function main(): Promise<void> {
 	const StartApp = importFresh('./start-app');
 	const startApp = StartApp.startApp as typeof start;
 	const app = await startApp(CONTEXT);
 
-	app.emitter.on('reload', () => {
+	const restart = async () => {
 		clearModule.match(new RegExp(`^${Path.join(__dirname, '..')}`));
-		main();
+		await main();
+		restarting = Promise.resolve();
+	};
+
+	app.emitter.on('reload', async () => {
+		await restarting;
+		restarting = restart();
 	});
 }
 

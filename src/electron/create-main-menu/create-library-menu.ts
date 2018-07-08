@@ -30,7 +30,7 @@ export function createLibraryMenu(
 
 					injection.sender.send({
 						id: uuid.v4(),
-						payload: undefined,
+						payload: { library: undefined },
 						type: Message.ServerMessageType.ConnectPatternLibraryRequest
 					});
 				}

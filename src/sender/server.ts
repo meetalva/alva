@@ -80,8 +80,8 @@ export class Sender {
 		this.sendHandlers.push(handler);
 	}
 
-	public last(type: Message.ServerMessageType): Message.ServerMessage | undefined {
-		return this.received.get(type);
+	public last<T extends Message.ServerMessage>(type: T['type']): T | undefined {
+		return this.received.get(type) as T;
 	}
 
 	// tslint:disable-next-line:no-any

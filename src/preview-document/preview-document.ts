@@ -1,18 +1,8 @@
 import * as Types from '../types';
 
-export type PreviewDocumentConfig = LivePreviewDocumentConfig | StaticPreviewDocumentConfig;
-
-export interface LivePreviewDocumentConfig {
+export interface PreviewDocumentConfig {
 	data: Types.SerializedProject;
-	mode: Types.PreviewDocumentMode.Live | Types.PreviewDocumentMode.LiveMirror;
-	scripts: string;
-}
-
-export interface StaticPreviewDocumentConfig {
-	content: string;
-	data: Types.SerializedProject;
-	mode: Types.PreviewDocumentMode.Static;
-	scripts: string;
+	scripts: string[];
 }
 
 const PRELOADER = `
@@ -88,11 +78,6 @@ preview,
 </div>
 `;
 
-const LIVE_SCRIPTS = `
-<script src="/scripts/renderer.js" data-script="renderer"><\/script>
-<script src="/scripts/preview.js" data-script="preview"><\/script>
-`;
-
 export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype html>
 <html>
 <head>
@@ -125,20 +110,20 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 </head>
 <body>
 	<div id="preview">
-		${config.mode === Types.PreviewDocumentMode.Static ? config.content : ''}
-		${config.mode === Types.PreviewDocumentMode.Live ? PRELOADER : ''}
+		${PRELOADER}
 	</div>
 	<div id="preview-selection"></div>
 	<div id="preview-highlight"></div>
 	<textarea data-data="alva" style="display: none">${encodeURIComponent(
 		JSON.stringify({
 			data: config.data,
-			mode: config.mode
+			mode: Types.PreviewDocumentMode.Live
 		})
 	)}</textarea>
-	<script src="/scripts/Mobx.js"><\/script>
-	${config.scripts ? config.scripts : ''}
-	${config.mode !== Types.PreviewDocumentMode.Static ? LIVE_SCRIPTS : ''}
+	${config.scripts ? config.scripts.join('\n') : ''}
+	<script src="/scripts/Mobx.js" data-script="Mobx"><\/script>
+	<script src="/scripts/renderer.js" data-script="renderer"><\/script>
+	<script src="/scripts/preview.js" data-script="preview"><\/script>
 </body>
 </html>
 `;

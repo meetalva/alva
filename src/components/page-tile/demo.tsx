@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-// import { Copy } from '../copy';
 import DemoContainer from '../demo-container';
 import { EditableTitle, EditableTitleState, EditableTitleType } from '../editable-title';
 import { Layout, LayoutDirection } from '../layout';

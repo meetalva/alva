@@ -46,7 +46,7 @@ const StyledPageTile = styled.div`
 	box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.15);
 	background-color: ${Color.White};
 	overflow: hidden;
-	margin: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.S)}px;
+	margin: ${getSpace(SpaceSize.XS)}px;
 	font-size: 12px;
 	display: flex;
 	align-items: center;

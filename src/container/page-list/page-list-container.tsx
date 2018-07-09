@@ -76,7 +76,6 @@ export class PageListContainer extends React.Component {
 		const project = store.getProject();
 		const currentPage = store.getCurrentPage();
 		const currentPageId = currentPage ? currentPage.getId() : undefined;
-
 		return (
 			<Component.DragArea
 				onDragStart={e => this.handleDragStart(e)}
@@ -84,7 +83,7 @@ export class PageListContainer extends React.Component {
 				onDragLeave={e => this.handleDragLeave(e)}
 				onDrop={e => this.handleDrop(e)}
 			>
-				<Component.Layout wrap={Component.LayoutWrap.Wrap}>
+				<Component.Layout inset={Component.SpaceSize.XS} wrap={Component.LayoutWrap.Wrap}>
 					{project
 						.getPages()
 						.map(page => (

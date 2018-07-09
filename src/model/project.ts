@@ -29,11 +29,11 @@ export interface ProjectCreateInit {
 }
 
 export class Project {
-	@Mobx.observable private elements: Element[] = [];
+	@Mobx.observable private elements: Map<string, Element> = new Map();
 
-	@Mobx.observable private elementActions: ElementAction[] = [];
+	@Mobx.observable private elementActions: Map<string, ElementAction> = new Map();
 
-	@Mobx.observable private elementContents: ElementContent[] = [];
+	@Mobx.observable private elementContents: Map<string, ElementContent> = new Map();
 
 	@Mobx.observable private focusedItemType: Types.FocusedItemType;
 
@@ -169,17 +169,17 @@ export class Project {
 
 	@Mobx.action
 	public addElement(element: Element): void {
-		this.elements.push(element);
+		this.elements.set(element.getId(), element);
 	}
 
 	@Mobx.action
 	public addElementAction(action: ElementAction): void {
-		this.elementActions.push(action);
+		this.elementActions.set(action.getId(), action);
 	}
 
 	@Mobx.action
 	public addElementContent(elementContent: ElementContent): void {
-		this.elementContents.push(elementContent);
+		this.elementContents.set(elementContent.getId(), elementContent);
 	}
 
 	@Mobx.action
@@ -202,27 +202,27 @@ export class Project {
 	}
 
 	public getElementActionById(id: string): undefined | ElementAction {
-		return this.elementActions.find(e => e.getId() === id);
+		return this.elementActions.get(id);
 	}
 
 	public getElementActions(): ElementAction[] {
-		return this.elementActions;
+		return [...this.elementActions.values()];
 	}
 
 	public getElementById(id: string): undefined | Element {
-		return this.elements.find(e => e.getId() === id);
+		return this.elements.get(id);
 	}
 
 	public getElementContentById(id: string): undefined | ElementContent {
-		return this.elementContents.find(e => e.getId() === id);
+		return this.elementContents.get(id);
 	}
 
 	public getElementContents(): ElementContent[] {
-		return this.elementContents;
+		return [...this.elementContents.values()];
 	}
 
 	public getElements(): Element[] {
-		return this.elements;
+		return [...this.elements.values()];
 	}
 
 	public getFocusedItem(): Element | Page | undefined {
@@ -344,32 +344,20 @@ export class Project {
 
 	@Mobx.action
 	public removeElement(element: Element): void {
-		const index = this.elements.indexOf(element);
-
-		if (index === -1) {
-			return;
-		}
+		this.elements.delete(element.getId());
 
 		element.getContents().forEach(content => {
 			this.removeElementContent(content);
 		});
-
-		this.elements.splice(index, 1);
 	}
 
 	@Mobx.action
 	public removeElementContent(elementContent: ElementContent): void {
-		const index = this.elementContents.indexOf(elementContent);
-
-		if (index === -1) {
-			return;
-		}
-
 		elementContent.getElements().forEach(element => {
 			this.removeElement(element);
 		});
 
-		this.elementContents.splice(index, 1);
+		this.elementContents.delete(elementContent.getId());
 	}
 
 	@Mobx.action
@@ -455,15 +443,15 @@ export class Project {
 
 	public toDisk(): Types.SavedProject {
 		const data = this.toJSON();
-		data.elements = this.elements.map(e => e.toDisk());
+		data.elements = this.getElements().map(e => e.toDisk());
 		return data;
 	}
 
 	public toJSON(): Types.SerializedProject {
 		return {
-			elements: this.elements.map(e => e.toJSON()),
-			elementActions: this.elementActions.map(e => e.toJSON()),
-			elementContents: this.elementContents.map(e => e.toJSON()),
+			elements: this.getElements().map(e => e.toJSON()),
+			elementActions: this.getElementActions().map(e => e.toJSON()),
+			elementContents: this.getElementContents().map(e => e.toJSON()),
 			id: this.id,
 			name: this.name,
 			pages: this.pages.map(p => p.toJSON()),
@@ -484,11 +472,13 @@ export class Project {
 
 	@Mobx.action
 	public unsetSelectedElement(): void {
-		this.elements.filter(element => element.getSelected()).forEach(element => {
-			element.setSelected(false);
-			element.getAncestors().forEach(ancestor => {
-				ancestor.setForcedOpen(false);
+		this.getElements()
+			.filter(element => element.getSelected())
+			.forEach(element => {
+				element.setSelected(false);
+				element.getAncestors().forEach(ancestor => {
+					ancestor.setForcedOpen(false);
+				});
 			});
-		});
 	}
 }

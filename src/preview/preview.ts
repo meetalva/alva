@@ -102,6 +102,7 @@ function main(): void {
 						);
 
 						const els = message.payload.elements.map(e => Model.Element.from(e, { project }));
+
 						const previousElements = project.getElements();
 						const elementChanges = computeDifference<Model.Element>(els, previousElements);
 
@@ -115,13 +116,25 @@ function main(): void {
 						elementChanges.removed.forEach(change => project.removeElement(change.before));
 						elementChanges.changed.forEach(change => change.before.update(change.after));
 
-						const highlightedItem =
-							contents.find(c => c.getHighlighted()) || els.find(e => e.getHighlighted());
+						// TODO: The explicit highlighting / selecting below should be done by the diffing,
+						// appears to be broken by a bug, though
+						const highlightedEl = els.find(el => el.getHighlighted());
+						const selectedElement = els.find(el => el.getSelected());
 
-						if (!highlightedItem) {
-							store.unsetHighlightedElement();
-							store.unsetHighlightedElementContent();
+						if (highlightedEl) {
+							const el = store.getElementById(highlightedEl.getId());
+							if (el) {
+								el.setHighlighted(true);
+							}
 						}
+
+						if (selectedElement) {
+							const el = store.getElementById(selectedElement.getId());
+							if (el) {
+								el.setSelected(true);
+							}
+						}
+
 						break;
 					}
 					case Message.ServerMessageType.ChangePatternLibraries: {

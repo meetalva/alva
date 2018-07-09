@@ -51,10 +51,8 @@ export class PageListContainer extends React.Component {
 		}
 		this.dropTargetIndex = store.getProject().getPageIndex(validDropTarget);
 
-		if (this.draggedIndex !== this.dropTargetIndex) {
-			validDropTarget.setDroppableState(true);
-			e.dataTransfer.dropEffect = 'copy';
-		}
+		validDropTarget.setDroppableState(true);
+		e.dataTransfer.dropEffect = 'copy';
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
@@ -63,7 +61,7 @@ export class PageListContainer extends React.Component {
 
 		project.getPages().forEach((page: Page) => page.setDroppableState(false));
 		project.reArrangePagesIndex(this.dropTargetIndex, this.draggedPage);
-		store.save();
+		store.commit();
 	}
 
 	public render(): JSX.Element {

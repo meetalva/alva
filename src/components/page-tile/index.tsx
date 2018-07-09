@@ -9,8 +9,13 @@ export const PageAnchors = {
 	page: 'data-id'
 };
 
+export interface DroppablePage {
+	back: boolean;
+	next: boolean;
+}
+
 export interface PageTileProps {
-	isdroppable: boolean;
+	isDroppable: DroppablePage;
 	focused: boolean;
 	highlighted: boolean;
 	id?: string;
@@ -57,7 +62,7 @@ const StyledPageTile = styled.div`
 
 export const PageTile: React.StatelessComponent<PageTileProps> = (props): JSX.Element => (
 	<React.Fragment>
-		<TargetSignal visible={props.isdroppable} />
+		<TargetSignal visible={props.isDroppable.back} />
 		<StyledPageTile
 			draggable
 			focused={props.focused}
@@ -68,5 +73,6 @@ export const PageTile: React.StatelessComponent<PageTileProps> = (props): JSX.El
 		>
 			{props.children}
 		</StyledPageTile>
+		<TargetSignal visible={props.isDroppable.next} />
 	</React.Fragment>
 );

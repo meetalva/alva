@@ -37,8 +37,8 @@ export class PageListContainer extends React.Component {
 			e.preventDefault();
 			return;
 		}
-
-		validDropTarget.setDroppableState(false);
+		validDropTarget.setDroppableBackState(false);
+		validDropTarget.setDroppableNextState(false);
 	}
 
 	private handleDragOver(e: React.DragEvent<HTMLElement>): void {
@@ -50,8 +50,12 @@ export class PageListContainer extends React.Component {
 			return;
 		}
 		this.dropTargetIndex = store.getProject().getPageIndex(validDropTarget);
+		if (this.draggedIndex >= this.dropTargetIndex) {
+			validDropTarget.setDroppableBackState(true);
+		} else {
+			validDropTarget.setDroppableNextState(true);
+		}
 
-		validDropTarget.setDroppableState(true);
 		e.dataTransfer.dropEffect = 'copy';
 	}
 
@@ -59,7 +63,10 @@ export class PageListContainer extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 		const project = store.getProject();
 
-		project.getPages().forEach((page: Page) => page.setDroppableState(false));
+		project.getPages().forEach((page: Page) => {
+			page.setDroppableBackState(false);
+			page.setDroppableNextState(false);
+		});
 		project.reArrangePagesIndex(this.dropTargetIndex, this.draggedPage);
 		store.commit();
 	}
@@ -83,7 +90,7 @@ export class PageListContainer extends React.Component {
 						.map(page => (
 							<PageTileContainer
 								highlighted={page.getId() === currentPageId}
-								isdroppable={page.getDroppableState()}
+								isDroppable={page.getPageDropState()}
 								focused={page === store.getFocusedItem()}
 								key={page.getId()}
 								page={page}

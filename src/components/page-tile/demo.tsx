@@ -15,7 +15,7 @@ export default (): JSX.Element => (
 				<PageTile
 					focused={false}
 					highlighted={false}
-					isdroppable={false}
+					isDroppable={{ back: false, next: false }}
 					onChange={handleChange}
 				>
 					<EditableTitle
@@ -28,7 +28,12 @@ export default (): JSX.Element => (
 				</PageTile>
 			</Space>
 			<Space size={[SpaceSize.S, SpaceSize.S, 0]}>
-				<PageTile focused={false} highlighted={true} isdroppable={true} onChange={handleChange}>
+				<PageTile
+					focused={false}
+					highlighted={true}
+					isDroppable={{ back: true, next: false }}
+					onChange={handleChange}
+				>
 					<EditableTitle
 						category={EditableTitleType.Primary}
 						focused={false}
@@ -39,7 +44,12 @@ export default (): JSX.Element => (
 				</PageTile>
 			</Space>
 			<Space size={[SpaceSize.S, SpaceSize.S, 0]}>
-				<PageTile focused={true} highlighted={true} isdroppable={false} onChange={handleChange}>
+				<PageTile
+					focused={true}
+					highlighted={true}
+					isDroppable={{ back: false, next: true }}
+					onChange={handleChange}
+				>
 					<EditableTitle
 						category={EditableTitleType.Primary}
 						focused={false}

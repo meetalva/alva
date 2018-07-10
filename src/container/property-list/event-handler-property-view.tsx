@@ -28,12 +28,17 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 			return;
 		}
 
-		const elementAction = new Model.ElementAction({
-			id: uuid.v4(),
-			payload: '',
-			storeActionId: selectedAction.getId(),
-			storePropertyId: selectedAction.getUserStorePropertyId() || ''
-		});
+		const elementAction = new Model.ElementAction(
+			{
+				id: uuid.v4(),
+				payload: '',
+				storeActionId: selectedAction.getId(),
+				storePropertyId: selectedAction.getUserStorePropertyId() || ''
+			},
+			{
+				userStore: project.getUserStore()
+			}
+		);
 
 		project.addElementAction(elementAction);
 		props.elementProperty.setValue(elementAction.getId());

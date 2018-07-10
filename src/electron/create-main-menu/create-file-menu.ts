@@ -1,5 +1,5 @@
 import * as Electron from 'electron';
-import { ServerMessageType } from '../../message';
+import { MessageType } from '../../message';
 import * as Model from '../../model';
 import { Sender } from '../../sender/server';
 import * as Types from '../../types';
@@ -24,7 +24,7 @@ export function createFileMenu(
 				accelerator: 'CmdOrCtrl+N',
 				click: () => {
 					injection.sender.send({
-						type: ServerMessageType.CreateNewFileRequest,
+						type: MessageType.CreateNewFileRequest,
 						id: uuid.v4(),
 						payload: undefined
 					});
@@ -35,7 +35,7 @@ export function createFileMenu(
 				accelerator: 'CmdOrCtrl+O',
 				click: () => {
 					injection.sender.send({
-						type: ServerMessageType.OpenFileRequest,
+						type: MessageType.OpenFileRequest,
 						id: uuid.v4(),
 						payload: undefined
 					});
@@ -50,7 +50,7 @@ export function createFileMenu(
 				accelerator: 'CmdOrCtrl+Shift+N',
 				click: () => {
 					injection.sender.send({
-						type: ServerMessageType.CreateNewPage,
+						type: MessageType.CreateNewPage,
 						id: uuid.v4(),
 						payload: undefined
 					});
@@ -69,7 +69,7 @@ export function createFileMenu(
 						return;
 					}
 					injection.sender.send({
-						type: ServerMessageType.Save,
+						type: MessageType.Save,
 						id: uuid.v4(),
 						payload: {
 							path: project.getPath(),
@@ -94,7 +94,7 @@ export function createFileMenu(
 
 							injection.sender.send({
 								id: uuid.v4(),
-								type: ServerMessageType.ExportSketchPage,
+								type: MessageType.ExportSketchPage,
 								payload: { path: undefined }
 							});
 						}
@@ -109,7 +109,7 @@ export function createFileMenu(
 
 							injection.sender.send({
 								id: uuid.v4(),
-								type: ServerMessageType.ExportPngPage,
+								type: MessageType.ExportPngPage,
 								payload: { path: undefined }
 							});
 						}
@@ -128,7 +128,7 @@ export function createFileMenu(
 
 							injection.sender.send({
 								id: uuid.v4(),
-								type: ServerMessageType.ExportHtmlProject,
+								type: MessageType.ExportHtmlProject,
 								payload: { path: undefined }
 							});
 						}

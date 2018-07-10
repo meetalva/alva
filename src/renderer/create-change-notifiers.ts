@@ -16,72 +16,87 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 		scheduler: window.requestIdleCallback
 	};
 
-	const send = ({ type, payload }) => {
+	Mobx.autorun(() => {
 		Sender.send({
 			id: uuid.v4(),
-			payload,
-			type
-		});
-	};
-
-	// Notifiy preview about page changes
-	Mobx.autorun(() => {
-		send({
 			payload: {
 				pages: store.getPages().map(p => p.toJSON())
 			},
-			type: Message.ServerMessageType.ChangePages
+			type: Message.MessageType.ChangePages
 		});
 	});
 
-	// Notify preview about element / element content changes
 	Mobx.autorun(() => {
 		const elements = store.getElements().map(e => e.toJSON());
+
+		Sender.send({
+			id: uuid.v4(),
+			payload: { elements },
+			type: Message.MessageType.ChangeElements
+		});
+	});
+
+	Mobx.autorun(() => {
 		const elementContents = store.getElementContents().map(e => e.toJSON());
 
-		send({
-			payload: { elements, elementContents },
-			type: Message.ServerMessageType.ChangeElements
+		Sender.send({
+			id: uuid.v4(),
+			payload: { elementContents },
+			type: Message.MessageType.ChangeElementContents
+		});
+	});
+
+	Mobx.autorun(() => {
+		const elementActions = store.getElementActions().map(e => e.toJSON());
+
+		Sender.send({
+			id: uuid.v4(),
+			payload: { elementActions },
+			type: Message.MessageType.ChangeElementActions
 		});
 	});
 
 	Mobx.autorun(() => {
 		const metaDown = store.getMetaDown();
 
-		send({
+		Sender.send({
+			id: uuid.v4(),
 			payload: {
 				metaDown
 			},
-			type: Message.ServerMessageType.KeyboardChange
+			type: Message.MessageType.KeyboardChange
 		});
 	});
 
 	Mobx.autorun(() => {
 		const patternLibraries = store.getPatternLibraries();
 
-		send({
+		Sender.send({
+			id: uuid.v4(),
 			payload: {
 				patternLibraries: patternLibraries.map(l => l.toJSON())
 			},
-			type: Message.ServerMessageType.ChangePatternLibraries
+			type: Message.MessageType.ChangePatternLibraries
 		});
 
-		send({
+		Sender.send({
+			id: uuid.v4(),
 			payload: {
 				libraries: patternLibraries
 					.filter(l => l.getOrigin() === Types.PatternLibraryOrigin.UserProvided)
 					.map(l => l.getId())
 			},
-			type: Message.ServerMessageType.CheckLibraryRequest
+			type: Message.MessageType.CheckLibraryRequest
 		});
 	}, opts);
 
 	Mobx.autorun(() => {
-		send({
+		Sender.send({
+			id: uuid.v4(),
 			payload: {
 				app: store.getApp().toJSON()
 			},
-			type: Message.ServerMessageType.ChangeApp
+			type: Message.MessageType.ChangeApp
 		});
 	}, opts);
 }

@@ -1,4 +1,4 @@
-import { computeDifference } from './compute-difference';
+import { computeDifference } from '../alva-util';
 import { ElementArea } from './element-area';
 import exportToSketchData from './export-to-sketch-data';
 import { getComponents } from './get-components';
@@ -76,45 +76,33 @@ function main(): void {
 		sender.receive(message => {
 			Mobx.transaction(() => {
 				switch (message.type) {
-					case Message.ServerMessageType.KeyboardChange: {
+					case Message.MessageType.KeyboardChange: {
 						store.setMetaDown(message.payload.metaDown);
 						break;
 					}
-					case Message.ServerMessageType.ChangePages: {
-						const pages = message.payload.pages.map(p => Model.Page.from(p, { project }));
-						const previousPages = project.getPages();
-						const pageChanges = computeDifference<Model.Page>(pages, previousPages);
+					case Message.MessageType.ChangePages: {
+						const changes = computeDifference<Model.Page>({
+							after: message.payload.pages.map(p => Model.Page.from(p, { project })),
+							before: project.getPages()
+						});
 
-						pageChanges.added.forEach(change => project.addPage(change.after));
-						pageChanges.changed.forEach(change => change.before.update(change.after));
-						pageChanges.removed.forEach(change => project.removePage(change.before));
+						changes.added.forEach(change => project.addPage(change.after));
+						changes.changed.forEach(change => change.before.update(change.after));
+						changes.removed.forEach(change => project.removePage(change.before));
 
 						break;
 					}
-					case Message.ServerMessageType.ChangeElements: {
-						const contents = message.payload.elementContents.map(e =>
-							Model.ElementContent.from(e, { project })
-						);
-						const previousContents = project.getElementContents();
-						const contentChanges = computeDifference<Model.ElementContent>(
-							contents,
-							previousContents
-						);
-
+					case Message.MessageType.ChangeElements: {
 						const els = message.payload.elements.map(e => Model.Element.from(e, { project }));
 
-						const previousElements = project.getElements();
-						const elementChanges = computeDifference<Model.Element>(els, previousElements);
+						const changes = computeDifference<Model.Element>({
+							before: project.getElements(),
+							after: els
+						});
 
-						contentChanges.added.forEach(change => project.addElementContent(change.after));
-						contentChanges.removed.forEach(change =>
-							project.removeElementContent(change.before)
-						);
-						contentChanges.changed.forEach(change => change.before.update(change.after));
-
-						elementChanges.added.forEach(change => project.addElement(change.after));
-						elementChanges.removed.forEach(change => project.removeElement(change.before));
-						elementChanges.changed.forEach(change => change.before.update(change.after));
+						changes.added.forEach(change => project.addElement(change.after));
+						changes.removed.forEach(change => project.removeElement(change.before));
+						changes.changed.forEach(change => change.before.update(change.after));
 
 						// TODO: The explicit highlighting / selecting below should be done by the diffing,
 						// appears to be broken by a bug, though
@@ -137,15 +125,37 @@ function main(): void {
 
 						break;
 					}
-					case Message.ServerMessageType.ChangePatternLibraries: {
-						const libraries = message.payload.patternLibraries.map(e =>
-							Model.PatternLibrary.from(e)
+					case Message.MessageType.ChangeElementContents: {
+						const contentChanges = computeDifference<Model.ElementContent>({
+							before: project.getElementContents(),
+							after: message.payload.elementContents.map(e =>
+								Model.ElementContent.from(e, { project })
+							)
+						});
+						contentChanges.added.forEach(change => project.addElementContent(change.after));
+						contentChanges.removed.forEach(change =>
+							project.removeElementContent(change.before)
 						);
-
-						const libraryChanges = computeDifference<Model.PatternLibrary>(
-							libraries,
-							project.getPatternLibraries()
-						);
+						contentChanges.changed.forEach(change => change.before.update(change.after));
+						break;
+					}
+					case Message.MessageType.ChangeElementActions: {
+						const changes = computeDifference<Model.ElementAction>({
+							before: project.getElementActions(),
+							after: message.payload.elementActions.map(e =>
+								Model.ElementAction.from(e, { userStore: project.getUserStore() })
+							)
+						});
+						changes.added.forEach(change => project.addElementAction(change.after));
+						changes.removed.forEach(change => project.removeElementAction(change.before));
+						changes.changed.forEach(change => change.before.update(change.after));
+						break;
+					}
+					case Message.MessageType.ChangePatternLibraries: {
+						const libraryChanges = computeDifference<Model.PatternLibrary>({
+							before: project.getPatternLibraries(),
+							after: message.payload.patternLibraries.map(e => Model.PatternLibrary.from(e))
+						});
 
 						libraryChanges.added.forEach(change => {
 							const script = document.createElement('script');
@@ -180,20 +190,20 @@ function main(): void {
 		});
 
 		// (5) Maintain selection area
-		Mobx.autorun(() => {
-			const selectedElement = store.getSelectedElement();
+		Mobx.reaction(
+			() => store.getSelectedElement(),
+			selectedElement => {
+				const selectionArea = store.getSelectionArea();
+				selectedElement ? selectionArea.show() : selectionArea.hide();
 
-			const selectionNode = document.getElementById('preview-selection') as HTMLElement;
-			const selectionArea = store.getSelectionArea();
+				if (selectedElement && selectedElement.getRole() === Types.ElementRole.Root) {
+					selectionArea.hide();
+				}
 
-			store.hasSelectedItem() ? selectionArea.show() : selectionArea.hide();
-
-			if (selectedElement && selectedElement.getRole() === Types.ElementRole.Root) {
-				selectionArea.hide();
+				const selectionNode = document.getElementById('preview-selection') as HTMLElement;
+				selectionArea.write(selectionNode);
 			}
-
-			selectionArea.write(selectionNode);
-		});
+		);
 
 		// (6) Maintain highlight area
 		Mobx.autorun(() => {
@@ -217,10 +227,20 @@ function main(): void {
 					payload: {
 						metaDown
 					},
-					type: Message.PreviewMessageType.KeyboardChange
+					type: Message.MessageType.KeyboardChange
 				});
 			}
 		);
+
+		Mobx.autorun(() => {
+			const userStore = store.getProject().getUserStore();
+
+			sender.send({
+				id: uuid.v4(),
+				payload: { userStore: userStore.toJSON() },
+				type: Message.MessageType.UserStoreChange
+			});
+		});
 	}
 }
 

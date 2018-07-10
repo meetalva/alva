@@ -1,4 +1,5 @@
 import * as Types from '../../types';
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import { UserStore } from '../user-store';
 import { UserStoreProperty } from '../user-store-property';
@@ -48,6 +49,10 @@ export class UserStoreAction {
 		});
 	}
 
+	public equals(b: UserStoreAction): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
+	}
+
 	public getAcceptsProperty(): boolean {
 		return this.acceptsProperty;
 	}
@@ -94,6 +99,15 @@ export class UserStoreAction {
 	@Mobx.action
 	public unsetUserStoreProperty(): void {
 		this.userStorePropertyId = undefined;
+	}
+
+	@Mobx.action
+	public update(b: this): void {
+		this.acceptsProperty = b.acceptsProperty;
+		this.id = b.id;
+		this.name = b.name;
+		this.userStorePropertyId = b.userStorePropertyId;
+		this.type = b.type;
 	}
 }
 

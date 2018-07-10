@@ -3,7 +3,7 @@ import * as Model from '../model';
 import { ViewStore } from '../store';
 import * as Types from '../types';
 
-export type EditMessageHandler = (message: Message.ServerMessage) => void;
+export type EditMessageHandler = (message: Message.Message) => void;
 
 export function createEditMessageHandler({
 	app,
@@ -13,22 +13,22 @@ export function createEditMessageHandler({
 	app: Model.AlvaApp;
 }): EditMessageHandler {
 	// tslint:disable-next-line:cyclomatic-complexity
-	return function editMessageHandler(message: Message.ServerMessage): void {
+	return function editMessageHandler(message: Message.Message): void {
 		// Do not perform custom operations when an input is selected
 		if (document.activeElement.tagName.toLowerCase() === 'input') {
 			return;
 		}
 
 		switch (message.type) {
-			case Message.ServerMessageType.Undo: {
+			case Message.MessageType.Undo: {
 				store.undo();
 				break;
 			}
-			case Message.ServerMessageType.Redo: {
+			case Message.MessageType.Redo: {
 				store.redo();
 				break;
 			}
-			case Message.ServerMessageType.Cut: {
+			case Message.MessageType.Cut: {
 				/*if (app.getActiveView() === Types.AlvaView.Pages) {
 						// TODO: implement this
 						// store.cutSelectedPage();
@@ -38,11 +38,11 @@ export function createEditMessageHandler({
 				}
 				break;
 			}
-			case Message.ServerMessageType.CutElement: {
+			case Message.MessageType.CutElement: {
 				store.executeElementCutById(message.payload);
 				break;
 			}
-			case Message.ServerMessageType.Delete: {
+			case Message.MessageType.Delete: {
 				if (
 					app.getActiveView() === Types.AlvaView.PageDetail &&
 					store.getProject().getFocusedItemType() === Types.FocusedItemType.Page
@@ -58,11 +58,11 @@ export function createEditMessageHandler({
 				}
 				break;
 			}
-			case Message.ServerMessageType.DeleteElement: {
+			case Message.MessageType.DeleteElement: {
 				store.executeElementRemoveById(message.payload);
 				break;
 			}
-			case Message.ServerMessageType.Copy: {
+			case Message.MessageType.Copy: {
 				/*if (app.getActiveView() === Types.AlvaView.Pages) {
 						// TODO: implement this
 						// store.copySelectedPage();
@@ -72,11 +72,11 @@ export function createEditMessageHandler({
 				}
 				break;
 			}
-			case Message.ServerMessageType.CopyElement: {
+			case Message.MessageType.CopyElement: {
 				store.copyElementById(message.payload);
 				break;
 			}
-			case Message.ServerMessageType.Paste: {
+			case Message.MessageType.Paste: {
 				/*if (app.getActiveView() === Types.AlvaView.Pages) {
 						// TODO: implement this
 						// store.pasteAfterSelectedPage();
@@ -86,21 +86,21 @@ export function createEditMessageHandler({
 				}
 				break;
 			}
-			case Message.ServerMessageType.PasteElementBelow: {
+			case Message.MessageType.PasteElementBelow: {
 				store.executeElementPasteAfterById(message.payload);
 				break;
 			}
-			case Message.ServerMessageType.PasteElementInside: {
+			case Message.MessageType.PasteElementInside: {
 				store.executeElementPasteInsideById(message.payload);
 				break;
 			}
-			case Message.ServerMessageType.Duplicate: {
+			case Message.MessageType.Duplicate: {
 				if (app.getActiveView() === Types.AlvaView.PageDetail) {
 					store.executeElementDuplicateSelected();
 				}
 				break;
 			}
-			case Message.ServerMessageType.DuplicateElement: {
+			case Message.MessageType.DuplicateElement: {
 				if (app.getActiveView() === Types.AlvaView.PageDetail) {
 					store.executeElementDuplicateById(message.payload);
 				}

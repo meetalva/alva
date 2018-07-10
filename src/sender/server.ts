@@ -1,24 +1,24 @@
 import { BrowserWindow, ipcMain } from 'electron';
-import { isServerMessage } from './is-server-message';
+import { isMessage } from './is-message';
 import * as uuid from 'uuid';
 import * as Message from '../message';
 
-export type ServerHandler = (message: Message.ServerMessage) => void;
+export type ServerHandler = (message: Message.Message) => void;
 
 // tslint:disable-next-line:no-any
 export type IpcHandler = (e: any, message: any) => void;
 
 export class Sender {
-	private received: Map<Message.ServerMessageType, Message.ServerMessage> = new Map();
+	private received: Map<Message.MessageType, Message.Message> = new Map();
 	private sendHandlers: ServerHandler[] = [];
 
 	// tslint:disable-next-line:no-any
 	private receiveIpcHandlers: IpcHandler[] = [];
 
-	public async receive(handler: (message: Message.ServerMessage) => void): Promise<void> {
+	public async receive(handler: (message: Message.Message) => void): Promise<void> {
 		// tslint:disable-next-line:no-any
 		const receiveHandler = (e: any, message: any) => {
-			if (!isServerMessage(message)) {
+			if (!isMessage(message)) {
 				return;
 			}
 			this.received.set(message.type, message);
@@ -36,7 +36,7 @@ export class Sender {
 		return new Promise((resolve, reject) => {
 			// tslint:disable-next-line:no-any
 			function messageHandler(e: any, responseMessage: any): void {
-				if (!isServerMessage(message)) {
+				if (!isMessage(message)) {
 					return;
 				}
 
@@ -57,8 +57,8 @@ export class Sender {
 		});
 	}
 
-	public async send(message: Message.ServerMessage): Promise<void> {
-		if (!isServerMessage(message)) {
+	public async send(message: Message.Message): Promise<void> {
+		if (!isMessage(message)) {
 			console.warn(`Server tried to send invalid message: ${JSON.stringify(message)}`);
 			return;
 		}
@@ -80,14 +80,14 @@ export class Sender {
 		this.sendHandlers.push(handler);
 	}
 
-	public last<T extends Message.ServerMessage>(type: T['type']): T | undefined {
+	public last<T extends Message.Message>(type: T['type']): T | undefined {
 		return this.received.get(type) as T;
 	}
 
 	// tslint:disable-next-line:no-any
 	public async log(...args: any[]): Promise<void> {
 		this.send({
-			type: Message.ServerMessageType.Log,
+			type: Message.MessageType.Log,
 			id: uuid.v4(),
 			payload: args
 		});

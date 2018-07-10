@@ -1,9 +1,9 @@
 import * as Electron from 'electron';
-import { isServerMessage } from './is-server-message';
+import { isMessage } from './is-message';
 import * as Message from '../message';
 
-export function send(message: Message.ServerMessage): void {
-	if (!isServerMessage(message)) {
+export function send(message: Message.Message): void {
+	if (!isMessage(message)) {
 		console.warn(`Client tried to send invalid message: ${JSON.stringify(message)}`);
 		return;
 	}
@@ -11,9 +11,9 @@ export function send(message: Message.ServerMessage): void {
 	Electron.ipcRenderer.send('message', message);
 }
 
-export function receive(handler: (message: Message.ServerMessage) => void): void {
+export function receive(handler: (message: Message.Message) => void): void {
 	Electron.ipcRenderer.on('message', (e: Electron.Event, message) => {
-		if (!isServerMessage(message)) {
+		if (!isMessage(message)) {
 			return;
 		}
 		handler(message);

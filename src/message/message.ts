@@ -1,7 +1,7 @@
 import { Envelope, EmptyEnvelope } from './envelope';
 import * as Types from '../types';
 
-export enum ServerMessageType {
+export enum MessageType {
 	ActivatePage = 'activate-page',
 	AppLoaded = 'app-loaded',
 	AppRequest = 'app-request',
@@ -34,6 +34,8 @@ export enum ServerMessageType {
 	ChangeActivePage = 'change-active-page',
 	ChangeApp = 'change-app',
 	ChangeElements = 'change-elements',
+	ChangeElementActions = 'change-element-actions',
+	ChangeElementContents = 'change-element-contents',
 	ChangeHighlightedElement = 'change-highlighted-element',
 	ChangeHighlightedElementContent = 'change-highlighted-element-content',
 	ChangePages = 'change-pages',
@@ -71,10 +73,11 @@ export enum ServerMessageType {
 	UnselectElement = 'unselect-element',
 	UpdatePatternLibraryRequest = 'update-pattern-library-request',
 	UpdatePatternLibraryResponse = 'update-pattern-library-response',
-	UnHighlightElement = 'unhighlight-element'
+	UnHighlightElement = 'unhighlight-element',
+	UserStoreChange = 'user-store-change'
 }
 
-export type ServerMessage =
+export type Message =
 	| ActivatePage
 	| AppRequest
 	| AppResponse
@@ -97,6 +100,8 @@ export type ServerMessage =
 	| ChangeActivePage
 	| ChangeApp
 	| ChangeElements
+	| ChangeElementActions
+	| ChangeElementContents
 	| ChangeHighlightedElement
 	| ChangeSelectedElement
 	| ChangeHighlightedElementContent
@@ -143,65 +148,71 @@ export type ServerMessage =
 	| UnselectElement
 	| UpdatePatternLibraryRequest
 	| UpdatePatternLibraryResponse
-	| UnHighlightElement;
+	| UnHighlightElement
+	| ChangeUserStore;
 
-export type ActivatePage = Envelope<ServerMessageType.ActivatePage, { id: string }>;
-export type AppLoaded = EmptyEnvelope<ServerMessageType.AppLoaded>;
-export type AppRequest = EmptyEnvelope<ServerMessageType.AppRequest>;
-export type AppResponse = Envelope<ServerMessageType.AppResponse, { app: Types.SerializedAlvaApp }>;
-export type AssetReadRequest = EmptyEnvelope<ServerMessageType.AssetReadRequest>;
-export type AssetReadResponse = Envelope<ServerMessageType.AssetReadResponse, string | undefined>;
-export type ChangeActivePage = Envelope<ServerMessageType.ChangeActivePage, string | undefined>;
-export type ChangeApp = Envelope<ServerMessageType.ChangeApp, { app: Types.SerializedAlvaApp }>;
+export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
+export type AppLoaded = EmptyEnvelope<MessageType.AppLoaded>;
+export type AppRequest = EmptyEnvelope<MessageType.AppRequest>;
+export type AppResponse = Envelope<MessageType.AppResponse, { app: Types.SerializedAlvaApp }>;
+export type AssetReadRequest = EmptyEnvelope<MessageType.AssetReadRequest>;
+export type AssetReadResponse = Envelope<MessageType.AssetReadResponse, string | undefined>;
+export type ChangeActivePage = Envelope<MessageType.ChangeActivePage, string | undefined>;
+export type ChangeApp = Envelope<MessageType.ChangeApp, { app: Types.SerializedAlvaApp }>;
 export type ChangeElements = Envelope<
-	ServerMessageType.ChangeElements,
-	{ elements: Types.SerializedElement[]; elementContents: Types.SerializedElementContent[] }
+	MessageType.ChangeElements,
+	{ elements: Types.SerializedElement[] }
+>;
+export type ChangeElementContents = Envelope<
+	MessageType.ChangeElementContents,
+	{ elementContents: Types.SerializedElementContent[] }
+>;
+export type ChangeElementActions = Envelope<
+	MessageType.ChangeElementActions,
+	{ elementActions: Types.SerializedElementAction[] }
 >;
 export type ChangeHighlightedElement = Envelope<
-	ServerMessageType.ChangeHighlightedElement,
+	MessageType.ChangeHighlightedElement,
 	string | undefined
 >;
-export type ChangeSelectedElement = Envelope<
-	ServerMessageType.ChangeSelectedElement,
-	string | undefined
->;
+export type ChangeSelectedElement = Envelope<MessageType.ChangeSelectedElement, string | undefined>;
 export type ChangeHighlightedElementContent = Envelope<
-	ServerMessageType.ChangeHighlightedElementContent,
+	MessageType.ChangeHighlightedElementContent,
 	string | undefined
 >;
 export type ChangeSelectedElementContent = Envelope<
-	ServerMessageType.ChangeSelectedElementContent,
+	MessageType.ChangeSelectedElementContent,
 	string | undefined
 >;
 export type ChangePages = Envelope<
-	ServerMessageType.ChangePages,
+	MessageType.ChangePages,
 	{
 		pages: Types.SerializedPage[];
 	}
 >;
-export type CheckForUpdatesRequest = EmptyEnvelope<ServerMessageType.CheckForUpdatesRequest>;
+export type CheckForUpdatesRequest = EmptyEnvelope<MessageType.CheckForUpdatesRequest>;
 export type CheckLibraryRequest = Envelope<
-	ServerMessageType.CheckLibraryRequest,
+	MessageType.CheckLibraryRequest,
 	{
 		libraries: string[];
 	}
 >;
 export type CheckLibraryResponse = Envelope<
-	ServerMessageType.CheckLibraryResponse,
+	MessageType.CheckLibraryResponse,
 	Types.LibraryCheckPayload[]
 >;
 export type ConnectedPatternLibraryNotification = Envelope<
-	ServerMessageType.ConnectedPatternLibraryNotification,
+	MessageType.ConnectedPatternLibraryNotification,
 	Types.LibraryNotificationPayload
 >;
 export type ConnectPatternLibraryRequest = Envelope<
-	ServerMessageType.ConnectPatternLibraryRequest,
+	MessageType.ConnectPatternLibraryRequest,
 	{
 		library: string | undefined;
 	}
 >;
 export type ConnectPatternLibraryResponse = Envelope<
-	ServerMessageType.ConnectPatternLibraryResponse,
+	MessageType.ConnectPatternLibraryResponse,
 	{
 		analysis: Types.LibraryAnalysis;
 		path: string;
@@ -209,110 +220,103 @@ export type ConnectPatternLibraryResponse = Envelope<
 	}
 >;
 export type ContextMenuRequst = Envelope<
-	ServerMessageType.ContextMenuRequest,
+	MessageType.ContextMenuRequest,
 	Types.ContextMenuRequestPayload
 >;
-export type ContentRequest = EmptyEnvelope<ServerMessageType.ContentRequest>;
-export type ContentResponse = Envelope<ServerMessageType.ContentResponse, string>;
-export type Copy = EmptyEnvelope<ServerMessageType.Copy>;
-export type CopyPageElement = Envelope<ServerMessageType.CopyElement, string>;
-export type CreateNewPage = Envelope<ServerMessageType.CreateNewPage, undefined>;
+export type ContentRequest = EmptyEnvelope<MessageType.ContentRequest>;
+export type ContentResponse = Envelope<MessageType.ContentResponse, string>;
+export type Copy = EmptyEnvelope<MessageType.Copy>;
+export type CopyPageElement = Envelope<MessageType.CopyElement, string>;
+export type CreateNewPage = Envelope<MessageType.CreateNewPage, undefined>;
 export type CreateScriptBundleRequest = Envelope<
-	ServerMessageType.CreateScriptBundleRequest,
+	MessageType.CreateScriptBundleRequest,
 	Types.SerializedProject
 >;
 export type CreateScriptBundleResponse = Envelope<
-	ServerMessageType.CreateScriptBundleResponse,
+	MessageType.CreateScriptBundleResponse,
 	Types.FilePayload[]
 >;
-export type Cut = EmptyEnvelope<ServerMessageType.Cut>;
-export type Delete = EmptyEnvelope<ServerMessageType.Delete>;
-export type HighlightElement = Envelope<ServerMessageType.HighlightElement, Types.PatternIdPayload>;
-export type KeyboardChange = Envelope<ServerMessageType.KeyboardChange, { metaDown: boolean }>;
-export type NewFileRequest = EmptyEnvelope<ServerMessageType.CreateNewFileRequest>;
-export type NewFileResponse = Envelope<
-	ServerMessageType.CreateNewFileResponse,
-	Types.ProjectPayload
->;
-export type CutPageElement = Envelope<ServerMessageType.CutElement, string>;
-export type DeletePageElement = Envelope<ServerMessageType.DeleteElement, string>;
-export type Duplicate = EmptyEnvelope<ServerMessageType.Duplicate>;
-export type DuplicatePageElement = Envelope<ServerMessageType.DuplicateElement, string>;
+export type Cut = EmptyEnvelope<MessageType.Cut>;
+export type Delete = EmptyEnvelope<MessageType.Delete>;
+export type HighlightElement = Envelope<MessageType.HighlightElement, Types.PatternIdPayload>;
+export type KeyboardChange = Envelope<MessageType.KeyboardChange, { metaDown: boolean }>;
+export type NewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
+export type NewFileResponse = Envelope<MessageType.CreateNewFileResponse, Types.ProjectPayload>;
+export type CutPageElement = Envelope<MessageType.CutElement, string>;
+export type DeletePageElement = Envelope<MessageType.DeleteElement, string>;
+export type Duplicate = EmptyEnvelope<MessageType.Duplicate>;
+export type DuplicatePageElement = Envelope<MessageType.DuplicateElement, string>;
 // tslint:disable-next-line:no-any
-export type Log = Envelope<ServerMessageType.Log, any>;
-export type Maximize = EmptyEnvelope<ServerMessageType.Maximize>;
-export type OpenExternalURL = Envelope<ServerMessageType.OpenExternalURL, string>;
-export type OpenFileRequest = Envelope<
-	ServerMessageType.OpenFileRequest,
-	{ path: string } | undefined
->;
-export type OpenFileResponse = Envelope<ServerMessageType.OpenFileResponse, Types.ProjectPayload>;
-export type PageChange = Envelope<ServerMessageType.PageChange, Types.PageChangePayload>;
-export type ProjectChange = Envelope<ServerMessageType.ProjectChange, Types.SerializedProject>;
-export type Paste = EmptyEnvelope<ServerMessageType.Paste>;
-export type PastePageElementBelow = Envelope<ServerMessageType.PasteElementBelow, string>;
-export type PastePageElementInside = Envelope<ServerMessageType.PasteElementInside, string>;
-export type ProjectRequest = EmptyEnvelope<ServerMessageType.ProjectRequest>;
+export type Log = Envelope<MessageType.Log, any>;
+export type Maximize = EmptyEnvelope<MessageType.Maximize>;
+export type OpenExternalURL = Envelope<MessageType.OpenExternalURL, string>;
+export type OpenFileRequest = Envelope<MessageType.OpenFileRequest, { path: string } | undefined>;
+export type OpenFileResponse = Envelope<MessageType.OpenFileResponse, Types.ProjectPayload>;
+export type PageChange = Envelope<MessageType.PageChange, Types.PageChangePayload>;
+export type ProjectChange = Envelope<MessageType.ProjectChange, Types.SerializedProject>;
+export type Paste = EmptyEnvelope<MessageType.Paste>;
+export type PastePageElementBelow = Envelope<MessageType.PasteElementBelow, string>;
+export type PastePageElementInside = Envelope<MessageType.PasteElementInside, string>;
+export type ProjectRequest = EmptyEnvelope<MessageType.ProjectRequest>;
 export type ProjectResponse = Envelope<
-	ServerMessageType.ProjectResponse,
+	MessageType.ProjectResponse,
 	{ data: Types.SerializedProject | undefined; status: Types.ProjectStatus }
 >;
-export type Redo = EmptyEnvelope<ServerMessageType.Redo>;
-export type Reload = Envelope<ServerMessageType.Reload, { forced: boolean } | undefined>;
-export type Save = Envelope<ServerMessageType.Save, Types.SavePayload>;
-export type SelectElement = Envelope<ServerMessageType.SelectElement, Types.PatternIdPayload>;
-export type SetPane = Envelope<
-	ServerMessageType.SetPane,
-	{ pane: Types.AppPane; visible: boolean }
->;
-export type ShowError = Envelope<ServerMessageType.ShowError, { message: string; stack: string }>;
+export type Redo = EmptyEnvelope<MessageType.Redo>;
+export type Reload = Envelope<MessageType.Reload, { forced: boolean } | undefined>;
+export type Save = Envelope<MessageType.Save, Types.SavePayload>;
+export type SelectElement = Envelope<MessageType.SelectElement, Types.PatternIdPayload>;
+export type SetPane = Envelope<MessageType.SetPane, { pane: Types.AppPane; visible: boolean }>;
+export type ShowError = Envelope<MessageType.ShowError, { message: string; stack: string }>;
 export type SketchExportRequest = Envelope<
-	ServerMessageType.SketchExportRequest,
+	MessageType.SketchExportRequest,
 	Types.SketchExportPayload
 >;
-export type SketchExportResponse = Envelope<ServerMessageType.SketchExportResponse, string>;
+export type SketchExportResponse = Envelope<MessageType.SketchExportResponse, string>;
 export type StartAppMessage = Envelope<
-	ServerMessageType.StartApp,
+	MessageType.StartApp,
 	{
 		app: Types.SerializedAlvaApp | undefined;
 		port: number;
 	}
 >;
 export type ChangePatternLibraries = Envelope<
-	ServerMessageType.ChangePatternLibraries,
+	MessageType.ChangePatternLibraries,
 	{
 		patternLibraries: Types.SerializedPatternLibrary[];
 	}
 >;
-export type Undo = EmptyEnvelope<ServerMessageType.Undo>;
-export type UnselectElement = EmptyEnvelope<ServerMessageType.UnselectElement>;
+export type Undo = EmptyEnvelope<MessageType.Undo>;
+export type UnselectElement = EmptyEnvelope<MessageType.UnselectElement>;
 export type UpdatePatternLibraryRequest = Envelope<
-	ServerMessageType.UpdatePatternLibraryRequest,
+	MessageType.UpdatePatternLibraryRequest,
 	{
 		id: string;
 	}
 >;
 export type UpdatePatternLibraryResponse = Envelope<
-	ServerMessageType.UpdatePatternLibraryResponse,
+	MessageType.UpdatePatternLibraryResponse,
 	{
 		analysis: Types.LibraryAnalysis;
 		path: string;
 		previousLibraryId: string;
 	}
 >;
-export type UnHighlightElement = EmptyEnvelope<ServerMessageType.UnHighlightElement>;
+export type UnHighlightElement = EmptyEnvelope<MessageType.UnHighlightElement>;
 
 export type ExportHtmlProject = Envelope<
-	ServerMessageType.ExportHtmlProject,
+	MessageType.ExportHtmlProject,
 	{ path: string | undefined }
 >;
-export type ExportPngPage = Envelope<ServerMessageType.ExportPngPage, { path: string | undefined }>;
-export type ExportSketchPage = Envelope<
-	ServerMessageType.ExportSketchPage,
-	{ path: string | undefined }
->;
+export type ExportPngPage = Envelope<MessageType.ExportPngPage, { path: string | undefined }>;
+export type ExportSketchPage = Envelope<MessageType.ExportSketchPage, { path: string | undefined }>;
 
 export type ChangeProject = Envelope<
-	ServerMessageType.ChangeProject,
+	MessageType.ChangeProject,
 	{ project: Types.SerializedProject }
+>;
+
+export type ChangeUserStore = Envelope<
+	MessageType.UserStoreChange,
+	{ userStore: Types.SerializedUserStore }
 >;

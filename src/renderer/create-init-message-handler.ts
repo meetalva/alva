@@ -6,7 +6,7 @@ import { ViewStore } from '../store';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
-export type InitMessageHandler = (message: Message.ServerMessage) => void;
+export type InitMessageHandler = (message: Message.Message) => void;
 
 export function createInitMessageHandler({
 	app,
@@ -17,9 +17,9 @@ export function createInitMessageHandler({
 	history: Model.EditHistory;
 	store: ViewStore;
 }): InitMessageHandler {
-	return function initMessageHandler(message: Message.ServerMessage): void {
+	return function initMessageHandler(message: Message.Message): void {
 		switch (message.type) {
-			case Message.ServerMessageType.StartApp: {
+			case Message.MessageType.StartApp: {
 				store.setServerPort(Number(message.payload.port));
 
 				try {
@@ -36,7 +36,7 @@ export function createInitMessageHandler({
 
 				break;
 			}
-			case Message.ServerMessageType.OpenFileResponse: {
+			case Message.MessageType.OpenFileResponse: {
 				history.clear();
 
 				try {
@@ -56,7 +56,7 @@ export function createInitMessageHandler({
 								.getPatternLibraries()
 								.map(lib => lib.getId())
 						},
-						type: Message.ServerMessageType.CheckLibraryRequest
+						type: Message.MessageType.CheckLibraryRequest
 					});
 				} catch (err) {
 					Sender.send({
@@ -67,13 +67,13 @@ export function createInitMessageHandler({
 							)}".\n Parsing the project failed with: ${err.message}`,
 							stack: err.stack
 						},
-						type: Message.ServerMessageType.ShowError
+						type: Message.MessageType.ShowError
 					});
 				}
 
 				break;
 			}
-			case Message.ServerMessageType.CreateNewFileResponse: {
+			case Message.MessageType.CreateNewFileResponse: {
 				history.clear();
 				const newProject = Model.Project.from(message.payload.contents);
 				store.setProject(newProject);
@@ -81,7 +81,7 @@ export function createInitMessageHandler({
 				store.commit();
 				break;
 			}
-			case Message.ServerMessageType.Log: {
+			case Message.MessageType.Log: {
 				if (Array.isArray(message.payload)) {
 					console.log(...message.payload);
 				} else {
@@ -89,7 +89,7 @@ export function createInitMessageHandler({
 				}
 				break;
 			}
-			case Message.ServerMessageType.KeyboardChange: {
+			case Message.MessageType.KeyboardChange: {
 				store.setMetaDown(message.payload.metaDown);
 			}
 		}

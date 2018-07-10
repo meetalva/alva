@@ -41,26 +41,26 @@ export interface ServerMessageHandlerInjection {
 export async function createServerMessageHandler(
 	ctx: ServerMessageHandlerContext,
 	injection: ServerMessageHandlerInjection
-): Promise<(message: Message.ServerMessage) => Promise<void>> {
-	return async function serverMessageHandler(message: Message.ServerMessage): Promise<void> {
+): Promise<(message: Message.Message) => Promise<void>> {
+	return async function serverMessageHandler(message: Message.Message): Promise<void> {
 		injection.server.emit('message', message);
 
 		// Handle messages that require
 		// access to system / fs
 		// tslint:disable-next-line:cyclomatic-complexity
 		switch (message.type) {
-			case Message.ServerMessageType.CheckForUpdatesRequest: {
+			case Message.MessageType.CheckForUpdatesRequest: {
 				if (ctx.win) {
 					checkForUpdates(ctx.win, true);
 				}
 				break;
 			}
-			case Message.ServerMessageType.AppLoaded: {
+			case Message.MessageType.AppLoaded: {
 				const pathToOpen = await injection.ephemeralStore.getProjectPath();
 
 				injection.sender.send({
 					id: uuid.v4(),
-					type: Message.ServerMessageType.StartApp,
+					type: Message.MessageType.StartApp,
 					payload: {
 						app: await injection.ephemeralStore.getAppState(),
 						port: ctx.port as number
@@ -70,18 +70,18 @@ export async function createServerMessageHandler(
 				if (electronIsDev && pathToOpen) {
 					injection.sender.send({
 						id: uuid.v4(),
-						type: Message.ServerMessageType.OpenFileRequest,
+						type: Message.MessageType.OpenFileRequest,
 						payload: { path: pathToOpen }
 					});
 				}
 
 				break;
 			}
-			case Message.ServerMessageType.Reload: {
+			case Message.MessageType.Reload: {
 				injection.emitter.emit('reload', message.payload || {});
 				break;
 			}
-			case Message.ServerMessageType.CreateNewFileRequest: {
+			case Message.MessageType.CreateNewFileRequest: {
 				const path = await showSaveDialog({
 					title: 'Create New Alva File',
 					defaultPath: 'Untitled Project.alva',
@@ -103,7 +103,7 @@ export async function createServerMessageHandler(
 					injection.ephemeralStore.setProjectPath(path);
 
 					injection.sender.send({
-						type: Message.ServerMessageType.CreateNewFileResponse,
+						type: Message.MessageType.CreateNewFileResponse,
 						id: message.id,
 						payload: {
 							path,
@@ -113,7 +113,7 @@ export async function createServerMessageHandler(
 				}
 				break;
 			}
-			case Message.ServerMessageType.OpenFileRequest: {
+			case Message.MessageType.OpenFileRequest: {
 				const path = await getPath(message.payload);
 
 				if (!path) {
@@ -132,7 +132,7 @@ export async function createServerMessageHandler(
 				}
 
 				injection.sender.send({
-					type: Message.ServerMessageType.OpenFileResponse,
+					type: Message.MessageType.OpenFileResponse,
 					id: message.id,
 					payload: { path, contents: project }
 				});
@@ -141,7 +141,7 @@ export async function createServerMessageHandler(
 
 				break;
 			}
-			case Message.ServerMessageType.AssetReadRequest: {
+			case Message.MessageType.AssetReadRequest: {
 				const paths = await showOpenDialog({
 					title: 'Select an image',
 					properties: ['openFile']
@@ -162,14 +162,14 @@ export async function createServerMessageHandler(
 				const mimeType = MimeTypes.lookup(path) || 'application/octet-stream';
 
 				injection.sender.send({
-					type: Message.ServerMessageType.AssetReadResponse,
+					type: Message.MessageType.AssetReadResponse,
 					id: message.id,
 					payload: `data:${mimeType};base64,${content.toString('base64')}`
 				});
 
 				break;
 			}
-			case Message.ServerMessageType.Save: {
+			case Message.MessageType.Save: {
 				const project = Model.Project.from(message.payload.project);
 
 				project.setPath(message.payload.path);
@@ -178,7 +178,7 @@ export async function createServerMessageHandler(
 				await Persistence.persist(project.getPath(), project);
 				break;
 			}
-			case Message.ServerMessageType.CreateScriptBundleRequest: {
+			case Message.MessageType.CreateScriptBundleRequest: {
 				// TODO: Come up with a proper id
 				const compiler = createCompiler([], {
 					cwd: process.cwd(),
@@ -195,7 +195,7 @@ export async function createServerMessageHandler(
 					const outputFileSystem = compiler.outputFileSystem;
 
 					injection.sender.send({
-						type: Message.ServerMessageType.CreateScriptBundleResponse,
+						type: Message.MessageType.CreateScriptBundleResponse,
 						id: message.id,
 						payload: ['renderer', 'preview']
 							.map(name => ({ name, path: Path.posix.join('/', `${name}.js`) }))
@@ -209,7 +209,7 @@ export async function createServerMessageHandler(
 
 				break;
 			}
-			case Message.ServerMessageType.ConnectedPatternLibraryNotification: {
+			case Message.MessageType.ConnectedPatternLibraryNotification: {
 				const project = await requestProject(injection.sender);
 
 				await injection.ephemeralStore.addConnection({
@@ -220,7 +220,7 @@ export async function createServerMessageHandler(
 
 				break;
 			}
-			case Message.ServerMessageType.ConnectPatternLibraryRequest: {
+			case Message.MessageType.ConnectPatternLibraryRequest: {
 				const project = await requestProject(injection.sender);
 
 				const paths = await showOpenDialog({
@@ -261,7 +261,7 @@ export async function createServerMessageHandler(
 
 				if (!previousLibrary) {
 					injection.sender.send({
-						type: Message.ServerMessageType.ConnectPatternLibraryResponse,
+						type: Message.MessageType.ConnectPatternLibraryResponse,
 						id: message.id,
 						payload: {
 							analysis: analysisResult.result,
@@ -271,7 +271,7 @@ export async function createServerMessageHandler(
 					});
 				} else {
 					injection.sender.send({
-						type: Message.ServerMessageType.UpdatePatternLibraryResponse,
+						type: Message.MessageType.UpdatePatternLibraryResponse,
 						id: message.id,
 						payload: {
 							analysis: analysisResult.result,
@@ -283,7 +283,7 @@ export async function createServerMessageHandler(
 
 				break;
 			}
-			case Message.ServerMessageType.UpdatePatternLibraryRequest: {
+			case Message.MessageType.UpdatePatternLibraryRequest: {
 				const project = await requestProject(injection.sender);
 				const library = project.getPatternLibraryById(message.payload.id);
 
@@ -308,7 +308,7 @@ export async function createServerMessageHandler(
 				}
 
 				injection.sender.send({
-					type: Message.ServerMessageType.UpdatePatternLibraryResponse,
+					type: Message.MessageType.UpdatePatternLibraryResponse,
 					id: message.id,
 					payload: {
 						analysis: analysisResult.result,
@@ -319,12 +319,12 @@ export async function createServerMessageHandler(
 
 				break;
 			}
-			case Message.ServerMessageType.CheckLibraryRequest: {
+			case Message.MessageType.CheckLibraryRequest: {
 				const connections = await injection.ephemeralStore.getConnections();
 
 				injection.sender.send({
 					id: message.id,
-					type: Message.ServerMessageType.CheckLibraryResponse,
+					type: Message.MessageType.CheckLibraryResponse,
 					payload: message.payload.libraries.map(lib => {
 						const connection = connections.find(c => c.libraryId === lib);
 
@@ -337,28 +337,28 @@ export async function createServerMessageHandler(
 				});
 				break;
 			}
-			case Message.ServerMessageType.OpenExternalURL: {
+			case Message.MessageType.OpenExternalURL: {
 				Electron.shell.openExternal(message.payload);
 				break;
 			}
-			case Message.ServerMessageType.Maximize: {
+			case Message.MessageType.Maximize: {
 				if (ctx.win) {
 					ctx.win.isMaximized() ? ctx.win.unmaximize() : ctx.win.maximize();
 				}
 
 				break;
 			}
-			case Message.ServerMessageType.ShowError: {
+			case Message.MessageType.ShowError: {
 				const error = new Error(message.payload.message);
 				error.stack = message.payload.stack;
 				showError(error);
 				break;
 			}
-			case Message.ServerMessageType.ContextMenuRequest: {
+			case Message.MessageType.ContextMenuRequest: {
 				showContextMenu(message.payload, { sender: injection.sender });
 				break;
 			}
-			case Message.ServerMessageType.ChangeApp: {
+			case Message.MessageType.ChangeApp: {
 				injection.ephemeralStore.setAppState(message.payload.app);
 				const project = await requestProjectSafely(injection.sender);
 
@@ -369,7 +369,7 @@ export async function createServerMessageHandler(
 
 				break;
 			}
-			case Message.ServerMessageType.ExportHtmlProject: {
+			case Message.MessageType.ExportHtmlProject: {
 				const project = await requestProject(injection.sender);
 
 				const path = await showSaveDialog({
@@ -402,7 +402,7 @@ export async function createServerMessageHandler(
 
 				break;
 			}
-			case Message.ServerMessageType.ExportPngPage: {
+			case Message.MessageType.ExportPngPage: {
 				const project = await requestProject(injection.sender);
 				const activePage = project.getPages().find(p => p.getActive());
 
@@ -438,7 +438,7 @@ export async function createServerMessageHandler(
 				}
 				break;
 			}
-			case Message.ServerMessageType.ExportSketchPage: {
+			case Message.MessageType.ExportSketchPage: {
 				const project = await requestProject(injection.sender);
 				const activePage = project.getPages().find(p => p.getActive());
 
@@ -528,10 +528,10 @@ async function requestProject(sender: Sender): Promise<Model.Project> {
 	const projectResponse = await sender.request<Message.ProjectRequestResponsePair>(
 		{
 			id: uuid.v4(),
-			type: Message.ServerMessageType.ProjectRequest,
+			type: Message.MessageType.ProjectRequest,
 			payload: undefined
 		},
-		Message.ServerMessageType.ProjectResponse
+		Message.MessageType.ProjectResponse
 	);
 
 	if (projectResponse.payload.status === Types.ProjectStatus.None) {

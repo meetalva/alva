@@ -31,7 +31,7 @@ export function createLibraryMenu(
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: { library: undefined },
-						type: Message.ServerMessageType.ConnectPatternLibraryRequest
+						type: Message.MessageType.ConnectPatternLibraryRequest
 					});
 				}
 			},
@@ -54,7 +54,7 @@ export function createLibraryMenu(
 						.forEach(library => {
 							injection.sender.send({
 								id: uuid.v4(),
-								type: Message.ServerMessageType.UpdatePatternLibraryRequest,
+								type: Message.MessageType.UpdatePatternLibraryRequest,
 								payload: {
 									id: library.getId()
 								}

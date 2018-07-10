@@ -2,7 +2,7 @@ import { App } from '../container/app';
 import { createChangeNotifiers } from './create-change-notifiers';
 import { createServerMessageHandler } from './create-server-message-handler';
 import * as Sender from '../sender/client';
-import { ServerMessageType } from '../message';
+import { MessageType } from '../message';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
 import * as React from 'react';
@@ -16,7 +16,7 @@ export function startRenderer(): void {
 
 	Sender.send({
 		id: uuid.v4(),
-		type: ServerMessageType.AppLoaded,
+		type: MessageType.AppLoaded,
 		payload: undefined
 	});
 

@@ -1,9 +1,9 @@
-import { PreviewMessage, PreviewMessageType } from '../message';
+import { Message, MessageType } from '../message';
 
-const TYPES = Object.values(PreviewMessageType);
+const TYPES = Object.values(MessageType);
 
 // tslint:disable-next-line:no-any
-export function isPreviewMessage(input: any): input is PreviewMessage {
+export function isMessage(input: any): input is Message {
 	if (typeof input !== 'object') {
 		return false;
 	}

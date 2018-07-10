@@ -4,7 +4,7 @@ import * as Sender from '../sender/client';
 import { ViewStore } from '../store';
 import * as Types from '../types';
 
-export type RequestMessageHandler = (message: Message.ServerMessage) => void;
+export type RequestMessageHandler = (message: Message.Message) => void;
 
 export function createRequestMessageHandler({
 	app,
@@ -15,15 +15,15 @@ export function createRequestMessageHandler({
 	history: Model.EditHistory;
 	store: ViewStore;
 }): RequestMessageHandler {
-	return function requestMessageHandler(message: Message.ServerMessage): void {
+	return function requestMessageHandler(message: Message.Message): void {
 		switch (message.type) {
-			case Message.ServerMessageType.ProjectRequest: {
+			case Message.MessageType.ProjectRequest: {
 				const data = store.getProject();
 
 				if (!data) {
 					return Sender.send({
 						id: message.id,
-						type: Message.ServerMessageType.ProjectResponse,
+						type: Message.MessageType.ProjectResponse,
 						payload: {
 							data: undefined,
 							status: Types.ProjectStatus.None
@@ -33,7 +33,7 @@ export function createRequestMessageHandler({
 
 				return Sender.send({
 					id: message.id,
-					type: Message.ServerMessageType.ProjectResponse,
+					type: Message.MessageType.ProjectResponse,
 					payload: {
 						data: data.toJSON(),
 						status: Types.ProjectStatus.Ok

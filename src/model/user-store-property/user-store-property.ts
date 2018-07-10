@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import * as Types from '../../types';
 
@@ -35,6 +36,10 @@ export class UserStoreProperty {
 		});
 	}
 
+	public equals(b: UserStoreProperty): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
+	}
+
 	public getId(): string {
 		return this.id;
 	}
@@ -68,6 +73,14 @@ export class UserStoreProperty {
 			payload: this.payload,
 			type: serializeType(this.type)
 		};
+	}
+
+	@Mobx.action
+	public update(b: UserStoreProperty): void {
+		this.id = b.id;
+		this.name = b.name;
+		this.payload = b.payload;
+		this.type = b.type;
 	}
 }
 

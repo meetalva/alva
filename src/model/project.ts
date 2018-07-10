@@ -1,7 +1,7 @@
 import { Element, ElementContent } from './element';
 import { ElementAction } from './element-action';
-import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
+import * as _ from 'lodash';
 import { Page } from './page';
 import { Pattern, PatternSlot } from './pattern';
 import { PatternLibrary } from './pattern-library';
@@ -152,19 +152,16 @@ export class Project {
 		);
 
 		serialized.elementActions.forEach(elementAction => {
-			project.addElementAction(ElementAction.from(elementAction));
+			project.addElementAction(ElementAction.from(elementAction, { userStore }));
 		});
 
 		return project;
 	}
 
-	public static isEqual(a: Types.SavedProject, b: Types.SavedProject): boolean;
-	public static isEqual(
-		a: Types.SavedProject | Project,
-		b: Types.SavedProject | Project
-	): boolean {
+	public static equals(a: Types.SavedProject, b: Types.SavedProject): boolean;
+	public static equals(a: Types.SavedProject | Project, b: Types.SavedProject | Project): boolean {
 		const toData = input => (input instanceof Project ? input.toDisk() : input);
-		return isEqual(toData(a), toData(b));
+		return _.isEqual(toData(a), toData(b));
 	}
 
 	@Mobx.action
@@ -349,6 +346,11 @@ export class Project {
 		element.getContents().forEach(content => {
 			this.removeElementContent(content);
 		});
+	}
+
+	@Mobx.action
+	public removeElementAction(elementAction: ElementAction): void {
+		this.elementActions.delete(elementAction.getId());
 	}
 
 	@Mobx.action

@@ -12,7 +12,7 @@ export interface ServerMessageHandlerContext {
 	store: ViewStore;
 }
 
-export type ServerMessageHandler = (message: Message.ServerMessage) => void;
+export type ServerMessageHandler = (message: Message.Message) => void;
 
 export function createServerMessageHandler({
 	app,
@@ -24,7 +24,7 @@ export function createServerMessageHandler({
 	const handleProjectMessages = createProjectMessageHandler({ app, history, store });
 	const handleRequestMessages = createRequestMessageHandler({ app, history, store });
 
-	return function serverMessageHandler(message: Message.ServerMessage): void {
+	return function serverMessageHandler(message: Message.Message): void {
 		handleInitMessages(message);
 		handleProjectMessages(message);
 		handleRequestMessages(message);

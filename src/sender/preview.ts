@@ -1,7 +1,6 @@
 import * as AlvaUtil from '../alva-util';
 import * as Message from '../message';
-import { isServerMessage } from './is-server-message';
-import { isPreviewMessage } from './is-preview-message';
+import { isMessage } from './is-message';
 
 export interface SenderInit {
 	endpoint: string;
@@ -16,8 +15,8 @@ export class Sender {
 		this.connection = new WebSocket(this.endpoint);
 	}
 
-	public async send(message: Message.PreviewMessage): Promise<void> {
-		if (!isPreviewMessage) {
+	public async send(message: Message.Message): Promise<void> {
+		if (!isMessage(message)) {
 			return;
 		}
 
@@ -27,7 +26,7 @@ export class Sender {
 	}
 
 	// tslint:disable-next-line:no-any
-	public async receive(handler: (message: Message.ServerMessage) => void): Promise<void> {
+	public async receive(handler: (message: Message.Message) => void): Promise<void> {
 		await onReady(this.connection);
 
 		this.connection.addEventListener('message', e => {
@@ -38,7 +37,7 @@ export class Sender {
 				return;
 			}
 
-			if (!isServerMessage(parseResult.result)) {
+			if (!isMessage(parseResult.result)) {
 				return;
 			}
 

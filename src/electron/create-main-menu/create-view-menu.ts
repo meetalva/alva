@@ -25,7 +25,7 @@ export function createViewMenu(
 				click: (item: Electron.MenuItem, focusedWindow: Electron.BrowserWindow) => {
 					injection.sender.send({
 						id: uuid.v4(),
-						type: Message.ServerMessageType.Reload,
+						type: Message.MessageType.Reload,
 						payload: undefined
 					});
 				}
@@ -36,7 +36,7 @@ export function createViewMenu(
 				click: (item: Electron.MenuItem, focusedWindow: Electron.BrowserWindow) => {
 					injection.sender.send({
 						id: uuid.v4(),
-						type: Message.ServerMessageType.Reload,
+						type: Message.MessageType.Reload,
 						payload: {
 							forced: true
 						}
@@ -68,7 +68,7 @@ export function createViewMenu(
 							payload: {
 								id: previousPage.getId()
 							},
-							type: Message.ServerMessageType.ActivatePage
+							type: Message.MessageType.ActivatePage
 						});
 					}
 				}
@@ -86,7 +86,7 @@ export function createViewMenu(
 							payload: {
 								id: nextPage.getId()
 							},
-							type: Message.ServerMessageType.ActivatePage
+							type: Message.MessageType.ActivatePage
 						});
 					}
 				}
@@ -107,7 +107,7 @@ export function createViewMenu(
 							pane: Types.AppPane.PagesPane,
 							visible: !app.getPanes().has(Types.AppPane.PagesPane)
 						},
-						type: Message.ServerMessageType.SetPane
+						type: Message.MessageType.SetPane
 					});
 				}
 			},
@@ -124,7 +124,7 @@ export function createViewMenu(
 							pane: Types.AppPane.ElementsPane,
 							visible: !app.getPanes().has(Types.AppPane.ElementsPane)
 						},
-						type: Message.ServerMessageType.SetPane
+						type: Message.MessageType.SetPane
 					});
 				}
 			},
@@ -141,7 +141,7 @@ export function createViewMenu(
 							pane: Types.AppPane.PropertiesPane,
 							visible: !app.getPanes().has(Types.AppPane.PropertiesPane)
 						},
-						type: Message.ServerMessageType.SetPane
+						type: Message.MessageType.SetPane
 					});
 				}
 			},

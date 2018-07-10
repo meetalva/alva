@@ -3,7 +3,7 @@ import * as Sender from '../sender/client';
 import * as Components from '../components';
 import { ConnectPaneContainer } from './connect-pane-container';
 import { ElementList } from './element-list';
-import { ServerMessageType } from '../message';
+import { MessageType } from '../message';
 import * as MobxReact from 'mobx-react';
 import { PageListContainer } from './page-list/page-list-container';
 import { PatternListContainer } from './pattern-list';
@@ -46,14 +46,14 @@ export class App extends React.Component {
 						<SplashScreenContainer
 							onPrimaryButtonClick={() => {
 								Sender.send({
-									type: ServerMessageType.CreateNewFileRequest,
+									type: MessageType.CreateNewFileRequest,
 									id: uuid.v4(),
 									payload: undefined
 								});
 							}}
 							onSecondaryButtonClick={() => {
 								Sender.send({
-									type: ServerMessageType.OpenFileRequest,
+									type: MessageType.OpenFileRequest,
 									id: uuid.v4(),
 									payload: undefined
 								});
@@ -137,7 +137,7 @@ export class App extends React.Component {
 												onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
 												onSecondaryButtonClick={() =>
 													Sender.send({
-														type: ServerMessageType.OpenExternalURL,
+														type: MessageType.OpenExternalURL,
 														id: uuid.v4(),
 														payload: 'http://meetalva.github.io/example/example.alva'
 													})

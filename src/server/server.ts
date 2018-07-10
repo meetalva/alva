@@ -9,7 +9,9 @@ import { createServerMessageHandler } from './create-server-message-handler';
 import { EventEmitter } from 'events';
 import * as express from 'express';
 import * as Http from 'http';
+import * as Message from '../message';
 import * as WS from 'ws';
+import { isMessage } from '../sender/is-message';
 import { Sender } from '../sender/server';
 
 export interface ServerOptions {
@@ -73,6 +75,25 @@ export class AlvaServer extends EventEmitter {
 
 	public stop(): Promise<void> {
 		return new Promise(resolve => this.server.close(resolve));
+	}
+
+	public emit(name: 'client-message' | 'message', message: Message.Message): boolean {
+		if (!isMessage(message)) {
+			return false;
+		}
+
+		return super.emit(name, message);
+	}
+
+	public on(name: 'client-message' | 'message', handler: (e: Message.Message) => void): this {
+		// tslint:disable-next-line:no-any
+		super.on(name, (message: any) => {
+			if (!isMessage(message)) {
+				return;
+			}
+			handler(message);
+		});
+		return this;
 	}
 }
 

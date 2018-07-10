@@ -1,6 +1,5 @@
 import { startUpdater, stopUpdater } from './auto-updater';
 import { createServerMessageHandler } from './create-server-message-handler';
-import { createClientMessageHandler } from './create-client-message-handler';
 import * as Electron from 'electron';
 import * as Ephemeral from './ephemeral-store';
 import * as Events from 'events';
@@ -39,12 +38,10 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 		sender
 	});
 
-	const clientMessageHandler = await createClientMessageHandler({ sender });
-
 	sender.use(message => server.emit('message', message));
 
 	sender.receive(serverMessageHandler);
-	server.on('client-message', clientMessageHandler);
+	server.on('client-message', e => sender.send(e));
 
 	Electron.app.on('will-finish-launching', () => {
 		Electron.app.on('open-file', async (event, path) => {
@@ -56,7 +53,7 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 
 			sender.send({
 				id: uuid.v4(),
-				type: Message.ServerMessageType.OpenFileRequest,
+				type: Message.MessageType.OpenFileRequest,
 				payload: { path }
 			});
 		});

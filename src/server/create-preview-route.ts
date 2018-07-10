@@ -1,6 +1,6 @@
 import * as Express from 'express';
 import * as PreviewDocument from '../preview-document';
-import { ProjectRequestResponsePair, ServerMessageType } from '../message';
+import { ProjectRequestResponsePair, MessageType } from '../message';
 import { Sender } from '../sender/server';
 import * as Model from '../model';
 import * as Types from '../types';
@@ -17,10 +17,10 @@ export function createPreviewRoute(options: PreviewRouteOptions): Express.Reques
 		const projectResponse = await options.sender.request<ProjectRequestResponsePair>(
 			{
 				id: uuid.v4(),
-				type: ServerMessageType.ProjectRequest,
+				type: MessageType.ProjectRequest,
 				payload: undefined
 			},
-			ServerMessageType.ProjectResponse
+			MessageType.ProjectResponse
 		);
 
 		if (projectResponse.payload.status === Types.ProjectStatus.None) {

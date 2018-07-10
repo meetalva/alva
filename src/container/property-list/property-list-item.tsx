@@ -1,7 +1,7 @@
 import * as Sender from '../../sender/client';
 import * as Component from '../../components';
 import { EventHandlerPropertyView } from './event-handler-property-view';
-import { ServerMessageType } from '../../message';
+import { MessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { ElementProperty, PatternEnumProperty } from '../../model';
 import * as React from 'react';
@@ -100,7 +100,7 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 
 							Sender.receive(message => {
 								if (
-									message.type === ServerMessageType.AssetReadResponse &&
+									message.type === MessageType.AssetReadResponse &&
 									message.id === transactionId
 								) {
 									property.setValue(message.payload);
@@ -111,7 +111,7 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 							Sender.send({
 								id: transactionId,
 								payload: undefined,
-								type: ServerMessageType.AssetReadRequest
+								type: MessageType.AssetReadRequest
 							});
 						}}
 						placeholder="Or enter URL"

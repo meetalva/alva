@@ -23,49 +23,46 @@ export interface PageContext {
 }
 
 export class Page {
-	@Mobx.observable private active: boolean;
-
 	@Mobx.observable private focused: boolean;
-
-	/**
-	 * Intermediary edited name
-	 */
 	@Mobx.observable private editedName: string = '';
-
-	/**
-	 * The technical unique identifier of this page
-	 */
 	@Mobx.observable private id: string;
-
-	/**
-	 * The human-friendly name of the page.
-	 * In the frontend, to be displayed instead of the ID.
-	 */
 	@Mobx.observable private name: string = 'Page';
-
-	/**
-	 * Wether the name may be edited
-	 */
 	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Editable;
 
 	private project: Project;
-
-	/**
-	 * The root element of the page, the first pattern element of the content tree.
-	 */
 	private rootId: string;
 
 	public constructor(init: PageInit, context: PageContext) {
-		this.active = init.active;
+		this.project = context.project;
 		this.id = init.id;
+
+		this.active = init.active;
 		this.rootId = init.rootId;
 		this.name = init.name;
-		this.project = context.project;
 
 		const rootElement = this.getRoot();
 
 		if (rootElement) {
 			rootElement.setPage(this);
+		}
+	}
+
+	@Mobx.computed
+	private get active(): boolean {
+		return (
+			this.project
+				.getUserStore()
+				.getPageProperty()
+				.getPayload() === this.id
+		);
+	}
+
+	private set active(active: boolean) {
+		if (active) {
+			this.project
+				.getUserStore()
+				.getPageProperty()
+				.setPayload(this.id);
 		}
 	}
 
@@ -127,12 +124,6 @@ export class Page {
 		);
 	}
 
-	/**
-	 * Loads and returns a page from a given JSON object.
-	 * @param jsonObject The JSON object to load from.
-	 * @param id The ID of the resulting page
-	 * @return A new page object containing the loaded data.
-	 */
 	public static from(serializedPage: Types.SerializedPage, context: PageContext): Page {
 		const page = new Page(
 			{
@@ -189,19 +180,10 @@ export class Page {
 		return rootElement.getElementById(id);
 	}
 
-	/**
-	 * Returns the technical (internal) ID of the page.
-	 * @return The technical (internal) ID of the page.
-	 */
 	public getId(): string {
 		return this.id;
 	}
 
-	/**
-	 * Returns the human-friendly name of the page.
-	 * In the frontend, to be displayed instead of the ID.
-	 * @return The human-friendly name of the page.
-	 */
 	public getName(options?: { unedited: boolean }): string {
 		if ((!options || !options.unedited) && this.nameState === Types.EditableTitleState.Editing) {
 			return this.editedName;
@@ -209,18 +191,10 @@ export class Page {
 		return this.name;
 	}
 
-	/**
-	 * Get the editable state of the page name
-	 * @param state
-	 */
 	public getNameState(): Types.EditableTitleState {
 		return this.nameState;
 	}
 
-	/**
-	 * Returns the root element of the page, the first pattern element of the content tree.
-	 * @return The root element of the page.
-	 */
 	public getRoot(): Element | undefined {
 		return this.project.getElementById(this.rootId);
 	}

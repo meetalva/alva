@@ -1,7 +1,7 @@
 import * as AlvaUtil from '../../alva-util';
 import { ChromeSwitch } from './chrome-switch';
 import { BugReport, Chrome, CopySize, ViewSwitch } from '../../components';
-import { ServerMessageType } from '../../message';
+import { MessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
@@ -44,7 +44,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 			<Chrome
 				onDoubleClick={() => {
 					Sender.send({
-						type: ServerMessageType.Maximize,
+						type: MessageType.Maximize,
 						id: uuid.v4(),
 						payload: undefined
 					});
@@ -69,7 +69,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 					title="Found a bug?"
 					onClick={() => {
 						Sender.send({
-							type: ServerMessageType.OpenExternalURL,
+							type: MessageType.OpenExternalURL,
 							id: uuid.v4(),
 							payload: 'https://github.com/meetalva/alva/labels/type%3A%20bug'
 						});

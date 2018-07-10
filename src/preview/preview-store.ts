@@ -145,8 +145,27 @@ export class PreviewStore<V> {
 				return renderProperties;
 			}
 
-			// TODO: Restore event handler things here
-			renderProperties[patternProperty.getPropertyName()] = elementProperty.getValue();
+			if (patternProperty.getType() === Types.PatternPropertyType.EventHandler) {
+				renderProperties[patternProperty.getPropertyName()] = e => {
+					if (this.mode !== Types.PreviewDocumentMode.Static && !this.getMetaDown()) {
+						return;
+					}
+
+					const elementAction = this.project.getElementActionById(
+						elementProperty.getValue() as string
+					);
+
+					if (!elementAction) {
+						return;
+					}
+
+					e.preventDefault();
+					elementAction.execute();
+				};
+			} else {
+				renderProperties[patternProperty.getPropertyName()] = elementProperty.getValue();
+			}
+
 			return renderProperties;
 		}, {});
 	}
@@ -192,7 +211,9 @@ export class PreviewStore<V> {
 	}
 
 	public onElementClick(e: MouseEvent, element: Model.Element): void {
-		console.log('onElementClick!');
+		if (!this.getMetaDown()) {
+			e.preventDefault();
+		}
 	}
 
 	public onElementMouseOver(e: MouseEvent, element: Model.Element): void {
@@ -211,7 +232,7 @@ export class PreviewStore<V> {
 				this.sender.send({
 					id: uuid.v4(),
 					payload: undefined,
-					type: Message.PreviewMessageType.UnHighlightElement
+					type: Message.MessageType.UnHighlightElement
 				});
 				return;
 			}
@@ -221,7 +242,7 @@ export class PreviewStore<V> {
 				payload: {
 					id: element.getId()
 				},
-				type: Message.PreviewMessageType.HighlightElement
+				type: Message.MessageType.HighlightElement
 			});
 		});
 	}
@@ -247,7 +268,7 @@ export class PreviewStore<V> {
 				payload: {
 					id: element.getId()
 				},
-				type: Message.PreviewMessageType.SelectElement
+				type: Message.MessageType.SelectElement
 			});
 		});
 	}
@@ -268,13 +289,13 @@ export class PreviewStore<V> {
 		this.sender.send({
 			id: uuid.v4(),
 			payload: undefined,
-			type: Message.PreviewMessageType.UnselectElement
+			type: Message.MessageType.UnselectElement
 		});
 
 		this.sender.send({
 			id: uuid.v4(),
 			payload: undefined,
-			type: Message.PreviewMessageType.UnHighlightElement
+			type: Message.MessageType.UnHighlightElement
 		});
 	}
 

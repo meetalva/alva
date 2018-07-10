@@ -32,3 +32,5 @@ export interface SerializedUserStore {
 	id: string;
 	properties: SerializedUserStoreProperty[];
 }
+
+export type UserStoreActionPayload = string;

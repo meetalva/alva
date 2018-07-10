@@ -1,6 +1,6 @@
 import * as Sender from '../sender/client';
 import { debounce, isEqual } from 'lodash';
-import { ServerMessageType } from '../message';
+import { MessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
 import * as Types from '../types';
@@ -99,7 +99,7 @@ export class ViewStore {
 	@Mobx.action
 	public connectPatternLibrary(library?: Model.PatternLibrary): void {
 		Sender.send({
-			type: ServerMessageType.ConnectPatternLibraryRequest,
+			type: MessageType.ConnectPatternLibraryRequest,
 			id: uuid.v4(),
 			payload: {
 				library: library ? library.getId() : undefined
@@ -567,6 +567,14 @@ export class ViewStore {
 		return this.project.getElements().some(e => e.getDragged());
 	}
 
+	public getElementActions(): Model.ElementAction[] {
+		if (!this.project) {
+			return [];
+		}
+
+		return this.project.getElementActions();
+	}
+
 	public getElementContents(): Model.ElementContent[] {
 		if (!this.project) {
 			return [];
@@ -839,7 +847,7 @@ export class ViewStore {
 	public requestContextMenu(payload: Types.ContextMenuRequestPayload): void {
 		Sender.send({
 			id: uuid.v4(),
-			type: ServerMessageType.ContextMenuRequest,
+			type: MessageType.ContextMenuRequest,
 			payload
 		});
 	}
@@ -849,7 +857,7 @@ export class ViewStore {
 		const savedProjects = this.getSavedProjects();
 		const savedProject = savedProjects[savedProjects.length - 1];
 
-		if (savedProject && Model.Project.isEqual(savedProject, this.project.toDisk())) {
+		if (savedProject && Model.Project.equals(savedProject, this.project.toDisk())) {
 			return;
 		}
 
@@ -865,7 +873,7 @@ export class ViewStore {
 			Sender.send({
 				id: uuid.v4(),
 				payload,
-				type: ServerMessageType.Save
+				type: MessageType.Save
 			});
 		}
 	}
@@ -1048,7 +1056,7 @@ export class ViewStore {
 
 	public updatePatternLibrary(library: Model.PatternLibrary): void {
 		Sender.send({
-			type: ServerMessageType.UpdatePatternLibraryRequest,
+			type: MessageType.UpdatePatternLibraryRequest,
 			payload: {
 				id: library.getId()
 			},

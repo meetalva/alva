@@ -5,7 +5,7 @@ import { ViewStore } from '../store';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
-export type ProjectMessageHandler = (message: Message.ServerMessage) => void;
+export type ProjectMessageHandler = (message: Message.Message) => void;
 
 export function createProjectMessageHandler({
 	app,
@@ -17,7 +17,7 @@ export function createProjectMessageHandler({
 	store: ViewStore;
 }): ProjectMessageHandler {
 	// tslint:disable-next-line:cyclomatic-complexity
-	return async function projectMessagehandler(message: Message.ServerMessage): Promise<void> {
+	return async function projectMessagehandler(message: Message.Message): Promise<void> {
 		const project = store.getProject();
 
 		if (!project) {
@@ -25,7 +25,7 @@ export function createProjectMessageHandler({
 		}
 
 		switch (message.type) {
-			case Message.ServerMessageType.CreateNewPage: {
+			case Message.MessageType.CreateNewPage: {
 				const page = store.executePageAddNew();
 
 				if (!page) {
@@ -37,7 +37,7 @@ export function createProjectMessageHandler({
 
 				break;
 			}
-			case Message.ServerMessageType.ConnectPatternLibraryResponse: {
+			case Message.MessageType.ConnectPatternLibraryResponse: {
 				const library = Model.PatternLibrary.import(message.payload.analysis);
 				project.addPatternLibrary(library);
 				store.getApp().setRightSidebarTab(Types.RightSidebarTab.ProjectSettings);
@@ -49,12 +49,12 @@ export function createProjectMessageHandler({
 						id: library.getId(),
 						path: message.payload.path
 					},
-					type: Message.ServerMessageType.ConnectedPatternLibraryNotification
+					type: Message.MessageType.ConnectedPatternLibraryNotification
 				});
 
 				break;
 			}
-			case Message.ServerMessageType.UpdatePatternLibraryResponse: {
+			case Message.MessageType.UpdatePatternLibraryResponse: {
 				const previousLibrary = project.getPatternLibraryById(
 					message.payload.previousLibraryId
 				);
@@ -74,12 +74,12 @@ export function createProjectMessageHandler({
 						id: library.getId(),
 						path: message.payload.path
 					},
-					type: Message.ServerMessageType.ConnectedPatternLibraryNotification
+					type: Message.MessageType.ConnectedPatternLibraryNotification
 				});
 
 				break;
 			}
-			case Message.ServerMessageType.CheckLibraryResponse: {
+			case Message.MessageType.CheckLibraryResponse: {
 				message.payload
 					.map(check => ({ library: project.getPatternLibraryById(check.id), check }))
 					.forEach(({ library, check }) => {
@@ -94,38 +94,42 @@ export function createProjectMessageHandler({
 					});
 				break;
 			}
-			case Message.ServerMessageType.SelectElement: {
+			case Message.MessageType.SelectElement: {
 				const element = store.getElementById(message.payload.id);
 				if (element) {
 					store.setSelectedElement(element);
 				}
 				break;
 			}
-			case Message.ServerMessageType.UnselectElement: {
+			case Message.MessageType.UnselectElement: {
 				store.getProject().unsetSelectedElement();
 				break;
 			}
-			case Message.ServerMessageType.HighlightElement: {
+			case Message.MessageType.HighlightElement: {
 				const element = store.getElementById(message.payload.id);
 				if (element) {
 					store.setHighlightedElement(element, { flat: !store.getMetaDown() });
 				}
 				break;
 			}
-			case Message.ServerMessageType.ActivatePage: {
+			case Message.MessageType.ActivatePage: {
 				const page = project.getPageById(message.payload.id);
 				if (page) {
 					store.getProject().setActivePage(page);
 				}
 				break;
 			}
-			case Message.ServerMessageType.SetPane: {
+			case Message.MessageType.SetPane: {
 				app.setPane(message.payload.pane, message.payload.visible);
 				break;
 			}
-			case Message.ServerMessageType.UnHighlightElement: {
+			case Message.MessageType.UnHighlightElement: {
 				store.unsetDraggedElement();
 				store.unsetHighlightedElementContent();
+				break;
+			}
+			case Message.MessageType.UserStoreChange: {
+				project.getUserStore().sync(message);
 			}
 		}
 	};

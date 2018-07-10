@@ -1,5 +1,5 @@
 import * as Electron from 'electron';
-import { ServerMessageType } from '../../message';
+import { MessageType } from '../../message';
 import * as Model from '../../model';
 import { Sender } from '../../sender/server';
 import * as Types from '../../types';
@@ -27,7 +27,7 @@ export function createEditMenu(
 				click: () =>
 					injection.sender.send({
 						id: uuid.v4(),
-						type: ServerMessageType.Undo,
+						type: MessageType.Undo,
 						payload: undefined
 					})
 			},
@@ -39,7 +39,7 @@ export function createEditMenu(
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
-						type: ServerMessageType.Redo
+						type: MessageType.Redo
 					})
 			},
 			{
@@ -53,7 +53,7 @@ export function createEditMenu(
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
-						type: ServerMessageType.Cut
+						type: MessageType.Cut
 					});
 					Electron.Menu.sendActionToFirstResponder('cut:');
 				}
@@ -66,7 +66,7 @@ export function createEditMenu(
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
-						type: ServerMessageType.Copy
+						type: MessageType.Copy
 					});
 					Electron.Menu.sendActionToFirstResponder('copy:');
 				}
@@ -79,7 +79,7 @@ export function createEditMenu(
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
-						type: ServerMessageType.Paste
+						type: MessageType.Paste
 					});
 					Electron.Menu.sendActionToFirstResponder('paste:');
 				}
@@ -95,7 +95,7 @@ export function createEditMenu(
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
-						type: ServerMessageType.Duplicate
+						type: MessageType.Duplicate
 					});
 				}
 			},
@@ -118,7 +118,7 @@ export function createEditMenu(
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
-						type: ServerMessageType.Delete
+						type: MessageType.Delete
 					});
 					Electron.Menu.sendActionToFirstResponder('delete:');
 				}

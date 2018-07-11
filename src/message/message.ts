@@ -36,17 +36,12 @@ export enum MessageType {
 	ChangeElements = 'change-elements',
 	ChangeElementActions = 'change-element-actions',
 	ChangeElementContents = 'change-element-contents',
-	ChangeHighlightedElement = 'change-highlighted-element',
-	ChangeHighlightedElementContent = 'change-highlighted-element-content',
 	ChangePages = 'change-pages',
 	ChangePatternLibraries = 'change-pattern-library',
 	ChangeProject = 'change-project',
-	ChangeSelectedElement = 'change-selected-element',
-	ChangeSelectedElementContent = 'change-selected-element-content',
 	ExportPngPage = 'export-png-page',
 	ExportSketchPage = 'export-sketch-page',
 	ExportHtmlProject = 'export-html-project',
-	HighlightElement = 'highlight-element',
 	KeyboardChange = 'keyboard-change',
 	Log = 'log',
 	Maximize = 'maximize',
@@ -64,17 +59,16 @@ export enum MessageType {
 	Reload = 'reload',
 	Save = 'save',
 	SetPane = 'set-pane',
-	SelectElement = 'select-element',
 	ShowError = 'show-error',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
 	Undo = 'undo',
-	UnselectElement = 'unselect-element',
 	UpdatePatternLibraryRequest = 'update-pattern-library-request',
 	UpdatePatternLibraryResponse = 'update-pattern-library-response',
-	UnHighlightElement = 'unhighlight-element',
-	UserStoreChange = 'user-store-change'
+	UserStoreChange = 'user-store-change',
+	SelectElement = 'select-element',
+	HighlightElement = 'highlight-element'
 }
 
 export type Message =
@@ -102,10 +96,6 @@ export type Message =
 	| ChangeElements
 	| ChangeElementActions
 	| ChangeElementContents
-	| ChangeHighlightedElement
-	| ChangeSelectedElement
-	| ChangeHighlightedElementContent
-	| ChangeSelectedElementContent
 	| ChangePatternLibraries
 	| ChangePages
 	| ChangeProject
@@ -121,7 +111,6 @@ export type Message =
 	| ExportHtmlProject
 	| ExportPngPage
 	| ExportSketchPage
-	| HighlightElement
 	| KeyboardChange
 	| Log
 	| Maximize
@@ -138,18 +127,17 @@ export type Message =
 	| Redo
 	| Reload
 	| Save
-	| SelectElement
 	| SetPane
 	| ShowError
 	| SketchExportRequest
 	| SketchExportResponse
 	| StartAppMessage
 	| Undo
-	| UnselectElement
 	| UpdatePatternLibraryRequest
 	| UpdatePatternLibraryResponse
-	| UnHighlightElement
-	| ChangeUserStore;
+	| ChangeUserStore
+	| SelectElement
+	| HighlightElement;
 
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
 export type AppLoaded = EmptyEnvelope<MessageType.AppLoaded>;
@@ -170,19 +158,6 @@ export type ChangeElementContents = Envelope<
 export type ChangeElementActions = Envelope<
 	MessageType.ChangeElementActions,
 	{ elementActions: Types.SerializedElementAction[] }
->;
-export type ChangeHighlightedElement = Envelope<
-	MessageType.ChangeHighlightedElement,
-	string | undefined
->;
-export type ChangeSelectedElement = Envelope<MessageType.ChangeSelectedElement, string | undefined>;
-export type ChangeHighlightedElementContent = Envelope<
-	MessageType.ChangeHighlightedElementContent,
-	string | undefined
->;
-export type ChangeSelectedElementContent = Envelope<
-	MessageType.ChangeSelectedElementContent,
-	string | undefined
 >;
 export type ChangePages = Envelope<
 	MessageType.ChangePages,
@@ -238,7 +213,6 @@ export type CreateScriptBundleResponse = Envelope<
 >;
 export type Cut = EmptyEnvelope<MessageType.Cut>;
 export type Delete = EmptyEnvelope<MessageType.Delete>;
-export type HighlightElement = Envelope<MessageType.HighlightElement, Types.PatternIdPayload>;
 export type KeyboardChange = Envelope<MessageType.KeyboardChange, { metaDown: boolean }>;
 export type NewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
 export type NewFileResponse = Envelope<MessageType.CreateNewFileResponse, Types.ProjectPayload>;
@@ -265,7 +239,6 @@ export type ProjectResponse = Envelope<
 export type Redo = EmptyEnvelope<MessageType.Redo>;
 export type Reload = Envelope<MessageType.Reload, { forced: boolean } | undefined>;
 export type Save = Envelope<MessageType.Save, Types.SavePayload>;
-export type SelectElement = Envelope<MessageType.SelectElement, Types.PatternIdPayload>;
 export type SetPane = Envelope<MessageType.SetPane, { pane: Types.AppPane; visible: boolean }>;
 export type ShowError = Envelope<MessageType.ShowError, { message: string; stack: string }>;
 export type SketchExportRequest = Envelope<
@@ -287,7 +260,6 @@ export type ChangePatternLibraries = Envelope<
 	}
 >;
 export type Undo = EmptyEnvelope<MessageType.Undo>;
-export type UnselectElement = EmptyEnvelope<MessageType.UnselectElement>;
 export type UpdatePatternLibraryRequest = Envelope<
 	MessageType.UpdatePatternLibraryRequest,
 	{
@@ -302,8 +274,6 @@ export type UpdatePatternLibraryResponse = Envelope<
 		previousLibraryId: string;
 	}
 >;
-export type UnHighlightElement = EmptyEnvelope<MessageType.UnHighlightElement>;
-
 export type ExportHtmlProject = Envelope<
 	MessageType.ExportHtmlProject,
 	{ path: string | undefined }
@@ -319,4 +289,14 @@ export type ChangeProject = Envelope<
 export type ChangeUserStore = Envelope<
 	MessageType.UserStoreChange,
 	{ userStore: Types.SerializedUserStore }
+>;
+
+export type HighlightElement = Envelope<
+	MessageType.HighlightElement,
+	{ element: Types.SerializedElement | undefined }
+>;
+
+export type SelectElement = Envelope<
+	MessageType.SelectElement,
+	{ element: Types.SerializedElement | undefined }
 >;

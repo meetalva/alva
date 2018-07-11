@@ -64,6 +64,11 @@ function main(): void {
 		}
 	});
 
+	document.body.addEventListener('mouseleave', () => {
+		store.getProject().unsetHighlightedElement();
+		store.getProject().unsetHighlightedElementContent();
+	});
+
 	// (3) Render the preview application
 	window.renderer.render(store, document.getElementById('preview') as HTMLElement);
 
@@ -104,22 +109,20 @@ function main(): void {
 						changes.removed.forEach(change => project.removeElement(change.before));
 						changes.changed.forEach(change => change.before.update(change.after));
 
-						// TODO: The explicit highlighting / selecting below should be done by the diffing,
-						// appears to be broken by a bug, though
-						const highlightedEl = els.find(el => el.getHighlighted());
-						const selectedElement = els.find(el => el.getSelected());
+						const selectedElement = els.find(e => e.getSelected());
+						const highlightedElement = els.find(e => e.getHighlighted());
 
-						if (highlightedEl) {
-							const el = store.getElementById(highlightedEl.getId());
+						if (selectedElement) {
+							const el = project.getElementById(selectedElement.getId());
 							if (el) {
-								el.setHighlighted(true);
+								project.setSelectedElement(el);
 							}
 						}
 
-						if (selectedElement) {
-							const el = store.getElementById(selectedElement.getId());
+						if (highlightedElement) {
+							const el = project.getElementById(highlightedElement.getId());
 							if (el) {
-								el.setSelected(true);
+								project.setHighlightedElement(el);
 							}
 						}
 
@@ -189,32 +192,34 @@ function main(): void {
 			});
 		});
 
-		// (5) Maintain selection area
 		Mobx.reaction(
-			() => store.getSelectedElement(),
-			selectedElement => {
+			() => store.hasSelectedItem(),
+			hasSelection => {
 				const selectionArea = store.getSelectionArea();
-				selectedElement ? selectionArea.show() : selectionArea.hide();
-
-				if (selectedElement && selectedElement.getRole() === Types.ElementRole.Root) {
-					selectionArea.hide();
-				}
-
-				const selectionNode = document.getElementById('preview-selection') as HTMLElement;
-				selectionArea.write(selectionNode);
+				hasSelection ? selectionArea.show() : selectionArea.hide();
 			}
 		);
 
-		// (6) Maintain highlight area
+		Mobx.reaction(
+			() => store.hasHighlightedItem(),
+			hasHighlight => {
+				const highlightArea = store.getHighlightArea();
+				hasHighlight ? highlightArea.show() : highlightArea.hide();
+			}
+		);
+
+		Mobx.autorun(() => {
+			const selectionArea = store.getSelectionArea();
+			const selectionNode = document.getElementById('preview-selection') as HTMLElement;
+			selectionArea.write(selectionNode);
+		});
+
 		Mobx.autorun(() => {
 			const highlightNode = document.getElementById('preview-highlight') as HTMLElement;
 			const highlightArea = store.getHighlightArea();
-
-			store.hasHighlightedItem() ? highlightArea.show() : highlightArea.hide();
 			highlightArea.write(highlightNode);
 		});
 
-		// (7) Notify sytem about meta keypress
 		Mobx.reaction(
 			() => store.getMetaDown(),
 			metaDown => {

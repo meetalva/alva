@@ -210,67 +210,111 @@ export class PreviewStore<V> {
 		return Boolean(this.getSelectedElement());
 	}
 
-	public onElementClick(e: MouseEvent, element: Model.Element): void {
+	@Mobx.action
+	public onElementClick(e: MouseEvent, data: { element: Model.Element; node?: Element }): void {
 		if (!this.getMetaDown()) {
 			e.preventDefault();
 		}
+
+		this.updateSelectedElement(data);
+
+		if (data.element.getRole() === Types.ElementRole.Root) {
+			this.project.unsetSelectedElement();
+		} else {
+			this.project.setSelectedElement(data.element);
+		}
+
+		if (this.sender) {
+			this.sender.send({
+				type: Message.MessageType.SelectElement,
+				id: uuid.v4(),
+				payload: { element: data.element.toJSON() }
+			});
+		}
 	}
 
-	public onElementMouseOver(e: MouseEvent, element: Model.Element): void {
+	@Mobx.action
+	public onElementMouseOver(
+		e: MouseEvent,
+		data: { element: Model.Element; node?: Element }
+	): void {
 		if (this.mode !== Types.PreviewDocumentMode.Live) {
 			return;
 		}
 
-		this.setHighlightedElement(element);
+		this.updateHighlightedElement(data);
 
-		window.requestIdleCallback(() => {
-			if (!this.sender) {
-				return;
-			}
+		if (data.element.getRole() === Types.ElementRole.Root) {
+			this.project.unsetHighlightedElement();
+		} else {
+			this.setHighlightedElement(data.element);
+		}
 
-			if (!element.getHighlighted()) {
-				this.sender.send({
-					id: uuid.v4(),
-					payload: undefined,
-					type: Message.MessageType.UnHighlightElement
-				});
-				return;
-			}
-
+		if (this.sender) {
 			this.sender.send({
+				type: Message.MessageType.HighlightElement,
 				id: uuid.v4(),
-				payload: {
-					id: element.getId()
-				},
-				type: Message.MessageType.HighlightElement
+				payload: { element: data.element.toJSON() }
 			});
-		});
+		}
 	}
 
-	public onElementSelect(e: MouseEvent, element: Model.Element): void {
+	@Mobx.action
+	public updateHighlightedElement(data: { element: Model.Element; node?: Element }): void {
 		if (this.mode !== Types.PreviewDocumentMode.Live) {
 			return;
 		}
 
-		this.setSelectedElement(element);
+		if (data.node) {
+			const rect = data.node.getBoundingClientRect();
 
-		if (!this.sender) {
+			this.highlightArea.setSize({
+				top: rect.top,
+				left: rect.left,
+				width: rect.width,
+				height: rect.height
+			});
+		}
+
+		if (data.element.getRole() === Types.ElementRole.Root) {
+			this.highlightArea.hide();
+		} else {
+			this.highlightArea.show();
+		}
+	}
+
+	@Mobx.action
+	public updateSelectedElement(data: { element: Model.Element; node?: Element }): void {
+		if (this.mode !== Types.PreviewDocumentMode.Live) {
 			return;
 		}
 
-		window.requestIdleCallback(() => {
-			if (!this.sender) {
-				return;
-			}
+		if (data.node) {
+			const rect = data.node.getBoundingClientRect();
 
-			this.sender.send({
-				id: uuid.v4(),
-				payload: {
-					id: element.getId()
-				},
-				type: Message.MessageType.SelectElement
+			this.selectionArea.setSize({
+				top: rect.top,
+				left: rect.left,
+				width: rect.width,
+				height: rect.height
 			});
-		});
+		}
+
+		if (data.element.getRole() === Types.ElementRole.Root) {
+			this.selectionArea.hide();
+		} else {
+			this.selectionArea.show();
+		}
+	}
+
+	@Mobx.action
+	public onHighlightedElementRemove(data: { element: Model.Element; node?: Element }): void {
+		if (this.mode !== Types.PreviewDocumentMode.Live) {
+			return;
+		}
+
+		this.project.unsetHighlightedElement();
+		this.project.unsetHighlightedElementContent();
 	}
 
 	public onOutsideClick(e: MouseEvent): void {
@@ -278,25 +322,9 @@ export class PreviewStore<V> {
 			return;
 		}
 
-		this.unsetSelectedElement();
-		this.unsetHighlightedElement();
-		this.unsetHighlightedElementContent();
-
-		if (!this.sender) {
-			return;
-		}
-
-		this.sender.send({
-			id: uuid.v4(),
-			payload: undefined,
-			type: Message.MessageType.UnselectElement
-		});
-
-		this.sender.send({
-			id: uuid.v4(),
-			payload: undefined,
-			type: Message.MessageType.UnHighlightElement
-		});
+		this.project.unsetSelectedElement();
+		this.project.unsetHighlightedElement();
+		this.project.unsetHighlightedElementContent();
 	}
 
 	@Mobx.action
@@ -312,9 +340,6 @@ export class PreviewStore<V> {
 
 	@Mobx.action
 	public setHighlightedElement(element: Model.Element): void {
-		this.unsetHighlightedElement();
-		this.unsetHighlightedElementContent();
-
 		if (element.getRole() === Types.ElementRole.Root) {
 			return;
 		}
@@ -327,35 +352,7 @@ export class PreviewStore<V> {
 		this.metaDown = metaDown;
 	}
 
-	@Mobx.action
-	public setSelectedElement(element: Model.Element): void {
-		this.unsetSelectedElement();
-
-		element.setSelected(true);
-	}
-
 	public setSender(sender: Sender): void {
 		this.sender = sender;
-	}
-
-	@Mobx.action
-	public unsetHighlightedElement(): void {
-		this.project.getElements().forEach(e => e.setHighlighted(false));
-	}
-
-	@Mobx.action
-	public unsetHighlightedElementContent(): void {
-		this.project.getElementContents().forEach(e => e.setHighlighted(false));
-	}
-
-	@Mobx.action
-	public unsetSelectedElement(): void {
-		const previousSelectedElement = this.getSelectedElement();
-
-		if (previousSelectedElement) {
-			previousSelectedElement.setSelected(false);
-		}
-
-		this.selectionArea.hide();
 	}
 }

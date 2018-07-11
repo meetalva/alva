@@ -1,11 +1,10 @@
 import { PreviewComponentError } from './preview-component-error';
-import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Injection } from '.';
 import * as Types from '../types';
+import { Injection } from '.';
 
 export interface PreviewComponentProps {
 	element: Model.Element;
@@ -13,12 +12,9 @@ export interface PreviewComponentProps {
 
 export type Injected = PreviewComponentProps & Injection;
 
-@MobxReact.inject('store', 'registry')
+@MobxReact.inject('store')
 @MobxReact.observer
 export class PreviewComponent extends React.Component<PreviewComponentProps> {
-	private disposeSelectReaction: () => void;
-	private disposeHighlightReaction: () => void;
-
 	private getDomElement(): Element | undefined {
 		const node = ReactDom.findDOMNode(this);
 
@@ -37,87 +33,64 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 		return node as Element;
 	}
 
-	private register(): void {
-		const node = this.getDomElement();
-
-		if (!node) {
-			return;
-		}
-
+	private handleMouseOver(e: MouseEvent): void {
 		const props = this.props as Injected;
-		props.registry.add({ node, element: props.element });
+		e.stopPropagation();
+		props.store.onElementMouseOver(e, { element: props.element, node: this.getDomElement() });
+	}
 
-		if (this.disposeSelectReaction) {
-			this.disposeSelectReaction();
+	private handleClick(e: MouseEvent): void {
+		const props = this.props as Injected;
+		e.stopPropagation();
+		props.store.onElementClick(e, { element: props.element, node: this.getDomElement() });
+	}
+
+	private update(): void {
+		const props = this.props as Injected;
+
+		const children = props.element.getContentBySlotType(Types.SlotType.Children);
+
+		if (props.element.getHighlighted() || (children && children.getHighlighted())) {
+			props.store.updateHighlightedElement({
+				element: props.element,
+				node: this.getDomElement()
+			});
 		}
 
-		if (this.disposeHighlightReaction) {
-			this.disposeHighlightReaction();
+		if (props.element.getSelected()) {
+			props.store.updateSelectedElement({ element: props.element, node: this.getDomElement() });
 		}
-
-		this.disposeSelectReaction = Mobx.autorun(() => {
-			if (props.element.getSelected()) {
-				const selectionArea = props.store.getSelectionArea();
-				const rect = node.getBoundingClientRect();
-
-				selectionArea.setSize({
-					top: rect.top + window.scrollY,
-					left: rect.left + window.scrollX,
-					width: rect.width,
-					height: rect.height
-				});
-			}
-		});
-
-		this.disposeHighlightReaction = Mobx.autorun(() => {
-			const children = props.element.getContentBySlotType(Types.SlotType.Children);
-			const highlightArea = props.store.getHighlightArea();
-
-			if (props.element.getRole() === Types.ElementRole.Root) {
-				highlightArea.hide();
-			} else {
-				highlightArea.show();
-			}
-
-			if (props.element.getHighlighted() || (children && children.getHighlighted())) {
-				const rect = node.getBoundingClientRect();
-
-				highlightArea.setSize({
-					top: rect.top + window.scrollY,
-					left: rect.left + window.scrollX,
-					width: rect.width,
-					height: rect.height
-				});
-			}
-		});
 	}
 
 	public componentDidMount(): void {
-		this.register();
-	}
+		const el = this.getDomElement();
 
-	public componentDidUpdate(): void {
-		this.register();
-	}
-
-	public componentWillUnmount(): void {
-		const props = this.props as Injected;
-
-		if (this.disposeSelectReaction) {
-			this.disposeSelectReaction();
-		}
-
-		if (this.disposeHighlightReaction) {
-			this.disposeHighlightReaction();
-		}
-
-		const node = ReactDom.findDOMNode(this);
-
-		if (!node) {
+		if (!el) {
 			return;
 		}
 
-		props.registry.remove({ node, element: props.element });
+		this.handleClick = this.handleClick.bind(this);
+		this.handleMouseOver = this.handleMouseOver.bind(this);
+
+		el.addEventListener('click', this.handleClick);
+		el.addEventListener('mouseover', this.handleMouseOver);
+
+		this.update();
+	}
+
+	public componentDidUpdate(): void {
+		this.update();
+	}
+
+	public componentWillUnmount(): void {
+		const el = this.getDomElement();
+
+		if (!el) {
+			return;
+		}
+
+		el.removeEventListener('click', this.handleClick);
+		el.removeEventListener('mouseover', this.handleMouseOver);
 	}
 
 	public render(): JSX.Element | null {

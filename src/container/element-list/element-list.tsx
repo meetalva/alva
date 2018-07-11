@@ -331,8 +331,8 @@ export class ElementList extends React.Component {
 				(label && targetContent) ||
 				(!label && targetElement && targetElement.getRole() === Types.ElementRole.Root)
 			) {
-				store.unsetHighlightedElement();
-				store.unsetHighlightedElementContent();
+				store.getProject().unsetHighlightedElement();
+				store.getProject().unsetHighlightedElementContent();
 			}
 
 			if (

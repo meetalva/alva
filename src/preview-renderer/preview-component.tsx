@@ -41,7 +41,6 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 	private handleClick(e: MouseEvent): void {
 		const props = this.props as Injected;
-		e.stopPropagation();
 		props.store.onElementClick(e, { element: props.element, node: this.getDomElement() });
 	}
 

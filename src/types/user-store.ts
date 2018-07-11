@@ -5,12 +5,13 @@ export enum UserStorePropertyType {
 
 export enum UserStoreActionType {
 	Noop = 'noop',
+	OpenExternal = 'open-external',
 	Set = 'set'
 }
 
 export type SerializedUserStorePropertyType = 'string' | 'page';
 
-export type SerializedUserStoreActionType = 'noop' | 'set';
+export type SerializedUserStoreActionType = 'noop' | 'set' | 'open-external';
 
 export interface SerializedUserStoreProperty {
 	id: string;

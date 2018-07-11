@@ -146,6 +146,44 @@ export class PreviewStore<V> {
 			}
 
 			if (patternProperty.getType() === Types.PatternPropertyType.EventHandler) {
+				// Special case:
+				// the link property should render "click" event handlers as href, too
+				const pattern = element.getPattern();
+
+				if (pattern && pattern.getType() === Types.PatternType.SyntheticLink) {
+					const elementAction = this.project.getElementActionById(
+						elementProperty.getValue() as string
+					);
+
+					const userStoreAction = elementAction
+						? this.project.getUserStore().getActionById(elementAction.getStoreActionId())
+						: undefined;
+
+					const propertyId = elementAction ? elementAction.getStorePropertyId() : undefined;
+
+					const userStoreProperty = propertyId
+						? this.project.getUserStore().getPropertyById(propertyId)
+						: undefined;
+
+					const actionType = userStoreAction ? userStoreAction.getType() : undefined;
+
+					const propertyType = userStoreProperty ? userStoreProperty.getType() : undefined;
+
+					switch (actionType) {
+						case Types.UserStoreActionType.OpenExternal:
+							if (elementAction) {
+								renderProperties['href'] = elementAction.getPayload();
+								renderProperties['target'] = '_blank';
+								renderProperties['rel'] = 'noopener';
+							}
+							break;
+						case Types.UserStoreActionType.Set:
+							if (userStoreProperty && propertyType === Types.UserStorePropertyType.Page) {
+								renderProperties['href'] = `?page=${userStoreProperty.getPayload()}`;
+							}
+					}
+				}
+
 				renderProperties[patternProperty.getPropertyName()] = e => {
 					if (this.mode !== Types.PreviewDocumentMode.Static && !this.getMetaDown()) {
 						return;
@@ -160,7 +198,7 @@ export class PreviewStore<V> {
 					}
 
 					e.preventDefault();
-					elementAction.execute();
+					elementAction.execute({ sender: this.sender });
 				};
 			} else {
 				renderProperties[patternProperty.getPropertyName()] = elementProperty.getValue();
@@ -212,9 +250,12 @@ export class PreviewStore<V> {
 
 	@Mobx.action
 	public onElementClick(e: MouseEvent, data: { element: Model.Element; node?: Element }): void {
-		if (!this.getMetaDown()) {
-			e.preventDefault();
+		if (this.getMetaDown() || this.mode === Types.PreviewDocumentMode.Static) {
+			return;
 		}
+
+		e.preventDefault();
+		e.stopPropagation();
 
 		this.updateSelectedElement(data);
 

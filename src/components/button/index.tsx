@@ -8,6 +8,7 @@ export interface ButtonProps {
 	/** @description For dark backgrounds */
 	inverted?: boolean;
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 	/** @description Visual weight @default Primary */
 	order?: ButtonOrder;
 	/** @description Spatial weight @default */
@@ -106,6 +107,7 @@ const StyledButton = styled.button`
 export const Button: React.StatelessComponent<ButtonProps> = props => (
 	<StyledButton
 		onClick={props.onClick}
+		onDoubleClick={props.onDoubleClick}
 		textColor={props.textColor}
 		order={props.order}
 		size={props.size}

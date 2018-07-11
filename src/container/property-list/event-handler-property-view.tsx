@@ -144,6 +144,27 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 					</div>
 					{elementAction &&
 						userAction &&
+						userAction.getType() === Types.UserStoreActionType.OpenExternal && (
+							<div
+								style={{
+									display: 'flex',
+									width: '100%',
+									marginTop: '6px',
+									alignItems: 'center'
+								}}
+							>
+								<Component.PropertyLabel label="to" />
+								<Component.PropertyInput
+									type={Component.PropertyInputType.Text}
+									value={elementAction.getPayload()}
+									placeholder="https://meetalva.io"
+									onBlur={() => props.store.commit()}
+									onChange={e => elementAction.setPayload(e.target.value)}
+								/>
+							</div>
+						)}
+					{elementAction &&
+						userAction &&
 						userAction.getAcceptsProperty() && (
 							<div style={{ width: '100%', marginBottom: '6px' }}>
 								<Component.CreateSelect

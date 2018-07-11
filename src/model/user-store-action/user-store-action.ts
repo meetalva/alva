@@ -117,6 +117,8 @@ function deserializeType(type: Types.SerializedUserStoreActionType): Types.UserS
 			return Types.UserStoreActionType.Noop;
 		case 'set':
 			return Types.UserStoreActionType.Set;
+		case 'open-external':
+			return Types.UserStoreActionType.OpenExternal;
 		default:
 			throw new Error(`Unknown user store action type: ${type}`);
 	}
@@ -128,6 +130,8 @@ function serializeType(type: Types.UserStoreActionType): Types.SerializedUserSto
 			return 'noop';
 		case Types.UserStoreActionType.Set:
 			return 'set';
+		case Types.UserStoreActionType.OpenExternal:
+			return 'open-external';
 		default:
 			throw new Error(`Unknown user store action type: ${type}`);
 	}

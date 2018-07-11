@@ -93,6 +93,14 @@ export class Project {
 			type: Types.UserStoreActionType.Set
 		});
 
+		const openLinkAction = new UserStoreAction({
+			acceptsProperty: false,
+			id: uuid.v4(),
+			name: 'Navigate',
+			userStorePropertyId: undefined,
+			type: Types.UserStoreActionType.OpenExternal
+		});
+
 		// TODO: Reenable when implementing full variable support
 		/* const setPropertyAction = new UserStoreAction({
 			acceptsProperty: true,
@@ -104,7 +112,7 @@ export class Project {
 		const userStore = new UserStore({
 			id: uuid.v4(),
 			properties: [currentPageProperty],
-			actions: [noopAction, navigatePageAction /*, setPropertyAction*/]
+			actions: [noopAction, navigatePageAction, openLinkAction /*, setPropertyAction*/]
 		});
 
 		const project = new Project({

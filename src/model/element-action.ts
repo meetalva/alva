@@ -1,8 +1,13 @@
 import * as Mobx from 'mobx';
+import * as Message from '../message';
 import * as _ from 'lodash';
 import * as Types from '../types';
 import { UserStore } from './user-store';
 import * as uuid from 'uuid';
+
+export interface Sender {
+	send(msg: Message.Message): void;
+}
 
 export interface ElementActionInit {
 	id: string;
@@ -57,24 +62,35 @@ export class ElementAction {
 		return _.isEqual(this.toJSON(), b.toJSON());
 	}
 
-	public execute(): void {
+	public execute({ sender }: { sender?: Sender }): void {
 		const storeAction = this.userStore.getActionById(this.storeActionId);
 
 		if (!storeAction) {
 			return;
 		}
 
-		const storeProperty = this.userStore.getPropertyById(this.storePropertyId);
-
-		if (!storeProperty) {
-			return;
-		}
-
 		switch (storeAction.getType()) {
 			case Types.UserStoreActionType.Noop:
 				return;
-			case Types.UserStoreActionType.Set:
-				storeProperty.setPayload(this.payload);
+			case Types.UserStoreActionType.Set: {
+				const storeProperty = this.userStore.getPropertyById(this.storePropertyId);
+
+				if (storeProperty) {
+					storeProperty.setPayload(this.payload);
+				}
+				break;
+			}
+			case Types.UserStoreActionType.OpenExternal: {
+				if (sender) {
+					sender.send({
+						type: Message.MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: this.payload
+					});
+				} else {
+					window.open(this.payload, '_blank', 'noopener');
+				}
+			}
 		}
 	}
 

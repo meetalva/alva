@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 export interface BugReportProps {
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 	title: string;
 }
 
@@ -14,7 +15,12 @@ const StyledBugReport = styled.div`
 
 export const BugReport: React.StatelessComponent<BugReportProps> = props => (
 	<StyledBugReport>
-		<Button order={ButtonOrder.Secondary} size={ButtonSize.Small} onClick={props.onClick}>
+		<Button
+			order={ButtonOrder.Secondary}
+			size={ButtonSize.Small}
+			onClick={props.onClick}
+			onDoubleClick={props.onDoubleClick}
+		>
 			{props.title}
 		</Button>
 	</StyledBugReport>

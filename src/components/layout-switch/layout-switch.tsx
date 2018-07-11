@@ -9,6 +9,7 @@ export interface LayoutSwitchProps {
 	active?: boolean;
 	onPrimaryClick?: React.MouseEventHandler<HTMLElement>;
 	onSecondaryClick?: React.MouseEventHandler<HTMLElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 	children?: React.ReactNode;
 }
 
@@ -60,7 +61,7 @@ const StyledSecondaryContainer = styled.label`
 `;
 
 export const LayoutSwitch: React.SFC<LayoutSwitchProps> = props => (
-	<StyledLayoutSwitch>
+	<StyledLayoutSwitch onDoubleClick={props.onDoubleClick}>
 		<StyledPrimaryContainer onClick={props.onPrimaryClick} active={props.active}>
 			<Layout size={IconSize.XS} strokeWidth={1.5} />
 		</StyledPrimaryContainer>

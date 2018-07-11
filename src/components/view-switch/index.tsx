@@ -154,6 +154,9 @@ export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 		<StyledLeftIcon
 			color={Color.Grey60}
 			onClick={props.onLeftClick}
+			onDoubleClick={event => {
+				event.stopPropagation();
+			}}
 			size={IconSize.XS}
 			visible={props.leftVisible}
 		/>
@@ -161,6 +164,9 @@ export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 		<StyledRightIcon
 			color={Color.Grey60}
 			onClick={props.onRightClick}
+			onDoubleClick={event => {
+				event.stopPropagation();
+			}}
 			size={IconSize.XS}
 			visible={props.rightVisible}
 		/>

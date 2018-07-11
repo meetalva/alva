@@ -86,6 +86,9 @@ export const ChromeContainer = MobxReact.inject('store')(
 							payload: 'https://github.com/meetalva/alva/labels/type%3A%20bug'
 						});
 					}}
+					onDoubleClick={event => {
+						event.stopPropagation();
+					}}
 				/>
 				{props.children}
 			</Chrome>

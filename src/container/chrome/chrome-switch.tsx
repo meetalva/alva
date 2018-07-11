@@ -27,6 +27,9 @@ export class ChromeSwitch extends React.Component {
 					onSecondaryClick={() => {
 						layoutMenu(store);
 					}}
+					onDoubleClick={event => {
+						event.stopPropagation();
+					}}
 				/>
 			</div>
 		);

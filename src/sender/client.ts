@@ -1,6 +1,9 @@
 import * as Electron from 'electron';
 import { isMessage } from './is-message';
 import * as Message from '../message';
+import * as uuid from 'uuid';
+
+export const senderId = uuid.v4();
 
 export function send(message: Message.Message): void {
 	if (!isMessage(message)) {

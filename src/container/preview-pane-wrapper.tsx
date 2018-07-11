@@ -29,8 +29,8 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 					offCanvas={false}
 					onMouseEnter={() => app.setHoverArea(Types.HoverArea.Preview)}
 					onMouseLeave={() => {
-						props.store.unsetHighlightedElement();
-						props.store.unsetHighlightedElementContent();
+						props.store.getProject().unsetHighlightedElement();
+						props.store.getProject().unsetHighlightedElementContent();
 						app.setHoverArea(Types.HoverArea.Chrome);
 					}}
 				/>

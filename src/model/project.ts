@@ -443,6 +443,18 @@ export class Project {
 		this.path = path;
 	}
 
+	@Mobx.action
+	public setHighlightedElement(element: Element): void {
+		this.unsetHighlightedElement();
+		element.setHighlighted(true);
+	}
+
+	@Mobx.action
+	public setSelectedElement(element: Element): void {
+		this.unsetSelectedElement();
+		element.setSelected(true);
+	}
+
 	public toDisk(): Types.SavedProject {
 		const data = this.toJSON();
 		data.elements = this.getElements().map(e => e.toDisk());
@@ -473,14 +485,34 @@ export class Project {
 	}
 
 	@Mobx.action
-	public unsetSelectedElement(): void {
+	public unsetSelectedElement(options?: { ignore: Element }): void {
 		this.getElements()
 			.filter(element => element.getSelected())
+			.filter(element => !options || options.ignore.getId() !== element.getId())
 			.forEach(element => {
 				element.setSelected(false);
 				element.getAncestors().forEach(ancestor => {
 					ancestor.setForcedOpen(false);
 				});
 			});
+	}
+
+	@Mobx.action
+	public unsetHighlightedElement(options?: { ignore: Element }): void {
+		this.getElements()
+			.filter(element => element.getHighlighted())
+			.filter(element => !options || options.ignore.getId() !== element.getId())
+			.forEach(element => {
+				element.setHighlighted(false);
+				element.getAncestors().forEach(ancestor => ancestor.setForcedOpen(false));
+			});
+	}
+
+	@Mobx.action
+	public unsetHighlightedElementContent(options?: { ignore: ElementContent }): void {
+		this.getElementContents()
+			.filter(content => !options || options.ignore.getId() !== content.getId())
+			.filter(content => content.getHighlighted())
+			.forEach(content => content.setHighlighted(false));
 	}
 }

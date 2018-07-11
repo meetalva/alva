@@ -73,6 +73,7 @@ export class Element {
 		this.dragged = init.dragged;
 		this.focused = init.focused;
 		this.highlighted = init.highlighted;
+		this.placeholderHighlighted = init.placeholderHighlighted;
 		this.id = init.id ? init.id : uuid.v4();
 		this.patternId = init.patternId;
 		this.containerId = init.containerId;
@@ -507,29 +508,6 @@ export class Element {
 		}
 	}
 
-	/* @Mobx.action
-	public setPatternLibrary(ctx: { patternLibrary: PatternLibrary; project: Project }): void {
-		const pattern = this.getPattern();
-
-		if (pattern) {
-			// Recreate element properties
-			this.properties = pattern.getProperties().map(patternProperty => {
-				const previous = this.properties.find(
-					prop => prop.getPatternPropertyId() === patternProperty.getId()
-				);
-				return new ElementProperty(
-					{
-						id: previous ? previous.getId() : uuid.v4(),
-						patternPropertyId: patternProperty.getId(),
-						setDefault: true,
-						value: previous ? previous.getValue() : undefined // copy previous values
-					},
-					ctx
-				);
-			});
-		}
-	} */
-
 	@Mobx.action
 	public setPlaceholderHighlighted(placeholderHighlighted: boolean): void {
 		this.placeholderHighlighted = placeholderHighlighted;
@@ -542,8 +520,6 @@ export class Element {
 
 	public toDisk(): Types.SerializedElement {
 		const serialized = this.toJSON();
-		// Do not save higlighted and selected states
-		// to avoid excessive file changes e.g. for sharing
 		serialized.dragged = false;
 		serialized.highlighted = false;
 		serialized.placeholderHighlighted = false;
@@ -593,9 +569,17 @@ export class Element {
 
 	@Mobx.action
 	public update(b: Element): void {
+		if (this.selected) {
+			this.project.unsetSelectedElement();
+		}
+
+		if (this.highlighted) {
+			this.project.unsetHighlightedElement();
+		}
+
+		this.highlighted = b.highlighted;
 		this.dragged = b.dragged;
 		this.focused = b.focused;
-		this.highlighted = b.highlighted;
 		this.containerId = b.containerId;
 		this.name = b.name;
 		this.open = b.open;

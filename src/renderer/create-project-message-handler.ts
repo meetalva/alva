@@ -94,42 +94,42 @@ export function createProjectMessageHandler({
 					});
 				break;
 			}
-			case Message.MessageType.SelectElement: {
-				const element = store.getElementById(message.payload.id);
-				if (element) {
-					store.setSelectedElement(element);
-				}
-				break;
-			}
-			case Message.MessageType.UnselectElement: {
-				store.getProject().unsetSelectedElement();
-				break;
-			}
-			case Message.MessageType.HighlightElement: {
-				const element = store.getElementById(message.payload.id);
-				if (element) {
-					store.setHighlightedElement(element, { flat: !store.getMetaDown() });
-				}
-				break;
-			}
-			case Message.MessageType.ActivatePage: {
-				const page = project.getPageById(message.payload.id);
-				if (page) {
-					store.getProject().setActivePage(page);
-				}
-				break;
-			}
 			case Message.MessageType.SetPane: {
 				app.setPane(message.payload.pane, message.payload.visible);
 				break;
 			}
-			case Message.MessageType.UnHighlightElement: {
-				store.unsetDraggedElement();
-				store.unsetHighlightedElementContent();
-				break;
-			}
 			case Message.MessageType.UserStoreChange: {
 				project.getUserStore().sync(message);
+				break;
+			}
+			case Message.MessageType.SelectElement: {
+				if (!message.payload.element) {
+					return;
+				}
+
+				const el = Model.Element.from(message.payload.element, { project });
+				const previousEl = project.getElementById(el.getId());
+
+				if (!previousEl) {
+					return;
+				}
+
+				store.setSelectedElement(previousEl);
+				break;
+			}
+			case Message.MessageType.HighlightElement: {
+				if (!message.payload.element) {
+					return;
+				}
+
+				const el = Model.Element.from(message.payload.element, { project });
+				const previousEl = project.getElementById(el.getId());
+
+				if (!previousEl) {
+					return;
+				}
+
+				store.setHighlightedElement(previousEl, { flat: !store.getMetaDown() });
 			}
 		}
 	};

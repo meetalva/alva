@@ -967,7 +967,8 @@ export class ViewStore {
 	@Mobx.action
 	public setProject(project: Model.Project): void {
 		this.project = project;
-		this.unsetHighlightedElement();
+		this.project.unsetHighlightedElement();
+		this.project.unsetSelectedElement();
 
 		project.getPatternLibraries().forEach(p => p.updateSearch());
 	}
@@ -1033,24 +1034,9 @@ export class ViewStore {
 
 	@Mobx.action
 	public unsetDraggedElement(): void {
-		this.unsetHighlightedElement();
+		this.project.unsetHighlightedElement();
 		this.project.getElements().forEach(e => {
 			e.setDragged(false);
-		});
-	}
-
-	@Mobx.action
-	public unsetHighlightedElement(): void {
-		this.project.getElements().forEach(e => {
-			e.setHighlighted(false);
-			e.setPlaceholderHighlighted(false);
-		});
-	}
-
-	@Mobx.action
-	public unsetHighlightedElementContent(): void {
-		this.project.getElementContents().forEach(e => {
-			e.setHighlighted(false);
 		});
 	}
 

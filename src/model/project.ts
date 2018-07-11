@@ -134,6 +134,8 @@ export class Project {
 			)
 		);
 
+		currentPageProperty.setProject(project);
+
 		return project;
 	}
 
@@ -163,6 +165,7 @@ export class Project {
 			project.addElementAction(ElementAction.from(elementAction, { userStore }));
 		});
 
+		userStore.getPageProperty().setProject(project);
 		return project;
 	}
 

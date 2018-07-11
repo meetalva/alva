@@ -66,7 +66,7 @@ export enum MessageType {
 	Undo = 'undo',
 	UpdatePatternLibraryRequest = 'update-pattern-library-request',
 	UpdatePatternLibraryResponse = 'update-pattern-library-response',
-	UserStoreChange = 'user-store-change',
+	ChangeUserStore = 'user-store-change',
 	SelectElement = 'select-element',
 	HighlightElement = 'highlight-element'
 }
@@ -287,7 +287,7 @@ export type ChangeProject = Envelope<
 >;
 
 export type ChangeUserStore = Envelope<
-	MessageType.UserStoreChange,
+	MessageType.ChangeUserStore,
 	{ userStore: Types.SerializedUserStore }
 >;
 

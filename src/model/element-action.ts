@@ -74,7 +74,6 @@ export class ElementAction {
 				return;
 			case Types.UserStoreActionType.Set: {
 				const storeProperty = this.userStore.getPropertyById(this.storePropertyId);
-
 				if (storeProperty) {
 					storeProperty.setPayload(this.payload);
 				}

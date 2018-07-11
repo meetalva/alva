@@ -187,6 +187,10 @@ function main(): void {
 						});
 
 						store.setComponents(getComponents(store.getProject()));
+						break;
+					}
+					case Message.MessageType.ChangeUserStore: {
+						project.getUserStore().sync(message);
 					}
 				}
 			});
@@ -243,7 +247,7 @@ function main(): void {
 			sender.send({
 				id: uuid.v4(),
 				payload: { userStore: userStore.toJSON() },
-				type: Message.MessageType.UserStoreChange
+				type: Message.MessageType.ChangeUserStore
 			});
 		});
 	}

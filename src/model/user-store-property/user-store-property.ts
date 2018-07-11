@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as Mobx from 'mobx';
+import { Project } from '../project';
 import * as Types from '../../types';
 
 export interface UserStorePropertyInit {
@@ -19,6 +20,7 @@ export class UserStoreProperty {
 	@Mobx.observable private name: string;
 	@Mobx.observable private payload: string;
 	private type: UserStorePropertyType;
+	private project: Project;
 
 	public constructor(init: UserStorePropertyInit) {
 		this.id = init.id;
@@ -63,7 +65,18 @@ export class UserStoreProperty {
 
 	@Mobx.action
 	public setPayload(payload: string): void {
+		// Skip if we try to switch to a page that does not exist
+		if (this.getType() === Types.UserStorePropertyType.Page) {
+			if (this.project && !this.project.getPageById(payload)) {
+				return;
+			}
+		}
+
 		this.payload = payload;
+	}
+
+	public setProject(project: Project): void {
+		this.project = project;
 	}
 
 	public toJSON(): Types.SerializedUserStoreProperty {

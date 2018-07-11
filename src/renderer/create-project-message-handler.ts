@@ -98,7 +98,7 @@ export function createProjectMessageHandler({
 				app.setPane(message.payload.pane, message.payload.visible);
 				break;
 			}
-			case Message.MessageType.UserStoreChange: {
+			case Message.MessageType.ChangeUserStore: {
 				project.getUserStore().sync(message);
 				break;
 			}

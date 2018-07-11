@@ -42,6 +42,17 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 
 		project.addElementAction(elementAction);
 		props.elementProperty.setValue(elementAction.getId());
+
+		const storePropertyId = elementAction.getStorePropertyId();
+		const storeProperty = storePropertyId
+			? userStore.getPropertyById(storePropertyId)
+			: undefined;
+
+		if (storeProperty && storeProperty.getType() === Types.UserStorePropertyType.Page) {
+			const page = props.store.getPages()[0];
+			elementAction.setPayload(page ? page.getId() : '');
+		}
+
 		props.store.commit();
 	}
 

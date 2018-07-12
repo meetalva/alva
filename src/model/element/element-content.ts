@@ -82,19 +82,21 @@ export class ElementContent {
 	}
 
 	@Mobx.action
-	public clone(): ElementContent {
+	public clone(opts?: { withState: boolean }): ElementContent {
+		const withState = Boolean(opts && opts.withState);
+
 		const clonedElements = this.elementIds
 			.map(elementId => this.project.getElementById(elementId))
 			.filter((e): e is Element => typeof e !== 'undefined')
-			.map(e => e.clone());
+			.map(e => e.clone({ withState }));
 
 		const clone = new ElementContent(
 			{
 				elementIds: clonedElements.map(e => e.getId()),
-				forcedOpen: false,
-				highlighted: false,
+				forcedOpen: withState ? this.forcedOpen : false,
+				highlighted: withState ? this.highlighted : false,
 				id: uuid.v4(),
-				open: false,
+				open: withState ? this.open : false,
 				slotId: this.slotId
 			},
 			{

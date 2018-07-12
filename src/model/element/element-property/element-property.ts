@@ -51,6 +51,21 @@ export class ElementProperty {
 		);
 	}
 
+	public static fromPatternProperty(
+		patternProperty: AnyPatternProperty,
+		context: ElementPropertyContext
+	): ElementProperty {
+		return new ElementProperty(
+			{
+				id: uuid.v4(),
+				patternPropertyId: patternProperty.getId(),
+				setDefault: patternProperty.getRequired(),
+				value: patternProperty.getDefaultValue()
+			},
+			context
+		);
+	}
+
 	public clone(): ElementProperty {
 		const cloneElementAction = (): string | undefined => {
 			const patternProperty = this.getPatternProperty();

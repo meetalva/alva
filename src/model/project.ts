@@ -45,17 +45,20 @@ export class Project {
 
 	@Mobx.observable private path;
 
-	@Mobx.observable private patternLibraries: PatternLibrary[];
+	@Mobx.observable private patternLibraries: Map<string, PatternLibrary> = new Map();
 
 	@Mobx.observable private userStore: UserStore;
 
 	public constructor(init: ProjectProperties) {
-		this.patternLibraries = init.patternLibraries;
 		this.name = init.name;
 		this.id = init.id ? init.id : uuid.v4();
 		this.pages = init.pages ? init.pages : [];
 		this.path = init.path;
 		this.userStore = init.userStore;
+
+		init.patternLibraries.forEach(patternLibrary =>
+			this.patternLibraries.set(patternLibrary.getId(), patternLibrary)
+		);
 	}
 
 	public static create(init: ProjectCreateInit): Project {
@@ -192,7 +195,7 @@ export class Project {
 
 	@Mobx.action
 	public addPatternLibrary(patternLibrary: PatternLibrary): void {
-		this.patternLibraries.push(patternLibrary);
+		this.patternLibraries.set(patternLibrary.getId(), patternLibrary);
 		// this.patternLibrary = patternLibrary;
 		// this.elements.forEach(e => e.setPatternLibrary({ patternLibrary, project: this }));
 		// this.elementContents.forEach(e => e.setPatternLibrary(this.patternLibrary));
@@ -204,7 +207,7 @@ export class Project {
 	}
 
 	public getBuiltinPatternLibrary(): PatternLibrary {
-		return this.patternLibraries.find(
+		return this.getPatternLibraries().find(
 			p => p.getOrigin() === Types.PatternLibraryOrigin.BuiltIn
 		) as PatternLibrary;
 	}
@@ -231,6 +234,10 @@ export class Project {
 
 	public getElements(): Element[] {
 		return [...this.elements.values()];
+	}
+
+	public getElementsByPattern(pattern: Pattern): Element[] {
+		return this.getElements().filter(e => e.hasPattern(pattern));
 	}
 
 	public getFocusedItem(): Element | Page | undefined {
@@ -301,11 +308,11 @@ export class Project {
 	}
 
 	public getPatternLibraries(): PatternLibrary[] {
-		return this.patternLibraries;
+		return [...this.patternLibraries.values()];
 	}
 
 	public getPatternLibraryById(id: string): PatternLibrary | undefined {
-		return this.patternLibraries.find(library => library.getId() === id);
+		return this.patternLibraries.get(id);
 	}
 
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
@@ -481,7 +488,7 @@ export class Project {
 			name: this.name,
 			pages: this.pages.map(p => p.toJSON()),
 			path: this.path,
-			patternLibraries: this.patternLibraries.map(p => p.toJSON()),
+			patternLibraries: this.getPatternLibraries().map(p => p.toJSON()),
 			userStore: this.userStore.toJSON()
 		};
 	}

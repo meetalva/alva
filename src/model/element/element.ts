@@ -63,7 +63,7 @@ export class Element {
 
 	private readonly project: Project;
 
-	@Mobx.observable private properties: ElementProperty[];
+	@Mobx.observable private properties: Map<string, ElementProperty> = new Map();
 
 	private role: Types.ElementRole;
 
@@ -122,7 +122,7 @@ export class Element {
 			});
 		};
 
-		this.properties = getProperties();
+		getProperties().forEach(prop => this.properties.set(prop.getId(), prop));
 	}
 
 	public static from(serialized: Types.SerializedElement, context: ElementContext): Element {
@@ -171,28 +171,35 @@ export class Element {
 	}
 
 	@Mobx.action
-	public clone(): Element {
+	public addProperty(property: ElementProperty): void {
+		this.properties.set(property.getId(), property);
+	}
+
+	@Mobx.action
+	public clone(opts?: { withState: boolean }): Element {
+		const withState = Boolean(opts && opts.withState);
+
 		const clonedContents = this.contentIds
 			.map(contentId => this.project.getElementContentById(contentId))
 			.filter((content): content is ElementContent => typeof content !== 'undefined')
-			.map(content => content.clone());
+			.map(content => content.clone({ withState }));
 
 		const clone = new Element(
 			{
 				dragged: false,
-				focused: false,
-				highlighted: false,
+				focused: withState ? this.focused : false,
+				highlighted: withState ? this.highlighted : false,
 				id: uuid.v4(),
-				containerId: undefined,
+				containerId: withState ? this.containerId : undefined,
 				contentIds: clonedContents.map(content => content.getId()),
 				name: this.name,
-				open: false,
-				forcedOpen: false,
+				open: withState ? this.open : false,
+				forcedOpen: withState ? this.forcedOpen : false,
 				patternId: this.patternId,
-				placeholderHighlighted: false,
-				properties: this.properties.map(propertyValue => propertyValue.clone()),
+				placeholderHighlighted: withState ? this.placeholderHighlighted : false,
+				properties: this.getProperties().map(propertyValue => propertyValue.clone()),
 				role: this.role,
-				selected: false
+				selected: withState ? this.selected : false
 			},
 			{
 				project: this.project
@@ -388,6 +395,10 @@ export class Element {
 		return this.project.getElementById(containerParentId);
 	}
 
+	public hasPattern(pattern: Pattern): boolean {
+		return this.patternId === pattern.getId();
+	}
+
 	public getPattern(): Pattern | undefined {
 		return this.project.getPatternById(this.patternId);
 	}
@@ -396,8 +407,31 @@ export class Element {
 		return this.placeholderHighlighted;
 	}
 
+	@Mobx.action
 	public getProperties(): ElementProperty[] {
-		return this.properties;
+		const pattern = this.getPattern();
+		const elementProperties = [...this.properties.values()];
+
+		if (pattern) {
+			return pattern.getProperties().map(patternProperty => {
+				const elementProperty = elementProperties.find(
+					e => e.getPatternPropertyId() === patternProperty.getId()
+				);
+
+				if (elementProperty) {
+					return elementProperty;
+				}
+
+				const newElementProperty = ElementProperty.fromPatternProperty(patternProperty, {
+					project: this.project
+				});
+
+				this.addProperty(newElementProperty);
+				return newElementProperty;
+			});
+		}
+
+		return elementProperties;
 	}
 
 	public getRole(): Types.ElementRole {
@@ -556,7 +590,7 @@ export class Element {
 			forcedOpen: this.forcedOpen,
 			patternId: this.patternId,
 			placeholderHighlighted: this.placeholderHighlighted,
-			properties: this.properties.map(elementProperty => elementProperty.toJSON()),
+			properties: this.getProperties().map(elementProperty => elementProperty.toJSON()),
 			role: serializeRole(this.role),
 			selected: this.selected
 		};

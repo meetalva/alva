@@ -7,8 +7,6 @@ import { PatternSlot } from './pattern-slot';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
-// const deepDiff = require('deep-diff');
-
 export interface PatternInit {
 	contextId: string;
 	description: string;

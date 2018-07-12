@@ -1,9 +1,9 @@
 import * as Components from '../../components';
 import { ElementDragImage } from '../element-drag-image';
 import * as MobxReact from 'mobx-react';
-// import { PatternFolderContainer } from './pattern-folder-container';
 import { PatternItemContainer } from './pattern-item-container';
 import * as React from 'react';
+import * as Types from '../../types';
 import { ViewStore } from '../../store';
 
 @MobxReact.inject('store')
@@ -34,6 +34,7 @@ export class PatternListContainer extends React.Component {
 					<Components.PatternFolderView key={library.getId()} name={library.getName()}>
 						{library
 							.getPatterns()
+							.filter(pattern => pattern.getType() !== Types.PatternType.SyntheticPage)
 							.map(pattern => (
 								<PatternItemContainer key={pattern.getId()} pattern={pattern} />
 							))}

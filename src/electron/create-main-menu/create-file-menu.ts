@@ -1,6 +1,7 @@
 import * as Electron from 'electron';
 import { MessageType } from '../../message';
 import * as Model from '../../model';
+import { requestProject } from '../request-project';
 import { Sender } from '../../sender/server';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
@@ -64,16 +65,15 @@ export function createFileMenu(
 				enabled: typeof ctx.project !== 'undefined',
 				accelerator: 'CmdOrCtrl+S',
 				role: 'save',
-				click: () => {
-					if (!project) {
-						return;
-					}
+				click: async () => {
+					const freshProject = await requestProject(injection.sender);
+
 					injection.sender.send({
 						type: MessageType.Save,
 						id: uuid.v4(),
 						payload: {
-							path: project.getPath(),
-							project: project.toJSON()
+							path: freshProject.getPath(),
+							project: freshProject.toJSON()
 						}
 					});
 				}

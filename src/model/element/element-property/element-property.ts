@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import { AnyPatternProperty } from '../../pattern-property';
 import { Project } from '../../project';
@@ -103,6 +104,10 @@ export class ElementProperty {
 		);
 	}
 
+	public equals(b: this): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
+	}
+
 	public getHidden(): boolean | undefined {
 		const patternProperty = this.getPatternProperty();
 
@@ -145,5 +150,13 @@ export class ElementProperty {
 			setDefault: this.setDefault,
 			value: this.value
 		};
+	}
+
+	@Mobx.action
+	public update(b: ElementProperty): void {
+		this.id = b.id;
+		this.patternPropertyId = b.patternPropertyId;
+		this.setDefault = b.setDefault;
+		this.value = b.value;
 	}
 }

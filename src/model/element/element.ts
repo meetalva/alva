@@ -1,3 +1,4 @@
+import { computeDifference } from '../../alva-util';
 import { ElementContent } from './element-content';
 import { ElementProperty } from './element-property';
 import * as _ from 'lodash';
@@ -457,6 +458,11 @@ export class Element {
 	}
 
 	@Mobx.action
+	public removeProperty(property: ElementProperty): void {
+		this.properties.delete(property.getId());
+	}
+
+	@Mobx.action
 	public setContainer(container: ElementContent): void {
 		this.containerId = container.getId();
 	}
@@ -611,6 +617,15 @@ export class Element {
 			this.project.unsetHighlightedElement();
 		}
 
+		const propsChanges = computeDifference({
+			before: this.getProperties(),
+			after: b.getProperties()
+		});
+
+		propsChanges.removed.forEach(change => this.removeProperty(change.before));
+		propsChanges.added.forEach(change => this.addProperty(change.after));
+		propsChanges.changed.forEach(change => change.before.update(change.after));
+
 		this.highlighted = b.highlighted;
 		this.dragged = b.dragged;
 		this.focused = b.focused;
@@ -619,7 +634,6 @@ export class Element {
 		this.open = b.open;
 		this.forcedOpen = b.forcedOpen;
 		this.placeholderHighlighted = b.placeholderHighlighted;
-		this.properties = b.properties;
 		this.selected = b.selected;
 	}
 }

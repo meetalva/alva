@@ -1,11 +1,13 @@
 import * as AlvaUtil from '../../alva-util';
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
-import { PatternFolder } from '../pattern-folder';
 import { PatternLibrary } from '../pattern-library';
 import * as PatternProperty from '../pattern-property';
 import { PatternSlot } from './pattern-slot';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
+
+// const deepDiff = require('deep-diff');
 
 export interface PatternInit {
 	contextId: string;
@@ -27,12 +29,11 @@ export class Pattern {
 	@Mobx.observable private contextId: string;
 	@Mobx.observable private description: string;
 	@Mobx.observable private exportName: string;
-	@Mobx.observable private folder: PatternFolder;
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
 	@Mobx.observable private origin: Types.PatternOrigin;
 	@Mobx.observable private patternLibrary: PatternLibrary;
-	@Mobx.observable private propertyIds: string[];
+	@Mobx.observable private propertyIds: Set<string> = new Set();
 	@Mobx.observable private slots: PatternSlot[];
 	@Mobx.observable private type: Types.PatternType;
 
@@ -44,7 +45,7 @@ export class Pattern {
 		this.name = AlvaUtil.guessName(init.name);
 		this.origin = init.origin;
 		this.patternLibrary = context.patternLibrary;
-		this.propertyIds = init.propertyIds;
+		this.propertyIds = new Set(init.propertyIds);
 		this.slots = init.slots;
 		this.type = init.type;
 	}
@@ -66,8 +67,16 @@ export class Pattern {
 		);
 	}
 
+	public addProperty(property: PatternProperty.AnyPatternProperty): void {
+		this.propertyIds.add(property.getId());
+	}
+
 	public addSlot(slot: PatternSlot): void {
 		this.slots.push(slot);
+	}
+
+	public equals(b: Pattern): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
 	}
 
 	public getContextId(): string {
@@ -80,10 +89,6 @@ export class Pattern {
 
 	public getExportName(): string {
 		return this.exportName;
-	}
-
-	public getFolder(): PatternFolder {
-		return this.folder;
 	}
 
 	public getId(): string {
@@ -99,7 +104,7 @@ export class Pattern {
 	}
 
 	public getProperties(): PatternProperty.AnyPatternProperty[] {
-		return this.propertyIds
+		return this.getPropertyIds()
 			.map(propertyId => this.patternLibrary.getPatternPropertyById(propertyId))
 			.filter((p): p is PatternProperty.AnyPatternProperty => typeof p !== 'undefined');
 	}
@@ -111,7 +116,7 @@ export class Pattern {
 	}
 
 	public getPropertyIds(): string[] {
-		return this.propertyIds;
+		return [...this.propertyIds];
 	}
 
 	public getSlots(): PatternSlot[] {
@@ -120,6 +125,10 @@ export class Pattern {
 
 	public getType(): Types.PatternType {
 		return this.type;
+	}
+
+	public removeProperty(property: PatternProperty.AnyPatternProperty): void {
+		this.propertyIds.delete(property.getId());
 	}
 
 	public toJSON(): Types.SerializedPattern {
@@ -143,7 +152,7 @@ export class Pattern {
 		this.name = pattern.getName();
 		this.origin = pattern.getOrigin();
 		this.patternLibrary = context.patternLibrary;
-		this.propertyIds = pattern.getPropertyIds();
+		this.propertyIds = pattern.propertyIds;
 		this.slots = pattern.getSlots();
 		this.type = pattern.getType();
 	}

@@ -1,10 +1,11 @@
+import { computeDifference } from '../../alva-util';
 import { Box, Image, Link, Page, Text } from './builtins';
 import * as Fuse from 'fuse.js';
 import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Pattern, PatternSlot } from '../pattern';
-import { PatternFolder } from '../pattern-folder';
 import { AnyPatternProperty, PatternEnumProperty, PatternProperty } from '../pattern-property';
+import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
@@ -17,7 +18,6 @@ export interface PatternLibraryInit {
 	origin: Types.PatternLibraryOrigin;
 	patternProperties: AnyPatternProperty[];
 	patterns: Pattern[];
-	root?: PatternFolder;
 	state: Types.PatternLibraryState;
 }
 
@@ -45,10 +45,9 @@ export class PatternLibrary {
 	@Mobx.observable private fuse: Fuse;
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
-	@Mobx.observable private patternProperties: AnyPatternProperty[] = [];
-	@Mobx.observable private patterns: Pattern[] = [];
+	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
+	@Mobx.observable private patterns: Map<string, Pattern> = new Map();
 	@Mobx.observable private origin: Types.PatternLibraryOrigin;
-	@Mobx.observable private root: PatternFolder;
 	@Mobx.observable private state: Types.PatternLibraryState;
 
 	public constructor(init: PatternLibraryInit) {
@@ -58,14 +57,11 @@ export class PatternLibrary {
 		this.id = init.id || uuid.v4();
 		this.name = init.name;
 		this.origin = init.origin;
-		this.patterns = init.patterns;
-		this.patternProperties = init.patternProperties;
+		init.patterns.forEach(pattern => this.patterns.set(pattern.getId(), pattern));
+		init.patternProperties.forEach(prop => this.patternProperties.set(prop.getId(), prop));
 		this.state = init.state;
 
-		if (init.root) {
-			this.root = init.root;
-			this.updateSearch();
-		}
+		this.updateSearch();
 	}
 
 	public static create(init: PatternLibraryInit): PatternLibrary {
@@ -78,37 +74,12 @@ export class PatternLibrary {
 
 		const patternLibrary = new PatternLibrary(init);
 
-		const root = new PatternFolder(
-			{
-				name: 'root',
-				type: Types.PatternFolderType.Builtin
-			},
-			{ patternLibrary }
-		);
-
-		patternLibrary.setRootFolder(root);
-
 		if (init.origin === Types.PatternLibraryOrigin.BuiltIn) {
-			const syntheticFolder = new PatternFolder(
-				{
-					name: 'Built-In Components',
-					type: Types.PatternFolderType.Builtin
-				},
-				{ patternLibrary }
-			);
-
-			root.addChild(syntheticFolder);
-
 			const link = Link({ options, patternLibrary });
 			const page = Page({ options, patternLibrary });
 			const image = Image({ options, patternLibrary });
 			const text = Text({ options, patternLibrary });
 			const box = Box({ options, patternLibrary });
-
-			syntheticFolder.addPattern(text.pattern);
-			syntheticFolder.addPattern(box.pattern);
-			syntheticFolder.addPattern(image.pattern);
-			syntheticFolder.addPattern(link.pattern);
 
 			[page.pattern, text.pattern, box.pattern, image.pattern, link.pattern].forEach(pattern => {
 				patternLibrary.addPattern(pattern);
@@ -143,8 +114,6 @@ export class PatternLibrary {
 			state
 		});
 
-		patternLibrary.setRootFolder(PatternFolder.from(serialized.root, { patternLibrary }));
-
 		serialized.patterns.forEach(pattern => {
 			patternLibrary.addPattern(Pattern.from(pattern, { patternLibrary }));
 		});
@@ -153,66 +122,78 @@ export class PatternLibrary {
 	}
 
 	@Mobx.action
-	public static import(
-		analysis: Types.LibraryAnalysis,
-		previousLibrary?: PatternLibrary
-	): PatternLibrary {
-		const patternLibrary =
-			previousLibrary ||
-			PatternLibrary.create({
-				id: uuid.v4(),
-				name: analysis.name,
-				origin: Types.PatternLibraryOrigin.UserProvided,
-				patternProperties: [],
-				patterns: [],
-				bundle: analysis.bundle,
-				bundleId: analysis.id,
-				description: analysis.description,
-				state: Types.PatternLibraryState.Connected
-			});
+	public import(analysis: Types.LibraryAnalysis, { project }: { project: Project }): void {
+		const patternsBefore = this.getPatterns();
 
-		const rootFolder = patternLibrary.getRoot();
-		rootFolder.getChildren().forEach(child => rootFolder.removeChild(child));
-
-		const folder = new PatternFolder(
-			{ name: analysis.name, type: Types.PatternFolderType.UserProvided },
-			{ patternLibrary }
-		);
-
-		analysis.patterns
-			.map(item => Pattern.from(item.pattern, { patternLibrary }))
-			.forEach(pattern => {
-				patternLibrary.addPattern(pattern);
-				folder.addPattern(pattern);
-			});
-
-		analysis.patterns.forEach(item => {
-			item.properties
-				.map(property => PatternProperty.from(property))
-				.forEach(property => patternLibrary.addProperty(property));
+		const patternChanges = computeDifference({
+			before: patternsBefore,
+			after: analysis.patterns.map(item => Pattern.from(item.pattern, { patternLibrary: this }))
 		});
 
-		patternLibrary.getRoot().addChild(folder);
-		patternLibrary.setState(Types.PatternLibraryState.Connected);
-		patternLibrary.updateSearch();
+		patternChanges.removed.map(change => {
+			this.removePattern(change.before);
+		});
 
-		patternLibrary.setBundle(analysis.bundle);
-		patternLibrary.setBundleId(analysis.id);
+		patternChanges.added.map(change => {
+			this.addPattern(change.after);
+		});
 
-		return patternLibrary;
+		patternChanges.changed.map(change => {
+			change.before.update(change.after, { patternLibrary: this });
+		});
+
+		const propMap: Map<string, Pattern> = new Map();
+
+		const props = analysis.patterns.reduce((p: AnyPatternProperty[], patternAnalysis) => {
+			const pattern = Pattern.from(patternAnalysis.pattern, { patternLibrary: this });
+
+			patternAnalysis.properties.forEach(prop => {
+				const patternProperty = PatternProperty.from(prop);
+				p.push(patternProperty);
+				propMap.set(patternProperty.getId(), pattern);
+			});
+			return p;
+		}, []);
+
+		const propChanges = computeDifference({
+			before: this.getPatternProperties(),
+			after: props
+		});
+
+		propChanges.removed.map(change => {
+			this.removeProperty(change.before);
+		});
+
+		propChanges.added.map(change => {
+			const pattern = propMap.get(change.after.getId());
+			const p = pattern ? this.getPatternById(pattern.getId()) : undefined;
+
+			this.addProperty(change.after);
+
+			if (p) {
+				p.addProperty(change.after);
+			}
+		});
+
+		propChanges.changed.map(change => change.before.update(change.after));
+
+		this.setState(Types.PatternLibraryState.Connected);
+		this.updateSearch();
+
+		this.setBundle(analysis.bundle);
+		this.setBundleId(analysis.id);
 	}
-
 	public equals(b: PatternLibrary): boolean {
 		return isEqual(this.toJSON(), b.toJSON());
 	}
 
 	public addPattern(pattern: Pattern): void {
-		this.patterns.push(pattern);
+		this.patterns.set(pattern.getId(), pattern);
 		this.updateSearch();
 	}
 
 	public addProperty(property: AnyPatternProperty): void {
-		this.patternProperties.push(property);
+		this.patternProperties.set(property.getId(), property);
 	}
 
 	public assignEnumOptionId(enumId: string, contextId: string): string {
@@ -293,23 +274,23 @@ export class PatternLibrary {
 	}
 
 	public getPatternByContextId(contextId: string): Pattern | undefined {
-		return this.patterns.find(pattern => pattern.getContextId() === contextId);
+		return this.getPatterns().find(pattern => pattern.getContextId() === contextId);
 	}
 
 	public getPatternById(id: string): Pattern | undefined {
-		return this.patterns.find(pattern => pattern.getId() === id);
+		return this.patterns.get(id);
 	}
 
 	public getPatternByType(type: Types.PatternType): Pattern {
-		return this.patterns.find(pattern => pattern.getType() === type) as Pattern;
+		return this.getPatterns().find(pattern => pattern.getType() === type) as Pattern;
 	}
 
 	public getPatternProperties(): AnyPatternProperty[] {
-		return this.patternProperties;
+		return [...this.patternProperties.values()];
 	}
 
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
-		return this.patternProperties.find(patternProperty => patternProperty.getId() === id);
+		return this.getPatternProperties().find(patternProperty => patternProperty.getId() === id);
 	}
 
 	public getPatternSlotById(id: string): PatternSlot | undefined {
@@ -317,15 +298,11 @@ export class PatternLibrary {
 	}
 
 	public getPatterns(): Pattern[] {
-		return this.patterns;
-	}
-
-	public getRoot(): PatternFolder {
-		return this.root;
+		return [...this.patterns.values()];
 	}
 
 	public getSlots(): PatternSlot[] {
-		return this.patterns.reduce((acc, pattern) => [...acc, ...pattern.getSlots()], []);
+		return this.getPatterns().reduce((acc, pattern) => [...acc, ...pattern.getSlots()], []);
 	}
 
 	public getState(): Types.PatternLibraryState {
@@ -334,34 +311,20 @@ export class PatternLibrary {
 
 	public query(term: string): string[] {
 		if (term.trim().length === 0) {
-			return this.root.getDescendants().map(item => item.getId());
+			return this.getPatterns().map(p => p.getId());
 		}
 
-		return this.fuse
-			.search<Types.SerializedPattern | Types.SerializedPatternFolder>(term)
-			.map(match => match.id);
+		return this.fuse.search<Types.SerializedPattern>(term).map(match => match.id);
 	}
 
 	@Mobx.action
 	public removePattern(pattern: Pattern): void {
-		const index = this.patterns.indexOf(pattern);
-
-		if (index === -1) {
-			return;
-		}
-
-		this.patterns.splice(index, 1);
+		this.patterns.delete(pattern.getId());
 	}
 
 	@Mobx.action
 	public removeProperty(property: AnyPatternProperty): void {
-		const index = this.patternProperties.indexOf(property);
-
-		if (index === -1) {
-			return;
-		}
-
-		this.patternProperties.splice(index, 1);
+		this.patternProperties.delete(property.getId());
 	}
 
 	@Mobx.action
@@ -385,11 +348,6 @@ export class PatternLibrary {
 	}
 
 	@Mobx.action
-	public setRootFolder(root: PatternFolder): void {
-		this.root = root;
-	}
-
-	@Mobx.action
 	public setState(state: Types.PatternLibraryState): void {
 		this.state = state;
 	}
@@ -402,9 +360,8 @@ export class PatternLibrary {
 			id: this.id,
 			name: this.name,
 			origin: serializeOrigin(this.origin),
-			patterns: this.patterns.map(p => p.toJSON()),
-			patternProperties: this.patternProperties.map(p => p.toJSON()),
-			root: this.root.toJSON(),
+			patterns: this.getPatterns().map(p => p.toJSON()),
+			patternProperties: this.getPatternProperties().map(p => p.toJSON()),
 			state: this.state
 		};
 	}
@@ -419,13 +376,12 @@ export class PatternLibrary {
 		this.origin = b.origin;
 		this.patterns = b.patterns;
 		this.patternProperties = b.patternProperties;
-		this.root = b.root;
 		this.state = this.state;
 	}
 
 	@Mobx.action
 	public updateSearch(): void {
-		const registry = this.root.getDescendants().map(item => item.toJSON());
+		const registry = this.getPatterns().map(item => item.toJSON());
 
 		this.fuse = new Fuse(registry, {
 			keys: ['name']

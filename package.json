@@ -158,6 +158,7 @@
     "common-dir": "2.0.2",
     "commondir": "1.0.1",
     "deep-assign": "2.0.0",
+    "deep-diff": "1.0.1",
     "electron-is-dev": "0.3.0",
     "electron-log": "2.2.14",
     "electron-store": "2.0.0",

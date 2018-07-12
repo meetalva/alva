@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
@@ -56,6 +57,10 @@ export abstract class PatternPropertyBase<T> {
 
 	// tslint:disable-next-line:no-any
 	public abstract coerceValue(value: any): T;
+
+	public equals(b: this): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
+	}
 
 	public getContextId(): string {
 		return this.contextId;

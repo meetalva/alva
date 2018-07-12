@@ -38,7 +38,22 @@ export function createProjectMessageHandler({
 				break;
 			}
 			case Message.MessageType.ConnectPatternLibraryResponse: {
-				const library = Model.PatternLibrary.import(message.payload.analysis);
+				const analysis = message.payload.analysis;
+
+				const library = Model.PatternLibrary.create({
+					id: uuid.v4(),
+					name: analysis.name,
+					origin: Types.PatternLibraryOrigin.UserProvided,
+					patternProperties: [],
+					patterns: [],
+					bundle: analysis.bundle,
+					bundleId: analysis.id,
+					description: analysis.description,
+					state: Types.PatternLibraryState.Connected
+				});
+
+				library.import(analysis, { project });
+
 				project.addPatternLibrary(library);
 				store.getApp().setRightSidebarTab(Types.RightSidebarTab.ProjectSettings);
 				store.commit();
@@ -55,17 +70,13 @@ export function createProjectMessageHandler({
 				break;
 			}
 			case Message.MessageType.UpdatePatternLibraryResponse: {
-				const previousLibrary = project.getPatternLibraryById(
-					message.payload.previousLibraryId
-				);
+				const library = project.getPatternLibraryById(message.payload.previousLibraryId);
 
-				if (!previousLibrary) {
+				if (!library) {
 					return;
 				}
 
-				const library = Model.PatternLibrary.import(message.payload.analysis, previousLibrary);
-
-				store.getApp().setRightSidebarTab(Types.RightSidebarTab.ProjectSettings);
+				library.import(message.payload.analysis, { project });
 				store.commit();
 
 				Sender.send({

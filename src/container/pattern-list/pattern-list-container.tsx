@@ -1,7 +1,7 @@
-import { Search, Space, SpaceSize } from '../../components';
+import * as Components from '../../components';
 import { ElementDragImage } from '../element-drag-image';
 import * as MobxReact from 'mobx-react';
-import { PatternFolderContainer } from './pattern-folder-container';
+// import { PatternFolderContainer } from './pattern-folder-container';
 import { PatternItemContainer } from './pattern-item-container';
 import * as React from 'react';
 import { ViewStore } from '../../store';
@@ -23,29 +23,22 @@ export class PatternListContainer extends React.Component {
 
 		return (
 			<div onDragStart={e => this.handleDragStart(e)}>
-				<Space sizeBottom={SpaceSize.XXS}>
-					<Search
+				<Components.Space sizeBottom={Components.SpaceSize.XXS}>
+					<Components.Search
 						placeholder="Search Library"
 						onChange={e => store.setPatternSearchTerm(e.target.value)}
 						value={store.getPatternSearchTerm()}
 					/>
-				</Space>
-				{store.getPatternLibraries().map(library => {
-					const patternRoot = library.getRoot();
-					const matches = library.query(store.getPatternSearchTerm());
-
-					return (
-						<PatternFolderContainer
-							isRoot
-							folder={patternRoot}
-							matches={matches}
-							key={library.getId()}
-							render={pattern => (
+				</Components.Space>
+				{store.getPatternLibraries().map(library => (
+					<Components.PatternFolderView key={library.getId()} name={library.getName()}>
+						{library
+							.getPatterns()
+							.map(pattern => (
 								<PatternItemContainer key={pattern.getId()} pattern={pattern} />
-							)}
-						/>
-					);
-				})}
+							))}
+					</Components.PatternFolderView>
+				))}
 
 				<ElementDragImage
 					element={store.getDraggedElement()}

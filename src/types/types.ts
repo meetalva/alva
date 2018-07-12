@@ -74,16 +74,7 @@ export interface SerializedPatternLibrary {
 	origin: SerializedPatternLibraryOrigin;
 	patternProperties: PatternProperty.SerializedPatternProperty[];
 	patterns: SerializedPattern[];
-	root: SerializedPatternFolder;
 	state: PatternLibraryState;
-}
-
-export interface SerializedPatternFolder {
-	children: SerializedPatternFolder[];
-	id: string;
-	name: string;
-	patterns: string[];
-	type: 'builtin' | 'user-provided';
 }
 
 export enum PatternType {

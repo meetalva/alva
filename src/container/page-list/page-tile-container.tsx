@@ -2,7 +2,7 @@ import { PageTile } from '../../components';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
-import { ViewStore } from '../../store';
+import { WithStore } from '../../store';
 import * as Types from '../../types';
 import { EditableTitleContainer } from '../editable-title/editable-title-container';
 
@@ -15,12 +15,8 @@ export interface PageTileContainerProps {
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PageTileContainer extends React.Component<PageTileContainerProps> {
-	protected handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
-		this.props.page.setName(e.target.value);
-	}
-
-	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
-		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
+	private handleClick(e: React.MouseEvent<HTMLElement>): void {
+		const { store } = this.props as PageTileContainerProps & WithStore;
 
 		if (!this.props.focused) {
 			store.getProject().setActivePage(this.props.page);
@@ -42,14 +38,8 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 		}
 	}
 
-	protected handleFocus(): void {
+	private handleFocus(): void {
 		this.props.page.setNameState(Types.EditableTitleState.Editing);
-	}
-
-	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
-		if (this.props.page.getNameState() === Types.EditableTitleState.Editing) {
-			return;
-		}
 	}
 
 	public render(): JSX.Element {

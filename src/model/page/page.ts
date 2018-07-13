@@ -39,12 +39,6 @@ export class Page {
 		this.active = init.active;
 		this.rootId = init.rootId;
 		this.name = init.name;
-
-		const rootElement = this.getRoot();
-
-		if (rootElement) {
-			rootElement.setPage(this);
-		}
 	}
 
 	@Mobx.computed
@@ -199,9 +193,24 @@ export class Page {
 		return this.project.getElementById(this.rootId);
 	}
 
+	public hasElement(element: Element): boolean {
+		const rootElement = this.getRoot();
+
+		if (!rootElement) {
+			return false;
+		}
+
+		return rootElement.getDescendants().some(desc => desc.getId() === element.getId());
+	}
+
 	@Mobx.action
 	public setActive(active: boolean): void {
 		this.active = active;
+	}
+
+	@Mobx.action
+	public setEditableName(name: string): void {
+		this.editedName = name;
 	}
 
 	@Mobx.action
@@ -210,19 +219,14 @@ export class Page {
 	}
 
 	@Mobx.action
-	public setName(name: string, editNameState?: Types.EditableTitleState): void {
-		if (editNameState === Types.EditableTitleState.Editing) {
-			this.editedName = name;
-			return;
-		}
+	public setName(name: string): void {
 		this.name = name;
+		this.editedName = name;
 	}
 
 	@Mobx.action
 	public setNameState(state: Types.EditableTitleState): void {
-		if (state === Types.EditableTitleState.Editing) {
-			this.editedName = this.name;
-		}
+		this.editedName = this.name;
 		this.nameState = state;
 	}
 

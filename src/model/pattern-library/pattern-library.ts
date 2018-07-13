@@ -297,8 +297,14 @@ export class PatternLibrary {
 		return this.getSlots().find(slot => slot.getId() === id);
 	}
 
-	public getPatterns(): Pattern[] {
-		return [...this.patterns.values()];
+	public getPatterns(ids?: string[]): Pattern[] {
+		if (typeof ids === 'undefined') {
+			return [...this.patterns.values()];
+		}
+
+		return ids
+			.map(id => this.getPatternById(id))
+			.filter((pattern): pattern is Pattern => typeof pattern !== 'undefined');
 	}
 
 	public getSlots(): PatternSlot[] {

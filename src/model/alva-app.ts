@@ -26,10 +26,9 @@ export class AlvaApp {
 	public constructor(init?: AlvaAppInit) {
 		if (init) {
 			this.activeView = init.activeView;
+			this.panes = init.panes;
 			this.searchTerm = init.searchTerm;
 			this.state = init.state;
-			this.rightSidebarTab = init.rightSidebarTab;
-			this.panes = init.panes;
 		}
 	}
 

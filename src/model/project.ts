@@ -3,6 +3,7 @@ import { ElementAction } from './element-action';
 import * as Mobx from 'mobx';
 import * as _ from 'lodash';
 import { Page } from './page';
+import { PatternSearch } from './pattern-search';
 import { Pattern, PatternSlot } from './pattern';
 import { PatternLibrary } from './pattern-library';
 import { AnyPatternProperty } from './pattern-property';
@@ -48,6 +49,13 @@ export class Project {
 	@Mobx.observable private patternLibraries: Map<string, PatternLibrary> = new Map();
 
 	@Mobx.observable private userStore: UserStore;
+
+	@Mobx.computed
+	private get patternSearch(): PatternSearch {
+		return new PatternSearch({
+			patterns: this.getPatternLibraries().reduce((ps, lib) => [...ps, ...lib.getPatterns()], [])
+		});
+	}
 
 	public constructor(init: ProjectProperties) {
 		this.name = init.name;
@@ -322,6 +330,10 @@ export class Project {
 			}
 			return lib.getPatternPropertyById(id);
 		}, undefined);
+	}
+
+	public getPatternSearch(): PatternSearch {
+		return this.patternSearch;
 	}
 
 	public getPatternSlotById(id: string): PatternSlot | undefined {

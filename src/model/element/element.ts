@@ -54,8 +54,6 @@ export class Element {
 
 	@Mobx.observable private open: boolean;
 
-	@Mobx.observable private page?: Page;
-
 	@Mobx.observable private parent: Element;
 
 	private readonly patternId: string;
@@ -331,6 +329,12 @@ export class Element {
 	}
 
 	public getHighlighted(): boolean {
+		const page = this.getPage();
+
+		if (!page || !page.getActive()) {
+			return false;
+		}
+
 		return this.highlighted;
 	}
 
@@ -369,15 +373,7 @@ export class Element {
 	}
 
 	public getPage(): Page | undefined {
-		if (this.page) {
-			return this.page;
-		}
-
-		if (this.parent) {
-			return this.parent.getPage();
-		}
-
-		return;
+		return this.project.getPages().find(page => page.hasElement(this));
 	}
 
 	public getParent(): Element | undefined {
@@ -405,6 +401,12 @@ export class Element {
 	}
 
 	public getPlaceholderHighlighted(): boolean {
+		const page = this.getPage();
+
+		if (!page || !page.getActive()) {
+			return false;
+		}
+
 		return this.placeholderHighlighted;
 	}
 
@@ -440,6 +442,12 @@ export class Element {
 	}
 
 	public getSelected(): boolean {
+		const page = this.getPage();
+
+		if (!page || !page.getActive()) {
+			return false;
+		}
+
 		return this.selected;
 	}
 
@@ -525,11 +533,6 @@ export class Element {
 	@Mobx.action
 	public setOpen(open: boolean): void {
 		this.open = open;
-	}
-
-	@Mobx.action
-	public setPage(page: Page): void {
-		this.page = page;
 	}
 
 	@Mobx.action

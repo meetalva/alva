@@ -4,7 +4,6 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import { PatternItemContainer } from './pattern-item-container';
 import * as React from 'react';
-import styled from 'styled-components';
 import * as Types from '../../types';
 import { ViewStore } from '../../store';
 

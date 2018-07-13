@@ -206,44 +206,6 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public executeElementCut(element: Model.Element): void {
-		if (element.getRole() === Types.ElementRole.Root) {
-			return;
-		}
-
-		this.setClipboardItem(element);
-		const selectNext = this.removeElement(element);
-		this.commit();
-		selectNext();
-	}
-
-	@Mobx.action
-	public executeElementCutById(id: string): void {
-		const element = this.getElementById(id);
-		if (!element) {
-			return;
-		}
-
-		this.setClipboardItem(element);
-		const selectNext = this.removeElement(element);
-		this.commit();
-		selectNext();
-	}
-
-	@Mobx.action
-	public executeElementDuplicate(element: Model.Element): Model.Element | undefined {
-		const clone = this.duplicateElement(element);
-
-		if (!clone) {
-			return;
-		}
-
-		this.setSelectedElement(clone);
-		this.commit();
-		return clone;
-	}
-
-	@Mobx.action
 	public duplicateElementById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
@@ -317,21 +279,6 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public executeElementInsertInside(init: {
-		element: Model.Element;
-		targetElement: Model.Element;
-	}): Model.Element | undefined {
-		if (init.element.getRole() === Types.ElementRole.Root) {
-			return;
-		}
-
-		this.insertElementInside(init);
-		this.commit();
-		this.setSelectedElement(init.element);
-
-		return init.element;
-	}
-
 	public executeElementMove(init: {
 		content: Model.ElementContent;
 		element: Model.Element;
@@ -339,121 +286,6 @@ export class ViewStore {
 	}): void {
 		this.moveElement(init);
 		this.commit();
-	}
-
-	@Mobx.action
-	public executeElementPasteAfter(targetElement: Model.Element): Model.Element | undefined {
-		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
-
-		if (!clipboardElement) {
-			return;
-		}
-
-		const element = this.insertElementAfter({ element: clipboardElement, targetElement });
-
-		if (!element) {
-			return;
-		}
-
-		this.setSelectedElement(element);
-		this.commit();
-		return element;
-	}
-
-	@Mobx.action
-	public executeElementPasteAfterById(id: string): Model.Element | undefined {
-		const element = this.getElementById(id);
-
-		if (!element) {
-			return;
-		}
-
-		return this.executeElementPasteAfter(element);
-	}
-
-	@Mobx.action
-	public executeElementPasteAfterSelected(): Model.Element | undefined {
-		const selectedElement = this.getSelectedElement();
-		const page = this.getActivePage();
-		const rootElement = page ? page.getRoot() : undefined;
-
-		if (!selectedElement && !rootElement) {
-			return;
-		}
-
-		if (selectedElement) {
-			return this.executeElementPasteAfter(selectedElement);
-		}
-
-		if (rootElement) {
-			return this.executeElementPasteInside(rootElement);
-		}
-
-		return;
-	}
-
-	@Mobx.action
-	public executeElementPasteInside(element: Model.Element): Model.Element | undefined {
-		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
-
-		if (!clipboardElement) {
-			return;
-		}
-
-		this.insertElementInside({ element: clipboardElement, targetElement: element });
-		this.setSelectedElement(clipboardElement);
-		this.commit();
-
-		return clipboardElement;
-	}
-
-	@Mobx.action
-	public executeElementPasteInsideById(id: string): Model.Element | undefined {
-		const element = this.getElementById(id);
-
-		if (!element) {
-			return;
-		}
-
-		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
-
-		if (!clipboardElement) {
-			return;
-		}
-
-		this.insertElementInside({ element: clipboardElement, targetElement: element });
-		this.setSelectedElement(clipboardElement);
-		this.commit();
-
-		return element;
-	}
-
-	@Mobx.action
-	public executeElementPasteInsideSelected(): Model.Element | undefined {
-		const selectedElement = this.getSelectedElement();
-
-		if (!selectedElement) {
-			return;
-		}
-
-		const clipboardElement = this.getClipboardItem(ClipBoardType.Element);
-
-		if (!clipboardElement) {
-			return;
-		}
-
-		this.insertElementInside({ element: clipboardElement, targetElement: selectedElement });
-		this.setSelectedElement(clipboardElement);
-		this.commit();
-
-		return clipboardElement;
-	}
-
-	@Mobx.action
-	public executeElementRemove(element: Model.Element): void {
-		const selectNext = this.removeElement(element);
-		this.commit();
-		selectNext();
 	}
 
 	@Mobx.action
@@ -553,20 +385,6 @@ export class ViewStore {
 
 	public getApp(): Model.AlvaApp {
 		return this.app;
-	}
-
-	public getClipboardItem(type: ClipBoardType.Element): Model.Element | undefined;
-	public getClipboardItem(type: ClipBoardType.Page): Model.Page | undefined;
-
-	@Mobx.action
-	public getClipboardItem(type: ClipBoardType): Model.Page | Model.Element | undefined {
-		const item = this.clipboardItem;
-
-		if (!item || item.type !== type) {
-			return;
-		}
-
-		return item.item.clone();
 	}
 
 	public getContentById(id: string): Model.ElementContent | undefined {

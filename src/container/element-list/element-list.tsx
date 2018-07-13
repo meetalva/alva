@@ -105,15 +105,13 @@ export class ElementList extends React.Component {
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const element = elementFromTarget(e.target, { sibling: false, store });
-		const clipboardItem = store.getClipboardItem(Store.ClipBoardType.Element);
 
 		if (element) {
 			store.requestContextMenu({
 				menu: Types.ContextMenuType.ElementMenu,
 				data: {
 					element: element.toJSON(),
-					project: store.getProject().toJSON(),
-					clipboardItem: clipboardItem ? clipboardItem.toJSON() : undefined
+					project: store.getProject().toJSON()
 				}
 			});
 		}

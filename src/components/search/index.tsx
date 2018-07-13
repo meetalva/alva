@@ -20,6 +20,7 @@ export interface SearchProps {
 
 const StyledContainer = styled.div`
 	position: relative;
+	padding: 0 ${getSpace(SpaceSize.M)}px;
 `;
 
 const StyledSearch = styled.input`
@@ -61,8 +62,8 @@ const StyledSearch = styled.input`
 
 const StyledIcon = styled(Icon.Search)`
 	position: absolute;
-	left: 0;
-	top: ${getSpace(SpaceSize.M) - 1}px; // fix to propertly align icon
+	left: ${getSpace(SpaceSize.M)}px;
+	top: ${getSpace(SpaceSize.M) - 1}px; /* fix to propertly align icon */
 	pointer-events: none;
 `;
 

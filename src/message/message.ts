@@ -9,6 +9,7 @@ export enum MessageType {
 	AssetReadRequest = 'asset-read-request',
 	AssetReadResponse = 'asset-read-response',
 	BundleChange = 'bundle-change',
+	Clipboard = 'clipboard',
 	CheckForUpdatesRequest = 'check-for-updates-request',
 	CheckLibraryRequest = 'check-library-request',
 	CheckLibraryResponse = 'check-library-response',
@@ -51,8 +52,8 @@ export enum MessageType {
 	PageChange = 'page-change',
 	ProjectChange = 'project-change',
 	Paste = 'paste',
-	PasteElementBelow = 'paste-page-element-below',
-	PasteElementInside = 'paste-page-element-inside',
+	PasteElement = 'paste-element',
+	PastePage = 'paste-page',
 	ProjectRequest = 'project-request',
 	ProjectResponse = 'project-response',
 	Redo = 'redo',
@@ -99,6 +100,7 @@ export type Message =
 	| ChangePatternLibraries
 	| ChangePages
 	| ChangeProject
+	| Clipboard
 	| NewFileRequest
 	| NewFileResponse
 	| Copy
@@ -120,8 +122,8 @@ export type Message =
 	| PageChange
 	| ProjectChange
 	| Paste
-	| PastePageElementBelow
-	| PastePageElementInside
+	| PasteElement
+	| PastePage
 	| ProjectRequest
 	| ProjectResponse
 	| Redo
@@ -200,7 +202,10 @@ export type ContextMenuRequst = Envelope<
 >;
 export type ContentRequest = EmptyEnvelope<MessageType.ContentRequest>;
 export type ContentResponse = Envelope<MessageType.ContentResponse, string>;
-export type Copy = EmptyEnvelope<MessageType.Copy>;
+export type Copy = Envelope<
+	MessageType.Copy,
+	{ type: Types.SerializedItemType; id: string } | undefined
+>;
 export type CopyPageElement = Envelope<MessageType.CopyElement, string>;
 export type CreateNewPage = Envelope<MessageType.CreateNewPage, undefined>;
 export type CreateScriptBundleRequest = Envelope<
@@ -228,9 +233,23 @@ export type OpenFileRequest = Envelope<MessageType.OpenFileRequest, { path: stri
 export type OpenFileResponse = Envelope<MessageType.OpenFileResponse, Types.ProjectPayload>;
 export type PageChange = Envelope<MessageType.PageChange, Types.PageChangePayload>;
 export type ProjectChange = Envelope<MessageType.ProjectChange, Types.SerializedProject>;
-export type Paste = EmptyEnvelope<MessageType.Paste>;
-export type PastePageElementBelow = Envelope<MessageType.PasteElementBelow, string>;
-export type PastePageElementInside = Envelope<MessageType.PasteElementInside, string>;
+export type Paste = Envelope<
+	MessageType.Paste,
+	undefined | { targetType: Types.ElementTargetType; id: string }
+>;
+export type PasteElement = Envelope<
+	MessageType.PasteElement,
+	{
+		element: Types.SerializedElement;
+		project: Types.SerializedProject;
+		targetType: Types.ElementTargetType;
+		targetId?: string;
+	}
+>;
+export type PastePage = Envelope<
+	MessageType.PastePage,
+	{ page: Types.SerializedPage; project: Types.SerializedProject }
+>;
 export type ProjectRequest = EmptyEnvelope<MessageType.ProjectRequest>;
 export type ProjectResponse = Envelope<
 	MessageType.ProjectResponse,
@@ -283,7 +302,7 @@ export type ExportSketchPage = Envelope<MessageType.ExportSketchPage, { path: st
 
 export type ChangeProject = Envelope<
 	MessageType.ChangeProject,
-	{ project: Types.SerializedProject }
+	{ project: Types.SerializedProject | undefined }
 >;
 
 export type ChangeUserStore = Envelope<
@@ -299,4 +318,13 @@ export type HighlightElement = Envelope<
 export type SelectElement = Envelope<
 	MessageType.SelectElement,
 	{ element: Types.SerializedElement | undefined }
+>;
+
+export type Clipboard = Envelope<
+	MessageType.Clipboard,
+	{
+		type: Types.SerializedItemType;
+		item: Types.SerializedItem;
+		project: Types.SerializedProject;
+	}
 >;

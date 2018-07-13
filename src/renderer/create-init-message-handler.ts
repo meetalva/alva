@@ -45,7 +45,7 @@ export function createInitMessageHandler({
 					store.setProject(newProject);
 
 					app.setActiveView(Types.AlvaView.PageDetail);
-					store.getProject().setFocusedItem(Types.FocusedItemType.Page, store.getActivePage());
+					store.getProject().setFocusedItem(Types.ItemType.Page, store.getActivePage());
 					store.commit();
 
 					Sender.send({

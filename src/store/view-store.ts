@@ -188,6 +188,24 @@ export class ViewStore {
 	}
 
 	@Mobx.action
+	public duplicatePage(page: Model.Page): Model.Page | undefined {
+		const clone = page.clone();
+
+		this.project.addPage(clone);
+
+		this.project.movePageAfter({
+			page: clone,
+			targetPage: page
+		});
+
+		if (!clone) {
+			return;
+		}
+
+		return clone;
+	}
+
+	@Mobx.action
 	public executeElementCut(element: Model.Element): void {
 		if (element.getRole() === Types.ElementRole.Root) {
 			return;
@@ -213,22 +231,6 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public executeElementCutSelected(): Model.Element | undefined {
-		const selectedElement = this.getSelectedElement();
-
-		if (!selectedElement) {
-			return;
-		}
-
-		this.setClipboardItem(selectedElement);
-		const selectNext = this.removeElement(selectedElement);
-		this.commit();
-		selectNext();
-
-		return selectedElement;
-	}
-
-	@Mobx.action
 	public executeElementDuplicate(element: Model.Element): Model.Element | undefined {
 		const clone = this.duplicateElement(element);
 
@@ -242,7 +244,7 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public executeElementDuplicateById(id: string): Model.Element | undefined {
+	public duplicateElementById(id: string): Model.Element | undefined {
 		const element = this.getElementById(id);
 
 		if (!element) {
@@ -261,7 +263,7 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public executeElementDuplicateSelected(): Model.Element | undefined {
+	public duplicateSelectedElement(): Model.Element | undefined {
 		const selectedElement = this.getSelectedElement();
 
 		if (!selectedElement) {
@@ -276,6 +278,25 @@ export class ViewStore {
 
 		this.commit();
 		this.setSelectedElement(clone);
+		return clone;
+	}
+
+	@Mobx.action
+	public duplicateActivePage(): Model.Page | undefined {
+		const activePage = this.getActivePage();
+
+		if (!activePage) {
+			return;
+		}
+
+		const clone = this.duplicatePage(activePage);
+
+		if (!clone) {
+			return;
+		}
+
+		this.commit();
+		this.project.setActivePage(clone);
 		return clone;
 	}
 
@@ -436,7 +457,7 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public executeElementRemoveById(id: string): void {
+	public removeElementById(id: string): void {
 		const element = this.getElementById(id);
 
 		if (element) {
@@ -447,7 +468,17 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public executeElementRemoveSelected(): Model.Element | undefined {
+	public removePageById(id: string): void {
+		const page = this.getPageById(id);
+
+		if (page) {
+			this.removePage(page);
+			this.commit();
+		}
+	}
+
+	@Mobx.action
+	public removeSelectedElement(): Model.Element | undefined {
 		const selectedElement = this.getSelectedElement();
 
 		if (!selectedElement) {
@@ -495,7 +526,7 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public executePageRemoveSelected(): Model.Page | undefined {
+	public removeSelectedPage(): Model.Page | undefined {
 		const page = this.getActivePage();
 
 		if (!page) {
@@ -995,7 +1026,7 @@ export class ViewStore {
 		selectedElement.setSelected(true);
 
 		this.app.setRightSidebarTab(Types.RightSidebarTab.Properties);
-		this.project.setFocusedItem(Types.FocusedItemType.Element, selectedElement);
+		this.project.setFocusedItem(Types.ItemType.Element, selectedElement);
 
 		selectedElement.getAncestors().forEach(ancestor => {
 			ancestor.setForcedOpen(true);

@@ -17,6 +17,7 @@ export interface SavedProject {
 	pages: SerializedPage[];
 	patternLibraries: SerializedPatternLibrary[];
 	userStore: UserStore.SerializedUserStore;
+	focusedItemType: SerializedItemType;
 }
 
 export interface SerializedProject extends SavedProject {
@@ -25,6 +26,7 @@ export interface SerializedProject extends SavedProject {
 
 export interface SerializedPage {
 	active: boolean;
+	focused: boolean;
 	id: string;
 	name: string;
 	rootId: string;
@@ -377,7 +379,6 @@ export interface ElementContextMenuRequest {
 
 export interface ElementContextMenuRequestPayload {
 	element: SerializedElement;
-	clipboardItem: SerializedElement | undefined;
 	project: SerializedProject;
 }
 
@@ -403,10 +404,15 @@ export interface MainMenuContext {
 	project?: SerializedProject;
 }
 
-export enum FocusedItemType {
-	Page,
-	Element
+export enum ItemType {
+	None = 'none',
+	Page = 'page',
+	Element = 'element'
 }
+
+export type SerializedItemType = 'none' | 'page' | 'element';
+
+export type SerializedItem = SerializedPage | SerializedElement;
 
 export enum HoverArea {
 	Chrome,
@@ -418,4 +424,10 @@ export enum LibraryCapability {
 	Update,
 	Reconnect,
 	SetPath
+}
+
+export enum ElementTargetType {
+	Auto = 'auto',
+	Below = 'below',
+	Inside = 'inside'
 }

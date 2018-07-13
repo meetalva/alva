@@ -40,6 +40,15 @@ export function createRequestMessageHandler({
 					}
 				});
 			}
+			case Message.MessageType.AppRequest: {
+				return Sender.send({
+					id: message.id,
+					type: Message.MessageType.AppResponse,
+					payload: {
+						app: app.toJSON()
+					}
+				});
+			}
 		}
 	};
 }

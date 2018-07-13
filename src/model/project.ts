@@ -22,6 +22,7 @@ export interface ProjectProperties {
 	path: string;
 	patternLibraries: PatternLibrary[];
 	userStore: UserStore;
+	focusedItemType?: Types.ItemType;
 }
 
 export interface ProjectCreateInit {
@@ -36,7 +37,7 @@ export class Project {
 
 	@Mobx.observable private elementContents: Map<string, ElementContent> = new Map();
 
-	@Mobx.observable private focusedItemType: Types.FocusedItemType;
+	@Mobx.observable private focusedItemType: Types.ItemType = Types.ItemType.None;
 
 	@Mobx.observable private id: string;
 
@@ -63,6 +64,10 @@ export class Project {
 		this.pages = init.pages ? init.pages : [];
 		this.path = init.path;
 		this.userStore = init.userStore;
+
+		if (typeof init.focusedItemType !== 'undefined') {
+			this.focusedItemType = init.focusedItemType;
+		}
 
 		init.patternLibraries.forEach(patternLibrary =>
 			this.patternLibraries.set(patternLibrary.getId(), patternLibrary)
@@ -159,7 +164,8 @@ export class Project {
 			path: serialized.path,
 			pages: [],
 			patternLibraries: serialized.patternLibraries.map(p => PatternLibrary.from(p)),
-			userStore
+			userStore,
+			focusedItemType: deserializeItemType(serialized.focusedItemType)
 		});
 
 		serialized.pages.forEach(page => project.addPage(Page.from(page, { project })));
@@ -188,6 +194,7 @@ export class Project {
 
 	@Mobx.action
 	public addElement(element: Element): void {
+		element.setProject(this);
 		this.elements.set(element.getId(), element);
 	}
 
@@ -198,20 +205,19 @@ export class Project {
 
 	@Mobx.action
 	public addElementContent(elementContent: ElementContent): void {
+		elementContent.setProject(this);
 		this.elementContents.set(elementContent.getId(), elementContent);
 	}
 
 	@Mobx.action
 	public addPatternLibrary(patternLibrary: PatternLibrary): void {
 		this.patternLibraries.set(patternLibrary.getId(), patternLibrary);
-		// this.patternLibrary = patternLibrary;
-		// this.elements.forEach(e => e.setPatternLibrary({ patternLibrary, project: this }));
-		// this.elementContents.forEach(e => e.setPatternLibrary(this.patternLibrary));
 	}
 
 	@Mobx.action
 	public addPage(page: Page): void {
 		this.pages.push(page);
+		page.setProject(this);
 	}
 
 	public getBuiltinPatternLibrary(): PatternLibrary {
@@ -249,16 +255,17 @@ export class Project {
 	}
 
 	public getFocusedItem(): Element | Page | undefined {
-		if (this.focusedItemType === Types.FocusedItemType.Element) {
-			return this.getElements().find(element => element.getFocused());
-		} else if (this.focusedItemType === Types.FocusedItemType.Page) {
-			return this.getPages().find(page => page.getFocused());
-		} else {
-			return undefined;
+		switch (this.focusedItemType) {
+			case Types.ItemType.Element:
+				return this.getElements().find(element => element.getFocused());
+			case Types.ItemType.Page:
+				return this.getPages().find(page => page.getFocused());
+			default:
+				return;
 		}
 	}
 
-	public getFocusedItemType(): Types.FocusedItemType {
+	public getFocusedItemType(): Types.ItemType {
 		return this.focusedItemType;
 	}
 
@@ -370,6 +377,42 @@ export class Project {
 	}
 
 	@Mobx.action
+	public importElement(element: Element): void {
+		element.getDescendants().forEach(descendant => this.importElement(descendant));
+		element.getContents().forEach(content => this.addElementContent(content));
+		this.addElement(element);
+	}
+
+	@Mobx.action
+	public importPage(page: Page): void {
+		const rootElement = page.getRoot();
+
+		if (rootElement) {
+			this.importElement(rootElement);
+		}
+
+		this.addPage(page);
+	}
+
+	@Mobx.action
+	public movePageAfter(opts: { page: Page; targetPage: Page }): void {
+		const targetAvailable = this.pages.some(p => p.getId() === opts.targetPage.getId());
+
+		if (!targetAvailable) {
+			return;
+		}
+
+		const index = this.pages.findIndex(p => opts.page.getId() === p.getId());
+
+		if (index > -1) {
+			this.pages.splice(index, 1);
+		}
+
+		const targetIndex = this.pages.findIndex(p => opts.targetPage.getId() === p.getId());
+		this.pages.splice(targetIndex + 1, 0, opts.page);
+	}
+
+	@Mobx.action
 	public removeElement(element: Element): void {
 		this.elements.delete(element.getId());
 
@@ -411,7 +454,7 @@ export class Project {
 		this.unsetSelectedElement();
 
 		page.setActive(true);
-		this.setFocusedItem(Types.FocusedItemType.Page, page);
+		this.setFocusedItem(Types.ItemType.Page, page);
 	}
 
 	@Mobx.action
@@ -441,7 +484,7 @@ export class Project {
 	}
 
 	@Mobx.action
-	public setFocusedItem(type: Types.FocusedItemType, payload: Element | Page | undefined): void {
+	public setFocusedItem(type: Types.ItemType, payload: Element | Page | undefined): void {
 		const previousFocusItem = this.getFocusedItem();
 
 		if (previousFocusItem) {
@@ -496,6 +539,7 @@ export class Project {
 			elements: this.getElements().map(e => e.toJSON()),
 			elementActions: this.getElementActions().map(e => e.toJSON()),
 			elementContents: this.getElementContents().map(e => e.toJSON()),
+			focusedItemType: serializeItemType(this.focusedItemType),
 			id: this.id,
 			name: this.name,
 			pages: this.pages.map(p => p.toJSON()),
@@ -544,5 +588,27 @@ export class Project {
 			.filter(content => !options || options.ignore.getId() !== content.getId())
 			.filter(content => content.getHighlighted())
 			.forEach(content => content.setHighlighted(false));
+	}
+}
+
+function serializeItemType(type: Types.ItemType): Types.SerializedItemType {
+	switch (type) {
+		case Types.ItemType.None:
+			return 'none';
+		case Types.ItemType.Element:
+			return 'element';
+		case Types.ItemType.Page:
+			return 'page';
+	}
+}
+
+function deserializeItemType(type: Types.SerializedItemType): Types.ItemType {
+	switch (type) {
+		case 'none':
+			return Types.ItemType.None;
+		case 'element':
+			return Types.ItemType.Element;
+		case 'page':
+			return Types.ItemType.Page;
 	}
 }

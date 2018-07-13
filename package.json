@@ -4,7 +4,7 @@
   "description": "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
   "main": "./build/electron/main.js",
   "scripts": {
-    "build": "concnpm run lint && tsc --project . && webpack",
+    "build": "npm run lint && tsc --project . && webpack",
     "build:clean": "npm run clean && npm run build",
     "build:electron": "electron-builder -mwl && node ./scripts/dist-postprocess.js",
     "clean": "rm -rf build && rm -rf dist",

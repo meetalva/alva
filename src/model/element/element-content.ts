@@ -214,6 +214,10 @@ export class ElementContent {
 		this.parentElementId = element.getId();
 	}
 
+	public setProject(project: Project): void {
+		this.project = project;
+	}
+
 	@Mobx.action
 	public toggleOpen(): void {
 		this.setOpen(!this.getOpen() && !this.getForcedOpen());

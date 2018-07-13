@@ -34,7 +34,7 @@ export interface ElementContext {
 export class Element {
 	@Mobx.observable private containerId?: string;
 
-	private readonly contentIds: string[] = [];
+	@Mobx.observable private readonly contentIds: string[] = [];
 
 	@Mobx.observable private dragged: boolean;
 
@@ -46,7 +46,7 @@ export class Element {
 
 	@Mobx.observable private highlighted: boolean;
 
-	private readonly id: string;
+	@Mobx.observable private id: string;
 
 	@Mobx.observable private name: string;
 
@@ -56,15 +56,15 @@ export class Element {
 
 	@Mobx.observable private parent: Element;
 
-	private readonly patternId: string;
+	@Mobx.observable private patternId: string;
 
 	@Mobx.observable private placeholderHighlighted: boolean;
 
-	private readonly project: Project;
+	private project: Project;
 
 	@Mobx.observable private properties: Map<string, ElementProperty> = new Map();
 
-	private role: Types.ElementRole;
+	@Mobx.observable private role: Types.ElementRole;
 
 	@Mobx.observable private selected: boolean;
 
@@ -339,6 +339,12 @@ export class Element {
 	}
 
 	public getFocused(): boolean {
+		const page = this.getPage();
+
+		if (!page || !page.getActive()) {
+			return false;
+		}
+
 		return this.focused;
 	}
 
@@ -554,6 +560,10 @@ export class Element {
 	@Mobx.action
 	public setPlaceholderHighlighted(placeholderHighlighted: boolean): void {
 		this.placeholderHighlighted = placeholderHighlighted;
+	}
+
+	public setProject(project: Project): void {
+		this.project = project;
 	}
 
 	@Mobx.action

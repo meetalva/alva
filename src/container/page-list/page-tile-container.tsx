@@ -34,7 +34,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 
 		if (rootElement) {
 			store.setSelectedElement(rootElement);
-			store.getProject().setFocusedItem(Types.FocusedItemType.Page, this.props.page);
+			store.getProject().setFocusedItem(Types.ItemType.Page, this.props.page);
 		}
 	}
 

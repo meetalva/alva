@@ -7,6 +7,7 @@ import * as uuid from 'uuid';
 
 export interface PageInit {
 	active: boolean;
+	focused: boolean;
 	id: string;
 	name: string;
 	rootId: string;
@@ -39,6 +40,7 @@ export class Page {
 		this.active = init.active;
 		this.rootId = init.rootId;
 		this.name = init.name;
+		this.focused = init.focused;
 	}
 
 	@Mobx.computed
@@ -110,6 +112,7 @@ export class Page {
 		return new Page(
 			{
 				active: init.active,
+				focused: false,
 				id: init.id,
 				name: init.name,
 				rootId: rootElement.getId()
@@ -122,6 +125,7 @@ export class Page {
 		const page = new Page(
 			{
 				active: serializedPage.active,
+				focused: serializedPage.focused,
 				id: serializedPage.id,
 				name: serializedPage.name,
 				rootId: serializedPage.rootId
@@ -133,9 +137,25 @@ export class Page {
 	}
 
 	public clone(): Page {
-		return Page.from(this.toJSON(), {
-			project: this.project
-		});
+		const rootElement = this.getRoot();
+		const rootClone = rootElement ? rootElement.clone() : undefined;
+
+		const page = new Page(
+			{
+				active: false,
+				focused: false,
+				id: uuid.v4(),
+				name: this.name,
+				rootId: rootClone ? rootClone.getId() : ''
+			},
+			{ project: this.project }
+		);
+
+		if (rootClone) {
+			this.project.importElement(rootClone);
+		}
+
+		return page;
 	}
 
 	public equals(b: Page): boolean {
@@ -230,6 +250,10 @@ export class Page {
 		this.nameState = state;
 	}
 
+	public setProject(project: Project): void {
+		this.project = project;
+	}
+
 	public toDisk(): Types.SerializedPage {
 		const serialized = this.toJSON();
 		serialized.active = false;
@@ -239,6 +263,7 @@ export class Page {
 	public toJSON(): Types.SerializedPage {
 		return {
 			active: this.getActive(),
+			focused: this.getFocused(),
 			id: this.getId(),
 			name: this.getName(),
 			rootId: this.rootId

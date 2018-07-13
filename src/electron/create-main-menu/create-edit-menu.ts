@@ -85,6 +85,29 @@ export function createEditMenu(
 				}
 			},
 			{
+				label: '&Paste Inside',
+				enabled:
+					typeof ctx.project !== 'undefined' &&
+					typeof selectedElement !== 'undefined' &&
+					selectedElement.acceptsChildren(),
+				accelerator: 'CmdOrCtrl+Shift+V',
+				click: () => {
+					if (typeof selectedElement === 'undefined') {
+						return;
+					}
+
+					injection.sender.send({
+						id: uuid.v4(),
+						payload: {
+							targetType: Types.ElementTargetType.Inside,
+							id: selectedElement.getId()
+						},
+						type: MessageType.Paste
+					});
+					Electron.Menu.sendActionToFirstResponder('paste:');
+				}
+			},
+			{
 				type: 'separator'
 			},
 			{

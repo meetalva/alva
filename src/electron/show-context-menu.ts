@@ -4,23 +4,24 @@ import { MessageType } from '../message';
 import * as Model from '../model';
 import * as Types from '../types';
 import * as uuid from 'uuid';
+import * as Clipboard from './clipboard';
 
 export interface ContextMenuContex {
 	sender: Sender;
 }
 
-export function showContextMenu(
+export async function showContextMenu(
 	payload: Types.ContextMenuRequestPayload,
 	context: ContextMenuContex
-): void {
-	const menu = createContextMenu(payload, context);
+): Promise<void> {
+	const menu = await createContextMenu(payload, context);
 	Electron.Menu.buildFromTemplate(menu).popup({});
 }
 
-function createContextMenu(
+async function createContextMenu(
 	payload: Types.ContextMenuRequestPayload,
 	context: ContextMenuContex
-): Electron.MenuItemConstructorOptions[] {
+): Promise<Electron.MenuItemConstructorOptions[]> {
 	switch (payload.menu) {
 		case Types.ContextMenuType.ElementMenu:
 			return createElementMenu(payload.data, context);
@@ -29,33 +30,41 @@ function createContextMenu(
 	}
 }
 
-function createElementMenu(
+async function createElementMenu(
 	data: Types.ElementContextMenuRequestPayload,
 	context: ContextMenuContex
-): Electron.MenuItemConstructorOptions[] {
+): Promise<Electron.MenuItemConstructorOptions[]> {
 	const element = Model.Element.from(data.element, { project: Model.Project.from(data.project) });
+	const clipboard = Clipboard.getClipboard();
+	const hasElementClipboard = clipboard ? clipboard.payload.type === 'element' : false;
 
 	const defaultPasteItems = [
 		{
 			label: 'Paste Below',
-			accelerator: 'CmdOrCtrl+C',
-			enabled: data.clipboardItem && element.getRole() !== Types.ElementRole.Root,
+			accelerator: 'CmdOrCtrl+V',
+			enabled: hasElementClipboard && element.getRole() !== Types.ElementRole.Root,
 			click: () => {
 				context.sender.send({
 					id: uuid.v4(),
-					type: MessageType.PasteElementBelow,
-					payload: element.getId()
+					type: MessageType.Paste,
+					payload: {
+						targetType: Types.ElementTargetType.Below,
+						id: element.getId()
+					}
 				});
 			}
 		},
 		{
 			label: 'Paste Inside',
-			enabled: data.clipboardItem && element.acceptsChildren(),
+			enabled: hasElementClipboard && element.acceptsChildren(),
 			click: () => {
 				context.sender.send({
 					id: uuid.v4(),
-					type: MessageType.PasteElementInside,
-					payload: element.getId()
+					type: MessageType.Paste,
+					payload: {
+						targetType: Types.ElementTargetType.Inside,
+						id: element.getId()
+					}
 				});
 			}
 		},

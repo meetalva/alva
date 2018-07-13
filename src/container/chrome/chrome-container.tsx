@@ -5,12 +5,9 @@ import { MessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
-import * as Types from '../../types';
 import * as Sender from '../../sender/client';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
-
-import { EditableTitleContainer } from '../editable-title/editable-title-container';
 
 export interface InjectedChromeContainerProps {
 	page: Page;
@@ -59,11 +56,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 					onLeftClick={toPreviousPage}
 					onRightClick={toNextPage}
 				>
-					<EditableTitleContainer
-						focused={props.focused}
-						page={page}
-						secondary={Types.EditableTitleType.Secondary}
-					/>
+					{page.getName()}
 				</ViewSwitch>
 				<BugReport
 					title="Found a bug?"

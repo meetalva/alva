@@ -88,23 +88,7 @@ export function createEditMessageHandler({
 							});
 						}
 						break;
-					case Types.ElementTargetType.Auto: {
-						if (
-							targetElement.acceptsChildren() &&
-							sourceElement.getId() !== targetElement.getId()
-						) {
-							store.insertElementInside({
-								element: clonedElement,
-								targetElement
-							});
-						} else {
-							store.insertElementAfter({
-								element: clonedElement,
-								targetElement
-							});
-						}
-						break;
-					}
+					case Types.ElementTargetType.Auto:
 					case Types.ElementTargetType.Below:
 						store.insertElementAfter({
 							element: clonedElement,

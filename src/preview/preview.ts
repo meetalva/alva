@@ -76,124 +76,136 @@ function main(): void {
 	// - when mode is "live", used for editable preview
 	if (mode === Types.PreviewDocumentMode.Live) {
 		const sender = new Sender({ endpoint: `ws://${window.location.host}` });
+
 		store.setSender(sender);
 
-		sender.receive(message => {
+		sender.match<Message.KeyboardChange>(Message.MessageType.KeyboardChange, message => {
+			store.setMetaDown(message.payload.metaDown);
+		});
+
+		sender.match<Message.ChangePages>(Message.MessageType.ChangePages, message => {
 			Mobx.transaction(() => {
-				switch (message.type) {
-					case Message.MessageType.KeyboardChange: {
-						store.setMetaDown(message.payload.metaDown);
-						break;
+				const changes = computeDifference<Model.Page>({
+					after: message.payload.pages.map(p => Model.Page.from(p, { project })),
+					before: project.getPages()
+				});
+
+				changes.added.forEach(change => project.addPage(change.after));
+				changes.changed.forEach(change => change.before.update(change.after));
+				changes.removed.forEach(change => project.removePage(change.before));
+			});
+		});
+
+		sender.match<Message.ChangeElements>(Message.MessageType.ChangeElements, message => {
+			Mobx.transaction(() => {
+				const els = message.payload.elements.map(e => Model.Element.from(e, { project }));
+
+				const changes = computeDifference<Model.Element>({
+					before: project.getElements(),
+					after: els
+				});
+
+				changes.added.forEach(change => project.addElement(change.after));
+				changes.removed.forEach(change => project.removeElement(change.before));
+				changes.changed.forEach(change => change.before.update(change.after));
+
+				const selectedElement = els.find(e => e.getSelected());
+				const highlightedElement = els.find(e => e.getHighlighted());
+
+				if (selectedElement) {
+					const el = project.getElementById(selectedElement.getId());
+					if (el) {
+						project.setSelectedElement(el);
 					}
-					case Message.MessageType.ChangePages: {
-						const changes = computeDifference<Model.Page>({
-							after: message.payload.pages.map(p => Model.Page.from(p, { project })),
-							before: project.getPages()
-						});
+				}
 
-						changes.added.forEach(change => project.addPage(change.after));
-						changes.changed.forEach(change => change.before.update(change.after));
-						changes.removed.forEach(change => project.removePage(change.before));
-
-						break;
-					}
-					case Message.MessageType.ChangeElements: {
-						const els = message.payload.elements.map(e => Model.Element.from(e, { project }));
-
-						const changes = computeDifference<Model.Element>({
-							before: project.getElements(),
-							after: els
-						});
-
-						changes.added.forEach(change => project.addElement(change.after));
-						changes.removed.forEach(change => project.removeElement(change.before));
-						changes.changed.forEach(change => change.before.update(change.after));
-
-						const selectedElement = els.find(e => e.getSelected());
-						const highlightedElement = els.find(e => e.getHighlighted());
-
-						if (selectedElement) {
-							const el = project.getElementById(selectedElement.getId());
-							if (el) {
-								project.setSelectedElement(el);
-							}
-						}
-
-						if (highlightedElement) {
-							const el = project.getElementById(highlightedElement.getId());
-							if (el) {
-								project.setHighlightedElement(el);
-							}
-						}
-
-						break;
-					}
-					case Message.MessageType.ChangeElementContents: {
-						const contentChanges = computeDifference<Model.ElementContent>({
-							before: project.getElementContents(),
-							after: message.payload.elementContents.map(e =>
-								Model.ElementContent.from(e, { project })
-							)
-						});
-						contentChanges.added.forEach(change => project.addElementContent(change.after));
-						contentChanges.removed.forEach(change =>
-							project.removeElementContent(change.before)
-						);
-						contentChanges.changed.forEach(change => change.before.update(change.after));
-						break;
-					}
-					case Message.MessageType.ChangeElementActions: {
-						const changes = computeDifference<Model.ElementAction>({
-							before: project.getElementActions(),
-							after: message.payload.elementActions.map(e =>
-								Model.ElementAction.from(e, { userStore: project.getUserStore() })
-							)
-						});
-						changes.added.forEach(change => project.addElementAction(change.after));
-						changes.removed.forEach(change => project.removeElementAction(change.before));
-						changes.changed.forEach(change => change.before.update(change.after));
-						break;
-					}
-					case Message.MessageType.ChangePatternLibraries: {
-						const libraryChanges = computeDifference<Model.PatternLibrary>({
-							before: project.getPatternLibraries(),
-							after: message.payload.patternLibraries.map(e => Model.PatternLibrary.from(e))
-						});
-
-						libraryChanges.added.forEach(change => {
-							const script = document.createElement('script');
-							script.dataset.bundle = change.after.getBundleId();
-							script.textContent = change.after.getBundle();
-							document.body.appendChild(script);
-
-							project.addPatternLibrary(change.after);
-						});
-
-						libraryChanges.changed.forEach(change => {
-							const scriptCandidate = document.querySelector(
-								`[data-bundle="${change.before.getBundleId()}"]`
-							);
-
-							if (scriptCandidate && scriptCandidate.parentElement) {
-								scriptCandidate.parentElement.removeChild(scriptCandidate);
-							}
-
-							const script = document.createElement('script');
-							script.dataset.bundle = change.after.getBundleId();
-							script.textContent = change.after.getBundle();
-							document.body.appendChild(script);
-
-							change.before.update(change.after);
-						});
-
-						store.setComponents(getComponents(store.getProject()));
-						break;
-					}
-					case Message.MessageType.ChangeUserStore: {
-						project.getUserStore().sync(message);
+				if (highlightedElement) {
+					const el = project.getElementById(highlightedElement.getId());
+					if (el) {
+						project.setHighlightedElement(el);
 					}
 				}
 			});
+		});
+
+		sender.match<Message.ChangeElementContents>(
+			Message.MessageType.ChangeElementContents,
+			message => {
+				Mobx.transaction(() => {
+					const contentChanges = computeDifference<Model.ElementContent>({
+						before: project.getElementContents(),
+						after: message.payload.elementContents.map(e =>
+							Model.ElementContent.from(e, { project })
+						)
+					});
+					contentChanges.added.forEach(change => project.addElementContent(change.after));
+					contentChanges.removed.forEach(change =>
+						project.removeElementContent(change.before)
+					);
+					contentChanges.changed.forEach(change => change.before.update(change.after));
+				});
+			}
+		);
+
+		sender.match<Message.ChangeElementActions>(
+			Message.MessageType.ChangeElementActions,
+			message => {
+				Mobx.transaction(() => {
+					const changes = computeDifference<Model.ElementAction>({
+						before: project.getElementActions(),
+						after: message.payload.elementActions.map(e =>
+							Model.ElementAction.from(e, { userStore: project.getUserStore() })
+						)
+					});
+					changes.added.forEach(change => project.addElementAction(change.after));
+					changes.removed.forEach(change => project.removeElementAction(change.before));
+					changes.changed.forEach(change => change.before.update(change.after));
+				});
+			}
+		);
+
+		sender.match<Message.ChangePatternLibraries>(
+			Message.MessageType.ChangePatternLibraries,
+			message => {
+				Mobx.transaction(() => {
+					const libraryChanges = computeDifference<Model.PatternLibrary>({
+						before: project.getPatternLibraries(),
+						after: message.payload.patternLibraries.map(e => Model.PatternLibrary.from(e))
+					});
+
+					libraryChanges.added.forEach(change => {
+						const script = document.createElement('script');
+						script.dataset.bundle = change.after.getBundleId();
+						script.textContent = change.after.getBundle();
+						document.body.appendChild(script);
+
+						project.addPatternLibrary(change.after);
+					});
+
+					libraryChanges.changed.forEach(change => {
+						const scriptCandidate = document.querySelector(
+							`[data-bundle="${change.before.getBundleId()}"]`
+						);
+
+						if (scriptCandidate && scriptCandidate.parentElement) {
+							scriptCandidate.parentElement.removeChild(scriptCandidate);
+						}
+
+						const script = document.createElement('script');
+						script.dataset.bundle = change.after.getBundleId();
+						script.textContent = change.after.getBundle();
+						document.body.appendChild(script);
+
+						change.before.update(change.after);
+					});
+
+					store.setComponents(getComponents(store.getProject()));
+				});
+			}
+		);
+
+		sender.match<Message.ChangeUserStore>(Message.MessageType.ChangeUserStore, message => {
+			project.getUserStore().sync(message);
 		});
 
 		Mobx.reaction(

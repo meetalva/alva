@@ -1,5 +1,6 @@
 import * as Message from '../message';
 import * as WS from 'ws';
+import * as Serde from '../sender/serde';
 
 export type ServerMessageHandler = (message: Message.Message) => void;
 
@@ -13,7 +14,7 @@ export function createServerMessageHandler(
 	return function serverMessageHandler(message: Message.Message): void {
 		context.webSocketServer.clients.forEach(client => {
 			if (client.readyState === WS.OPEN) {
-				client.send(JSON.stringify(message));
+				client.send(Serde.serialize(message));
 			}
 		});
 	};

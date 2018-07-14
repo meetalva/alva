@@ -1,5 +1,5 @@
-import * as AlvaUtil from '../alva-util';
 import * as Events from 'events';
+import * as Serde from '../sender/serde';
 
 import { createClientConnectHandler } from './create-client-connect-handler';
 
@@ -25,13 +25,13 @@ export function createConnectionHandler(context: ConnectionHandlerContext): Conn
 				return;
 			}
 
-			const parseResult = AlvaUtil.parseJSON(String(envelope));
+			const message = Serde.deserialize(envelope);
 
-			if (parseResult.type === AlvaUtil.ParseResultType.Error) {
+			if (!message) {
 				return;
 			}
 
-			context.emitter.emit('client-message', parseResult.result);
+			context.emitter.emit('client-message', message);
 		});
 
 		onClientConnect(ws);

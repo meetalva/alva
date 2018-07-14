@@ -1,6 +1,7 @@
 import * as AlvaUtil from '../alva-util';
 import * as Message from '../message';
 import { isMessage } from './is-message';
+import * as Serde from './serde';
 
 export interface SenderInit {
 	endpoint: string;
@@ -22,16 +23,48 @@ export class Sender {
 
 		await onReady(this.connection);
 
-		this.connection.send(JSON.stringify(message));
+		this.connection.send(Serde.serialize(message));
 	}
 
-	// tslint:disable-next-line:no-any
 	public async receive(handler: (message: Message.Message) => void): Promise<void> {
 		await onReady(this.connection);
 
 		this.connection.addEventListener('message', e => {
+			const message = Serde.deserialize(e.data);
+
+			if (!message) {
+				return;
+			}
+
+			handler(message);
+		});
+	}
+
+	public async match<T extends Message.Message>(
+		type: Message.Message['type'],
+		handler: (message: T) => void
+	): Promise<void> {
+		await onReady(this.connection);
+
+		this.connection.addEventListener('message', e => {
+			const header = Serde.getMessageHeader(e.data);
+
+			if (header.status === Serde.MessageHeaderStatus.Error) {
+				return;
+			}
+
+			if (header.type !== type) {
+				return;
+			}
+
+			const body = Serde.getMessageBody(e.data);
+
+			if (!body) {
+				return;
+			}
+
 			// tslint:disable-next-line:no-any
-			const parseResult = AlvaUtil.parseJSON<any>(e.data);
+			const parseResult = AlvaUtil.parseJSON<any>(body);
 
 			if (parseResult.type === AlvaUtil.ParseResultType.Error) {
 				return;
@@ -41,7 +74,11 @@ export class Sender {
 				return;
 			}
 
-			handler(parseResult.result);
+			if (parseResult.result.type !== type) {
+				return;
+			}
+
+			handler(parseResult.result as T);
 		});
 	}
 }

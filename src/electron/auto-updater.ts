@@ -15,7 +15,16 @@ export async function checkForUpdates(win: BrowserWindow, startedByUser?: boolea
 
 	try {
 		await autoUpdater.checkForUpdatesAndNotify();
-	} catch {
+	} catch (err) {
+		if (!startedByUser && err.message === 'net::ERR_INTERNET_DISCONNECTED') {
+			return;
+		}
+
+		dialog.showErrorBox(
+			'Check for Updates',
+			`An error occured while updating. Please try again manually.\n\n${err.message}`
+		);
+
 		dialog.showErrorBox('Check for Updates', 'Error while checking for updates.');
 	}
 }
@@ -52,10 +61,14 @@ export function startUpdater(): void {
 		});
 	});
 
-	autoUpdater.on('error', () => {
+	autoUpdater.on('error', err => {
+		if (err.message === 'net::ERR_INTERNET_DISCONNECTED') {
+			return;
+		}
+
 		dialog.showErrorBox(
 			'Check for Updates',
-			'An error occured while updating. Please try again manually.'
+			`An error occured while updating. Please try again manually.\n\n${err.message}`
 		);
 	});
 

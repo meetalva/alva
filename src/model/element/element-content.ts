@@ -157,16 +157,17 @@ export class ElementContent {
 		return this.parentElementId;
 	}
 
-	public getSlot(): PatternSlot {
-		return this.project.getPatternSlotById(this.slotId) as PatternSlot;
+	public getSlot(): PatternSlot | undefined {
+		return this.project.getPatternSlotById(this.slotId);
 	}
 
 	public getSlotId(): string {
 		return this.slotId;
 	}
 
-	public getSlotType(): Types.SlotType {
-		return this.getSlot().getType();
+	public getSlotType(): Types.SlotType | undefined {
+		const slot = this.getSlot();
+		return slot ? slot.getType() : undefined;
 	}
 
 	@Mobx.action

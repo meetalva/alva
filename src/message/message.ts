@@ -229,7 +229,10 @@ export type DuplicatePageElement = Envelope<MessageType.DuplicateElement, string
 export type Log = Envelope<MessageType.Log, any>;
 export type Maximize = EmptyEnvelope<MessageType.Maximize>;
 export type OpenExternalURL = Envelope<MessageType.OpenExternalURL, string>;
-export type OpenFileRequest = Envelope<MessageType.OpenFileRequest, { path: string } | undefined>;
+export type OpenFileRequest = Envelope<
+	MessageType.OpenFileRequest,
+	{ path: string; silent?: boolean } | undefined
+>;
 export type OpenFileResponse = Envelope<MessageType.OpenFileResponse, Types.ProjectPayload>;
 export type PageChange = Envelope<MessageType.PageChange, Types.PageChangePayload>;
 export type ProjectChange = Envelope<MessageType.ProjectChange, Types.SerializedProject>;

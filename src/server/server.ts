@@ -39,6 +39,8 @@ export class AlvaServer extends EventEmitter {
 		this.server = init.server;
 		this.webSocketServer = init.webSocketServer;
 
+		this.app.get('/', (_, res) => res.send('ok'));
+
 		this.app.get('/preview.html', createPreviewRoute({ sender: this.options.sender }));
 
 		this.app.use('/static', createStaticRoute({ sender: this.options.sender }));

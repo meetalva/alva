@@ -4,6 +4,7 @@ const ElectronStore = require('electron-store');
 
 interface Store {
 	clear(): void;
+	delete(key: string): void;
 	// tslint:disable-next-line:no-any
 	get(key: string): any;
 	// tslint:disable-next-line:no-any
@@ -46,6 +47,10 @@ export class EphemeralStore {
 				typeof item.libraryPath === 'string' &&
 				typeof item.projectId === 'string'
 		);
+	}
+
+	public async clearProjectPath(): Promise<void> {
+		this.store.delete('project-path');
 	}
 
 	public async getProjectPath(): Promise<string | undefined> {

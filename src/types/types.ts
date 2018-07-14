@@ -218,9 +218,22 @@ export interface PageChangePayload {
 	userStore: UserStore.SerializedUserStore;
 }
 
-export interface ProjectPayload {
+export enum ProjectPayloadStatus {
+	Ok,
+	Error
+}
+
+export type ProjectPayload = ProjectPayloadError | ProjectPayloadSuccess;
+
+export interface ProjectPayloadError {
+	error: Error;
+	status: ProjectPayloadStatus;
+}
+
+export interface ProjectPayloadSuccess {
 	contents: SerializedProject;
 	path: string;
+	status: ProjectPayloadStatus;
 }
 
 export interface SavePayload {

@@ -60,6 +60,13 @@ export class Persistence {
 	public static read<T>(path: string): Promise<PersistenceReadResult<T>> {
 		return new Promise(resolve => {
 			Fs.readFile(path, (error, contents) => {
+				if (error) {
+					return resolve({
+						state: PersistenceState.Error,
+						error
+					});
+				}
+
 				try {
 					resolve({
 						state: PersistenceState.Success,

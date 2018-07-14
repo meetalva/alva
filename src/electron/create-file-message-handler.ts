@@ -2,10 +2,10 @@ import * as Fs from 'fs';
 import * as Message from '../message';
 import * as MimeTypes from 'mime-types';
 import * as Model from '../model';
-import { Persistence } from '../persistence';
-import { readProjectOrError } from './read-project-or-error';
+import { Persistence, PersistenceState } from '../persistence';
 import { showOpenDialog } from './show-open-dialog';
 import { showSaveDialog } from './show-save-dialog';
+import * as Types from '../types';
 import * as Util from 'util';
 
 import {
@@ -47,7 +47,8 @@ export async function createFileMessageHandler(
 						id: message.id,
 						payload: {
 							path,
-							contents: project.toJSON()
+							contents: project.toJSON(),
+							status: Types.ProjectPayloadStatus.Ok
 						}
 					});
 				}
@@ -55,17 +56,35 @@ export async function createFileMessageHandler(
 			}
 			case Message.MessageType.OpenFileRequest: {
 				const path = await getPath(message.payload);
+				const silent = message.payload ? message.payload.silent : false;
 
 				if (!path) {
 					return;
 				}
 
-				// tslint:disable-next-line:no-any
-				const project = (await readProjectOrError(path)) as any;
+				const projectResult = await Persistence.read<Types.SavedProject>(path);
 
-				if (!project) {
-					return;
+				if (projectResult.state === PersistenceState.Error) {
+					if (!silent) {
+						injection.sender.send({
+							type: Message.MessageType.ShowError,
+							id: message.id,
+							payload: {
+								message: [projectResult.error.message].join('\n'),
+								stack: projectResult.error.stack || ''
+							}
+						});
+					}
+
+					return injection.sender.send({
+						type: Message.MessageType.OpenFileResponse,
+						id: message.id,
+						payload: { error: projectResult.error, status: Types.ProjectPayloadStatus.Error }
+					});
 				}
+
+				const savedProject = projectResult.contents;
+				const project = savedProject as Types.SerializedProject;
 
 				if (typeof project === 'object') {
 					project.path = path;
@@ -74,7 +93,7 @@ export async function createFileMessageHandler(
 				injection.sender.send({
 					type: Message.MessageType.OpenFileResponse,
 					id: message.id,
-					payload: { path, contents: project }
+					payload: { path, contents: project, status: Types.ProjectPayloadStatus.Ok }
 				});
 
 				injection.ephemeralStore.setProjectPath(path);

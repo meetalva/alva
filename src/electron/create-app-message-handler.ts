@@ -2,12 +2,12 @@ import * as Electron from 'electron';
 import * as Message from '../message';
 import * as uuid from 'uuid';
 import { checkForUpdates } from './auto-updater';
-import * as electronIsDev from 'electron-is-dev';
 import { showError } from './show-error';
 import { requestAppSafely } from './request-app';
 import { requestProjectSafely } from './request-project';
 import { showContextMenu } from './show-context-menu';
 import { showMainMenu } from './show-main-menu';
+import * as Types from '../types';
 
 import {
 	ServerMessageHandlerContext,
@@ -29,7 +29,42 @@ export async function createAppMessageHandler(
 			case Message.MessageType.AppLoaded: {
 				const pathToOpen = await injection.ephemeralStore.getProjectPath();
 
-				injection.sender.send({
+				if (!pathToOpen) {
+					return injection.sender.send({
+						id: uuid.v4(),
+						type: Message.MessageType.StartApp,
+						payload: {
+							app: undefined,
+							port: ctx.port as number
+						}
+					});
+				}
+
+				const projectResponse = await injection.sender.request<
+					Message.OpenFileRequestResponsePair
+				>(
+					{
+						id: uuid.v4(),
+						type: Message.MessageType.OpenFileRequest,
+						payload: pathToOpen ? { path: pathToOpen, silent: true } : undefined
+					},
+					Message.MessageType.OpenFileResponse
+				);
+
+				if (projectResponse.payload.status === Types.ProjectPayloadStatus.Error) {
+					injection.ephemeralStore.clearProjectPath();
+
+					return injection.sender.send({
+						id: uuid.v4(),
+						type: Message.MessageType.StartApp,
+						payload: {
+							app: undefined,
+							port: ctx.port as number
+						}
+					});
+				}
+
+				return injection.sender.send({
 					id: uuid.v4(),
 					type: Message.MessageType.StartApp,
 					payload: {
@@ -37,16 +72,6 @@ export async function createAppMessageHandler(
 						port: ctx.port as number
 					}
 				});
-
-				if (electronIsDev && pathToOpen) {
-					injection.sender.send({
-						id: uuid.v4(),
-						type: Message.MessageType.OpenFileRequest,
-						payload: { path: pathToOpen }
-					});
-				}
-
-				break;
 			}
 			case Message.MessageType.Reload: {
 				injection.emitter.emit('reload', message.payload || {});

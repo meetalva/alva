@@ -230,7 +230,9 @@ export class PreviewStore<V> {
 			.reduce((renderProperties, content) => {
 				const slot = content.getSlot();
 
-				renderProperties[slot.getPropertyName()] = content.getElements().map(render);
+				if (slot) {
+					renderProperties[slot.getPropertyName()] = content.getElements().map(render);
+				}
 
 				return renderProperties;
 			}, {});

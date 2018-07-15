@@ -14,8 +14,9 @@ export interface ElementSlotContainerProps {
 export class ElementSlotContainer extends React.Component<ElementSlotContainerProps> {
 	public render(): JSX.Element | null {
 		const props = this.props as ElementSlotContainerProps & { store: ViewStore };
+		const slot = props.content.getSlot();
 
-		if (props.content.getSlot().getHidden()) {
+		if (!slot || slot.getHidden()) {
 			return null;
 		}
 
@@ -25,7 +26,7 @@ export class ElementSlotContainer extends React.Component<ElementSlotContainerPr
 				description={'Slot'}
 				open={props.content.getOpen() || props.content.getForcedOpen()}
 				state={getSlotState(props.content, props.store)}
-				title={props.content.getSlot().getName()}
+				title={slot.getName()}
 			>
 				{props.content
 					.getElements()

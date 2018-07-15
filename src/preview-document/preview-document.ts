@@ -95,7 +95,7 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 		#preview-selection {
 			box-sizing: border-box;
 			pointer-events: none;
-			position: absolute;
+			position: fixed;
 		}
 		#preview-highlight {
 			z-index: 100;

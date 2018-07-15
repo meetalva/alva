@@ -57,6 +57,7 @@ export class PreviewStore<V> {
 	@Mobx.observable private project: Model.Project;
 	@Mobx.observable private selectionArea: ElementArea;
 	@Mobx.observable private synthetics: SyntheticComponents<V>;
+	@Mobx.observable private scrollPosition: Types.Point;
 	private sender?: Sender;
 
 	@Mobx.computed
@@ -247,6 +248,10 @@ export class PreviewStore<V> {
 			}, {});
 	}
 
+	public getScrollPosition(): Types.Point {
+		return this.scrollPosition;
+	}
+
 	public getSender(): Sender | undefined {
 		return this.sender;
 	}
@@ -317,16 +322,7 @@ export class PreviewStore<V> {
 			return;
 		}
 
-		if (data.node) {
-			const rect = data.node.getBoundingClientRect();
-
-			this.highlightArea.setSize({
-				top: rect.top,
-				left: rect.left,
-				width: rect.width,
-				height: rect.height
-			});
-		}
+		this.highlightArea.setElement(data.node);
 
 		if (data.element.getRole() === Types.ElementRole.Root) {
 			this.highlightArea.hide();
@@ -341,16 +337,7 @@ export class PreviewStore<V> {
 			return;
 		}
 
-		if (data.node) {
-			const rect = data.node.getBoundingClientRect();
-
-			this.selectionArea.setSize({
-				top: rect.top,
-				left: rect.left,
-				width: rect.width,
-				height: rect.height
-			});
-		}
+		this.selectionArea.setElement(data.node);
 
 		if (data.element.getRole() === Types.ElementRole.Root) {
 			this.selectionArea.hide();
@@ -406,5 +393,10 @@ export class PreviewStore<V> {
 
 	public setSender(sender: Sender): void {
 		this.sender = sender;
+	}
+
+	@Mobx.action
+	public setScrollPosition(scrollPosition: Types.Point): void {
+		this.scrollPosition = scrollPosition;
 	}
 }

@@ -64,6 +64,14 @@ function main(): void {
 		}
 	});
 
+	window.addEventListener('scroll', () => {
+		const el = document.scrollingElement || document.documentElement;
+		store.setScrollPosition({
+			x: el.scrollLeft,
+			y: el.scrollTop
+		});
+	});
+
 	document.body.addEventListener('mouseleave', () => {
 		store.getProject().unsetHighlightedElement();
 		store.getProject().unsetHighlightedElementContent();
@@ -224,17 +232,23 @@ function main(): void {
 			}
 		);
 
-		Mobx.autorun(() => {
-			const selectionArea = store.getSelectionArea();
-			const selectionNode = document.getElementById('preview-selection') as HTMLElement;
-			selectionArea.write(selectionNode);
-		});
+		Mobx.autorun(
+			() => {
+				const selectionArea = store.getSelectionArea();
+				const selectionNode = document.getElementById('preview-selection') as HTMLElement;
+				selectionArea.write(selectionNode, { scrollPositon: store.getScrollPosition() });
+			},
+			{ scheduler: window.requestAnimationFrame }
+		);
 
-		Mobx.autorun(() => {
-			const highlightNode = document.getElementById('preview-highlight') as HTMLElement;
-			const highlightArea = store.getHighlightArea();
-			highlightArea.write(highlightNode);
-		});
+		Mobx.autorun(
+			() => {
+				const highlightNode = document.getElementById('preview-highlight') as HTMLElement;
+				const highlightArea = store.getHighlightArea();
+				highlightArea.write(highlightNode, { scrollPositon: store.getScrollPosition() });
+			},
+			{ scheduler: window.requestAnimationFrame }
+		);
 
 		Mobx.reaction(
 			() => store.getMetaDown(),

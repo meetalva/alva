@@ -68,6 +68,11 @@ export class Element {
 
 	@Mobx.observable private selected: boolean;
 
+	@Mobx.computed
+	private get page(): Page | undefined {
+		return this.project.getPages().find(page => page.hasElement(this));
+	}
+
 	public constructor(init: ElementInit, context: ElementContext) {
 		this.dragged = init.dragged;
 		this.focused = init.focused;
@@ -329,9 +334,7 @@ export class Element {
 	}
 
 	public getHighlighted(): boolean {
-		const page = this.getPage();
-
-		if (!page || !page.getActive()) {
+		if (!this.page || !this.page.getActive()) {
 			return false;
 		}
 
@@ -339,9 +342,7 @@ export class Element {
 	}
 
 	public getFocused(): boolean {
-		const page = this.getPage();
-
-		if (!page || !page.getActive()) {
+		if (!this.page || !this.page.getActive()) {
 			return false;
 		}
 
@@ -378,10 +379,6 @@ export class Element {
 		return this.open;
 	}
 
-	public getPage(): Page | undefined {
-		return this.project.getPages().find(page => page.hasElement(this));
-	}
-
 	public getParent(): Element | undefined {
 		const container = this.getContainer();
 
@@ -407,9 +404,7 @@ export class Element {
 	}
 
 	public getPlaceholderHighlighted(): boolean {
-		const page = this.getPage();
-
-		if (!page || !page.getActive()) {
+		if (!this.page || !this.page.getActive()) {
 			return false;
 		}
 
@@ -418,29 +413,7 @@ export class Element {
 
 	@Mobx.action
 	public getProperties(): ElementProperty[] {
-		const pattern = this.getPattern();
-		const elementProperties = [...this.properties.values()];
-
-		if (pattern) {
-			return pattern.getProperties().map(patternProperty => {
-				const elementProperty = elementProperties.find(
-					e => e.getPatternPropertyId() === patternProperty.getId()
-				);
-
-				if (elementProperty) {
-					return elementProperty;
-				}
-
-				const newElementProperty = ElementProperty.fromPatternProperty(patternProperty, {
-					project: this.project
-				});
-
-				this.addProperty(newElementProperty);
-				return newElementProperty;
-			});
-		}
-
-		return elementProperties;
+		return [...this.properties.values()];
 	}
 
 	public getRole(): Types.ElementRole {
@@ -448,9 +421,7 @@ export class Element {
 	}
 
 	public getSelected(): boolean {
-		const page = this.getPage();
-
-		if (!page || !page.getActive()) {
+		if (!this.page || !this.page.getActive()) {
 			return false;
 		}
 

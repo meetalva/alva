@@ -52,10 +52,26 @@ export class Project {
 	@Mobx.observable private userStore: UserStore;
 
 	@Mobx.computed
+	private get patterns(): Pattern[] {
+		return this.getPatternLibraries().reduce((ps, lib) => [...ps, ...lib.getPatterns()], []);
+	}
+
+	@Mobx.computed
+	private get patternProperties(): AnyPatternProperty[] {
+		return this.getPatternLibraries().reduce(
+			(ps, lib) => [...ps, ...lib.getPatternProperties()],
+			[]
+		);
+	}
+
+	@Mobx.computed
+	private get patternSlots(): PatternSlot[] {
+		return this.getPatternLibraries().reduce((ps, lib) => [...ps, ...lib.getSlots()], []);
+	}
+
+	@Mobx.computed
 	private get patternSearch(): PatternSearch {
-		return new PatternSearch({
-			patterns: this.getPatternLibraries().reduce((ps, lib) => [...ps, ...lib.getPatterns()], [])
-		});
+		return new PatternSearch({ patterns: this.patterns });
 	}
 
 	public constructor(init: ProjectProperties) {
@@ -314,12 +330,7 @@ export class Project {
 	}
 
 	public getPatternById(id: string): Pattern | undefined {
-		return this.getPatternLibraries().reduce((result, lib) => {
-			if (typeof result !== 'undefined') {
-				return result;
-			}
-			return lib.getPatternById(id);
-		}, undefined);
+		return this.patterns.find(p => p.getId() === id);
 	}
 
 	public getPatternLibraries(): PatternLibrary[] {
@@ -331,12 +342,7 @@ export class Project {
 	}
 
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
-		return this.getPatternLibraries().reduce((result, lib) => {
-			if (typeof result !== 'undefined') {
-				return result;
-			}
-			return lib.getPatternPropertyById(id);
-		}, undefined);
+		return this.patternProperties.find(p => p.getId() === id);
 	}
 
 	public getPatternSearch(): PatternSearch {
@@ -344,12 +350,7 @@ export class Project {
 	}
 
 	public getPatternSlotById(id: string): PatternSlot | undefined {
-		return this.getPatternLibraries().reduce((result, lib) => {
-			if (typeof result !== 'undefined') {
-				return result;
-			}
-			return lib.getPatternSlotById(id);
-		}, undefined);
+		return this.patternSlots.find(p => p.getId() === id);
 	}
 
 	public getPreviousPage(): Page | undefined {

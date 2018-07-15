@@ -60,7 +60,6 @@ export class PatternLibrary {
 		init.patterns.forEach(pattern => this.patterns.set(pattern.getId(), pattern));
 		init.patternProperties.forEach(prop => this.patternProperties.set(prop.getId(), prop));
 		this.state = init.state;
-
 		this.updateSearch();
 	}
 
@@ -290,7 +289,7 @@ export class PatternLibrary {
 	}
 
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
-		return this.getPatternProperties().find(patternProperty => patternProperty.getId() === id);
+		return this.patternProperties.get(id);
 	}
 
 	public getPatternSlotById(id: string): PatternSlot | undefined {

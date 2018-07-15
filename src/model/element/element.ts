@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import { Page } from '../page';
 import { Pattern } from '../pattern';
+import { AnyPatternProperty } from '../pattern-property';
 import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
@@ -71,6 +72,25 @@ export class Element {
 	@Mobx.computed
 	private get page(): Page | undefined {
 		return this.project.getPages().find(page => page.hasElement(this));
+	}
+
+	@Mobx.computed
+	private get pattern(): Pattern | undefined {
+		return this.project.getPatternById(this.patternId);
+	}
+
+	@Mobx.computed
+	private get flattenedProperties(): ElementProperty[] {
+		return [...this.properties.values()];
+	}
+
+	@Mobx.computed
+	private get patternProperties(): AnyPatternProperty[] {
+		if (!this.pattern) {
+			return [];
+		}
+
+		return this.pattern.getProperties();
 	}
 
 	public constructor(init: ElementInit, context: ElementContext) {
@@ -413,7 +433,22 @@ export class Element {
 
 	@Mobx.action
 	public getProperties(): ElementProperty[] {
-		return [...this.properties.values()];
+		return this.patternProperties.map(patternProperty => {
+			const elementProperty = this.flattenedProperties.find(
+				e => e.getPatternPropertyId() === patternProperty.getId()
+			);
+
+			if (elementProperty) {
+				return elementProperty;
+			}
+
+			const newElementProperty = ElementProperty.fromPatternProperty(patternProperty, {
+				project: this.project
+			});
+
+			this.addProperty(newElementProperty);
+			return newElementProperty;
+		});
 	}
 
 	public getRole(): Types.ElementRole {

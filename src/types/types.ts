@@ -444,3 +444,8 @@ export enum ElementTargetType {
 	Below = 'below',
 	Inside = 'inside'
 }
+
+export interface Point {
+	x: number;
+	y: number;
+}

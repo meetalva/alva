@@ -40,6 +40,7 @@ export interface ElementProps {
 	placeholderHighlighted?: boolean;
 	state: ElementState;
 	title: string;
+	description?: string;
 }
 
 interface StyledElementLabelProps {
@@ -87,7 +88,7 @@ const LABEL_BACKGROUND = (props: StyledElementLabelProps): string => {
 		case ElementState.Highlighted:
 			return Color.Grey90;
 		default:
-			return 'transparent';
+			return Color.Grey97;
 	}
 };
 
@@ -204,6 +205,35 @@ const StyledSeamlessInput = styled.input`
 	}
 `;
 
+const StyledElementDescription = styled.div`
+	position: absolute;
+	right: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	box-sizing: border-box;
+	color: ${Color.Grey60};
+	padding: 0 ${getSpace(SpaceSize.M)}px 0 ${getSpace(SpaceSize.XS)}px;
+	font-size: 12px;
+	justify-self: flex-end;
+	max-width: 50%;
+	padding-left: 30px;
+	padding-right: 18px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	&::before {
+		content: '';
+		position: absolute;
+		z-index: -1;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		mask-image: linear-gradient(to right, transparent, black 25px, black);
+		background: ${LABEL_BACKGROUND};
+	}
+`;
+
 interface SeamlessInputProps {
 	autoFocus?: boolean;
 	autoSelect?: boolean;
@@ -285,6 +315,11 @@ export class Element extends React.Component<ElementProps> {
 							{...{ [ElementAnchors.label]: true }}
 						>
 							{props.title}
+							{props.description && (
+								<StyledElementDescription state={props.state}>
+									{props.description}
+								</StyledElementDescription>
+							)}
 						</LabelContent>
 					)}
 				</StyledElementLabel>

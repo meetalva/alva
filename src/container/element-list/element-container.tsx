@@ -23,6 +23,7 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 		const open = props.element.getOpen() || props.element.getForcedOpen();
 
 		const contents = props.element.getContents();
+		const pattern = props.element.getPattern();
 
 		const [[childContent], slotContents] = partition(
 			contents,
@@ -49,6 +50,9 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 				state={getElementState(props.element, store)}
 				title={
 					props.element.getRole() === Types.ElementRole.Root ? 'Page' : props.element.getName()
+				}
+				description={
+					pattern && props.element.getName() !== pattern.getName() ? pattern.getName() : ''
 				}
 			>
 				<Components.Element.ElementSlots>

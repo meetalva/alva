@@ -31,6 +31,21 @@ export class ElementContent {
 
 	@Mobx.observable private slotId: string;
 
+	@Mobx.computed
+	private get elements(): Element[] {
+		return this.elementIds
+			.map(id => this.project.getElementById(id))
+			.filter((element): element is Element => typeof element !== 'undefined');
+	}
+
+	@Mobx.computed
+	private get descendants(): Element[] {
+		return this.getElements().reduce(
+			(acc, element) => [...acc, element, ...element.getDescendants()],
+			[]
+		);
+	}
+
 	public constructor(init: ElementContentInit, context: ElementContentContext) {
 		this.forcedOpen = init.forcedOpen;
 		this.id = init.id;
@@ -113,10 +128,7 @@ export class ElementContent {
 	}
 
 	public getDescendants(): Element[] {
-		return this.getElements().reduce(
-			(acc, element) => [...acc, element, ...element.getDescendants()],
-			[]
-		);
+		return this.descendants;
 	}
 
 	public getElementIndexById(id: string): number {
@@ -124,9 +136,7 @@ export class ElementContent {
 	}
 
 	public getElements(): Element[] {
-		return this.elementIds
-			.map(id => this.project.getElementById(id))
-			.filter((element): element is Element => typeof element !== 'undefined');
+		return this.elements;
 	}
 
 	public getForcedOpen(): boolean {

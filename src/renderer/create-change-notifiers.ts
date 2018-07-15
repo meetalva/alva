@@ -100,15 +100,17 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 		});
 	}, opts);
 
-	Mobx.autorun(() => {
-		const project = store.getProject();
-
-		Sender.send({
-			id: uuid.v4(),
-			payload: {
-				project: project ? project.toJSON() : undefined
-			},
-			type: Message.MessageType.ChangeProject
-		});
-	}, opts);
+	// Mobx.autorun(() => {
+	// 	const project = store.getProject();
+	// 	Sender.send({
+	// 		id: uuid.v4(),
+	// 		payload: {
+	// 			project: project ? project.toJSON() : undefined
+	// 		},
+	// 		type: Message.MessageType.ChangeProject
+	// 	});
+	// }, {
+	// 	delay: 5000,
+	// 	scheduler: window.requestIdleCallback
+	// });
 }

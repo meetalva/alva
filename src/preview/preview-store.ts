@@ -57,8 +57,17 @@ export class PreviewStore<V> {
 	@Mobx.observable private project: Model.Project;
 	@Mobx.observable private selectionArea: ElementArea;
 	@Mobx.observable private synthetics: SyntheticComponents<V>;
-
 	private sender?: Sender;
+
+	@Mobx.computed
+	private get elements(): Model.Element[] {
+		return this.project.getElements();
+	}
+
+	@Mobx.computed
+	private get elementContents(): Model.ElementContent[] {
+		return this.project.getElementContents();
+	}
 
 	public constructor(init: PreviewStoreInit<V, Types.PreviewDocumentMode>) {
 		this.mode = init.mode;
@@ -116,15 +125,15 @@ export class PreviewStore<V> {
 	}
 
 	public getElementById(id: string): Model.Element | undefined {
-		return this.project.getElements().find(element => element.getId() === id);
+		return this.project.getElementById(id);
 	}
 
 	public getHighlightedElement(): Model.Element | undefined {
-		return this.project.getElements().find(element => element.getHighlighted());
+		return this.elements.find(element => element.getHighlighted());
 	}
 
 	public getHighlightedElementContent(): Model.ElementContent | undefined {
-		return this.project.getElementContents().find(c => c.getHighlighted());
+		return this.elementContents.find(c => c.getHighlighted());
 	}
 
 	public getHighlightArea(): ElementArea {

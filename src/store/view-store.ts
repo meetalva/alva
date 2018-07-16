@@ -285,6 +285,7 @@ export class ViewStore {
 		index: number;
 	}): void {
 		this.moveElement(init);
+		this.project.unsetPlaceholderHighlightedElement();
 		this.commit();
 	}
 

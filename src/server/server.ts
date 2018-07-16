@@ -71,7 +71,7 @@ export class AlvaServer extends EventEmitter {
 	public start(): Promise<void> {
 		return new Promise((resolve, reject) => {
 			this.server.once('error', reject);
-			this.server.listen(this.options.port, () => resolve());
+			this.server.listen(this.options.port, 'localhost', () => resolve());
 		});
 	}
 

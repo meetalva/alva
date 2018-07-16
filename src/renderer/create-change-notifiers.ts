@@ -24,7 +24,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 			},
 			type: Message.MessageType.ChangePages
 		});
-	});
+	}, opts);
 
 	Mobx.autorun(() => {
 		const elements = store.getElements().map(e => e.toJSON());
@@ -34,7 +34,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 			payload: { elements },
 			type: Message.MessageType.ChangeElements
 		});
-	});
+	}, opts);
 
 	Mobx.autorun(() => {
 		const elementContents = store.getElementContents().map(e => e.toJSON());
@@ -44,7 +44,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 			payload: { elementContents },
 			type: Message.MessageType.ChangeElementContents
 		});
-	});
+	}, opts);
 
 	Mobx.autorun(() => {
 		const elementActions = store.getElementActions().map(e => e.toJSON());
@@ -54,7 +54,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 			payload: { elementActions },
 			type: Message.MessageType.ChangeElementActions
 		});
-	});
+	}, opts);
 
 	Mobx.autorun(() => {
 		const metaDown = store.getMetaDown();
@@ -66,7 +66,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 			},
 			type: Message.MessageType.KeyboardChange
 		});
-	});
+	}, opts);
 
 	Mobx.autorun(() => {
 		const patternLibraries = store.getPatternLibraries();

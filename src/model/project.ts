@@ -590,6 +590,16 @@ export class Project {
 			.filter(content => content.getHighlighted())
 			.forEach(content => content.setHighlighted(false));
 	}
+
+	@Mobx.action
+	public unsetPlaceholderHighlightedElement(options?: { ignore: Element }): void {
+		this.getElements()
+			.filter(el => el.getPlaceholderHighlighted())
+			.filter(element => !options || options.ignore.getId() !== element.getId())
+			.forEach(element => {
+				element.setPlaceholderHighlighted(false);
+			});
+	}
 }
 
 function serializeItemType(type: Types.ItemType): Types.SerializedItemType {

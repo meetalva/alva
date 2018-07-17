@@ -3,13 +3,15 @@ import * as Mobx from 'mobx';
 import * as Message from '../message';
 import { Project } from './project';
 import * as Types from '../types';
+import * as uuid from 'uuid';
 import { UserStoreAction } from './user-store-action';
 import { UserStoreProperty } from './user-store-property';
 
 export interface UserStoreInit {
-	actions: UserStoreAction[];
 	id: string;
-	properties: UserStoreProperty[];
+	properties?: UserStoreProperty[];
+	actions?: UserStoreAction[];
+	currentPageProperty?: UserStoreProperty;
 }
 
 export interface UserStoreContext {
@@ -18,18 +20,70 @@ export interface UserStoreContext {
 
 export class UserStore {
 	private id: string;
-	@Mobx.observable private actions: Map<string, UserStoreAction> = new Map();
+	private actions: Map<string, UserStoreAction> = new Map();
+	private currentPageProperty: UserStoreProperty;
 	@Mobx.observable private properties: Map<string, UserStoreProperty> = new Map();
 
 	public constructor(init: UserStoreInit) {
 		this.id = init.id;
-		init.properties.forEach(prop => this.addProperty(prop));
-		init.actions.forEach(action => this.addAction(action));
+
+		if (init.currentPageProperty) {
+			this.currentPageProperty = init.currentPageProperty;
+		} else {
+			this.currentPageProperty = new UserStoreProperty({
+				id: uuid.v4(),
+				name: 'Current Page',
+				payload: '',
+				type: Types.UserStorePropertyType.Page
+			});
+		}
+
+		(init.properties || []).forEach(prop => this.addProperty(prop));
+
+		const actions = init.actions || [];
+
+		[
+			new UserStoreAction({
+				acceptsProperty: false,
+				id: uuid.v4(),
+				name: 'No Interaction',
+				type: Types.UserStoreActionType.Noop
+			}),
+			new UserStoreAction({
+				acceptsProperty: false,
+				id: uuid.v4(),
+				name: 'Switch Page',
+				userStorePropertyId: this.currentPageProperty.getId(),
+				type: Types.UserStoreActionType.Set
+			}),
+			new UserStoreAction({
+				acceptsProperty: false,
+				id: uuid.v4(),
+				name: 'Navigate',
+				userStorePropertyId: undefined,
+				type: Types.UserStoreActionType.OpenExternal
+			}),
+			new UserStoreAction({
+				acceptsProperty: true,
+				id: uuid.v4(),
+				name: 'Set Variable',
+				type: Types.UserStoreActionType.Set
+			})
+		]
+			.filter(
+				b => !actions.some(i => b.getType() === i.getType() && b.getName() === i.getName())
+			)
+			.forEach(b => actions.push(b));
+
+		actions.forEach(action => this.addAction(action));
 	}
 
 	public static from(serialized: Types.SerializedUserStore): UserStore {
 		return new UserStore({
 			actions: serialized.actions.map(a => UserStoreAction.from(a)),
+			currentPageProperty: serialized.currentPageProperty
+				? UserStoreProperty.from(serialized.currentPageProperty)
+				: undefined,
 			id: serialized.id,
 			properties: serialized.properties.map(p => UserStoreProperty.from(p))
 		});
@@ -60,9 +114,7 @@ export class UserStore {
 	}
 
 	public getPageProperty(): UserStoreProperty {
-		return this.getProperties().find(
-			p => p.getType() === Types.UserStorePropertyType.Page
-		) as UserStoreProperty;
+		return this.currentPageProperty;
 	}
 
 	public getProperties(): UserStoreProperty[] {
@@ -109,6 +161,7 @@ export class UserStore {
 	public toJSON(): Types.SerializedUserStore {
 		return {
 			actions: this.getActions().map(a => a.toJSON()),
+			currentPageProperty: this.currentPageProperty.toJSON(),
 			id: this.id,
 			properties: this.getProperties().map(p => p.toJSON())
 		};

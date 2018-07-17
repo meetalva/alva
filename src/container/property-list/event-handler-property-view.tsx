@@ -28,20 +28,33 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 			return;
 		}
 
-		const elementAction = new Model.ElementAction(
-			{
-				id: uuid.v4(),
-				payload: '',
-				storeActionId: selectedAction.getId(),
-				storePropertyId: selectedAction.getUserStorePropertyId() || ''
-			},
-			{
-				userStore: project.getUserStore()
-			}
-		);
+		const existingElementAction = project
+			.getElementActions()
+			.find(
+				action =>
+					action.getElementPropertyId() === props.elementProperty.getId() &&
+					selectedAction.getId() === action.getStoreActionId()
+			);
+
+		const elementAction =
+			existingElementAction ||
+			new Model.ElementAction(
+				{
+					elementPropertyId: props.elementProperty.getId(),
+					id: uuid.v4(),
+					payload: '',
+					storeActionId: selectedAction.getId(),
+					storePropertyId: selectedAction.getUserStorePropertyId() || ''
+				},
+				{
+					userStore: project.getUserStore()
+				}
+			);
 
 		project.addElementAction(elementAction);
 		props.elementProperty.setValue(elementAction.getId());
+
+		console.log({ elementActionId: elementAction.getId() });
 
 		const storePropertyId = elementAction.getStorePropertyId();
 		const storeProperty = storePropertyId
@@ -77,6 +90,43 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 					elementAction.setStorePropertyId(storeProperty.getId());
 					props.store.commit();
 				}
+
+				elementAction.setPayload('');
+				break;
+			}
+			case 'create-option': {
+				const newProperty = new Model.UserStoreProperty({
+					id: uuid.v4(),
+					name: item.value,
+					type: Types.UserStorePropertyType.String,
+					payload: ''
+				});
+
+				userStore.addProperty(newProperty);
+				elementAction.setStorePropertyId(newProperty.getId());
+				elementAction.setPayload('');
+				props.store.commit();
+			}
+		}
+
+		/* const props = this.props as EventHandlerPropertyViewProps & StoreInjection;
+		const project = props.store.getProject();
+		const userStore = project.getUserStore();
+		const elementAction = project.getElementActionById(String(props.elementProperty.getValue()));
+
+		if (!elementAction) {
+			return;
+		}
+
+		switch (action.action) {
+			case 'select-option': {
+				const storeProperty = userStore.getPropertyById(item.value);
+
+				if (storeProperty) {
+					elementAction.setStorePropertyId(storeProperty.getId());
+					props.store.commit();
+				}
+
 				break;
 			}
 			case 'create-option': {
@@ -101,7 +151,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 					props.store.commit();
 				}
 			}
-		}
+		} */
 	}
 
 	public render(): JSX.Element | null {
@@ -177,7 +227,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 					{elementAction &&
 						userAction &&
 						userAction.getAcceptsProperty() && (
-							<div style={{ width: '100%', marginBottom: '6px' }}>
+							<div style={{ width: '100%', marginTop: '6px', marginBottom: '6px' }}>
 								<Component.CreateSelect
 									options={project
 										.getUserStore()
@@ -196,7 +246,8 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 								/>
 							</div>
 						)}
-					{userProperty &&
+					{elementAction &&
+						userProperty &&
 						(() => {
 							switch (userProperty.getType()) {
 								case Types.UserStorePropertyType.String:
@@ -212,11 +263,9 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 											<Component.PropertyLabel label="to" />
 											<Component.PropertyInput
 												type={Component.PropertyInputType.Text}
-												value={userProperty.getPayload()}
+												value={elementAction.getPayload()}
 												onBlur={() => props.store.commit()}
-												onChange={e => {
-													userProperty.setPayload(e.target.value);
-												}}
+												onChange={e => elementAction.setPayload(e.target.value)}
 											/>
 										</div>
 									);

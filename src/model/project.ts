@@ -9,8 +9,6 @@ import { PatternLibrary } from './pattern-library';
 import { AnyPatternProperty } from './pattern-property';
 import * as Types from '../types';
 import { UserStore } from './user-store';
-import { UserStoreAction } from './user-store-action';
-import { UserStoreProperty } from './user-store-property';
 import * as uuid from 'uuid';
 
 export interface ProjectProperties {
@@ -128,49 +126,7 @@ export class Project {
 			state: Types.PatternLibraryState.Connected
 		});
 
-		const currentPageProperty = new UserStoreProperty({
-			id: uuid.v4(),
-			name: 'Current Page',
-			payload: '',
-			type: Types.UserStorePropertyType.Page
-		});
-
-		const noopAction = new UserStoreAction({
-			acceptsProperty: false,
-			id: uuid.v4(),
-			name: 'No Interaction',
-			type: Types.UserStoreActionType.Noop
-		});
-
-		const navigatePageAction = new UserStoreAction({
-			acceptsProperty: false,
-			id: uuid.v4(),
-			name: 'Switch Page',
-			userStorePropertyId: currentPageProperty.getId(),
-			type: Types.UserStoreActionType.Set
-		});
-
-		const openLinkAction = new UserStoreAction({
-			acceptsProperty: false,
-			id: uuid.v4(),
-			name: 'Navigate',
-			userStorePropertyId: undefined,
-			type: Types.UserStoreActionType.OpenExternal
-		});
-
-		// TODO: Reenable when implementing full variable support
-		/* const setPropertyAction = new UserStoreAction({
-			acceptsProperty: true,
-			id: uuid.v4(),
-			name: 'Set Variable',
-			type: Types.UserStoreActionType.Set
-		}); */
-
-		const userStore = new UserStore({
-			id: uuid.v4(),
-			properties: [currentPageProperty],
-			actions: [noopAction, navigatePageAction, openLinkAction /*, setPropertyAction*/]
-		});
+		const userStore = new UserStore({ id: uuid.v4() });
 
 		const project = new Project({
 			name: init.name,
@@ -191,8 +147,7 @@ export class Project {
 			)
 		);
 
-		currentPageProperty.setProject(project);
-
+		userStore.getPageProperty().setProject(project);
 		return project;
 	}
 

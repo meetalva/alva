@@ -70,7 +70,6 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 
 		// TODO: Split ElementProperty into type-specific classes for better type safety
 		// TODO: Implement inputs for
-		// - Number
 		// - NumberArray
 		// - Object
 		// - StringArray

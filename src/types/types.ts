@@ -340,6 +340,7 @@ export type ElementPropertyValue =
 	| string[];
 
 export interface SerializedElementAction {
+	elementPropertyId: string;
 	id: string;
 	payload: string;
 	storeActionId: string;

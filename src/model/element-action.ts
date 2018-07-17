@@ -10,6 +10,7 @@ export interface Sender {
 }
 
 export interface ElementActionInit {
+	elementPropertyId: string;
 	id: string;
 	payload: string;
 	storeActionId: string;
@@ -17,6 +18,7 @@ export interface ElementActionInit {
 }
 
 export class ElementAction {
+	private elementPropertyId: string;
 	private id: string;
 	private userStore: UserStore;
 	@Mobx.observable private payload: string;
@@ -24,6 +26,7 @@ export class ElementAction {
 	@Mobx.observable private storePropertyId: string;
 
 	public constructor(init: ElementActionInit, ctx: { userStore: UserStore }) {
+		this.elementPropertyId = init.elementPropertyId;
 		this.id = init.id;
 		this.payload = init.payload;
 		this.storeActionId = init.storeActionId;
@@ -37,6 +40,7 @@ export class ElementAction {
 	): ElementAction {
 		return new ElementAction(
 			{
+				elementPropertyId: serialized.elementPropertyId,
 				id: serialized.id,
 				payload: serialized.payload || '',
 				storeActionId: serialized.storeActionId,
@@ -49,6 +53,7 @@ export class ElementAction {
 	public clone(): ElementAction {
 		return new ElementAction(
 			{
+				elementPropertyId: this.elementPropertyId,
 				id: uuid.v4(),
 				payload: this.payload,
 				storeActionId: this.storeActionId,
@@ -75,6 +80,7 @@ export class ElementAction {
 			case Types.UserStoreActionType.Set: {
 				const storeProperty = this.userStore.getPropertyById(this.storePropertyId);
 				if (storeProperty) {
+					console.log(this.payload);
 					storeProperty.setPayload(this.payload);
 				}
 				break;
@@ -95,6 +101,10 @@ export class ElementAction {
 
 	public getId(): string {
 		return this.id;
+	}
+
+	public getElementPropertyId(): string {
+		return this.elementPropertyId;
 	}
 
 	public getPayload(): string {
@@ -121,6 +131,7 @@ export class ElementAction {
 
 	public toJSON(): Types.SerializedElementAction {
 		return {
+			elementPropertyId: this.elementPropertyId,
 			id: this.id,
 			payload: this.payload,
 			storeActionId: this.storeActionId,

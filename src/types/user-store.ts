@@ -30,6 +30,7 @@ export interface SerializedUserStoreAction {
 
 export interface SerializedUserStore {
 	actions: SerializedUserStoreAction[];
+	currentPageProperty: SerializedUserStoreProperty;
 	id: string;
 	properties: SerializedUserStoreProperty[];
 }

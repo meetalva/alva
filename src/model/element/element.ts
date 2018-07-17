@@ -41,11 +41,11 @@ export class Element {
 
 	@Mobx.observable private editedName: string;
 
-	@Mobx.observable private focused: boolean;
+	@Mobx.observable private shouldFocus: boolean;
 
 	@Mobx.observable private forcedOpen: boolean;
 
-	@Mobx.observable private highlighted: boolean;
+	@Mobx.observable private shouldHighlight: boolean;
 
 	@Mobx.observable private id: string;
 
@@ -59,7 +59,7 @@ export class Element {
 
 	@Mobx.observable private patternId: string;
 
-	@Mobx.observable private placeholderHighlighted: boolean;
+	@Mobx.observable private shouldPlaceholderHighlight: boolean;
 
 	private project: Project;
 
@@ -68,6 +68,42 @@ export class Element {
 	@Mobx.observable private role: Types.ElementRole;
 
 	@Mobx.observable private selected: boolean;
+
+	@Mobx.computed
+	private get mayHighiglight(): boolean {
+		if (!this.page || !this.page.getActive()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Mobx.computed
+	private get highlighted(): boolean {
+		if (!this.shouldHighlight) {
+			return false;
+		}
+
+		return this.mayHighiglight;
+	}
+
+	@Mobx.computed
+	private get placeholderHighlighted(): boolean {
+		if (!this.shouldPlaceholderHighlight) {
+			return false;
+		}
+
+		return this.mayHighiglight;
+	}
+
+	@Mobx.computed
+	private get focused(): boolean {
+		if (!this.shouldFocus) {
+			return false;
+		}
+
+		return this.mayHighiglight;
+	}
 
 	@Mobx.computed
 	private get page(): Page | undefined {
@@ -95,9 +131,9 @@ export class Element {
 
 	public constructor(init: ElementInit, context: ElementContext) {
 		this.dragged = init.dragged;
-		this.focused = init.focused;
-		this.highlighted = init.highlighted;
-		this.placeholderHighlighted = init.placeholderHighlighted;
+		this.shouldFocus = init.focused;
+		this.shouldHighlight = init.highlighted;
+		this.shouldPlaceholderHighlight = init.placeholderHighlighted;
 		this.id = init.id ? init.id : uuid.v4();
 		this.patternId = init.patternId;
 		this.containerId = init.containerId;
@@ -212,7 +248,7 @@ export class Element {
 			{
 				dragged: false,
 				focused: withState ? this.focused : false,
-				highlighted: withState ? this.highlighted : false,
+				highlighted: withState ? this.shouldHighlight : false,
 				id: uuid.v4(),
 				containerId: withState ? this.containerId : undefined,
 				contentIds: clonedContents.map(content => content.getId()),
@@ -354,18 +390,10 @@ export class Element {
 	}
 
 	public getHighlighted(): boolean {
-		if (!this.page || !this.page.getActive()) {
-			return false;
-		}
-
 		return this.highlighted;
 	}
 
 	public getFocused(): boolean {
-		if (!this.page || !this.page.getActive()) {
-			return false;
-		}
-
 		return this.focused;
 	}
 
@@ -424,10 +452,6 @@ export class Element {
 	}
 
 	public getPlaceholderHighlighted(): boolean {
-		if (!this.page || !this.page.getActive()) {
-			return false;
-		}
-
 		return this.placeholderHighlighted;
 	}
 
@@ -499,12 +523,12 @@ export class Element {
 
 	@Mobx.action
 	public setHighlighted(highlighted: boolean): void {
-		this.highlighted = highlighted;
+		this.shouldHighlight = highlighted;
 	}
 
 	@Mobx.action
 	public setFocused(focused: boolean): void {
-		this.focused = focused;
+		this.shouldFocus = focused;
 	}
 
 	@Mobx.action
@@ -565,7 +589,7 @@ export class Element {
 
 	@Mobx.action
 	public setPlaceholderHighlighted(placeholderHighlighted: boolean): void {
-		this.placeholderHighlighted = placeholderHighlighted;
+		this.shouldPlaceholderHighlight = placeholderHighlighted;
 	}
 
 	public setProject(project: Project): void {
@@ -608,7 +632,7 @@ export class Element {
 			contentIds: Array.from(this.contentIds),
 			dragged: this.dragged,
 			focused: this.focused,
-			highlighted: this.highlighted,
+			highlighted: this.shouldHighlight,
 			id: this.id,
 			name: this.name,
 			open: this.open,
@@ -632,7 +656,7 @@ export class Element {
 			this.project.unsetSelectedElement();
 		}
 
-		if (this.highlighted) {
+		if (this.shouldHighlight) {
 			this.project.unsetHighlightedElement();
 		}
 
@@ -645,14 +669,14 @@ export class Element {
 		propsChanges.added.forEach(change => this.addProperty(change.after));
 		propsChanges.changed.forEach(change => change.before.update(change.after));
 
-		this.highlighted = b.highlighted;
+		this.shouldHighlight = b.shouldHighlight;
 		this.dragged = b.dragged;
-		this.focused = b.focused;
+		this.shouldFocus = b.focused;
 		this.containerId = b.containerId;
 		this.name = b.name;
 		this.open = b.open;
 		this.forcedOpen = b.forcedOpen;
-		this.placeholderHighlighted = b.placeholderHighlighted;
+		this.shouldPlaceholderHighlight = b.placeholderHighlighted;
 		this.selected = b.selected;
 	}
 }

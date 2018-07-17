@@ -74,6 +74,31 @@ export class Project {
 		return new PatternSearch({ patterns: this.patterns });
 	}
 
+	@Mobx.computed
+	private get selectedElements(): Element[] {
+		return this.getElements().filter(e => e.getSelected());
+	}
+
+	@Mobx.computed
+	private get highlightedElements(): Element[] {
+		return this.getElements().filter(e => e.getHighlighted());
+	}
+
+	@Mobx.computed
+	private get placeholderHighlightedElements(): Element[] {
+		return this.getElements().filter(e => e.getPlaceholderHighlighted());
+	}
+
+	@Mobx.computed
+	private get highlightedElementContents(): ElementContent[] {
+		return this.getElementContents().filter(e => e.getHighlighted());
+	}
+
+	@Mobx.computed
+	private get draggedElements(): Element[] {
+		return this.getElements().filter(e => e.getDragged());
+	}
+
 	public constructor(init: ProjectProperties) {
 		this.name = init.name;
 		this.id = init.id ? init.id : uuid.v4();
@@ -561,44 +586,37 @@ export class Project {
 
 	@Mobx.action
 	public unsetSelectedElement(options?: { ignore: Element }): void {
-		this.getElements()
-			.filter(element => element.getSelected())
+		this.selectedElements
 			.filter(element => !options || options.ignore.getId() !== element.getId())
-			.forEach(element => {
-				element.setSelected(false);
-				element.getAncestors().forEach(ancestor => {
-					ancestor.setForcedOpen(false);
-				});
-			});
+			.forEach(selectedElement => selectedElement.setSelected(false));
+	}
+
+	@Mobx.action
+	public unsetDraggedElements(options?: { ignore: Element }): void {
+		this.draggedElements
+			.filter(element => !options || options.ignore.getId() !== element.getId())
+			.forEach(element => element.setDragged(false));
 	}
 
 	@Mobx.action
 	public unsetHighlightedElement(options?: { ignore: Element }): void {
-		this.getElements()
-			.filter(element => element.getHighlighted())
+		this.highlightedElements
 			.filter(element => !options || options.ignore.getId() !== element.getId())
-			.forEach(element => {
-				element.setHighlighted(false);
-				element.getAncestors().forEach(ancestor => ancestor.setForcedOpen(false));
-			});
+			.forEach(selectedElement => selectedElement.setHighlighted(false));
 	}
 
 	@Mobx.action
 	public unsetHighlightedElementContent(options?: { ignore: ElementContent }): void {
-		this.getElementContents()
-			.filter(content => !options || options.ignore.getId() !== content.getId())
-			.filter(content => content.getHighlighted())
-			.forEach(content => content.setHighlighted(false));
+		this.highlightedElementContents
+			.filter(elementContent => !options || options.ignore.getId() !== elementContent.getId())
+			.forEach(elementContent => elementContent.setHighlighted(false));
 	}
 
 	@Mobx.action
 	public unsetPlaceholderHighlightedElement(options?: { ignore: Element }): void {
-		this.getElements()
-			.filter(el => el.getPlaceholderHighlighted())
+		this.placeholderHighlightedElements
 			.filter(element => !options || options.ignore.getId() !== element.getId())
-			.forEach(element => {
-				element.setPlaceholderHighlighted(false);
-			});
+			.forEach(element => element.setPlaceholderHighlighted(false));
 	}
 }
 

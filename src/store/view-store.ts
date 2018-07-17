@@ -442,7 +442,7 @@ export class ViewStore {
 	}
 
 	public getElementById(id: string): Model.Element | undefined {
-		return this.getElements().find(e => e.getId() === id);
+		return this.project.getElementById(id);
 	}
 
 	public getHighlightedElement(): Model.Element | undefined {
@@ -885,9 +885,7 @@ export class ViewStore {
 	@Mobx.action
 	public unsetDraggedElement(): void {
 		this.project.unsetHighlightedElement();
-		this.project.getElements().forEach(e => {
-			e.setDragged(false);
-		});
+		this.project.unsetDraggedElements();
 	}
 
 	public updatePatternLibrary(library: Model.PatternLibrary): void {

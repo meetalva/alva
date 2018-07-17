@@ -54,8 +54,6 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 		project.addElementAction(elementAction);
 		props.elementProperty.setValue(elementAction.getId());
 
-		console.log({ elementActionId: elementAction.getId() });
-
 		const storePropertyId = elementAction.getStorePropertyId();
 		const storeProperty = storePropertyId
 			? userStore.getPropertyById(storePropertyId)
@@ -108,50 +106,6 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 				props.store.commit();
 			}
 		}
-
-		/* const props = this.props as EventHandlerPropertyViewProps & StoreInjection;
-		const project = props.store.getProject();
-		const userStore = project.getUserStore();
-		const elementAction = project.getElementActionById(String(props.elementProperty.getValue()));
-
-		if (!elementAction) {
-			return;
-		}
-
-		switch (action.action) {
-			case 'select-option': {
-				const storeProperty = userStore.getPropertyById(item.value);
-
-				if (storeProperty) {
-					elementAction.setStorePropertyId(storeProperty.getId());
-					props.store.commit();
-				}
-
-				break;
-			}
-			case 'create-option': {
-				const newProperty = new Model.UserStoreProperty({
-					id: uuid.v4(),
-					name: item.value,
-					type: Types.UserStorePropertyType.String,
-					payload: ''
-				});
-				userStore.addProperty(newProperty);
-				elementAction.setStorePropertyId(newProperty.getId());
-				props.store.commit();
-				break;
-			}
-			case 'pop-value': {
-				const removedStoreProperty = userStore.getPropertyById(action.removedValue.value);
-				if (
-					removedStoreProperty &&
-					elementAction.getStorePropertyId() === removedStoreProperty.getId()
-				) {
-					elementAction.unsetStorePropertyId();
-					props.store.commit();
-				}
-			}
-		} */
 	}
 
 	public render(): JSX.Element | null {

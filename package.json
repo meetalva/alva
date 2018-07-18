@@ -145,7 +145,7 @@
     "webpack-cli": "3.0.8"
   },
   "dependencies": {
-    "@brainly/html-sketchapp": "3.0.2",
+    "@brainly/html-sketchapp": "3.3.1",
     "@marionebl/sander": "0.6.1",
     "@patternplate/load-config": "2.5.2",
     "@patternplate/load-meta": "2.5.2",
@@ -189,6 +189,7 @@
     "react-dom": "16.3.1",
     "react-feather": "1.1.0",
     "react-helmet": "5.2.0",
+    "react-outside-click-handler": "1.2.0",
     "react-router": "4.2.0",
     "react-select": "2.0.0-beta.6",
     "read-pkg": "3.0.0",

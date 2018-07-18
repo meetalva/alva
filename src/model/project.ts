@@ -1,4 +1,4 @@
-import { Element, ElementContent } from './element';
+import { Element, ElementContent, ElementProperty } from './element';
 import { ElementAction } from './element-action';
 import * as Mobx from 'mobx';
 import * as _ from 'lodash';
@@ -9,6 +9,7 @@ import { PatternLibrary } from './pattern-library';
 import { AnyPatternProperty } from './pattern-property';
 import * as Types from '../types';
 import { UserStore } from './user-store';
+import { UserStoreReference } from './user-store-reference';
 import * as uuid from 'uuid';
 
 export interface ProjectProperties {
@@ -95,6 +96,17 @@ export class Project {
 	@Mobx.computed
 	private get draggedElements(): Element[] {
 		return this.getElements().filter(e => e.getDragged());
+	}
+
+	@Mobx.computed
+	private get elementProperties(): Map<string, ElementProperty> {
+		const elementProperties = new Map();
+
+		this.elements.forEach(element => {
+			element.getProperties().forEach(p => elementProperties.set(p.getId(), p));
+		});
+
+		return elementProperties;
 	}
 
 	public constructor(init: ProjectProperties) {
@@ -355,6 +367,16 @@ export class Project {
 
 	public getUserStore(): UserStore {
 		return this.userStore;
+	}
+
+	public getElementPropertyById(id: string): ElementProperty | undefined {
+		return this.elementProperties.get(id);
+	}
+
+	public getElementPropertyByReference(
+		reference: UserStoreReference
+	): ElementProperty | undefined {
+		return this.getElementPropertyById(reference.getElementPropertyId());
 	}
 
 	@Mobx.action

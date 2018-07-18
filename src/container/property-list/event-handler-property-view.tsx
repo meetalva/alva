@@ -1,9 +1,10 @@
-import * as Component from '../../components';
+import * as Components from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
+import { UserStorePropertySelect } from '../user-store-property-select';
 import * as uuid from 'uuid';
 
 export interface EventHandlerPropertyViewProps {
@@ -68,8 +69,8 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 	}
 
 	private handlePropertyNameChange(
-		item: Component.CreateSelectOption,
-		action: Component.CreateSelectAction
+		item: Components.CreateSelectOption,
+		action: Components.CreateSelectAction
 	): void {
 		const props = this.props as EventHandlerPropertyViewProps & StoreInjection;
 		const project = props.store.getProject();
@@ -129,7 +130,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 				key={props.elementProperty.getId()}
 				style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}
 			>
-				<Component.PropertyBox
+				<Components.PropertyBox
 					headline={patternProperty.getLabel()}
 					copy={patternProperty.getDescription()}
 				>
@@ -141,21 +142,21 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 							marginTop: '12px'
 						}}
 					>
-						<Component.PropertyLabel label={'Action'} />
-						<Component.Select
+						<Components.PropertyLabel label={'Action'} />
+						<Components.Select
 							onChange={e => this.handleActionChange(e)}
 							selectedValue={userAction.getId()}
 						>
 							{userStore
 								.getActions()
 								.map(action => (
-									<Component.SelectOption
+									<Components.SelectOption
 										key={action.getId()}
 										label={action.getName()}
 										value={action.getId()}
 									/>
 								))}
-						</Component.Select>
+						</Components.Select>
 					</div>
 					{elementAction &&
 						userAction &&
@@ -168,9 +169,9 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 									alignItems: 'center'
 								}}
 							>
-								<Component.PropertyLabel label="to" />
-								<Component.PropertyInput
-									type={Component.PropertyInputType.Text}
+								<Components.PropertyLabel label="to" />
+								<Components.PropertyInput
+									type={Components.PropertyInputType.Text}
 									value={elementAction.getPayload()}
 									placeholder="https://meetalva.io"
 									onBlur={() => props.store.commit()}
@@ -182,21 +183,10 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 						userAction &&
 						userAction.getAcceptsProperty() && (
 							<div style={{ width: '100%', marginTop: '6px', marginBottom: '6px' }}>
-								<Component.CreateSelect
-									options={project
-										.getUserStore()
-										.getProperties()
-										.map(p => ({
-											label: p.getName(),
-											value: p.getId()
-										}))}
+								<UserStorePropertySelect
 									placeholder="Select Variable"
 									onChange={(e, meta) => this.handlePropertyNameChange(e, meta)}
-									value={
-										userAction && userProperty
-											? { label: userProperty.getName(), value: userProperty.getId() }
-											: undefined
-									}
+									property={userProperty}
 								/>
 							</div>
 						)}
@@ -210,13 +200,13 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 											style={{
 												display: 'flex',
 												alignItems: 'center',
-												flexWrap: 'wrap',
+												flexWrap: 'nowrap',
 												width: '100%'
 											}}
 										>
-											<Component.PropertyLabel label="to" />
-											<Component.PropertyInput
-												type={Component.PropertyInputType.Text}
+											<Components.PropertyLabel label="to" />
+											<Components.PropertyInput
+												type={Components.PropertyInputType.Text}
 												value={elementAction.getPayload()}
 												onBlur={() => props.store.commit()}
 												onChange={e => elementAction.setPayload(e.target.value)}
@@ -233,8 +223,8 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 												marginTop: '6px'
 											}}
 										>
-											<Component.PropertyLabel label="to" />
-											<Component.Select
+											<Components.PropertyLabel label="to" />
+											<Components.Select
 												onChange={e => {
 													if (elementAction) {
 														elementAction.setPayload(
@@ -248,18 +238,18 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 												{project
 													.getPages()
 													.map(page => (
-														<Component.SelectOption
+														<Components.SelectOption
 															key={page.getId()}
 															value={page.getId()}
 															label={page.getName()}
 														/>
 													))}
-											</Component.Select>
+											</Components.Select>
 										</div>
 									);
 							}
 						})()}
-				</Component.PropertyBox>
+				</Components.PropertyBox>
 			</div>
 		);
 	}

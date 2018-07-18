@@ -100,6 +100,19 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 		});
 	}, opts);
 
+	Mobx.autorun(() => {
+		Sender.send({
+			id: uuid.v4(),
+			payload: {
+				userStore: store
+					.getProject()
+					.getUserStore()
+					.toJSON()
+			},
+			type: Message.MessageType.ChangeUserStore
+		});
+	}, opts);
+
 	// Mobx.autorun(() => {
 	// 	const project = store.getProject();
 	// 	Sender.send({

@@ -33,6 +33,14 @@ export interface SerializedUserStore {
 	currentPageProperty: SerializedUserStoreProperty;
 	id: string;
 	properties: SerializedUserStoreProperty[];
+	references: SerializedUserStoreReference[];
 }
 
 export type UserStoreActionPayload = string;
+
+export interface SerializedUserStoreReference {
+	id: string;
+	open: boolean;
+	elementPropertyId: string;
+	userStorePropertyId: string | undefined;
+}

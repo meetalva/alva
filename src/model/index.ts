@@ -10,3 +10,4 @@ export * from './project';
 export * from './user-store';
 export * from './user-store-action';
 export * from './user-store-property';
+export * from './user-store-reference';

@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import { AnyPatternProperty } from '../../pattern-property';
+import { UserStoreProperty } from '../../user-store-property';
+import { UserStoreReference } from '../../user-store-reference';
 import { Project } from '../../project';
 import * as Types from '../../../types';
 import * as uuid from 'uuid';
@@ -22,6 +24,26 @@ export class ElementProperty {
 	private project: Project;
 	@Mobx.observable private setDefault: boolean;
 	@Mobx.observable private value: Types.ElementPropertyValue;
+
+	@Mobx.computed
+	private get userStoreReference(): UserStoreReference | undefined {
+		return this.project.getUserStore().getReferenceByElementProperty(this);
+	}
+
+	@Mobx.computed
+	private get referencedUserStoreProperty(): UserStoreProperty | undefined {
+		if (!this.userStoreReference) {
+			return;
+		}
+
+		const userStorePropertyId = this.userStoreReference.getUserStorePropertyId();
+
+		if (!userStorePropertyId) {
+			return;
+		}
+
+		return this.project.getUserStore().getPropertyById(userStorePropertyId);
+	}
 
 	public constructor(init: ElementPropertyInit, context: ElementPropertyContext) {
 		this.id = init.id;
@@ -132,6 +154,14 @@ export class ElementProperty {
 
 	public getValue(): Types.ElementPropertyValue {
 		return this.value;
+	}
+
+	public getUserStoreReference(): UserStoreReference | undefined {
+		return this.userStoreReference;
+	}
+
+	public getReferencedUserStoreProperty(): UserStoreProperty | undefined {
+		return this.referencedUserStoreProperty;
 	}
 
 	public hasPatternProperty(patternProperty: AnyPatternProperty): boolean {

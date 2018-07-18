@@ -80,7 +80,6 @@ export class ElementAction {
 			case Types.UserStoreActionType.Set: {
 				const storeProperty = this.userStore.getPropertyById(this.storePropertyId);
 				if (storeProperty) {
-					console.log(this.payload);
 					storeProperty.setPayload(this.payload);
 				}
 				break;

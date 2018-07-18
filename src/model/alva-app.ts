@@ -12,10 +12,13 @@ export interface AlvaAppInit {
 export class AlvaApp {
 	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
 	@Mobx.observable private hoverArea: Types.HoverArea = Types.HoverArea.Chrome;
+
 	@Mobx.observable
 	private rightSidebarTab: Types.RightSidebarTab = Types.RightSidebarTab.Properties;
+
 	@Mobx.observable private searchTerm: string = '';
 	@Mobx.observable private state: Types.AppState = Types.AppState.Starting;
+
 	@Mobx.observable
 	private panes: Set<Types.AppPane> = new Set([
 		Types.AppPane.PagesPane,

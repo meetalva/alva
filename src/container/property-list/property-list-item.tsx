@@ -1,16 +1,17 @@
 import * as Sender from '../../sender/client';
-import * as Component from '../../components';
+import * as Components from '../../components';
 import { EventHandlerPropertyView } from './event-handler-property-view';
 import { MessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
-import { ElementProperty, PatternEnumProperty } from '../../model';
+import * as Model from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
+import { UserStorePropertySelect } from '../user-store-property-select';
 import * as uuid from 'uuid';
 
 export interface PropertyListItemProps {
-	property: ElementProperty;
+	property: Model.ElementProperty;
 }
 
 export interface StoreInjection {
@@ -29,7 +30,7 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 
 	private handleEnumChange(e: React.ChangeEvent<HTMLElement>): void {
 		const props = this.props as PropertyListItemProps & StoreInjection;
-		const patternProperty = props.property.getPatternProperty() as PatternEnumProperty;
+		const patternProperty = props.property.getPatternProperty() as Model.PatternEnumProperty;
 		const selectedOption = patternProperty.getOptionById((e.target as HTMLSelectElement).value);
 		const selectedValue = selectedOption ? selectedOption.getValue() : undefined;
 		this.props.property.setValue(selectedValue);
@@ -43,6 +44,64 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 
 	private handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void {
 		this.props.property.setValue(e.target.value);
+	}
+
+	private handleConnectClick(e: React.MouseEvent<HTMLElement>): void {
+		const props = this.props as PropertyListItemProps & StoreInjection;
+		e.stopPropagation();
+		e.preventDefault();
+
+		props.store
+			.getProject()
+			.getUserStore()
+			.addReference(
+				new Model.UserStoreReference({
+					id: uuid.v4(),
+					elementPropertyId: props.property.getId(),
+					open: true,
+					userStorePropertyId: undefined
+				})
+			);
+	}
+
+	private handleUserStorePropertyChange(
+		item: Components.CreateSelectOption,
+		action: Components.CreateSelectAction
+	): void {
+		const props = this.props as PropertyListItemProps & StoreInjection;
+		const project = props.store.getProject();
+		const userStore = project.getUserStore();
+		const userStoreReference = props.property.getUserStoreReference();
+
+		if (!userStoreReference) {
+			return;
+		}
+
+		// const props = this.props as PropertyListItemProps & StoreInjection;
+		switch (action.action) {
+			case 'select-option':
+				const storeProperty = userStore.getPropertyById(item.value);
+
+				if (storeProperty && userStoreReference) {
+					userStoreReference.setUserStoreProperty(storeProperty);
+					userStoreReference.setOpen(false);
+					props.store.commit();
+				}
+
+				break;
+			case 'create-option':
+				const newProperty = new Model.UserStoreProperty({
+					id: uuid.v4(),
+					name: item.value,
+					type: Types.UserStorePropertyType.String,
+					payload: ''
+				});
+
+				userStore.addProperty(newProperty);
+				userStoreReference.setUserStoreProperty(newProperty);
+				userStoreReference.setOpen(false);
+				props.store.commit();
+		}
 	}
 
 	// tslint:disable-next-line:cyclomatic-complexity
@@ -79,11 +138,11 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 				const inputValue = imageSrc && !imageSrc.startsWith('data:') ? imageSrc : '';
 				const inputType =
 					imageSrc && imageSrc.startsWith('data:')
-						? Component.PropertyItemAssetInputType.File
-						: Component.PropertyItemAssetInputType.Url;
+						? Components.PropertyItemAssetInputType.File
+						: Components.PropertyItemAssetInputType.Url;
 
 				return (
-					<Component.PropertyItemAsset
+					<Components.PropertyItemAsset
 						{...base}
 						imageSrc={imageSrc}
 						inputType={inputType}
@@ -120,7 +179,7 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 			case Types.PatternPropertyType.Boolean: {
 				const value = property.getValue() as boolean;
 				return (
-					<Component.PropertyItemBoolean
+					<Components.PropertyItemBoolean
 						{...base}
 						checked={value}
 						onChange={e => this.handleCheckboxChange(e)}
@@ -130,13 +189,13 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 			case Types.PatternPropertyType.Enum: {
 				const inputType = patternProperty.getInputType() as Types.PatternPropertyInputType;
 				const value = property.getValue() as string;
-				const enumProp = patternProperty as PatternEnumProperty;
+				const enumProp = patternProperty as Model.PatternEnumProperty;
 				const selectedOption = enumProp.getOptionByValue(value);
 				const selectedValue = selectedOption ? selectedOption.getId() : undefined;
-				
+
 				if (inputType === Types.PatternPropertyInputType.RadioGroup) {
 					return (
-						<Component.PropertyItemRadiogroup
+						<Components.PropertyItemRadiogroup
 							{...base}
 							selectedValue={selectedValue}
 							values={enumProp.getOptions().map(option => ({
@@ -149,7 +208,7 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 					);
 				} else {
 					return (
-						<Component.PropertyItemSelect
+						<Components.PropertyItemSelect
 							{...base}
 							selectedValue={selectedValue}
 							values={enumProp.getOptions().map(option => ({
@@ -166,7 +225,7 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 			}
 			case Types.PatternPropertyType.Number:
 				return (
-					<Component.PropertyItemNumber
+					<Components.PropertyItemNumber
 						{...base}
 						key={id}
 						value={property.getValue() as string}
@@ -177,17 +236,81 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 				);
 			case Types.PatternPropertyType.String:
 			default: {
+				const userStoreReference = property.getUserStoreReference();
+				const referencedUserStoreProperty = property.getReferencedUserStoreProperty();
+
 				return (
-					<Component.PropertyItemString
+					<Components.PropertyItemString
 						{...base}
 						key={id}
 						value={property.getValue() as string}
 						onBlur={e => this.handleInputBlur(e)}
 						onChange={e => this.handleInputChange(e)}
 						placeholder={example ? `e.g.: ${example}` : ''}
-					/>
+					>
+						{renderProps => {
+							if (
+								!userStoreReference ||
+								(!userStoreReference.getOpen() && !referencedUserStoreProperty)
+							) {
+								return (
+									<div style={{ display: 'flex', flexGrow: 1, alignItems: 'center' }}>
+										<Components.PropertyInput
+											onChange={renderProps.onChange}
+											onBlur={renderProps.onBlur}
+											type={Components.PropertyInputType.Text}
+											value={renderProps.value || ''}
+											placeholder={renderProps.placeholder}
+										/>
+										<Components.LinkIcon onClick={e => this.handleConnectClick(e)} />
+									</div>
+								);
+							}
+							if (userStoreReference && userStoreReference.getOpen()) {
+								return (
+									<UserStorePropertySelect
+										menuIsOpen={userStoreReference.getOpen()}
+										property={referencedUserStoreProperty}
+										onChange={(e, meta) => this.handleUserStorePropertyChange(e, meta)}
+										placeholder="Connect Variable"
+									/>
+								);
+							}
+							if (userStoreReference && !userStoreReference.getOpen()) {
+								return <UserStoreReferenceContainer reference={userStoreReference} />;
+							}
+							return null;
+						}}
+					</Components.PropertyItemString>
 				);
 			}
 		}
+	}
+}
+
+interface UserStoreReferenceContainerProps {
+	reference: Model.UserStoreReference;
+}
+
+@MobxReact.inject('store')
+@MobxReact.observer
+class UserStoreReferenceContainer extends React.Component<UserStoreReferenceContainerProps> {
+	public render(): JSX.Element | null {
+		const props = this.props as UserStoreReferenceContainerProps & StoreInjection;
+		const store = props.store.getProject().getUserStore();
+		const storeProperty = store.getPropertyByReference(props.reference);
+
+		if (!storeProperty) {
+			return null;
+		}
+
+		return (
+			<Components.PropertyReference
+				name={storeProperty.getName()}
+				value={storeProperty.getPayload()}
+				onClick={() => props.reference.setOpen(true)}
+				onLinkClick={() => store.removeReference(props.reference)}
+			/>
+		);
 	}
 }

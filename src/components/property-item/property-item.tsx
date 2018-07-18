@@ -14,9 +14,9 @@ const StyledPropertyItem = styled.label`
 `;
 
 const StyledPropertyItemContainer = styled.div`
+	position: relative;
 	display: flex;
-	align-items: center;
-	flex-grow: 1;
+	width: 100%;
 `;
 
 export interface PropertyItemProps {

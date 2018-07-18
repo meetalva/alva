@@ -32,6 +32,7 @@ export * from './property-item-number';
 export * from './property-item-radiogroup';
 export * from './property-item-select';
 export * from './property-item-string';
+export * from './property-reference';
 export * from './search';
 export * from './select';
 export * from './space';

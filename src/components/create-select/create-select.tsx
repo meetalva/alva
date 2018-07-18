@@ -20,9 +20,12 @@ export type CreateSelectAction =
 	| { action: 'pop-value' | 'remove-value'; removedValue: CreateSelectOption };
 
 export interface CreateSelectProps {
+	autoFocus?: boolean;
+	menuIsOpen?: boolean;
 	options: CreateSelectOption[];
 	placeholder: string;
 	value?: CreateSelectOption;
+	onBlur?(e: React.ChangeEvent<HTMLElement>): void;
 	onChange?(item: CreateSelectOption, action: CreateSelectAction): void;
 	onInputChange?(e: React.ChangeEvent<HTMLElement>, action: CreateSelectAction): void;
 }
@@ -42,13 +45,21 @@ const StyledChevron = styled(Icon).attrs({ name: IconName.ArrowFillRight })`
 	transform: rotate(90deg);
 `;
 
+export const ChevronIcon: React.SFC = props => (
+	<StyledChevron {...props} name={IconName.ArrowFillLeft} />
+);
+
 export const CreateSelect: React.SFC<CreateSelectProps> = props => (
 	<>
 		<CreatableSelect
+			autoFocus={props.autoFocus}
+			backspaceRemovesValue
 			components={{
 				IndicatorsContainer: StyledChevron
 			}}
+			menuIsOpen={props.menuIsOpen}
 			options={props.options}
+			onBlur={props.onBlur}
 			onChange={props.onChange}
 			onInputChange={props.onInputChange}
 			placeholder={props.placeholder}
@@ -65,6 +76,7 @@ export const CreateSelect: React.SFC<CreateSelectProps> = props => (
 					}
 				}),
 				control: () => ({
+					boxSizing: 'border-box',
 					display: 'flex',
 					alignItems: 'center',
 					background: Color.White,
@@ -75,6 +87,10 @@ export const CreateSelect: React.SFC<CreateSelectProps> = props => (
 					fontSize: '15px',
 					height: '30px',
 					position: 'relative'
+				}),
+				input: base => ({
+					...base,
+					marginRight: '-3px'
 				}),
 				menu: base => ({
 					...base,
@@ -95,11 +111,20 @@ export const CreateSelect: React.SFC<CreateSelectProps> = props => (
 					background: Color.White,
 					color: Color.Grey20,
 					fontSize: '15px',
-					padding: '6px 12px'
+					padding: '6px 12px 6px 9px'
 				}),
 				valueContainer: base => ({
 					...base,
-					padding: '6px 12px'
+					padding: '6px 12px 6px 9px',
+					color: Color.Grey20
+				}),
+				placeholder: base => ({
+					...base,
+					color: Color.Grey20,
+					margin: 0,
+					whiteSpace: 'nowrap',
+					textOverflow: 'ellipsis',
+					overflow: 'hidden'
 				})
 			}}
 		/>

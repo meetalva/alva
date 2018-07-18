@@ -10,6 +10,8 @@ import * as Types from '../../types';
 import { UserStorePropertySelect } from '../user-store-property-select';
 import * as uuid from 'uuid';
 
+const OutsideClickHandler = require('react-outside-click-handler').default;
+
 export interface PropertyListItemProps {
 	property: Model.ElementProperty;
 }
@@ -48,20 +50,26 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 
 	private handleConnectClick(e: React.MouseEvent<HTMLElement>): void {
 		const props = this.props as PropertyListItemProps & StoreInjection;
+		const store = props.store.getProject().getUserStore();
+
 		e.stopPropagation();
 		e.preventDefault();
 
-		props.store
-			.getProject()
-			.getUserStore()
-			.addReference(
-				new Model.UserStoreReference({
-					id: uuid.v4(),
-					elementPropertyId: props.property.getId(),
-					open: true,
-					userStorePropertyId: undefined
-				})
-			);
+		const previous = store.getReferenceByElementProperty(props.property);
+
+		if (previous) {
+			previous.setOpen(true);
+			return;
+		}
+
+		store.addReference(
+			new Model.UserStoreReference({
+				id: uuid.v4(),
+				elementPropertyId: props.property.getId(),
+				open: true,
+				userStorePropertyId: undefined
+			})
+		);
 	}
 
 	private handleUserStorePropertyChange(
@@ -239,6 +247,13 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 				const userStoreReference = property.getUserStoreReference();
 				const referencedUserStoreProperty = property.getReferencedUserStoreProperty();
 
+				if (userStoreReference) {
+					userStoreReference.getOpen();
+				}
+
+				console.log(userStoreReference);
+				console.log(referencedUserStoreProperty);
+
 				return (
 					<Components.PropertyItemString
 						{...base}
@@ -268,12 +283,20 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 							}
 							if (userStoreReference && userStoreReference.getOpen()) {
 								return (
-									<UserStorePropertySelect
-										menuIsOpen={userStoreReference.getOpen()}
-										property={referencedUserStoreProperty}
-										onChange={(e, meta) => this.handleUserStorePropertyChange(e, meta)}
-										placeholder="Connect Variable"
-									/>
+									<div style={{ width: '100%' }}>
+										<OutsideClickHandler
+											onOutsideClick={() => userStoreReference.setOpen(false)}
+										>
+											<UserStorePropertySelect
+												menuIsOpen={userStoreReference.getOpen()}
+												property={referencedUserStoreProperty}
+												onChange={(e, meta) =>
+													this.handleUserStorePropertyChange(e, meta)
+												}
+												placeholder="Connect Variable"
+											/>
+										</OutsideClickHandler>
+									</div>
 								);
 							}
 							if (userStoreReference && !userStoreReference.getOpen()) {

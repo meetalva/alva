@@ -98,6 +98,7 @@ export interface FixedAreaProps {
 	right?: number;
 	bottom?: number;
 	left?: number;
+	z?: number;
 	children?: React.ReactNode;
 }
 
@@ -108,6 +109,7 @@ const StyledFixedArea = styled.div`
 	bottom: ${(props: FixedAreaProps) =>
 		typeof props.bottom === 'undefined' ? 'auto' : props.bottom};
 	left: ${(props: FixedAreaProps) => (typeof props.left === 'undefined' ? 'auto' : props.left)};
+	z-index: ${props => (typeof props.z === 'undefined' ? '' : props.z)};
 `;
 
 export const FixedArea: React.StatelessComponent<FixedAreaProps> = props => (

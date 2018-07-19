@@ -39,7 +39,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 
 		return (
 			<Chrome
-				onDoubleClick={() => {
+				onDoubleClick={e => {
 					Sender.send({
 						type: MessageType.Maximize,
 						id: uuid.v4(),

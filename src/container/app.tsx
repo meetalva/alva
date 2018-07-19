@@ -38,7 +38,7 @@ export class App extends React.Component {
 
 		return (
 			<Components.Layout direction={Components.LayoutDirection.Column}>
-				<Components.FixedArea top={0} right={0} left={0}>
+				<Components.FixedArea top={0} right={0} left={0} z={10}>
 					<ChromeContainer />
 				</Components.FixedArea>
 				<Components.MainArea>

@@ -74,6 +74,10 @@ export class UserStoreAction {
 			return;
 		}
 
+		if (this.type === Types.UserStoreActionType.SetPage) {
+			return this.userStore.getPageProperty();
+		}
+
 		return this.userStore.getPropertyById(this.userStorePropertyId);
 	}
 

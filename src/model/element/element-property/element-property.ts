@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as Mobx from 'mobx';
+import { Element } from '../../element';
 import { AnyPatternProperty } from '../../pattern-property';
 import { UserStoreProperty } from '../../user-store-property';
 import { UserStoreReference } from '../../user-store-reference';
@@ -24,6 +25,13 @@ export class ElementProperty {
 	private project: Project;
 	@Mobx.observable private setDefault: boolean;
 	@Mobx.observable private value: Types.ElementPropertyValue;
+
+	@Mobx.computed
+	private get element(): Element | undefined {
+		return this.project
+			.getElements()
+			.find(e => e.getProperties().some(p => p.getId() === this.id));
+	}
 
 	@Mobx.computed
 	private get userStoreReference(): UserStoreReference | undefined {
@@ -138,6 +146,10 @@ export class ElementProperty {
 		}
 
 		return patternProperty.getHidden();
+	}
+
+	public getElement(): Element | undefined {
+		return this.element;
 	}
 
 	public getId(): string {

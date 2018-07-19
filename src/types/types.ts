@@ -342,7 +342,9 @@ export type ElementPropertyValue =
 export interface SerializedElementAction {
 	elementPropertyId: string;
 	id: string;
+	open: boolean;
 	payload: string;
+	payloadType: ElementActionPayloadType;
 	storeActionId: string;
 	storePropertyId: string;
 }
@@ -453,4 +455,16 @@ export interface Point {
 
 export interface Identifiable {
 	getId(): string;
+}
+
+export enum ElementActionPayloadType {
+	String = 'string',
+	EventPayload = 'event-payload',
+	PropertyPayload = 'property-payload'
+}
+
+export interface SerializedElementActionPayload {
+	id: string;
+	type: ElementActionPayloadType;
+	value: string;
 }

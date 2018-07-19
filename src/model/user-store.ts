@@ -41,7 +41,9 @@ export class UserStore {
 			});
 		}
 
-		(init.properties || []).forEach(prop => this.addProperty(prop));
+		(init.properties || [])
+			.filter(prop => prop.getType() !== Types.UserStorePropertyType.Page)
+			.forEach(prop => this.addProperty(prop));
 
 		const actions = init.actions || [];
 
@@ -129,10 +131,14 @@ export class UserStore {
 	}
 
 	public getProperties(): UserStoreProperty[] {
-		return [...this.properties.values()];
+		return [this.currentPageProperty, ...this.properties.values()];
 	}
 
 	public getPropertyById(id: string): UserStoreProperty | undefined {
+		if (id === this.currentPageProperty.getId()) {
+			return this.currentPageProperty;
+		}
+
 		return this.properties.get(id);
 	}
 

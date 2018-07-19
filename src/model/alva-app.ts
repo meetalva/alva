@@ -12,6 +12,7 @@ export interface AlvaAppInit {
 export class AlvaApp {
 	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
 	@Mobx.observable private hoverArea: Types.HoverArea = Types.HoverArea.Chrome;
+	@Mobx.observable private paneSelectOpen: boolean = false;
 
 	@Mobx.observable
 	private rightSidebarTab: Types.RightSidebarTab = Types.RightSidebarTab.Properties;
@@ -57,6 +58,10 @@ export class AlvaApp {
 		return this.panes;
 	}
 
+	public getPaneSelectOpen(): boolean {
+		return this.paneSelectOpen;
+	}
+
 	public getRightSidebarTab(): Types.RightSidebarTab {
 		return this.rightSidebarTab;
 	}
@@ -72,6 +77,10 @@ export class AlvaApp {
 	@Mobx.action
 	public setActiveView(view: Types.AlvaView): void {
 		this.activeView = view;
+	}
+
+	public setPaneSelectOpen(paneSelectOpen: boolean): void {
+		this.paneSelectOpen = paneSelectOpen;
 	}
 
 	@Mobx.action

@@ -30,10 +30,17 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 		props.store.commit();
 	}
 
-	private handleEnumChange(e: React.ChangeEvent<HTMLElement>): void {
+	private handleEnumChange(raw: Components.SimpleSelectOption | React.ChangeEvent<HTMLElement>): void {
+		if (raw.hasOwnProperty('target')) {
+			const e = raw as React.ChangeEvent<HTMLElement>;
+			console.log(e);
+			return;
+		}
+
+		const item = raw as Components.SimpleSelectOption;
 		const props = this.props as PropertyListItemProps & StoreInjection;
 		const patternProperty = props.property.getPatternProperty() as Model.PatternEnumProperty;
-		const selectedOption = patternProperty.getOptionById((e.target as HTMLSelectElement).value);
+		const selectedOption = patternProperty.getOptionById(item.value);
 		const selectedValue = selectedOption ? selectedOption.getValue() : undefined;
 		this.props.property.setValue(selectedValue);
 		props.store.commit();
@@ -223,7 +230,7 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 								id: option.getId(),
 								name: option.getName()
 							}))}
-							onChange={e => this.handleEnumChange(e)}
+							onChange={e => this.handleEnumChange(e as Components.SimpleSelectOption)}
 						/>
 					);
 				}
@@ -250,9 +257,6 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 				if (userStoreReference) {
 					userStoreReference.getOpen();
 				}
-
-				console.log(userStoreReference);
-				console.log(referencedUserStoreProperty);
 
 				return (
 					<Components.PropertyItemString

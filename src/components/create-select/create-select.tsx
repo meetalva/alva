@@ -1,8 +1,6 @@
 import { Color } from '../colors';
-import { Icon, IconName } from '../icons';
 import * as React from 'react';
-import { getSpace, SpaceSize } from '../space';
-import styled from 'styled-components';
+import { ChevronIcon } from '../select';
 
 const CreatableSelect = require('react-select/lib/Creatable').default;
 
@@ -35,27 +33,13 @@ export interface CreateSelectOption {
 	value: string;
 }
 
-const StyledChevron = styled(Icon).attrs({ name: IconName.ArrowFillRight })`
-	color: ${Color.Black};
-	fill: ${Color.Grey60};
-	width: 12px;
-	height: 12px;
-	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px;
-	transform: rotate(90deg);
-	transform: rotate(90deg);
-`;
-
-export const ChevronIcon: React.SFC = props => (
-	<StyledChevron {...props} name={IconName.ArrowFillLeft} />
-);
-
 export const CreateSelect: React.SFC<CreateSelectProps> = props => (
 	<>
 		<CreatableSelect
 			autoFocus={props.autoFocus}
 			backspaceRemovesValue
 			components={{
-				IndicatorsContainer: StyledChevron
+				IndicatorsContainer: ChevronIcon
 			}}
 			menuIsOpen={props.menuIsOpen}
 			options={props.options}

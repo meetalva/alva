@@ -1,7 +1,7 @@
 import { Color } from '../colors';
 import { IconSize } from '../icons';
 import * as React from 'react';
-import { ChevronDown, Layout } from 'react-feather';
+import { Layout } from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
@@ -66,7 +66,7 @@ export const LayoutSwitch: React.SFC<LayoutSwitchProps> = props => (
 			<Layout size={IconSize.XS} strokeWidth={1.5} />
 		</StyledPrimaryContainer>
 		<StyledSecondaryContainer onClick={props.onSecondaryClick}>
-			<ChevronDown size={IconSize.XXS} style={{ zIndex: 10, pointerEvents: 'none' }} />
+			{props.children}
 		</StyledSecondaryContainer>
 	</StyledLayoutSwitch>
 );

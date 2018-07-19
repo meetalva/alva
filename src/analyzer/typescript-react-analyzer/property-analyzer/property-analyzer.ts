@@ -269,8 +269,8 @@ function createEventHandlerProperty(
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
-		// TODO: Determine event type from static information, allow TSDoc override
-		event: { type: 'MouseEvent' },
+		// TODO: Allow TSDoc override
+		event: { type: getEventType(args, ctx) },
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
@@ -280,6 +280,27 @@ function createEventHandlerProperty(
 		required: false,
 		type: Types.PatternPropertyType.EventHandler
 	};
+}
+
+function getEventType(
+	args: PropertyInit,
+	ctx: PropertyAnalyzeContext
+): Types.SerializedPatternEventType {
+	if (args.type.aliasTypeArguments) {
+		const typeArgument = args.type.aliasTypeArguments[0];
+		const typeArgumentSymbol = typeArgument ? typeArgument.getSymbol() : undefined;
+		const typeArgumentName = typeArgumentSymbol ? typeArgumentSymbol.getName() : undefined;
+
+		switch (typeArgumentName) {
+			case 'InputEvent':
+			case 'ChangeEvent':
+			case 'FocusEvent':
+			case 'MouseEvent':
+				return typeArgumentName;
+		}
+	}
+
+	return 'Event';
 }
 
 function setPropertyMetaData(init: {

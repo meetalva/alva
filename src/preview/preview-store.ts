@@ -205,10 +205,14 @@ export class PreviewStore<V> {
 							}
 					}
 				}
+				const property = patternProperty as Model.PatternEventHandlerProperty;
+				const event = property.getEvent();
 
 				renderProperties[patternProperty.getPropertyName()] = e => {
-					if (this.mode !== Types.PreviewDocumentMode.Static && !this.getMetaDown()) {
-						return;
+					if (event.getType() === Types.PatternEventType.MouseEvent) {
+						if (this.mode !== Types.PreviewDocumentMode.Static && !this.getMetaDown()) {
+							return;
+						}
 					}
 
 					const elementAction = this.project.getElementActionById(
@@ -220,7 +224,7 @@ export class PreviewStore<V> {
 					}
 
 					e.preventDefault();
-					elementAction.execute({ sender: this.sender });
+					elementAction.execute({ sender: this.sender, project: this.getProject(), event: e });
 				};
 			} else {
 				renderProperties[patternProperty.getPropertyName()] = elementProperty.getValue();

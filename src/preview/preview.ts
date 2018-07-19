@@ -267,15 +267,20 @@ function main(): void {
 			}
 		);
 
-		Mobx.autorun(() => {
-			const userStore = store.getProject().getUserStore();
+		Mobx.autorun(
+			() => {
+				const userStore = store.getProject().getUserStore();
 
-			sender.send({
-				id: uuid.v4(),
-				payload: { userStore: userStore.toJSON() },
-				type: Message.MessageType.ChangeUserStore
-			});
-		});
+				sender.send({
+					id: uuid.v4(),
+					payload: { userStore: userStore.toJSON() },
+					type: Message.MessageType.ChangeUserStore
+				});
+			},
+			{
+				scheduler: window.requestIdleCallback
+			}
+		);
 	}
 }
 

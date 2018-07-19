@@ -1,10 +1,11 @@
+import { ActionPayloadInput } from './action-payload-input';
+import { UserStorePropertySelect } from '../user-store-property-select';
+import { ViewStore } from '../../store';
 import * as Components from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
-import { ViewStore } from '../../store';
 import * as Types from '../../types';
-import { UserStorePropertySelect } from '../user-store-property-select';
 import * as uuid from 'uuid';
 
 export interface EventHandlerPropertyViewProps {
@@ -18,11 +19,14 @@ export interface StoreInjection {
 @MobxReact.inject('store')
 @MobxReact.observer
 export class EventHandlerPropertyView extends React.Component<EventHandlerPropertyViewProps> {
-	private handleActionChange(e: React.ChangeEvent<HTMLSelectElement>): void {
+	private handleActionChange(
+		item: Components.SimpleSelectOption | Components.SimpleSelectOption[]
+	): void {
+		const selected = Array.isArray(item) ? item[0] : item;
 		const props = this.props as EventHandlerPropertyViewProps & StoreInjection;
 		const project = props.store.getProject();
 		const userStore = project.getUserStore();
-		const selectedAction = userStore.getActionById((e.target as HTMLSelectElement).value);
+		const selectedAction = userStore.getActionById(selected.value);
 
 		if (!selectedAction || selectedAction.getType() === Types.UserStoreActionType.Noop) {
 			props.elementProperty.setValue('');
@@ -43,6 +47,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 				{
 					elementPropertyId: props.elementProperty.getId(),
 					id: uuid.v4(),
+					open: false,
 					payload: '',
 					storeActionId: selectedAction.getId(),
 					storePropertyId: selectedAction.getUserStorePropertyId() || ''
@@ -91,6 +96,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 				}
 
 				elementAction.setPayload('');
+				elementAction.setPayloadType(Types.ElementActionPayloadType.String);
 				break;
 			}
 			case 'create-option': {
@@ -104,6 +110,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 				userStore.addProperty(newProperty);
 				elementAction.setStorePropertyId(newProperty.getId());
 				elementAction.setPayload('');
+				elementAction.setPayloadType(Types.ElementActionPayloadType.String);
 				props.store.commit();
 			}
 		}
@@ -116,6 +123,11 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 
 		const userStore = project.getUserStore();
 		const elementAction = project.getElementActionById(String(props.elementProperty.getValue()));
+		const element = props.elementProperty.getElement();
+
+		if (!element) {
+			return null;
+		}
 
 		const userAction =
 			(elementAction && userStore.getActionById(elementAction.getStoreActionId())) ||
@@ -145,18 +157,11 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 						<Components.PropertyLabel label={'Action'} />
 						<Components.Select
 							onChange={e => this.handleActionChange(e)}
-							selectedValue={userAction.getId()}
-						>
-							{userStore
+							options={userStore
 								.getActions()
-								.map(action => (
-									<Components.SelectOption
-										key={action.getId()}
-										label={action.getName()}
-										value={action.getId()}
-									/>
-								))}
-						</Components.Select>
+								.map(a => ({ label: a.getName(), value: a.getId() }))}
+							value={{ label: userAction.getName(), value: userAction.getId() }}
+						/>
 					</div>
 					{elementAction &&
 						userAction &&
@@ -190,65 +195,9 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 								/>
 							</div>
 						)}
-					{elementAction &&
-						userProperty &&
-						(() => {
-							switch (userProperty.getType()) {
-								case Types.UserStorePropertyType.String:
-									return (
-										<div
-											style={{
-												display: 'flex',
-												alignItems: 'center',
-												flexWrap: 'nowrap',
-												width: '100%'
-											}}
-										>
-											<Components.PropertyLabel label="to" />
-											<Components.PropertyInput
-												type={Components.PropertyInputType.Text}
-												value={elementAction.getPayload()}
-												onBlur={() => props.store.commit()}
-												onChange={e => elementAction.setPayload(e.target.value)}
-											/>
-										</div>
-									);
-								case Types.UserStorePropertyType.Page:
-									return (
-										<div
-											style={{
-												display: 'flex',
-												alignItems: 'center',
-												flexWrap: 'nowrap',
-												marginTop: '6px'
-											}}
-										>
-											<Components.PropertyLabel label="to" />
-											<Components.Select
-												onChange={e => {
-													if (elementAction) {
-														elementAction.setPayload(
-															(e.target as HTMLSelectElement).value
-														);
-														props.store.commit();
-													}
-												}}
-												selectedValue={elementAction && elementAction.getPayload()}
-											>
-												{project
-													.getPages()
-													.map(page => (
-														<Components.SelectOption
-															key={page.getId()}
-															value={page.getId()}
-															label={page.getName()}
-														/>
-													))}
-											</Components.Select>
-										</div>
-									);
-							}
-						})()}
+					{elementAction && (
+						<ActionPayloadInput elementAction={elementAction} element={element} />
+					)}
 				</Components.PropertyBox>
 			</div>
 		);

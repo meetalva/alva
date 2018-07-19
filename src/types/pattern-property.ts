@@ -89,11 +89,19 @@ export interface SerializedEnumOption {
 }
 
 export enum PatternEventType {
-	ChangeEvent,
-	MouseEvent
+	Event = 'event',
+	InputEvent = 'input-event',
+	ChangeEvent = 'change-event',
+	FocusEvent = 'focus-event',
+	MouseEvent = 'mouse-event'
 }
 
-export type SerializedPatternEventType = 'ChangeEvent' | 'MouseEvent';
+export type SerializedPatternEventType =
+	| 'Event'
+	| 'InputEvent'
+	| 'ChangeEvent'
+	| 'FocusEvent'
+	| 'MouseEvent';
 
 export type PatternEvent = PatternChangeEvent | PatternMouseEvent;
 

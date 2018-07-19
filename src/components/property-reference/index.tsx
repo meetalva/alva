@@ -66,8 +66,8 @@ export const StyledLinkIcon: StyledComponentClass<{}, any, any> = styled(Link2)`
 `;
 
 export interface PropertyReferenceProps {
-	name: string;
-	value: string;
+	name: string | undefined;
+	value: string | undefined;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onLinkClick?: React.MouseEventHandler<HTMLElement>;
 }

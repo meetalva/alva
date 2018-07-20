@@ -82,6 +82,7 @@ export interface SerializedPatternLibrary {
 export enum PatternType {
 	Pattern = 'pattern',
 	SyntheticBox = 'synthetic:box',
+	SyntheticConditional = 'synthetic:conditional',
 	SyntheticImage = 'synthetic:image',
 	SyntheticLink = 'synthetic:link',
 	SyntheticPage = 'synthetic:page',
@@ -91,6 +92,7 @@ export enum PatternType {
 export type SerializedPatternType =
 	| 'pattern'
 	| 'synthetic:box'
+	| 'synthetic:conditional'
 	| 'synthetic:image'
 	| 'synthetic:link'
 	| 'synthetic:page'

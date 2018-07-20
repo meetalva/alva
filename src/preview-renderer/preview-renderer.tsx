@@ -4,6 +4,7 @@ import { PreviewApplication } from './preview-application';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { SyntheticBox } from './synthetic-box';
+import { SyntheticConditional } from './synthetic-conditional';
 import { SyntheticImage } from './synthetic-image';
 import { SyntheticLink } from './synthetic-link';
 import { SyntheticPage } from './synthetic-page';
@@ -25,6 +26,7 @@ export function render(store: PreviewStore<React.SFC>, container: HTMLElement): 
 export function getSynthetics(): SyntheticComponents<React.SFC> {
 	return {
 		'synthetic:box': SyntheticBox,
+		'synthetic:conditional': SyntheticConditional,
 		'synthetic:image': SyntheticImage,
 		'synthetic:link': SyntheticLink,
 		'synthetic:page': SyntheticPage,

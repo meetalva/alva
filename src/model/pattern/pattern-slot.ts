@@ -1,4 +1,5 @@
 import * as Types from '../../types';
+import * as _ from 'lodash';
 
 export interface PatternSlotInit {
 	contextId: string;
@@ -50,6 +51,10 @@ export class PatternSlot {
 		});
 	}
 
+	public equals(b: PatternSlot): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
+	}
+
 	public getContextId(): string {
 		return this.contextId;
 	}
@@ -86,6 +91,17 @@ export class PatternSlot {
 			required: this.required,
 			type: this.type
 		};
+	}
+
+	public update(b: this): void {
+		this.contextId = b.contextId;
+		this.description = b.description;
+		this.example = b.example;
+		this.hidden = b.hidden;
+		this.displayName = b.displayName;
+		this.propertyName = b.propertyName;
+		this.required = b.required;
+		this.type = b.type;
 	}
 }
 

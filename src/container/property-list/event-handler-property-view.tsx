@@ -145,7 +145,9 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 			>
 				<Components.PropertyBox
 					headline={patternProperty.getLabel()}
-					copy={patternProperty.getDescription()}
+					copy={[patternProperty.getEvent().getType(), patternProperty.getDescription()]
+						.filter(Boolean)
+						.join(' - ')}
 				>
 					<div
 						style={{

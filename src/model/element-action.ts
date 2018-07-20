@@ -147,6 +147,7 @@ export class ElementAction {
 		event
 	}: {
 		project: Project;
+		// tslint:disable-next-line:no-any
 		event: any;
 	}): string | undefined {
 		switch (this.payloadType) {

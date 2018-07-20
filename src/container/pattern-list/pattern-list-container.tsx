@@ -42,8 +42,7 @@ export class PatternListContainer extends React.Component {
 						marginRight:
 							-1 *
 							(Components.getSpace(Components.SpaceSize.M) -
-								1) /* -1 to not overlap parent border */,
-						width: '100%'
+								1) /* -1 to not overlap parent border */
 					}}
 				>
 					<Components.Space sizeBottom={Components.SpaceSize.XXS}>

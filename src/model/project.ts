@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { Page } from './page';
 import { PatternSearch } from './pattern-search';
 import { Pattern, PatternSlot } from './pattern';
-import { PatternLibrary } from './pattern-library';
+import { PatternLibrary, PatternLibraryCreateOptions } from './pattern-library';
 import { AnyPatternProperty } from './pattern-property';
 import * as Types from '../types';
 import { UserStore } from './user-store';
@@ -120,31 +120,50 @@ export class Project {
 			this.focusedItemType = init.focusedItemType;
 		}
 
-		init.patternLibraries.forEach(patternLibrary =>
-			this.patternLibraries.set(patternLibrary.getId(), patternLibrary)
+		init.patternLibraries.forEach(patternLibrary => {
+			if (patternLibrary.getOrigin() === Types.PatternLibraryOrigin.BuiltIn) {
+				const updatedLibrary = Project.createBuiltinPatternLibrary({
+					getGlobalEnumOptionId: (enumId, contextId) =>
+						patternLibrary.assignEnumOptionId(enumId, contextId),
+					getGlobalPatternId: contextId => patternLibrary.assignPatternId(contextId),
+					getGlobalPropertyId: (patternId, contextId) =>
+						patternLibrary.assignPropertyId(patternId, contextId),
+					getGlobalSlotId: (patternId, contextId) =>
+						patternLibrary.assignSlotId(patternId, contextId)
+				});
+
+				patternLibrary.update(updatedLibrary);
+			}
+
+			this.patternLibraries.set(patternLibrary.getId(), patternLibrary);
+		});
+	}
+
+	public static createBuiltinPatternLibrary(opts?: PatternLibraryCreateOptions): PatternLibrary {
+		return PatternLibrary.create(
+			{
+				bundle: '',
+				bundleId: '',
+				description: 'Basic building blocks available to every new Alva project',
+				id: uuid.v4(),
+				name: 'Built-In Components',
+				origin: Types.PatternLibraryOrigin.BuiltIn,
+				patternProperties: [],
+				patterns: [],
+				state: Types.PatternLibraryState.Connected
+			},
+			opts
 		);
 	}
 
 	public static create(init: ProjectCreateInit): Project {
-		const patternLibrary = PatternLibrary.create({
-			bundle: '',
-			bundleId: '',
-			description: 'Basic building blocks available to every new Alva project',
-			id: uuid.v4(),
-			name: 'Built-In Components',
-			origin: Types.PatternLibraryOrigin.BuiltIn,
-			patternProperties: [],
-			patterns: [],
-			state: Types.PatternLibraryState.Connected
-		});
-
 		const userStore = new UserStore({ id: uuid.v4() });
 
 		const project = new Project({
 			name: init.name,
 			pages: [],
 			path: init.path,
-			patternLibraries: [patternLibrary],
+			patternLibraries: [Project.createBuiltinPatternLibrary()],
 			userStore
 		});
 

@@ -1,6 +1,5 @@
 import { computeDifference } from '../../alva-util';
-import { Box, Image, Link, Page, Text } from './builtins';
-import * as Fuse from 'fuse.js';
+import { Box, Conditional, Image, Link, Page, Text } from './builtins';
 import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Pattern, PatternSlot } from '../pattern';
@@ -42,13 +41,17 @@ export class PatternLibrary {
 	@Mobx.observable private bundleId: string;
 	@Mobx.observable private bundle: string;
 	@Mobx.observable private description: string;
-	@Mobx.observable private fuse: Fuse;
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
 	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
 	@Mobx.observable private patterns: Map<string, Pattern> = new Map();
 	@Mobx.observable private origin: Types.PatternLibraryOrigin;
 	@Mobx.observable private state: Types.PatternLibraryState;
+
+	@Mobx.computed
+	private get slots(): PatternSlot[] {
+		return this.getPatterns().reduce((acc, pattern) => [...acc, ...pattern.getSlots()], []);
+	}
 
 	public constructor(init: PatternLibraryInit) {
 		this.bundleId = init.bundleId;
@@ -60,12 +63,14 @@ export class PatternLibrary {
 		init.patterns.forEach(pattern => this.patterns.set(pattern.getId(), pattern));
 		init.patternProperties.forEach(prop => this.patternProperties.set(prop.getId(), prop));
 		this.state = init.state;
-		this.updateSearch();
 	}
 
-	public static create(init: PatternLibraryInit): PatternLibrary {
-		const options = {
-			getGloablEnumOptionId: () => uuid.v4(),
+	public static create(
+		init: PatternLibraryInit,
+		opts?: PatternLibraryCreateOptions
+	): PatternLibrary {
+		const options = opts || {
+			getGlobalEnumOptionId: () => uuid.v4(),
 			getGlobalPatternId: () => uuid.v4(),
 			getGlobalPropertyId: () => uuid.v4(),
 			getGlobalSlotId: () => uuid.v4()
@@ -79,8 +84,16 @@ export class PatternLibrary {
 			const image = Image({ options, patternLibrary });
 			const text = Text({ options, patternLibrary });
 			const box = Box({ options, patternLibrary });
+			const conditional = Conditional({ options, patternLibrary });
 
-			[page.pattern, text.pattern, box.pattern, image.pattern, link.pattern].forEach(pattern => {
+			[
+				page.pattern,
+				text.pattern,
+				box.pattern,
+				conditional.pattern,
+				image.pattern,
+				link.pattern
+			].forEach(pattern => {
 				patternLibrary.addPattern(pattern);
 			});
 
@@ -89,6 +102,7 @@ export class PatternLibrary {
 				...image.properties,
 				...text.properties,
 				...box.properties,
+				...conditional.properties,
 				...link.properties
 			].forEach(property => {
 				patternLibrary.addProperty(property);
@@ -177,7 +191,6 @@ export class PatternLibrary {
 		propChanges.changed.map(change => change.before.update(change.after));
 
 		this.setState(Types.PatternLibraryState.Connected);
-		this.updateSearch();
 
 		this.setBundle(analysis.bundle);
 		this.setBundleId(analysis.id);
@@ -188,7 +201,6 @@ export class PatternLibrary {
 
 	public addPattern(pattern: Pattern): void {
 		this.patterns.set(pattern.getId(), pattern);
-		this.updateSearch();
 	}
 
 	public addProperty(property: AnyPatternProperty): void {
@@ -307,19 +319,11 @@ export class PatternLibrary {
 	}
 
 	public getSlots(): PatternSlot[] {
-		return this.getPatterns().reduce((acc, pattern) => [...acc, ...pattern.getSlots()], []);
+		return this.slots;
 	}
 
 	public getState(): Types.PatternLibraryState {
 		return this.state;
-	}
-
-	public query(term: string): string[] {
-		if (term.trim().length === 0) {
-			return this.getPatterns().map(p => p.getId());
-		}
-
-		return this.fuse.search<Types.SerializedPattern>(term).map(match => match.id);
 	}
 
 	@Mobx.action
@@ -379,18 +383,27 @@ export class PatternLibrary {
 		this.id = b.id;
 		this.name = b.name;
 		this.origin = b.origin;
-		this.patterns = b.patterns;
-		this.patternProperties = b.patternProperties;
 		this.state = this.state;
-	}
 
-	@Mobx.action
-	public updateSearch(): void {
-		const registry = this.getPatterns().map(item => item.toJSON());
-
-		this.fuse = new Fuse(registry, {
-			keys: ['name']
+		const patternChanges = computeDifference<Pattern>({
+			before: this.getPatterns(),
+			after: b.getPatterns()
 		});
+
+		patternChanges.added.forEach(change => this.addPattern(change.after));
+		patternChanges.changed.forEach(change =>
+			change.before.update(change.after, { patternLibrary: this })
+		);
+		patternChanges.removed.forEach(change => this.removePattern(change.before));
+
+		const propertyChanges = computeDifference<AnyPatternProperty>({
+			before: this.getPatternProperties(),
+			after: b.getPatternProperties()
+		});
+
+		propertyChanges.added.forEach(change => this.addProperty(change.after));
+		propertyChanges.changed.forEach(change => change.before.update(change.after));
+		propertyChanges.removed.forEach(change => this.removeProperty(change.before));
 	}
 }
 

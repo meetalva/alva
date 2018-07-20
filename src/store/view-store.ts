@@ -819,8 +819,6 @@ export class ViewStore {
 		this.project = project;
 		this.project.unsetHighlightedElement();
 		this.project.unsetSelectedElement();
-
-		project.getPatternLibraries().forEach(p => p.updateSearch());
 	}
 
 	@Mobx.action

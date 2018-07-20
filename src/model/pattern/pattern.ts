@@ -32,7 +32,7 @@ export class Pattern {
 	@Mobx.observable private origin: Types.PatternOrigin;
 	@Mobx.observable private patternLibrary: PatternLibrary;
 	@Mobx.observable private propertyIds: Set<string> = new Set();
-	@Mobx.observable private slots: PatternSlot[];
+	@Mobx.observable private slots: Map<string, PatternSlot> = new Map();
 	@Mobx.observable private type: Types.PatternType;
 
 	public constructor(init: PatternInit, context: PatternContext) {
@@ -44,8 +44,9 @@ export class Pattern {
 		this.origin = init.origin;
 		this.patternLibrary = context.patternLibrary;
 		this.propertyIds = new Set(init.propertyIds);
-		this.slots = init.slots;
 		this.type = init.type;
+
+		init.slots.forEach(slot => this.slots.set(slot.getId(), slot));
 	}
 
 	public static from(serialized: Types.SerializedPattern, context: PatternContext): Pattern {
@@ -70,7 +71,7 @@ export class Pattern {
 	}
 
 	public addSlot(slot: PatternSlot): void {
-		this.slots.push(slot);
+		this.slots.set(slot.getId(), slot);
 	}
 
 	public equals(b: Pattern): boolean {
@@ -118,7 +119,7 @@ export class Pattern {
 	}
 
 	public getSlots(): PatternSlot[] {
-		return this.slots;
+		return [...this.slots.values()];
 	}
 
 	public getType(): Types.PatternType {
@@ -127,6 +128,10 @@ export class Pattern {
 
 	public removeProperty(property: PatternProperty.AnyPatternProperty): void {
 		this.propertyIds.delete(property.getId());
+	}
+
+	public removeSlot(slot: PatternSlot): void {
+		this.slots.delete(slot.getId());
 	}
 
 	public toJSON(): Types.SerializedPattern {
@@ -138,7 +143,7 @@ export class Pattern {
 			name: this.name,
 			origin: serializeOrigin(this.origin),
 			propertyIds: Array.from(this.propertyIds),
-			slots: this.slots.map(slot => slot.toJSON()),
+			slots: this.getSlots().map(slot => slot.toJSON()),
 			type: serializeType(this.type)
 		};
 	}
@@ -151,8 +156,16 @@ export class Pattern {
 		this.origin = pattern.getOrigin();
 		this.patternLibrary = context.patternLibrary;
 		this.propertyIds = pattern.propertyIds;
-		this.slots = pattern.getSlots();
 		this.type = pattern.getType();
+
+		const slotChanges = AlvaUtil.computeDifference<PatternSlot>({
+			before: this.getSlots(),
+			after: pattern.getSlots()
+		});
+
+		slotChanges.added.forEach(change => this.addSlot(change.after));
+		slotChanges.changed.forEach(change => change.before.update(change.after));
+		slotChanges.removed.forEach(change => this.removeSlot(change.before));
 	}
 }
 
@@ -178,6 +191,8 @@ function deserializeType(input: Types.SerializedPatternType): Types.PatternType 
 			return Types.PatternType.SyntheticText;
 		case 'synthetic:link':
 			return Types.PatternType.SyntheticLink;
+		case 'synthetic:conditional':
+			return Types.PatternType.SyntheticConditional;
 		case 'pattern':
 			return Types.PatternType.Pattern;
 	}
@@ -202,6 +217,8 @@ function serializeType(input: Types.PatternType): Types.SerializedPatternType {
 			return 'synthetic:box';
 		case Types.PatternType.SyntheticImage:
 			return 'synthetic:image';
+		case Types.PatternType.SyntheticConditional:
+			return 'synthetic:conditional';
 		case Types.PatternType.SyntheticText:
 			return 'synthetic:text';
 		case Types.PatternType.SyntheticLink:

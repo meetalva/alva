@@ -43,6 +43,7 @@ export interface Components {
 
 export interface SyntheticComponents<V> {
 	'synthetic:box': V;
+	'synthetic:conditional': V;
 	'synthetic:page': V;
 	'synthetic:image': V;
 	'synthetic:link': V;
@@ -114,15 +115,9 @@ export class PreviewStore<V> {
 				}
 
 				return component[pattern.getExportName()];
-			case Types.PatternType.SyntheticBox:
-			case Types.PatternType.SyntheticPage:
-			case Types.PatternType.SyntheticImage:
-			case Types.PatternType.SyntheticText:
-			case Types.PatternType.SyntheticLink:
+			default:
 				return this.synthetics[type];
 		}
-
-		return;
 	}
 
 	public getElementById(id: string): Model.Element | undefined {

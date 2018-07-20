@@ -101,13 +101,16 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 	}, opts);
 
 	Mobx.autorun(() => {
+		const project = store.getProject();
+
+		if (!project) {
+			return;
+		}
+
 		Sender.send({
 			id: uuid.v4(),
 			payload: {
-				userStore: store
-					.getProject()
-					.getUserStore()
-					.toJSON()
+				userStore: project.getUserStore().toJSON()
 			},
 			type: Message.MessageType.ChangeUserStore
 		});

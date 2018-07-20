@@ -37,8 +37,13 @@ export class PatternListContainer extends React.Component {
 						position: 'sticky',
 						top: 0,
 						backgroundColor: Components.Color.Grey97,
+						boxSizing: 'border-box',
 						marginLeft: -1 * Components.getSpace(Components.SpaceSize.M),
-						marginRight: -1 * Components.getSpace(Components.SpaceSize.M)
+						marginRight:
+							-1 *
+							(Components.getSpace(Components.SpaceSize.M) -
+								1) /* -1 to not overlap parent border */,
+						width: '100%'
 					}}
 				>
 					<Components.Space sizeBottom={Components.SpaceSize.XXS}>

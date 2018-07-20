@@ -49,6 +49,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 					id: uuid.v4(),
 					open: false,
 					payload: '',
+					payloadType: Types.ElementActionPayloadType.String,
 					storeActionId: selectedAction.getId(),
 					storePropertyId: selectedAction.getUserStorePropertyId() || ''
 				},

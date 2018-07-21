@@ -31,13 +31,14 @@ export function analyze(
 	return type
 		.getApparentProperties()
 		.map(symbol => {
-			if ((symbol.flags & Ts.SymbolFlags.Property) !== Ts.SymbolFlags.Property) {
-				return;
-			}
-
 			const declaration = TypescriptUtils.findTypeDeclaration(symbol, {
 				typechecker
 			}) as Ts.Declaration;
+
+			if (!Ts.isPropertySignature(declaration) && !Ts.isMethodSignature(declaration)) {
+				return;
+			}
+
 			const memberType = typechecker.getTypeAtLocation(declaration);
 
 			if (ReactUtils.isReactSlotType(memberType, { program: ctx.program })) {
@@ -265,12 +266,14 @@ function createEventHandlerProperty(
 	args: PropertyInit,
 	ctx: PropertyAnalyzeContext
 ): Types.SerializedPatternEventHandlerProperty {
+	const eventType = ReactUtils.getEventType(args, { typechecker: ctx.program.getTypeChecker() });
+
 	return {
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
 		// TODO: Allow TSDoc override
-		event: { type: getEventType(args, ctx) },
+		event: { type: eventType },
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
@@ -280,27 +283,6 @@ function createEventHandlerProperty(
 		required: false,
 		type: Types.PatternPropertyType.EventHandler
 	};
-}
-
-function getEventType(
-	args: PropertyInit,
-	ctx: PropertyAnalyzeContext
-): Types.SerializedPatternEventType {
-	if (args.type.aliasTypeArguments) {
-		const typeArgument = args.type.aliasTypeArguments[0];
-		const typeArgumentSymbol = typeArgument ? typeArgument.getSymbol() : undefined;
-		const typeArgumentName = typeArgumentSymbol ? typeArgumentSymbol.getName() : undefined;
-
-		switch (typeArgumentName) {
-			case 'InputEvent':
-			case 'ChangeEvent':
-			case 'FocusEvent':
-			case 'MouseEvent':
-				return typeArgumentName;
-		}
-	}
-
-	return 'Event';
 }
 
 function setPropertyMetaData(init: {

@@ -6,7 +6,7 @@ const fixtures = require('fixturez')(__dirname);
 test('returns false for any prop declaration', () => {
 	const { sourceFile, program } = TestUtils.getFixtureSourceFile('prop-any.ts', { fixtures });
 	const [prop] = TestUtils.getPropTypes(sourceFile, { program });
-	expect(isReactEventHandlerType(prop, { program })).toBe(false);
+	expect(isReactEventHandlerType(prop.type, { program })).toBe(false);
 });
 
 test('returns true for React.EventHandler prop declaration', () => {
@@ -14,7 +14,7 @@ test('returns true for React.EventHandler prop declaration', () => {
 		fixtures
 	});
 	const [prop] = TestUtils.getPropTypes(sourceFile, { program });
-	expect(isReactEventHandlerType(prop, { program })).toBe(true);
+	expect(isReactEventHandlerType(prop.type, { program })).toBe(true);
 });
 
 test('returns true for method declaration with React.Event as first argument', () => {
@@ -22,7 +22,7 @@ test('returns true for method declaration with React.Event as first argument', (
 		fixtures
 	});
 	const [prop] = TestUtils.getPropTypes(sourceFile, { program });
-	expect(isReactEventHandlerType(prop, { program })).toBe(true);
+	expect(isReactEventHandlerType(prop.type, { program })).toBe(true);
 });
 
 test('returns true for function member declarations with React.Event as first argument', () => {
@@ -30,5 +30,5 @@ test('returns true for function member declarations with React.Event as first ar
 		fixtures
 	});
 	const [prop] = TestUtils.getPropTypes(sourceFile, { program });
-	expect(isReactEventHandlerType(prop, { program })).toBe(true);
+	expect(isReactEventHandlerType(prop.type, { program })).toBe(true);
 });

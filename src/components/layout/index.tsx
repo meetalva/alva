@@ -112,9 +112,15 @@ const StyledFixedArea = styled.div`
 	z-index: ${props => (typeof props.z === 'undefined' ? '' : props.z)};
 `;
 
+const StyledRelativeArea = styled.div`
+	position: relative;
+`;
+
 export const FixedArea: React.StatelessComponent<FixedAreaProps> = props => (
 	<StyledFixedArea {...props} />
 );
+
+export const RelativeArea: React.StatelessComponent = props => <StyledRelativeArea {...props} />;
 
 export const MainArea: React.StatelessComponent<MainAreaProps> = props => (
 	<StyledMainArea className={props.className} direction={props.direction} border={props.border}>

@@ -13,7 +13,6 @@ export interface PropertyItemStringProps {
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	placeholder?: string;
 	value?: string;
-	icon?: React.ReactNode;
 	children?(renderProps: PropertyItemStringProps): JSX.Element | null;
 }
 
@@ -64,16 +63,12 @@ export const UnlinkIcon: StyledComponentClass<{}, 'svg'> = styled(Link2)`
 
 export const PropertyItemString: React.StatelessComponent<PropertyItemStringProps> = props => (
 	<PropertyItem description={props.description} label={props.label}>
-		{props.icon}
-		{typeof props.children === 'function' && props.children(props)}
-		{typeof props.children === 'undefined' && (
-			<PropertyInput
-				onChange={props.onChange}
-				onBlur={props.onBlur}
-				type={PropertyInputType.Text}
-				value={props.value || ''}
-				placeholder={props.placeholder}
-			/>
-		)}
+		<PropertyInput
+			onChange={props.onChange}
+			onBlur={props.onBlur}
+			type={PropertyInputType.Text}
+			value={props.value || ''}
+			placeholder={props.placeholder}
+		/>
 	</PropertyItem>
 );

@@ -4,15 +4,42 @@ import * as Model from '../../model';
 import * as React from 'react';
 import { UserStorePropertySelect } from '../user-store-property-select';
 import { Reference } from './reference';
+import styled from 'styled-components';
 import * as Types from '../../types';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
 
 export interface ReferenceSelectProps {
 	property: Model.ElementProperty;
+	iconPosition?: IconPosition;
+}
+
+export enum IconPosition {
+	Default,
+	Indent
 }
 
 const OutsideClickHandler = require('react-outside-click-handler').default;
+
+const HoverReveal = styled.div`
+	${Components.LinkIcon} {
+		opacity: 0;
+		transition: 0.3s ease-in-out opacity;
+	}
+
+	&:hover ${Components.LinkIcon} {
+		opacity: 1;
+	}
+`;
+
+interface PositionedLinkIconProps {
+	position: IconPosition;
+}
+
+const PositionedLinkIcon = styled(Components.LinkIcon)`
+	right: ${(props: PositionedLinkIconProps) =>
+		props.position === IconPosition.Indent ? 20 : 0}px;
+`;
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -101,10 +128,13 @@ export class ReferenceSelect extends React.Component<ReferenceSelectProps> {
 		return (
 			<Components.RelativeArea>
 				{showConcreteValue && (
-					<>
+					<HoverReveal>
 						{this.props.children}
-						<Components.LinkIcon onClick={e => this.handleConnect(e)} />
-					</>
+						<PositionedLinkIcon
+							onClick={e => this.handleConnect(e)}
+							position={props.iconPosition || IconPosition.Default}
+						/>
+					</HoverReveal>
 				)}
 				{showPropertySelect &&
 					userStoreReference && (

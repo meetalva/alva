@@ -1,10 +1,8 @@
-import * as Components from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
-import * as uuid from 'uuid';
 
 import { PropertyItemAsset } from './property-item-asset';
 import { PropertyItemBoolean } from './property-item-boolean';
@@ -13,6 +11,7 @@ import { PropertyItemEvent } from './property-item-event';
 import { PropertyItemNumber } from './property-item-number';
 import { PropertyItemString } from './property-item-string';
 import { PropertyItemRadioGroup } from './property-item-radio-group';
+import { ReferenceSelect } from './reference-select';
 
 export interface PropertyListItemProps {
 	property: Model.ElementProperty;
@@ -25,70 +24,6 @@ export interface StoreInjection {
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyListItem extends React.Component<PropertyListItemProps> {
-	private handleConnectClick(e: React.MouseEvent<HTMLElement>): void {
-		const props = this.props as PropertyListItemProps & StoreInjection;
-		const store = props.store.getProject().getUserStore();
-
-		e.stopPropagation();
-		e.preventDefault();
-
-		const previous = store.getReferenceByElementProperty(props.property);
-
-		if (previous) {
-			previous.setOpen(true);
-			return;
-		}
-
-		store.addReference(
-			new Model.UserStoreReference({
-				id: uuid.v4(),
-				elementPropertyId: props.property.getId(),
-				open: true,
-				userStorePropertyId: undefined
-			})
-		);
-	}
-
-	private handleUserStorePropertyChange(
-		item: Components.CreateSelectOption,
-		action: Components.CreateSelectAction
-	): void {
-		const props = this.props as PropertyListItemProps & StoreInjection;
-		const project = props.store.getProject();
-		const userStore = project.getUserStore();
-		const userStoreReference = props.property.getUserStoreReference();
-
-		if (!userStoreReference) {
-			return;
-		}
-
-		// const props = this.props as PropertyListItemProps & StoreInjection;
-		switch (action.action) {
-			case 'select-option':
-				const storeProperty = userStore.getPropertyById(item.value);
-
-				if (storeProperty && userStoreReference) {
-					userStoreReference.setUserStoreProperty(storeProperty);
-					userStoreReference.setOpen(false);
-					props.store.commit();
-				}
-
-				break;
-			case 'create-option':
-				const newProperty = new Model.UserStoreProperty({
-					id: uuid.v4(),
-					name: item.value,
-					type: Types.UserStorePropertyType.String,
-					payload: ''
-				});
-
-				userStore.addProperty(newProperty);
-				userStoreReference.setUserStoreProperty(newProperty);
-				userStoreReference.setOpen(false);
-				props.store.commit();
-		}
-	}
-
 	public render(): React.ReactNode {
 		const props = this.props as PropertyListItemProps & StoreInjection;
 		const { property } = props;
@@ -122,14 +57,9 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 			case Types.PatternPropertyType.String:
 			default: {
 				return (
-					<PropertyItemString
-						key={id}
-						property={property}
-						onReferenceConnect={e => this.handleConnectClick(e)}
-						onReferenceChange={(item, action) =>
-							this.handleUserStorePropertyChange(item, action)
-						}
-					/>
+					<ReferenceSelect key={id} property={property}>
+						<PropertyItemString property={property} />
+					</ReferenceSelect>
 				);
 			}
 		}

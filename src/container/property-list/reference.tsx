@@ -4,15 +4,15 @@ import * as Model from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 
-export interface UserStoreReferenceContainerProps {
+export interface ReferenceProps {
 	reference: Model.UserStoreReference;
 }
 
 @MobxReact.inject('store')
 @MobxReact.observer
-export class UserStoreReferenceContainer extends React.Component<UserStoreReferenceContainerProps> {
+export class Reference extends React.Component<ReferenceProps> {
 	public render(): JSX.Element | null {
-		const props = this.props as UserStoreReferenceContainerProps & { store: ViewStore };
+		const props = this.props as ReferenceProps & { store: ViewStore };
 		const project = props.store.getProject();
 		const store = project.getUserStore();
 		const storeProperty = store.getPropertyByReference(props.reference);

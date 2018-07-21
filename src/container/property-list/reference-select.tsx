@@ -123,7 +123,8 @@ export class ReferenceSelect extends React.Component<ReferenceSelectProps> {
 
 		const showPropertySelect = userStoreReference && userStoreReference.getOpen();
 
-		const showReference = userStoreReference && !userStoreReference.getOpen();
+		const showReference =
+			userStoreReference && !userStoreReference.getOpen() && referencedUserStoreProperty;
 
 		return (
 			<Components.RelativeArea>

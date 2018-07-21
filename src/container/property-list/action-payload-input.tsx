@@ -31,7 +31,8 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 						style={{
 							display: 'flex',
 							flexWrap: 'nowrap',
-							width: '100%'
+							width: '100%',
+							marginTop: '6px'
 						}}
 					>
 						<Components.PropertyLabel label="to" />
@@ -43,6 +44,7 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 										type={Components.PropertyInputType.Text}
 										value={props.elementAction.getPayload()}
 										onChange={e => props.elementAction.setPayload(e.target.value)}
+										onBlur={() => props.store.commit()}
 									/>
 									<Components.LinkIcon
 										onClick={() => {
@@ -71,6 +73,7 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 										props.elementAction.setPayloadType(
 											Types.ElementActionPayloadType.String
 										);
+										props.store.commit();
 									}}
 								/>
 							)}
@@ -99,6 +102,8 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 												);
 											}
 										});
+
+										props.store.commit();
 									}}
 									onOutsideClick={() => {
 										props.elementAction.setOpen(false);

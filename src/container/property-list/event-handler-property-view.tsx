@@ -30,6 +30,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 
 		if (!selectedAction || selectedAction.getType() === Types.UserStoreActionType.Noop) {
 			props.elementProperty.setValue('');
+			props.store.commit();
 			return;
 		}
 
@@ -157,7 +158,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 							marginTop: '12px'
 						}}
 					>
-						<Components.PropertyLabel label={'Action'} />
+						<Components.PropertyLabel label="Perform" />
 						<Components.Select
 							onChange={e => this.handleActionChange(e)}
 							options={userStore
@@ -190,7 +191,15 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 					{elementAction &&
 						userAction &&
 						userAction.getAcceptsProperty() && (
-							<div style={{ width: '100%', marginTop: '6px', marginBottom: '6px' }}>
+							<div
+								style={{
+									display: 'flex',
+									width: '100%',
+									marginTop: '6px',
+									alignItems: 'center'
+								}}
+							>
+								<Components.PropertyLabel label="named" />
 								<UserStorePropertySelect
 									placeholder="Select Variable"
 									onChange={(e, meta) => this.handlePropertyNameChange(e, meta)}

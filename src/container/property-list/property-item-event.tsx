@@ -8,8 +8,8 @@ import * as React from 'react';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
-export interface EventHandlerPropertyViewProps {
-	elementProperty: Model.ElementProperty;
+export interface PropertyItemEventProps {
+	property: Model.ElementProperty;
 }
 
 export interface StoreInjection {
@@ -18,18 +18,18 @@ export interface StoreInjection {
 
 @MobxReact.inject('store')
 @MobxReact.observer
-export class EventHandlerPropertyView extends React.Component<EventHandlerPropertyViewProps> {
+export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 	private handleActionChange(
 		item: Components.SimpleSelectOption | Components.SimpleSelectOption[]
 	): void {
 		const selected = Array.isArray(item) ? item[0] : item;
-		const props = this.props as EventHandlerPropertyViewProps & StoreInjection;
+		const props = this.props as PropertyItemEventProps & StoreInjection;
 		const project = props.store.getProject();
 		const userStore = project.getUserStore();
 		const selectedAction = userStore.getActionById(selected.value);
 
 		if (!selectedAction || selectedAction.getType() === Types.UserStoreActionType.Noop) {
-			props.elementProperty.setValue('');
+			props.property.setValue('');
 			props.store.commit();
 			return;
 		}
@@ -38,7 +38,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 			.getElementActions()
 			.find(
 				action =>
-					action.getElementPropertyId() === props.elementProperty.getId() &&
+					action.getElementPropertyId() === props.property.getId() &&
 					selectedAction.getId() === action.getStoreActionId()
 			);
 
@@ -46,7 +46,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 			existingElementAction ||
 			new Model.ElementAction(
 				{
-					elementPropertyId: props.elementProperty.getId(),
+					elementPropertyId: props.property.getId(),
 					id: uuid.v4(),
 					open: false,
 					payload: '',
@@ -60,7 +60,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 			);
 
 		project.addElementAction(elementAction);
-		props.elementProperty.setValue(elementAction.getId());
+		props.property.setValue(elementAction.getId());
 
 		const storePropertyId = elementAction.getStorePropertyId();
 		const storeProperty = storePropertyId
@@ -79,10 +79,10 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 		item: Components.CreateSelectOption,
 		action: Components.CreateSelectAction
 	): void {
-		const props = this.props as EventHandlerPropertyViewProps & StoreInjection;
+		const props = this.props as PropertyItemEventProps & StoreInjection;
 		const project = props.store.getProject();
 		const userStore = project.getUserStore();
-		const elementAction = project.getElementActionById(String(props.elementProperty.getValue()));
+		const elementAction = project.getElementActionById(String(props.property.getValue()));
 
 		if (!elementAction) {
 			return;
@@ -119,13 +119,13 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 	}
 
 	public render(): JSX.Element | null {
-		const props = this.props as EventHandlerPropertyViewProps & StoreInjection;
+		const props = this.props as PropertyItemEventProps & StoreInjection;
 		const project = props.store.getProject();
-		const patternProperty = props.elementProperty.getPatternProperty() as Model.PatternEventHandlerProperty;
+		const patternProperty = props.property.getPatternProperty() as Model.PatternEventHandlerProperty;
 
 		const userStore = project.getUserStore();
-		const elementAction = project.getElementActionById(String(props.elementProperty.getValue()));
-		const element = props.elementProperty.getElement();
+		const elementAction = project.getElementActionById(String(props.property.getValue()));
+		const element = props.property.getElement();
 
 		if (!element) {
 			return null;
@@ -141,7 +141,7 @@ export class EventHandlerPropertyView extends React.Component<EventHandlerProper
 
 		return (
 			<div
-				key={props.elementProperty.getId()}
+				key={props.property.getId()}
 				style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}
 			>
 				<Components.PropertyBox

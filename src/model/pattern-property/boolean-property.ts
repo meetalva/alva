@@ -26,11 +26,8 @@ export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefi
 		});
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
+	public coerceValue(value: any): boolean {
 		return value === true || value === 'true' || value === 1;
 	}
 

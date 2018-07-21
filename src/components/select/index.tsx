@@ -20,7 +20,7 @@ const StyledChevron = styled(Icon).attrs({ name: IconName.ArrowFillRight })`
 const NOOP = () => {};
 
 export const ChevronIcon: React.SFC = props => (
-	<StyledChevron {...props} name={IconName.ArrowFillLeft} />
+	<StyledChevron {...props} name={IconName.ArrowFillRight} />
 );
 
 export interface SelectProps {

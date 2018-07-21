@@ -1,0 +1,70 @@
+import * as Sender from '../../sender/client';
+import * as Components from '../../components';
+import { MessageType } from '../../message';
+import * as MobxReact from 'mobx-react';
+import * as Model from '../../model';
+import * as React from 'react';
+import { ViewStore } from '../../store';
+import * as uuid from 'uuid';
+
+export interface PropertyItemAssetProps {
+	property: Model.ElementProperty;
+}
+
+@MobxReact.inject('store')
+@MobxReact.observer
+export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
+	public render(): JSX.Element | null {
+		const props = this.props as PropertyItemAssetProps & { store: ViewStore };
+		const { property } = props;
+
+		const patternProperty = property.getPatternProperty();
+
+		if (!patternProperty) {
+			return null;
+		}
+
+		const imageSrc = (property.getValue() as string | undefined) || '';
+		const inputValue = imageSrc && !imageSrc.startsWith('data:') ? imageSrc : '';
+		const inputType =
+			imageSrc && imageSrc.startsWith('data:')
+				? Components.PropertyItemAssetInputType.File
+				: Components.PropertyItemAssetInputType.Url;
+
+		return (
+			<Components.PropertyItemAsset
+				description={patternProperty.getDescription()}
+				label={patternProperty.getLabel()}
+				imageSrc={imageSrc}
+				inputType={inputType}
+				inputValue={inputValue}
+				onInputBlur={e => props.store.commit()}
+				onInputChange={e => property.setValue(e.target.value)}
+				onClearClick={() => {
+					property.setValue('');
+					props.store.commit();
+				}}
+				onChooseClick={() => {
+					const transactionId = uuid.v4();
+
+					Sender.receive(message => {
+						if (
+							message.type === MessageType.AssetReadResponse &&
+							message.id === transactionId
+						) {
+							property.setValue(message.payload);
+							props.store.commit();
+						}
+					});
+
+					Sender.send({
+						id: transactionId,
+						payload: undefined,
+						type: MessageType.AssetReadRequest
+					});
+				}}
+				placeholder="Or enter URL"
+			/>
+		);
+	}
+}

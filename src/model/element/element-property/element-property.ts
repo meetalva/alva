@@ -34,6 +34,11 @@ export class ElementProperty {
 	}
 
 	@Mobx.computed
+	private get patternProperty(): AnyPatternProperty | undefined {
+		return this.project.getPatternPropertyById(this.patternPropertyId);
+	}
+
+	@Mobx.computed
 	private get userStoreReference(): UserStoreReference | undefined {
 		return this.project.getUserStore().getReferenceByElementProperty(this);
 	}
@@ -157,7 +162,7 @@ export class ElementProperty {
 	}
 
 	public getPatternProperty(): AnyPatternProperty | undefined {
-		return this.project.getPatternPropertyById(this.patternPropertyId);
+		return this.patternProperty;
 	}
 
 	public getPatternPropertyId(): string {
@@ -165,6 +170,11 @@ export class ElementProperty {
 	}
 
 	public getValue(): Types.ElementPropertyValue {
+		if (this.referencedUserStoreProperty && this.patternProperty) {
+			const referencedValue = this.referencedUserStoreProperty.getPayload();
+			return this.patternProperty.coerceValue(referencedValue);
+		}
+
 		return this.value;
 	}
 

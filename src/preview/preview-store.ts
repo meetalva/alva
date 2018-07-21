@@ -150,18 +150,6 @@ export class PreviewStore<V> {
 				return renderProperties;
 			}
 
-			const reference = this.project
-				.getUserStore()
-				.getReferenceByElementProperty(elementProperty);
-			const referencedProperty = reference
-				? this.project.getUserStore().getPropertyByReference(reference)
-				: undefined;
-
-			if (referencedProperty) {
-				renderProperties[patternProperty.getPropertyName()] = referencedProperty.getPayload();
-				return renderProperties;
-			}
-
 			if (patternProperty.getType() === Types.PatternPropertyType.EventHandler) {
 				// Special case:
 				// the link property should render "click" event handlers as href, too

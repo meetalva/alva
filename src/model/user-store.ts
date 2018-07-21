@@ -41,9 +41,7 @@ export class UserStore {
 			});
 		}
 
-		(init.properties || [])
-			.filter(prop => prop.getType() !== Types.UserStorePropertyType.Page)
-			.forEach(prop => this.addProperty(prop));
+		(init.properties || []).forEach(prop => this.addProperty(prop));
 
 		const actions = init.actions || [];
 
@@ -104,6 +102,10 @@ export class UserStore {
 
 	@Mobx.action
 	public addProperty(property: UserStoreProperty): void {
+		if (property.getType() === Types.UserStorePropertyType.Page) {
+			return;
+		}
+
 		this.properties.set(property.getId(), property);
 	}
 
@@ -131,7 +133,12 @@ export class UserStore {
 	}
 
 	public getProperties(): UserStoreProperty[] {
-		return [this.currentPageProperty, ...this.properties.values()];
+		const props = [...this.properties.values()];
+
+		return [
+			this.currentPageProperty,
+			...props.filter(p => p.getType() !== Types.UserStorePropertyType.Page)
+		];
 	}
 
 	public getPropertyById(id: string): UserStoreProperty | undefined {

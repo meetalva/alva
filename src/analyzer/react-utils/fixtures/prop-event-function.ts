@@ -5,3 +5,5 @@ import * as React from 'react';
 export interface Props {
 	doFunctionClickThing: (e: React.MouseEvent<any>) => void;
 }
+
+export const Component: React.SFC<Props> = () => null;

@@ -1,4 +1,5 @@
 import * as AlvaUtil from '../../alva-util';
+import * as Mobx from 'mobx';
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../../types';
 
@@ -18,7 +19,7 @@ export interface PatternEventHandlerPropertyInit {
 
 export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 	public readonly type = Types.PatternPropertyType.EventHandler;
-	private event: PatternEvent;
+	@Mobx.observable private event: PatternEvent;
 
 	public constructor(init: PatternEventHandlerPropertyInit) {
 		super(init);
@@ -72,6 +73,7 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 	public update(prop: PatternEventHandlerProperty): void {
 		this.contextId = prop.getContextId();
 		this.description = prop.getDescription();
+		this.event = prop.getEvent();
 		this.hidden = prop.getHidden();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();
@@ -84,7 +86,7 @@ export interface PatternEventInit {
 }
 
 export class PatternEvent {
-	private type: Types.PatternEventType;
+	@Mobx.observable private type: Types.PatternEventType;
 
 	public constructor(init: PatternEventInit) {
 		this.type = init.type;

@@ -4,6 +4,7 @@ import * as Types from '../types';
 export interface AlvaAppInit {
 	activeView: Types.AlvaView;
 	panes: Set<Types.AppPane>;
+	paneSizes: Types.PaneSize[];
 	rightSidebarTab: Types.RightSidebarTab;
 	searchTerm: string;
 	state: Types.AppState;
@@ -27,12 +28,15 @@ export class AlvaApp {
 		Types.AppPane.PropertiesPane
 	]);
 
+	@Mobx.observable private paneSizes: Map<Types.AppPane, Types.PaneSize> = new Map();
+
 	public constructor(init?: AlvaAppInit) {
 		if (init) {
 			this.activeView = init.activeView;
 			this.panes = init.panes;
 			this.searchTerm = init.searchTerm;
 			this.state = init.state;
+			init.paneSizes.forEach(paneSize => this.setPaneSize(paneSize));
 		}
 	}
 
@@ -40,6 +44,11 @@ export class AlvaApp {
 		return new AlvaApp({
 			activeView: deserializeView(serialized.activeView),
 			panes: new Set(serialized.panes.map(deserializePane)),
+			paneSizes: serialized.paneSizes.map(p => ({
+				width: p.width,
+				height: p.height,
+				pane: deserializePane(p.pane)
+			})),
 			rightSidebarTab: deserializeRightSidebarTab(serialized.rightSidebarTab),
 			searchTerm: serialized.searchTerm,
 			state: deserializeState(serialized.state)
@@ -62,6 +71,10 @@ export class AlvaApp {
 		return this.paneSelectOpen;
 	}
 
+	public getPaneSize(pane: Types.AppPane): Types.PaneSize | undefined {
+		return this.paneSizes.get(pane);
+	}
+
 	public getRightSidebarTab(): Types.RightSidebarTab {
 		return this.rightSidebarTab;
 	}
@@ -74,13 +87,23 @@ export class AlvaApp {
 		return this.state;
 	}
 
+	public isVisible(pane: Types.AppPane): boolean {
+		return this.panes.has(pane);
+	}
+
 	@Mobx.action
 	public setActiveView(view: Types.AlvaView): void {
 		this.activeView = view;
 	}
 
+	@Mobx.action
 	public setPaneSelectOpen(paneSelectOpen: boolean): void {
 		this.paneSelectOpen = paneSelectOpen;
+	}
+
+	@Mobx.action
+	public setPaneSize(size: Types.PaneSize): void {
+		this.paneSizes.set(size.pane, size);
 	}
 
 	@Mobx.action
@@ -124,6 +147,7 @@ export class AlvaApp {
 		return {
 			activeView: serializeView(this.activeView),
 			panes: [...this.panes.values()].map(serializePane),
+			paneSizes: [...this.paneSizes.values()],
 			rightSidebarTab: serializeRightSidebarTab(this.rightSidebarTab),
 			searchTerm: this.searchTerm,
 			state: serializeState(this.state)
@@ -134,6 +158,7 @@ export class AlvaApp {
 	public update(b: AlvaApp): void {
 		this.activeView = b.activeView;
 		this.panes = b.panes;
+		this.paneSizes = b.paneSizes;
 		this.rightSidebarTab = b.rightSidebarTab;
 		this.searchTerm = b.searchTerm;
 		this.state = b.state;
@@ -144,10 +169,14 @@ function deserializePane(state: Types.SerializedAppPane): Types.AppPane {
 	switch (state) {
 		case 'pages-pane':
 			return Types.AppPane.PagesPane;
+		case 'patterns-pane':
+			return Types.AppPane.PatternsPane;
 		case 'elements-pane':
 			return Types.AppPane.ElementsPane;
 		case 'properties-pane':
 			return Types.AppPane.PropertiesPane;
+		case 'development-pane':
+			return Types.AppPane.DevelopmentPane;
 	}
 	throw new Error(`Unknown app pane: ${state}`);
 }
@@ -186,10 +215,14 @@ function serializePane(pane: Types.AppPane): Types.SerializedAppPane {
 	switch (pane) {
 		case Types.AppPane.PagesPane:
 			return 'pages-pane';
+		case Types.AppPane.PatternsPane:
+			return 'patterns-pane';
 		case Types.AppPane.ElementsPane:
 			return 'elements-pane';
 		case Types.AppPane.PropertiesPane:
 			return 'properties-pane';
+		case Types.AppPane.DevelopmentPane:
+			return 'development-pane';
 	}
 	throw new Error(`Unknown app pane: ${pane}`);
 }

@@ -319,9 +319,22 @@ export enum ElementRole {
 	Node = 'node'
 }
 
+export interface PaneSize {
+	pane: AppPane;
+	width: number;
+	height: number;
+}
+
+export interface SerializedPaneSize {
+	pane: SerializedAppPane;
+	width: number;
+	height: number;
+}
+
 export interface SerializedAlvaApp {
 	activeView: SerializedAlvaView;
 	panes: SerializedAppPane[];
+	paneSizes: SerializedPaneSize[];
 	rightSidebarTab: SerializedRightSidebarTab;
 	searchTerm: string;
 	state: SerializedAppState;
@@ -411,11 +424,18 @@ export interface LayoutContextMenuRequestPayload {
 
 export enum AppPane {
 	PagesPane = 'pages-pane',
+	PatternsPane = 'patterns-pane',
 	ElementsPane = 'elements-pane',
-	PropertiesPane = 'properties-pane'
+	PropertiesPane = 'properties-pane',
+	DevelopmentPane = 'development-pane'
 }
 
-export type SerializedAppPane = 'pages-pane' | 'elements-pane' | 'properties-pane';
+export type SerializedAppPane =
+	| 'pages-pane'
+	| 'patterns-pane'
+	| 'elements-pane'
+	| 'properties-pane'
+	| 'development-pane';
 
 export interface MainMenuContext {
 	app: SerializedAlvaApp;

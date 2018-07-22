@@ -146,6 +146,23 @@ export function createViewMenu(
 				}
 			},
 			{
+				label: 'Show Development Editor',
+				type: 'checkbox',
+				checked: app.getPanes().has(Types.AppPane.DevelopmentPane),
+				enabled: app.getActiveView() === Types.AlvaView.PageDetail,
+				accelerator: 'CmdOrCtrl+Alt+4',
+				click: (item, checked) => {
+					injection.sender.send({
+						id: uuid.v4(),
+						payload: {
+							pane: Types.AppPane.DevelopmentPane,
+							visible: !app.getPanes().has(Types.AppPane.DevelopmentPane)
+						},
+						type: Message.MessageType.SetPane
+					});
+				}
+			},
+			{
 				type: 'separator'
 			},
 			{

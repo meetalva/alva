@@ -122,7 +122,7 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 	)}</textarea>
 	${config.scripts ? config.scripts.join('\n') : ''}
 	<script src="/scripts/Mobx.js" data-script="Mobx"><\/script>
-	<script src="/scripts/renderer.js" data-script="renderer"><\/script>
+	<script src="/scripts/previewRenderer.js" data-script="previewRenderer"><\/script>
 	<script src="/scripts/preview.js" data-script="preview"><\/script>
 </body>
 </html>

@@ -5,7 +5,7 @@ import * as Types from '../types';
 const SCRIPT_PATHS = [
 	require.resolve('../scripts/exportToSketchData'),
 	require.resolve('../scripts/Mobx'),
-	require.resolve('../scripts/renderer'),
+	require.resolve('../scripts/previewRenderer'),
 	require.resolve('../scripts/preview')
 ];
 

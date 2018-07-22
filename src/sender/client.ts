@@ -1,3 +1,4 @@
+// TODO: Merge this with sender/preview
 import * as Electron from 'electron';
 import { isMessage } from './is-message';
 import * as Message from '../message';

@@ -7,7 +7,6 @@ export const rendererDocument = `<!doctype html>
 <html>
 <head>
 	<script>require('${stringEscape(ZOOM_LEVEL_ENTRY)}')</script>
-	<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline'">
 </head>
 <body>
 	<div id="app" style="overflow: hidden; width: 100%; height: 100%;"></div>

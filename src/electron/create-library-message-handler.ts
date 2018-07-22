@@ -40,7 +40,7 @@ export async function createLibraryMessageHandler(
 					injection.sender.send({
 						type: Message.MessageType.CreateScriptBundleResponse,
 						id: message.id,
-						payload: ['renderer', 'preview']
+						payload: ['previewRenderer', 'preview']
 							.map(name => ({ name, path: Path.posix.join('/', `${name}.js`) }))
 							.map(({ name, path }) => ({
 								name,

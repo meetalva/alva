@@ -1,4 +1,3 @@
-import * as Sender from '../../sender/client';
 import * as Components from '../../components';
 import { MessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
@@ -47,7 +46,9 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 				onChooseClick={() => {
 					const transactionId = uuid.v4();
 
-					Sender.receive(message => {
+					const sender = props.store.getSender();
+
+					sender.receive(message => {
 						if (
 							message.type === MessageType.AssetReadResponse &&
 							message.id === transactionId
@@ -57,7 +58,7 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 						}
 					});
 
-					Sender.send({
+					sender.send({
 						id: transactionId,
 						payload: undefined,
 						type: MessageType.AssetReadRequest

@@ -1,4 +1,6 @@
 const Path = require('path');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const webpack = require('webpack');
 
 const MOBX_PATH = require.resolve('mobx');
 const HTML_SKETCHAPP_PATH = require.resolve('@brainly/html-sketchapp');
@@ -50,6 +52,10 @@ module.exports = [
 		module: {
 			rules: [
 				{
+					test: /\.css$/,
+					use: ['style-loader', 'css-loader']
+				},
+				{
 					test: /\.tsx?$/,
 					loader: 'ts-loader',
 					options: {
@@ -58,16 +64,19 @@ module.exports = [
 				}
 			]
 		},
+		plugins: [
+			new MonacoWebpackPlugin()
+		],
 		resolve: {
 			extensions: ['.ts', '.tsx', '.js']
 		},
-		target: 'electron-renderer',
 		node: {
 			__dirname: false
 		},
 		output: {
 			filename: '[name].js',
-			path: Path.join(__dirname, 'build')
+			path: Path.join(__dirname, 'build', 'scripts'),
+			publicPath: '/scripts/'
 		}
 	},
 	{

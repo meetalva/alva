@@ -3,7 +3,6 @@ import { checkForUpdates } from './auto-updater';
 import { Color } from '../components/colors';
 import * as Electron from 'electron';
 import * as electronIsDev from 'electron-is-dev';
-import { rendererDocument } from './renderer-document';
 
 export interface ElectronWindowContext {
 	window: undefined | Electron.BrowserWindow;
@@ -13,7 +12,7 @@ const CONTEXT: ElectronWindowContext = {
 	window: undefined
 };
 
-export async function createWindow(): Promise<ElectronWindowContext> {
+export async function createWindow(ctx: { port: number }): Promise<ElectronWindowContext> {
 	// Create the browser window.
 	const win = new Electron.BrowserWindow({
 		minWidth: 780,
@@ -22,13 +21,17 @@ export async function createWindow(): Promise<ElectronWindowContext> {
 		backgroundColor: ConvertColor(Color.Grey97)
 			.hex()
 			.toString(),
-		title: 'Alva'
+		title: 'Alva',
+		webPreferences: {
+			nodeIntegration: false,
+			preload: require.resolve('./preload')
+		}
 	});
 
 	win.maximize();
 
 	// and load the index.html of the app.
-	win.loadURL(`data:text/html;charset=utf-8,${encodeURI(rendererDocument)}`);
+	win.loadURL(`http://localhost:${ctx.port}/`);
 
 	// Emitted when the window is closed.
 	win.on('closed', () => {

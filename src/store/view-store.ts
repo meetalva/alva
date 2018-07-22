@@ -1,4 +1,4 @@
-import * as Sender from '../sender/client';
+import { Sender } from '../sender/client';
 import { debounce, isEqual } from 'lodash';
 import { MessageType } from '../message';
 import * as Mobx from 'mobx';
@@ -9,6 +9,7 @@ import * as uuid from 'uuid';
 
 export interface ViewStoreInit {
 	app: Model.AlvaApp;
+	sender: Sender;
 	history: Model.EditHistory;
 }
 
@@ -58,10 +59,12 @@ export class ViewStore {
 
 	@Mobx.observable private serverPort: number;
 
+	@Mobx.observable private sender: Sender;
+
 	public constructor(init: ViewStoreInit) {
 		this.app = init.app;
 		this.editHistory = init.history;
-
+		this.sender = init.sender;
 		this.save = debounce(this.save, 1000);
 	}
 
@@ -98,7 +101,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public connectPatternLibrary(library?: Model.PatternLibrary): void {
-		Sender.send({
+		this.sender.send({
 			type: MessageType.ConnectPatternLibraryRequest,
 			id: uuid.v4(),
 			payload: {
@@ -529,6 +532,10 @@ export class ViewStore {
 		return this.project.getElements().find(element => element.getSelected());
 	}
 
+	public getSender(): Sender {
+		return this.sender;
+	}
+
 	public getServerPort(): number {
 		return this.serverPort;
 	}
@@ -695,7 +702,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public requestContextMenu(payload: Types.ContextMenuRequestPayload): void {
-		Sender.send({
+		this.sender.send({
 			id: uuid.v4(),
 			type: MessageType.ContextMenuRequest,
 			payload
@@ -720,7 +727,7 @@ export class ViewStore {
 				project: serializedProject
 			};
 
-			Sender.send({
+			this.sender.send({
 				id: uuid.v4(),
 				payload,
 				type: MessageType.Save
@@ -887,7 +894,7 @@ export class ViewStore {
 	}
 
 	public updatePatternLibrary(library: Model.PatternLibrary): void {
-		Sender.send({
+		this.sender.send({
 			type: MessageType.UpdatePatternLibraryRequest,
 			payload: {
 				id: library.getId()

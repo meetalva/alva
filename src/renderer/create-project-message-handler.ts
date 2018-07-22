@@ -1,6 +1,5 @@
 import * as Message from '../message';
 import * as Model from '../model';
-import * as Sender from '../sender/client';
 import { ViewStore } from '../store';
 import * as Types from '../types';
 import * as uuid from 'uuid';
@@ -58,7 +57,7 @@ export function createProjectMessageHandler({
 				store.getApp().setRightSidebarTab(Types.RightSidebarTab.ProjectSettings);
 				store.commit();
 
-				Sender.send({
+				store.getSender().send({
 					id: uuid.v4(),
 					payload: {
 						id: library.getId(),
@@ -79,7 +78,7 @@ export function createProjectMessageHandler({
 				library.import(message.payload.analysis, { project });
 				store.commit();
 
-				Sender.send({
+				store.getSender().send({
 					id: uuid.v4(),
 					payload: {
 						id: library.getId(),

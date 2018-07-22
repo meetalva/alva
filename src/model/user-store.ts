@@ -5,6 +5,7 @@ import { Project } from './project';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 import { UserStoreAction } from './user-store-action';
+import { UserStoreEnhancer } from './user-store-enhancer';
 import { UserStoreProperty } from './user-store-property';
 import { UserStoreReference } from './user-store-reference';
 
@@ -12,6 +13,7 @@ export interface UserStoreInit {
 	id: string;
 	properties?: UserStoreProperty[];
 	actions?: UserStoreAction[];
+	enhancer: UserStoreEnhancer;
 	references?: UserStoreReference[];
 	currentPageProperty?: UserStoreProperty;
 }
@@ -22,8 +24,9 @@ export interface UserStoreContext {
 
 export class UserStore {
 	private id: string;
-	private actions: Map<string, UserStoreAction> = new Map();
-	private currentPageProperty: UserStoreProperty;
+	@Mobx.observable private actions: Map<string, UserStoreAction> = new Map();
+	@Mobx.observable private currentPageProperty: UserStoreProperty;
+	@Mobx.observable private enhancer: UserStoreEnhancer;
 	@Mobx.observable private properties: Map<string, UserStoreProperty> = new Map();
 	@Mobx.observable private references: Map<string, UserStoreReference> = new Map();
 
@@ -81,6 +84,8 @@ export class UserStore {
 		actions.forEach(action => this.addAction(action));
 
 		(init.references || []).forEach(reference => this.addReference(reference));
+
+		this.enhancer = init.enhancer;
 	}
 
 	public static from(serialized: Types.SerializedUserStore): UserStore {
@@ -89,6 +94,7 @@ export class UserStore {
 			currentPageProperty: serialized.currentPageProperty
 				? UserStoreProperty.from(serialized.currentPageProperty)
 				: undefined,
+			enhancer: UserStoreEnhancer.from(serialized.enhancer),
 			id: serialized.id,
 			properties: (serialized.properties || []).map(p => UserStoreProperty.from(p)),
 			references: (serialized.references || []).map(r => UserStoreReference.from(r))
@@ -147,6 +153,10 @@ export class UserStore {
 		}
 
 		return this.properties.get(id);
+	}
+
+	public getEnhancer(): UserStoreEnhancer {
+		return this.enhancer;
 	}
 
 	public getReferenceByElementProperty(
@@ -216,12 +226,15 @@ export class UserStore {
 		referenceChanges.added.forEach(change => this.addReference(change.after));
 		referenceChanges.changed.forEach(change => change.before.update(change.after));
 		referenceChanges.removed.forEach(change => this.removeReference(change.before));
+
+		this.enhancer.update(userStore.enhancer);
 	}
 
 	public toJSON(): Types.SerializedUserStore {
 		return {
 			actions: this.getActions().map(a => a.toJSON()),
 			currentPageProperty: this.currentPageProperty.toJSON(),
+			enhancer: this.enhancer.toJSON(),
 			id: this.id,
 			properties: this.getProperties().map(p => p.toJSON()),
 			references: this.getReferences().map(r => r.toJSON())

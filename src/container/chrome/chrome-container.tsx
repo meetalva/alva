@@ -5,7 +5,6 @@ import { MessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
-import * as Sender from '../../sender/client';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
 
@@ -40,7 +39,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 		return (
 			<Chrome
 				onDoubleClick={e => {
-					Sender.send({
+					props.store.getSender().send({
 						type: MessageType.Maximize,
 						id: uuid.v4(),
 						payload: undefined
@@ -61,7 +60,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 				<BugReport
 					title="Found a bug?"
 					onClick={() => {
-						Sender.send({
+						props.store.getSender().send({
 							type: MessageType.OpenExternalURL,
 							id: uuid.v4(),
 							payload: 'https://github.com/meetalva/alva/labels/type%3A%20bug'

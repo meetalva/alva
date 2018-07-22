@@ -1,8 +1,6 @@
 import * as Events from 'events';
 import * as Serde from '../sender/serde';
 
-import { createClientConnectHandler } from './create-client-connect-handler';
-
 export type ConnectionHandler = (ws: WebSocket) => void;
 
 export interface ConnectionHandlerContext {
@@ -10,8 +8,6 @@ export interface ConnectionHandlerContext {
 }
 
 export function createConnectionHandler(context: ConnectionHandlerContext): ConnectionHandler {
-	const onClientConnect = createClientConnectHandler();
-
 	return function connectionHandler(ws: WebSocket): void {
 		// tslint:disable-next-line:no-any
 		const w = ws as any;
@@ -33,7 +29,5 @@ export function createConnectionHandler(context: ConnectionHandlerContext): Conn
 
 			context.emitter.emit('client-message', message);
 		});
-
-		onClientConnect(ws);
 	};
 }

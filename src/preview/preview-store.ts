@@ -2,7 +2,7 @@ import { ElementArea } from './element-area';
 import * as Message from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
-import { Sender } from '../sender/preview';
+import { Sender } from '../sender/client';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 

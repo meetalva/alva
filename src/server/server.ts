@@ -1,3 +1,4 @@
+import { createRendererRoute } from './create-renderer-route';
 import { createConnectionHandler } from './create-connection-handler';
 import { createLibrariesRoute } from './create-libraries-route';
 import { createPreviewRoute } from './create-preview-route';
@@ -39,7 +40,7 @@ export class AlvaServer extends EventEmitter {
 		this.server = init.server;
 		this.webSocketServer = init.webSocketServer;
 
-		this.app.get('/', (_, res) => res.send('ok'));
+		this.app.get('/', createRendererRoute({ sender: this.options.sender }));
 
 		this.app.get('/preview.html', createPreviewRoute({ sender: this.options.sender }));
 

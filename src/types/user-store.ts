@@ -32,6 +32,7 @@ export interface SerializedUserStoreAction {
 export interface SerializedUserStore {
 	actions: SerializedUserStoreAction[];
 	currentPageProperty: SerializedUserStoreProperty;
+	enhancer: SerializedUserStoreEnhancer;
 	id: string;
 	properties: SerializedUserStoreProperty[];
 	references: SerializedUserStoreReference[];
@@ -44,4 +45,9 @@ export interface SerializedUserStoreReference {
 	open: boolean;
 	elementPropertyId: string;
 	userStorePropertyId: string | undefined;
+}
+
+export interface SerializedUserStoreEnhancer {
+	id: string;
+	code: string;
 }

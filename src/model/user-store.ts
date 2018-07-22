@@ -86,6 +86,7 @@ export class UserStore {
 		(init.references || []).forEach(reference => this.addReference(reference));
 
 		this.enhancer = init.enhancer;
+		this.enhancer.setUserStore(this);
 	}
 
 	public static from(serialized: Types.SerializedUserStore): UserStore {

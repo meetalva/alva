@@ -1,5 +1,6 @@
 import * as Mobx from 'mobx';
 import * as Types from '../types';
+import { UserStore } from './user-store';
 
 export interface UserStoreEnhancerInit {
 	id: string;
@@ -7,8 +8,10 @@ export interface UserStoreEnhancerInit {
 	code: string;
 }
 
-const userStoreApi = `
+const userStoreApi = (names: string[]) => `
 declare module "alva" {
+	export type PropertyName = ${names.join(' | ')};
+
 	/**
 	 * Alva UserStore during design phase that allows to
 	 * add, remove and rename properties.
@@ -37,7 +40,7 @@ declare module "alva" {
 		 * }
 		 * \`\`\`
 		 **/
-		getProperty(name: string): DesignProperty | undefined;
+		getProperty(name: PropertyName): DesignProperty;
 
 		/**
 		 * \`\`\`ts
@@ -51,7 +54,7 @@ declare module "alva" {
 		/**
 		 * Remove a UserStore propery by reference or its name
 		 **/
-		removeProperty(name: string): void;
+		removeProperty(name: PropertyName): void;
 		removeProperty(prop: DesignProperty): void;
 	}
 
@@ -68,7 +71,7 @@ declare module "alva" {
 		 * const name = prop.getName();
 		 * \`\`\`
 		 **/
-		getName(): string;
+		getName(): PropertyName;
 
 		/**
 		 * \`\`\`ts
@@ -111,7 +114,7 @@ declare module "alva" {
 		 * }
 		 * \`\`\`
 		 **/
-		getProperty(name: string): RuntimeProperty | undefined;
+		getProperty(name: PropertyName): RuntimeProperty;
 	}
 
 	export interface RuntimeProperty {
@@ -120,7 +123,7 @@ declare module "alva" {
 		 * const name = prop.getName();
 		 * \`\`\`
 		 **/
-		getName(): string;
+		getName(): PropertyName;
 
 		/**
 		 * \`\`\`ts
@@ -157,6 +160,8 @@ export class UserStoreEnhancer {
 	@Mobx.observable private id: string;
 	@Mobx.observable private code: string;
 
+	private usetStore: UserStore;
+
 	public constructor(init: UserStoreEnhancerInit) {
 		this.id = init.id;
 		this.code = init.code;
@@ -167,7 +172,7 @@ export class UserStoreEnhancer {
 	}
 
 	public getApi(): string {
-		return userStoreApi;
+		return userStoreApi(this.usetStore.getProperties().map(p => JSON.stringify(p.getName())));
 	}
 
 	public getCode(): string {
@@ -177,6 +182,10 @@ export class UserStoreEnhancer {
 	@Mobx.action
 	public setCode(code: string): void {
 		this.code = code;
+	}
+
+	public setUserStore(userStore: UserStore): void {
+		this.usetStore = userStore;
 	}
 
 	public toJSON(): Types.SerializedUserStoreEnhancer {

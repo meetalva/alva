@@ -321,14 +321,14 @@ export enum ElementRole {
 
 export interface PaneSize {
 	pane: AppPane;
-	width: number;
-	height: number;
+	width?: number;
+	height?: number;
 }
 
 export interface SerializedPaneSize {
 	pane: SerializedAppPane;
-	width: number;
-	height: number;
+	width?: number;
+	height?: number;
 }
 
 export interface SerializedAlvaApp {

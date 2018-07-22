@@ -1,11 +1,10 @@
 import { AppPane } from './app-pane';
-
-import * as Sender from '../sender/client';
 import * as Components from '../components';
 import { ConnectPaneContainer } from './connect-pane-container';
 import { ElementList } from './element-list';
 import { MessageType } from '../message';
 import * as MobxReact from 'mobx-react';
+import { PaneDevelopmentEditor } from './pane-development-editor';
 import { PageListContainer } from './page-list/page-list-container';
 import { PatternListContainer } from './pattern-list';
 import { PreviewPaneWrapper } from './preview-pane-wrapper';
@@ -79,7 +78,7 @@ export class ViewDetails extends React.Component {
 						enable={{ top: true }}
 						minHeight={240}
 					>
-						<div style={{ borderTop: `1px solid ${Components.Color.Grey90}` }} />
+						<PaneDevelopmentEditor />
 					</AppPane>
 				</div>
 				<AppPane
@@ -102,7 +101,7 @@ export class ViewDetails extends React.Component {
 							<ConnectPaneContainer
 								onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
 								onSecondaryButtonClick={() =>
-									Sender.send({
+									props.store.getSender().send({
 										type: MessageType.OpenExternalURL,
 										id: uuid.v4(),
 										payload: 'http://meetalva.github.io/example/example.alva'

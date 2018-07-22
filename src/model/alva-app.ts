@@ -147,7 +147,11 @@ export class AlvaApp {
 		return {
 			activeView: serializeView(this.activeView),
 			panes: [...this.panes.values()].map(serializePane),
-			paneSizes: [...this.paneSizes.values()],
+			paneSizes: [...this.paneSizes.values()].map(paneSize => ({
+				width: paneSize.width,
+				height: paneSize.height,
+				pane: serializePane(paneSize.pane)
+			})),
 			rightSidebarTab: serializeRightSidebarTab(this.rightSidebarTab),
 			searchTerm: this.searchTerm,
 			state: serializeState(this.state)

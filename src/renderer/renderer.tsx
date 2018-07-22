@@ -1,7 +1,7 @@
 import { App } from '../container/app';
 import { createChangeNotifiers } from './create-change-notifiers';
 import { createServerMessageHandler } from './create-server-message-handler';
-import * as Sender from '../sender/client';
+import { Sender } from '../sender/client';
 import { MessageType } from '../message';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
@@ -14,7 +14,11 @@ import * as uuid from 'uuid';
 export function startRenderer(): void {
 	console.log('App starting...');
 
-	Sender.send({
+	const sender = new Sender({
+		endpoint: `ws://${window.location.host}/`
+	});
+
+	sender.send({
 		id: uuid.v4(),
 		type: MessageType.AppLoaded,
 		payload: undefined
@@ -22,7 +26,7 @@ export function startRenderer(): void {
 
 	const app = new Model.AlvaApp();
 	const history = new Model.EditHistory();
-	const store = new ViewStore({ app, history });
+	const store = new ViewStore({ app, history, sender });
 
 	const id = `s${uuid
 		.v4()
@@ -33,7 +37,7 @@ export function startRenderer(): void {
 	(window as any)[id] = store;
 	console.log(`Access ViewStore at ${id}`);
 
-	Sender.receive(createServerMessageHandler({ app, history, store }));
+	sender.receive(createServerMessageHandler({ app, history, store }));
 	registerGlobalListeners({ store });
 	createChangeNotifiers({ app, store });
 

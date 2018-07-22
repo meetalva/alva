@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain } from 'electron';
+import { ipcMain } from 'electron';
 import { isMessage } from './is-message';
 import * as uuid from 'uuid';
 import * as Message from '../message';
@@ -10,7 +10,6 @@ export type IpcHandler = (e: any, message: any) => void;
 
 export class Sender {
 	private received: Map<Message.MessageType, Message.Message> = new Map();
-	private sendHandlers: ServerHandler[] = [];
 
 	// tslint:disable-next-line:no-any
 	private receiveIpcHandlers: IpcHandler[] = [];
@@ -63,21 +62,14 @@ export class Sender {
 			return;
 		}
 
-		this.sendHandlers.forEach(handler => handler(message));
 		ipcMain.emit('message', undefined, message);
-		BrowserWindow.getAllWindows().forEach(win => win.webContents.send('message', message));
 	}
 
 	public stop(): void {
 		this.received.clear();
-		this.sendHandlers = [];
 		this.receiveIpcHandlers.forEach(receiveIpcHandler => {
 			ipcMain.removeListener('message', receiveIpcHandler);
 		});
-	}
-
-	public use(handler: ServerHandler): void {
-		this.sendHandlers.push(handler);
 	}
 
 	public last<T extends Message.Message>(type: T['type']): T | undefined {

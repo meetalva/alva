@@ -1,6 +1,5 @@
 import * as Message from '../message';
 import * as Model from '../model';
-import * as Sender from '../sender/client';
 import { ViewStore } from '../store';
 import * as Types from '../types';
 
@@ -15,13 +14,15 @@ export function createRequestMessageHandler({
 	history: Model.EditHistory;
 	store: ViewStore;
 }): RequestMessageHandler {
+	const sender = store.getSender();
+
 	return function requestMessageHandler(message: Message.Message): void {
 		switch (message.type) {
 			case Message.MessageType.ProjectRequest: {
 				const data = store.getProject();
 
 				if (!data) {
-					return Sender.send({
+					sender.send({
 						id: message.id,
 						type: Message.MessageType.ProjectResponse,
 						payload: {
@@ -29,9 +30,11 @@ export function createRequestMessageHandler({
 							status: Types.ProjectStatus.None
 						}
 					});
+
+					return;
 				}
 
-				return Sender.send({
+				sender.send({
 					id: message.id,
 					type: Message.MessageType.ProjectResponse,
 					payload: {
@@ -39,9 +42,11 @@ export function createRequestMessageHandler({
 						status: Types.ProjectStatus.Ok
 					}
 				});
+
+				return;
 			}
 			case Message.MessageType.AppRequest: {
-				return Sender.send({
+				sender.send({
 					id: message.id,
 					type: Message.MessageType.AppResponse,
 					payload: {

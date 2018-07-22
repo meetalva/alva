@@ -1,7 +1,6 @@
 import * as Message from '../message';
 import * as Model from '../model';
 import * as Path from 'path';
-import * as Sender from '../sender/client';
 import { ViewStore } from '../store';
 import * as Types from '../types';
 import * as uuid from 'uuid';
@@ -49,7 +48,7 @@ export function createInitMessageHandler({
 				const projectResult = createProject(payload.contents);
 
 				if (projectResult.status === ProjectCreateStatus.Error) {
-					return Sender.send({
+					store.getSender().send({
 						id: uuid.v4(),
 						payload: {
 							message: `Sorry, we had trouble reading the project in file "${Path.basename(
@@ -59,6 +58,8 @@ export function createInitMessageHandler({
 						},
 						type: Message.MessageType.ShowError
 					});
+
+					return;
 				}
 
 				store.setProject(projectResult.project);

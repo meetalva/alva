@@ -7,7 +7,7 @@ import * as Message from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
 import { PreviewStore, SyntheticComponents } from './preview-store';
-import { Sender } from '../sender/preview';
+import { Sender } from '../sender/client';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 

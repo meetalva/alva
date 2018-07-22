@@ -39,15 +39,16 @@ export class AppPane extends React.Component<AppPaneProps> {
 				enable={props.enable}
 				minWidth={props.minWidth}
 				minHeight={props.minHeight}
-				onResizeStop={(_, __, el: HTMLElement) => {
+				onResizeStop={(_, direction, el: HTMLElement) => {
 					if (!props.pane) {
 						return;
 					}
 
 					app.setPaneSize({
 						pane: props.pane,
-						width: el.clientWidth,
-						height: el.clientHeight
+						width: direction === 'left' || direction === 'right' ? el.clientWidth : undefined,
+						height:
+							direction === 'top' || direction === 'bottom' ? el.clientHeight : undefined
 					});
 				}}
 			>

@@ -1,6 +1,11 @@
+import * as Fs from 'fs';
 import * as Mobx from 'mobx';
 import * as Types from '../types';
+import * as TypeScript from 'typescript';
 import { UserStore } from './user-store';
+import * as VM from 'vm';
+
+const MemoryFilesystem = require('memory-fs');
 
 export interface UserStoreEnhancerInit {
 	id: string;
@@ -151,7 +156,11 @@ export function onStoreCreate(store: Alva.DesignStore): Alva.DesignStore {
 
 export function onStoreUpdate(store: Alva.RuntimeStore): Alva.RuntimeStore {
 	// Set property values here, e.g.
-	// store.setProperty('Hello', store.getProperty('Hello') + ' World');
+	// const prop = store.getProperty('Hello');
+	// const value = prop.getValue()
+	// if (!value.endsWith('World')) {
+	//    prop.setValue(prop.getValue() + 'World');
+	// }
 	return store;
 }
 `;
@@ -159,6 +168,25 @@ export function onStoreUpdate(store: Alva.RuntimeStore): Alva.RuntimeStore {
 export class UserStoreEnhancer {
 	@Mobx.observable private id: string;
 	@Mobx.observable private code: string;
+
+	@Mobx.computed
+	private get js(): string {
+		const fs = new MemoryFilesystem();
+		fs.writeFileSync('/file.ts', this.code);
+		compile('/file.ts', {
+			compilerOptions: {},
+			fs,
+			languageVersion: TypeScript.ScriptTarget.ESNext
+		});
+		return String(fs.readFileSync('/file.js'));
+	}
+
+	@Mobx.computed
+	private get module(): Types.UserStoreEnhancerModule {
+		const context = { exports: {}, module: { exports: {} } };
+		VM.runInNewContext(this.getJavaScript(), context);
+		return context.exports as Types.UserStoreEnhancerModule;
+	}
 
 	private usetStore: UserStore;
 
@@ -177,6 +205,14 @@ export class UserStoreEnhancer {
 
 	public getCode(): string {
 		return this.code;
+	}
+
+	public getJavaScript(): string {
+		return this.js;
+	}
+
+	public getModule(): Types.UserStoreEnhancerModule {
+		return this.module;
 	}
 
 	@Mobx.action
@@ -198,4 +234,61 @@ export class UserStoreEnhancer {
 	public update(b: this): void {
 		this.code = b.code;
 	}
+}
+
+export interface CompileOptions {
+	fs: typeof Fs;
+	languageVersion: TypeScript.ScriptTarget;
+	compilerOptions: TypeScript.CompilerOptions;
+}
+
+function compile(filename: string, opts: CompileOptions): typeof Fs {
+	const compilerHost: TypeScript.CompilerHost = {
+		fileExists(sourceFileName: string): boolean {
+			return opts.fs.existsSync(`/${sourceFileName}`);
+		},
+		getCanonicalFileName(sourceFileName: string): string {
+			return sourceFileName;
+		},
+		getCurrentDirectory(): string {
+			return '';
+		},
+		getDefaultLibFileName(): string {
+			return 'lib.d.ts';
+		},
+		getDirectories(): string[] {
+			return [];
+		},
+		getNewLine(): string {
+			return '\n';
+		},
+		getSourceFile(sourceFileName: string): TypeScript.SourceFile | undefined {
+			if (!opts.fs.existsSync(`/${sourceFileName}`)) {
+				return;
+			}
+
+			const source = opts.fs.readFileSync(`/${sourceFileName}`);
+
+			if (!source) {
+				return;
+			}
+
+			return TypeScript.createSourceFile(filename, source.toString(), opts.languageVersion);
+		},
+		useCaseSensitiveFileNames(): boolean {
+			return false;
+		},
+		readFile(sourceFileName: string): string | undefined {
+			const buffer = opts.fs.readFileSync(sourceFileName);
+			return buffer ? buffer.toString() : undefined;
+		},
+		writeFile(sourceFileName: string, text: string): void {
+			opts.fs.writeFileSync(`/${sourceFileName}`, text);
+		}
+	};
+
+	const program = TypeScript.createProgram(['file.ts'], opts.compilerOptions, compilerHost);
+	program.emit();
+
+	return opts.fs;
 }

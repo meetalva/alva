@@ -3,6 +3,7 @@ import * as Mobx from 'mobx';
 import * as Types from '../types';
 import * as TypeScript from 'typescript';
 import { UserStore } from './user-store';
+import * as uuid from 'uuid';
 import * as VM from 'vm';
 
 const MemoryFilesystem = require('memory-fs');
@@ -193,10 +194,15 @@ export class UserStoreEnhancer {
 	public constructor(init: UserStoreEnhancerInit) {
 		this.id = init.id;
 		this.code = init.code;
+
+		if (!init) {
+			this.id = uuid.v4();
+			this.code = defaultCode;
+		}
 	}
 
 	public static from(serialized: Types.SerializedUserStoreEnhancer): UserStoreEnhancer {
-		return new UserStoreEnhancer(serialized);
+		return new UserStoreEnhancer(serialized || {});
 	}
 
 	public getApi(): string {

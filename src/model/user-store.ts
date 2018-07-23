@@ -4,6 +4,7 @@ import * as Message from '../message';
 import { Project } from './project';
 import * as Types from '../types';
 import * as uuid from 'uuid';
+import { DesignTimeUserStore, RuntimeUserStore } from './user-store-api';
 import { UserStoreAction } from './user-store-action';
 import { UserStoreEnhancer } from './user-store-enhancer';
 import { UserStoreProperty } from './user-store-property';
@@ -87,6 +88,8 @@ export class UserStore {
 
 		this.enhancer = init.enhancer;
 		this.enhancer.setUserStore(this);
+
+		this.enhanceOnCreate();
 	}
 
 	public static from(serialized: Types.SerializedUserStore): UserStore {
@@ -119,6 +122,30 @@ export class UserStore {
 	@Mobx.action
 	public addReference(reference: UserStoreReference): void {
 		this.references.set(reference.getId(), reference);
+	}
+
+	@Mobx.action
+	public enhanceOnCreate(): void {
+		try {
+			const { onStoreCreate } = this.enhancer.getModule();
+			if (typeof onStoreCreate === 'function') {
+				onStoreCreate(new DesignTimeUserStore(this));
+			}
+		} catch {
+			/* */
+		}
+	}
+
+	@Mobx.action
+	public enhanceOnUpdate(): void {
+		try {
+			const { onStoreUpdate } = this.enhancer.getModule();
+			if (typeof onStoreUpdate === 'function') {
+				onStoreUpdate(new RuntimeUserStore(this));
+			}
+		} catch {
+			/* */
+		}
 	}
 
 	public getActionById(id: string): UserStoreAction | undefined {

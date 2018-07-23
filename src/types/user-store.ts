@@ -51,3 +51,33 @@ export interface SerializedUserStoreEnhancer {
 	id: string;
 	code: string;
 }
+
+export interface UserStoreEnhancerModule {
+	onStoreCreate(store: DesignTimeUserStore): DesignTimeUserStore;
+	onStoreUpdate(store: RuntimeUserStore): RuntimeUserStore;
+}
+
+export interface DesignTimeUserStore {
+	getProperties(): DesignTimeProperty[];
+	getProperty(name: string): DesignTimeProperty | undefined;
+	addProperty(name: string, value?: string): DesignTimeProperty;
+	removeProperty(prop: string | DesignTimeProperty): void;
+}
+
+export interface DesignTimeProperty {
+	setName(name: string): void;
+	getName(): string;
+	getValue(): string | undefined;
+	setValue(value: string): void;
+}
+
+export interface RuntimeUserStore {
+	getProperties(): RuntimeProperty[];
+	getProperty(name: string): RuntimeProperty | undefined;
+}
+
+export interface RuntimeProperty {
+	getName(): string;
+	getValue(): string | undefined;
+	setValue(value: string): void;
+}

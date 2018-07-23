@@ -38,9 +38,10 @@ export class DesignTimeUserStore implements Types.DesignTimeUserStore {
 
 		if (!previous) {
 			this.store.addProperty(prop);
-			if (typeof value !== 'undefined') {
-				prop.setPayload(value);
-			}
+		}
+
+		if (typeof value !== 'undefined') {
+			prop.setPayload(value);
 		}
 
 		return new DesignTimeProperty(prop);

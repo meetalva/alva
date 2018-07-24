@@ -3,10 +3,15 @@ import * as Mobx from 'mobx';
 import * as Types from '../types';
 import * as TypeScript from 'typescript';
 import { UserStore } from './user-store';
+import { DesignTimeUserStore } from './design-time-user-store';
 import * as uuid from 'uuid';
 import * as VM from 'vm';
 
 const MemoryFilesystem = require('memory-fs');
+
+export interface UserStoreEnhancerModule {
+	onStoreCreate(store: DesignTimeUserStore): DesignTimeUserStore;
+}
 
 export interface UserStoreEnhancerInit {
 	id: string;
@@ -17,151 +22,63 @@ export interface UserStoreEnhancerInit {
 const userStoreApi = (names: string[]) => `
 declare module "alva" {
 	export type PropertyName = ${names.join(' | ')};
+	export type DesignTimeDescriptor = ConcreteDesignTimeDescriptor | ComputedDesignTimeDescriptor;
 
-	/**
-	 * Alva UserStore during design phase that allows to
-	 * add, remove and rename properties.
-	 *
-	 * Changes to the properties of \`CreatableStore\` will be reflected in the Alva interface.
-	 **/
-	export interface DesignStore {
-		/**
-		 * \`\`\`ts
-		 * store.getProperties()
-		 *   .forEach(prop => {
-		 *      if (prop.getValue() === 'Hello') {
-		 *         prop.setValue('Hello World');
-		 *      }
-		 *   })
-		 * \`\`\`
-		 **/
-		getProperties(): DesignProperty[];
-
-		/**
-		 * \`\`\`ts
-		 * const prop = store.getProperty('Hello');
-		 *
-		 * if (prop) {
-		 *     prop.setValue('World');
-		 * }
-		 * \`\`\`
-		 **/
-		getProperty(name: PropertyName): DesignProperty;
-
-		/**
-		 * \`\`\`ts
-		 * const prop = store.addProperty('Hello', 'World');
-		 * const otherProp = store.addProperty('How');
-		 * otherProp.setValue('are you?');
-		 * \`\`\`
-		 **/
-		addProperty(name: string, value?: string): DesignProperty;
-
-		/**
-		 * Remove a UserStore propery by reference or its name
-		 **/
-		removeProperty(name: PropertyName): void;
-		removeProperty(prop: DesignProperty): void;
+	export interface ConcreteDesignTimeDescriptor {
+		type?: DesignTimePropertyType.Concrete;
+		value: string;
+		get?: undefined;
 	}
-
-	export interface DesignProperty {
-		/**
-		 * \`\`\`ts
-		 * prop.setName('SomeVariable');
-		 * \`\`\`
-		 **/
-		setName(name: string): void;
-
-		/**
-		 * \`\`\`ts
-		 * const name = prop.getName();
-		 * \`\`\`
-		 **/
+	export interface ComputedDesignTimeDescriptor {
+		type?: DesignTimePropertyType.Computed;
+		value?: undefined;
+		get(): string;
+	}
+	export type QualifiedDesignTimeDescriptor =
+		| QualifiedConcreteDesignTimeDescriptor
+		| QualifiedComputedDesignTimeDescriptor;
+	export interface QualifiedConcreteDesignTimeDescriptor {
+		type: DesignTimePropertyType.Concrete;
+		value: string;
+		get: undefined;
+	}
+	export interface QualifiedComputedDesignTimeDescriptor {
+		type: DesignTimePropertyType.Computed;
+		value: undefined;
+		get(): string;
+	}
+	export declare enum DesignTimePropertyType {
+		Computed = 0,
+		Concrete = 1,
+	}
+	export declare class DesignTimeUserStore {
+		getProperties(): DesignTimeProperty[];
+		getProperty(name: PropertyName): DesignTimeProperty;
+		defineProperty(name: string, descriptor: DesignTimeDescriptor): DesignTimeProperty;
+	}
+	export interface DesignTimePropertyInit {
+		name: string;
+		type: DesignTimePropertyType;
+		value: string | undefined;
+		getter: Computation | undefined;
+	}
+	export declare type Computation = () => string;
+	export declare class DesignTimeProperty {
+		configureProperty(descriptor: DesignTimeDescriptor): void;
 		getName(): PropertyName;
-
-		/**
-		 * \`\`\`ts
-		 * const value = prop.getValue();
-		 * \`\`\`
-		 **/
+		getType(): DesignTimePropertyType;
 		getValue(): string | undefined;
-
-		/**
-		 * \`\`\`ts
-		 * prop.setValue('World');
-		 * \`\`\`
-		 **/
-		setValue(value: string): void;
-	}
-
-	/**
-	 * Alva UserStore during runtime.
-	 * Properties can not be added or removed, but their values can be read/set.
-	 **/
-	export interface RuntimeStore {
-		/**
-		 * \`\`\`ts
-		 * store.getProperties()
-		 *   .forEach(prop => {
-		 *      if (prop.getValue() === 'Hello') {
-		 *         prop.setValue('Hello World');
-		 *      }
-		 *   })
-		 * \`\`\`
-		 **/
-		getProperties(): RuntimeProperty[];
-
-		/**
-		 * \`\`\`ts
-		 * const prop = store.getProperty('Hello');
-		 *
-		 * if (prop) {
-		 *     prop.setValue('World');
-		 * }
-		 * \`\`\`
-		 **/
-		getProperty(name: PropertyName): RuntimeProperty;
-	}
-
-	export interface RuntimeProperty {
-		/**
-		 * \`\`\`ts
-		 * const name = prop.getName();
-		 * \`\`\`
-		 **/
-		getName(): PropertyName;
-
-		/**
-		 * \`\`\`ts
-		 * const value = prop.getValue();
-		 * \`\`\`
-		 **/
-		getValue(): string | undefined;
-
-		/**
-		 * \`\`\`ts
-		 * prop.setValue('World');
-		 * \`\`\`
-		 **/
-		setValue(value: string): void;
+		getGetter(): Computation | undefined;
 	}
 }`;
 
 export const defaultCode = `import * as Alva from 'alva';
 
-export function onStoreCreate(store: Alva.DesignStore): Alva.DesignStore {
+export function onStoreCreate(store: Alva.DesignTimeUserStore): Alva.DesignTimeUserStore {
 	// Add properties to your store here, e.g.:
-	// store.addProperty('Hello', 'World');
-	return store;
-}
-
-export function onStoreUpdate(store: Alva.RuntimeStore): Alva.RuntimeStore {
-	// Set property values here, e.g.
-	// const prop = store.getProperty('Hello');
-	// const value = prop.getValue()
-	// if (!value.endsWith('World')) {
-	//    prop.setValue(prop.getValue() + 'World');
-	// }
+	// store.defineProperty('hello', { value: 'Hello' });
+	// store.defineProperty('world', { value: 'World' });
+	// store.defineProperty('helloWorld', { get: () => store.getProperty('hello').getValue() + ' ' + store.getProperty('world').getValue() });
 	return store;
 }
 `;
@@ -183,10 +100,10 @@ export class UserStoreEnhancer {
 	}
 
 	@Mobx.computed
-	private get module(): Types.UserStoreEnhancerModule {
-		const context = { exports: {}, module: { exports: {} } };
+	private get module(): UserStoreEnhancerModule {
+		const context = { exports: {}, module: { exports: {} }, console };
 		VM.runInNewContext(this.getJavaScript(), context);
-		return context.exports as Types.UserStoreEnhancerModule;
+		return context.exports as UserStoreEnhancerModule;
 	}
 
 	private usetStore: UserStore;
@@ -217,7 +134,7 @@ export class UserStoreEnhancer {
 		return this.js;
 	}
 
-	public getModule(): Types.UserStoreEnhancerModule {
+	public getModule(): UserStoreEnhancerModule {
 		return this.module;
 	}
 

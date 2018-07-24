@@ -1,4 +1,4 @@
-export enum UserStorePropertyType {
+export enum UserStorePropertyValueType {
 	String = 'string',
 	Page = 'page'
 }
@@ -10,15 +10,24 @@ export enum UserStoreActionType {
 	SetPage = 'set-page'
 }
 
-export type SerializedUserStorePropertyType = 'string' | 'page';
+export type SerializedUserStorePropertyValueType = 'string' | 'page';
+
+export type SerializedUserStorePropertyType = 'concrete' | 'computed';
 
 export type SerializedUserStoreActionType = 'noop' | 'set' | 'set-page' | 'open-external';
 
 export interface SerializedUserStoreProperty {
 	id: string;
 	name: string;
-	payload: string;
+	concreteValue: string | undefined;
+	initialValue: string;
 	type: SerializedUserStorePropertyType;
+	valueType: SerializedUserStorePropertyValueType;
+}
+
+export enum UserStorePropertyType {
+	Concrete = 'concrete',
+	Computed = 'computed'
 }
 
 export interface SerializedUserStoreAction {
@@ -50,34 +59,4 @@ export interface SerializedUserStoreReference {
 export interface SerializedUserStoreEnhancer {
 	id: string;
 	code: string;
-}
-
-export interface UserStoreEnhancerModule {
-	onStoreCreate(store: DesignTimeUserStore): DesignTimeUserStore;
-	onStoreUpdate(store: RuntimeUserStore): RuntimeUserStore;
-}
-
-export interface DesignTimeUserStore {
-	getProperties(): DesignTimeProperty[];
-	getProperty(name: string): DesignTimeProperty | undefined;
-	addProperty(name: string, value?: string): DesignTimeProperty;
-	removeProperty(prop: string | DesignTimeProperty): void;
-}
-
-export interface DesignTimeProperty {
-	setName(name: string): void;
-	getName(): string;
-	getValue(): string | undefined;
-	setValue(value: string): void;
-}
-
-export interface RuntimeUserStore {
-	getProperties(): RuntimeProperty[];
-	getProperty(name: string): RuntimeProperty | undefined;
-}
-
-export interface RuntimeProperty {
-	getName(): string;
-	getValue(): string | undefined;
-	setValue(value: string): void;
 }

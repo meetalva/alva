@@ -6,35 +6,62 @@ import * as Types from '../../types';
 export interface UserStorePropertyInit {
 	id: string;
 	name: string;
-	payload: string;
-	type: UserStorePropertyType;
+	initialValue: string;
+	concreteValue?: string;
+	valueType: Types.UserStorePropertyValueType;
+	type: Types.UserStorePropertyType;
+	getter?(): string;
 }
 
-export enum UserStorePropertyType {
-	String,
-	Page
-}
+const NOOP = () => '';
 
 export class UserStoreProperty {
 	private id: string;
-	@Mobx.observable private name: string;
-	@Mobx.observable private payload: string;
-	private type: UserStorePropertyType;
 	private project: Project;
+
+	@Mobx.observable private concreteValue: string | undefined;
+	@Mobx.observable private initialValue: string;
+	@Mobx.observable private getter: () => string;
+	@Mobx.observable private name: string;
+	@Mobx.observable private type: Types.UserStorePropertyType;
+	@Mobx.observable private valueType: Types.UserStorePropertyValueType;
+
+	@Mobx.computed
+	private get value(): string {
+		if (this.type === Types.UserStorePropertyType.Computed) {
+			try {
+				return this.getter();
+			} catch (err) {
+				console.error(err);
+				return '';
+			}
+		}
+
+		if (typeof this.concreteValue === 'undefined') {
+			return this.initialValue;
+		}
+
+		return this.concreteValue;
+	}
 
 	public constructor(init: UserStorePropertyInit) {
 		this.id = init.id;
 		this.name = init.name;
-		this.payload = init.payload;
+		this.initialValue = init.initialValue;
+		this.concreteValue = init.concreteValue;
+		this.valueType = init.valueType;
 		this.type = init.type;
+		this.getter = init.getter || NOOP;
 	}
 
 	public static from(serialized: Types.SerializedUserStoreProperty): UserStoreProperty {
 		return new UserStoreProperty({
 			id: serialized.id,
 			name: serialized.name,
-			payload: serialized.payload,
-			type: deserializeType(serialized.type)
+			concreteValue: serialized.concreteValue,
+			initialValue: serialized.initialValue,
+			type: deserializeType(serialized.type),
+			valueType: deserializeValueType(serialized.valueType)
 		});
 	}
 
@@ -50,12 +77,20 @@ export class UserStoreProperty {
 		return this.name;
 	}
 
-	public getPayload(): string {
-		return this.payload;
+	public getValue(): string {
+		return this.value;
 	}
 
 	public getType(): Types.UserStorePropertyType {
 		return this.type;
+	}
+
+	public getValueType(): Types.UserStorePropertyValueType {
+		return this.valueType;
+	}
+
+	public getGetter(): () => string {
+		return this.getter;
 	}
 
 	@Mobx.action
@@ -64,15 +99,15 @@ export class UserStoreProperty {
 	}
 
 	@Mobx.action
-	public setPayload(payload: string): void {
+	public setValue(value: string): void {
 		// Skip if we try to switch to a page that does not exist
-		if (this.getType() === Types.UserStorePropertyType.Page) {
-			if (this.project && !this.project.getPageById(payload)) {
+		if (this.getValueType() === Types.UserStorePropertyValueType.Page) {
+			if (this.project && !this.project.getPageById(value)) {
 				return;
 			}
 		}
 
-		this.payload = payload;
+		this.concreteValue = value;
 	}
 
 	public setProject(project: Project): void {
@@ -83,8 +118,10 @@ export class UserStoreProperty {
 		return {
 			id: this.id,
 			name: this.name,
-			payload: this.payload,
-			type: serializeType(this.type)
+			concreteValue: this.concreteValue,
+			initialValue: this.initialValue,
+			type: serializeType(this.type),
+			valueType: serializeValueType(this.valueType)
 		};
 	}
 
@@ -92,29 +129,47 @@ export class UserStoreProperty {
 	public update(b: UserStoreProperty): void {
 		this.id = b.id;
 		this.name = b.name;
-		this.payload = b.payload;
-		this.type = b.type;
+		this.concreteValue = b.value;
+		this.valueType = b.valueType;
+	}
+}
+
+function deserializeValueType(
+	type: Types.SerializedUserStorePropertyValueType
+): Types.UserStorePropertyValueType {
+	switch (type) {
+		case 'string':
+			return Types.UserStorePropertyValueType.String;
+		case 'page':
+			return Types.UserStorePropertyValueType.Page;
+	}
+}
+
+function serializeValueType(
+	type: Types.UserStorePropertyValueType
+): Types.SerializedUserStorePropertyValueType {
+	switch (type) {
+		case Types.UserStorePropertyValueType.String:
+			return 'string';
+		case Types.UserStorePropertyValueType.Page:
+			return 'page';
 	}
 }
 
 function deserializeType(type: Types.SerializedUserStorePropertyType): Types.UserStorePropertyType {
 	switch (type) {
-		case 'string':
-			return Types.UserStorePropertyType.String;
-		case 'page':
-			return Types.UserStorePropertyType.Page;
-		default:
-			throw new Error(`Unknown user store property type: ${type}`);
+		case 'computed':
+			return Types.UserStorePropertyType.Computed;
+		case 'concrete':
+			return Types.UserStorePropertyType.Concrete;
 	}
 }
 
 function serializeType(type: Types.UserStorePropertyType): Types.SerializedUserStorePropertyType {
 	switch (type) {
-		case Types.UserStorePropertyType.String:
-			return 'string';
-		case Types.UserStorePropertyType.Page:
-			return 'page';
-		default:
-			throw new Error(`Unknown user store property type: ${type}`);
+		case Types.UserStorePropertyType.Computed:
+			return 'computed';
+		case Types.UserStorePropertyType.Concrete:
+			return 'concrete';
 	}
 }

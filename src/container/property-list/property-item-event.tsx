@@ -67,7 +67,7 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 			? userStore.getPropertyById(storePropertyId)
 			: undefined;
 
-		if (storeProperty && storeProperty.getType() === Types.UserStorePropertyType.Page) {
+		if (storeProperty && storeProperty.getValueType() === Types.UserStorePropertyValueType.Page) {
 			const page = props.store.getPages()[0];
 			elementAction.setPayload(page ? page.getId() : '');
 		}
@@ -105,8 +105,9 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 				const newProperty = new Model.UserStoreProperty({
 					id: uuid.v4(),
 					name: item.value,
-					type: Types.UserStorePropertyType.String,
-					payload: ''
+					valueType: Types.UserStorePropertyValueType.String,
+					type: Types.UserStorePropertyType.Concrete,
+					initialValue: ''
 				});
 
 				userStore.addProperty(newProperty);
@@ -204,6 +205,7 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 									placeholder="Select Variable"
 									onChange={(e, meta) => this.handlePropertyNameChange(e, meta)}
 									property={userProperty}
+									type={Types.UserStorePropertyType.Concrete}
 								/>
 							</div>
 						)}

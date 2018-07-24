@@ -24,8 +24,8 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 
 		const payloadType = props.elementAction.getPayloadType();
 
-		switch (userProperty.getType()) {
-			case Types.UserStorePropertyType.String:
+		switch (userProperty.getValueType()) {
+			case Types.UserStorePropertyValueType.String:
 				return (
 					<div
 						style={{
@@ -113,7 +113,7 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 						)}
 					</div>
 				);
-			case Types.UserStorePropertyType.Page: {
+			case Types.UserStorePropertyValueType.Page: {
 				const project = props.store.getProject();
 				const page = project.getPageById(props.elementAction.getPayload());
 

@@ -96,8 +96,9 @@ export class ReferenceSelect extends React.Component<ReferenceSelectProps> {
 				const newProperty = new Model.UserStoreProperty({
 					id: uuid.v4(),
 					name: item.value,
-					type: Types.UserStorePropertyType.String,
-					payload: ''
+					type: Types.UserStorePropertyType.Concrete,
+					valueType: Types.UserStorePropertyValueType.String,
+					initialValue: ''
 				});
 
 				userStore.addProperty(newProperty);

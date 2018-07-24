@@ -25,6 +25,8 @@ export interface UserStoreContext {
 
 export class UserStore {
 	private id: string;
+	private previousDesignTimeStore: DesignTime.DesignTimeUserStore;
+
 	@Mobx.observable private actions: Map<string, UserStoreAction> = new Map();
 	@Mobx.observable private currentPageProperty: UserStoreProperty;
 	@Mobx.observable private enhancer: UserStoreEnhancer;
@@ -35,14 +37,17 @@ export class UserStore {
 	private get designTimeStore(): DesignTime.DesignTimeUserStore | undefined {
 		try {
 			const enhanceModule = this.enhancer.getModule();
-			return enhanceModule.onStoreCreate(
+
+			this.previousDesignTimeStore = enhanceModule.onStoreCreate(
 				new DesignTime.DesignTimeUserStore({
 					properties: [...this.internalProperties.values()]
 				})
 			);
+
+			return this.previousDesignTimeStore;
 		} catch (error) {
 			console.error(error);
-			return;
+			return this.previousDesignTimeStore;
 		}
 	}
 

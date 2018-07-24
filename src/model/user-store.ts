@@ -4,7 +4,7 @@ import * as Message from '../message';
 import { Project } from './project';
 import * as Types from '../types';
 import * as uuid from 'uuid';
-import { DesignTimeUserStore, RuntimeUserStore } from './user-store-api';
+import * as DesignTime from './design-time-user-store';
 import { UserStoreAction } from './user-store-action';
 import { UserStoreEnhancer } from './user-store-enhancer';
 import { UserStoreProperty } from './user-store-property';
@@ -28,8 +28,62 @@ export class UserStore {
 	@Mobx.observable private actions: Map<string, UserStoreAction> = new Map();
 	@Mobx.observable private currentPageProperty: UserStoreProperty;
 	@Mobx.observable private enhancer: UserStoreEnhancer;
-	@Mobx.observable private properties: Map<string, UserStoreProperty> = new Map();
+	@Mobx.observable private internalProperties: Map<string, UserStoreProperty> = new Map();
 	@Mobx.observable private references: Map<string, UserStoreReference> = new Map();
+
+	@Mobx.computed
+	private get designTimeStore(): DesignTime.DesignTimeUserStore | undefined {
+		try {
+			const enhanceModule = this.enhancer.getModule();
+			return enhanceModule.onStoreCreate(
+				new DesignTime.DesignTimeUserStore({
+					properties: [...this.internalProperties.values()]
+				})
+			);
+		} catch (error) {
+			console.error(error);
+			return;
+		}
+	}
+
+	@Mobx.computed
+	private get properties(): Map<string, UserStoreProperty> {
+		const map = new Map();
+
+		this.internalProperties.forEach(prop => {
+			map.set(prop.getId(), prop);
+		});
+
+		if (!this.designTimeStore) {
+			return map;
+		}
+
+		this.designTimeStore.getProperties().forEach(designProperty => {
+			const previous = designProperty.getProperty();
+
+			if (previous) {
+				map.set(previous.getId(), previous);
+				return;
+			}
+
+			const property = new UserStoreProperty({
+				id: designProperty.getName(),
+				name: designProperty.getName(),
+				getter: designProperty.getGetter(),
+				initialValue: designProperty.getValue() || '',
+				valueType: Types.UserStorePropertyValueType.String,
+				type:
+					designProperty.getType() === DesignTime.DesignTimePropertyType.Computed
+						? Types.UserStorePropertyType.Computed
+						: Types.UserStorePropertyType.Concrete
+			});
+
+			designProperty.setProperty(property);
+			map.set(property.getId(), property);
+		});
+
+		return map;
+	}
 
 	public constructor(init: UserStoreInit) {
 		this.id = init.id;
@@ -40,8 +94,9 @@ export class UserStore {
 			this.currentPageProperty = new UserStoreProperty({
 				id: uuid.v4(),
 				name: 'Current Page',
-				payload: '',
-				type: Types.UserStorePropertyType.Page
+				initialValue: '',
+				type: Types.UserStorePropertyType.Concrete,
+				valueType: Types.UserStorePropertyValueType.Page
 			});
 		}
 
@@ -88,8 +143,6 @@ export class UserStore {
 
 		this.enhancer = init.enhancer;
 		this.enhancer.setUserStore(this);
-
-		this.enhanceOnCreate();
 	}
 
 	public static from(serialized: Types.SerializedUserStore): UserStore {
@@ -112,40 +165,16 @@ export class UserStore {
 
 	@Mobx.action
 	public addProperty(property: UserStoreProperty): void {
-		if (property.getType() === Types.UserStorePropertyType.Page) {
+		if (property.getValueType() === Types.UserStorePropertyValueType.Page) {
 			return;
 		}
 
-		this.properties.set(property.getId(), property);
+		this.internalProperties.set(property.getId(), property);
 	}
 
 	@Mobx.action
 	public addReference(reference: UserStoreReference): void {
 		this.references.set(reference.getId(), reference);
-	}
-
-	@Mobx.action
-	public enhanceOnCreate(): void {
-		try {
-			const { onStoreCreate } = this.enhancer.getModule();
-			if (typeof onStoreCreate === 'function') {
-				onStoreCreate(new DesignTimeUserStore(this));
-			}
-		} catch {
-			/* */
-		}
-	}
-
-	@Mobx.action
-	public enhanceOnUpdate(): void {
-		try {
-			const { onStoreUpdate } = this.enhancer.getModule();
-			if (typeof onStoreUpdate === 'function') {
-				onStoreUpdate(new RuntimeUserStore(this));
-			}
-		} catch {
-			/* */
-		}
 	}
 
 	public getActionById(id: string): UserStoreAction | undefined {
@@ -167,12 +196,7 @@ export class UserStore {
 	}
 
 	public getProperties(): UserStoreProperty[] {
-		const props = [...this.properties.values()];
-
-		return [
-			this.currentPageProperty,
-			...props.filter(p => p.getType() !== Types.UserStorePropertyType.Page)
-		];
+		return [...this.properties.values()];
 	}
 
 	public getPropertyById(id: string): UserStoreProperty | undefined {
@@ -221,7 +245,7 @@ export class UserStore {
 
 	@Mobx.action
 	public removeProperty(property: UserStoreProperty): void {
-		this.properties.delete(property.getId());
+		this.internalProperties.delete(property.getId());
 	}
 
 	@Mobx.action
@@ -229,8 +253,8 @@ export class UserStore {
 		const userStore = UserStore.from(message.payload.userStore);
 
 		const propertyChanges = computeDifference<UserStoreProperty>({
-			before: this.getProperties(),
-			after: userStore.getProperties()
+			before: [...this.internalProperties.values()],
+			after: [...userStore.internalProperties.values()]
 		});
 
 		propertyChanges.added.forEach(change => this.addProperty(change.after));
@@ -264,7 +288,7 @@ export class UserStore {
 			currentPageProperty: this.currentPageProperty.toJSON(),
 			enhancer: this.enhancer.toJSON(),
 			id: this.id,
-			properties: this.getProperties().map(p => p.toJSON()),
+			properties: [...this.internalProperties.values()].map(p => p.toJSON()),
 			references: this.getReferences().map(r => r.toJSON())
 		};
 	}

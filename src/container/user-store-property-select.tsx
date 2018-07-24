@@ -3,12 +3,14 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
 import * as React from 'react';
 import { ViewStore } from '../store';
+import * as Types from '../types';
 
 export interface UserStorePropertySelectProps {
 	autoFocus?: boolean;
 	placeholder: string;
 	menuIsOpen?: boolean;
 	property: Model.UserStoreProperty | undefined;
+	type?: Types.UserStorePropertyType;
 	onChange: Components.CreateSelectProps['onChange'];
 	onBlur?: React.ChangeEventHandler<HTMLElement>;
 }
@@ -23,6 +25,7 @@ export class UserStorePropertySelect extends React.Component<UserStorePropertySe
 			.getProject()
 			.getUserStore()
 			.getProperties()
+			.filter(this.props.type ? p => p.getType() === this.props.type : () => true)
 			.map(p => ({
 				label: p.getName(),
 				value: p.getId()

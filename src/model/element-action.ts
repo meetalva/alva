@@ -102,13 +102,13 @@ export class ElementAction {
 			case Types.UserStoreActionType.Set: {
 				const storeProperty = this.userStore.getPropertyById(this.storePropertyId);
 				if (storeProperty) {
-					storeProperty.setPayload(this.getResolvedPayload({ project, event }) || '');
+					storeProperty.setValue(this.getResolvedPayload({ project, event }) || '');
 				}
 				break;
 			}
 			case Types.UserStoreActionType.SetPage: {
 				const pageProperty = this.userStore.getPageProperty();
-				pageProperty.setPayload(this.getPayload());
+				pageProperty.setValue(this.getPayload());
 				break;
 			}
 			case Types.UserStoreActionType.OpenExternal: {

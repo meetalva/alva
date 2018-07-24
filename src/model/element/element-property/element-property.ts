@@ -171,7 +171,7 @@ export class ElementProperty {
 
 	public getValue(): Types.ElementPropertyValue {
 		if (this.referencedUserStoreProperty && this.patternProperty) {
-			const referencedValue = this.referencedUserStoreProperty.getPayload();
+			const referencedValue = this.referencedUserStoreProperty.getValue();
 			return this.patternProperty.coerceValue(referencedValue);
 		}
 

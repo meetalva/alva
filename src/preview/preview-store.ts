@@ -172,7 +172,9 @@ export class PreviewStore<V> {
 
 					const actionType = userStoreAction ? userStoreAction.getType() : undefined;
 
-					const propertyType = userStoreProperty ? userStoreProperty.getType() : undefined;
+					const propertyType = userStoreProperty
+						? userStoreProperty.getValueType()
+						: undefined;
 
 					switch (actionType) {
 						case Types.UserStoreActionType.OpenExternal:
@@ -183,8 +185,11 @@ export class PreviewStore<V> {
 							}
 							break;
 						case Types.UserStoreActionType.Set:
-							if (userStoreProperty && propertyType === Types.UserStorePropertyType.Page) {
-								renderProperties['href'] = `?page=${userStoreProperty.getPayload()}`;
+							if (
+								userStoreProperty &&
+								propertyType === Types.UserStorePropertyValueType.Page
+							) {
+								renderProperties['href'] = `?page=${userStoreProperty.getValue()}`;
 							}
 					}
 				}

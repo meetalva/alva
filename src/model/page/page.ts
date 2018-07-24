@@ -49,7 +49,7 @@ export class Page {
 			this.project
 				.getUserStore()
 				.getPageProperty()
-				.getPayload() === this.id
+				.getValue() === this.id
 		);
 	}
 
@@ -58,7 +58,7 @@ export class Page {
 			this.project
 				.getUserStore()
 				.getPageProperty()
-				.setPayload(this.id);
+				.setValue(this.id);
 		}
 	}
 

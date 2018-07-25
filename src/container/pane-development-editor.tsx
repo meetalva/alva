@@ -1,4 +1,5 @@
 import * as Components from '../components';
+import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Monaco from 'monaco-editor';
 import * as React from 'react';
@@ -14,12 +15,14 @@ export class PaneDevelopmentEditor extends React.Component {
 	public componentDidMount(): void {
 		const props = this.props as WithStore;
 
+		if (!this.node) {
+			return;
+		}
+
 		const storeEnhancer = props.store
 			.getProject()
 			.getUserStore()
 			.getEnhancer();
-
-		Monaco.languages.typescript.typescriptDefaults.addExtraLib(storeEnhancer.getApi());
 
 		Monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
 			noSemanticValidation: true,
@@ -30,10 +33,6 @@ export class PaneDevelopmentEditor extends React.Component {
 			target: Monaco.languages.typescript.ScriptTarget.ESNext,
 			allowNonTsExtensions: true
 		});
-
-		if (!this.node) {
-			return;
-		}
 
 		this.editor = Monaco.editor.create(this.node, {
 			language: 'typescript',
@@ -56,6 +55,23 @@ export class PaneDevelopmentEditor extends React.Component {
 			storeEnhancer.setCode(this.editor.getValue());
 			props.store.commit();
 		});
+
+		let lib: Monaco.IDisposable;
+
+		Mobx.autorun(
+			() => {
+				if (lib) {
+					lib.dispose();
+				}
+
+				lib = Monaco.languages.typescript.typescriptDefaults.addExtraLib(
+					storeEnhancer.getApi()
+				);
+			},
+			{
+				scheduler: fn => setTimeout(fn, 1000)
+			}
+		);
 	}
 
 	public componentWillUnmount(): void {

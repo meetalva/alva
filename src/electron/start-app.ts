@@ -25,7 +25,7 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 
 	// Cast getPort return type from PromiseLike<number> to Promise<number>
 	// to avoid async-promise tslint rule to produce errors here
-	ctx.port = await (getPort({ port: 1879 }) as Promise<number>);
+	ctx.port = await (getPort({ port: ctx.port }) as Promise<number>);
 
 	const sender = new Sender();
 	const server = createServer({ port: ctx.port, sender });
@@ -68,7 +68,7 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 	log.info(`Server started on port ${ctx.port}.`);
 
 	if (ctx.win) {
-		ctx.win.reload();
+		ctx.win.loadURL(`http://localhost:${ctx.port}/`);
 	} else {
 		ctx.win = (await createWindow({ port: ctx.port as number })).window;
 	}

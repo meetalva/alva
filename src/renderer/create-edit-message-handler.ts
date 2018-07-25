@@ -14,8 +14,7 @@ export function createEditMessageHandler({
 }): EditMessageHandler {
 	// tslint:disable-next-line:cyclomatic-complexity
 	return function editMessageHandler(message: Message.Message): void {
-		// Do not perform custom operations when an input/textarea is selected
-		if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) {
+		if (store.getApp().getHasFocusedInput()) {
 			return;
 		}
 

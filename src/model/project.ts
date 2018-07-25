@@ -15,14 +15,11 @@ import * as uuid from 'uuid';
 
 export interface ProjectProperties {
 	id?: string;
-	lastChangedAuthor?: string;
-	lastChangedDate?: Date;
 	name: string;
 	pages: Page[];
 	path: string;
 	patternLibraries: PatternLibrary[];
 	userStore: UserStore;
-	focusedItemType?: Types.ItemType;
 }
 
 export interface ProjectCreateInit {
@@ -36,8 +33,6 @@ export class Project {
 	@Mobx.observable private elementActions: Map<string, ElementAction> = new Map();
 
 	@Mobx.observable private elementContents: Map<string, ElementContent> = new Map();
-
-	@Mobx.observable private focusedItemType: Types.ItemType = Types.ItemType.None;
 
 	@Mobx.observable private id: string;
 
@@ -110,16 +105,42 @@ export class Project {
 		return elementProperties;
 	}
 
+	@Mobx.computed
+	private get focusedItem(): Element | Page | undefined {
+		const element = this.getElements().find(e => e.getFocused());
+
+		if (element) {
+			return element;
+		}
+
+		const page = this.getPages().find(p => p.getFocused());
+
+		if (page) {
+			return page;
+		}
+
+		return;
+	}
+
+	@Mobx.computed
+	private get focusedItemType(): Types.ItemType {
+		if (this.focusedItem instanceof Page) {
+			return Types.ItemType.Page;
+		}
+
+		if (this.focusedItem instanceof Element) {
+			return Types.ItemType.Element;
+		}
+
+		return Types.ItemType.None;
+	}
+
 	public constructor(init: ProjectProperties) {
 		this.name = init.name;
 		this.id = init.id ? init.id : uuid.v4();
 		this.pages = init.pages ? init.pages : [];
 		this.path = init.path;
 		this.userStore = init.userStore;
-
-		if (typeof init.focusedItemType !== 'undefined') {
-			this.focusedItemType = init.focusedItemType;
-		}
 
 		init.patternLibraries.forEach(patternLibrary => {
 			if (patternLibrary.getOrigin() === Types.PatternLibraryOrigin.BuiltIn) {
@@ -198,8 +219,7 @@ export class Project {
 			path: serialized.path,
 			pages: [],
 			patternLibraries: serialized.patternLibraries.map(p => PatternLibrary.from(p)),
-			userStore,
-			focusedItemType: deserializeItemType(serialized.focusedItemType)
+			userStore
 		});
 
 		serialized.pages.forEach(page => project.addPage(Page.from(page, { project })));
@@ -289,14 +309,7 @@ export class Project {
 	}
 
 	public getFocusedItem(): Element | Page | undefined {
-		switch (this.focusedItemType) {
-			case Types.ItemType.Element:
-				return this.getElements().find(element => element.getFocused());
-			case Types.ItemType.Page:
-				return this.getPages().find(page => page.getFocused());
-			default:
-				return;
-		}
+		return this.focusedItem;
 	}
 
 	public getFocusedItemType(): Types.ItemType {
@@ -483,7 +496,7 @@ export class Project {
 		this.unsetSelectedElement();
 
 		page.setActive(true);
-		this.setFocusedItem(Types.ItemType.Page, page);
+		this.setFocusedItem(page);
 	}
 
 	@Mobx.action
@@ -513,13 +526,13 @@ export class Project {
 	}
 
 	@Mobx.action
-	public setFocusedItem(type: Types.ItemType, payload: Element | Page | undefined): void {
+	public setFocusedItem(payload: Element | Page | undefined): void {
 		const previousFocusItem = this.getFocusedItem();
 
 		if (previousFocusItem) {
 			previousFocusItem.setFocused(false);
 		}
-		this.focusedItemType = type;
+
 		if (payload) {
 			payload.setFocused(true);
 		}
@@ -568,7 +581,6 @@ export class Project {
 			elements: this.getElements().map(e => e.toJSON()),
 			elementActions: this.getElementActions().map(e => e.toJSON()),
 			elementContents: this.getElementContents().map(e => e.toJSON()),
-			focusedItemType: serializeItemType(this.focusedItemType),
 			id: this.id,
 			name: this.name,
 			pages: this.pages.map(p => p.toJSON()),
@@ -620,27 +632,5 @@ export class Project {
 		this.placeholderHighlightedElements
 			.filter(element => !options || options.ignore.getId() !== element.getId())
 			.forEach(element => element.setPlaceholderHighlighted(false));
-	}
-}
-
-function serializeItemType(type: Types.ItemType): Types.SerializedItemType {
-	switch (type) {
-		case Types.ItemType.None:
-			return 'none';
-		case Types.ItemType.Element:
-			return 'element';
-		case Types.ItemType.Page:
-			return 'page';
-	}
-}
-
-function deserializeItemType(type: Types.SerializedItemType): Types.ItemType {
-	switch (type) {
-		case 'none':
-			return Types.ItemType.None;
-		case 'element':
-			return Types.ItemType.Element;
-		case 'page':
-			return Types.ItemType.Page;
 	}
 }

@@ -1,5 +1,6 @@
 import * as Clipboard from './clipboard';
 import * as Message from '../message';
+import { requestApp } from './request-app';
 import { requestProject } from './request-project';
 import * as Types from '../types';
 import * as uuid from 'uuid';
@@ -17,11 +18,17 @@ export async function createEditMessageHandler(
 		switch (message.type) {
 			case Message.MessageType.Cut:
 			case Message.MessageType.Copy: {
+				const app = await requestApp(injection.sender);
+
+				if (app.getHasFocusedInput()) {
+					return;
+				}
+
 				const project = await requestProject(injection.sender);
 				const focusedItemType = project.getFocusedItemType();
 				const focusedItem = project.getFocusedItem();
 
-				if (!focusedItem || focusedItemType === Types.ItemType.None) {
+				if (!focusedItem) {
 					return;
 				}
 

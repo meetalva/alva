@@ -13,6 +13,25 @@ export function registerGlobalListeners({ store }: { store: ViewStore }): void {
 		}
 	});
 
+	window.addEventListener(
+		'focus',
+		() =>
+			store
+				.getApp()
+				.setHasFocusedInput(
+					['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())
+				),
+		true
+	);
+
+	window.addEventListener(
+		'blur',
+		() => {
+			store.getApp().setHasFocusedInput(false);
+		},
+		true
+	);
+
 	// Disable drag and drop from outside the application
 	document.addEventListener(
 		'dragenter',

@@ -3,6 +3,7 @@ import * as Types from '../types';
 
 export interface AlvaAppInit {
 	activeView: Types.AlvaView;
+	hasFocusedInput: boolean;
 	panes: Set<Types.AppPane>;
 	paneSizes: Types.PaneSize[];
 	rightSidebarTab: Types.RightSidebarTab;
@@ -30,6 +31,8 @@ export class AlvaApp {
 
 	@Mobx.observable private paneSizes: Map<Types.AppPane, Types.PaneSize> = new Map();
 
+	@Mobx.observable private hasFocusedInput: boolean = false;
+
 	public constructor(init?: AlvaAppInit) {
 		if (init) {
 			this.activeView = init.activeView;
@@ -43,6 +46,7 @@ export class AlvaApp {
 	public static from(serialized: Types.SerializedAlvaApp): AlvaApp {
 		return new AlvaApp({
 			activeView: deserializeView(serialized.activeView),
+			hasFocusedInput: serialized.hasFocusedInput,
 			panes: new Set(serialized.panes.map(deserializePane)),
 			paneSizes: serialized.paneSizes.map(p => ({
 				width: p.width,
@@ -57,6 +61,10 @@ export class AlvaApp {
 
 	public getActiveView(): Types.AlvaView {
 		return this.activeView;
+	}
+
+	public getHasFocusedInput(): boolean {
+		return this.hasFocusedInput;
 	}
 
 	public getHoverArea(): Types.HoverArea {
@@ -94,6 +102,11 @@ export class AlvaApp {
 	@Mobx.action
 	public setActiveView(view: Types.AlvaView): void {
 		this.activeView = view;
+	}
+
+	@Mobx.action
+	public setHasFocusedInput(hasFocusedInput: boolean): void {
+		this.hasFocusedInput = hasFocusedInput;
 	}
 
 	@Mobx.action
@@ -146,6 +159,7 @@ export class AlvaApp {
 	public toJSON(): Types.SerializedAlvaApp {
 		return {
 			activeView: serializeView(this.activeView),
+			hasFocusedInput: this.hasFocusedInput,
 			panes: [...this.panes.values()].map(serializePane),
 			paneSizes: [...this.paneSizes.values()].map(paneSize => ({
 				width: paneSize.width,

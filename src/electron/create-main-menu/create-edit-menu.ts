@@ -24,23 +24,33 @@ export function createEditMenu(
 				label: '&Undo',
 				accelerator: 'CmdOrCtrl+Z',
 				enabled: typeof ctx.project !== 'undefined',
-				click: () =>
+				click: () => {
+					if (ctx.app.hasFocusedInput) {
+						return Electron.Menu.sendActionToFirstResponder('redo:');
+					}
+
 					injection.sender.send({
 						id: uuid.v4(),
 						type: MessageType.Undo,
 						payload: undefined
-					})
+					});
+				}
 			},
 			{
 				label: '&Redo',
 				accelerator: 'Shift+CmdOrCtrl+Z',
 				enabled: typeof ctx.project !== 'undefined',
-				click: () =>
+				click: () => {
+					if (ctx.app.hasFocusedInput) {
+						return Electron.Menu.sendActionToFirstResponder('redo:');
+					}
+
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: MessageType.Redo
-					})
+					});
+				}
 			},
 			{
 				type: 'separator'
@@ -50,12 +60,15 @@ export function createEditMenu(
 				enabled: typeof ctx.project !== 'undefined',
 				accelerator: 'CmdOrCtrl+X',
 				click: () => {
+					if (ctx.app.hasFocusedInput) {
+						return Electron.Menu.sendActionToFirstResponder('cut:');
+					}
+
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: MessageType.Cut
 					});
-					Electron.Menu.sendActionToFirstResponder('cut:');
 				}
 			},
 			{
@@ -63,12 +76,15 @@ export function createEditMenu(
 				enabled: typeof ctx.project !== 'undefined',
 				accelerator: 'CmdOrCtrl+C',
 				click: () => {
+					if (ctx.app.hasFocusedInput) {
+						return Electron.Menu.sendActionToFirstResponder('copy:');
+					}
+
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: MessageType.Copy
 					});
-					Electron.Menu.sendActionToFirstResponder('copy:');
 				}
 			},
 			{
@@ -76,12 +92,15 @@ export function createEditMenu(
 				enabled: typeof ctx.project !== 'undefined',
 				accelerator: 'CmdOrCtrl+V',
 				click: () => {
+					if (ctx.app.hasFocusedInput) {
+						return Electron.Menu.sendActionToFirstResponder('paste:');
+					}
+
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: MessageType.Paste
 					});
-					Electron.Menu.sendActionToFirstResponder('paste:');
 				}
 			},
 			{
@@ -104,7 +123,6 @@ export function createEditMenu(
 						},
 						type: MessageType.Paste
 					});
-					Electron.Menu.sendActionToFirstResponder('paste:');
 				}
 			},
 			{
@@ -138,12 +156,14 @@ export function createEditMenu(
 				enabled: typeof ctx.project !== 'undefined',
 				accelerator: process.platform === 'darwin' ? 'Backspace' : 'Delete',
 				click: () => {
+					if (ctx.app.hasFocusedInput) {
+						return Electron.Menu.sendActionToFirstResponder('delete:');
+					}
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: MessageType.Delete
 					});
-					Electron.Menu.sendActionToFirstResponder('delete:');
 				}
 			}
 		]

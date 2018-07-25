@@ -17,7 +17,6 @@ export interface SavedProject {
 	pages: SerializedPage[];
 	patternLibraries: SerializedPatternLibrary[];
 	userStore: UserStore.SerializedUserStore;
-	focusedItemType: SerializedItemType;
 }
 
 export interface SerializedProject extends SavedProject {
@@ -333,6 +332,7 @@ export interface SerializedPaneSize {
 
 export interface SerializedAlvaApp {
 	activeView: SerializedAlvaView;
+	hasFocusedInput: boolean;
 	panes: SerializedAppPane[];
 	paneSizes: SerializedPaneSize[];
 	rightSidebarTab: SerializedRightSidebarTab;

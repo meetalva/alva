@@ -361,10 +361,10 @@ export class ElementList extends React.Component {
 			return null;
 		}
 
+		const childrenContent = rootElement.getContentBySlotType(Types.SlotType.Children);
+
 		const anchors = {
-			[Components.ElementAnchors.content]: (rootElement.getContentBySlotType(
-				Types.SlotType.Children
-			) as Model.ElementContent).getId(),
+			[Components.ElementAnchors.content]: childrenContent ? childrenContent.getId() : '',
 			[Components.ElementAnchors.element]: rootElement.getId()
 		};
 
@@ -388,7 +388,7 @@ export class ElementList extends React.Component {
 				innerRef={ref => (this.ref = ref)}
 			>
 				<Components.Element.ElementChildren>
-					{childContent && <ElementContentContainer content={childContent} />}
+					{childContent ? <ElementContentContainer content={childContent} /> : null}
 				</Components.Element.ElementChildren>
 				<ElementDragImage
 					element={store.getDraggedElement()}

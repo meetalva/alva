@@ -70,9 +70,11 @@ export function createEditMessageHandler({
 				}
 
 				const contextProject = Model.Project.from(message.payload.project);
+
 				const sourceElement = Model.Element.from(message.payload.element, {
 					project: contextProject
 				});
+
 				const clonedElement = sourceElement.clone();
 
 				// TODO: Check if the pattern can be resolved, abort when missing

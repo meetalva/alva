@@ -3,6 +3,45 @@ import * as Mobx from 'mobx';
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../../types';
 
+export class PatternEvent {
+	@Mobx.observable private type: Types.PatternEventType;
+
+	public constructor(init: PatternEventInit) {
+		this.type = init.type;
+	}
+
+	public static from(serialized: Types.SerializedPatternEvent): PatternEvent {
+		return new PatternEvent({
+			type: deserializeEventType(serialized.type)
+		});
+	}
+
+	public getPayloadFields(): string[] {
+		// TODO: Use an Enum
+		switch (this.type) {
+			case Types.PatternEventType.FocusEvent:
+				return ['name', 'value'];
+			case Types.PatternEventType.ChangeEvent:
+			case Types.PatternEventType.InputEvent:
+				return ['name', 'value'];
+			case Types.PatternEventType.MouseEvent:
+				return ['x', 'y'];
+			default:
+				return [];
+		}
+	}
+
+	public getType(): Types.PatternEventType {
+		return this.type;
+	}
+
+	public toJSON(): Types.SerializedPatternEvent {
+		return {
+			type: serializeEventType(this.type)
+		};
+	}
+}
+
 export interface PatternEventHandlerPropertyInit {
 	contextId: string;
 	defaultOptionId?: string;
@@ -55,6 +94,7 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 
 	public toJSON(): Types.SerializedPatternEventHandlerProperty {
 		return {
+			model: this.model,
 			contextId: this.contextId,
 			description: this.description,
 			event: this.event.toJSON(),
@@ -70,7 +110,9 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 		};
 	}
 
-	public update(prop: PatternEventHandlerProperty): void {
+	public update(raw: this | Types.SerializedPatternEventHandlerProperty): void {
+		const prop =
+			raw instanceof PatternEventHandlerProperty ? raw : PatternEventHandlerProperty.from(raw);
 		this.contextId = prop.getContextId();
 		this.description = prop.getDescription();
 		this.event = prop.getEvent();
@@ -83,45 +125,6 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 
 export interface PatternEventInit {
 	type: Types.PatternEventType;
-}
-
-export class PatternEvent {
-	@Mobx.observable private type: Types.PatternEventType;
-
-	public constructor(init: PatternEventInit) {
-		this.type = init.type;
-	}
-
-	public static from(serialized: Types.SerializedPatternEvent): PatternEvent {
-		return new PatternEvent({
-			type: deserializeEventType(serialized.type)
-		});
-	}
-
-	public getPayloadFields(): string[] {
-		// TODO: Use an Enum
-		switch (this.type) {
-			case Types.PatternEventType.FocusEvent:
-				return ['name', 'value'];
-			case Types.PatternEventType.ChangeEvent:
-			case Types.PatternEventType.InputEvent:
-				return ['name', 'value'];
-			case Types.PatternEventType.MouseEvent:
-				return ['x', 'y'];
-			default:
-				return [];
-		}
-	}
-
-	public getType(): Types.PatternEventType {
-		return this.type;
-	}
-
-	public toJSON(): Types.SerializedPatternEvent {
-		return {
-			type: serializeEventType(this.type)
-		};
-	}
 }
 
 function deserializeEventType(type: Types.SerializedPatternEventType): Types.PatternEventType {

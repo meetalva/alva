@@ -46,6 +46,9 @@ export enum MessageType {
 	KeyboardChange = 'keyboard-change',
 	Log = 'log',
 	Maximize = 'maximize',
+	MobxAdd = 'mobx-add',
+	MobxUpdate = 'mobx-update',
+	MobxSplice = 'mobx-splice',
 	OpenExternalURL = 'open-external-url',
 	OpenFileRequest = 'open-file-request',
 	OpenFileResponse = 'open-file-response',
@@ -116,6 +119,9 @@ export type Message =
 	| KeyboardChange
 	| Log
 	| Maximize
+	| MobxAddMessage
+	| MobxUpdateMessage
+	| MobxSpliceMessage
 	| OpenExternalURL
 	| OpenFileRequest
 	| OpenFileResponse
@@ -331,3 +337,64 @@ export type Clipboard = Envelope<
 		project: Types.SerializedProject;
 	}
 >;
+
+export interface MobxUpdatePayload {
+	id: string;
+	name: string;
+	change: MobxUpdateChange;
+}
+
+export interface MobxAddPayload<T = unknown> {
+	id: string;
+	name: string;
+	memberName: string;
+	valueModel: Types.ModelName | undefined;
+	change: MobxAddChange<T>;
+}
+
+export interface MobxSplicePayload<T = unknown> {
+	id: string;
+	name: string;
+	memberName: string;
+	change: MobxSpliceChange<T>;
+}
+
+export interface MobxAddChange<T> {
+	type: Types.MobxChangeType.Add;
+	key: string;
+	newValue: T;
+}
+
+export interface MobxSpliceChange<T> {
+	type: Types.MobxChangeType.Splice;
+	index: number;
+	added: T[];
+	removed: T[];
+}
+
+export type MobxUpdateChange =
+	| MobxArrayUpdatePayload
+	| MobxMapUpdatePayload
+	| MobxObjectUpdatePayload;
+
+export interface MobxArrayUpdatePayload<T = unknown> {
+	type: Types.MobxChangeType.Update;
+	index: number;
+	newValue: T;
+}
+
+export interface MobxMapUpdatePayload<T = unknown> {
+	type: Types.MobxChangeType.Update;
+	key: string;
+	newValue: T;
+}
+
+export interface MobxObjectUpdatePayload<T = unknown> {
+	type: Types.MobxChangeType.Update;
+	key: string;
+	newValue: T;
+}
+
+export type MobxUpdateMessage = Envelope<MessageType.MobxUpdate, MobxUpdatePayload>;
+export type MobxAddMessage = Envelope<MessageType.MobxAdd, MobxAddPayload>;
+export type MobxSpliceMessage = Envelope<MessageType.MobxSplice, MobxSplicePayload>;

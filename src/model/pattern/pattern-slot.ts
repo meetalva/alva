@@ -14,6 +14,8 @@ export interface PatternSlotInit {
 }
 
 export class PatternSlot {
+	public readonly model = Types.ModelName.PatternSlot;
+
 	private contextId: string;
 	private displayName: string;
 	private description: string;
@@ -81,6 +83,7 @@ export class PatternSlot {
 
 	public toJSON(): Types.SerializedPatternSlot {
 		return {
+			model: this.model,
 			contextId: this.contextId,
 			description: this.description,
 			example: this.example,
@@ -93,15 +96,17 @@ export class PatternSlot {
 		};
 	}
 
-	public update(b: this): void {
+	public update(raw: PatternSlot | Types.SerializedPatternSlot): void {
+		const b = raw instanceof PatternSlot ? raw.toJSON() : raw;
+
 		this.contextId = b.contextId;
 		this.description = b.description;
 		this.example = b.example;
 		this.hidden = b.hidden;
-		this.displayName = b.displayName;
+		this.displayName = b.label;
 		this.propertyName = b.propertyName;
 		this.required = b.required;
-		this.type = b.type;
+		this.type = toSlotType(b.type);
 	}
 }
 

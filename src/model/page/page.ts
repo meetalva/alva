@@ -24,6 +24,8 @@ export interface PageContext {
 }
 
 export class Page {
+	public readonly model = Types.ModelName.Page;
+
 	@Mobx.observable private focused: boolean;
 	@Mobx.observable private editedName: string = '';
 	@Mobx.observable private id: string;
@@ -262,6 +264,7 @@ export class Page {
 
 	public toJSON(): Types.SerializedPage {
 		return {
+			model: this.model,
 			active: this.getActive(),
 			focused: this.getFocused(),
 			id: this.getId(),
@@ -270,7 +273,8 @@ export class Page {
 		};
 	}
 
-	public update(b: Page): void {
+	public update(raw: Page | Types.SerializedPage): void {
+		const b = raw instanceof Page ? raw.toJSON() : raw;
 		this.active = b.active;
 		this.name = b.name;
 		this.rootId = b.rootId;

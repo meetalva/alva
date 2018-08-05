@@ -14,6 +14,8 @@ export interface UserStoreActionInit {
 }
 
 export class UserStoreAction {
+	public readonly model = 'UserStoreAction';
+
 	private acceptsProperty: boolean;
 	private id: string;
 	@Mobx.observable private name: string;
@@ -92,6 +94,7 @@ export class UserStoreAction {
 
 	public toJSON(): Types.SerializedUserStoreAction {
 		return {
+			model: 'UserStoreAction',
 			acceptsProperty: this.acceptsProperty,
 			id: this.id,
 			name: this.name,
@@ -106,12 +109,14 @@ export class UserStoreAction {
 	}
 
 	@Mobx.action
-	public update(b: this): void {
+	public update(raw: this | Types.SerializedUserStoreAction): void {
+		const b = raw instanceof UserStoreAction ? raw.toJSON() : raw;
+
 		this.acceptsProperty = b.acceptsProperty;
 		this.id = b.id;
 		this.name = b.name;
-		this.userStorePropertyId = b.userStorePropertyId;
-		this.type = b.type;
+		this.userStorePropertyId = b.storePropertyId;
+		this.type = deserializeType(b.type);
 	}
 }
 

@@ -33,6 +33,7 @@ export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefi
 
 	public toJSON(): Types.SerializedPatternBooleanProperty {
 		return {
+			model: this.model,
 			contextId: this.contextId,
 			defaultValue: this.defaultValue,
 			description: this.description,
@@ -48,7 +49,8 @@ export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefi
 		};
 	}
 
-	public update(prop: PatternBooleanProperty): void {
+	public update(raw: PatternBooleanProperty | Types.SerializedPatternBooleanProperty): void {
+		const prop = raw instanceof PatternBooleanProperty ? raw : PatternBooleanProperty.from(raw);
 		this.contextId = prop.getContextId();
 		this.defaultValue = prop.getDefaultValue();
 		this.description = prop.getDescription();

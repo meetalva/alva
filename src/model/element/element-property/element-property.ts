@@ -20,6 +20,8 @@ export interface ElementPropertyContext {
 }
 
 export class ElementProperty {
+	public readonly model = Types.ModelName.ElementProperty;
+
 	@Mobx.observable private id: string;
 	@Mobx.observable private patternPropertyId: string;
 	private project: Project;
@@ -197,6 +199,7 @@ export class ElementProperty {
 
 	public toJSON(): Types.SerializedElementProperty {
 		return {
+			model: this.model,
 			id: this.id,
 			patternPropertyId: this.patternPropertyId,
 			setDefault: this.setDefault,
@@ -205,10 +208,12 @@ export class ElementProperty {
 	}
 
 	@Mobx.action
-	public update(b: ElementProperty): void {
-		this.id = b.id;
-		this.patternPropertyId = b.patternPropertyId;
-		this.setDefault = b.setDefault;
-		this.value = b.value;
+	public update(b: ElementProperty | Types.SerializedElementProperty): void {
+		const data = b instanceof ElementProperty ? b.toJSON() : b;
+
+		this.id = data.id;
+		this.patternPropertyId = data.patternPropertyId;
+		this.setDefault = data.setDefault;
+		this.value = data.value;
 	}
 }

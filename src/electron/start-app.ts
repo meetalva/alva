@@ -5,6 +5,7 @@ import * as Ephemeral from './ephemeral-store';
 import * as Events from 'events';
 import * as getPort from 'get-port';
 import * as Message from '../message';
+import * as Model from '../model';
 import { Sender } from '../sender/server';
 import { createServer } from '../server';
 import { createWindow } from './create-window';
@@ -13,6 +14,7 @@ import * as uuid from 'uuid';
 const log = require('electron-log');
 
 export interface AppContext {
+	project: undefined | Model.Project;
 	port: undefined | number;
 	sender: undefined | Sender;
 	win: undefined | Electron.BrowserWindow;
@@ -28,7 +30,7 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 	ctx.port = await (getPort({ port: ctx.port }) as Promise<number>);
 
 	const sender = new Sender();
-	const server = createServer({ port: ctx.port, sender });
+	const server = createServer({ port: ctx.port, sender, context: ctx });
 	const ephemeralStore = new Ephemeral.EphemeralStore();
 
 	const serverMessageHandler = await createServerMessageHandler(ctx, {

@@ -1,48 +1,24 @@
 import * as Express from 'express';
 import * as Path from 'path';
 import * as PreviewDocument from '../preview-document';
-import { ProjectRequestResponsePair, MessageType } from '../message';
 import { Sender } from '../sender/server';
 import * as Model from '../model';
-import * as Types from '../types';
-import * as uuid from 'uuid';
 
 export interface StaticRouteOptions {
-	sender: Sender;
+	project: Model.Project | undefined;
+	sender: Sender | undefined;
 }
 
 export function createStaticRoute(options: StaticRouteOptions): Express.RequestHandler {
 	return async function staticRoute(req: Express.Request, res: Express.Response): Promise<void> {
 		res.type('html');
 
-		const projectResponse = await options.sender.request<ProjectRequestResponsePair>(
-			{
-				id: uuid.v4(),
-				type: MessageType.ProjectRequest,
-				payload: undefined
-			},
-			MessageType.ProjectResponse
-		);
-
-		if (projectResponse.payload.status === Types.ProjectStatus.None) {
-			res.sendStatus(404);
+		if (!options.project) {
+			res.send(404);
 			return;
 		}
 
-		if (projectResponse.payload.status === Types.ProjectStatus.Error) {
-			res.sendStatus(500);
-			return;
-		}
-
-		if (
-			projectResponse.payload.status !== Types.ProjectStatus.Ok ||
-			typeof projectResponse.payload.data === 'undefined'
-		) {
-			res.sendStatus(500);
-			return;
-		}
-
-		const project = Model.Project.from(projectResponse.payload.data);
+		const project = options.project;
 		const firstPage = project.getPages()[0];
 
 		const id = Path.basename(req.path, Path.extname(req.path));

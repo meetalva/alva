@@ -38,6 +38,8 @@ export interface PatternLibraryCreateOptions {
 }
 
 export class PatternLibrary {
+	public readonly model = Types.ModelName.PatternLibrary;
+
 	@Mobx.observable private bundleId: string;
 	@Mobx.observable private bundle: string;
 	@Mobx.observable private description: string;
@@ -363,6 +365,7 @@ export class PatternLibrary {
 
 	public toJSON(): Types.SerializedPatternLibrary {
 		return {
+			model: this.model,
 			bundleId: this.bundleId,
 			bundle: this.bundle,
 			description: this.description,
@@ -376,7 +379,9 @@ export class PatternLibrary {
 	}
 
 	@Mobx.action
-	public update(b: PatternLibrary): void {
+	public update(raw: PatternLibrary | Types.SerializedPatternLibrary): void {
+		const b = raw instanceof PatternLibrary ? raw : PatternLibrary.from(raw);
+
 		this.bundleId = b.bundleId;
 		this.bundle = b.bundle;
 		this.description = b.description;

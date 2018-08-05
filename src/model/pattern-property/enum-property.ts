@@ -94,6 +94,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 
 	public toJSON(): Types.SerializedPatternEnumProperty {
 		return {
+			model: this.model,
 			contextId: this.contextId,
 			defaultOptionId: this.defaultOptionId,
 			example: String(this.example),
@@ -110,7 +111,8 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		};
 	}
 
-	public update(prop: PatternEnumProperty): void {
+	public update(raw: PatternEnumProperty | Types.SerializedPatternEnumProperty): void {
+		const prop = raw instanceof PatternEnumProperty ? raw : PatternEnumProperty.from(raw);
 		this.contextId = prop.getContextId();
 		this.defaultOptionId = prop.getDefaultOptionId();
 		this.example = prop.getExample();

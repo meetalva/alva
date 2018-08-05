@@ -84,6 +84,8 @@ export function onStoreCreate(store: Alva.DesignTimeUserStore): Alva.DesignTimeU
 `;
 
 export class UserStoreEnhancer {
+	public readonly model = Types.ModelName.UserStoreEnhancer;
+
 	@Mobx.observable private id: string;
 	@Mobx.observable private code: string;
 
@@ -130,6 +132,10 @@ export class UserStoreEnhancer {
 		return this.code;
 	}
 
+	public getId(): string {
+		return this.id;
+	}
+
 	public getJavaScript(): string {
 		return this.js;
 	}
@@ -149,12 +155,14 @@ export class UserStoreEnhancer {
 
 	public toJSON(): Types.SerializedUserStoreEnhancer {
 		return {
+			model: this.model,
 			id: this.id,
 			code: this.code
 		};
 	}
 
-	public update(b: this): void {
+	public update(raw: this | UserStoreEnhancer): void {
+		const b = raw instanceof UserStoreEnhancer ? raw : UserStoreEnhancer.from(raw);
 		this.code = b.code;
 	}
 }

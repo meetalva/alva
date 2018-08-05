@@ -104,73 +104,85 @@ function main(): void {
 			});
 		});
 
-		sender.match<Message.ChangeElements>(Message.MessageType.ChangeElements, message => {
-			Mobx.transaction(() => {
-				const els = message.payload.elements.map(e => Model.Element.from(e, { project }));
+		sender.match<Message.MobxUpdateMessage>(Message.MessageType.MobxUpdate, message => {
+			if (message.payload.change.hasOwnProperty('key')) {
+				const change = message.payload.change as
+					| Message.MobxObjectUpdatePayload
+					| Message.MobxMapUpdatePayload;
+				const object = store.getObject(message.payload.name, message.payload.id);
 
-				const changes = computeDifference<Model.Element>({
-					before: project.getElements(),
-					after: els
-				});
-
-				changes.added.forEach(change => project.addElement(change.after));
-				changes.removed.forEach(change => project.removeElement(change.before));
-				changes.changed.forEach(change => change.before.update(change.after));
-
-				const selectedElement = els.find(e => e.getSelected());
-				const highlightedElement = els.find(e => e.getHighlighted());
-
-				if (selectedElement) {
-					const el = project.getElementById(selectedElement.getId());
-					if (el) {
-						project.setSelectedElement(el);
-					}
+				if (!object) {
+					// console.log(message);
+					return;
 				}
 
-				if (highlightedElement) {
-					const el = project.getElementById(highlightedElement.getId());
-					if (el) {
-						project.setHighlightedElement(el);
-					}
-				}
-			});
+				const changedData = object.toJSON();
+				changedData[change.key] = change.newValue;
+
+				// tslint:disable-next-line:no-any
+				(object.update as any)(changedData);
+			}
+
+			if (message.payload.change.hasOwnProperty('index')) {
+				console.log('MobxArrayUpdatePayload', message);
+				// const change = message.payload.change as Message.MobxArrayUpdatePayload;
+			}
 		});
 
-		sender.match<Message.ChangeElementContents>(
-			Message.MessageType.ChangeElementContents,
-			message => {
-				Mobx.transaction(() => {
-					const contentChanges = computeDifference<Model.ElementContent>({
-						before: project.getElementContents(),
-						after: message.payload.elementContents.map(e =>
-							Model.ElementContent.from(e, { project })
-						)
-					});
-					contentChanges.added.forEach(change => project.addElementContent(change.after));
-					contentChanges.removed.forEach(change =>
-						project.removeElementContent(change.before)
-					);
-					contentChanges.changed.forEach(change => change.before.update(change.after));
-				});
-			}
-		);
+		sender.match<Message.MobxAddMessage>(Message.MessageType.MobxAdd, message => {
+			const parent = store.getObject(message.payload.name, message.payload.id);
+			const ValueModel = store.getModel(message.payload.valueModel);
 
-		sender.match<Message.ChangeElementActions>(
-			Message.MessageType.ChangeElementActions,
-			message => {
-				Mobx.transaction(() => {
-					const changes = computeDifference<Model.ElementAction>({
-						before: project.getElementActions(),
-						after: message.payload.elementActions.map(e =>
-							Model.ElementAction.from(e, { userStore: project.getUserStore() })
-						)
-					});
-					changes.added.forEach(change => project.addElementAction(change.after));
-					changes.removed.forEach(change => project.removeElementAction(change.before));
-					changes.changed.forEach(change => change.before.update(change.after));
-				});
+			if (!parent) {
+				console.log(message);
+				return;
 			}
-		);
+
+			const mayBeMember = parent[message.payload.memberName];
+
+			if (!mayBeMember) {
+				return;
+			}
+
+			const value = ValueModel
+				? ValueModel.from(message.payload.change.newValue, { project })
+				: message.payload.change.newValue;
+
+			if (typeof value === 'object' && !ValueModel) {
+				console.log(message);
+			}
+
+			const member = mayBeMember as Map<unknown, unknown>;
+			member.set(message.payload.change.key, value);
+		});
+
+		sender.match<Message.MobxSpliceMessage>(Message.MessageType.MobxSplice, message => {
+			const parent = store.getObject(message.payload.name, message.payload.id);
+
+			if (!parent) {
+				console.log(message);
+				return;
+			}
+
+			const changedData = parent.toJSON();
+			const target = changedData[message.payload.memberName];
+
+			if (!Array.isArray(target)) {
+				console.log(message);
+				return;
+			}
+
+			if (message.payload.change.removed.length > 0) {
+				target.splice(message.payload.change.index, message.payload.change.removed.length);
+			}
+
+			if (message.payload.change.added.length > 0) {
+				target.splice(message.payload.change.index, 0, ...message.payload.change.added);
+			}
+
+			// tslint:disable-next-line:no-any
+			(parent.update as any)(changedData);
+		});
 
 		sender.match<Message.ChangePatternLibraries>(
 			Message.MessageType.ChangePatternLibraries,
@@ -211,10 +223,6 @@ function main(): void {
 				});
 			}
 		);
-
-		sender.match<Message.ChangeUserStore>(Message.MessageType.ChangeUserStore, message => {
-			project.getUserStore().sync(message);
-		});
 
 		Mobx.reaction(
 			() => store.hasSelectedItem(),
@@ -267,7 +275,7 @@ function main(): void {
 			}
 		);
 
-		Mobx.autorun(
+		/* Mobx.autorun(
 			() => {
 				const userStore = store.getProject().getUserStore();
 
@@ -280,7 +288,7 @@ function main(): void {
 			{
 				scheduler: window.requestIdleCallback
 			}
-		);
+		); */
 	}
 }
 

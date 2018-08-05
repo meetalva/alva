@@ -39,6 +39,8 @@ export async function createFileMessageHandler(
 						path
 					});
 
+					ctx.project = project;
+
 					await Persistence.persist(path, project);
 					injection.ephemeralStore.setProjectPath(path);
 
@@ -89,6 +91,8 @@ export async function createFileMessageHandler(
 				if (typeof project === 'object') {
 					project.path = path;
 				}
+
+				ctx.project = Model.Project.from(project);
 
 				injection.sender.send({
 					type: Message.MessageType.OpenFileResponse,

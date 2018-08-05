@@ -1,15 +1,17 @@
 import * as Electron from 'electron';
+import * as Mobx from 'mobx';
 import * as Path from 'path';
 import { AppContext, startApp as start } from './start-app';
 
 const clearModule = require('clear-module');
 const importFresh = require('import-fresh');
 
-const CONTEXT: AppContext = {
+const CONTEXT: AppContext = Mobx.observable({
 	port: undefined,
+	project: undefined,
 	sender: undefined,
 	win: undefined
-};
+});
 
 async function main(): Promise<void> {
 	const StartApp = importFresh('./start-app');

@@ -10,6 +10,8 @@ export interface UserStoreReferenceInit {
 }
 
 export class UserStoreReference {
+	public readonly model = Types.ModelName.UserStoreReference;
+
 	private id: string;
 	@Mobx.observable private open: boolean;
 	@Mobx.observable private elementPropertyId: string;
@@ -57,7 +59,9 @@ export class UserStoreReference {
 	}
 
 	@Mobx.action
-	public update(b: this): void {
+	public update(raw: this | Types.SerializedUserStoreReference): void {
+		const b = raw instanceof UserStoreReference ? raw : UserStoreReference.from(raw);
+
 		this.id = b.id;
 		this.open = b.open;
 		this.elementPropertyId = b.elementPropertyId;
@@ -66,6 +70,7 @@ export class UserStoreReference {
 
 	public toJSON(): Types.SerializedUserStoreReference {
 		return {
+			model: this.model,
 			id: this.id,
 			open: this.open,
 			elementPropertyId: this.elementPropertyId,

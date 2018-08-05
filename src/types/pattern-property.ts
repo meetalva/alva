@@ -1,4 +1,5 @@
 import { IconName } from '../components';
+import { ModelName } from './types';
 
 export enum PatternPropertyType {
 	Asset = 'asset',
@@ -50,6 +51,7 @@ export type SerializedPatternProperty =
 	| SerializedHrefProperty;
 
 export interface SerializedPropertyBase {
+	model: ModelName.PatternProperty;
 	contextId: string;
 	description: string;
 	example: string;

@@ -1,13 +1,11 @@
 import * as Express from 'express';
-import { ProjectRequestResponsePair, MessageType } from '../message';
 import { Sender } from '../sender/server';
 import * as Model from '../model';
 import * as Path from 'path';
-import * as Types from '../types';
-import * as uuid from 'uuid';
 
 export interface LibrariesRouteOptions {
-	sender: Sender;
+	sender: Sender | undefined;
+	project: Model.Project | undefined;
 }
 
 export function createLibrariesRoute(options: LibrariesRouteOptions): Express.RequestHandler {
@@ -15,36 +13,13 @@ export function createLibrariesRoute(options: LibrariesRouteOptions): Express.Re
 		req: Express.Request,
 		res: Express.Response
 	): Promise<void> {
-		const projectResponse = await options.sender.request<ProjectRequestResponsePair>(
-			{
-				id: uuid.v4(),
-				type: MessageType.ProjectRequest,
-				payload: undefined
-			},
-			MessageType.ProjectResponse
-		);
-
-		if (projectResponse.payload.status === Types.ProjectStatus.None) {
-			res.sendStatus(404);
-			return;
-		}
-
-		if (projectResponse.payload.status === Types.ProjectStatus.Error) {
-			res.sendStatus(500);
-			return;
-		}
-
-		if (
-			projectResponse.payload.status !== Types.ProjectStatus.Ok ||
-			typeof projectResponse.payload.data === 'undefined'
-		) {
-			res.sendStatus(500);
+		if (!options.project) {
+			res.send(404);
 			return;
 		}
 
 		const id = Path.basename(req.path, Path.extname(req.path));
-		const project = Model.Project.from(projectResponse.payload.data);
-		const patternLibrary = project.getPatternLibraryById(id);
+		const patternLibrary = options.project.getPatternLibraryById(id);
 
 		if (typeof patternLibrary === 'undefined') {
 			res.sendStatus(404);

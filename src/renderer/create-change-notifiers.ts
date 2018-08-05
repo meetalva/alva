@@ -79,7 +79,8 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 				switch (change.type) {
 					case Types.MobxChangeType.Update: {
 						if (change.hasOwnProperty('index')) {
-							const arrayChange = change as Types.MobxArrayUpdate;
+							console.log(change);
+							/* const arrayChange = change as Types.MobxArrayUpdate;
 
 							sender.send({
 								id: uuid.v4(),
@@ -93,18 +94,21 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 										newValue: change.newValue
 									}
 								}
-							});
+							}); */
 						}
 
 						if (change.hasOwnProperty('key')) {
-							const objectChange = change as Types.MobxObjectUpdate | Types.MobxMapUpdate;
+							const objectChange = change as
+								| Types.MobxObjectUpdate<Model.AnyModel>
+								| Types.MobxMapUpdate<string, Model.AnyModel>;
 
 							sender.send({
 								id: uuid.v4(),
 								type: Message.MessageType.MobxUpdate,
 								payload: {
-									id: change.object.id,
-									name: change.object.constructor.name,
+									// tslint:disable-next-line:no-any
+									id: (objectChange.object as any).id,
+									name: objectChange.object.constructor.name,
 									change: {
 										type: objectChange.type,
 										key: objectChange.key,
@@ -153,8 +157,34 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 								valueModel: typeof newValue === 'object' ? newValue.model : undefined,
 								change: {
 									type: change.type,
-									key: change.key,
+									key: change.key as string,
 									newValue
+								}
+							}
+						});
+
+						break;
+					}
+
+					case Types.MobxChangeType.Delete: {
+						const parent = getParentByMember(change.object, { name: change.name, project });
+						const name = parseChangeName(change.name);
+						const deletion = change as Types.MobxDelete<string, Model.AnyModel>;
+
+						if (!parent) {
+							return;
+						}
+
+						sender.send({
+							id: uuid.v4(),
+							type: Message.MessageType.MobxDelete,
+							payload: {
+								id: parent.getId(),
+								name: name.parentName,
+								memberName: name.memberName,
+								change: {
+									type: deletion.type,
+									key: deletion.key
 								}
 							}
 						});
@@ -185,6 +215,8 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 								}
 							}
 						});
+
+						break;
 					}
 				}
 			});

@@ -1,3 +1,4 @@
+import { AnyModel } from './any-model';
 import { Element, ElementContent, ElementProperty } from './element';
 import { ElementAction } from './element-action';
 import * as Mobx from 'mobx';
@@ -344,6 +345,62 @@ export class Project {
 		}
 
 		return this.pages[nextIndex];
+	}
+
+	public getObject(constructorName: string, id: string): AnyModel | undefined {
+		if (constructorName === 'Element') {
+			return this.getElementById(id);
+		}
+
+		if (constructorName === 'ElementAction') {
+			return this.getElementActionById(id);
+		}
+
+		if (constructorName === 'ElementContent') {
+			return this.getElementContentById(id);
+		}
+
+		if (constructorName === 'ElementProperty') {
+			return this.getElementPropertyById(id);
+		}
+
+		if (constructorName === 'Page') {
+			return this.getPageById(id);
+		}
+
+		if (constructorName === 'Pattern') {
+			return this.getPatternById(id);
+		}
+
+		if (constructorName === 'PatternLibrary') {
+			return this.getPatternLibraryById(id);
+		}
+
+		if (constructorName === 'Project') {
+			return this;
+		}
+
+		if (constructorName === 'UserStore') {
+			return this.getUserStore();
+		}
+
+		if (constructorName === 'UserStoreAction') {
+			return this.getUserStore().getActionById(id);
+		}
+
+		if (constructorName === 'UserStoreProperty') {
+			return this.getUserStore().getPropertyById(id);
+		}
+
+		if (constructorName === 'UserStoreEnhancer') {
+			return this.getUserStore().getEnhancer();
+		}
+
+		if (constructorName === 'UserStoreReference') {
+			return this.getUserStore().getReferenceById(id);
+		}
+
+		return;
 	}
 
 	public getPageById(id: string): Page | undefined {

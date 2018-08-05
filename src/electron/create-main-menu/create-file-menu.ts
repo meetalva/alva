@@ -1,8 +1,7 @@
 import * as Electron from 'electron';
+import { MainMenuContext } from '.';
 import { MessageType } from '../../message';
-import * as Model from '../../model';
 import { Sender } from '../../sender/server';
-import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface FileMenuInjection {
@@ -10,11 +9,10 @@ export interface FileMenuInjection {
 }
 
 export function createFileMenu(
-	ctx: Types.MainMenuContext,
+	ctx: MainMenuContext,
 	injection: FileMenuInjection
 ): Electron.MenuItemConstructorOptions {
-	const project = ctx.project ? Model.Project.from(ctx.project) : undefined;
-	const activePage = project && project.getPages().find(p => p.getActive());
+	const activePage = ctx.project && ctx.project.getPages().find(p => p.getActive());
 
 	return {
 		label: '&File',
@@ -116,7 +114,7 @@ export function createFileMenu(
 						enabled: Boolean(activePage),
 						accelerator: 'CmdOrCtrl+Shift+E',
 						click: async () => {
-							if (!project) {
+							if (!ctx.project) {
 								return;
 							}
 

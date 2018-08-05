@@ -261,7 +261,6 @@ export interface ElementContextMenuRequest {
 
 export interface ElementContextMenuRequestPayload {
 	element: SerializedModel.SerializedElement;
-	project: SerializedModel.SerializedProject;
 }
 
 export interface LayoutContextMenuRequest {
@@ -279,11 +278,6 @@ export enum AppPane {
 	ElementsPane = 'elements-pane',
 	PropertiesPane = 'properties-pane',
 	DevelopmentPane = 'development-pane'
-}
-
-export interface MainMenuContext {
-	app: SerializedModel.SerializedAlvaApp;
-	project?: SerializedModel.SerializedProject;
 }
 
 export enum ItemType {

@@ -8,6 +8,7 @@ import * as Clipboard from './clipboard';
 
 export interface ContextMenuContex {
 	sender: Sender;
+	project?: Model.Project;
 }
 
 export async function showContextMenu(
@@ -34,7 +35,11 @@ async function createElementMenu(
 	data: Types.ElementContextMenuRequestPayload,
 	context: ContextMenuContex
 ): Promise<Electron.MenuItemConstructorOptions[]> {
-	const element = Model.Element.from(data.element, { project: Model.Project.from(data.project) });
+	if (!context.project) {
+		return [];
+	}
+
+	const element = Model.Element.from(data.element, { project: context.project });
 	const clipboard = Clipboard.getClipboard();
 	const hasElementClipboard = clipboard ? clipboard.payload.type === 'element' : false;
 

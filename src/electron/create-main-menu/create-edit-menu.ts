@@ -1,8 +1,8 @@
 import * as Electron from 'electron';
 import { MessageType } from '../../message';
-import * as Model from '../../model';
 import { Sender } from '../../sender/server';
 import * as Types from '../../types';
+import { MainMenuContext } from '.';
 import * as uuid from 'uuid';
 
 export interface EditMenuInjection {
@@ -10,22 +10,22 @@ export interface EditMenuInjection {
 }
 
 export function createEditMenu(
-	ctx: Types.MainMenuContext,
+	{ app, project }: MainMenuContext,
 	injection: EditMenuInjection
 ): Electron.MenuItemConstructorOptions {
-	const project = ctx.project ? Model.Project.from(ctx.project) : undefined;
-	const activePage = project && project.getPages().find(p => p.getActive());
-	const selectedElement = project && project.getElements().find(e => e.getSelected());
+	const selectedElement = project ? project.getElements().find(e => e.getSelected()) : undefined;
+	const activePage = project ? project.getPages().find(p => p.getActive()) : undefined;
 
 	return {
-		label: '&Edit',
+		label: 'Edit',
+		role: 'edit',
 		submenu: [
 			{
 				label: '&Undo',
 				accelerator: 'CmdOrCtrl+Z',
-				enabled: typeof ctx.project !== 'undefined',
+				enabled: typeof project !== 'undefined',
 				click: () => {
-					if (ctx.app.hasFocusedInput) {
+					if (app.getHasFocusedInput()) {
 						return Electron.Menu.sendActionToFirstResponder('redo:');
 					}
 
@@ -39,9 +39,9 @@ export function createEditMenu(
 			{
 				label: '&Redo',
 				accelerator: 'Shift+CmdOrCtrl+Z',
-				enabled: typeof ctx.project !== 'undefined',
+				enabled: typeof project !== 'undefined',
 				click: () => {
-					if (ctx.app.hasFocusedInput) {
+					if (app.getHasFocusedInput()) {
 						return Electron.Menu.sendActionToFirstResponder('redo:');
 					}
 
@@ -57,10 +57,10 @@ export function createEditMenu(
 			},
 			{
 				label: '&Cut',
-				enabled: typeof ctx.project !== 'undefined',
+				enabled: typeof project !== 'undefined',
 				accelerator: 'CmdOrCtrl+X',
 				click: () => {
-					if (ctx.app.hasFocusedInput) {
+					if (app.getHasFocusedInput()) {
 						return Electron.Menu.sendActionToFirstResponder('cut:');
 					}
 
@@ -73,10 +73,10 @@ export function createEditMenu(
 			},
 			{
 				label: 'C&opy',
-				enabled: typeof ctx.project !== 'undefined',
+				enabled: typeof project !== 'undefined',
 				accelerator: 'CmdOrCtrl+C',
 				click: () => {
-					if (ctx.app.hasFocusedInput) {
+					if (app.getHasFocusedInput()) {
 						return Electron.Menu.sendActionToFirstResponder('copy:');
 					}
 
@@ -89,10 +89,10 @@ export function createEditMenu(
 			},
 			{
 				label: '&Paste',
-				enabled: typeof ctx.project !== 'undefined',
+				enabled: typeof project !== 'undefined',
 				accelerator: 'CmdOrCtrl+V',
 				click: () => {
-					if (ctx.app.hasFocusedInput) {
+					if (app.getHasFocusedInput()) {
 						return Electron.Menu.sendActionToFirstResponder('paste:');
 					}
 
@@ -106,7 +106,8 @@ export function createEditMenu(
 			{
 				label: '&Paste Inside',
 				enabled:
-					typeof ctx.project !== 'undefined' &&
+					!app.getHasFocusedInput() &&
+					typeof project !== 'undefined' &&
 					typeof selectedElement !== 'undefined' &&
 					selectedElement.acceptsChildren(),
 				accelerator: 'CmdOrCtrl+Shift+V',
@@ -130,7 +131,9 @@ export function createEditMenu(
 			},
 			{
 				label: '&Duplicate',
-				enabled: typeof selectedElement !== 'undefined' || typeof activePage !== 'undefined',
+				enabled:
+					typeof selectedElement !== 'undefined' ||
+					(typeof activePage !== 'undefined' && !app.getHasFocusedInput()),
 				accelerator: 'CmdOrCtrl+D',
 				click: () => {
 					injection.sender.send({
@@ -153,10 +156,10 @@ export function createEditMenu(
 			},
 			{
 				label: '&Delete',
-				enabled: typeof ctx.project !== 'undefined',
+				enabled: typeof project !== 'undefined',
 				accelerator: process.platform === 'darwin' ? 'Backspace' : 'Delete',
 				click: () => {
-					if (ctx.app.hasFocusedInput) {
+					if (app.getHasFocusedInput()) {
 						return Electron.Menu.sendActionToFirstResponder('delete:');
 					}
 					injection.sender.send({

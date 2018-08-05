@@ -1,3 +1,10 @@
+import { AlvaApp, Project } from '../../model';
+
+export interface MainMenuContext {
+	app: AlvaApp;
+	project?: Project;
+}
+
 export * from './create-app-menu';
 export * from './create-edit-menu';
 export * from './create-file-menu';

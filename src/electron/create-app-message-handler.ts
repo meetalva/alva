@@ -1,11 +1,10 @@
 import * as Electron from 'electron';
 import * as Message from '../message';
+import * as Model from '../model';
 import * as uuid from 'uuid';
 import { checkForUpdates } from './auto-updater';
 import { showError } from './show-error';
-import { requestAppSafely } from './request-app';
 import { showContextMenu } from './show-context-menu';
-import { showMainMenu } from './show-main-menu';
 import * as Types from '../types';
 
 import {
@@ -93,30 +92,13 @@ export async function createAppMessageHandler(
 				break;
 			}
 			case Message.MessageType.ContextMenuRequest: {
-				showContextMenu(message.payload, { sender: injection.sender });
+				showContextMenu(message.payload, { sender: injection.sender, project: ctx.project });
 				break;
 			}
 			case Message.MessageType.ChangeApp: {
-				/* injection.ephemeralStore.setAppState(message.payload.app);
-
-				showMainMenu(
-					{ app: message.payload.app, project: project ? project.toJSON() : undefined },
-					{ sender: injection.sender }
-				); */
-
+				// TODO: Replace with app.sync
+				ctx.app = Model.AlvaApp.from(message.payload.app);
 				break;
-			}
-			case Message.MessageType.ChangeProject: {
-				const app = await requestAppSafely(injection.sender);
-
-				if (!app) {
-					return;
-				}
-
-				showMainMenu(
-					{ app: app.toJSON(), project: message.payload.project },
-					{ sender: injection.sender }
-				);
 			}
 		}
 	};

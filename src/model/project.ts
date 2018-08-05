@@ -28,6 +28,8 @@ export interface ProjectCreateInit {
 }
 
 export class Project {
+	public readonly model = Types.ModelName.Project;
+
 	@Mobx.observable private elements: Map<string, Element> = new Map();
 
 	@Mobx.observable private elementActions: Map<string, ElementAction> = new Map();
@@ -578,6 +580,7 @@ export class Project {
 
 	public toJSON(): Types.SerializedProject {
 		return {
+			model: this.model,
 			elements: this.getElements().map(e => e.toJSON()),
 			elementActions: this.getElementActions().map(e => e.toJSON()),
 			elementContents: this.getElementContents().map(e => e.toJSON()),
@@ -632,5 +635,9 @@ export class Project {
 		this.placeholderHighlightedElements
 			.filter(element => !options || options.ignore.getId() !== element.getId())
 			.forEach(element => element.setPlaceholderHighlighted(false));
+	}
+
+	public update(raw: this | Types.SerializedProject): void {
+		/** */
 	}
 }

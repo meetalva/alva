@@ -28,14 +28,9 @@ export function startRenderer(): void {
 	const history = new Model.EditHistory();
 	const store = new ViewStore({ app, history, sender });
 
-	const id = `s${uuid
-		.v4()
-		.split('-')
-		.join('')}`;
-
 	// tslint:disable-next-line:no-any
-	(window as any)[id] = store;
-	console.log(`Access ViewStore at ${id}`);
+	(window as any).store = store;
+	console.log('Access ViewStore at .store');
 
 	sender.receive(createServerMessageHandler({ app, history, store }));
 	registerGlobalListeners({ store });

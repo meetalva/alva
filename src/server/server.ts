@@ -11,11 +11,20 @@ import { EventEmitter } from 'events';
 import * as express from 'express';
 import * as Http from 'http';
 import * as Message from '../message';
+import * as Model from '../model';
 import * as WS from 'ws';
 import { isMessage } from '../sender/is-message';
 import { Sender } from '../sender/server';
 
+export interface AppContext {
+	project: undefined | Model.Project;
+	port: undefined | number;
+	sender: undefined | Sender;
+	win: undefined | unknown;
+}
+
 export interface ServerOptions {
+	context: AppContext;
 	port: number;
 	sender: Sender;
 }
@@ -40,17 +49,15 @@ export class AlvaServer extends EventEmitter {
 		this.server = init.server;
 		this.webSocketServer = init.webSocketServer;
 
-		this.app.get('/', createRendererRoute({ sender: this.options.sender }));
-
-		this.app.get('/preview.html', createPreviewRoute({ sender: this.options.sender }));
-
-		this.app.use('/static', createStaticRoute({ sender: this.options.sender }));
+		this.app.get('/', createRendererRoute());
+		this.app.get('/preview.html', createPreviewRoute(this.options.context));
+		this.app.use('/static', createStaticRoute(this.options.context));
 
 		this.app.use(
 			'/sketch',
 			createSketchRoute({
 				previewLocation: `http://localhost:${this.options.port}/sketch`,
-				sender: this.options.sender
+				context: this.options.context
 			})
 		);
 
@@ -58,12 +65,12 @@ export class AlvaServer extends EventEmitter {
 			'/screenshots',
 			createScreenshotRoute({
 				previewLocation: `http://localhost:${this.options.port}/static`,
-				sender: this.options.sender
+				context: this.options.context
 			})
 		);
 
 		this.app.use('/scripts', createScriptsRoute());
-		this.app.use('/libraries', createLibrariesRoute({ sender: this.options.sender }));
+		this.app.use('/libraries', createLibrariesRoute(this.options.context));
 
 		this.webSocketServer.on('connection', createConnectionHandler({ emitter: this }));
 		this.on('message', createServerMessageHandler({ webSocketServer: this.webSocketServer }));

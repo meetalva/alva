@@ -35,6 +35,7 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 
 	public toJSON(): Types.SerializedPatternNumberProperty {
 		return {
+			model: this.model,
 			contextId: this.contextId,
 			defaultValue: this.defaultValue,
 			description: this.description,
@@ -50,7 +51,8 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 		};
 	}
 
-	public update(prop: PatternNumberProperty): void {
+	public update(raw: PatternNumberProperty | Types.SerializedPatternNumberProperty): void {
+		const prop = raw instanceof PatternNumberProperty ? raw : PatternNumberProperty.from(raw);
 		this.contextId = prop.getContextId();
 		this.defaultValue = prop.getDefaultValue();
 		this.description = prop.getDescription();

@@ -24,6 +24,8 @@ export interface UserStoreContext {
 }
 
 export class UserStore {
+	public readonly model = Types.ModelName.UserStore;
+
 	private id: string;
 	private previousDesignTimeStore: DesignTime.DesignTimeUserStore;
 
@@ -190,6 +192,10 @@ export class UserStore {
 		return [...this.actions.values()];
 	}
 
+	public getId(): string {
+		return this.id;
+	}
+
 	public getNoopAction(): UserStoreAction {
 		return this.getActions().find(
 			a => a.getType() === Types.UserStoreActionType.Noop
@@ -232,6 +238,10 @@ export class UserStore {
 		}
 
 		return this.getPropertyById(propertyId);
+	}
+
+	public getReferenceById(id: string): UserStoreReference | undefined {
+		return this.references.get(id);
 	}
 
 	public getReferences(): UserStoreReference[] {
@@ -289,6 +299,7 @@ export class UserStore {
 
 	public toJSON(): Types.SerializedUserStore {
 		return {
+			model: this.model,
 			actions: this.getActions().map(a => a.toJSON()),
 			currentPageProperty: this.currentPageProperty.toJSON(),
 			enhancer: this.enhancer.toJSON(),
@@ -296,5 +307,9 @@ export class UserStore {
 			properties: [...this.internalProperties.values()].map(p => p.toJSON()),
 			references: this.getReferences().map(r => r.toJSON())
 		};
+	}
+
+	public update(b: UserStore | Types.SerializedUserStore): void {
+		// noop
 	}
 }

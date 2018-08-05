@@ -18,46 +18,6 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 	const sender = store.getSender();
 
 	Mobx.autorun(() => {
-		sender.send({
-			id: uuid.v4(),
-			payload: {
-				pages: store.getPages().map(p => p.toJSON())
-			},
-			type: Message.MessageType.ChangePages
-		});
-	}, opts);
-
-	Mobx.autorun(() => {
-		const elements = store.getElements().map(e => e.toJSON());
-
-		sender.send({
-			id: uuid.v4(),
-			payload: { elements },
-			type: Message.MessageType.ChangeElements
-		});
-	}, opts);
-
-	Mobx.autorun(() => {
-		const elementContents = store.getElementContents().map(e => e.toJSON());
-
-		sender.send({
-			id: uuid.v4(),
-			payload: { elementContents },
-			type: Message.MessageType.ChangeElementContents
-		});
-	}, opts);
-
-	Mobx.autorun(() => {
-		const elementActions = store.getElementActions().map(e => e.toJSON());
-
-		sender.send({
-			id: uuid.v4(),
-			payload: { elementActions },
-			type: Message.MessageType.ChangeElementActions
-		});
-	}, opts);
-
-	Mobx.autorun(() => {
 		const metaDown = store.getMetaDown();
 
 		sender.send({
@@ -102,32 +62,175 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 	}, opts);
 
 	Mobx.autorun(() => {
+		let dispose;
+
 		const project = store.getProject();
+
+		if (!project && dispose) {
+			dispose();
+		}
 
 		if (!project) {
 			return;
 		}
 
-		sender.send({
-			id: uuid.v4(),
-			payload: {
-				userStore: project.getUserStore().toJSON()
-			},
-			type: Message.MessageType.ChangeUserStore
-		});
-	}, opts);
+		dispose = Mobx.spy((change: Types.MobxChange) => {
+			window.requestIdleCallback(() => {
+				switch (change.type) {
+					case Types.MobxChangeType.Update: {
+						if (change.hasOwnProperty('index')) {
+							const arrayChange = change as Types.MobxArrayUpdate;
 
-	// Mobx.autorun(() => {
-	// 	const project = store.getProject();
-	// 	sender.send({
-	// 		id: uuid.v4(),
-	// 		payload: {
-	// 			project: project ? project.toJSON() : undefined
-	// 		},
-	// 		type: Message.MessageType.ChangeProject
-	// 	});
-	// }, {
-	// 	delay: 5000,
-	// 	scheduler: window.requestIdleCallback
-	// });
+							sender.send({
+								id: uuid.v4(),
+								type: Message.MessageType.MobxUpdate,
+								payload: {
+									id: change.object.id,
+									name: '',
+									change: {
+										type: arrayChange.type,
+										index: arrayChange.index,
+										newValue: change.newValue
+									}
+								}
+							});
+						}
+
+						if (change.hasOwnProperty('key')) {
+							const objectChange = change as Types.MobxObjectUpdate | Types.MobxMapUpdate;
+
+							sender.send({
+								id: uuid.v4(),
+								type: Message.MessageType.MobxUpdate,
+								payload: {
+									id: change.object.id,
+									name: change.object.constructor.name,
+									change: {
+										type: objectChange.type,
+										key: objectChange.key,
+										newValue: change.newValue
+									}
+								}
+							});
+						}
+
+						break;
+					}
+
+					case Types.MobxChangeType.Add: {
+						if (change.newValue === undefined) {
+							return;
+						}
+
+						const parent = getParentByMember(change.object, { name: change.name, project });
+						const name = parseChangeName(change.name);
+
+						if (!parent) {
+							return;
+						}
+
+						// tslint:disable-next-line:no-any
+						const newValue =
+							change.newValue && typeof (change.newValue as any).toJSON === 'function'
+								? (change.newValue as any).toJSON()
+								: change.newValue;
+
+						if (typeof newValue === 'object' && !newValue.model) {
+							console.log(change);
+							return;
+						}
+
+						sender.send({
+							id: uuid.v4(),
+							type: Message.MessageType.MobxAdd,
+							payload: {
+								id: parent.getId(),
+								name: name.parentName,
+								memberName: name.memberName,
+								// tslint:disable-next-line:no-any
+								valueModel: typeof newValue === 'object' ? newValue.model : undefined,
+								change: {
+									type: change.type,
+									key: change.key,
+									newValue
+								}
+							}
+						});
+
+						break;
+					}
+
+					case Types.MobxChangeType.Splice: {
+						const parent = getParentByMember(change.object, { name: change.name, project });
+						const name = parseChangeName(change.name);
+
+						if (!parent) {
+							return;
+						}
+
+						sender.send({
+							id: uuid.v4(),
+							type: Message.MessageType.MobxSplice,
+							payload: {
+								id: parent.getId(),
+								name: name.parentName,
+								memberName: name.memberName,
+								change: {
+									type: change.type,
+									index: change.index,
+									added: change.added,
+									removed: change.removed
+								}
+							}
+						});
+					}
+				}
+			});
+		});
+	});
+}
+
+function getParentByMember(
+	member: unknown,
+	{ name, project }: { name: string; project: Model.Project }
+): Model.AnyModel | undefined {
+	const { parentName, parentId } = parseChangeName(name);
+
+	switch (parentName) {
+		case 'Project':
+			return project;
+		case 'UserStore':
+			return project.getUserStore();
+		case 'Element':
+		case 'ElementContent':
+			return getObjectsByName(parentName, { project }).find((e: unknown) => {
+				const admin = Mobx._getAdministration(e);
+				return admin.name === parentId;
+			});
+		default:
+			return;
+	}
+}
+
+function getObjectsByName(name: string, { project }: { project: Model.Project }): Model.AnyModel[] {
+	switch (name) {
+		case 'Element':
+			return project.getElements();
+		case 'ElementContent':
+			return project.getElementContents();
+	}
+
+	return [];
+}
+
+function parseChangeName(
+	name: string
+): { parentName: string; parentId: string; memberName: string } {
+	const [rawParentName = '', rawMemberName = ''] = name.split('.');
+
+	return {
+		parentName: rawParentName.split('@')[0] || '',
+		parentId: rawParentName || '',
+		memberName: rawMemberName.split('@')[0] || ''
+	};
 }

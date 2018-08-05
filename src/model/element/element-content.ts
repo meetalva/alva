@@ -21,6 +21,8 @@ export interface ElementContentInit {
 }
 
 export class ElementContent {
+	public readonly model = Types.ModelName.ElementContent;
+
 	@Mobx.observable private elementIds: string[] = [];
 	@Mobx.observable private forcedOpen: boolean;
 	@Mobx.observable private highlighted: boolean;
@@ -237,6 +239,7 @@ export class ElementContent {
 
 	public toJSON(): Types.SerializedElementContent {
 		return {
+			model: this.model,
 			elementIds: Array.from(this.elementIds),
 			forcedOpen: this.forcedOpen,
 			highlighted: this.highlighted,
@@ -248,7 +251,8 @@ export class ElementContent {
 	}
 
 	@Mobx.action
-	public update(b: ElementContent): void {
+	public update(raw: ElementContent | Types.SerializedElementContent): void {
+		const b = raw instanceof ElementContent ? raw.toJSON() : raw;
 		this.elementIds = b.elementIds;
 		this.forcedOpen = b.forcedOpen;
 		this.highlighted = b.highlighted;

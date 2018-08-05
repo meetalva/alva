@@ -24,6 +24,8 @@ export interface PatternContext {
 }
 
 export class Pattern {
+	public readonly model = Types.ModelName.Pattern;
+
 	@Mobx.observable private contextId: string;
 	@Mobx.observable private description: string;
 	@Mobx.observable private exportName: string;
@@ -136,6 +138,7 @@ export class Pattern {
 
 	public toJSON(): Types.SerializedPattern {
 		return {
+			model: this.model,
 			contextId: this.contextId,
 			description: this.description,
 			exportName: this.exportName,
@@ -148,13 +151,18 @@ export class Pattern {
 		};
 	}
 
-	public update(pattern: Pattern, context: PatternContext): void {
+	public update(raw: Pattern | Types.SerializedPattern, context?: PatternContext): void {
+		const pattern =
+			raw instanceof Pattern
+				? raw
+				: Pattern.from(raw, context || { patternLibrary: this.patternLibrary });
+
 		this.contextId = pattern.getContextId();
 		this.description = pattern.getDescription();
 		this.exportName = pattern.getExportName();
 		this.name = pattern.getName();
 		this.origin = pattern.getOrigin();
-		this.patternLibrary = context.patternLibrary;
+		this.patternLibrary = context ? context.patternLibrary : this.patternLibrary;
 		this.propertyIds = pattern.propertyIds;
 		this.type = pattern.getType();
 

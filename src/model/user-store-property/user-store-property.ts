@@ -16,6 +16,8 @@ export interface UserStorePropertyInit {
 const NOOP = () => '';
 
 export class UserStoreProperty {
+	public readonly model = Types.ModelName.UserStoreProperty;
+
 	private id: string;
 	private project: Project;
 
@@ -116,6 +118,7 @@ export class UserStoreProperty {
 
 	public toJSON(): Types.SerializedUserStoreProperty {
 		return {
+			model: this.model,
 			id: this.id,
 			name: this.name,
 			concreteValue: this.concreteValue,
@@ -126,11 +129,13 @@ export class UserStoreProperty {
 	}
 
 	@Mobx.action
-	public update(b: UserStoreProperty): void {
+	public update(raw: UserStoreProperty | Types.SerializedUserStoreProperty): void {
+		const b = raw instanceof UserStoreProperty ? raw.toJSON() : raw;
+
 		this.id = b.id;
 		this.name = b.name;
-		this.concreteValue = b.value;
-		this.valueType = b.valueType;
+		this.concreteValue = b.concreteValue;
+		this.valueType = deserializeValueType(b.valueType);
 	}
 }
 

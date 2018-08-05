@@ -711,7 +711,8 @@ export class ViewStore {
 
 	@Mobx.action
 	public save(): void {
-		const savedProjects = this.getSavedProjects();
+		// TODO TODO: send rework saving
+		/* const savedProjects = this.getSavedProjects();
 		const savedProject = savedProjects[savedProjects.length - 1];
 
 		if (savedProject && Model.Project.equals(savedProject, this.project.toDisk())) {
@@ -732,7 +733,7 @@ export class ViewStore {
 				payload,
 				type: MessageType.Save
 			});
-		}
+		} */
 	}
 
 	@Mobx.action

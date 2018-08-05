@@ -33,6 +33,8 @@ export interface ElementContext {
 }
 
 export class Element {
+	public readonly model = Types.ModelName.Element;
+
 	@Mobx.observable private containerId?: string;
 
 	@Mobx.observable private readonly contentIds: string[] = [];
@@ -628,6 +630,7 @@ export class Element {
 
 	public toJSON(): Types.SerializedElement {
 		return {
+			model: this.model,
 			containerId: this.containerId,
 			contentIds: Array.from(this.contentIds),
 			dragged: this.dragged,
@@ -651,7 +654,9 @@ export class Element {
 	}
 
 	@Mobx.action
-	public update(b: Element): void {
+	public update(b: Element | Types.SerializedElement): void {
+		const e = b instanceof Element ? b : Element.from(b, { project: this.project });
+
 		if (this.selected) {
 			this.project.unsetSelectedElement();
 		}
@@ -662,22 +667,22 @@ export class Element {
 
 		const propsChanges = computeDifference({
 			before: this.getProperties(),
-			after: b.getProperties()
+			after: e.getProperties()
 		});
 
 		propsChanges.removed.forEach(change => this.removeProperty(change.before));
 		propsChanges.added.forEach(change => this.addProperty(change.after));
 		propsChanges.changed.forEach(change => change.before.update(change.after));
 
-		this.shouldHighlight = b.shouldHighlight;
-		this.dragged = b.dragged;
-		this.shouldFocus = b.focused;
-		this.containerId = b.containerId;
-		this.name = b.name;
-		this.open = b.open;
-		this.forcedOpen = b.forcedOpen;
-		this.shouldPlaceholderHighlight = b.placeholderHighlighted;
-		this.selected = b.selected;
+		this.shouldHighlight = e.shouldHighlight;
+		this.dragged = e.dragged;
+		this.shouldFocus = e.focused;
+		this.containerId = e.containerId;
+		this.name = e.name;
+		this.open = e.open;
+		this.forcedOpen = e.forcedOpen;
+		this.shouldPlaceholderHighlight = e.placeholderHighlighted;
+		this.selected = e.selected;
 	}
 }
 

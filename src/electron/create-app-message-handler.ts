@@ -4,7 +4,6 @@ import * as uuid from 'uuid';
 import { checkForUpdates } from './auto-updater';
 import { showError } from './show-error';
 import { requestAppSafely } from './request-app';
-import { requestProjectSafely } from './request-project';
 import { showContextMenu } from './show-context-menu';
 import { showMainMenu } from './show-main-menu';
 import * as Types from '../types';
@@ -98,13 +97,12 @@ export async function createAppMessageHandler(
 				break;
 			}
 			case Message.MessageType.ChangeApp: {
-				injection.ephemeralStore.setAppState(message.payload.app);
-				const project = await requestProjectSafely(injection.sender);
+				/* injection.ephemeralStore.setAppState(message.payload.app);
 
 				showMainMenu(
 					{ app: message.payload.app, project: project ? project.toJSON() : undefined },
 					{ sender: injection.sender }
-				);
+				); */
 
 				break;
 			}

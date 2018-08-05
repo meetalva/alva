@@ -9,8 +9,11 @@ import * as Types from '../types';
 import * as uuid from 'uuid';
 
 export interface ScreenshotRouteOptions {
+	context: {
+		project: Model.Project | undefined;
+		sender: Sender | undefined;
+	};
 	previewLocation: string;
-	sender: Sender;
 }
 
 const SUPPORTED_EXTENSIONS = ['.png'];
@@ -22,6 +25,11 @@ export function createScreenshotRoute(options: ScreenshotRouteOptions): Express.
 	): Promise<void> {
 		const extname = Path.extname(req.path);
 		const id = Path.basename(req.path, Path.extname(req.path));
+
+		if (!options.context.sender) {
+			res.sendStatus(404);
+			return;
+		}
 
 		if (!id || !extname) {
 			res.sendStatus(400);
@@ -35,7 +43,7 @@ export function createScreenshotRoute(options: ScreenshotRouteOptions): Express.
 
 		res.type(extname);
 
-		const projectResponse = await options.sender.request<ProjectRequestResponsePair>(
+		const projectResponse = await options.context.sender.request<ProjectRequestResponsePair>(
 			{
 				id: uuid.v4(),
 				type: MessageType.ProjectRequest,

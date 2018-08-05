@@ -1,7 +1,9 @@
 import * as Mobx from 'mobx';
 import * as Types from '../types';
+import * as uuid from 'uuid';
 
 export interface AlvaAppInit {
+	id?: string;
 	activeView: Types.AlvaView;
 	hasFocusedInput: boolean;
 	panes: Set<Types.AppPane>;
@@ -12,6 +14,9 @@ export interface AlvaAppInit {
 }
 
 export class AlvaApp {
+	public readonly model = Types.ModelName.AlvaApp;
+	private id: string = uuid.v4();
+
 	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
 	@Mobx.observable private hoverArea: Types.HoverArea = Types.HoverArea.Chrome;
 	@Mobx.observable private paneSelectOpen: boolean = false;
@@ -35,6 +40,7 @@ export class AlvaApp {
 
 	public constructor(init?: AlvaAppInit) {
 		if (init) {
+			this.id = init.id || uuid.v4();
 			this.activeView = init.activeView;
 			this.panes = init.panes;
 			this.searchTerm = init.searchTerm;
@@ -69,6 +75,10 @@ export class AlvaApp {
 
 	public getHoverArea(): Types.HoverArea {
 		return this.hoverArea;
+	}
+
+	public getId(): string {
+		return this.id;
 	}
 
 	public getPanes(): Set<Types.AppPane> {
@@ -158,6 +168,7 @@ export class AlvaApp {
 
 	public toJSON(): Types.SerializedAlvaApp {
 		return {
+			model: this.model,
 			activeView: serializeView(this.activeView),
 			hasFocusedInput: this.hasFocusedInput,
 			panes: [...this.panes.values()].map(serializePane),
@@ -173,7 +184,9 @@ export class AlvaApp {
 	}
 
 	@Mobx.action
-	public update(b: AlvaApp): void {
+	public update(raw: AlvaApp | Types.SerializedAlvaApp): void {
+		const b = raw instanceof AlvaApp ? raw : AlvaApp.from(raw);
+
 		this.activeView = b.activeView;
 		this.panes = b.panes;
 		this.paneSizes = b.paneSizes;

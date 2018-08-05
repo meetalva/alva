@@ -2,6 +2,7 @@ import * as Ephemeral from './ephemeral-store';
 import * as Electron from 'electron';
 import * as Events from 'events';
 import * as Message from '../message';
+import * as Model from '../model';
 import { Sender } from '../sender/server';
 
 import { createAppMessageHandler } from './create-app-message-handler';
@@ -12,6 +13,7 @@ import { createLibraryMessageHandler } from './create-library-message-handler';
 
 export interface ServerMessageHandlerContext {
 	port: undefined | number;
+	project: undefined | Model.Project;
 	win: undefined | Electron.BrowserWindow;
 }
 

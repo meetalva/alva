@@ -1,3 +1,5 @@
+import { ModelName } from './types';
+
 export enum UserStorePropertyValueType {
 	String = 'string',
 	Page = 'page'
@@ -17,6 +19,7 @@ export type SerializedUserStorePropertyType = 'concrete' | 'computed';
 export type SerializedUserStoreActionType = 'noop' | 'set' | 'set-page' | 'open-external';
 
 export interface SerializedUserStoreProperty {
+	model: ModelName.UserStoreProperty;
 	id: string;
 	name: string;
 	concreteValue: string | undefined;
@@ -31,6 +34,7 @@ export enum UserStorePropertyType {
 }
 
 export interface SerializedUserStoreAction {
+	model: 'UserStoreAction';
 	acceptsProperty: boolean;
 	id: string;
 	name: string;
@@ -39,6 +43,7 @@ export interface SerializedUserStoreAction {
 }
 
 export interface SerializedUserStore {
+	model: ModelName.UserStore;
 	actions: SerializedUserStoreAction[];
 	currentPageProperty: SerializedUserStoreProperty;
 	enhancer: SerializedUserStoreEnhancer;
@@ -50,6 +55,7 @@ export interface SerializedUserStore {
 export type UserStoreActionPayload = string;
 
 export interface SerializedUserStoreReference {
+	model: ModelName.UserStoreReference;
 	id: string;
 	open: boolean;
 	elementPropertyId: string;
@@ -57,6 +63,7 @@ export interface SerializedUserStoreReference {
 }
 
 export interface SerializedUserStoreEnhancer {
+	model: ModelName.UserStoreEnhancer;
 	id: string;
 	code: string;
 }

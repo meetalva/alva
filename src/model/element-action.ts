@@ -23,6 +23,8 @@ export interface ElementActionInit {
 }
 
 export class ElementAction {
+	public readonly model = Types.ModelName.ElementAction;
+
 	private elementPropertyId: string;
 	private id: string;
 	private userStore: UserStore;
@@ -230,6 +232,7 @@ export class ElementAction {
 
 	public toJSON(): Types.SerializedElementAction {
 		return {
+			model: this.model,
 			elementPropertyId: this.elementPropertyId,
 			id: this.id,
 			open: this.open,
@@ -246,11 +249,16 @@ export class ElementAction {
 	}
 
 	@Mobx.action
-	public update(after: this): void {
-		this.id = after.id;
-		this.payload = after.payload;
-		this.payloadType = after.payloadType;
-		this.storeActionId = after.storeActionId;
-		this.storePropertyId = after.storePropertyId;
+	public update(raw: this | Types.SerializedElementAction): void {
+		const b =
+			raw instanceof ElementAction
+				? raw
+				: ElementAction.from(raw, { userStore: this.userStore });
+
+		this.id = b.id;
+		this.payload = b.payload;
+		this.payloadType = b.payloadType;
+		this.storeActionId = b.storeActionId;
+		this.storePropertyId = b.storePropertyId;
 	}
 }

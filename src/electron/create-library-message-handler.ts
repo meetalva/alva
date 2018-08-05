@@ -6,7 +6,6 @@ import * as Fs from 'fs';
 import * as Message from '../message';
 import * as Model from '../model';
 import * as Path from 'path';
-import { requestProject } from './request-project';
 import { showOpenDialog } from './show-open-dialog';
 import * as Types from '../types';
 import * as uuid from 'uuid';
@@ -19,6 +18,7 @@ export async function createLibraryMessageHandler(
 	ctx: ServerMessageHandlerContext,
 	injection: ServerMessageHandlerInjection
 ): Promise<(message: Message.Message) => Promise<void>> {
+	// tslint:disable-next-line:cyclomatic-complexity
 	return async function libraryMessageHandler(message: Message.Message): Promise<void> {
 		switch (message.type) {
 			case Message.MessageType.CreateScriptBundleRequest: {
@@ -53,10 +53,12 @@ export async function createLibraryMessageHandler(
 				break;
 			}
 			case Message.MessageType.ConnectedPatternLibraryNotification: {
-				const project = await requestProject(injection.sender);
+				if (!ctx.project) {
+					return;
+				}
 
 				await injection.ephemeralStore.addConnection({
-					projectId: project.getId(),
+					projectId: ctx.project.getId(),
 					libraryId: message.payload.id,
 					libraryPath: message.payload.path
 				});
@@ -64,7 +66,9 @@ export async function createLibraryMessageHandler(
 				break;
 			}
 			case Message.MessageType.ConnectPatternLibraryRequest: {
-				const project = await requestProject(injection.sender);
+				if (!ctx.project) {
+					return;
+				}
 
 				const paths = await showOpenDialog({
 					title: 'Connnect Pattern Library',
@@ -82,8 +86,8 @@ export async function createLibraryMessageHandler(
 				);
 
 				const previousLibrary = message.payload.library
-					? project.getPatternLibraryById(message.payload.library)
-					: project
+					? ctx.project.getPatternLibraryById(message.payload.library)
+					: ctx.project
 							.getPatternLibraries()
 							.find(p => connections.some(c => c.libraryId === p.getId()));
 
@@ -127,8 +131,11 @@ export async function createLibraryMessageHandler(
 				break;
 			}
 			case Message.MessageType.UpdatePatternLibraryRequest: {
-				const project = await requestProject(injection.sender);
-				const library = project.getPatternLibraryById(message.payload.id);
+				if (!ctx.project) {
+					return;
+				}
+
+				const library = ctx.project.getPatternLibraryById(message.payload.id);
 
 				if (!library || !library.getCapabilites().includes(Types.LibraryCapability.Update)) {
 					return;

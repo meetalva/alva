@@ -5,6 +5,7 @@ import * as Ephemeral from './ephemeral-store';
 import * as Events from 'events';
 import * as getPort from 'get-port';
 import * as Message from '../message';
+import * as Mobx from 'mobx';
 import * as Model from '../model';
 import { Sender } from '../sender/server';
 import { createServer } from '../server';
@@ -32,6 +33,14 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 	const sender = new Sender();
 	const server = createServer({ port: ctx.port, sender, context: ctx });
 	const ephemeralStore = new Ephemeral.EphemeralStore();
+
+	const dispose = Mobx.autorun(() => {
+		if (!ctx.project) {
+			return;
+		}
+
+		ctx.project.sync(sender);
+	});
 
 	const serverMessageHandler = await createServerMessageHandler(ctx, {
 		emitter,
@@ -84,6 +93,7 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 			ephemeralStore.clear();
 		}
 
+		dispose();
 		await server.stop();
 		sender.stop();
 		server.removeAllListeners();

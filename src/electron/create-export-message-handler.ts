@@ -1,7 +1,6 @@
 import * as Export from '../export';
 import * as Fs from 'fs';
 import * as Message from '../message';
-import { requestProject } from './request-project';
 import { showError } from './show-error';
 import { showSaveDialog } from './show-save-dialog';
 import * as Types from '../types';
@@ -18,14 +17,16 @@ export async function createExportMessageHandler(
 	return async function exportMessageHandler(message: Message.Message): Promise<void> {
 		switch (message.type) {
 			case Message.MessageType.ExportHtmlProject: {
-				const project = await requestProject(injection.sender);
+				if (!ctx.project) {
+					return;
+				}
 
 				const path = await showSaveDialog({
-					defaultPath: `/${project.getName()}.html`,
-					title: `Export ${project.getName()} as HTML file`,
+					defaultPath: `/${ctx.project.getName()}.html`,
+					title: `Export ${ctx.project.getName()} as HTML file`,
 					filters: [
 						{
-							name: project.getName(),
+							name: ctx.project.getName(),
 							extensions: ['html', 'htm']
 						}
 					]
@@ -35,7 +36,10 @@ export async function createExportMessageHandler(
 					return;
 				}
 
-				const htmlExport = await Export.exportHtmlProject({ project, port: ctx.port });
+				const htmlExport = await Export.exportHtmlProject({
+					project: ctx.project,
+					port: ctx.port
+				});
 
 				if (htmlExport.type === Types.ExportResultType.ExportError) {
 					showError(htmlExport.error);
@@ -51,18 +55,21 @@ export async function createExportMessageHandler(
 				break;
 			}
 			case Message.MessageType.ExportPngPage: {
-				const project = await requestProject(injection.sender);
-				const activePage = project.getPages().find(p => p.getActive());
+				if (!ctx.project) {
+					return;
+				}
+
+				const activePage = ctx.project.getPages().find(p => p.getActive());
 
 				if (!activePage) {
 					return;
 				}
 
-				const index = project.getPages().indexOf(activePage);
+				const index = ctx.project.getPages().indexOf(activePage);
 
 				const path = await showSaveDialog({
-					defaultPath: `${project.getName()} - ${index}.png`,
-					title: `Export Page ${index} of ${project.getName()} as PNG`
+					defaultPath: `${ctx.project.getName()} - ${index}.png`,
+					title: `Export Page ${index} of ${ctx.project.getName()} as PNG`
 				});
 
 				if (!path) {
@@ -87,18 +94,21 @@ export async function createExportMessageHandler(
 				break;
 			}
 			case Message.MessageType.ExportSketchPage: {
-				const project = await requestProject(injection.sender);
-				const activePage = project.getPages().find(p => p.getActive());
+				if (!ctx.project) {
+					return;
+				}
+
+				const activePage = ctx.project.getPages().find(p => p.getActive());
 
 				if (!activePage) {
 					return;
 				}
 
-				const index = project.getPages().indexOf(activePage);
+				const index = ctx.project.getPages().indexOf(activePage);
 
 				const path = await showSaveDialog({
-					defaultPath: `${project.getName()} - Page ${index}.asketch.json`,
-					title: `Export Page ${index} of ${project.getName()} as .asketch.json`
+					defaultPath: `${ctx.project.getName()} - Page ${index}.asketch.json`,
+					title: `Export Page ${index} of ${ctx.project.getName()} as .asketch.json`
 				});
 
 				if (!path) {

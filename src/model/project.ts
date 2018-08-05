@@ -1,7 +1,9 @@
 import { AnyModel } from './any-model';
 import { Element, ElementContent, ElementProperty } from './element';
 import { ElementAction } from './element-action';
+import * as Message from '../message';
 import * as Mobx from 'mobx';
+import * as ModelTree from '../model-tree';
 import * as _ from 'lodash';
 import { Page } from './page';
 import { PatternSearch } from './pattern-search';
@@ -652,6 +654,107 @@ export class Project {
 
 	public toString(): string {
 		return JSON.stringify(this.toJSON());
+	}
+
+	public sync(sender: Types.Sender): void {
+		sender.match<Message.MobxUpdateMessage>(Message.MessageType.MobxUpdate, message => {
+			if (message.payload.change.hasOwnProperty('key')) {
+				const change = message.payload.change as
+					| Message.MobxObjectUpdatePayload
+					| Message.MobxMapUpdatePayload;
+
+				const object = this.getObject(message.payload.name, message.payload.id);
+
+				if (!object) {
+					// console.log(message);
+					return;
+				}
+
+				const changedData = object.toJSON();
+				changedData[change.key] = change.newValue;
+
+				// tslint:disable-next-line:no-any
+				(object.update as any)(changedData);
+			}
+
+			if (message.payload.change.hasOwnProperty('index')) {
+				console.log('MobxArrayUpdatePayload', message);
+				// const change = message.payload.change as Message.MobxArrayUpdatePayload;
+			}
+		});
+
+		sender.match<Message.MobxAddMessage>(Message.MessageType.MobxAdd, message => {
+			const parent = this.getObject(message.payload.name, message.payload.id);
+			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
+
+			if (!parent) {
+				console.log(message);
+				return;
+			}
+
+			const mayBeMember = parent[message.payload.memberName];
+
+			if (!mayBeMember) {
+				return;
+			}
+
+			const value = ValueModel
+				? ValueModel.from(message.payload.change.newValue, { project: this })
+				: message.payload.change.newValue;
+
+			if (typeof value === 'object' && !ValueModel) {
+				console.log(message);
+			}
+
+			const member = mayBeMember as Map<unknown, unknown>;
+			member.set(message.payload.change.key, value);
+		});
+
+		sender.match<Message.MobxDeleteMessage>(Message.MessageType.MobxDelete, message => {
+			const parent = this.getObject(message.payload.name, message.payload.id);
+
+			if (!parent) {
+				console.log(message);
+				return;
+			}
+
+			const mayBeMember = parent[message.payload.memberName];
+
+			if (!mayBeMember) {
+				return;
+			}
+
+			const member = mayBeMember as Map<unknown, unknown>;
+			member.delete(message.payload.change.key);
+		});
+
+		sender.match<Message.MobxSpliceMessage>(Message.MessageType.MobxSplice, message => {
+			const parent = this.getObject(message.payload.name, message.payload.id);
+
+			if (!parent) {
+				console.log(message);
+				return;
+			}
+
+			const changedData = parent.toJSON();
+			const target = changedData[message.payload.memberName];
+
+			if (!Array.isArray(target)) {
+				console.log(message);
+				return;
+			}
+
+			if (message.payload.change.removed.length > 0) {
+				target.splice(message.payload.change.index, message.payload.change.removed.length);
+			}
+
+			if (message.payload.change.added.length > 0) {
+				target.splice(message.payload.change.index, 0, ...message.payload.change.added);
+			}
+
+			// tslint:disable-next-line:no-any
+			(parent.update as any)(changedData);
+		});
 	}
 
 	@Mobx.action

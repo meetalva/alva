@@ -6,7 +6,6 @@ import { getInitialData } from './get-initial-data';
 import * as Message from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
-import * as ModelTree from '../model-tree';
 import { PreviewStore, SyntheticComponents } from './preview-store';
 import { Sender } from '../sender/client';
 import * as Types from '../types';
@@ -88,6 +87,8 @@ function main(): void {
 
 		store.setSender(sender);
 
+		project.sync(sender);
+
 		sender.match<Message.KeyboardChange>(Message.MessageType.KeyboardChange, message => {
 			store.setMetaDown(message.payload.metaDown);
 		});
@@ -103,104 +104,6 @@ function main(): void {
 				changes.changed.forEach(change => change.before.update(change.after));
 				changes.removed.forEach(change => project.removePage(change.before));
 			});
-		});
-
-		sender.match<Message.MobxUpdateMessage>(Message.MessageType.MobxUpdate, message => {
-			if (message.payload.change.hasOwnProperty('key')) {
-				const change = message.payload.change as
-					| Message.MobxObjectUpdatePayload
-					| Message.MobxMapUpdatePayload;
-				const object = project.getObject(message.payload.name, message.payload.id);
-
-				if (!object) {
-					// console.log(message);
-					return;
-				}
-
-				const changedData = object.toJSON();
-				changedData[change.key] = change.newValue;
-
-				// tslint:disable-next-line:no-any
-				(object.update as any)(changedData);
-			}
-
-			if (message.payload.change.hasOwnProperty('index')) {
-				console.log('MobxArrayUpdatePayload', message);
-				// const change = message.payload.change as Message.MobxArrayUpdatePayload;
-			}
-		});
-
-		sender.match<Message.MobxAddMessage>(Message.MessageType.MobxAdd, message => {
-			const parent = project.getObject(message.payload.name, message.payload.id);
-			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
-
-			if (!parent) {
-				console.log(message);
-				return;
-			}
-
-			const mayBeMember = parent[message.payload.memberName];
-
-			if (!mayBeMember) {
-				return;
-			}
-
-			const value = ValueModel
-				? ValueModel.from(message.payload.change.newValue, { project })
-				: message.payload.change.newValue;
-
-			if (typeof value === 'object' && !ValueModel) {
-				console.log(message);
-			}
-
-			const member = mayBeMember as Map<unknown, unknown>;
-			member.set(message.payload.change.key, value);
-		});
-
-		sender.match<Message.MobxDeleteMessage>(Message.MessageType.MobxDelete, message => {
-			const parent = project.getObject(message.payload.name, message.payload.id);
-
-			if (!parent) {
-				console.log(message);
-				return;
-			}
-
-			const mayBeMember = parent[message.payload.memberName];
-
-			if (!mayBeMember) {
-				return;
-			}
-
-			const member = mayBeMember as Map<unknown, unknown>;
-			member.delete(message.payload.change.key);
-		});
-
-		sender.match<Message.MobxSpliceMessage>(Message.MessageType.MobxSplice, message => {
-			const parent = project.getObject(message.payload.name, message.payload.id);
-
-			if (!parent) {
-				console.log(message);
-				return;
-			}
-
-			const changedData = parent.toJSON();
-			const target = changedData[message.payload.memberName];
-
-			if (!Array.isArray(target)) {
-				console.log(message);
-				return;
-			}
-
-			if (message.payload.change.removed.length > 0) {
-				target.splice(message.payload.change.index, message.payload.change.removed.length);
-			}
-
-			if (message.payload.change.added.length > 0) {
-				target.splice(message.payload.change.index, 0, ...message.payload.change.added);
-			}
-
-			// tslint:disable-next-line:no-any
-			(parent.update as any)(changedData);
 		});
 
 		sender.match<Message.ChangePatternLibraries>(

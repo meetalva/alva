@@ -1,7 +1,6 @@
 import * as Clipboard from './clipboard';
 import * as Message from '../message';
 import { requestApp } from './request-app';
-import { requestProject } from './request-project';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
@@ -20,13 +19,12 @@ export async function createEditMessageHandler(
 			case Message.MessageType.Copy: {
 				const app = await requestApp(injection.sender);
 
-				if (app.getHasFocusedInput()) {
+				if (app.getHasFocusedInput() || !ctx.project) {
 					return;
 				}
 
-				const project = await requestProject(injection.sender);
-				const focusedItemType = project.getFocusedItemType();
-				const focusedItem = project.getFocusedItem();
+				const focusedItemType = ctx.project.getFocusedItemType();
+				const focusedItem = ctx.project.getFocusedItem();
 
 				if (!focusedItem) {
 					return;
@@ -35,15 +33,18 @@ export async function createEditMessageHandler(
 				Clipboard.setClipboard({
 					type: serializeItemType(focusedItemType),
 					item: focusedItem.toJSON(),
-					project: project.toJSON()
+					project: ctx.project.toJSON()
 				});
 
 				break;
 			}
 			case Message.MessageType.CutElement:
 			case Message.MessageType.CopyElement: {
-				const project = await requestProject(injection.sender);
-				const element = project.getElementById(message.payload);
+				if (!ctx.project) {
+					return;
+				}
+
+				const element = ctx.project.getElementById(message.payload);
 
 				if (!element) {
 					return;
@@ -52,7 +53,7 @@ export async function createEditMessageHandler(
 				Clipboard.setClipboard({
 					type: serializeItemType(Types.ItemType.Element),
 					item: element.toJSON(),
-					project: project.toJSON()
+					project: ctx.project.toJSON()
 				});
 
 				break;

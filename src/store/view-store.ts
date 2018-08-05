@@ -1,5 +1,5 @@
 import { Sender } from '../sender/client';
-import { debounce, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import { MessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
@@ -55,8 +55,6 @@ export class ViewStore {
 
 	@Mobx.observable private project: Model.Project;
 
-	private savedProjects: Types.SavedProject[] = [];
-
 	@Mobx.observable private serverPort: number;
 
 	@Mobx.observable private sender: Sender;
@@ -65,7 +63,6 @@ export class ViewStore {
 		this.app = init.app;
 		this.editHistory = init.history;
 		this.sender = init.sender;
-		this.save = debounce(this.save, 1000);
 	}
 
 	@Mobx.action
@@ -81,22 +78,19 @@ export class ViewStore {
 		ViewStore.EPHEMERAL_CONTENTS.delete(element);
 	}
 
-	public addSavedProject(project: Model.Project): void {
-		this.savedProjects.push(project.toDisk());
-	}
-
 	public commit(): void {
-		if (!this.project || !this.app) {
-			return;
-		}
+		window.requestIdleCallback(() => {
+			if (!this.project || !this.app) {
+				return;
+			}
 
-		this.editHistory.push({
-			app: this.app.toJSON(),
-			project: this.project.toJSON()
+			this.editHistory.push({
+				app: this.app.toJSON(),
+				project: this.project.toJSON()
+			});
+
+			this.save();
 		});
-
-		// tslint:disable-next-line:no-any
-		(window as any).requestIdleCallback(() => this.save());
 	}
 
 	@Mobx.action
@@ -520,10 +514,6 @@ export class ViewStore {
 		return this.project;
 	}
 
-	public getSavedProjects(): Types.SavedProject[] {
-		return this.savedProjects;
-	}
-
 	public getSelectedElement(): Model.Element | undefined {
 		if (!this.project) {
 			return;
@@ -711,6 +701,11 @@ export class ViewStore {
 
 	@Mobx.action
 	public save(): void {
+		this.sender.send({
+			id: uuid.v4(),
+			payload: undefined,
+			type: MessageType.Save
+		});
 		// TODO TODO: send rework saving
 		/* const savedProjects = this.getSavedProjects();
 		const savedProject = savedProjects[savedProjects.length - 1];

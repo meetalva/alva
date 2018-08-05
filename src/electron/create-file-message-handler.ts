@@ -133,12 +133,12 @@ export async function createFileMessageHandler(
 				break;
 			}
 			case Message.MessageType.Save: {
-				const project = Model.Project.from(message.payload.project);
+				if (!ctx.project) {
+					return;
+				}
 
-				project.setPath(message.payload.path);
-				injection.ephemeralStore.setProjectPath(project.getPath());
-
-				await Persistence.persist(project.getPath(), project);
+				injection.ephemeralStore.setProjectPath(ctx.project.getPath());
+				await Persistence.persist(ctx.project.getPath(), ctx.project);
 			}
 		}
 	};

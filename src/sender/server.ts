@@ -84,4 +84,15 @@ export class Sender {
 			payload: args
 		});
 	}
+
+	public async match<T extends Message.Message>(
+		type: Message.Message['type'],
+		handler: (message: T) => void
+	): Promise<void> {
+		this.receive(message => {
+			if (message.type === type) {
+				handler(message as T);
+			}
+		});
+	}
 }

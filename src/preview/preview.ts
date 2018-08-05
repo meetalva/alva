@@ -6,6 +6,7 @@ import { getInitialData } from './get-initial-data';
 import * as Message from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
+import * as ModelTree from '../model-tree';
 import { PreviewStore, SyntheticComponents } from './preview-store';
 import { Sender } from '../sender/client';
 import * as Types from '../types';
@@ -109,7 +110,7 @@ function main(): void {
 				const change = message.payload.change as
 					| Message.MobxObjectUpdatePayload
 					| Message.MobxMapUpdatePayload;
-				const object = store.getObject(message.payload.name, message.payload.id);
+				const object = project.getObject(message.payload.name, message.payload.id);
 
 				if (!object) {
 					// console.log(message);
@@ -130,8 +131,8 @@ function main(): void {
 		});
 
 		sender.match<Message.MobxAddMessage>(Message.MessageType.MobxAdd, message => {
-			const parent = store.getObject(message.payload.name, message.payload.id);
-			const ValueModel = store.getModel(message.payload.valueModel);
+			const parent = project.getObject(message.payload.name, message.payload.id);
+			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
 
 			if (!parent) {
 				console.log(message);
@@ -157,7 +158,7 @@ function main(): void {
 		});
 
 		sender.match<Message.MobxDeleteMessage>(Message.MessageType.MobxDelete, message => {
-			const parent = store.getObject(message.payload.name, message.payload.id);
+			const parent = project.getObject(message.payload.name, message.payload.id);
 
 			if (!parent) {
 				console.log(message);
@@ -175,7 +176,7 @@ function main(): void {
 		});
 
 		sender.match<Message.MobxSpliceMessage>(Message.MessageType.MobxSplice, message => {
-			const parent = store.getObject(message.payload.name, message.payload.id);
+			const parent = project.getObject(message.payload.name, message.payload.id);
 
 			if (!parent) {
 				console.log(message);

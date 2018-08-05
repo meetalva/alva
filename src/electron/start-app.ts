@@ -8,6 +8,7 @@ import * as Message from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
 import { Sender } from '../sender/server';
+import { showMainMenu } from './show-main-menu';
 import { createServer } from '../server';
 import { createWindow } from './create-window';
 import * as uuid from 'uuid';
@@ -15,6 +16,7 @@ import * as uuid from 'uuid';
 const log = require('electron-log');
 
 export interface AppContext {
+	app: undefined | Model.AlvaApp;
 	project: undefined | Model.Project;
 	port: undefined | number;
 	sender: undefined | Sender;
@@ -34,12 +36,18 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 	const server = createServer({ port: ctx.port, sender, context: ctx });
 	const ephemeralStore = new Ephemeral.EphemeralStore();
 
+	const syncing = new WeakSet<Model.Project>();
+
 	const dispose = Mobx.autorun(() => {
-		if (!ctx.project) {
-			return;
+		if (ctx.app) {
+			ephemeralStore.setAppState(ctx.app.toJSON());
+			showMainMenu({ app: ctx.app, project: ctx.project }, { sender });
 		}
 
-		ctx.project.sync(sender);
+		if (ctx.project && !syncing.has(ctx.project)) {
+			syncing.add(ctx.project);
+			ctx.project.sync(sender);
+		}
 	});
 
 	const serverMessageHandler = await createServerMessageHandler(ctx, {

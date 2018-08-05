@@ -1,7 +1,7 @@
 import * as Electron from 'electron';
 import { Sender } from '../../sender/server';
 import { MessageType } from '../../message';
-import * as Types from '../../types';
+import { MainMenuContext } from '.';
 import * as uuid from 'uuid';
 
 export interface AppMenuInjection {
@@ -9,7 +9,7 @@ export interface AppMenuInjection {
 }
 
 export function createAppMenu(
-	ctx: Types.MainMenuContext,
+	ctx: MainMenuContext,
 	injecton: AppMenuInjection
 ): Electron.MenuItemConstructorOptions | undefined {
 	if (process.platform !== 'darwin') {

@@ -1,7 +1,7 @@
 import * as Electron from 'electron';
-import * as Types from '../../types';
+import { MainMenuContext } from '.';
 
-export function createHelpMenu(ctx: Types.MainMenuContext): Electron.MenuItemConstructorOptions {
+export function createHelpMenu(ctx: MainMenuContext): Electron.MenuItemConstructorOptions {
 	return {
 		label: '&Help',
 		role: 'help',

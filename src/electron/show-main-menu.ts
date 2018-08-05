@@ -1,13 +1,15 @@
 import * as CreateMainMenu from './create-main-menu';
 import * as Electron from 'electron';
 import { Sender } from '../sender/server';
-import * as Types from '../types';
 
 export interface MainMenuInjection {
 	sender: Sender;
 }
 
-export function showMainMenu(ctx: Types.MainMenuContext, injection: { sender: Sender }): void {
+export function showMainMenu(
+	ctx: CreateMainMenu.MainMenuContext,
+	injection: { sender: Sender }
+): void {
 	const mainMenu = [
 		CreateMainMenu.createAppMenu(ctx, injection),
 		CreateMainMenu.createFileMenu(ctx, injection),

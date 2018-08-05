@@ -7,6 +7,7 @@ const clearModule = require('clear-module');
 const importFresh = require('import-fresh');
 
 const CONTEXT: AppContext = Mobx.observable({
+	app: undefined,
 	port: undefined,
 	project: undefined,
 	sender: undefined,

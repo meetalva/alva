@@ -1,21 +1,18 @@
 import * as Electron from 'electron';
 import * as Message from '../../message';
-import * as Model from '../../model';
 import { Sender } from '../../sender/server';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
+import { MainMenuContext } from '.';
 
 export interface ViewMenuInjection {
 	sender: Sender;
 }
 
 export function createViewMenu(
-	ctx: Types.MainMenuContext,
+	{ app, project }: MainMenuContext,
 	injection: ViewMenuInjection
 ): Electron.MenuItemConstructorOptions {
-	const app = Model.AlvaApp.from(ctx.app);
-	const project = ctx.project ? Model.Project.from(ctx.project) : undefined;
-
 	return {
 		label: '&View',
 		submenu: [

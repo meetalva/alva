@@ -1,19 +1,19 @@
 import * as Electron from 'electron';
 import * as Message from '../../message';
-import * as Model from '../../model';
 import { Sender } from '../../sender/server';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
+import { MainMenuContext } from '.';
 
 export interface LibraryMenuInjection {
 	sender: Sender;
 }
 
 export function createLibraryMenu(
-	ctx: Types.MainMenuContext,
+	ctx: MainMenuContext,
 	injection: LibraryMenuInjection
 ): Electron.MenuItemConstructorOptions {
-	const project = ctx.project ? Model.Project.from(ctx.project) : undefined;
+	const project = ctx.project;
 	const libraries = project ? project.getPatternLibraries() : [];
 
 	return {
@@ -42,11 +42,11 @@ export function createLibraryMenu(
 					libraries.some(lib => lib.getState() === Types.PatternLibraryState.Connected),
 				accelerator: 'CmdOrCtrl+U',
 				click: () => {
-					if (typeof ctx.project === 'undefined') {
+					if (!project) {
 						return;
 					}
 
-					Model.Project.from(ctx.project)
+					project
 						.getPatternLibraries()
 						.filter(library =>
 							library.getCapabilites().includes(Types.LibraryCapability.Update)

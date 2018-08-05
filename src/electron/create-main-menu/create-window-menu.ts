@@ -1,7 +1,7 @@
 import * as Electron from 'electron';
-import * as Types from '../../types';
+import { MainMenuContext } from '.';
 
-export function createWindowMenu(ctx: Types.MainMenuContext): Electron.MenuItemConstructorOptions {
+export function createWindowMenu(ctx: MainMenuContext): Electron.MenuItemConstructorOptions {
 	const bringToFront: Electron.MenuItemConstructorOptions[] =
 		process.platform === 'darwin'
 			? /* prettier-ignore */ [

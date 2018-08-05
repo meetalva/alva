@@ -184,9 +184,6 @@
 			true,
 			"LF"
 		],
-		"max-classes-per-file": [
-			false
-		],
 		"max-file-line-count": [
 			false
 		],

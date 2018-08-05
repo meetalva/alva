@@ -130,9 +130,11 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 						}
 
 						// tslint:disable-next-line:no-any
+						const rawValue = change.newValue as any;
+
 						const newValue =
-							change.newValue && typeof (change.newValue as any).toJSON === 'function'
-								? (change.newValue as any).toJSON()
+							rawValue && typeof rawValue.toJSON === 'function'
+								? rawValue.toJSON()
 								: change.newValue;
 
 						if (typeof newValue === 'object' && !newValue.model) {

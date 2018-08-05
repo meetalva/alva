@@ -178,6 +178,7 @@ function analyzePatternExport(
 	return {
 		path: ctx.candidate.artifactPath,
 		pattern: {
+			model: Types.ModelName.Pattern,
 			contextId,
 			description: ctx.candidate.description,
 			exportName,

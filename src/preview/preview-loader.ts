@@ -11,7 +11,9 @@ interface StringMap {
 }
 
 export function alvaEntryLoader(this: loader.LoaderContext): string {
-	const options = getOptions(this);
+	// tslint:disable-next-line:no-any
+	const options = getOptions(this as any);
+
 	const components: StringMap = JSON.parse(options.components);
 	const componentDirs = Object.values(components);
 

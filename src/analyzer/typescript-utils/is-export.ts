@@ -14,7 +14,9 @@ export function isExport(node: TypeScript.Node): boolean {
 		return false;
 	}
 
-	const modifiers = TypeScript.getCombinedModifierFlags(node);
+	// tslint:disable-next-line:no-any
+	const modifiers = TypeScript.getCombinedModifierFlags(node as any);
+
 	if ((modifiers & TypeScript.ModifierFlags.Export) === TypeScript.ModifierFlags.Export) {
 		return true;
 	}

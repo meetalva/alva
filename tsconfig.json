@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"skipLibCheck": true,
 		"allowJs": false,
 		"allowSyntheticDefaultImports": false,
 		"alwaysStrict": true,

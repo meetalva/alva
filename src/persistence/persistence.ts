@@ -70,7 +70,7 @@ export class Persistence {
 				try {
 					resolve({
 						state: PersistenceState.Success,
-						contents: Yaml.load(String(contents)) as T
+						contents: (Yaml.load(String(contents)) as unknown) as T
 					});
 				} catch (error) {
 					return resolve({

@@ -156,6 +156,24 @@ function main(): void {
 			member.set(message.payload.change.key, value);
 		});
 
+		sender.match<Message.MobxDeleteMessage>(Message.MessageType.MobxDelete, message => {
+			const parent = store.getObject(message.payload.name, message.payload.id);
+
+			if (!parent) {
+				console.log(message);
+				return;
+			}
+
+			const mayBeMember = parent[message.payload.memberName];
+
+			if (!mayBeMember) {
+				return;
+			}
+
+			const member = mayBeMember as Map<unknown, unknown>;
+			member.delete(message.payload.change.key);
+		});
+
 		sender.match<Message.MobxSpliceMessage>(Message.MessageType.MobxSplice, message => {
 			const parent = store.getObject(message.payload.name, message.payload.id);
 

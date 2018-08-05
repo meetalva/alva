@@ -203,14 +203,6 @@
 				"destructuring": "any"
 			}
 		],
-		"trailing-comma": [
-			true,
-			{
-				"multiline": "never",
-				"singleline": "never",
-				"esSpecCompliant": true
-			}
-		],
 		"align": [
 			true,
 			"elements",
@@ -313,7 +305,6 @@
 			true,
 			0
 		],
-		"switch-final-break": true,
 		"type-literal-delimiter": true,
 		"variable-name": [
 			true,

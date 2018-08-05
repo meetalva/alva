@@ -18,11 +18,11 @@ export class Sender {
 
 	public async send(message: Message.Message): Promise<void> {
 		if (!isMessage(message)) {
+			console.error(`Tried to send invalid message: ${message}`);
 			return;
 		}
 
 		await onReady(this.connection);
-
 		this.connection.send(Serde.serialize(message));
 	}
 
@@ -50,6 +50,7 @@ export class Sender {
 			const header = Serde.getMessageHeader(e.data);
 
 			if (header.status === Serde.MessageHeaderStatus.Error) {
+				console.error(header);
 				return;
 			}
 

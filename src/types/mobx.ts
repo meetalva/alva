@@ -1,17 +1,13 @@
-export type MobxChange =
+export type MobxChange<V = unknown, T = unknown> =
 	| MobxAction
 	| MobxScheduledReaction
 	| MobxReaction
 	| MobxCompute
-	// tslint:disable-next-line:no-any
-	| MobxUpdate<any, any>
+	| MobxUpdate
 	| MobxSplice
-	// tslint:disable-next-line:no-any
-	| MobxAdd<any>
-	// tslint:disable-next-line:no-any
-	| MobxDelete<any>
-	// tslint:disable-next-line:no-any
-	| MobxCreate<any>
+	| MobxAdd
+	| MobxDelete
+	| MobxCreate
 	| MobxReportEnd;
 
 export interface MobxReportStart {
@@ -73,21 +69,25 @@ export interface MobxMapAdd<V, T> extends MobxReportStart {
 	type: MobxChangeType.Add;
 }
 
-export interface MobxDelete<T> extends MobxReportStart {
+export interface MobxDelete<V = unknown, T = unknown> extends MobxReportStart {
 	object: T;
 	name: string;
 	oldValue: T;
+	key: V;
 	type: MobxChangeType.Delete;
 }
 
-export interface MobxCreate<T> extends MobxReportStart {
+export interface MobxCreate<T = unknown> extends MobxReportStart {
 	object: T;
 	name: string;
 	newValue: T;
 	type: MobxChangeType.Create;
 }
 
-export type MobxUpdate<V, T> = MobxArrayUpdate<T> | MobxMapUpdate<V, T> | MobxObjectUpdate<T>;
+export type MobxUpdate<V = unknown, T = unknown> =
+	| MobxArrayUpdate<T>
+	| MobxMapUpdate<V, T>
+	| MobxObjectUpdate<T>;
 
 export interface MobxArrayUpdate<T = unknown> extends MobxReportStart {
 	type: MobxChangeType.Update;

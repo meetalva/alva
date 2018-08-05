@@ -47,6 +47,7 @@ export enum MessageType {
 	Log = 'log',
 	Maximize = 'maximize',
 	MobxAdd = 'mobx-add',
+	MobxDelete = 'mobx-delete',
 	MobxUpdate = 'mobx-update',
 	MobxSplice = 'mobx-splice',
 	OpenExternalURL = 'open-external-url',
@@ -120,6 +121,7 @@ export type Message =
 	| Log
 	| Maximize
 	| MobxAddMessage
+	| MobxDeleteMessage
 	| MobxUpdateMessage
 	| MobxSpliceMessage
 	| OpenExternalURL
@@ -352,6 +354,16 @@ export interface MobxAddPayload<T = unknown> {
 	change: MobxAddChange<T>;
 }
 
+export interface MobxDeletePayload {
+	id: string;
+	name: string;
+	memberName: string;
+	change: {
+		type: Types.MobxChangeType.Delete;
+		key: string;
+	};
+}
+
 export interface MobxSplicePayload<T = unknown> {
 	id: string;
 	name: string;
@@ -397,4 +409,5 @@ export interface MobxObjectUpdatePayload<T = unknown> {
 
 export type MobxUpdateMessage = Envelope<MessageType.MobxUpdate, MobxUpdatePayload>;
 export type MobxAddMessage = Envelope<MessageType.MobxAdd, MobxAddPayload>;
+export type MobxDeleteMessage = Envelope<MessageType.MobxDelete, MobxDeletePayload>;
 export type MobxSpliceMessage = Envelope<MessageType.MobxSplice, MobxSplicePayload>;

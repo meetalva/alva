@@ -45,7 +45,7 @@ export class Pattern {
 		this.name = AlvaUtil.guessName(init.name);
 		this.origin = init.origin;
 		this.patternLibrary = context.patternLibrary;
-		this.propertyIds = new Set(init.propertyIds);
+		this.propertyIds = new Set(init.propertyIds || []);
 		this.type = init.type;
 
 		init.slots.forEach(slot => this.slots.set(slot.getId(), slot));

@@ -109,10 +109,7 @@ export class ElementList extends React.Component {
 		if (element) {
 			store.requestContextMenu({
 				menu: Types.ContextMenuType.ElementMenu,
-				data: {
-					element: element.toJSON(),
-					project: store.getProject().toJSON()
-				}
+				data: { element: element.toJSON() }
 			});
 		}
 	}

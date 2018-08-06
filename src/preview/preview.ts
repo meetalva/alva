@@ -93,19 +93,6 @@ function main(): void {
 			store.setMetaDown(message.payload.metaDown);
 		});
 
-		sender.match<Message.ChangePages>(Message.MessageType.ChangePages, message => {
-			Mobx.transaction(() => {
-				const changes = computeDifference<Model.Page>({
-					after: message.payload.pages.map(p => Model.Page.from(p, { project })),
-					before: project.getPages()
-				});
-
-				changes.added.forEach(change => project.addPage(change.after));
-				changes.changed.forEach(change => change.before.update(change.after));
-				changes.removed.forEach(change => project.removePage(change.before));
-			});
-		});
-
 		sender.match<Message.ChangePatternLibraries>(
 			Message.MessageType.ChangePatternLibraries,
 			message => {

@@ -368,6 +368,7 @@ export interface MobxSplicePayload<T = unknown> {
 	id: string;
 	name: string;
 	memberName: string;
+	valueModel: Types.ModelName | undefined;
 	change: MobxSpliceChange<T>;
 }
 

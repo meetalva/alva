@@ -201,7 +201,7 @@ export class Element {
 				contentIds: serialized.contentIds,
 				open: serialized.open,
 				forcedOpen: serialized.forcedOpen,
-				properties: serialized.properties.map(p => ElementProperty.from(p, context)),
+				properties: (serialized.properties || []).map(p => ElementProperty.from(p, context)),
 				role: deserializeRole(serialized.role),
 				selected: serialized.selected
 			},

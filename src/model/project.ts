@@ -666,7 +666,6 @@ export class Project {
 				const object = this.getObject(message.payload.name, message.payload.id);
 
 				if (!object) {
-					// console.log(message);
 					return;
 				}
 
@@ -688,7 +687,7 @@ export class Project {
 			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
 
 			if (!parent) {
-				console.log(message);
+				console.log('no parent', message);
 				return;
 			}
 
@@ -703,7 +702,7 @@ export class Project {
 				: message.payload.change.newValue;
 
 			if (typeof value === 'object' && !ValueModel) {
-				console.log(message);
+				console.log('no value model', message);
 			}
 
 			const member = mayBeMember as Map<unknown, unknown>;
@@ -730,30 +729,32 @@ export class Project {
 
 		sender.match<Message.MobxSpliceMessage>(Message.MessageType.MobxSplice, message => {
 			const parent = this.getObject(message.payload.name, message.payload.id);
+			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
 
 			if (!parent) {
-				console.log(message);
+				console.log('no parent', message);
 				return;
 			}
 
-			const changedData = parent.toJSON();
-			const target = changedData[message.payload.memberName];
+			const mayBeMember = parent[message.payload.memberName];
 
-			if (!Array.isArray(target)) {
-				console.log(message);
+			if (!mayBeMember) {
 				return;
 			}
 
-			if (message.payload.change.removed.length > 0) {
-				target.splice(message.payload.change.index, message.payload.change.removed.length);
+			const added = message.payload.change.added.map(
+				a => (ValueModel ? ValueModel.from(a, { project: this }) : a)
+			);
+			const removed = message.payload.change.removed;
+			const member = mayBeMember as unknown[];
+
+			if (removed.length > 0) {
+				member.splice(message.payload.change.index, removed.length);
 			}
 
-			if (message.payload.change.added.length > 0) {
-				target.splice(message.payload.change.index, 0, ...message.payload.change.added);
+			if (added.length > 0) {
+				member.splice(message.payload.change.index, 0, ...added);
 			}
-
-			// tslint:disable-next-line:no-any
-			(parent.update as any)(changedData);
 		});
 	}
 

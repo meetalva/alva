@@ -14,7 +14,7 @@ export interface UserStoreActionInit {
 }
 
 export class UserStoreAction {
-	public readonly model = 'UserStoreAction';
+	public readonly model = Types.ModelName.UserStoreAction;
 
 	private acceptsProperty: boolean;
 	private id: string;
@@ -94,7 +94,7 @@ export class UserStoreAction {
 
 	public toJSON(): Types.SerializedUserStoreAction {
 		return {
-			model: 'UserStoreAction',
+			model: Types.ModelName.UserStoreAction,
 			acceptsProperty: this.acceptsProperty,
 			id: this.id,
 			name: this.name,

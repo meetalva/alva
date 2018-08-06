@@ -153,7 +153,6 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 								id: parent.getId(),
 								name: name.parentName,
 								memberName: name.memberName,
-								// tslint:disable-next-line:no-any
 								valueModel: typeof newValue === 'object' ? newValue.model : undefined,
 								change: {
 									type: change.type,
@@ -200,6 +199,14 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 							return;
 						}
 
+						// tslint:disable-next-line:no-any
+						const exampleValue = (change.added || change.removed)[0] as Model.AnyModel;
+
+						const model =
+							exampleValue && typeof exampleValue.toJSON === 'function'
+								? exampleValue.model
+								: undefined;
+
 						sender.send({
 							id: uuid.v4(),
 							type: Message.MessageType.MobxSplice,
@@ -207,6 +214,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 								id: parent.getId(),
 								name: name.parentName,
 								memberName: name.memberName,
+								valueModel: model,
 								change: {
 									type: change.type,
 									index: change.index,

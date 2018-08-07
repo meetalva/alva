@@ -110,9 +110,7 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 		};
 	}
 
-	public update(raw: this | Types.SerializedPatternEventHandlerProperty): void {
-		const prop =
-			raw instanceof PatternEventHandlerProperty ? raw : PatternEventHandlerProperty.from(raw);
+	public update(prop: this): void {
 		this.contextId = prop.getContextId();
 		this.description = prop.getDescription();
 		this.event = prop.getEvent();

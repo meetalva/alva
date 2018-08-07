@@ -184,9 +184,7 @@ export class AlvaApp {
 	}
 
 	@Mobx.action
-	public update(raw: AlvaApp | Types.SerializedAlvaApp): void {
-		const b = raw instanceof AlvaApp ? raw : AlvaApp.from(raw);
-
+	public update(b: AlvaApp): void {
 		this.activeView = b.activeView;
 		this.panes = b.panes;
 		this.paneSizes = b.paneSizes;

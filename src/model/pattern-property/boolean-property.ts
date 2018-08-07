@@ -49,8 +49,7 @@ export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefi
 		};
 	}
 
-	public update(raw: PatternBooleanProperty | Types.SerializedPatternBooleanProperty): void {
-		const prop = raw instanceof PatternBooleanProperty ? raw : PatternBooleanProperty.from(raw);
+	public update(prop: PatternBooleanProperty): void {
 		this.contextId = prop.getContextId();
 		this.defaultValue = prop.getDefaultValue();
 		this.description = prop.getDescription();

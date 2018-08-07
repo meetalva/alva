@@ -273,8 +273,7 @@ export class Page {
 		};
 	}
 
-	public update(raw: Page | Types.SerializedPage): void {
-		const b = raw instanceof Page ? raw.toJSON() : raw;
+	public update(b: Page): void {
 		this.active = b.active;
 		this.name = b.name;
 		this.rootId = b.rootId;

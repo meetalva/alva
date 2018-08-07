@@ -47,8 +47,7 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 		};
 	}
 
-	public update(raw: PatternAssetProperty | Types.SerializedPatternAssetProperty): void {
-		const prop = raw instanceof PatternAssetProperty ? raw : PatternAssetProperty.from(raw);
+	public update(prop: PatternAssetProperty): void {
 		this.contextId = prop.getContextId();
 		this.defaultValue = prop.getDefaultValue();
 		this.description = prop.getDescription();

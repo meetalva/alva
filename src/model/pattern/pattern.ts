@@ -151,12 +151,7 @@ export class Pattern {
 		};
 	}
 
-	public update(raw: Pattern | Types.SerializedPattern, context?: PatternContext): void {
-		const pattern =
-			raw instanceof Pattern
-				? raw
-				: Pattern.from(raw, context || { patternLibrary: this.patternLibrary });
-
+	public update(pattern: Pattern, context?: PatternContext): void {
 		this.contextId = pattern.getContextId();
 		this.description = pattern.getDescription();
 		this.exportName = pattern.getExportName();

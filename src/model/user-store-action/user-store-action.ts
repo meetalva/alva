@@ -109,13 +109,11 @@ export class UserStoreAction {
 	}
 
 	@Mobx.action
-	public update(raw: this | Types.SerializedUserStoreAction): void {
-		const b = raw instanceof UserStoreAction ? raw.toJSON() : raw;
-
+	public update(b: this): void {
 		this.acceptsProperty = b.acceptsProperty;
 		this.id = b.id;
 		this.name = b.name;
-		this.userStorePropertyId = b.storePropertyId;
+		this.userStorePropertyId = b.userStorePropertyId;
 		this.type = deserializeType(b.type);
 	}
 }

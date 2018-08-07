@@ -142,7 +142,7 @@
     "typescript-styled-plugin": "0.6.3"
   },
   "dependencies": {
-    "@brainly/html-sketchapp": "3.0.2",
+    "@brainly/html-sketchapp": "4.0.0",
     "@marionebl/react-docgen-typescript": "1.6.0-1",
     "@patternplate/load-config": "2.5.2",
     "@patternplate/load-meta": "2.5.2",

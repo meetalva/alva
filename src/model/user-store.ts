@@ -160,8 +160,8 @@ export class UserStore {
 				: undefined,
 			enhancer: UserStoreEnhancer.from(serialized.enhancer),
 			id: serialized.id,
-			properties: (serialized.properties || []).map(p => UserStoreProperty.from(p)),
-			references: (serialized.references || []).map(r => UserStoreReference.from(r))
+			properties: Array.from(serialized.properties || []).map(p => UserStoreProperty.from(p)),
+			references: Array.from(serialized.references || []).map(r => UserStoreReference.from(r))
 		});
 	}
 

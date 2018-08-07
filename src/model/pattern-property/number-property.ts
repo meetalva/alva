@@ -51,8 +51,7 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 		};
 	}
 
-	public update(raw: PatternNumberProperty | Types.SerializedPatternNumberProperty): void {
-		const prop = raw instanceof PatternNumberProperty ? raw : PatternNumberProperty.from(raw);
+	public update(prop: PatternNumberProperty): void {
 		this.contextId = prop.getContextId();
 		this.defaultValue = prop.getDefaultValue();
 		this.description = prop.getDescription();

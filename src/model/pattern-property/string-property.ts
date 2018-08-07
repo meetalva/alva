@@ -54,8 +54,7 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 		};
 	}
 
-	public update(raw: PatternStringProperty | Types.SerializedStringProperty): void {
-		const prop = raw instanceof PatternStringProperty ? raw : PatternStringProperty.from(raw);
+	public update(prop: PatternStringProperty): void {
 		this.contextId = prop.getContextId();
 		this.description = prop.getDescription();
 		this.defaultValue = prop.getDefaultValue();

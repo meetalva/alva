@@ -59,9 +59,7 @@ export class UserStoreReference {
 	}
 
 	@Mobx.action
-	public update(raw: this | Types.SerializedUserStoreReference): void {
-		const b = raw instanceof UserStoreReference ? raw : UserStoreReference.from(raw);
-
+	public update(b: this): void {
 		this.id = b.id;
 		this.open = b.open;
 		this.elementPropertyId = b.elementPropertyId;

@@ -61,40 +61,35 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 		});
 	}, opts);
 
-	Mobx.autorun(() => {
-		let dispose;
+	const spying: Map<Model.Project, () => void> = new Map();
 
+	Mobx.autorun(() => {
 		const project = store.getProject();
 
-		if (!project && dispose) {
-			dispose();
-		}
-
 		if (!project) {
+			spying.forEach(end => end());
 			return;
 		}
 
-		dispose = Mobx.spy((change: Types.MobxChange) => {
-			window.requestIdleCallback(() => {
+		if (project) {
+			for (const [p, e] of spying.entries()) {
+				if (p !== project) {
+					e();
+				}
+			}
+		}
+
+		if (spying.has(project)) {
+			return;
+		}
+
+		spying.set(
+			project,
+			Mobx.spy((change: Types.MobxChange) => {
 				switch (change.type) {
 					case Types.MobxChangeType.Update: {
 						if (change.hasOwnProperty('index')) {
-							console.log(change);
-							/* const arrayChange = change as Types.MobxArrayUpdate;
-
-							sender.send({
-								id: uuid.v4(),
-								type: Message.MessageType.MobxUpdate,
-								payload: {
-									id: change.object.id,
-									name: '',
-									change: {
-										type: arrayChange.type,
-										index: arrayChange.index,
-										newValue: change.newValue
-									}
-								}
-							}); */
+							console.log('ArrayUpdate:', change);
 						}
 
 						if (change.hasOwnProperty('key')) {
@@ -102,19 +97,21 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 								| Types.MobxObjectUpdate<Model.AnyModel>
 								| Types.MobxMapUpdate<string, Model.AnyModel>;
 
-							sender.send({
-								id: uuid.v4(),
-								type: Message.MessageType.MobxUpdate,
-								payload: {
-									// tslint:disable-next-line:no-any
-									id: (objectChange.object as any).id,
-									name: objectChange.object.constructor.name,
-									change: {
-										type: objectChange.type,
-										key: objectChange.key,
-										newValue: change.newValue
+							window.requestIdleCallback(() => {
+								sender.send({
+									id: uuid.v4(),
+									type: Message.MessageType.MobxUpdate,
+									payload: {
+										// tslint:disable-next-line:no-any
+										id: (objectChange.object as any).id,
+										name: objectChange.object.constructor.name,
+										change: {
+											type: objectChange.type,
+											key: objectChange.key,
+											newValue: change.newValue
+										}
 									}
-								}
+								});
 							});
 						}
 
@@ -126,7 +123,10 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 							return;
 						}
 
-						const parent = getParentByMember(change.object, { name: change.name, project });
+						const parent = getParentByMember(change.object, {
+							name: change.name,
+							project
+						});
 						const name = parseChangeName(change.name);
 
 						if (!parent) {
@@ -166,7 +166,10 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 					}
 
 					case Types.MobxChangeType.Delete: {
-						const parent = getParentByMember(change.object, { name: change.name, project });
+						const parent = getParentByMember(change.object, {
+							name: change.name,
+							project
+						});
 						const name = parseChangeName(change.name);
 						const deletion = change as Types.MobxDelete<string, Model.AnyModel>;
 
@@ -192,7 +195,10 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 					}
 
 					case Types.MobxChangeType.Splice: {
-						const parent = getParentByMember(change.object, { name: change.name, project });
+						const parent = getParentByMember(change.object, {
+							name: change.name,
+							project
+						});
 						const name = parseChangeName(change.name);
 
 						if (!parent) {
@@ -223,12 +229,11 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 								}
 							}
 						});
-
 						break;
 					}
 				}
-			});
-		});
+			})
+		);
 	});
 }
 

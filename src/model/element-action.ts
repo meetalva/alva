@@ -249,12 +249,7 @@ export class ElementAction {
 	}
 
 	@Mobx.action
-	public update(raw: this | Types.SerializedElementAction): void {
-		const b =
-			raw instanceof ElementAction
-				? raw
-				: ElementAction.from(raw, { userStore: this.userStore });
-
+	public update(b: this): void {
 		this.id = b.id;
 		this.payload = b.payload;
 		this.payloadType = b.payloadType;

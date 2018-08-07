@@ -2,7 +2,7 @@ import * as Clipboard from './clipboard';
 import * as Message from '../message';
 import { requestApp } from './request-app';
 import * as Types from '../types';
-import * as uuid from 'uuid';
+// import * as uuid from 'uuid';
 
 import {
 	ServerMessageHandlerContext,
@@ -59,7 +59,8 @@ export async function createEditMessageHandler(
 				break;
 			}
 			case Message.MessageType.Paste: {
-				const clipboard = Clipboard.getClipboard();
+				// Disabled pending investigation
+				/* const clipboard = Clipboard.getClipboard();
 
 				if (!clipboard) {
 					return;
@@ -93,7 +94,7 @@ export async function createEditMessageHandler(
 								project: clipboard.payload.project
 							}
 						});
-				}
+				}*/
 			}
 		}
 	};
@@ -107,16 +108,5 @@ function serializeItemType(type: Types.ItemType): Types.SerializedItemType {
 			return 'page';
 		case Types.ItemType.None:
 			return 'none';
-	}
-}
-
-function deserializeItemType(type: Types.SerializedItemType): Types.ItemType {
-	switch (type) {
-		case 'element':
-			return Types.ItemType.Element;
-		case 'page':
-			return Types.ItemType.Page;
-		case 'none':
-			return Types.ItemType.None;
 	}
 }

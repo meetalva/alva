@@ -669,11 +669,24 @@ export class Project {
 					return;
 				}
 
-				const changedData = object.toJSON();
-				changedData[change.key] = change.newValue;
+				if (!object.hasOwnProperty(change.key)) {
+					return;
+				}
 
-				// tslint:disable-next-line:no-any
-				(object.update as any)(changedData);
+				const ValueModel =
+					typeof change.newValue === 'object'
+						? ModelTree.getModelByName((change.newValue as AnyModel).model)
+						: undefined;
+
+				const value = ValueModel
+					? ValueModel.from(change.newValue, { project: this })
+					: change.newValue;
+
+				if (typeof value === 'object' && !ValueModel) {
+					return;
+				}
+
+				object[change.key] = value;
 			}
 
 			if (message.payload.change.hasOwnProperty('index')) {

@@ -96,14 +96,12 @@ export class PatternSlot {
 		};
 	}
 
-	public update(raw: PatternSlot | Types.SerializedPatternSlot): void {
-		const b = raw instanceof PatternSlot ? raw.toJSON() : raw;
-
+	public update(b: PatternSlot): void {
 		this.contextId = b.contextId;
 		this.description = b.description;
 		this.example = b.example;
 		this.hidden = b.hidden;
-		this.displayName = b.label;
+		this.displayName = b.displayName;
 		this.propertyName = b.propertyName;
 		this.required = b.required;
 		this.type = toSlotType(b.type);

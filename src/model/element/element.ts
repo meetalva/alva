@@ -656,9 +656,7 @@ export class Element {
 	}
 
 	@Mobx.action
-	public update(b: Element | Types.SerializedElement): void {
-		const e = b instanceof Element ? b : Element.from(b, { project: this.project });
-
+	public update(b: Element): void {
 		if (this.selected) {
 			this.project.unsetSelectedElement();
 		}
@@ -669,22 +667,22 @@ export class Element {
 
 		const propsChanges = computeDifference({
 			before: this.getProperties(),
-			after: e.getProperties()
+			after: b.getProperties()
 		});
 
 		propsChanges.removed.forEach(change => this.removeProperty(change.before));
 		propsChanges.added.forEach(change => this.addProperty(change.after));
 		propsChanges.changed.forEach(change => change.before.update(change.after));
 
-		this.shouldHighlight = e.shouldHighlight;
-		this.dragged = e.dragged;
-		this.shouldFocus = e.focused;
-		this.containerId = e.containerId;
-		this.name = e.name;
-		this.open = e.open;
-		this.forcedOpen = e.forcedOpen;
-		this.shouldPlaceholderHighlight = e.placeholderHighlighted;
-		this.selected = e.selected;
+		this.shouldHighlight = b.shouldHighlight;
+		this.dragged = b.dragged;
+		this.shouldFocus = b.focused;
+		this.containerId = b.containerId;
+		this.name = b.name;
+		this.open = b.open;
+		this.forcedOpen = b.forcedOpen;
+		this.shouldPlaceholderHighlight = b.placeholderHighlighted;
+		this.selected = b.selected;
 	}
 }
 

@@ -161,8 +161,7 @@ export class UserStoreEnhancer {
 		};
 	}
 
-	public update(raw: this | UserStoreEnhancer): void {
-		const b = raw instanceof UserStoreEnhancer ? raw : UserStoreEnhancer.from(raw);
+	public update(b: this): void {
 		this.code = b.code;
 	}
 }

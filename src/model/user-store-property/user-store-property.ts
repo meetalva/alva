@@ -129,9 +129,7 @@ export class UserStoreProperty {
 	}
 
 	@Mobx.action
-	public update(raw: UserStoreProperty | Types.SerializedUserStoreProperty): void {
-		const b = raw instanceof UserStoreProperty ? raw.toJSON() : raw;
-
+	public update(b: UserStoreProperty): void {
 		this.id = b.id;
 		this.name = b.name;
 		this.concreteValue = b.concreteValue;

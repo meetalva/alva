@@ -111,8 +111,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		};
 	}
 
-	public update(raw: PatternEnumProperty | Types.SerializedPatternEnumProperty): void {
-		const prop = raw instanceof PatternEnumProperty ? raw : PatternEnumProperty.from(raw);
+	public update(prop: PatternEnumProperty): void {
 		this.contextId = prop.getContextId();
 		this.defaultOptionId = prop.getDefaultOptionId();
 		this.example = prop.getExample();

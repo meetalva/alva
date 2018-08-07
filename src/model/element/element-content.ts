@@ -251,8 +251,7 @@ export class ElementContent {
 	}
 
 	@Mobx.action
-	public update(raw: ElementContent | Types.SerializedElementContent): void {
-		const b = raw instanceof ElementContent ? raw.toJSON() : raw;
+	public update(b: ElementContent): void {
 		this.elementIds = b.elementIds;
 		this.forcedOpen = b.forcedOpen;
 		this.highlighted = b.highlighted;

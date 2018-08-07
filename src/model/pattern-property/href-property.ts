@@ -47,8 +47,7 @@ export class PatternHrefProperty extends PatternPropertyBase<string | undefined>
 		};
 	}
 
-	public update(raw: PatternHrefProperty | Types.SerializedHrefProperty): void {
-		const prop = raw instanceof PatternHrefProperty ? raw : PatternHrefProperty.from(raw);
+	public update(prop: PatternHrefProperty): void {
 		this.contextId = prop.getContextId();
 		this.description = prop.getDescription();
 		this.defaultValue = prop.getDefaultValue();

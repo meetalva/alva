@@ -379,9 +379,7 @@ export class PatternLibrary {
 	}
 
 	@Mobx.action
-	public update(raw: PatternLibrary | Types.SerializedPatternLibrary): void {
-		const b = raw instanceof PatternLibrary ? raw : PatternLibrary.from(raw);
-
+	public update(b: PatternLibrary): void {
 		this.bundleId = b.bundleId;
 		this.bundle = b.bundle;
 		this.description = b.description;

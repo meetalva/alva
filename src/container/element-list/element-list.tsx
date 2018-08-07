@@ -122,8 +122,10 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		targetElement.setHighlighted(false);
-		targetElement.setPlaceholderHighlighted(false);
+		Mobx.transaction(() => {
+			targetElement.setHighlighted(false);
+			targetElement.setPlaceholderHighlighted(false);
+		});
 	}
 
 	private handleDragOver(e: React.DragEvent<HTMLElement>): void {
@@ -139,35 +141,33 @@ export class ElementList extends React.Component {
 
 		const draggedElement = store.getDraggedElement();
 
-		if (!targetContent || !visualTargetElement) {
+		if (!targetContent || !visualTargetElement || !draggedElement) {
 			return;
 		}
 
+		const higlightedElement = store.getHighlightedElement();
+		const placeholderHighlightedElement = store.getPlaceHolderHighhlightedElement();
+
+		const higlightedElementContent = store.getHighlightedElementContent();
+		const accepted = targetContent.accepts(draggedElement);
+
 		Mobx.transaction(() => {
-			if (!draggedElement) {
+			if (!accepted) {
 				targetContent.setHighlighted(false);
 				visualTargetElement.setPlaceholderHighlighted(false);
 				return;
 			}
 
-			store
-				.getProject()
-				.getElementContents()
-				.filter(sec => sec.getHighlighted() && sec !== targetContent)
-				.forEach(se => se.setHighlighted(false));
+			if (placeholderHighlightedElement) {
+				placeholderHighlightedElement.setPlaceholderHighlighted(false);
+			}
 
-			store
-				.getProject()
-				.getElements()
-				.filter(se => se.getHighlighted() && se !== visualTargetElement)
-				.forEach(se => se.setHighlighted(false));
+			if (higlightedElement) {
+				higlightedElement.setPlaceholderHighlighted(false);
+			}
 
-			const accepted = targetContent.accepts(draggedElement);
-
-			if (!accepted) {
-				targetContent.setHighlighted(false);
-				visualTargetElement.setPlaceholderHighlighted(false);
-				return;
+			if (higlightedElementContent) {
+				higlightedElementContent.setHighlighted(false);
 			}
 
 			e.dataTransfer.dropEffect = 'copy';
@@ -195,13 +195,15 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		draggedElement.setDragged(true);
-		store.setSelectedElement(draggedElement);
-
 		if (this.dragImg) {
 			e.dataTransfer.effectAllowed = 'copy';
 			e.dataTransfer.setDragImage(this.dragImg, 75, 15);
 		}
+
+		Mobx.transaction(() => {
+			draggedElement.setDragged(true);
+			store.setSelectedElement(draggedElement);
+		});
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {

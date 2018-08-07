@@ -7,6 +7,8 @@ import * as Types from '../types';
 
 import * as uuid from 'uuid';
 
+const EMPTY_ARRAY = [];
+
 export interface ViewStoreInit {
 	app: Model.AlvaApp;
 	sender: Sender;
@@ -58,6 +60,44 @@ export class ViewStore {
 	@Mobx.observable private serverPort: number;
 
 	@Mobx.observable private sender: Sender;
+
+	@Mobx.computed
+	private get elements(): Model.Element[] {
+		if (!this.project) {
+			return EMPTY_ARRAY;
+		}
+
+		return this.project.getElements();
+	}
+
+	@Mobx.computed
+	private get elementContents(): Model.ElementContent[] {
+		if (!this.project) {
+			return EMPTY_ARRAY;
+		}
+
+		return this.project.getElementContents();
+	}
+
+	@Mobx.computed
+	private get draggedElement(): Model.Element | undefined {
+		return this.elements.find(e => e.getDragged());
+	}
+
+	@Mobx.computed
+	private get highlightedElement(): Model.Element | undefined {
+		return this.elements.find(element => element.getHighlighted());
+	}
+
+	@Mobx.computed
+	private get highlightedElementContent(): Model.ElementContent | undefined {
+		return this.elementContents.find(c => c.getHighlighted());
+	}
+
+	@Mobx.computed
+	private get placeholderHighlightedElement(): Model.Element | undefined {
+		return this.elements.find(element => element.getPlaceholderHighlighted());
+	}
 
 	public constructor(init: ViewStoreInit) {
 		this.app = init.app;
@@ -399,19 +439,11 @@ export class ViewStore {
 	}
 
 	public getDraggedElement(): Model.Element | undefined {
-		if (!this.project) {
-			return;
-		}
-
-		return this.project.getElements().find(e => e.getDragged());
+		return this.draggedElement;
 	}
 
 	public getDragging(): boolean {
-		if (!this.project) {
-			return false;
-		}
-
-		return this.project.getElements().some(e => e.getDragged());
+		return typeof this.draggedElement !== 'undefined';
 	}
 
 	public getElementActions(): Model.ElementAction[] {
@@ -442,20 +474,16 @@ export class ViewStore {
 		return this.project.getElementById(id);
 	}
 
-	public getHighlightedElement(): Model.Element | undefined {
-		if (!this.project) {
-			return;
-		}
+	public getPlaceHolderHighhlightedElement(): Model.Element | undefined {
+		return this.placeholderHighlightedElement;
+	}
 
-		return this.project.getElements().find(element => element.getHighlighted());
+	public getHighlightedElement(): Model.Element | undefined {
+		return this.highlightedElement;
 	}
 
 	public getHighlightedElementContent(): Model.ElementContent | undefined {
-		if (!this.project) {
-			return;
-		}
-
-		return this.project.getElementContents().find(c => c.getHighlighted());
+		return this.highlightedElementContent;
 	}
 
 	public getMetaDown(): boolean {

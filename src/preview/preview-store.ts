@@ -201,7 +201,6 @@ export class PreviewStore<V> {
 						return;
 					}
 
-					e.preventDefault();
 					elementAction.execute({ sender: this.sender, project: this.getProject(), event: e });
 				};
 			} else {

@@ -164,6 +164,8 @@ export class ElementAction {
 						return event.target.name;
 					case 'value':
 						return event.target.value;
+					case 'checked':
+						return event.target.checked;
 				}
 				return undefined;
 			}

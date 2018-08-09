@@ -3,6 +3,10 @@ import * as Mobx from 'mobx';
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../../types';
 
+export interface PatternEventInit {
+	type: Types.PatternEventType;
+}
+
 export class PatternEvent {
 	@Mobx.observable private type: Types.PatternEventType;
 
@@ -22,6 +26,7 @@ export class PatternEvent {
 			case Types.PatternEventType.FocusEvent:
 				return ['name', 'value'];
 			case Types.PatternEventType.ChangeEvent:
+				return ['name', 'checked', 'value'];
 			case Types.PatternEventType.InputEvent:
 				return ['name', 'value'];
 			case Types.PatternEventType.MouseEvent:
@@ -119,10 +124,6 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 		this.propertyName = prop.getPropertyName();
 		this.required = prop.getRequired();
 	}
-}
-
-export interface PatternEventInit {
-	type: Types.PatternEventType;
 }
 
 function deserializeEventType(type: Types.SerializedPatternEventType): Types.PatternEventType {

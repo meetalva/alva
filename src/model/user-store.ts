@@ -264,7 +264,7 @@ export class UserStore {
 	}
 
 	@Mobx.action
-	public sync(message: Message.ChangeUserStore, opts: { withEnhancer: boolean }): void {
+	public sync(message: Message.ChangeUserStore, opts?: { withEnhancer: boolean }): void {
 		const userStore = UserStore.from(message.payload.userStore);
 
 		const propertyChanges = computeDifference<UserStoreProperty>({

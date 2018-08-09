@@ -93,18 +93,6 @@ export class UserStoreEnhancer {
 	@Mobx.observable private typeScript: string;
 	@Mobx.observable private javaScript: string;
 
-	// @Mobx.computed
-	// private get js(): string {
-	// 	const fs = new MemoryFilesystem();
-	// 	fs.writeFileSync('/file.ts', this.code);
-	// 	compile('/file.ts', {
-	// 		compilerOptions: {},
-	// 		fs,
-	// 		languageVersion: TypeScript.ScriptTarget.ESNext
-	// 	});
-	// 	return String(fs.readFileSync('/file.js'));
-	// }
-
 	@Mobx.computed
 	private get module(): UserStoreEnhancerModule {
 		const context = { exports: {}, module: { exports: {} }, console };
@@ -171,5 +159,6 @@ export class UserStoreEnhancer {
 
 	public update(b: this): void {
 		this.typeScript = b.typeScript;
+		this.javaScript = b.javaScript;
 	}
 }

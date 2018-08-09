@@ -55,24 +55,38 @@ export class PaneDevelopmentEditor extends React.Component {
 		});
 
 		this.editor.onDidChangeModelContent(async () => {
+			const value = this.editor.getValue();
+			storeEnhancer.setTypeScript(value);
+
+			const model = this.editor.getModel();
+			const getClient = await Monaco.languages.typescript.getTypeScriptWorker();
+			const client = await getClient(model.uri);
+			const emitOutput = await client.getEmitOutput(model.uri.toString());
+
+			const outputFile = emitOutput.outputFiles.find(
+				file => file.name === `${model.uri.toString()}.js`
+			);
+
+			if (outputFile) {
+				storeEnhancer.setJavaScript(outputFile.text);
+			}
+		});
+
+		this.editor.onDidBlurEditor(async () => {
 			storeEnhancer.setTypeScript(this.editor.getValue());
 
 			const model = this.editor.getModel();
-			const worker = await Monaco.languages.typescript.getTypeScriptWorker();
-			const client = await worker(model.uri);
+			const getClient = await Monaco.languages.typescript.getTypeScriptWorker();
+			const client = await getClient(model.uri);
 			const emitOutput = await client.getEmitOutput(model.uri.toString());
 			const outputFile = emitOutput.outputFiles.find(
 				file => file.name === `${model.uri.toString()}.js`
 			);
 
 			if (outputFile) {
-				console.log(outputFile.text);
 				storeEnhancer.setJavaScript(outputFile.text);
 			}
-		});
 
-		this.editor.onDidBlurEditor(() => {
-			storeEnhancer.setTypeScript(this.editor.getValue());
 			props.store.commit();
 		});
 

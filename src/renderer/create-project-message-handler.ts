@@ -109,7 +109,7 @@ export function createProjectMessageHandler({
 				break;
 			}
 			case Message.MessageType.ChangeUserStore: {
-				project.getUserStore().sync(message);
+				project.getUserStore().sync(message, { withEnhancer: false });
 				break;
 			}
 			case Message.MessageType.SelectElement: {

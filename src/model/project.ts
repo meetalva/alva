@@ -687,6 +687,10 @@ export class Project {
 					return;
 				}
 
+				if (change.key === 'getter') {
+					console.log(message);
+				}
+
 				object[change.key] = value;
 			}
 

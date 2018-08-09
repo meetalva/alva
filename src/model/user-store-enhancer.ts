@@ -1,13 +1,13 @@
-import * as Fs from 'fs';
+// import * as Fs from 'fs';
 import * as Mobx from 'mobx';
 import * as Types from '../types';
-import * as TypeScript from 'typescript';
+// import * as TypeScript from 'typescript';
 import { UserStore } from './user-store';
 import { DesignTimeUserStore } from './design-time-user-store';
 import * as uuid from 'uuid';
 import * as VM from 'vm';
 
-const MemoryFilesystem = require('memory-fs');
+// const MemoryFilesystem = require('memory-fs');
 
 export interface UserStoreEnhancerModule {
 	onStoreCreate(store: DesignTimeUserStore): DesignTimeUserStore;
@@ -15,8 +15,8 @@ export interface UserStoreEnhancerModule {
 
 export interface UserStoreEnhancerInit {
 	id: string;
-	editedCode?: string;
-	code: string;
+	typeScript: string;
+	javaScript: string;
 }
 
 const userStoreApi = (names: string[]) => `
@@ -83,28 +83,32 @@ export function onStoreCreate(store: Alva.DesignTimeUserStore): Alva.DesignTimeU
 }
 `;
 
+export const defaultJavaScript =
+	'exports.onStoreCreate = function onStoreCreate(store) { return store; }';
+
 export class UserStoreEnhancer {
 	public readonly model = Types.ModelName.UserStoreEnhancer;
 
 	@Mobx.observable private id: string;
-	@Mobx.observable private code: string;
+	@Mobx.observable private typeScript: string;
+	@Mobx.observable private javaScript: string;
 
-	@Mobx.computed
-	private get js(): string {
-		const fs = new MemoryFilesystem();
-		fs.writeFileSync('/file.ts', this.code);
-		compile('/file.ts', {
-			compilerOptions: {},
-			fs,
-			languageVersion: TypeScript.ScriptTarget.ESNext
-		});
-		return String(fs.readFileSync('/file.js'));
-	}
+	// @Mobx.computed
+	// private get js(): string {
+	// 	const fs = new MemoryFilesystem();
+	// 	fs.writeFileSync('/file.ts', this.code);
+	// 	compile('/file.ts', {
+	// 		compilerOptions: {},
+	// 		fs,
+	// 		languageVersion: TypeScript.ScriptTarget.ESNext
+	// 	});
+	// 	return String(fs.readFileSync('/file.js'));
+	// }
 
 	@Mobx.computed
 	private get module(): UserStoreEnhancerModule {
 		const context = { exports: {}, module: { exports: {} }, console };
-		VM.runInNewContext(this.getJavaScript(), context);
+		VM.runInNewContext(this.javaScript, context);
 		return context.exports as UserStoreEnhancerModule;
 	}
 
@@ -112,11 +116,13 @@ export class UserStoreEnhancer {
 
 	public constructor(init: UserStoreEnhancerInit) {
 		this.id = init.id;
-		this.code = init.code;
+		this.typeScript = init.typeScript;
+		this.javaScript = init.javaScript;
 
 		if (!init) {
 			this.id = uuid.v4();
-			this.code = defaultCode;
+			this.typeScript = defaultCode;
+			this.javaScript = defaultJavaScript;
 		}
 	}
 
@@ -128,16 +134,12 @@ export class UserStoreEnhancer {
 		return userStoreApi(this.usetStore.getProperties().map(p => JSON.stringify(p.getName())));
 	}
 
-	public getCode(): string {
-		return this.code;
-	}
-
 	public getId(): string {
 		return this.id;
 	}
 
-	public getJavaScript(): string {
-		return this.js;
+	public getTypeScript(): string {
+		return this.typeScript;
 	}
 
 	public getModule(): UserStoreEnhancerModule {
@@ -145,8 +147,13 @@ export class UserStoreEnhancer {
 	}
 
 	@Mobx.action
-	public setCode(code: string): void {
-		this.code = code;
+	public setTypeScript(code: string): void {
+		this.typeScript = code;
+	}
+
+	@Mobx.action
+	public setJavaScript(javaScript: string): void {
+		this.javaScript = javaScript;
 	}
 
 	public setUserStore(userStore: UserStore): void {
@@ -157,68 +164,12 @@ export class UserStoreEnhancer {
 		return {
 			model: this.model,
 			id: this.id,
-			code: this.code
+			typeScript: this.typeScript,
+			javaScript: this.javaScript
 		};
 	}
 
 	public update(b: this): void {
-		this.code = b.code;
+		this.typeScript = b.typeScript;
 	}
-}
-
-export interface CompileOptions {
-	fs: typeof Fs;
-	languageVersion: TypeScript.ScriptTarget;
-	compilerOptions: TypeScript.CompilerOptions;
-}
-
-function compile(filename: string, opts: CompileOptions): typeof Fs {
-	const compilerHost: TypeScript.CompilerHost = {
-		fileExists(sourceFileName: string): boolean {
-			return opts.fs.existsSync(`/${sourceFileName}`);
-		},
-		getCanonicalFileName(sourceFileName: string): string {
-			return sourceFileName;
-		},
-		getCurrentDirectory(): string {
-			return '';
-		},
-		getDefaultLibFileName(): string {
-			return 'lib.d.ts';
-		},
-		getDirectories(): string[] {
-			return [];
-		},
-		getNewLine(): string {
-			return '\n';
-		},
-		getSourceFile(sourceFileName: string): TypeScript.SourceFile | undefined {
-			if (!opts.fs.existsSync(`/${sourceFileName}`)) {
-				return;
-			}
-
-			const source = opts.fs.readFileSync(`/${sourceFileName}`);
-
-			if (!source) {
-				return;
-			}
-
-			return TypeScript.createSourceFile(filename, source.toString(), opts.languageVersion);
-		},
-		useCaseSensitiveFileNames(): boolean {
-			return false;
-		},
-		readFile(sourceFileName: string): string | undefined {
-			const buffer = opts.fs.readFileSync(sourceFileName);
-			return buffer ? buffer.toString() : undefined;
-		},
-		writeFile(sourceFileName: string, text: string): void {
-			opts.fs.writeFileSync(`/${sourceFileName}`, text);
-		}
-	};
-
-	const program = TypeScript.createProgram(['file.ts'], opts.compilerOptions, compilerHost);
-	program.emit();
-
-	return opts.fs;
 }

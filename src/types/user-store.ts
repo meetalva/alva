@@ -65,5 +65,6 @@ export interface SerializedUserStoreReference {
 export interface SerializedUserStoreEnhancer {
 	model: ModelName.UserStoreEnhancer;
 	id: string;
-	code: string;
+	typeScript: string;
+	javaScript: string;
 }

@@ -31,12 +31,19 @@ export class PaneDevelopmentEditor extends React.Component {
 
 		Monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
 			target: Monaco.languages.typescript.ScriptTarget.ESNext,
-			allowNonTsExtensions: true
+			allowNonTsExtensions: true,
+			module: Monaco.languages.typescript.ModuleKind.CommonJS
+		});
+
+		Monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+			target: Monaco.languages.typescript.ScriptTarget.ESNext,
+			allowNonTsExtensions: true,
+			module: Monaco.languages.typescript.ModuleKind.CommonJS
 		});
 
 		this.editor = Monaco.editor.create(this.node, {
 			language: 'typescript',
-			value: storeEnhancer.getCode(),
+			value: storeEnhancer.getTypeScript(),
 			theme: 'vs-light',
 			automaticLayout: true
 		});
@@ -47,12 +54,25 @@ export class PaneDevelopmentEditor extends React.Component {
 			}
 		});
 
-		this.editor.onDidChangeModelContent(() => {
-			storeEnhancer.setCode(this.editor.getValue());
+		this.editor.onDidChangeModelContent(async () => {
+			storeEnhancer.setTypeScript(this.editor.getValue());
+
+			const model = this.editor.getModel();
+			const worker = await Monaco.languages.typescript.getTypeScriptWorker();
+			const client = await worker(model.uri);
+			const emitOutput = await client.getEmitOutput(model.uri.toString());
+			const outputFile = emitOutput.outputFiles.find(
+				file => file.name === `${model.uri.toString()}.js`
+			);
+
+			if (outputFile) {
+				console.log(outputFile.text);
+				storeEnhancer.setJavaScript(outputFile.text);
+			}
 		});
 
 		this.editor.onDidBlurEditor(() => {
-			storeEnhancer.setCode(this.editor.getValue());
+			storeEnhancer.setTypeScript(this.editor.getValue());
 			props.store.commit();
 		});
 

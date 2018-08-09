@@ -85,9 +85,14 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 
 		spying.set(
 			project,
+			// tslint:disable-next-line:cyclomatic-complexity
 			Mobx.spy((change: Types.MobxChange) => {
 				switch (change.type) {
 					case Types.MobxChangeType.Update: {
+						if (typeof change.newValue === 'function') {
+							return;
+						}
+
 						if (change.hasOwnProperty('index')) {
 							console.log('ArrayUpdate:', change);
 						}
@@ -108,7 +113,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 										change: {
 											type: objectChange.type,
 											key: objectChange.key,
-											newValue: change.newValue
+											newValue: objectChange.newValue
 										}
 									}
 								});
@@ -119,7 +124,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 					}
 
 					case Types.MobxChangeType.Add: {
-						if (change.newValue === undefined) {
+						if (change.newValue === undefined || typeof change.newValue === 'function') {
 							return;
 						}
 

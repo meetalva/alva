@@ -34,6 +34,7 @@ export class UserStoreProperty {
 			try {
 				return this.getter();
 			} catch (err) {
+				console.log(this);
 				console.error(err);
 				return '';
 			}

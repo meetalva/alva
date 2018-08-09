@@ -264,7 +264,7 @@ export class UserStore {
 	}
 
 	@Mobx.action
-	public sync(message: Message.ChangeUserStore): void {
+	public sync(message: Message.ChangeUserStore, opts: { withEnhancer: boolean }): void {
 		const userStore = UserStore.from(message.payload.userStore);
 
 		const propertyChanges = computeDifference<UserStoreProperty>({
@@ -293,6 +293,10 @@ export class UserStore {
 		referenceChanges.added.forEach(change => this.addReference(change.after));
 		referenceChanges.changed.forEach(change => change.before.update(change.after));
 		referenceChanges.removed.forEach(change => this.removeReference(change.before));
+
+		if (opts && !opts.withEnhancer) {
+			return;
+		}
 
 		this.enhancer.update(userStore.enhancer);
 	}

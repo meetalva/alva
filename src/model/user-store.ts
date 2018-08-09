@@ -61,7 +61,7 @@ export class UserStore {
 			map.set(prop.getId(), prop);
 		});
 
-		/* if (!this.designTimeStore) {
+		if (!this.designTimeStore) {
 			return map;
 		}
 
@@ -87,7 +87,7 @@ export class UserStore {
 
 			designProperty.setProperty(property);
 			map.set(property.getId(), property);
-		}); */
+		});
 
 		return map;
 	}

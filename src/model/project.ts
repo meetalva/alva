@@ -12,7 +12,7 @@ import { PatternLibrary, PatternLibraryCreateOptions } from './pattern-library';
 import { AnyPatternProperty } from './pattern-property';
 import * as Types from '../types';
 import { UserStore } from './user-store';
-import { UserStoreEnhancer, defaultCode } from './user-store-enhancer';
+import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-enhancer';
 import { UserStoreReference } from './user-store-reference';
 import * as uuid from 'uuid';
 
@@ -188,7 +188,8 @@ export class Project {
 			id: uuid.v4(),
 			enhancer: new UserStoreEnhancer({
 				id: uuid.v4(),
-				code: defaultCode
+				typeScript: defaultCode,
+				javaScript: defaultJavaScript
 			})
 		});
 

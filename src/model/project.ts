@@ -342,6 +342,14 @@ export class Project {
 		return this.getElements().filter(e => e.hasPattern(pattern));
 	}
 
+	public getHighlightedElements(): Element[] {
+		return this.highlightedElements;
+	}
+
+	public getHighlightedElementContents(): ElementContent[] {
+		return this.highlightedElementContents;
+	}
+
 	public getFocusedItem(): Element | Page | undefined {
 		return this.focusedItem;
 	}

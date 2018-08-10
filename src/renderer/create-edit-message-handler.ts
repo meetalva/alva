@@ -55,6 +55,8 @@ export function createEditMessageHandler({
 				break;
 			}
 			case Message.MessageType.PasteElement: {
+				project.startBatch();
+
 				const activePage = store.getActivePage() as Model.Page;
 
 				if (!activePage) {
@@ -69,15 +71,17 @@ export function createEditMessageHandler({
 					return;
 				}
 
-				const contextProject = Model.Project.from(message.payload.project);
+				const contextProject = message.payload.project
+					? Model.Project.from(message.payload.project)
+					: store.getProject();
 
 				const sourceElement = Model.Element.from(message.payload.element, {
 					project: contextProject
 				});
 
 				const clonedElement = sourceElement.clone();
+				project.endBatch();
 
-				// TODO: Check if the pattern can be resolved, abort when missing
 				project.importElement(clonedElement);
 
 				switch (message.payload.targetType) {
@@ -99,18 +103,25 @@ export function createEditMessageHandler({
 
 				store.commit();
 				project.setSelectedElement(clonedElement);
+
 				break;
 			}
 			case Message.MessageType.PastePage: {
+				project.startBatch();
+
 				const pages = store.getPages();
 				const activePage = (store.getActivePage() || pages[pages.length - 1]) as Model.Page;
 
-				const contextProject = Model.Project.from(message.payload.project);
+				const contextProject = message.payload.project
+					? Model.Project.from(message.payload.project)
+					: store.getProject();
+
 				const sourcePage = Model.Page.from(message.payload.page, { project: contextProject });
 				const clonedPage = sourcePage.clone();
 
-				project.importPage(clonedPage);
+				project.endBatch();
 
+				project.importPage(clonedPage);
 				store.commit();
 
 				project.movePageAfter({
@@ -119,6 +130,7 @@ export function createEditMessageHandler({
 				});
 
 				project.setActivePage(clonedPage);
+
 				break;
 			}
 			case Message.MessageType.Duplicate: {

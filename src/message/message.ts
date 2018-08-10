@@ -252,14 +252,14 @@ export type PasteElement = Envelope<
 	MessageType.PasteElement,
 	{
 		element: Types.SerializedElement;
-		project: Types.SerializedProject;
+		project?: Types.SerializedProject;
 		targetType: Types.ElementTargetType;
 		targetId?: string;
 	}
 >;
 export type PastePage = Envelope<
 	MessageType.PastePage,
-	{ page: Types.SerializedPage; project: Types.SerializedProject }
+	{ page: Types.SerializedPage; project?: Types.SerializedProject }
 >;
 export type ProjectRequest = EmptyEnvelope<MessageType.ProjectRequest>;
 export type ProjectResponse = Envelope<

@@ -46,7 +46,9 @@ export class Project {
 
 	@Mobx.observable private name: string;
 
-	@Mobx.observable private pages: Page[] = [];
+	@Mobx.observable private internalPages: Map<string, Page> = new Map();
+
+	@Mobx.observable private pageList: string[] = [];
 
 	@Mobx.observable private path;
 
@@ -143,12 +145,22 @@ export class Project {
 		return Types.ItemType.None;
 	}
 
+	@Mobx.computed
+	private get pages(): Page[] {
+		return this.pageList
+			.map(id => this.internalPages.get(id))
+			.filter((page): page is Page => typeof page !== 'undefined');
+	}
+
 	public constructor(init: ProjectProperties) {
 		this.name = init.name;
 		this.id = init.id ? init.id : uuid.v4();
-		this.pages = init.pages ? init.pages : [];
 		this.path = init.path;
 		this.userStore = init.userStore;
+
+		init.pages.forEach(page => {
+			this.addPage(page);
+		});
 
 		init.patternLibraries.forEach(patternLibrary => {
 			this.addPatternLibrary(patternLibrary);
@@ -288,7 +300,11 @@ export class Project {
 
 	@Mobx.action
 	public addPage(page: Page): void {
-		this.pages.push(page);
+		if (!this.pageList.includes(page.getId())) {
+			this.pageList.push(page.getId());
+		}
+
+		this.internalPages.set(page.getId(), page);
 		page.setProject(this);
 	}
 
@@ -552,16 +568,16 @@ export class Project {
 	}
 
 	@Mobx.action
-	public removePage(page: Page): boolean {
-		const index = this.pages.indexOf(page);
+	public removePage(page: Page): void {
+		this.internalPages.delete(page.getId());
+
+		const index = this.pageList.indexOf(page.getId());
 
 		if (index === -1) {
-			return false;
+			return;
 		}
 
-		this.pages.splice(index, 1);
-
-		return true;
+		this.pageList.splice(index, 1);
 	}
 
 	@Mobx.action
@@ -625,11 +641,6 @@ export class Project {
 	@Mobx.action
 	public setName(name: string): void {
 		this.name = name;
-	}
-
-	@Mobx.action
-	public setPages(pages: Page[]): void {
-		this.pages = pages;
 	}
 
 	@Mobx.action
@@ -882,16 +893,6 @@ export class Project {
 		pageChanges.removed.forEach(change => this.removePage(change.before));
 		pageChanges.added.forEach(change => this.addPage(change.after));
 		pageChanges.changed.forEach(change => change.before.update(change.after));
-
-		// elements: this.getElements().map(e => e.toJSON()),
-		// elementActions: this.getElementActions().map(e => e.toJSON()),
-		// elementContents: this.getElementContents().map(e => e.toJSON()),
-		// id: this.id,
-		// name: this.name,
-		// pages: this.pages.map(p => p.toJSON()),
-		// path: this.path,
-		// patternLibraries: this.getPatternLibraries().map(p => p.toJSON()),
-		// userStore: this.userStore.toJSON()
 	}
 
 	public startBatch(): void {

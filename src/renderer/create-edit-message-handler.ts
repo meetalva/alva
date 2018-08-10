@@ -79,8 +79,9 @@ export function createEditMessageHandler({
 					project: contextProject
 				});
 
-				const clonedElement = sourceElement.clone();
 				project.endBatch();
+
+				const clonedElement = sourceElement.clone();
 
 				project.importElement(clonedElement);
 
@@ -117,9 +118,9 @@ export function createEditMessageHandler({
 					: store.getProject();
 
 				const sourcePage = Model.Page.from(message.payload.page, { project: contextProject });
-				const clonedPage = sourcePage.clone();
-
 				project.endBatch();
+
+				const clonedPage = sourcePage.clone();
 
 				project.importPage(clonedPage);
 				store.commit();

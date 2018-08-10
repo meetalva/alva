@@ -645,6 +645,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public redo(): void {
+		this.getProject().startBatch();
 		const item = this.editHistory.forward();
 
 		if (!item) {
@@ -659,7 +660,7 @@ export class ViewStore {
 
 		this.unsetDraggedElement();
 		this.setApp(Model.AlvaApp.from(item.app));
-		this.setProject(project);
+		this.getProject().update(project);
 	}
 
 	@Mobx.action
@@ -888,6 +889,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public undo(): void {
+		this.getProject().startBatch();
 		const item = this.editHistory.back();
 
 		if (!item) {
@@ -903,7 +905,9 @@ export class ViewStore {
 
 		this.unsetDraggedElement();
 		this.setApp(app);
-		this.setProject(project);
+
+		this.getProject().endBatch();
+		this.getProject().update(project);
 	}
 
 	@Mobx.action

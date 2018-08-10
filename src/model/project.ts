@@ -1,4 +1,5 @@
 import { AnyModel } from './any-model';
+import { computeDifference } from '../alva-util';
 import { Element, ElementContent, ElementProperty } from './element';
 import { ElementAction } from './element-action';
 import * as Message from '../message';
@@ -33,7 +34,7 @@ export interface ProjectCreateInit {
 export class Project {
 	public readonly model = Types.ModelName.Project;
 
-	private batch: number = 0;
+	private batch: number = 1;
 
 	@Mobx.observable private elements: Map<string, Element> = new Map();
 
@@ -150,22 +151,10 @@ export class Project {
 		this.userStore = init.userStore;
 
 		init.patternLibraries.forEach(patternLibrary => {
-			if (patternLibrary.getOrigin() === Types.PatternLibraryOrigin.BuiltIn) {
-				const updatedLibrary = Project.createBuiltinPatternLibrary({
-					getGlobalEnumOptionId: (enumId, contextId) =>
-						patternLibrary.assignEnumOptionId(enumId, contextId),
-					getGlobalPatternId: contextId => patternLibrary.assignPatternId(contextId),
-					getGlobalPropertyId: (patternId, contextId) =>
-						patternLibrary.assignPropertyId(patternId, contextId),
-					getGlobalSlotId: (patternId, contextId) =>
-						patternLibrary.assignSlotId(patternId, contextId)
-				});
-
-				patternLibrary.update(updatedLibrary);
-			}
-
-			this.patternLibraries.set(patternLibrary.getId(), patternLibrary);
+			this.addPatternLibrary(patternLibrary);
 		});
+
+		this.endBatch();
 	}
 
 	public static createBuiltinPatternLibrary(opts?: PatternLibraryCreateOptions): PatternLibrary {
@@ -226,9 +215,13 @@ export class Project {
 			name: serialized.name,
 			path: serialized.path,
 			pages: [],
-			patternLibraries: serialized.patternLibraries.map(p => PatternLibrary.from(p)),
+			patternLibraries: [],
 			userStore
 		});
+
+		project.startBatch();
+
+		serialized.patternLibraries.forEach(p => project.addPatternLibrary(PatternLibrary.from(p)));
 
 		serialized.pages.forEach(page => project.addPage(Page.from(page, { project })));
 
@@ -245,6 +238,9 @@ export class Project {
 		});
 
 		userStore.getPageProperty().setProject(project);
+
+		project.endBatch();
+
 		return project;
 	}
 
@@ -273,6 +269,20 @@ export class Project {
 
 	@Mobx.action
 	public addPatternLibrary(patternLibrary: PatternLibrary): void {
+		if (patternLibrary.getOrigin() === Types.PatternLibraryOrigin.BuiltIn) {
+			const updatedLibrary = Project.createBuiltinPatternLibrary({
+				getGlobalEnumOptionId: (enumId, contextId) =>
+					patternLibrary.assignEnumOptionId(enumId, contextId),
+				getGlobalPatternId: contextId => patternLibrary.assignPatternId(contextId),
+				getGlobalPropertyId: (patternId, contextId) =>
+					patternLibrary.assignPropertyId(patternId, contextId),
+				getGlobalSlotId: (patternId, contextId) =>
+					patternLibrary.assignSlotId(patternId, contextId)
+			});
+
+			patternLibrary.update(updatedLibrary);
+		}
+
 		this.patternLibraries.set(patternLibrary.getId(), patternLibrary);
 	}
 
@@ -555,6 +565,11 @@ export class Project {
 	}
 
 	@Mobx.action
+	public removePatternLibrary(patternLibrary: PatternLibrary): void {
+		this.patternLibraries.delete(patternLibrary.getId());
+	}
+
+	@Mobx.action
 	public setActivePage(page: Page): void {
 		this.unsetActivePage();
 		this.unsetSelectedElement();
@@ -818,8 +833,65 @@ export class Project {
 			.forEach(element => element.setPlaceholderHighlighted(false));
 	}
 
-	public update(raw: this | Types.SerializedProject): void {
-		/** */
+	public update(b: this): void {
+		this.name = b.name;
+		this.path = b.path;
+		this.userStore.update(b.userStore);
+
+		const elementChanges = computeDifference({
+			before: this.getElements(),
+			after: b.getElements()
+		});
+
+		elementChanges.removed.forEach(change => this.removeElement(change.before));
+		elementChanges.added.forEach(change => this.addElement(change.after));
+		elementChanges.changed.forEach(change => change.before.update(change.after));
+
+		const elementActionChanges = computeDifference({
+			before: this.getElementActions(),
+			after: b.getElementActions()
+		});
+
+		elementActionChanges.removed.forEach(change => this.removeElementAction(change.before));
+		elementActionChanges.added.forEach(change => this.addElementAction(change.after));
+		elementActionChanges.changed.forEach(change => change.before.update(change.after));
+
+		const elementContentChanges = computeDifference({
+			before: this.getElementContents(),
+			after: b.getElementContents()
+		});
+
+		elementContentChanges.removed.forEach(change => this.removeElementContent(change.before));
+		elementContentChanges.added.forEach(change => this.addElementContent(change.after));
+		elementContentChanges.changed.forEach(change => change.before.update(change.after));
+
+		const patternLibraryChanges = computeDifference({
+			before: this.getPatternLibraries(),
+			after: b.getPatternLibraries()
+		});
+
+		patternLibraryChanges.removed.forEach(change => this.removePatternLibrary(change.before));
+		patternLibraryChanges.added.forEach(change => this.addPatternLibrary(change.after));
+		patternLibraryChanges.changed.forEach(change => change.before.update(change.after));
+
+		const pageChanges = computeDifference({
+			before: this.getPages(),
+			after: b.getPages()
+		});
+
+		pageChanges.removed.forEach(change => this.removePage(change.before));
+		pageChanges.added.forEach(change => this.addPage(change.after));
+		pageChanges.changed.forEach(change => change.before.update(change.after));
+
+		// elements: this.getElements().map(e => e.toJSON()),
+		// elementActions: this.getElementActions().map(e => e.toJSON()),
+		// elementContents: this.getElementContents().map(e => e.toJSON()),
+		// id: this.id,
+		// name: this.name,
+		// pages: this.pages.map(p => p.toJSON()),
+		// path: this.path,
+		// patternLibraries: this.getPatternLibraries().map(p => p.toJSON()),
+		// userStore: this.userStore.toJSON()
 	}
 
 	public startBatch(): void {

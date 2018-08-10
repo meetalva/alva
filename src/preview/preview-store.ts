@@ -1,10 +1,10 @@
 import { ElementArea } from './element-area';
 import * as Mobx from 'mobx';
-// import * as Message from '../message';
+import * as Message from '../message';
 import * as Model from '../model';
 import { Sender } from '../sender/client';
 import * as Types from '../types';
-// import * as uuid from 'uuid';
+import * as uuid from 'uuid';
 
 export type RequestIdleCallbackHandle = number;
 
@@ -275,13 +275,13 @@ export class PreviewStore<V> {
 			this.project.setSelectedElement(data.element);
 		}
 
-		// if (this.sender) {
-		// 	this.sender.send({
-		// 		type: Message.MessageType.SelectElement,
-		// 		id: uuid.v4(),
-		// 		payload: { element: data.element.toJSON() }
-		// 	});
-		// }
+		if (this.sender) {
+			this.sender.send({
+				type: Message.MessageType.SelectElement,
+				id: uuid.v4(),
+				payload: { element: data.element.toJSON() }
+			});
+		}
 	}
 
 	@Mobx.action
@@ -301,13 +301,13 @@ export class PreviewStore<V> {
 			this.setHighlightedElement(data.element);
 		}
 
-		// if (this.sender) {
-		// 	this.sender.send({
-		// 		type: Message.MessageType.HighlightElement,
-		// 		id: uuid.v4(),
-		// 		payload: { element: data.element.toJSON() }
-		// 	});
-		// }
+		if (this.sender) {
+			this.sender.send({
+				type: Message.MessageType.HighlightElement,
+				id: uuid.v4(),
+				payload: { element: data.element.toJSON() }
+			});
+		}
 	}
 
 	@Mobx.action

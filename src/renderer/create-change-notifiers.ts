@@ -89,6 +89,10 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 			Mobx.spy((change: Types.MobxChange) => {
 				switch (change.type) {
 					case Types.MobxChangeType.Update: {
+						if (project.batching) {
+							return;
+						}
+
 						if (typeof change.newValue === 'function') {
 							return;
 						}

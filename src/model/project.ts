@@ -33,6 +33,8 @@ export interface ProjectCreateInit {
 export class Project {
 	public readonly model = Types.ModelName.Project;
 
+	private batch: number = 0;
+
 	@Mobx.observable private elements: Map<string, Element> = new Map();
 
 	@Mobx.observable private elementActions: Map<string, ElementAction> = new Map();
@@ -818,5 +820,17 @@ export class Project {
 
 	public update(raw: this | Types.SerializedProject): void {
 		/** */
+	}
+
+	public startBatch(): void {
+		++this.batch;
+	}
+
+	public endBatch(): void {
+		this.batch = Math.max(0, --this.batch);
+	}
+
+	public get batching(): boolean {
+		return this.batch > 0;
 	}
 }

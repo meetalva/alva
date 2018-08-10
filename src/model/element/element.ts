@@ -118,8 +118,14 @@ export class Element {
 	}
 
 	@Mobx.computed
-	private get flattenedProperties(): ElementProperty[] {
-		return [...this.properties.values()];
+	private get propertyByPatternProperty(): Map<string, ElementProperty> {
+		const map = new Map();
+
+		this.properties.forEach(property => {
+			map.set(property.getPatternPropertyId(), property);
+		});
+
+		return map;
 	}
 
 	@Mobx.computed
@@ -129,6 +135,24 @@ export class Element {
 		}
 
 		return this.pattern.getProperties();
+	}
+
+	@Mobx.computed
+	private get computedProperties(): ElementProperty[] {
+		return this.patternProperties.map(patternProperty => {
+			const elementProperty = this.propertyByPatternProperty.get(patternProperty.getId());
+
+			if (elementProperty) {
+				return elementProperty;
+			}
+
+			const newElementProperty = ElementProperty.fromPatternProperty(patternProperty, {
+				project: this.project
+			});
+
+			this.addProperty(newElementProperty);
+			return newElementProperty;
+		});
 	}
 
 	public constructor(init: ElementInit, context: ElementContext) {
@@ -461,22 +485,7 @@ export class Element {
 
 	@Mobx.action
 	public getProperties(): ElementProperty[] {
-		return this.patternProperties.map(patternProperty => {
-			const elementProperty = this.flattenedProperties.find(
-				e => e.getPatternPropertyId() === patternProperty.getId()
-			);
-
-			if (elementProperty) {
-				return elementProperty;
-			}
-
-			const newElementProperty = ElementProperty.fromPatternProperty(patternProperty, {
-				project: this.project
-			});
-
-			this.addProperty(newElementProperty);
-			return newElementProperty;
-		});
+		return this.computedProperties;
 	}
 
 	public getRole(): Types.ElementRole {

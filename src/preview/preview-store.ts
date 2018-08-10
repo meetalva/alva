@@ -61,16 +61,6 @@ export class PreviewStore<V> {
 	@Mobx.observable private scrollPosition: Types.Point;
 	private sender?: Sender;
 
-	@Mobx.computed
-	private get elements(): Model.Element[] {
-		return this.project.getElements();
-	}
-
-	@Mobx.computed
-	private get elementContents(): Model.ElementContent[] {
-		return this.project.getElementContents();
-	}
-
 	public constructor(init: PreviewStoreInit<V, Types.PreviewDocumentMode>) {
 		this.mode = init.mode;
 		this.project = init.project;
@@ -125,11 +115,11 @@ export class PreviewStore<V> {
 	}
 
 	public getHighlightedElement(): Model.Element | undefined {
-		return this.elements.find(element => element.getHighlighted());
+		return this.project.getHighlightedElements()[0];
 	}
 
 	public getHighlightedElementContent(): Model.ElementContent | undefined {
-		return this.elementContents.find(c => c.getHighlighted());
+		return this.project.getHighlightedElementContents()[0];
 	}
 
 	public getHighlightArea(): ElementArea {

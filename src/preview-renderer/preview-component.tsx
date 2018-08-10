@@ -1,4 +1,5 @@
 import { PreviewComponentError } from './preview-component-error';
+import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
 import * as React from 'react';
@@ -15,6 +16,8 @@ export type Injected = PreviewComponentProps & Injection;
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PreviewComponent extends React.Component<PreviewComponentProps> {
+	private dispose: () => void;
+
 	private getDomElement(): Element | undefined {
 		const node = ReactDom.findDOMNode(this);
 
@@ -44,23 +47,6 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 		props.store.onElementClick(e, { element: props.element, node: this.getDomElement() });
 	}
 
-	private update(): void {
-		const props = this.props as Injected;
-
-		const children = props.element.getContentBySlotType(Types.SlotType.Children);
-
-		if (props.element.getHighlighted() || (children && children.getHighlighted())) {
-			props.store.updateHighlightedElement({
-				element: props.element,
-				node: this.getDomElement()
-			});
-		}
-
-		if (props.element.getSelected()) {
-			props.store.updateSelectedElement({ element: props.element, node: this.getDomElement() });
-		}
-	}
-
 	public componentDidMount(): void {
 		const el = this.getDomElement();
 
@@ -74,11 +60,24 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 		el.addEventListener('click', this.handleClick);
 		el.addEventListener('mouseover', this.handleMouseOver);
 
-		this.update();
-	}
+		this.dispose = Mobx.autorun(() => {
+			const props = this.props as Injected;
+			const children = props.element.getContentBySlotType(Types.SlotType.Children);
 
-	public componentDidUpdate(): void {
-		this.update();
+			if (props.element.getHighlighted() || (children && children.getHighlighted())) {
+				props.store.updateHighlightedElement({
+					element: props.element,
+					node: this.getDomElement()
+				});
+			}
+
+			if (props.element.getSelected()) {
+				props.store.updateSelectedElement({
+					element: props.element,
+					node: this.getDomElement()
+				});
+			}
+		});
 	}
 
 	public componentWillUnmount(): void {
@@ -90,6 +89,10 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 		el.removeEventListener('click', this.handleClick);
 		el.removeEventListener('mouseover', this.handleMouseOver);
+
+		if (this.dispose) {
+			this.dispose();
+		}
 	}
 
 	public render(): JSX.Element | null {

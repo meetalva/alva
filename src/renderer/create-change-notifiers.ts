@@ -61,188 +61,164 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 		});
 	}, opts);
 
-	const spying: Map<Model.Project, () => void> = new Map();
-
-	Mobx.autorun(() => {
+	// tslint:disable-next-line:cyclomatic-complexity
+	Mobx.spy((change: Types.MobxChange) => {
 		const project = store.getProject();
 
-		if (!project) {
-			spying.forEach(end => end());
+		if (!project || project.batching) {
 			return;
 		}
 
-		if (project) {
-			for (const [p, e] of spying.entries()) {
-				if (p !== project) {
-					e();
+		switch (change.type) {
+			case Types.MobxChangeType.Update: {
+				if (typeof change.newValue === 'function') {
+					return;
 				}
+
+				if (change.hasOwnProperty('index')) {
+					console.log('ArrayUpdate:', change);
+				}
+
+				if (change.hasOwnProperty('key')) {
+					const objectChange = change as
+						| Types.MobxObjectUpdate<Model.AnyModel>
+						| Types.MobxMapUpdate<string, Model.AnyModel>;
+
+					window.requestIdleCallback(() => {
+						sender.send({
+							id: uuid.v4(),
+							type: Message.MessageType.MobxUpdate,
+							payload: {
+								// tslint:disable-next-line:no-any
+								id: (objectChange.object as any).id,
+								name: objectChange.object.constructor.name,
+								change: {
+									type: objectChange.type,
+									key: objectChange.key,
+									newValue: objectChange.newValue
+								}
+							}
+						});
+					});
+				}
+
+				break;
+			}
+
+			case Types.MobxChangeType.Add: {
+				if (change.newValue === undefined || typeof change.newValue === 'function') {
+					return;
+				}
+
+				const parent = getParentByMember(change.object, {
+					name: change.name,
+					project
+				});
+				const name = parseChangeName(change.name);
+
+				if (!parent) {
+					return;
+				}
+
+				// tslint:disable-next-line:no-any
+				const rawValue = change.newValue as any;
+
+				const newValue =
+					rawValue && typeof rawValue.toJSON === 'function'
+						? rawValue.toJSON()
+						: change.newValue;
+
+				if (typeof newValue === 'object' && !newValue.model) {
+					console.log(change);
+					return;
+				}
+
+				sender.send({
+					id: uuid.v4(),
+					type: Message.MessageType.MobxAdd,
+					payload: {
+						id: parent.getId(),
+						name: name.parentName,
+						memberName: name.memberName,
+						valueModel: typeof newValue === 'object' ? newValue.model : undefined,
+						change: {
+							type: change.type,
+							key: change.key as string,
+							newValue
+						}
+					}
+				});
+
+				break;
+			}
+
+			case Types.MobxChangeType.Delete: {
+				const parent = getParentByMember(change.object, {
+					name: change.name,
+					project
+				});
+				const name = parseChangeName(change.name);
+				const deletion = change as Types.MobxDelete<string, Model.AnyModel>;
+
+				if (!parent) {
+					return;
+				}
+
+				sender.send({
+					id: uuid.v4(),
+					type: Message.MessageType.MobxDelete,
+					payload: {
+						id: parent.getId(),
+						name: name.parentName,
+						memberName: name.memberName,
+						change: {
+							type: deletion.type,
+							key: deletion.key
+						}
+					}
+				});
+
+				break;
+			}
+
+			case Types.MobxChangeType.Splice: {
+				const parent = getParentByMember(change.object, {
+					name: change.name,
+					project
+				});
+				const name = parseChangeName(change.name);
+
+				if (!parent) {
+					return;
+				}
+
+				// tslint:disable-next-line:no-any
+				const exampleValue = (change.added || change.removed)[0] as Model.AnyModel;
+
+				const model =
+					exampleValue && typeof exampleValue.toJSON === 'function'
+						? exampleValue.model
+						: undefined;
+
+				sender.send({
+					id: uuid.v4(),
+					type: Message.MessageType.MobxSplice,
+					payload: {
+						id: parent.getId(),
+						name: name.parentName,
+						memberName: name.memberName,
+						valueModel: model,
+						change: {
+							type: change.type,
+							index: change.index,
+							added: change.added,
+							removed: change.removed
+						}
+					}
+				});
+				break;
 			}
 		}
-
-		if (spying.has(project)) {
-			return;
-		}
-
-		spying.set(
-			project,
-			// tslint:disable-next-line:cyclomatic-complexity
-			Mobx.spy((change: Types.MobxChange) => {
-				switch (change.type) {
-					case Types.MobxChangeType.Update: {
-						if (project.batching) {
-							return;
-						}
-
-						if (typeof change.newValue === 'function') {
-							return;
-						}
-
-						if (change.hasOwnProperty('index')) {
-							console.log('ArrayUpdate:', change);
-						}
-
-						if (change.hasOwnProperty('key')) {
-							const objectChange = change as
-								| Types.MobxObjectUpdate<Model.AnyModel>
-								| Types.MobxMapUpdate<string, Model.AnyModel>;
-
-							window.requestIdleCallback(() => {
-								sender.send({
-									id: uuid.v4(),
-									type: Message.MessageType.MobxUpdate,
-									payload: {
-										// tslint:disable-next-line:no-any
-										id: (objectChange.object as any).id,
-										name: objectChange.object.constructor.name,
-										change: {
-											type: objectChange.type,
-											key: objectChange.key,
-											newValue: objectChange.newValue
-										}
-									}
-								});
-							});
-						}
-
-						break;
-					}
-
-					case Types.MobxChangeType.Add: {
-						if (change.newValue === undefined || typeof change.newValue === 'function') {
-							return;
-						}
-
-						const parent = getParentByMember(change.object, {
-							name: change.name,
-							project
-						});
-						const name = parseChangeName(change.name);
-
-						if (!parent) {
-							return;
-						}
-
-						// tslint:disable-next-line:no-any
-						const rawValue = change.newValue as any;
-
-						const newValue =
-							rawValue && typeof rawValue.toJSON === 'function'
-								? rawValue.toJSON()
-								: change.newValue;
-
-						if (typeof newValue === 'object' && !newValue.model) {
-							console.log(change);
-							return;
-						}
-
-						sender.send({
-							id: uuid.v4(),
-							type: Message.MessageType.MobxAdd,
-							payload: {
-								id: parent.getId(),
-								name: name.parentName,
-								memberName: name.memberName,
-								valueModel: typeof newValue === 'object' ? newValue.model : undefined,
-								change: {
-									type: change.type,
-									key: change.key as string,
-									newValue
-								}
-							}
-						});
-
-						break;
-					}
-
-					case Types.MobxChangeType.Delete: {
-						const parent = getParentByMember(change.object, {
-							name: change.name,
-							project
-						});
-						const name = parseChangeName(change.name);
-						const deletion = change as Types.MobxDelete<string, Model.AnyModel>;
-
-						if (!parent) {
-							return;
-						}
-
-						sender.send({
-							id: uuid.v4(),
-							type: Message.MessageType.MobxDelete,
-							payload: {
-								id: parent.getId(),
-								name: name.parentName,
-								memberName: name.memberName,
-								change: {
-									type: deletion.type,
-									key: deletion.key
-								}
-							}
-						});
-
-						break;
-					}
-
-					case Types.MobxChangeType.Splice: {
-						const parent = getParentByMember(change.object, {
-							name: change.name,
-							project
-						});
-						const name = parseChangeName(change.name);
-
-						if (!parent) {
-							return;
-						}
-
-						// tslint:disable-next-line:no-any
-						const exampleValue = (change.added || change.removed)[0] as Model.AnyModel;
-
-						const model =
-							exampleValue && typeof exampleValue.toJSON === 'function'
-								? exampleValue.model
-								: undefined;
-
-						sender.send({
-							id: uuid.v4(),
-							type: Message.MessageType.MobxSplice,
-							payload: {
-								id: parent.getId(),
-								name: name.parentName,
-								memberName: name.memberName,
-								valueModel: model,
-								change: {
-									type: change.type,
-									index: change.index,
-									added: change.added,
-									removed: change.removed
-								}
-							}
-						});
-						break;
-					}
-				}
-			})
-		);
 	});
 }
 

@@ -294,6 +294,8 @@ export class UserStore {
 		referenceChanges.changed.forEach(change => change.before.update(change.after));
 		referenceChanges.removed.forEach(change => this.removeReference(change.before));
 
+		this.currentPageProperty.update(userStore.currentPageProperty);
+
 		if (opts && !opts.withEnhancer) {
 			return;
 		}

@@ -92,7 +92,8 @@ export class ElementAction {
 		project: Project;
 		event: Event;
 	}): void {
-		const storeAction = this.userStore.getActionById(this.storeActionId);
+		const userStore = project.getUserStore();
+		const storeAction = userStore.getActionById(this.storeActionId);
 
 		if (!storeAction) {
 			return;
@@ -102,14 +103,14 @@ export class ElementAction {
 			case Types.UserStoreActionType.Noop:
 				return;
 			case Types.UserStoreActionType.Set: {
-				const storeProperty = this.userStore.getPropertyById(this.storePropertyId);
+				const storeProperty = userStore.getPropertyById(this.storePropertyId);
 				if (storeProperty) {
 					storeProperty.setValue(this.getResolvedPayload({ project, event }) || '');
 				}
 				break;
 			}
 			case Types.UserStoreActionType.SetPage: {
-				const pageProperty = this.userStore.getPageProperty();
+				const pageProperty = userStore.getPageProperty();
 				pageProperty.setValue(this.getPayload());
 				break;
 			}

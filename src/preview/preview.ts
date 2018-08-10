@@ -184,7 +184,7 @@ function main(): void {
 			}
 		);
 
-		/* Mobx.autorun(
+		Mobx.autorun(
 			() => {
 				const userStore = store.getProject().getUserStore();
 
@@ -197,7 +197,7 @@ function main(): void {
 			{
 				scheduler: window.requestIdleCallback
 			}
-		); */
+		);
 	}
 }
 

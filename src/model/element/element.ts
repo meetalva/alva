@@ -1,4 +1,3 @@
-import { computeDifference } from '../../alva-util';
 import { ElementContent } from './element-content';
 import { ElementProperty } from './element-property';
 import * as _ from 'lodash';
@@ -22,7 +21,8 @@ export interface ElementInit {
 	open: boolean;
 	patternId: string;
 	placeholderHighlighted: boolean;
-	properties: ElementProperty[];
+	// tslint:disable-next-line:no-any
+	propertyValues: [string, any][];
 	role?: Types.ElementRole;
 	selected: boolean;
 	setDefaults?: boolean;
@@ -65,7 +65,7 @@ export class Element {
 
 	private project: Project;
 
-	@Mobx.observable private properties: Map<string, ElementProperty> = new Map();
+	@Mobx.observable private propertyValues: Map<string, Types.ElementPropertyValue> = new Map();
 
 	@Mobx.observable private role: Types.ElementRole;
 
@@ -118,17 +118,6 @@ export class Element {
 	}
 
 	@Mobx.computed
-	private get propertyByPatternProperty(): Map<string, ElementProperty> {
-		const map = new Map();
-
-		this.properties.forEach(property => {
-			map.set(property.getPatternPropertyId(), property);
-		});
-
-		return map;
-	}
-
-	@Mobx.computed
 	private get patternProperties(): AnyPatternProperty[] {
 		if (!this.pattern) {
 			return [];
@@ -138,21 +127,13 @@ export class Element {
 	}
 
 	@Mobx.computed
-	private get computedProperties(): ElementProperty[] {
-		return this.patternProperties.map(patternProperty => {
-			const elementProperty = this.propertyByPatternProperty.get(patternProperty.getId());
-
-			if (elementProperty) {
-				return elementProperty;
-			}
-
-			const newElementProperty = ElementProperty.fromPatternProperty(patternProperty, {
+	private get properties(): ElementProperty[] {
+		return this.patternProperties.map(patternProperty =>
+			ElementProperty.fromPatternProperty(patternProperty, {
+				element: this,
 				project: this.project
-			});
-
-			this.addProperty(newElementProperty);
-			return newElementProperty;
-		});
+			})
+		);
 	}
 
 	public constructor(init: ElementInit, context: ElementContext) {
@@ -181,38 +162,11 @@ export class Element {
 			this.name = pattern.getName();
 		}
 
-		const getProperties = () => {
-			if (!pattern) {
-				return [];
-			}
-			return pattern.getProperties().map(patternProperty => {
-				const hydratedProperty = init.properties.find(elementProperty =>
-					elementProperty.hasPatternProperty(patternProperty)
-				);
-
-				if (hydratedProperty) {
-					return hydratedProperty;
-				}
-
-				return new ElementProperty(
-					{
-						id: uuid.v4(),
-						patternPropertyId: patternProperty.getId(),
-						setDefault: Boolean(init.setDefaults),
-						value: undefined
-					},
-					{
-						project: this.project
-					}
-				);
-			});
-		};
-
-		getProperties().forEach(prop => this.properties.set(prop.getId(), prop));
+		this.propertyValues = new Map(init.propertyValues);
 	}
 
 	public static from(serialized: Types.SerializedElement, context: ElementContext): Element {
-		return new Element(
+		const element = new Element(
 			{
 				dragged: serialized.dragged,
 				focused: serialized.focused,
@@ -225,14 +179,21 @@ export class Element {
 				contentIds: serialized.contentIds,
 				open: serialized.open,
 				forcedOpen: serialized.forcedOpen,
-				properties: Array.from(serialized.properties || []).map(p =>
-					ElementProperty.from(p, context)
-				),
+				propertyValues: serialized.propertyValues,
 				role: deserializeRole(serialized.role),
 				selected: serialized.selected
 			},
 			context
 		);
+
+		// Keep backward compat
+		if (Array.isArray(serialized.properties)) {
+			serialized.properties.forEach((property: Types.LegacySerializedElementProperty) => {
+				element.setPropertyValue(property.patternPropertyId, property.value);
+			});
+		}
+
+		return element;
 	}
 
 	public accepts(child: Element): boolean {
@@ -259,11 +220,6 @@ export class Element {
 	}
 
 	@Mobx.action
-	public addProperty(property: ElementProperty): void {
-		this.properties.set(property.getId(), property);
-	}
-
-	@Mobx.action
 	public clone(opts?: { withState: boolean }): Element {
 		const withState = Boolean(opts && opts.withState);
 
@@ -285,7 +241,7 @@ export class Element {
 				forcedOpen: withState ? this.forcedOpen : false,
 				patternId: this.patternId,
 				placeholderHighlighted: withState ? this.placeholderHighlighted : false,
-				properties: this.getProperties().map(propertyValue => propertyValue.clone()),
+				propertyValues: [...this.propertyValues.entries()],
 				role: this.role,
 				selected: withState ? this.selected : false
 			},
@@ -483,9 +439,17 @@ export class Element {
 		return this.placeholderHighlighted;
 	}
 
-	@Mobx.action
 	public getProperties(): ElementProperty[] {
-		return this.computedProperties;
+		return this.properties;
+	}
+
+	public getPropertyValue(id: string): Types.ElementPropertyValue {
+		return this.propertyValues.get(id);
+	}
+
+	@Mobx.action
+	public setPropertyValue(id: string, value: Types.ElementPropertyValue): void {
+		this.propertyValues.set(id, value);
 	}
 
 	public getRole(): Types.ElementRole {
@@ -512,11 +476,6 @@ export class Element {
 		if (container) {
 			container.remove({ element: this });
 		}
-	}
-
-	@Mobx.action
-	public removeProperty(property: ElementProperty): void {
-		this.properties.delete(property.getId());
 	}
 
 	@Mobx.action
@@ -653,7 +612,7 @@ export class Element {
 			forcedOpen: this.forcedOpen,
 			patternId: this.patternId,
 			placeholderHighlighted: this.placeholderHighlighted,
-			properties: this.getProperties().map(elementProperty => elementProperty.toJSON()),
+			propertyValues: [...this.propertyValues.entries()],
 			role: serializeRole(this.role),
 			selected: this.selected
 		};
@@ -673,15 +632,6 @@ export class Element {
 		if (this.shouldHighlight) {
 			this.project.unsetHighlightedElement();
 		}
-
-		const propsChanges = computeDifference({
-			before: this.getProperties(),
-			after: b.getProperties()
-		});
-
-		propsChanges.removed.forEach(change => this.removeProperty(change.before));
-		propsChanges.added.forEach(change => this.addProperty(change.after));
-		propsChanges.changed.forEach(change => change.before.update(change.after));
 
 		this.shouldHighlight = b.shouldHighlight;
 		this.dragged = b.dragged;

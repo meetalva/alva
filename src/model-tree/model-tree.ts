@@ -11,8 +11,6 @@ export function getModelByName(modelName?: Types.ModelName): Types.ModelSurface 
 			return Model.ElementAction;
 		case Types.ModelName.ElementContent:
 			return Model.ElementContent;
-		case Types.ModelName.ElementProperty:
-			return Model.ElementProperty;
 		case Types.ModelName.Page:
 			return Model.Page;
 		case Types.ModelName.Pattern:

@@ -399,10 +399,6 @@ export class Project {
 			return this.getElementContentById(id);
 		}
 
-		if (constructorName === 'ElementProperty') {
-			return this.getElementPropertyById(id);
-		}
-
 		if (constructorName === 'Page') {
 			return this.getPageById(id);
 		}
@@ -695,11 +691,11 @@ export class Project {
 
 	public sync(sender: Types.Sender): void {
 		sender.match<Message.MobxUpdateMessage>(Message.MessageType.MobxUpdate, message => {
-			if (message.payload.change.hasOwnProperty('key')) {
-				const change = message.payload.change as
-					| Message.MobxObjectUpdatePayload
-					| Message.MobxMapUpdatePayload;
-
+			if (
+				message.payload.change.hasOwnProperty('key') &&
+				!message.payload.change.hasOwnProperty('mapKey')
+			) {
+				const change = message.payload.change as Message.MobxObjectUpdatePayload;
 				const object = this.getObject(message.payload.name, message.payload.id);
 
 				if (!object) {
@@ -723,11 +719,22 @@ export class Project {
 					return;
 				}
 
-				if (change.key === 'getter') {
-					console.log(message);
+				object[change.key] = value;
+			}
+
+			if (message.payload.change.hasOwnProperty('mapKey')) {
+				const change = message.payload.change as Message.MobxMapUpdatePayload;
+				const object = this.getObject(message.payload.name, message.payload.id);
+
+				if (!object) {
+					return;
 				}
 
-				object[change.key] = value;
+				if (!object.hasOwnProperty(change.key)) {
+					return;
+				}
+
+				object[change.key].set(change.mapKey, change.newValue);
 			}
 
 			if (message.payload.change.hasOwnProperty('index')) {

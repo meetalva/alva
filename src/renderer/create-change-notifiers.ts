@@ -79,26 +79,52 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 					console.log('ArrayUpdate:', change);
 				}
 
-				if (change.hasOwnProperty('key')) {
-					const objectChange = change as
-						| Types.MobxObjectUpdate<Model.AnyModel>
-						| Types.MobxMapUpdate<string, Model.AnyModel>;
+				if (change.hasOwnProperty('key') && !(change.object instanceof Mobx.ObservableMap)) {
+					const objectChange = change as Types.MobxObjectUpdate<Model.AnyModel>;
 
-					window.requestIdleCallback(() => {
-						sender.send({
-							id: uuid.v4(),
-							type: Message.MessageType.MobxUpdate,
-							payload: {
-								// tslint:disable-next-line:no-any
-								id: (objectChange.object as any).id,
-								name: objectChange.object.constructor.name,
-								change: {
-									type: objectChange.type,
-									key: objectChange.key,
-									newValue: objectChange.newValue
-								}
+					sender.send({
+						id: uuid.v4(),
+						type: Message.MessageType.MobxUpdate,
+						payload: {
+							// tslint:disable-next-line:no-any
+							id: (objectChange.object as any).id,
+							name: objectChange.object.constructor.name,
+							change: {
+								type: objectChange.type,
+								key: objectChange.key,
+								newValue: objectChange.newValue
 							}
-						});
+						}
+					});
+				}
+
+				if (change.hasOwnProperty('key') && change.object instanceof Mobx.ObservableMap) {
+					const mapChange = change as Types.MobxMapUpdate<string, Model.AnyModel>;
+					const name = parseChangeName(change.name);
+
+					const parent = getParentByMember(change.object, {
+						name: change.name,
+						project
+					});
+
+					if (!parent) {
+						return;
+					}
+
+					sender.send({
+						id: uuid.v4(),
+						type: Message.MessageType.MobxUpdate,
+						payload: {
+							// tslint:disable-next-line:no-any
+							id: parent.getId(),
+							name: name.parentName,
+							change: {
+								type: mapChange.type,
+								key: name.memberName,
+								mapKey: mapChange.key,
+								newValue: mapChange.newValue
+							}
+						}
 					});
 				}
 
@@ -114,6 +140,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 					name: change.name,
 					project
 				});
+
 				const name = parseChangeName(change.name);
 
 				if (!parent) {
@@ -129,7 +156,6 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 						: change.newValue;
 
 				if (typeof newValue === 'object' && !newValue.model) {
-					console.log(change);
 					return;
 				}
 

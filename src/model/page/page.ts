@@ -98,7 +98,7 @@ export class Page {
 				focused: false,
 				patternId: rootPattern.getId(),
 				placeholderHighlighted: false,
-				properties: [],
+				propertyValues: [],
 				role: Types.ElementRole.Root,
 				setDefaults: true,
 				selected: false

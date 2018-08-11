@@ -7,6 +7,7 @@ export interface AppPaneProps {
 	pane: Types.AppPane;
 	force?: boolean;
 	children: React.ReactNode;
+	size?: { width: number | string; height: number | string };
 	defaultSize?: { width: number | string; height: number | string };
 	enable?: { top?: boolean; right?: boolean; bottom?: boolean; left?: boolean };
 	minWidth?: number;
@@ -26,7 +27,7 @@ export class AppPane extends React.Component<AppPaneProps> {
 			return null;
 		}
 
-		const paneSize = props.pane ? app.getPaneSize(props.pane) : undefined;
+		const paneSize = props.size || props.pane ? app.getPaneSize(props.pane) : undefined;
 
 		const defaultSize = paneSize
 			? { width: paneSize.width, height: paneSize.height }

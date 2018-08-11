@@ -22,6 +22,19 @@ export class ViewDetails extends React.Component {
 	public render(): JSX.Element {
 		const props = this.props as { store: ViewStore };
 
+		/**
+		 * TODO: Remove before releasing BETA
+		 * Hack for backwards compat with versions that computed js output instead of saving -
+		 * for those we have to transpile the ts payload once, thus create an editor
+		 */
+		const forceEditor =
+			!props.store.getApp().isVisible(Types.AppPane.DevelopmentPane) &&
+			typeof props.store
+				.getProject()
+				.getUserStore()
+				.getEnhancer()
+				.getJavaScript() === 'undefined';
+
 		return (
 			<React.Fragment>
 				<AppPane
@@ -80,6 +93,11 @@ export class ViewDetails extends React.Component {
 					>
 						<PaneDevelopmentEditor />
 					</AppPane>
+					{forceEditor && (
+						<div style={{ position: 'fixed', top: '100vh' }}>
+							<PaneDevelopmentEditor />
+						</div>
+					)}
 				</div>
 				<AppPane
 					pane={Types.AppPane.PropertiesPane}

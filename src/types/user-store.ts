@@ -63,6 +63,8 @@ export interface SerializedUserStoreReference {
 }
 
 export interface SerializedUserStoreEnhancer {
+	/** @deprecated */
+	code?: string;
 	model: ModelName.UserStoreEnhancer;
 	id: string;
 	typeScript: string;

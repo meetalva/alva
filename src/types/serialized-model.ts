@@ -158,7 +158,6 @@ export interface LegacySerializedElementProperty {
 	model: Types.ModelName.ElementProperty;
 	id: string;
 	patternPropertyId: string;
-	setDefault: boolean;
 	value: Types.ElementPropertyValue;
 }
 

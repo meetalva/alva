@@ -547,7 +547,7 @@ export class ViewStore {
 			return;
 		}
 
-		return this.project.getElements().find(element => element.getSelected());
+		return this.project.getSelectedElement();
 	}
 
 	public getSender(): Sender {

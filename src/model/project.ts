@@ -57,6 +57,11 @@ export class Project {
 	@Mobx.observable private userStore: UserStore;
 
 	@Mobx.computed
+	private get activePage(): Page {
+		return this.pages.find(p => p.getActive()) || this.pages[0];
+	}
+
+	@Mobx.computed
 	private get patterns(): Pattern[] {
 		return this.getPatternLibraries().reduce((ps, lib) => [...ps, ...lib.getPatterns()], []);
 	}
@@ -496,6 +501,12 @@ export class Project {
 		}
 
 		return this.pages[previousIndex];
+	}
+
+	public getSelectedElement(): Element | undefined {
+		const selected = this.selectedElements[0];
+
+		return selected ? selected : this.activePage.getRoot();
 	}
 
 	public getUserStore(): UserStore {

@@ -15,6 +15,7 @@ export type MessageHandler<T extends M.Message = M.Message> = (msg: T) => void;
 export function createHandlers(ctx: MessageHandlerContext): void {
 	const sender = ctx.store.getSender();
 
+	sender.match<M.ActivatePage>(M.MessageType.ActivatePage, Handlers.activatePage(ctx));
 	sender.match<M.AppRequest>(M.MessageType.AppRequest, Handlers.appRequest(ctx));
 	sender.match<M.ChangeUserStore>(M.MessageType.ChangeUserStore, Handlers.changeUserStore(ctx));
 	sender.match<M.CheckLibraryResponse>(

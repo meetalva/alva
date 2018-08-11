@@ -1,3 +1,4 @@
+export * from './activate-page';
 export * from './app-request';
 export * from './change-user-store';
 export * from './check-pattern-library';

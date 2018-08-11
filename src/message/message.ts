@@ -28,9 +28,9 @@ export enum MessageType {
 	CreateScriptBundleResponse = 'create-script-bundle-response',
 	Cut = 'cut',
 	CutElement = 'cut-page-element',
-	Delete = 'delete',
+	DeleteSelected = 'delete',
 	DeleteElement = 'delete-page-element',
-	Duplicate = 'duplicate',
+	DuplicateSelected = 'duplicate',
 	DuplicateElement = 'duplicate-page-element',
 	ChangeActivePage = 'change-active-page',
 	ChangeApp = 'change-app',
@@ -109,11 +109,11 @@ export type Message =
 	| NewFileResponse
 	| Copy
 	| Cut
-	| CutPageElement
-	| Delete
-	| DeletePageElement
-	| Duplicate
-	| DuplicatePageElement
+	| CutElement
+	| DeleteSelected
+	| DeleteElement
+	| DuplicateSelected
+	| DuplicateElement
 	| ExportHtmlProject
 	| ExportPngPage
 	| ExportSketchPage
@@ -225,14 +225,14 @@ export type CreateScriptBundleResponse = Envelope<
 	Types.FilePayload[]
 >;
 export type Cut = EmptyEnvelope<MessageType.Cut>;
-export type Delete = EmptyEnvelope<MessageType.Delete>;
+export type DeleteSelected = EmptyEnvelope<MessageType.DeleteSelected>;
 export type KeyboardChange = Envelope<MessageType.KeyboardChange, { metaDown: boolean }>;
 export type NewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
 export type NewFileResponse = Envelope<MessageType.CreateNewFileResponse, Types.ProjectPayload>;
-export type CutPageElement = Envelope<MessageType.CutElement, string>;
-export type DeletePageElement = Envelope<MessageType.DeleteElement, string>;
-export type Duplicate = EmptyEnvelope<MessageType.Duplicate>;
-export type DuplicatePageElement = Envelope<MessageType.DuplicateElement, string>;
+export type CutElement = Envelope<MessageType.CutElement, string>;
+export type DeleteElement = Envelope<MessageType.DeleteElement, string>;
+export type DuplicateSelected = EmptyEnvelope<MessageType.DuplicateSelected>;
+export type DuplicateElement = Envelope<MessageType.DuplicateElement, string>;
 // tslint:disable-next-line:no-any
 export type Log = Envelope<MessageType.Log, any>;
 export type Maximize = EmptyEnvelope<MessageType.Maximize>;

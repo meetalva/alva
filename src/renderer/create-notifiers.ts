@@ -10,7 +10,7 @@ export interface NotifierContext {
 	store: ViewStore;
 }
 
-export function createChangeNotifiers({ app, store }: NotifierContext): void {
+export function createNotifiers({ store }: NotifierContext): void {
 	const opts = {
 		scheduler: window.requestIdleCallback
 	};
@@ -61,6 +61,9 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 		});
 	}, opts);
 
+	const send = (message: Message.Message) =>
+		window.requestIdleCallback(() => sender.send(message));
+
 	// tslint:disable-next-line:cyclomatic-complexity
 	Mobx.spy((change: Types.MobxChange) => {
 		const project = store.getProject();
@@ -82,7 +85,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 				if (change.hasOwnProperty('key') && !(change.object instanceof Mobx.ObservableMap)) {
 					const objectChange = change as Types.MobxObjectUpdate<Model.AnyModel>;
 
-					sender.send({
+					send({
 						id: uuid.v4(),
 						type: Message.MessageType.MobxUpdate,
 						payload: {
@@ -111,7 +114,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 						return;
 					}
 
-					sender.send({
+					send({
 						id: uuid.v4(),
 						type: Message.MessageType.MobxUpdate,
 						payload: {
@@ -159,7 +162,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 					return;
 				}
 
-				sender.send({
+				send({
 					id: uuid.v4(),
 					type: Message.MessageType.MobxAdd,
 					payload: {
@@ -190,7 +193,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 					return;
 				}
 
-				sender.send({
+				send({
 					id: uuid.v4(),
 					type: Message.MessageType.MobxDelete,
 					payload: {
@@ -226,7 +229,7 @@ export function createChangeNotifiers({ app, store }: NotifierContext): void {
 						? exampleValue.model
 						: undefined;
 
-				sender.send({
+				send({
 					id: uuid.v4(),
 					type: Message.MessageType.MobxSplice,
 					payload: {

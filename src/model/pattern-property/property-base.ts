@@ -64,6 +64,10 @@ export abstract class PatternPropertyBase<T> {
 		return _.isEqual(this.toJSON(), b.toJSON());
 	}
 
+	public hasDefault(): boolean {
+		return typeof this.defaultValue !== 'undefined';
+	}
+
 	public getContextId(): string {
 		return this.contextId;
 	}

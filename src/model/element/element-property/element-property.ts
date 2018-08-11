@@ -11,7 +11,6 @@ import * as uuid from 'uuid';
 export interface ElementPropertyInit {
 	id: string;
 	patternPropertyId: string;
-	setDefault: boolean;
 }
 
 export interface ElementPropertyContext {
@@ -26,7 +25,6 @@ export class ElementProperty {
 
 	@Mobx.observable private id: string;
 	@Mobx.observable private patternPropertyId: string;
-	@Mobx.observable private setDefault: boolean;
 	@Mobx.observable private value: Types.ElementPropertyValue;
 
 	@Mobx.computed
@@ -60,11 +58,10 @@ export class ElementProperty {
 
 		this.id = init.id;
 		this.patternPropertyId = init.patternPropertyId;
-		this.setDefault = init.setDefault;
 
 		const patternProperty = this.project.getPatternPropertyById(this.patternPropertyId);
 
-		if (typeof this.value === 'undefined' && this.setDefault && patternProperty) {
+		if (typeof this.value === 'undefined' && patternProperty) {
 			this.value = patternProperty.getDefaultValue();
 		}
 	}
@@ -76,8 +73,7 @@ export class ElementProperty {
 		return new ElementProperty(
 			{
 				id: serialized.id,
-				patternPropertyId: serialized.patternPropertyId,
-				setDefault: serialized.setDefault
+				patternPropertyId: serialized.patternPropertyId
 			},
 			context
 		);
@@ -90,8 +86,7 @@ export class ElementProperty {
 		return new ElementProperty(
 			{
 				id: uuid.v4(),
-				patternPropertyId: patternProperty.getId(),
-				setDefault: patternProperty.getRequired()
+				patternPropertyId: patternProperty.getId()
 			},
 			context
 		);
@@ -101,8 +96,7 @@ export class ElementProperty {
 		return new ElementProperty(
 			{
 				id: uuid.v4(),
-				patternPropertyId: this.patternPropertyId,
-				setDefault: this.setDefault
+				patternPropertyId: this.patternPropertyId
 			},
 			{
 				project: this.project,
@@ -147,7 +141,17 @@ export class ElementProperty {
 			return this.patternProperty.coerceValue(referencedValue);
 		}
 
-		return this.element.getPropertyValue(this.patternPropertyId);
+		const concreteValue = this.element.getPropertyValue(this.patternPropertyId);
+
+		if (typeof concreteValue !== 'undefined' && concreteValue !== null) {
+			return concreteValue;
+		}
+
+		if (this.patternProperty) {
+			return this.patternProperty.getDefaultValue();
+		}
+
+		return;
 	}
 
 	public getUserStoreReference(): UserStoreReference | undefined {
@@ -176,7 +180,6 @@ export class ElementProperty {
 			model: this.model,
 			id: this.id,
 			patternPropertyId: this.patternPropertyId,
-			setDefault: this.setDefault,
 			value: this.value
 		};
 	}
@@ -185,7 +188,6 @@ export class ElementProperty {
 	public update(b: ElementProperty): void {
 		this.id = b.id;
 		this.patternPropertyId = b.patternPropertyId;
-		this.setDefault = b.setDefault;
 		this.value = b.value;
 	}
 }

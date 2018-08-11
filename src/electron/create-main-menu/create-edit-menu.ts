@@ -139,7 +139,7 @@ export function createEditMenu(
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
-						type: MessageType.Duplicate
+						type: MessageType.DuplicateSelected
 					});
 				}
 			},
@@ -165,7 +165,7 @@ export function createEditMenu(
 					injection.sender.send({
 						id: uuid.v4(),
 						payload: undefined,
-						type: MessageType.Delete
+						type: MessageType.DeleteSelected
 					});
 				}
 			}

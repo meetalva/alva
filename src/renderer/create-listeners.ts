@@ -1,6 +1,6 @@
 import { ViewStore } from '../store';
 
-export function registerGlobalListeners({ store }: { store: ViewStore }): void {
+export function createListeners({ store }: { store: ViewStore }): void {
 	window.addEventListener('keydown', e => {
 		if (e.key === 'Meta') {
 			store.setMetaDown(true);

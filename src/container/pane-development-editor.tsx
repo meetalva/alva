@@ -106,6 +106,16 @@ export class PaneDevelopmentEditor extends React.Component {
 				scheduler: fn => setTimeout(fn, 1000)
 			}
 		);
+
+		Mobx.autorun(() => {
+			const value = storeEnhancer.getTypeScript();
+
+			if (value === this.editor.getValue() && storeEnhancer.getJavaScript() !== 'undefined') {
+				return;
+			}
+
+			this.editor.setValue(value);
+		});
 	}
 
 	public componentWillUnmount(): void {

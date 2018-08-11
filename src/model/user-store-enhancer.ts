@@ -1,13 +1,9 @@
-// import * as Fs from 'fs';
 import * as Mobx from 'mobx';
 import * as Types from '../types';
-// import * as TypeScript from 'typescript';
 import { UserStore } from './user-store';
 import { DesignTimeUserStore } from './design-time-user-store';
 import * as uuid from 'uuid';
 import * as VM from 'vm';
-
-// const MemoryFilesystem = require('memory-fs');
 
 export interface UserStoreEnhancerModule {
 	onStoreCreate(store: DesignTimeUserStore): DesignTimeUserStore;
@@ -115,7 +111,11 @@ export class UserStoreEnhancer {
 	}
 
 	public static from(serialized: Types.SerializedUserStoreEnhancer): UserStoreEnhancer {
-		return new UserStoreEnhancer(serialized || {});
+		return new UserStoreEnhancer({
+			id: serialized.id,
+			typeScript: serialized.typeScript || serialized.code || '',
+			javaScript: serialized.javaScript
+		});
 	}
 
 	public getApi(): string {
@@ -124,6 +124,10 @@ export class UserStoreEnhancer {
 
 	public getId(): string {
 		return this.id;
+	}
+
+	public getJavaScript(): string {
+		return this.javaScript;
 	}
 
 	public getTypeScript(): string {

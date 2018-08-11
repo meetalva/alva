@@ -12,28 +12,22 @@ export interface ElementPropertyInit {
 	id: string;
 	patternPropertyId: string;
 	setDefault: boolean;
-	value: Types.ElementPropertyValue;
 }
 
 export interface ElementPropertyContext {
+	element: Element;
 	project: Project;
 }
 
 export class ElementProperty {
 	public readonly model = Types.ModelName.ElementProperty;
+	private project: Project;
+	private element: Element;
 
 	@Mobx.observable private id: string;
 	@Mobx.observable private patternPropertyId: string;
-	private project: Project;
 	@Mobx.observable private setDefault: boolean;
 	@Mobx.observable private value: Types.ElementPropertyValue;
-
-	@Mobx.computed
-	private get element(): Element | undefined {
-		return this.project
-			.getElements()
-			.find(e => e.getProperties().some(p => p.getId() === this.id));
-	}
 
 	@Mobx.computed
 	private get patternProperty(): AnyPatternProperty | undefined {
@@ -61,11 +55,12 @@ export class ElementProperty {
 	}
 
 	public constructor(init: ElementPropertyInit, context: ElementPropertyContext) {
+		this.project = context.project;
+		this.element = context.element;
+
 		this.id = init.id;
 		this.patternPropertyId = init.patternPropertyId;
 		this.setDefault = init.setDefault;
-		this.value = init.value;
-		this.project = context.project;
 
 		const patternProperty = this.project.getPatternPropertyById(this.patternPropertyId);
 
@@ -75,15 +70,14 @@ export class ElementProperty {
 	}
 
 	public static from(
-		serialized: Types.SerializedElementProperty,
+		serialized: Types.LegacySerializedElementProperty,
 		context: ElementPropertyContext
 	): ElementProperty {
 		return new ElementProperty(
 			{
 				id: serialized.id,
 				patternPropertyId: serialized.patternPropertyId,
-				setDefault: serialized.setDefault,
-				value: serialized.value
+				setDefault: serialized.setDefault
 			},
 			context
 		);
@@ -97,46 +91,22 @@ export class ElementProperty {
 			{
 				id: uuid.v4(),
 				patternPropertyId: patternProperty.getId(),
-				setDefault: patternProperty.getRequired(),
-				value: patternProperty.getDefaultValue()
+				setDefault: patternProperty.getRequired()
 			},
 			context
 		);
 	}
 
 	public clone(): ElementProperty {
-		const cloneElementAction = (): string | undefined => {
-			const patternProperty = this.getPatternProperty();
-
-			if (
-				!patternProperty ||
-				patternProperty.getType() !== Types.PatternPropertyType.EventHandler
-			) {
-				return;
-			}
-
-			const elementAction = this.project.getElementActionById(this.value as string);
-
-			if (!elementAction) {
-				return;
-			}
-
-			const clonedAction = elementAction.clone();
-			this.project.addElementAction(clonedAction);
-			return clonedAction.getId();
-		};
-
-		const clonedActionId = cloneElementAction();
-
 		return new ElementProperty(
 			{
 				id: uuid.v4(),
 				patternPropertyId: this.patternPropertyId,
-				setDefault: this.setDefault,
-				value: clonedActionId || this.value
+				setDefault: this.setDefault
 			},
 			{
-				project: this.project
+				project: this.project,
+				element: this.element
 			}
 		);
 	}
@@ -177,7 +147,7 @@ export class ElementProperty {
 			return this.patternProperty.coerceValue(referencedValue);
 		}
 
-		return this.value;
+		return this.element.getPropertyValue(this.patternPropertyId);
 	}
 
 	public getUserStoreReference(): UserStoreReference | undefined {
@@ -194,10 +164,14 @@ export class ElementProperty {
 
 	@Mobx.action
 	public setValue(value: Types.ElementPropertyValue): void {
-		this.value = value;
+		if (this.referencedUserStoreProperty && this.patternProperty) {
+			this.referencedUserStoreProperty.setValue(value as string);
+		}
+
+		return this.element.setPropertyValue(this.patternPropertyId, value);
 	}
 
-	public toJSON(): Types.SerializedElementProperty {
+	public toJSON(): Types.LegacySerializedElementProperty {
 		return {
 			model: this.model,
 			id: this.id,

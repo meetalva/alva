@@ -128,7 +128,13 @@ export interface SerializedElement {
 	open: boolean;
 	patternId: string;
 	placeholderHighlighted: boolean;
-	properties: SerializedElementProperty[];
+	propertyValues: [string, Types.ElementPropertyValue][];
+	/** @deprecated
+	 * Formerly direct serialization of ElementProperty,
+	 * which are derived from propertyValues + patternProperties now.
+	 * Kept around for backward compat
+	 * */
+	properties?: [];
 	role: SerializedElementRole;
 	selected: boolean;
 }
@@ -144,7 +150,11 @@ export interface SerializedElementContent {
 	slotId: string;
 }
 
-export interface SerializedElementProperty {
+/**
+ * @deprecated
+ * Element properties are now derived from patternProperties + element.propertyValues
+ */
+export interface LegacySerializedElementProperty {
 	model: Types.ModelName.ElementProperty;
 	id: string;
 	patternPropertyId: string;

@@ -200,7 +200,7 @@ export class ViewStore {
 				open: false,
 				patternId: init.pattern.getId(),
 				placeholderHighlighted: false,
-				properties: [],
+				propertyValues: [],
 				setDefaults: true,
 				selected: false
 			},

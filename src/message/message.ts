@@ -399,6 +399,7 @@ export interface MobxArrayUpdatePayload<T = unknown> {
 export interface MobxMapUpdatePayload<T = unknown> {
 	type: Types.MobxChangeType.Update;
 	key: string;
+	mapKey: string;
 	newValue: T;
 }
 

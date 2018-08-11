@@ -139,6 +139,11 @@ export interface SerializedElement {
 	selected: boolean;
 }
 
+export interface SerializedElementValue {
+	id: string;
+	value: Types.ElementPropertyValue;
+}
+
 export interface SerializedElementContent {
 	model: Types.ModelName.ElementContent;
 	elementIds: string[];

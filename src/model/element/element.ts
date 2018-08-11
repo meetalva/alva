@@ -21,8 +21,7 @@ export interface ElementInit {
 	open: boolean;
 	patternId: string;
 	placeholderHighlighted: boolean;
-	// tslint:disable-next-line:no-any
-	propertyValues: [string, any][];
+	propertyValues: [string, Types.ElementPropertyValue][];
 	role?: Types.ElementRole;
 	selected: boolean;
 	setDefaults?: boolean;
@@ -70,6 +69,12 @@ export class Element {
 	@Mobx.observable private role: Types.ElementRole;
 
 	@Mobx.observable private selected: boolean;
+
+	/**
+	/* TODO: Remove before beta
+	/* Keep backward compat
+	/*/
+	private readonly LEGACY_elementPropertyIds: Map<string, string> = new Map();
 
 	@Mobx.computed
 	private get mayHighiglight(): boolean {
@@ -130,6 +135,7 @@ export class Element {
 	private get properties(): ElementProperty[] {
 		return this.patternProperties.map(patternProperty =>
 			ElementProperty.fromPatternProperty(patternProperty, {
+				LEGACY_ID: this.LEGACY_elementPropertyIds.get(patternProperty.getId()),
 				element: this,
 				project: this.project
 			})
@@ -186,10 +192,14 @@ export class Element {
 			context
 		);
 
-		// Keep backward compat
+		/**
+		 * TODO: Remove before beta
+		 * Keep backward compat
+		 */
 		if (Array.isArray(serialized.properties)) {
 			serialized.properties.forEach((property: Types.LegacySerializedElementProperty) => {
 				element.setPropertyValue(property.patternPropertyId, property.value);
+				element.LEGACY_elementPropertyIds.set(property.patternPropertyId, property.id);
 			});
 		}
 

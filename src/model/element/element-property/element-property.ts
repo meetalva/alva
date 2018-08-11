@@ -81,11 +81,13 @@ export class ElementProperty {
 
 	public static fromPatternProperty(
 		patternProperty: AnyPatternProperty,
-		context: ElementPropertyContext
+		context: ElementPropertyContext & { LEGACY_ID?: string }
 	): ElementProperty {
 		return new ElementProperty(
 			{
-				id: uuid.v4(),
+				id: context.LEGACY_ID
+					? context.LEGACY_ID
+					: [context.element.getId(), patternProperty.getId()].join('-'),
 				patternPropertyId: patternProperty.getId()
 			},
 			context

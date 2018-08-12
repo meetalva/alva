@@ -116,16 +116,52 @@ export class ElementList extends React.Component {
 
 	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
+		const target = e.target as HTMLElement;
+		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
 		const targetElement = elementFromTarget(e.target, { sibling: false, store });
 
 		if (!targetElement) {
 			return;
 		}
 
-		Mobx.transaction(() => {
-			targetElement.setHighlighted(false);
+		targetElement.setHighlighted(false);
+		const content = targetElement.getContentBySlotType(Types.SlotType.Children);
+
+		if (content) {
+			content.setHighlighted(false);
+		}
+
+		if (isSibling) {
 			targetElement.setPlaceholderHighlighted(false);
-		});
+		}
+	}
+
+	private handleDragEnter(e: React.DragEvent<HTMLElement>): void {
+		const { store } = this.props as { store: Store.ViewStore };
+
+		const target = e.target as HTMLElement;
+		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
+		const visualTargetElement = elementFromTarget(e.target, { sibling: false, store });
+
+		const targetContent = isSibling
+			? visualTargetElement && visualTargetElement.getContainer()
+			: elementContentFromTarget(e.target, { store });
+
+		const draggedElement = store.getDraggedElement();
+
+		if (!targetContent || !visualTargetElement || !draggedElement) {
+			return;
+		}
+
+		const accepted = targetContent.accepts(draggedElement);
+
+		if (!accepted) {
+			return;
+		}
+
+		targetContent.setHighlighted(!isSibling);
+		visualTargetElement.setHighlighted(!isSibling);
+		visualTargetElement.setPlaceholderHighlighted(isSibling);
 	}
 
 	private handleDragOver(e: React.DragEvent<HTMLElement>): void {
@@ -145,35 +181,13 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		const higlightedElement = store.getHighlightedElement();
-		const placeholderHighlightedElement = store.getPlaceHolderHighhlightedElement();
-
-		const higlightedElementContent = store.getHighlightedElementContent();
 		const accepted = targetContent.accepts(draggedElement);
 
-		Mobx.transaction(() => {
-			if (!accepted) {
-				targetContent.setHighlighted(false);
-				visualTargetElement.setPlaceholderHighlighted(false);
-				return;
-			}
+		if (!accepted) {
+			return;
+		}
 
-			if (placeholderHighlightedElement) {
-				placeholderHighlightedElement.setPlaceholderHighlighted(false);
-			}
-
-			if (higlightedElement) {
-				higlightedElement.setPlaceholderHighlighted(false);
-			}
-
-			if (higlightedElementContent) {
-				higlightedElementContent.setHighlighted(false);
-			}
-
-			e.dataTransfer.dropEffect = 'copy';
-			targetContent.setHighlighted(!isSibling);
-			visualTargetElement.setPlaceholderHighlighted(isSibling);
-		});
+		e.dataTransfer.dropEffect = 'copy';
 	}
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
@@ -377,6 +391,7 @@ export class ElementList extends React.Component {
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
+				onDragEnter={e => this.handleDragEnter(e)}
 				onDragLeave={e => this.handleDragLeave(e)}
 				onDragOver={e => this.handleDragOver(e)}
 				onDragStart={e => this.handleDragStart(e)}

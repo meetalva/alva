@@ -1,3 +1,4 @@
+import { ElementAction } from '../element-action';
 import { ElementContent } from './element-content';
 import { ElementProperty } from './element-property';
 import * as _ from 'lodash';
@@ -233,10 +234,47 @@ export class Element {
 	public clone(opts?: { withState: boolean }): Element {
 		const withState = Boolean(opts && opts.withState);
 
+		const clonedActions: Map<string, ElementAction> = this.properties
+			.filter(prop => {
+				const patternProperty = prop.getPatternProperty();
+				return (
+					patternProperty &&
+					patternProperty.getType() === Types.PatternPropertyType.EventHandler
+				);
+			})
+			.reduce((clones, prop) => {
+				const id = prop.getValue() as string;
+
+				if (!id) {
+					return clones;
+				}
+
+				const elementAction = this.project.getElementActionById(id);
+
+				if (!elementAction) {
+					return clones;
+				}
+
+				clones.set(prop.getPatternPropertyId(), elementAction.clone());
+				return clones;
+			}, new Map());
+
 		const clonedContents = this.contentIds
 			.map(contentId => this.project.getElementContentById(contentId))
 			.filter((content): content is ElementContent => typeof content !== 'undefined')
 			.map(content => content.clone({ withState }));
+
+		const propertyValues: [string, Types.ElementPropertyValue][] = [
+			...this.propertyValues.entries()
+		].map(([id, value]) => {
+			const clonedAction = clonedActions.get(id);
+
+			if (clonedAction) {
+				return [id, clonedAction.getId()] as [string, string];
+			}
+
+			return [id, value] as [string, Types.ElementPropertyValue];
+		});
 
 		const clone = new Element(
 			{
@@ -251,7 +289,7 @@ export class Element {
 				forcedOpen: withState ? this.forcedOpen : false,
 				patternId: this.patternId,
 				placeholderHighlighted: withState ? this.placeholderHighlighted : false,
-				propertyValues: [...this.propertyValues.entries()],
+				propertyValues,
 				role: this.role,
 				selected: withState ? this.selected : false
 			},
@@ -263,6 +301,10 @@ export class Element {
 		clonedContents.forEach(clonedContent => {
 			clonedContent.setParentElement(clone);
 			this.project.addElementContent(clonedContent);
+		});
+
+		[...clonedActions.values()].forEach(clonedAction => {
+			this.project.addElementAction(clonedAction);
 		});
 
 		this.project.addElement(clone);

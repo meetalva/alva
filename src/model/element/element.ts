@@ -8,6 +8,7 @@ import { Pattern } from '../pattern';
 import { AnyPatternProperty } from '../pattern-property';
 import { Project } from '../project';
 import * as Types from '../../types';
+import { UserStoreReference } from '../user-store-reference';
 import * as uuid from 'uuid';
 
 export interface ElementInit {
@@ -297,6 +298,40 @@ export class Element {
 				project: this.project
 			}
 		);
+
+		const clonedReferences = this.properties
+			.map(prop => prop.getUserStoreReference())
+			.filter((prop): prop is UserStoreReference => typeof prop !== 'undefined')
+			.map(ref => {
+				const sourceElementProperty = this.project.getElementPropertyById(
+					ref.getElementPropertyId()
+				);
+
+				if (!sourceElementProperty) {
+					return;
+				}
+
+				const sourcePatternProperty = sourceElementProperty.getPatternProperty();
+
+				if (!sourcePatternProperty) {
+					return;
+				}
+
+				const clonedProperty = clone.properties.find(
+					prop => prop.getPatternProperty() === sourcePatternProperty
+				);
+
+				if (!clonedProperty) {
+					return;
+				}
+
+				return ref.clone({ elementPropertyId: clonedProperty.getId(), open: false });
+			})
+			.filter((ref): ref is UserStoreReference => typeof ref !== 'undefined');
+
+		clonedReferences.forEach(clonedReference => {
+			this.project.getUserStore().addReference(clonedReference);
+		});
 
 		clonedContents.forEach(clonedContent => {
 			clonedContent.setParentElement(clone);

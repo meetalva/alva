@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import * as Types from '../types';
+import * as uuid from 'uuid';
 
 export interface UserStoreReferenceInit {
 	id: string;
@@ -28,6 +29,17 @@ export class UserStoreReference {
 		return new UserStoreReference(serialized);
 	}
 
+	public clone(ctx?: Partial<UserStoreReferenceInit>): UserStoreReference {
+		const override = ctx || { elementPropertyId: undefined };
+
+		return new UserStoreReference({
+			open: override.open || this.open,
+			id: override.id || uuid.v4(),
+			elementPropertyId: override.elementPropertyId || this.elementPropertyId,
+			userStorePropertyId: override.userStorePropertyId || this.userStorePropertyId
+		});
+	}
+
 	public equals(b: this): boolean {
 		return _.isEqual(this.toJSON(), b.toJSON());
 	}
@@ -46,6 +58,11 @@ export class UserStoreReference {
 
 	public getUserStorePropertyId(): string | undefined {
 		return this.userStorePropertyId;
+	}
+
+	@Mobx.action
+	public setElementProperty(elementProperty: Types.Identifiable): void {
+		this.elementPropertyId = elementProperty.getId();
 	}
 
 	@Mobx.action

@@ -589,6 +589,8 @@ export class Element {
 		serialized.highlighted = false;
 		serialized.placeholderHighlighted = false;
 		serialized.selected = false;
+		serialized.forcedOpen = false;
+		serialized.focused = false;
 		return serialized;
 	}
 

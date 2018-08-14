@@ -92,6 +92,11 @@ export class UserStoreAction {
 		this.userStore = userStore;
 	}
 
+	@Mobx.action
+	public setUserStoreProperty(userStoreProperty: UserStoreProperty): void {
+		this.userStorePropertyId = userStoreProperty.getId();
+	}
+
 	public toJSON(): Types.SerializedUserStoreAction {
 		return {
 			model: Types.ModelName.UserStoreAction,

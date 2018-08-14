@@ -201,9 +201,10 @@ export class ElementAction {
 
 	public getStoreProperty(): UserStoreProperty | undefined {
 		const storeAction = this.getStoreAction();
+		const actionPropId = storeAction && storeAction.getUserStorePropertyId();
 
-		if (storeAction && storeAction.getType() === Types.UserStoreActionType.SetPage) {
-			return this.userStore.getPageProperty();
+		if (actionPropId) {
+			return this.userStore.getPropertyById(actionPropId);
 		}
 
 		if (!this.storePropertyId) {

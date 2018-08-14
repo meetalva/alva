@@ -119,7 +119,7 @@
     "@types/uuid": "3.4.3",
     "@types/webpack": "4.1.3",
     "@types/webpack-dev-middleware": "2.0.1",
-    "@types/ws": "5.1.0",
+    "@types/ws": "6.0.0",
     "concurrently": "3.5.1",
     "devtron": "1.4.0",
     "electron": "2.0.2",
@@ -193,7 +193,7 @@
     "username": "3.0.0",
     "uuid": "3.2.1",
     "webpack": "4.6.0",
-    "ws": "5.1.1"
+    "ws": "6.0.0"
   },
   "homepage": "https://meetalva.github.io/"
 }

@@ -113,6 +113,11 @@ export class UserStoreProperty {
 		this.concreteValue = value;
 	}
 
+	@Mobx.action
+	public setValueType(valueType: Types.UserStorePropertyValueType): void {
+		this.valueType = valueType;
+	}
+
 	public setProject(project: Project): void {
 		this.project = project;
 	}

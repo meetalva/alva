@@ -107,6 +107,8 @@ export class UserStore {
 			});
 		}
 
+		this.currentPageProperty.setValueType(Types.UserStorePropertyValueType.Page);
+
 		(init.properties || []).forEach(prop => this.addProperty(prop));
 
 		const actions = init.actions || [];
@@ -145,6 +147,12 @@ export class UserStore {
 			.forEach(b => actions.push(b));
 
 		actions.forEach(action => this.addAction(action));
+
+		const switchPageAction = [...this.actions.values()].find(a => a.getName() === 'Switch Page');
+
+		if (switchPageAction) {
+			switchPageAction.setUserStoreProperty(this.currentPageProperty);
+		}
 
 		(init.references || []).forEach(reference => this.addReference(reference));
 

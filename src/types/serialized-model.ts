@@ -194,3 +194,7 @@ export interface SerializedElementActionPayload {
 	type: Types.ElementActionPayloadType;
 	value: string;
 }
+
+export enum SerialializationType {
+	Set = 'Set'
+}

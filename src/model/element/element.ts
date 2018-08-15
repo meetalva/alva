@@ -129,7 +129,6 @@ export class Element {
 		if (!this.pattern) {
 			return [];
 		}
-
 		return this.pattern.getProperties();
 	}
 

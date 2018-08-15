@@ -15,6 +15,7 @@ import * as Types from '../types';
 import { UserStore } from './user-store';
 import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-enhancer';
 import { UserStoreReference } from './user-store-reference';
+import * as isPlainObject from 'is-plain-object';
 import * as uuid from 'uuid';
 
 export interface ProjectProperties {
@@ -463,6 +464,14 @@ export class Project {
 		return this.patterns.find(p => p.getId() === id);
 	}
 
+	public getPatterns(): Pattern[] {
+		return this.patterns;
+	}
+
+	public getPatternProperties(): AnyPatternProperty[] {
+		return this.patternProperties;
+	}
+
 	public getPatternLibraries(): PatternLibrary[] {
 		return [...this.patternLibraries.values()];
 	}
@@ -696,10 +705,6 @@ export class Project {
 		};
 	}
 
-	public toString(): string {
-		return JSON.stringify(this.toJSON());
-	}
-
 	public sync(sender: Types.Sender): void {
 		sender.match<Message.MobxUpdateMessage>(Message.MessageType.MobxUpdate, message => {
 			if (
@@ -726,7 +731,7 @@ export class Project {
 					? ValueModel.from(change.newValue, { project: this })
 					: change.newValue;
 
-				if (typeof value === 'object' && !ValueModel) {
+				if (isPlainObject(value) && !ValueModel) {
 					return;
 				}
 
@@ -750,7 +755,6 @@ export class Project {
 
 			if (message.payload.change.hasOwnProperty('index')) {
 				console.log('MobxArrayUpdatePayload', message);
-				// const change = message.payload.change as Message.MobxArrayUpdatePayload;
 			}
 		});
 
@@ -759,7 +763,6 @@ export class Project {
 			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
 
 			if (!parent) {
-				console.log('no parent', message);
 				return;
 			}
 
@@ -773,8 +776,8 @@ export class Project {
 				? ValueModel.from(message.payload.change.newValue, { project: this })
 				: message.payload.change.newValue;
 
-			if (typeof value === 'object' && !ValueModel) {
-				console.log('no value model', message);
+			if (isPlainObject(value) && !ValueModel) {
+				return;
 			}
 
 			const member = mayBeMember as Map<unknown, unknown>;
@@ -785,7 +788,6 @@ export class Project {
 			const parent = this.getObject(message.payload.name, message.payload.id);
 
 			if (!parent) {
-				console.log(message);
 				return;
 			}
 
@@ -804,7 +806,6 @@ export class Project {
 			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
 
 			if (!parent) {
-				console.log('no parent', message);
 				return;
 			}
 

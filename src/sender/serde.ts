@@ -22,7 +22,8 @@ export interface MessageHeader {
 }
 
 export function serialize(message: Message.Message): string {
-	const headerData = JSON.stringify({ type: message.type });
+	const headerData = AlvaUtil.toJSON({ type: message.type });
+
 	const headerLength = headerData.length.toString();
 
 	if (headerLength.length > OVERTURE_LENGTH) {
@@ -32,7 +33,7 @@ export function serialize(message: Message.Message): string {
 	}
 
 	const length = _.padStart(headerLength, OVERTURE_LENGTH, '0');
-	return [length, headerData, JSON.stringify(message)].join('');
+	return [length, headerData, AlvaUtil.toJSON(message)].join('');
 }
 
 export function deserialize(data: string): Message.Message | undefined {

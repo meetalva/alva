@@ -151,7 +151,6 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 				const name = parseChangeName(change.name);
 
 				if (!parent) {
-					console.log('no parent', change);
 					return;
 				}
 

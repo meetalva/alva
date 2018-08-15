@@ -1,6 +1,7 @@
 import * as Fs from 'fs';
 import * as Path from 'path';
 import * as Types from '../types';
+import * as AlvaUtil from '../alva-util';
 
 const SCRIPT_PATHS = [
 	require.resolve('../scripts/Mobx'),
@@ -42,7 +43,7 @@ const doc = (config: StaticDocumentConfig) => `<!doctype html>
 <body>
 	<div id="preview"></div>
 	<textarea data-data="alva" style="display: none">${encodeURIComponent(
-		JSON.stringify({
+		AlvaUtil.toJSON({
 			data: config.data,
 			mode: Types.PreviewDocumentMode.Static
 		})

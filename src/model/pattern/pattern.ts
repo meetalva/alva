@@ -151,6 +151,7 @@ export class Pattern {
 		};
 	}
 
+	@Mobx.action
 	public update(pattern: Pattern, context?: PatternContext): void {
 		this.contextId = pattern.getContextId();
 		this.description = pattern.getDescription();

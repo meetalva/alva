@@ -1,4 +1,5 @@
 import * as Types from '../types';
+import * as AlvaUtil from '../alva-util';
 
 export interface PreviewDocumentConfig {
 	data: Types.SerializedProject;
@@ -115,7 +116,7 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 	<div id="preview-selection"></div>
 	<div id="preview-highlight"></div>
 	<textarea data-data="alva" style="display: none">${encodeURIComponent(
-		JSON.stringify({
+		AlvaUtil.toJSON({
 			data: config.data,
 			mode: Types.PreviewDocumentMode.Live
 		})

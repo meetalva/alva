@@ -4,13 +4,14 @@ import * as Model from '../model';
 import { ViewStore } from '../store';
 import * as Types from '../types';
 import * as uuid from 'uuid';
+import * as isPlainObject from 'is-plain-object';
 
 export interface NotifierContext {
 	app: Model.AlvaApp;
 	store: ViewStore;
 }
 
-export function createNotifiers({ store }: NotifierContext): void {
+export function createNotifiers({ app, store }: NotifierContext): void {
 	const opts = {
 		scheduler: window.requestIdleCallback
 	};
@@ -80,6 +81,7 @@ export function createNotifiers({ store }: NotifierContext): void {
 
 				if (change.hasOwnProperty('index')) {
 					console.log('ArrayUpdate:', change);
+					return;
 				}
 
 				if (change.hasOwnProperty('key') && !(change.object instanceof Mobx.ObservableMap)) {
@@ -106,6 +108,7 @@ export function createNotifiers({ store }: NotifierContext): void {
 					const name = parseChangeName(change.name);
 
 					const parent = getParentByMember(change.object, {
+						app,
 						name: change.name,
 						project
 					});
@@ -140,6 +143,7 @@ export function createNotifiers({ store }: NotifierContext): void {
 				}
 
 				const parent = getParentByMember(change.object, {
+					app,
 					name: change.name,
 					project
 				});
@@ -147,6 +151,7 @@ export function createNotifiers({ store }: NotifierContext): void {
 				const name = parseChangeName(change.name);
 
 				if (!parent) {
+					console.log('no parent', change);
 					return;
 				}
 
@@ -158,7 +163,7 @@ export function createNotifiers({ store }: NotifierContext): void {
 						? rawValue.toJSON()
 						: change.newValue;
 
-				if (typeof newValue === 'object' && !newValue.model) {
+				if (isPlainObject(newValue) && !newValue.model) {
 					return;
 				}
 
@@ -183,6 +188,7 @@ export function createNotifiers({ store }: NotifierContext): void {
 
 			case Types.MobxChangeType.Delete: {
 				const parent = getParentByMember(change.object, {
+					app,
 					name: change.name,
 					project
 				});
@@ -212,6 +218,7 @@ export function createNotifiers({ store }: NotifierContext): void {
 
 			case Types.MobxChangeType.Splice: {
 				const parent = getParentByMember(change.object, {
+					app,
 					name: change.name,
 					project
 				});
@@ -253,22 +260,28 @@ export function createNotifiers({ store }: NotifierContext): void {
 
 function getParentByMember(
 	member: unknown,
-	{ name, project }: { name: string; project: Model.Project }
+	{ app, name, project }: { app: Model.AlvaApp; name: string; project: Model.Project }
 ): Model.AnyModel | undefined {
 	const { parentName, parentId } = parseChangeName(name);
 
 	switch (parentName) {
+		case 'AlvaApp':
+			return app;
 		case 'Project':
 			return project;
 		case 'UserStore':
 			return project.getUserStore();
 		case 'Element':
 		case 'ElementContent':
+		case 'Pattern':
+		case 'PatternLibrary':
+		case 'PatternEnumProperty':
 			return getObjectsByName(parentName, { project }).find((e: unknown) => {
 				const admin = Mobx._getAdministration(e);
 				return admin.name === parentId;
 			});
 		default:
+			console.log(parentName);
 			return;
 	}
 }
@@ -279,6 +292,12 @@ function getObjectsByName(name: string, { project }: { project: Model.Project })
 			return project.getElements();
 		case 'ElementContent':
 			return project.getElementContents();
+		case 'PatternLibrary':
+			return project.getPatternLibraries();
+		case 'PatternEnumProperty':
+			return project.getPatternProperties();
+		case 'Pattern':
+			return project.getPatterns();
 	}
 
 	return [];

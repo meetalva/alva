@@ -201,11 +201,17 @@ export class PatternLibrary {
 		return isEqual(this.toJSON(), b.toJSON());
 	}
 
+	@Mobx.action
 	public addPattern(pattern: Pattern): void {
 		this.patterns.set(pattern.getId(), pattern);
 	}
 
+	@Mobx.action
 	public addProperty(property: AnyPatternProperty): void {
+		if (property.getPropertyName() === 'thing') {
+			console.log('addProperty', property);
+		}
+
 		this.patternProperties.set(property.getId(), property);
 	}
 

@@ -8,7 +8,7 @@ export function setClipboard(payload: Message.Clipboard['payload']): void {
 	Electron.clipboard.writeBuffer(
 		'application/alva',
 		Buffer.from(
-			JSON.stringify({
+			AlvaUtil.toJSON({
 				type: Message.MessageType.Clipboard,
 				id: uuid.v4(),
 				payload

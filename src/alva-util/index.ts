@@ -3,4 +3,5 @@ export * from './ensure-array';
 export * from './guess-name';
 export * from './noop';
 export * from './parse-json';
+export * from './to-json';
 export * from './set-search';

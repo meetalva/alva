@@ -136,7 +136,7 @@
     "prettier": "1.12.0",
     "standard-version": "4.3.0",
     "tempy": "0.2.1",
-    "ts-jest": "22.4.2",
+    "ts-jest": "23.1.4",
     "tslint": "5.9.1",
     "typedoc": "0.11.1",
     "typescript-styled-plugin": "0.6.3"

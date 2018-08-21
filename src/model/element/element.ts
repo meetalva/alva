@@ -497,6 +497,10 @@ export class Element {
 		return this.open;
 	}
 
+	public getPage(): Page | undefined {
+		return this.page;
+	}
+
 	public getParent(): Element | undefined {
 		const container = this.getContainer();
 

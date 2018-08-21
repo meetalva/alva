@@ -2,12 +2,12 @@ import * as React from 'react';
 import { Color } from '../colors';
 import { fonts } from '../fonts';
 import { getSpace, SpaceSize } from '../space';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const INPUT_PADDING_RIGHT = (props: PropertyInputProps) =>
-	props.type === PropertyInputType.Number ? 0 : getSpace(SpaceSize.S);
+	props.type && props.type === PropertyInputType.Number ? 0 : getSpace(SpaceSize.S);
 
-const StyledInput = styled.input`
+export const PropertyInputStyles = css`
 	display: block;
 	box-sizing: border-box;
 	width: 100%;
@@ -42,13 +42,17 @@ const StyledInput = styled.input`
 	}
 `;
 
+const StyledInput = styled.input`
+	${PropertyInputStyles};
+`;
+
 export interface PropertyInputProps {
 	list?: string;
 	className?: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	placeholder?: string;
-	type: PropertyInputType;
+	type?: PropertyInputType;
 	value?: string;
 }
 

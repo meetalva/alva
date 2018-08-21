@@ -1,16 +1,17 @@
 import * as React from 'react';
-import { PropertyInput, PropertyInputType } from '../property-input';
+import { PropertyInputStyles } from '../property-input';
 import { PropertyItem } from '../property-item';
 import { Link2 } from 'react-feather';
 import styled, { StyledComponentClass } from 'styled-components';
 import { Color } from '../colors';
+import * as TextareaAutosize from 'react-textarea-autosize';
 
 export interface PropertyItemStringProps {
 	className?: string;
 	description?: string;
 	label: string;
-	onBlur?: React.FocusEventHandler<HTMLInputElement>;
-	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+	onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 	placeholder?: string;
 	value?: string;
 	children?(renderProps: PropertyItemStringProps): JSX.Element | null;
@@ -33,12 +34,17 @@ export const LinkIcon: StyledComponentClass<{}, {}, any> = styled(Link2)`
 	}
 `;
 
+const StyledTextArea = styled(TextareaAutosize.default)`
+	resize: none;
+	${PropertyInputStyles};
+`;
+
 export const PropertyItemString: React.StatelessComponent<PropertyItemStringProps> = props => (
 	<PropertyItem description={props.description} label={props.label}>
-		<PropertyInput
+		<StyledTextArea
 			onChange={props.onChange}
 			onBlur={props.onBlur}
-			type={PropertyInputType.Text}
+			useCacheForDOMMeasurements
 			value={props.value || ''}
 			placeholder={props.placeholder}
 		/>

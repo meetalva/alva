@@ -18,6 +18,7 @@ export const Conditional = (context: BuiltInContext): BuiltInResult => {
 			defaultValue: true,
 			hidden: false,
 			id: context.options.getGlobalPropertyId(patternId, CONDITION_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Condition',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'condition',

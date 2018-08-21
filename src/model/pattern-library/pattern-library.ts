@@ -218,7 +218,7 @@ export class PatternLibrary {
 	public assignEnumOptionId(enumId: string, contextId: string): string {
 		const enumProperty = this.getPatternPropertyById(enumId) as PatternEnumProperty;
 
-		if (!enumProperty) {
+		if (!enumProperty || typeof enumProperty.getOptionByContextId !== 'function') {
 			return uuid.v4();
 		}
 

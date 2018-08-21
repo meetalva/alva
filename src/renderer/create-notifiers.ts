@@ -65,47 +65,106 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 	const send = (message: Message.Message) =>
 		window.requestIdleCallback(() => sender.send(message));
 
-	// tslint:disable-next-line:cyclomatic-complexity
+	const transactions: Types.MobxChange[] = [];
+
 	Mobx.spy((change: Types.MobxChange) => {
-		const project = store.getProject();
+		// tslint:disable-next-line:cyclomatic-complexity
+		Mobx.transaction(() => {
+			// Track what actions/transactions are running currently
+			if (change.spyReportStart) {
+				transactions.push(change);
+			}
 
-		if (!project || project.batching) {
-			return;
-		}
+			if (change.spyReportEnd) {
+				transactions.pop();
+			}
 
-		switch (change.type) {
-			case Types.MobxChangeType.Update: {
-				if (typeof change.newValue === 'function') {
-					return;
-				}
+			/**
+			 * Do not send messages as long as matchHighlighhtedElement is running
+			 * TODO: Generalize this to skip message sending as long as any matcher is running
+			 */
+			if (
+				transactions[0] &&
+				(transactions[0] as { name: string | undefined }).name ===
+					Types.ActionName.MatchHighlightedElement
+			) {
+				return;
+			}
 
-				if (change.hasOwnProperty('index')) {
-					console.log('ArrayUpdate:', change);
-					return;
-				}
+			const project = store.getProject();
 
-				if (change.hasOwnProperty('key') && !(change.object instanceof Mobx.ObservableMap)) {
-					const objectChange = change as Types.MobxObjectUpdate<Model.AnyModel>;
+			if (!project || project.batching) {
+				return;
+			}
 
-					send({
-						id: uuid.v4(),
-						type: Message.MessageType.MobxUpdate,
-						payload: {
-							// tslint:disable-next-line:no-any
-							id: (objectChange.object as any).id,
-							name: objectChange.object.constructor.name,
-							change: {
-								type: objectChange.type,
-								key: objectChange.key,
-								newValue: objectChange.newValue
+			switch (change.type) {
+				case Types.MobxChangeType.Update: {
+					if (typeof change.newValue === 'function') {
+						return;
+					}
+
+					if (change.hasOwnProperty('index')) {
+						console.log('ArrayUpdate:', change);
+						return;
+					}
+
+					if (change.hasOwnProperty('key') && !(change.object instanceof Mobx.ObservableMap)) {
+						const objectChange = change as Types.MobxObjectUpdate<Model.AnyModel>;
+
+						send({
+							id: uuid.v4(),
+							type: Message.MessageType.MobxUpdate,
+							payload: {
+								// tslint:disable-next-line:no-any
+								id: (objectChange.object as any).id,
+								name: objectChange.object.constructor.name,
+								change: {
+									type: objectChange.type,
+									key: objectChange.key,
+									newValue: objectChange.newValue
+								}
 							}
+						});
+					}
+
+					if (change.hasOwnProperty('key') && change.object instanceof Mobx.ObservableMap) {
+						const mapChange = change as Types.MobxMapUpdate<string, Model.AnyModel>;
+						const name = parseChangeName(change.name);
+
+						const parent = getParentByMember(change.object, {
+							app,
+							name: change.name,
+							project
+						});
+
+						if (!parent) {
+							return;
 						}
-					});
+
+						send({
+							id: uuid.v4(),
+							type: Message.MessageType.MobxUpdate,
+							payload: {
+								// tslint:disable-next-line:no-any
+								id: parent.getId(),
+								name: name.parentName,
+								change: {
+									type: mapChange.type,
+									key: name.memberName,
+									mapKey: mapChange.key,
+									newValue: mapChange.newValue
+								}
+							}
+						});
+					}
+
+					break;
 				}
 
-				if (change.hasOwnProperty('key') && change.object instanceof Mobx.ObservableMap) {
-					const mapChange = change as Types.MobxMapUpdate<string, Model.AnyModel>;
-					const name = parseChangeName(change.name);
+				case Types.MobxChangeType.Add: {
+					if (change.newValue === undefined || typeof change.newValue === 'function') {
+						return;
+					}
 
 					const parent = getParentByMember(change.object, {
 						app,
@@ -113,147 +172,113 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 						project
 					});
 
+					const name = parseChangeName(change.name);
+
+					if (!parent) {
+						return;
+					}
+
+					// tslint:disable-next-line:no-any
+					const rawValue = change.newValue as any;
+
+					const newValue =
+						rawValue && typeof rawValue.toJSON === 'function'
+							? rawValue.toJSON()
+							: change.newValue;
+
+					if (isPlainObject(newValue) && !newValue.model) {
+						return;
+					}
+
+					send({
+						id: uuid.v4(),
+						type: Message.MessageType.MobxAdd,
+						payload: {
+							id: parent.getId(),
+							name: name.parentName,
+							memberName: name.memberName,
+							valueModel: typeof newValue === 'object' ? newValue.model : undefined,
+							change: {
+								type: change.type,
+								key: change.key as string,
+								newValue
+							}
+						}
+					});
+
+					break;
+				}
+
+				case Types.MobxChangeType.Delete: {
+					const parent = getParentByMember(change.object, {
+						app,
+						name: change.name,
+						project
+					});
+					const name = parseChangeName(change.name);
+					const deletion = change as Types.MobxDelete<string, Model.AnyModel>;
+
 					if (!parent) {
 						return;
 					}
 
 					send({
 						id: uuid.v4(),
-						type: Message.MessageType.MobxUpdate,
+						type: Message.MessageType.MobxDelete,
 						payload: {
-							// tslint:disable-next-line:no-any
 							id: parent.getId(),
 							name: name.parentName,
+							memberName: name.memberName,
 							change: {
-								type: mapChange.type,
-								key: name.memberName,
-								mapKey: mapChange.key,
-								newValue: mapChange.newValue
+								type: deletion.type,
+								key: deletion.key
 							}
 						}
 					});
+
+					break;
 				}
 
-				break;
-			}
+				case Types.MobxChangeType.Splice: {
+					const parent = getParentByMember(change.object, {
+						app,
+						name: change.name,
+						project
+					});
+					const name = parseChangeName(change.name);
 
-			case Types.MobxChangeType.Add: {
-				if (change.newValue === undefined || typeof change.newValue === 'function') {
-					return;
-				}
-
-				const parent = getParentByMember(change.object, {
-					app,
-					name: change.name,
-					project
-				});
-
-				const name = parseChangeName(change.name);
-
-				if (!parent) {
-					return;
-				}
-
-				// tslint:disable-next-line:no-any
-				const rawValue = change.newValue as any;
-
-				const newValue =
-					rawValue && typeof rawValue.toJSON === 'function'
-						? rawValue.toJSON()
-						: change.newValue;
-
-				if (isPlainObject(newValue) && !newValue.model) {
-					return;
-				}
-
-				send({
-					id: uuid.v4(),
-					type: Message.MessageType.MobxAdd,
-					payload: {
-						id: parent.getId(),
-						name: name.parentName,
-						memberName: name.memberName,
-						valueModel: typeof newValue === 'object' ? newValue.model : undefined,
-						change: {
-							type: change.type,
-							key: change.key as string,
-							newValue
-						}
+					if (!parent) {
+						return;
 					}
-				});
 
-				break;
-			}
+					// tslint:disable-next-line:no-any
+					const exampleValue = (change.added || change.removed)[0] as Model.AnyModel;
 
-			case Types.MobxChangeType.Delete: {
-				const parent = getParentByMember(change.object, {
-					app,
-					name: change.name,
-					project
-				});
-				const name = parseChangeName(change.name);
-				const deletion = change as Types.MobxDelete<string, Model.AnyModel>;
+					const model =
+						exampleValue && typeof exampleValue.toJSON === 'function'
+							? exampleValue.model
+							: undefined;
 
-				if (!parent) {
-					return;
-				}
-
-				send({
-					id: uuid.v4(),
-					type: Message.MessageType.MobxDelete,
-					payload: {
-						id: parent.getId(),
-						name: name.parentName,
-						memberName: name.memberName,
-						change: {
-							type: deletion.type,
-							key: deletion.key
+					send({
+						id: uuid.v4(),
+						type: Message.MessageType.MobxSplice,
+						payload: {
+							id: parent.getId(),
+							name: name.parentName,
+							memberName: name.memberName,
+							valueModel: model,
+							change: {
+								type: change.type,
+								index: change.index,
+								added: change.added,
+								removed: change.removed
+							}
 						}
-					}
-				});
-
-				break;
-			}
-
-			case Types.MobxChangeType.Splice: {
-				const parent = getParentByMember(change.object, {
-					app,
-					name: change.name,
-					project
-				});
-				const name = parseChangeName(change.name);
-
-				if (!parent) {
-					return;
+					});
+					break;
 				}
-
-				// tslint:disable-next-line:no-any
-				const exampleValue = (change.added || change.removed)[0] as Model.AnyModel;
-
-				const model =
-					exampleValue && typeof exampleValue.toJSON === 'function'
-						? exampleValue.model
-						: undefined;
-
-				send({
-					id: uuid.v4(),
-					type: Message.MessageType.MobxSplice,
-					payload: {
-						id: parent.getId(),
-						name: name.parentName,
-						memberName: name.memberName,
-						valueModel: model,
-						change: {
-							type: change.type,
-							index: change.index,
-							added: change.added,
-							removed: change.removed
-						}
-					}
-				});
-				break;
 			}
-		}
+		});
 	});
 }
 

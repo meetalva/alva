@@ -127,6 +127,23 @@ export async function createServer(opts: ServerOptions): Promise<EventEmitter> {
 		ws.send(JSON.stringify(state));
 	});
 
+	app.use((req, res, next) => {
+		// get IPv4 ip out of IPv4-mapped IPv6 address
+		const remoteAddress = ((req.connection.remoteAddress as string) || '').split(':').pop();
+		// get first address since it may contain more than one
+		const xForwardedFor = ((req.headers['x-forwarded-for'] as string) || '').split(',').shift();
+		// ip could be either x.x.x.x like an IPv4 address or 1 as equivalent of 127.0.0.1 out of IPv6 address
+		const ip = xForwardedFor || remoteAddress;
+		// get host address without port
+		const host = ((req.get('host') as string) || '').split(':').shift();
+
+		if (ip === host || ip === '1') {
+			return next();
+		}
+
+		res.status(404).send();
+	});
+
 	app.get('/preview.html', (req, res) => {
 		res.type('html');
 

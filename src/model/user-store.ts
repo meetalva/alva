@@ -40,11 +40,13 @@ export class UserStore {
 		try {
 			const enhanceModule = this.enhancer.getModule();
 
-			this.previousDesignTimeStore = enhanceModule.onStoreCreate(
-				new DesignTime.DesignTimeUserStore({
-					properties: [...this.internalProperties.values()]
-				})
-			);
+			if (typeof enhanceModule.onStoreCreate === 'function') {
+				this.previousDesignTimeStore = enhanceModule.onStoreCreate(
+					new DesignTime.DesignTimeUserStore({
+						properties: [...this.internalProperties.values()]
+					})
+				);
+			}
 
 			return this.previousDesignTimeStore;
 		} catch (error) {

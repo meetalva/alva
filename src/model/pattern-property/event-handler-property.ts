@@ -9,6 +9,7 @@ export interface PatternEventHandlerPropertyInit {
 	event: PatternEvent;
 	hidden: boolean;
 	id: string;
+	inputType: Types.PatternPropertyInputType;
 	label: string;
 	origin: Types.PatternPropertyOrigin;
 	propertyName: string;
@@ -33,6 +34,7 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 			event: PatternEvent.from(serialized.event),
 			hidden: serialized.hidden,
 			id: serialized.id,
+			inputType: serialized.inputType,
 			label: serialized.label,
 			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
@@ -54,6 +56,7 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 			example: this.example,
 			hidden: this.hidden,
 			id: this.id,
+			inputType: this.inputType,
 			label: this.label,
 			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,

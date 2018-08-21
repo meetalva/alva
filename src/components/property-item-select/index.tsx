@@ -1,23 +1,25 @@
+import { PropertyItem } from '../property-item';
 import * as React from 'react';
 import { Select, SelectOption } from '../select';
-import { PropertyItem } from '../property-item';
 
-export interface PropertyItemEnumValues {
+export interface PropertyItemSelectValues {
 	id: string;
 	name: string;
 }
 
-export interface PropertyItemEnumProps {
+export interface PropertyItemSelectProps {
 	className?: string;
 	description?: string;
 	label: string;
 	onChange?: React.ChangeEventHandler<HTMLSelectElement>;
 	required?: boolean;
 	selectedValue?: string;
-	values: PropertyItemEnumValues[];
+	values: PropertyItemSelectValues[];
 }
 
-export const PropertyItemEnum: React.StatelessComponent<PropertyItemEnumProps> = props => (
+export const PropertyItemSelect: React.StatelessComponent<
+	PropertyItemSelectProps
+> = props => (
 	<PropertyItem description={props.description} label={props.label}>
 		<Select onChange={props.onChange} selectedValue={props.selectedValue}>
 			{!props.required && <SelectOption key="required" value="" label="" />}

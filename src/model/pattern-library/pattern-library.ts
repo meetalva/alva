@@ -28,7 +28,7 @@ export interface BuiltInResult {
 }
 
 export interface PatternLibraryCreateOptions {
-	getGloablEnumOptionId(enumId: string, contextId: string): string;
+	getGlobalEnumOptionId(enumId: string, contextId: string): string;
 	getGlobalPatternId(contextId: string): string;
 	getGlobalPropertyId(patternId: string, contextId: string): string;
 	getGlobalSlotId(patternId: string, contextId: string): string;
@@ -138,7 +138,7 @@ export class PatternLibrary {
 		previousLibrary?: PatternLibrary
 	): PatternLibrary {
 		const patternLibrary = PatternLibrary.create({
-			getGloablEnumOptionId: (enumId, contextId) =>
+			getGlobalEnumOptionId: (enumId, contextId) =>
 				previousLibrary ? previousLibrary.assignEnumOptionId(enumId, contextId) : uuid.v4(),
 			getGlobalPatternId: contextId =>
 				previousLibrary ? previousLibrary.assignPatternId(contextId) : uuid.v4(),

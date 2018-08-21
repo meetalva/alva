@@ -16,6 +16,7 @@ export const Link = (context: BuiltInContext): BuiltInResult => {
 			contextId: HREF_CONTEXT_ID,
 			example: 'https://meetalva.io',
 			id: context.options.getGlobalPropertyId(patternId, HREF_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Link target',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'href'
@@ -28,6 +29,7 @@ export const Link = (context: BuiltInContext): BuiltInResult => {
 			}),
 			hidden: false,
 			id: context.options.getGlobalPropertyId(patternId, ONCLICK_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Interaction',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'onClick',

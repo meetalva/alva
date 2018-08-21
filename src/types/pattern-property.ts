@@ -1,3 +1,5 @@
+import { IconName } from '../components';
+
 export enum PatternPropertyType {
 	Asset = 'asset',
 	Boolean = 'boolean',
@@ -28,6 +30,14 @@ export enum PatternPropertyOrigin {
 
 export type SerializedPatternPropertyOrigin = 'built-in' | 'user-provided';
 
+export enum PatternPropertyInputType {
+	Default = 'default',
+	Select = 'select',
+	RadioGroup = 'radio-group'
+}
+
+export type SerializedPatternPropertyInputType = 'default' | 'select' | 'radio-group';
+
 export type SerializedPatternProperty =
 	| SerializedPatternAssetProperty
 	| SerializedPatternBooleanProperty
@@ -45,6 +55,7 @@ export interface SerializedPropertyBase {
 	example: string;
 	hidden: boolean;
 	id: string;
+	inputType: PatternPropertyInputType;
 	label: string;
 	origin: SerializedPatternPropertyOrigin;
 	propertyName: string;
@@ -70,6 +81,7 @@ export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
 
 export interface SerializedEnumOption {
 	contextId: string;
+	icon: IconName | undefined;
 	id: string;
 	name: string;
 	ordinal: string;

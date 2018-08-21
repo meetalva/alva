@@ -92,14 +92,12 @@ const Box: React.SFC = (props: any) => {
 		alignItems: props.alignItems,
 		display: props.flex ? 'flex' : 'block',
 		flexBasis: props.flexBasis,
-		// tslint:disable-next-line:no-any
-		flexDirection: props.column ? 'column' : (null as any),
+		flexDirection: props.flexDirection,
 		// tslint:disable-next-line:no-any
 		flexWrap: props.wrap ? 'wrap' : ('nowrap' as any),
 		flexGrow: props.flexGrow,
 		flexShrink: props.flexShrink,
 		justifyContent: props.justifyContent,
-		order: props.order,
 		width: props.width,
 		height: props.height,
 		backgroundColor: props.backgroundColor

@@ -1,10 +1,11 @@
-import { PropertyItemEnum, PropertyItemEnumValues } from './index';
+import { PropertyItemRadiogroup, PropertyItemRadiogroupValues } from './index';
 import * as React from 'react';
 import DemoContainer from '../demo-container';
+import { IconName } from '../icons';
 
 export interface EnumItemDemoState {
 	selectedItem: string;
-	values: PropertyItemEnumValues[];
+	values: PropertyItemRadiogroupValues[];
 }
 
 export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
@@ -12,9 +13,9 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 		super(props);
 
 		const values = [
-			{ id: 'id1', name: 'Medium' },
-			{ id: 'id2', name: 'Rare' },
-			{ id: 'id3', name: 'Solid Shoe' }
+			{ id: 'id1', name: 'Medium', icon: IconName.ArrowFillLeft },
+			{ id: 'id2', name: 'Rare', icon: IconName.ArrowFillLeft },
+			{ id: 'id3', name: 'Solid Shoe', icon: IconName.ArrowFillLeft }
 		];
 
 		this.state = {
@@ -26,8 +27,8 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 	public render(): JSX.Element {
 		return (
 			<DemoContainer title="Enum Item">
-				<PropertyItemEnum label="Label" values={this.state.values} />
-				<PropertyItemEnum
+				<PropertyItemRadiogroup label="Label" key="0" values={this.state.values} />
+				<PropertyItemRadiogroup
 					label="Label"
 					values={this.state.values}
 					selectedValue={this.state.selectedItem}

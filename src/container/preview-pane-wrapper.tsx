@@ -25,7 +25,7 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 				/>
 				<Overlay isVisisble={props.isDragging}>
 					<Space size={[0, 0, SpaceSize.L]}>
-						<Layout size={IconSize.S} />
+						<Layout size={IconSize.M} />
 					</Space>
 					<Copy size={CopySize.M}>Drop the component on the left element list</Copy>
 				</Overlay>

@@ -129,22 +129,38 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 				);
 			}
 			case Types.PatternPropertyType.Enum: {
+				const inputType = patternProperty.getInputType() as Types.PatternPropertyInputType;
 				const value = property.getValue() as string;
 				const enumProp = patternProperty as PatternEnumProperty;
 				const selectedOption = enumProp.getOptionByValue(value);
 				const selectedValue = selectedOption ? selectedOption.getId() : undefined;
-
-				return (
-					<Component.PropertyItemEnum
-						{...base}
-						selectedValue={selectedValue}
-						values={enumProp.getOptions().map(option => ({
-							id: option.getId(),
-							name: option.getName()
-						}))}
-						onChange={e => this.handleEnumChange(e)}
-					/>
-				);
+				
+				if (inputType === Types.PatternPropertyInputType.RadioGroup) {
+					return (
+						<Component.PropertyItemRadiogroup
+							{...base}
+							selectedValue={selectedValue}
+							values={enumProp.getOptions().map(option => ({
+								id: option.getId(),
+								name: option.getName(),
+								icon: option.getIcon()
+							}))}
+							onChange={e => this.handleEnumChange(e)}
+						/>
+					);
+				} else {
+					return (
+						<Component.PropertyItemSelect
+							{...base}
+							selectedValue={selectedValue}
+							values={enumProp.getOptions().map(option => ({
+								id: option.getId(),
+								name: option.getName()
+							}))}
+							onChange={e => this.handleEnumChange(e)}
+						/>
+					);
+				}
 			}
 			case Types.PatternPropertyType.EventHandler: {
 				return <EventHandlerPropertyView elementProperty={property} />;

@@ -62,7 +62,7 @@ export class Project {
 
 	public static create(init: ProjectCreateInit): Project {
 		const patternLibrary = PatternLibrary.create({
-			getGloablEnumOptionId: () => uuid.v4(),
+			getGlobalEnumOptionId: () => uuid.v4(),
 			getGlobalPatternId: () => uuid.v4(),
 			getGlobalPropertyId: () => uuid.v4(),
 			getGlobalSlotId: () => uuid.v4()

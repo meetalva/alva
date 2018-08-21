@@ -45,6 +45,7 @@ export class AlvaApp {
 			this.panes = init.panes;
 			this.searchTerm = init.searchTerm;
 			this.state = init.state;
+			this.hasFocusedInput = init.hasFocusedInput;
 			init.paneSizes.forEach(paneSize => this.setPaneSize(paneSize));
 		}
 	}

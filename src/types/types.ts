@@ -351,3 +351,7 @@ export interface Sender {
 		handler: (message: T) => void
 	): Promise<void>;
 }
+
+export enum ActionName {
+	MatchHighlightedElement = 'MatchHighlightedElement'
+}

@@ -19,9 +19,12 @@ export function createPreviewRoute(options: PreviewRouteOptions): Express.Reques
 			return;
 		}
 
+		const clone = Model.Project.from(project.toJSON());
+		clone.getPatternLibraries().map(l => l.setBundle(''));
+
 		res.send(
 			PreviewDocument.previewDocument({
-				data: project.toJSON(),
+				data: clone.toJSON(),
 				scripts: project
 					.getPatternLibraries()
 					.map(

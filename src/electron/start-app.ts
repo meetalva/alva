@@ -17,6 +17,7 @@ const log = require('electron-log');
 
 export interface AppContext {
 	app: undefined | Model.AlvaApp;
+	hot: undefined | boolean;
 	project: undefined | Model.Project;
 	port: undefined | number;
 	sender: undefined | Sender;
@@ -24,7 +25,7 @@ export interface AppContext {
 }
 
 export async function startApp(ctx: AppContext): Promise<{ emitter: Events.EventEmitter }> {
-	log.info('App starting...');
+	log.info(`App starting ${ctx.hot ? 'with hot reloading' : ''}...`);
 
 	const emitter = new Events.EventEmitter();
 

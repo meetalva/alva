@@ -17,6 +17,7 @@ import { isMessage } from '../sender/is-message';
 import { Sender } from '../sender/server';
 
 export interface AppContext {
+	hot: undefined | boolean;
 	project: undefined | Model.Project;
 	port: undefined | number;
 	sender: undefined | Sender;
@@ -49,7 +50,7 @@ export class AlvaServer extends EventEmitter {
 		this.server = init.server;
 		this.webSocketServer = init.webSocketServer;
 
-		this.app.get('/', createRendererRoute());
+		this.app.get('/', createRendererRoute(this.options.context));
 		this.app.get('/preview.html', createPreviewRoute(this.options.context));
 		this.app.use('/static', createStaticRoute(this.options.context));
 

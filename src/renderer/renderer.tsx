@@ -11,6 +11,10 @@ import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';
 
+let app;
+let history;
+let store;
+
 export function startRenderer(): void {
 	console.log('App starting...');
 
@@ -24,9 +28,9 @@ export function startRenderer(): void {
 		payload: undefined
 	});
 
-	const app = new Model.AlvaApp();
-	const history = new Model.EditHistory();
-	const store = new ViewStore({ app, history, sender });
+	app = new Model.AlvaApp();
+	history = new Model.EditHistory();
+	store = new ViewStore({ app, history, sender });
 
 	// tslint:disable-next-line:no-any
 	(window as any).store = store;
@@ -42,4 +46,20 @@ export function startRenderer(): void {
 		</MobxReact.Provider>,
 		document.getElementById('app')
 	);
+}
+
+// tslint:disable-next-line:no-any
+const mod = module as any;
+
+if (mod.hot) {
+	mod.hot.accept('./src/container/app.tsx', () => {
+		const { App: LoadedApp } = require('../container/app');
+
+		ReactDom.render(
+			<MobxReact.Provider app={app} store={store}>
+				<LoadedApp />
+			</MobxReact.Provider>,
+			document.getElementById('app')
+		);
+	});
 }

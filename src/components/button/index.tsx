@@ -148,6 +148,7 @@ export const Button: React.StatelessComponent<ButtonProps> = props => {
 			size={props.size}
 			inverted={props.inverted}
 			style={{ color: props.textColor }}
+			disabled={props.disabled}
 		>
 			{props.children}
 		</Component>

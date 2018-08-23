@@ -49,7 +49,7 @@ export function startRenderer(): void {
 }
 
 if (module.hot) {
-	module.hot.accept(['../container/app'], () => {
+	module.hot.accept(['../container/app', '../model', '../store'], () => {
 		const LoadedApp = require('../container/app').App;
 		ReactDom.render(
 			<MobxReact.Provider app={app} store={store}>

@@ -10,19 +10,39 @@ const importFresh = require('import-fresh');
 
 const CONTEXT: AppContext = Mobx.observable({
 	app: undefined,
+	base: '',
 	port: undefined,
 	project: undefined,
 	sender: undefined,
 	win: undefined,
-	hot: undefined
+	hot: undefined,
+	middlewares: []
 });
 
 async function main(): Promise<void> {
 	const args = yargsParser(process.argv.slice(2));
 	CONTEXT.hot = args.hot || false;
+	CONTEXT.base = args.base || '';
 
 	const StartApp = importFresh('./start-app');
 	const startApp = StartApp.startApp as typeof start;
+
+	if (CONTEXT.hot) {
+		const webpack = require('webpack');
+		const webpackConfig = require('../../webpack.config');
+
+		const compiler = webpack(webpackConfig);
+
+		const devWare = require('webpack-dev-middleware')(compiler, {
+			noInfo: true,
+			publicPath: webpackConfig.output.publicPath
+		});
+
+		const hotWare = require('webpack-hot-middleware')(compiler);
+
+		CONTEXT.middlewares = [devWare, hotWare];
+	}
+
 	const app = await startApp(CONTEXT);
 
 	const rl = Readline.createInterface({

@@ -3,18 +3,18 @@ import * as Path from 'path';
 import * as Types from '../types';
 import * as AlvaUtil from '../alva-util';
 
-const SCRIPT_PATHS = [
-	require.resolve('../scripts/Mobx'),
-	require.resolve('../scripts/previewRenderer'),
-	require.resolve('../scripts/preview')
-];
-
 export interface StaticDocumentConfig {
 	data: Types.SerializedProject;
 	scripts: string[];
 }
 
 export const staticDocument = (config: StaticDocumentConfig): string => {
+	const SCRIPT_PATHS = [
+		require.resolve('../scripts/Mobx'),
+		require.resolve('../scripts/previewRenderer'),
+		require.resolve('../scripts/preview')
+	];
+
 	// Read preview scripts from disk
 	const scripts = SCRIPT_PATHS.map(scriptPath => ({
 		basename: Path.basename(scriptPath, Path.extname(scriptPath)),

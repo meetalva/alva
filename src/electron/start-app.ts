@@ -2,6 +2,7 @@ import { startUpdater, stopUpdater } from './auto-updater';
 import { createServerMessageHandler } from './create-server-message-handler';
 import * as Electron from 'electron';
 import * as Ephemeral from './ephemeral-store';
+import * as Express from 'express';
 import * as Events from 'events';
 import * as getPort from 'get-port';
 import * as Message from '../message';
@@ -17,11 +18,13 @@ const log = require('electron-log');
 
 export interface AppContext {
 	app: undefined | Model.AlvaApp;
+	base: undefined | string;
 	hot: undefined | boolean;
 	project: undefined | Model.Project;
 	port: undefined | number;
 	sender: undefined | Sender;
 	win: undefined | Electron.BrowserWindow;
+	middlewares: Express.RequestHandler[];
 }
 
 export async function startApp(ctx: AppContext): Promise<{ emitter: Events.EventEmitter }> {

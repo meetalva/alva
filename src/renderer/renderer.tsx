@@ -48,13 +48,9 @@ export function startRenderer(): void {
 	);
 }
 
-// tslint:disable-next-line:no-any
-const mod = module as any;
-
-if (mod.hot) {
-	mod.hot.accept('./src/container/app.tsx', () => {
-		const { App: LoadedApp } = require('../container/app');
-
+if (module.hot) {
+	module.hot.accept(['../container/app'], () => {
+		const LoadedApp = require('../container/app').App;
 		ReactDom.render(
 			<MobxReact.Provider app={app} store={store}>
 				<LoadedApp />

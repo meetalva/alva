@@ -58,7 +58,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 					{page.getName()}
 				</ViewSwitch>
 				<BugReport
-					title="Found a bug?"
+					title="Found a bug"
 					onClick={() => {
 						props.store.getSender().send({
 							type: MessageType.OpenExternalURL,

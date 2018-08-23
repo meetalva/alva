@@ -17,11 +17,13 @@ import { isMessage } from '../sender/is-message';
 import { Sender } from '../sender/server';
 
 export interface AppContext {
+	base: undefined | string;
 	hot: undefined | boolean;
 	project: undefined | Model.Project;
 	port: undefined | number;
 	sender: undefined | Sender;
 	win: undefined | unknown;
+	middlewares: express.RequestHandler[];
 }
 
 export interface ServerOptions {
@@ -49,6 +51,8 @@ export class AlvaServer extends EventEmitter {
 		this.options = init.options;
 		this.server = init.server;
 		this.webSocketServer = init.webSocketServer;
+
+		this.options.context.middlewares.forEach(middleware => this.app.use(middleware));
 
 		this.app.get('/', createRendererRoute(this.options.context));
 		this.app.get('/preview.html', createPreviewRoute(this.options.context));

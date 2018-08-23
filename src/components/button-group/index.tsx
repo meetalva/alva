@@ -21,6 +21,10 @@ const StyledButtonGroup = styled.div`
 			border-left-width: 0.5px;
 		}
 	}
+
+	[disabled] {
+		opacity: 0.3;
+	}
 `;
 
 export const ButtonGroupButton = props => (

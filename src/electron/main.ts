@@ -1,6 +1,7 @@
 import * as Electron from 'electron';
 import * as Mobx from 'mobx';
 import * as Path from 'path';
+import * as Readline from 'readline';
 import { AppContext, startApp as start } from './start-app';
 
 const yargsParser = require('yargs-parser');
@@ -23,6 +24,21 @@ async function main(): Promise<void> {
 	const StartApp = importFresh('./start-app');
 	const startApp = StartApp.startApp as typeof start;
 	const app = await startApp(CONTEXT);
+
+	const rl = Readline.createInterface({
+		input: process.stdin,
+		terminal: false
+	});
+
+	rl.on('line', line => {
+		if (!line.endsWith('rs')) {
+			return;
+		}
+
+		Readline.moveCursor(process.stdin, 0, -1);
+		Readline.clearLine(process.stdin, 0);
+		app.emitter.emit('reload', { forced: true });
+	});
 
 	app.emitter.once('reload', async () => {
 		clearModule.match(new RegExp(`^${Path.join(__dirname, '..')}`));

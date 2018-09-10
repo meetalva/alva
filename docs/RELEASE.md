@@ -37,3 +37,6 @@ tags:
 	4. Add the release notes from the changelog.md for the specific version in the description
 	5. New contributors should be mentioned additionally
 5. Upload the files from the `upload-for-github-release` folder
+
+## Architecture
+![Architecture Diagram](./architecture-diagram.svg)

@@ -231,6 +231,11 @@ export class Element {
 	}
 
 	@Mobx.action
+	public addContent(content: ElementContent): void {
+		this.contentIds.push(content.getId());
+	}
+
+	@Mobx.action
 	public clone(opts?: { withState: boolean }): Element {
 		const withState = Boolean(opts && opts.withState);
 
@@ -259,7 +264,7 @@ export class Element {
 				return clones;
 			}, new Map());
 
-		const clonedContents = this.contentIds
+		const clonedContents = [...this.contentIds]
 			.map(contentId => this.project.getElementContentById(contentId))
 			.filter((content): content is ElementContent => typeof content !== 'undefined')
 			.map(content => content.clone({ withState }));
@@ -415,7 +420,7 @@ export class Element {
 	}
 
 	public getContents(): ElementContent[] {
-		return this.contentIds
+		return [...this.contentIds]
 			.map(contentId => this.project.getElementContentById(contentId))
 			.filter(
 				(elementContent): elementContent is ElementContent =>

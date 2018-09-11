@@ -175,20 +175,9 @@ export class ViewStore {
 	public createElement(init: { dragged?: boolean; pattern: Model.Pattern }): Model.Element {
 		const project = this.getProject();
 
-		const elementContents = init.pattern.getSlots().map(
-			slot =>
-				new Model.ElementContent(
-					{
-						elementIds: [],
-						forcedOpen: false,
-						highlighted: false,
-						id: uuid.v4(),
-						open: false,
-						slotId: slot.getId()
-					},
-					{ project }
-				)
-		);
+		const elementContents = init.pattern
+			.getSlots()
+			.map(slot => Model.ElementContent.fromSlot(slot, { project }));
 
 		const element = new Model.Element(
 			{

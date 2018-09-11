@@ -80,6 +80,20 @@ export class ElementContent {
 		);
 	}
 
+	public static fromSlot(slot: PatternSlot, context: ElementContentContext): ElementContent {
+		return new ElementContent(
+			{
+				elementIds: [],
+				forcedOpen: false,
+				highlighted: false,
+				id: uuid.v4(),
+				open: false,
+				slotId: slot.getId()
+			},
+			context
+		);
+	}
+
 	public accepts(child: Element): boolean {
 		const parentElementId = this.getParentElementId();
 

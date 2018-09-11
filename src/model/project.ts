@@ -831,11 +831,11 @@ export class Project {
 			const removed = message.payload.change.removed;
 			const member = mayBeMember as unknown[];
 
-			if (removed.length > 0) {
+			if (Array.isArray(member) && removed.length > 0) {
 				member.splice(message.payload.change.index, removed.length);
 			}
 
-			if (added.length > 0) {
+			if (Array.isArray(member) && added.length > 0) {
 				member.splice(message.payload.change.index, 0, ...added);
 			}
 		});

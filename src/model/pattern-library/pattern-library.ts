@@ -3,6 +3,7 @@ import { Box, Conditional, Image, Link, Page, Text } from './builtins';
 import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Pattern, PatternSlot } from '../pattern';
+import { ElementContent } from '../element';
 import { AnyPatternProperty, PatternEnumProperty, PatternProperty } from '../pattern-property';
 import { Project } from '../project';
 import * as Types from '../../types';
@@ -139,10 +140,13 @@ export class PatternLibrary {
 	@Mobx.action
 	public import(analysis: Types.LibraryAnalysis, { project }: { project: Project }): void {
 		const patternsBefore = this.getPatterns();
+		const patternsAfter = analysis.patterns.map(item =>
+			Pattern.from(item.pattern, { patternLibrary: this })
+		);
 
 		const patternChanges = computeDifference({
 			before: patternsBefore,
-			after: analysis.patterns.map(item => Pattern.from(item.pattern, { patternLibrary: this }))
+			after: patternsAfter
 		});
 
 		patternChanges.removed.map(change => {
@@ -191,6 +195,26 @@ export class PatternLibrary {
 		});
 
 		propChanges.changed.map(change => change.before.update(change.after));
+
+		// TODO: This might be solved via a bigger refactoring that
+		// computes available element contents from pattern slots directly
+		patternsAfter.forEach(pattern => {
+			project.getElementsByPattern(pattern).forEach(element => {
+				const contents = element.getContents();
+
+				pattern
+					.getSlots()
+					// Check if there is a corresponding element content for each pattern slot
+					.filter(slot => !contents.some(content => content.getSlot() === slot))
+					.forEach(slot => {
+						// No element content, create a new one and add it to element
+						const content = ElementContent.fromSlot(slot, { project });
+						content.setParentElement(element);
+						element.addContent(content);
+						project.addElementContent(content);
+					});
+			});
+		});
 
 		this.setState(Types.PatternLibraryState.Connected);
 

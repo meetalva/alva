@@ -1,4 +1,3 @@
-import { computeDifference } from '../alva-util';
 import { ElementArea } from './element-area';
 import exportToSketchData from './export-to-sketch-data';
 import { getComponents } from './get-components';
@@ -93,45 +92,25 @@ function main(): void {
 			store.setMetaDown(message.payload.metaDown);
 		});
 
-		sender.match<Message.ChangePatternLibraries>(
-			Message.MessageType.ChangePatternLibraries,
-			message => {
-				Mobx.transaction(() => {
-					const libraryChanges = computeDifference<Model.PatternLibrary>({
-						before: project.getPatternLibraries(),
-						after: message.payload.patternLibraries.map(e => Model.PatternLibrary.from(e))
-					});
+		Mobx.autorun(() => {
+			Array.prototype.slice
+				.call(document.querySelectorAll('script[data-bundle]'), 0)
+				.filter(script => script.parentElement)
+				.forEach(script => script.parentElement.removeChild(script));
 
-					libraryChanges.added.forEach(change => {
-						const script = document.createElement('script');
-						script.dataset.bundle = change.after.getBundleId();
-						script.textContent = change.after.getBundle();
-						document.body.appendChild(script);
-
-						project.addPatternLibrary(change.after);
-					});
-
-					libraryChanges.changed.forEach(change => {
-						const scriptCandidate = document.querySelector(
-							`[data-bundle="${change.before.getBundleId()}"]`
-						);
-
-						if (scriptCandidate && scriptCandidate.parentElement) {
-							scriptCandidate.parentElement.removeChild(scriptCandidate);
-						}
-
-						const script = document.createElement('script');
-						script.dataset.bundle = change.after.getBundleId();
-						script.textContent = change.after.getBundle();
-						document.body.appendChild(script);
-
-						change.before.update(change.after);
-					});
-
-					store.setComponents(getComponents(store.getProject()));
+			store
+				.getProject()
+				.getPatternLibraries()
+				.filter(library => library.getOrigin() === Types.PatternLibraryOrigin.UserProvided)
+				.forEach(library => {
+					const script = document.createElement('script');
+					script.dataset.bundle = library.getBundleId();
+					script.textContent = library.getBundle();
+					document.body.appendChild(script);
 				});
-			}
-		);
+
+			store.setComponents(getComponents(store.getProject()));
+		});
 
 		Mobx.reaction(
 			() => store.hasSelectedItem(),

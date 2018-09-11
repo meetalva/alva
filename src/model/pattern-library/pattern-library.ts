@@ -39,11 +39,11 @@ export interface PatternLibraryCreateOptions {
 
 export class PatternLibrary {
 	public readonly model = Types.ModelName.PatternLibrary;
+	private readonly id: string;
 
 	@Mobx.observable private bundleId: string;
 	@Mobx.observable private bundle: string;
 	@Mobx.observable private description: string;
-	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
 	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
 	@Mobx.observable private patterns: Map<string, Pattern> = new Map();
@@ -389,7 +389,6 @@ export class PatternLibrary {
 		this.bundleId = b.bundleId;
 		this.bundle = b.bundle;
 		this.description = b.description;
-		this.id = b.id;
 		this.name = b.name;
 		this.origin = b.origin;
 		this.state = this.state;

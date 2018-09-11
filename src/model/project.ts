@@ -286,22 +286,19 @@ export class Project {
 	}
 
 	@Mobx.action
-	public addPatternLibrary(patternLibrary: PatternLibrary): void {
-		if (patternLibrary.getOrigin() === Types.PatternLibraryOrigin.BuiltIn) {
+	public addPatternLibrary(lib: PatternLibrary): void {
+		if (lib.getOrigin() === Types.PatternLibraryOrigin.BuiltIn) {
 			const updatedLibrary = Project.createBuiltinPatternLibrary({
-				getGlobalEnumOptionId: (enumId, contextId) =>
-					patternLibrary.assignEnumOptionId(enumId, contextId),
-				getGlobalPatternId: contextId => patternLibrary.assignPatternId(contextId),
-				getGlobalPropertyId: (patternId, contextId) =>
-					patternLibrary.assignPropertyId(patternId, contextId),
-				getGlobalSlotId: (patternId, contextId) =>
-					patternLibrary.assignSlotId(patternId, contextId)
+				getGlobalEnumOptionId: lib.assignEnumOptionId.bind(lib),
+				getGlobalPatternId: lib.assignPatternId.bind(lib),
+				getGlobalPropertyId: lib.assignPropertyId.bind(lib),
+				getGlobalSlotId: lib.assignSlotId.bind(lib)
 			});
 
-			patternLibrary.update(updatedLibrary);
+			lib.update(updatedLibrary);
 		}
 
-		this.patternLibraries.set(patternLibrary.getId(), patternLibrary);
+		this.patternLibraries.set(lib.getId(), lib);
 	}
 
 	@Mobx.action

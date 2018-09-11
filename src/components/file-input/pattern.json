@@ -1,0 +1,8 @@
+{
+	"name": "file-input",
+	"description": "Input for file references, copies, etc.",
+	"displayName": "File Input",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": []
+}

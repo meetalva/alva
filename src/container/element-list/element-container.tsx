@@ -23,6 +23,7 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 		const open = props.element.getOpen() || props.element.getForcedOpen();
 
 		const contents = props.element.getContents();
+		const pattern = props.element.getPattern();
 
 		const [[childContent], slotContents] = partition(
 			contents,
@@ -34,10 +35,8 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 			<Components.Element
 				capabilities={[
 					Components.ElementCapability.Draggable,
-					props.element.getRole() !== Types.ElementRole.Root &&
-						Components.ElementCapability.Editable,
+					Components.ElementCapability.Editable,
 					contents.some(content => content.acceptsChildren()) &&
-						props.element.getRole() !== Types.ElementRole.Root &&
 						Components.ElementCapability.Openable
 				].filter((item): item is Components.ElementCapability => Boolean(item))}
 				dragging={store.getDragging()}
@@ -50,6 +49,9 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 				state={getElementState(props.element, store)}
 				title={
 					props.element.getRole() === Types.ElementRole.Root ? 'Page' : props.element.getName()
+				}
+				description={
+					pattern && props.element.getName() !== pattern.getName() ? pattern.getName() : ''
 				}
 			>
 				<Components.Element.ElementSlots>

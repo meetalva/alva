@@ -11,7 +11,6 @@ export interface EditableTitleContainerProps {
 	focused: boolean;
 	page: Page;
 	secondary: Types.EditableTitleType;
-	value: string;
 }
 
 @MobxReact.inject('store')
@@ -24,28 +23,20 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 	protected handleBlur(): void {
 		const { store } = this.props as EditableTitleContainerProps & { store: ViewStore };
 
-		if (!this.props.page.getName()) {
-			this.props.page.setName(
-				this.props.page.getName({ unedited: true }),
-				Types.EditableTitleState.Editing
-			);
+		if (this.props.page.getEditedName().trim().length === 0) {
+			this.props.page.setName(this.props.page.getName({ unedited: true }));
 			this.editNameState = Types.EditableTitleState.Editable;
 			return;
 		}
 
-		const name = this.props.page.getName();
-		const editedName = this.props.page.getEditedName();
-
 		this.editNameState = Types.EditableTitleState.Editable;
 		this.props.page.setName(this.props.page.getEditedName());
 
-		if (editedName !== name) {
-			store.commit();
-		}
+		store.commit();
 	}
 
 	protected handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
-		this.props.page.setName(e.target.value, this.editNameState);
+		this.props.page.setEditableName(e.target.value);
 	}
 
 	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
@@ -70,24 +61,18 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 		switch (e.key) {
 			case 'Escape':
 				this.editNameState = Types.EditableTitleState.Editable;
-				this.props.page.setName(
-					this.props.page.getName({ unedited: true }),
-					Types.EditableTitleState.Editing
-				);
+				this.props.page.setName(this.props.page.getName({ unedited: true }));
 				return;
 			case 'Enter':
 				if (this.editNameState === Types.EditableTitleState.Editing) {
 					if (!this.props.page.getName()) {
-						this.props.page.setName(
-							this.props.page.getName({ unedited: true }),
-							this.editNameState
-						);
+						this.props.page.setName(this.props.page.getName({ unedited: true }));
 						this.editNameState = Types.EditableTitleState.Editable;
 						return;
 					}
 
 					this.editNameState = Types.EditableTitleState.Editable;
-					this.props.page.setName(this.props.page.getEditedName(), this.editNameState);
+					this.props.page.setName(this.props.page.getEditedName());
 					store.commit();
 					return;
 				}

@@ -8,6 +8,7 @@ import {
 	PatternStringProperty
 } from '../../pattern-property';
 import * as Types from '../../../types';
+import { IconName } from '../../../components';
 
 const CONTEXT_ID = 'synthetic:box';
 const FLEX_CONTEXT_ID = 'flex';
@@ -21,7 +22,6 @@ const ALIGN_ITEMS_CONTEXT_ID = 'align-items';
 const JUSTIFY_CONTENT_CONTEXT_ID = 'justify-content';
 const FLEX_DIRECTION_CONTEXT_ID = 'flex-direction';
 const FLEX_WRAP_CONTEXT_ID = 'flex-wrap';
-const ORDER_CONTEXT_ID = 'order';
 const BACKGROUND_COLOR_CONTEXT_ID = 'background-color';
 
 export const Box = (context: BuiltInContext): BuiltInResult => {
@@ -40,67 +40,58 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		FLEX_DIRECTION_CONTEXT_ID
 	);
 	const flexWrapId = context.options.getGlobalPropertyId(patternId, FLEX_WRAP_CONTEXT_ID);
-	const orderId = context.options.getGlobalPropertyId(patternId, ORDER_CONTEXT_ID);
 	const backgroundColorId = context.options.getGlobalPropertyId(
 		patternId,
 		BACKGROUND_COLOR_CONTEXT_ID
 	);
 
-	const defaultAlign = context.options.getGloablEnumOptionId(alignId, 'center');
-	const defaultJustify = context.options.getGloablEnumOptionId(justifyId, 'center');
+	const defaultAlign = context.options.getGlobalEnumOptionId(alignId, 'center');
+	const defaultDirection = context.options.getGlobalEnumOptionId(flexDirectionId, 'row');
+	const defaultJustify = context.options.getGlobalEnumOptionId(justifyId, 'center');
 
 	const properties = [
 		new PatternBooleanProperty({
 			contextId: FLEX_CONTEXT_ID,
 			id: flexId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Flex',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'flex',
 			defaultValue: true
 		}),
-		new PatternNumberProperty({
-			contextId: FLEX_GROW_CONTEXT_ID,
-			id: growId,
-			label: 'Grow',
+		new PatternEnumProperty({
+			contextId: FLEX_DIRECTION_CONTEXT_ID,
+			id: flexDirectionId,
+			inputType: Types.PatternPropertyInputType.RadioGroup,
+			label: 'Direction',
+			propertyName: 'flexDirection',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
-			propertyName: 'flexGrow',
-			defaultValue: 1
-		}),
-		new PatternNumberProperty({
-			contextId: FLEX_SHRINK_CONTEXT_ID,
-			id: shrinkId,
-			label: 'Shrink',
-			origin: Types.PatternPropertyOrigin.BuiltIn,
-			propertyName: 'flexShrink',
-			defaultValue: 1
-		}),
-		new PatternStringProperty({
-			contextId: FLEX_BASIS_CONTEXT_ID,
-			id: basisId,
-			label: 'Size',
-			origin: Types.PatternPropertyOrigin.BuiltIn,
-			propertyName: 'flexBasis',
-			defaultValue: 'auto'
-		}),
-		new PatternStringProperty({
-			contextId: WIDHT_CONTEXT_ID,
-			id: widthId,
-			label: 'Width',
-			origin: Types.PatternPropertyOrigin.BuiltIn,
-			propertyName: 'width',
-			defaultValue: 'auto'
-		}),
-		new PatternStringProperty({
-			contextId: HEIGHT_CONTEXT_ID,
-			id: heightId,
-			label: 'Height',
-			origin: Types.PatternPropertyOrigin.BuiltIn,
-			propertyName: 'height',
-			defaultValue: 'auto'
+			defaultOptionId: defaultDirection,
+			required: false,
+			hidden: false,
+			options: [
+				new PatternEnumPropertyOption({
+					contextId: 'row',
+					id: context.options.getGlobalEnumOptionId(flexDirectionId, 'row'),
+					name: 'Horizontal',
+					value: 'row',
+					icon: undefined,
+					ordinal: '0'
+				}),
+				new PatternEnumPropertyOption({
+					contextId: 'column',
+					id: context.options.getGlobalEnumOptionId(flexDirectionId, 'column'),
+					name: 'Vertical',
+					value: 'column',
+					icon: undefined,
+					ordinal: '1'
+				})
+			]
 		}),
 		new PatternEnumProperty({
 			contextId: ALIGN_ITEMS_CONTEXT_ID,
 			id: alignId,
+			inputType: Types.PatternPropertyInputType.RadioGroup,
 			label: 'Align',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'alignItems',
@@ -110,37 +101,42 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			options: [
 				new PatternEnumPropertyOption({
 					contextId: 'flex-start',
-					id: context.options.getGloablEnumOptionId(alignId, 'flex-start'),
+					id: context.options.getGlobalEnumOptionId(alignId, 'flex-start'),
 					name: 'Start',
 					value: 'flex-start',
+					icon: IconName.FlexStart,
 					ordinal: '0'
-				}),
-				new PatternEnumPropertyOption({
-					contextId: 'flex-end',
-					id: context.options.getGloablEnumOptionId(alignId, 'flex-end'),
-					name: 'End',
-					value: 'flex-end',
-					ordinal: '1'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'center',
 					id: defaultAlign,
 					name: 'Center',
 					value: 'center',
+					icon: IconName.FlexCenter,
+					ordinal: '1'
+				}),
+				new PatternEnumPropertyOption({
+					contextId: 'flex-end',
+					id: context.options.getGlobalEnumOptionId(alignId, 'flex-end'),
+					name: 'End',
+					value: 'flex-end',
+					icon: IconName.FlexEnd,
 					ordinal: '2'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'stretch',
-					id: context.options.getGloablEnumOptionId(alignId, 'stretch'),
+					id: context.options.getGlobalEnumOptionId(alignId, 'stretch'),
 					name: 'Stretch',
 					value: 'stretch',
+					icon: IconName.FlexStretch,
 					ordinal: '3'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'baseline',
-					id: context.options.getGloablEnumOptionId(alignId, 'baseline'),
+					id: context.options.getGlobalEnumOptionId(alignId, 'baseline'),
 					name: 'Baseline',
 					value: 'baseline',
+					icon: IconName.FlexBaseline,
 					ordinal: '4'
 				})
 			]
@@ -148,6 +144,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 		new PatternEnumProperty({
 			contextId: JUSTIFY_CONTENT_CONTEXT_ID,
 			id: justifyId,
+			inputType: Types.PatternPropertyInputType.Select,
 			label: 'Justify',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'justifyContent',
@@ -157,16 +154,18 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			options: [
 				new PatternEnumPropertyOption({
 					contextId: 'flex-start',
-					id: context.options.getGloablEnumOptionId(justifyId, 'flex-start'),
+					id: context.options.getGlobalEnumOptionId(justifyId, 'flex-start'),
 					name: 'Start',
 					value: 'flex-start',
+					icon: undefined,
 					ordinal: '0'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'flex-end',
-					id: context.options.getGloablEnumOptionId(justifyId, 'flex-end'),
+					id: context.options.getGlobalEnumOptionId(justifyId, 'flex-end'),
 					name: 'End',
 					value: 'flex-end',
+					icon: undefined,
 					ordinal: '1'
 				}),
 				new PatternEnumPropertyOption({
@@ -174,57 +173,93 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 					id: defaultJustify,
 					name: 'Center',
 					value: 'center',
+					icon: undefined,
 					ordinal: '2'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'space-between',
-					id: context.options.getGloablEnumOptionId(justifyId, 'space-between'),
+					id: context.options.getGlobalEnumOptionId(justifyId, 'space-between'),
 					name: 'Space Between',
 					value: 'space-between',
+					icon: undefined,
 					ordinal: '3'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'space-around',
-					id: context.options.getGloablEnumOptionId(justifyId, 'space-around'),
+					id: context.options.getGlobalEnumOptionId(justifyId, 'space-around'),
 					name: 'Space Around',
 					value: 'space-around',
+					icon: undefined,
 					ordinal: '4'
 				}),
 				new PatternEnumPropertyOption({
 					contextId: 'space-evenly',
-					id: context.options.getGloablEnumOptionId(justifyId, 'space-evenly'),
+					id: context.options.getGlobalEnumOptionId(justifyId, 'space-evenly'),
 					name: 'Space Evenly',
 					value: 'space-evenly',
+					icon: undefined,
 					ordinal: '5'
 				})
 			]
 		}),
 		new PatternBooleanProperty({
-			contextId: FLEX_DIRECTION_CONTEXT_ID,
-			id: flexDirectionId,
-			label: 'Column',
-			propertyName: 'column',
-			origin: Types.PatternPropertyOrigin.BuiltIn,
-			defaultValue: false
-		}),
-		new PatternBooleanProperty({
 			contextId: FLEX_WRAP_CONTEXT_ID,
 			id: flexWrapId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Wrap',
 			propertyName: 'wrap',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			defaultValue: false
 		}),
 		new PatternNumberProperty({
-			contextId: ORDER_CONTEXT_ID,
-			id: orderId,
-			label: 'Order',
+			contextId: FLEX_GROW_CONTEXT_ID,
+			id: growId,
+			inputType: Types.PatternPropertyInputType.Default,
+			label: 'Grow',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
-			propertyName: 'order'
+			propertyName: 'flexGrow',
+			defaultValue: 1
+		}),
+		new PatternNumberProperty({
+			contextId: FLEX_SHRINK_CONTEXT_ID,
+			id: shrinkId,
+			inputType: Types.PatternPropertyInputType.Default,
+			label: 'Shrink',
+			origin: Types.PatternPropertyOrigin.BuiltIn,
+			propertyName: 'flexShrink',
+			defaultValue: 1
+		}),
+		new PatternStringProperty({
+			contextId: FLEX_BASIS_CONTEXT_ID,
+			id: basisId,
+			inputType: Types.PatternPropertyInputType.Default,
+			label: 'Size',
+			origin: Types.PatternPropertyOrigin.BuiltIn,
+			propertyName: 'flexBasis',
+			defaultValue: 'auto'
+		}),
+		new PatternStringProperty({
+			contextId: WIDHT_CONTEXT_ID,
+			id: widthId,
+			inputType: Types.PatternPropertyInputType.Default,
+			label: 'Width',
+			origin: Types.PatternPropertyOrigin.BuiltIn,
+			propertyName: 'width',
+			defaultValue: 'auto'
+		}),
+		new PatternStringProperty({
+			contextId: HEIGHT_CONTEXT_ID,
+			id: heightId,
+			inputType: Types.PatternPropertyInputType.Default,
+			label: 'Height',
+			origin: Types.PatternPropertyOrigin.BuiltIn,
+			propertyName: 'height',
+			defaultValue: 'auto'
 		}),
 		new PatternStringProperty({
 			contextId: BACKGROUND_COLOR_CONTEXT_ID,
 			id: backgroundColorId,
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Background Color',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'backgroundColor'

@@ -99,7 +99,7 @@ const StyledMainArea = styled(StyledLayout)`
 const StyledSideBar = styled(StyledLayout)`
 	flex-basis: 240px;
 	height: 100%;
-	overflow-y: hidden;
+	overflow-y: auto;
 `;
 
 export interface FixedAreaProps {
@@ -107,6 +107,7 @@ export interface FixedAreaProps {
 	right?: number;
 	bottom?: number;
 	left?: number;
+	z?: number;
 	children?: React.ReactNode;
 }
 
@@ -117,11 +118,18 @@ const StyledFixedArea = styled.div`
 	bottom: ${(props: FixedAreaProps) =>
 		typeof props.bottom === 'undefined' ? 'auto' : props.bottom};
 	left: ${(props: FixedAreaProps) => (typeof props.left === 'undefined' ? 'auto' : props.left)};
+	z-index: ${props => (typeof props.z === 'undefined' ? '' : props.z)};
+`;
+
+const StyledRelativeArea = styled.div`
+	position: relative;
 `;
 
 export const FixedArea: React.StatelessComponent<FixedAreaProps> = props => (
 	<StyledFixedArea {...props} />
 );
+
+export const RelativeArea: React.StatelessComponent = props => <StyledRelativeArea {...props} />;
 
 export const MainArea: React.StatelessComponent<MainAreaProps> = props => (
 	<StyledMainArea className={props.className} direction={props.direction} border={props.border}>

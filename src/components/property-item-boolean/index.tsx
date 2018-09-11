@@ -109,6 +109,7 @@ export const PropertyItemBoolean: React.StatelessComponent<PropertyItemBooleanPr
 					)}
 				</StyledIndicatorKnob>
 			</StyledIndicatorTrack>
+			{props.children}
 		</PropertyItem>
 	);
 };

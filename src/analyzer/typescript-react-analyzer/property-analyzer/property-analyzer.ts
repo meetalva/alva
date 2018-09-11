@@ -31,13 +31,14 @@ export function analyze(
 	return type
 		.getApparentProperties()
 		.map(symbol => {
-			if ((symbol.flags & Ts.SymbolFlags.Property) !== Ts.SymbolFlags.Property) {
-				return;
-			}
-
 			const declaration = TypescriptUtils.findTypeDeclaration(symbol, {
 				typechecker
 			}) as Ts.Declaration;
+
+			if (!Ts.isPropertySignature(declaration) && !Ts.isMethodSignature(declaration)) {
+				return;
+			}
+
 			const memberType = typechecker.getTypeAtLocation(declaration);
 
 			if (ReactUtils.isReactSlotType(memberType, { program: ctx.program })) {
@@ -106,62 +107,8 @@ function createProperty(
 		return createNumberProperty(init, ctx);
 	}
 
-	if (init.typechecker.isArrayLikeType(init.type)) {
-		return createArrayProperty(init, ctx);
-	}
-
 	if (ReactUtils.isReactEventHandlerType(init.type, { program: ctx.program })) {
 		return createEventHandlerProperty(init, ctx);
-	}
-
-	return;
-}
-
-function createArrayProperty(
-	args: PropertyInit,
-	ctx: PropertyAnalyzeContext
-):
-	| Types.SerializedPatternNumberArrayProperty
-	| Types.SerializedPatternStringArrayProperty
-	| undefined {
-	const arrayType: Ts.GenericType = args.type as Ts.GenericType;
-
-	if (!arrayType.typeArguments) {
-		return;
-	}
-
-	const [itemType] = arrayType.typeArguments;
-
-	if ((itemType.flags & Ts.TypeFlags.String) === Ts.TypeFlags.String) {
-		return {
-			contextId: args.symbol.name,
-			defaultValue: [],
-			description: '',
-			example: '',
-			hidden: false,
-			id: ctx.getPropertyId(args.symbol.name),
-			label: args.symbol.name,
-			origin: 'user-provided',
-			propertyName: args.symbol.name,
-			required: false,
-			type: Types.PatternPropertyType.StringArray
-		};
-	}
-
-	if ((itemType.flags & Ts.TypeFlags.Number) === Ts.TypeFlags.Number) {
-		return {
-			contextId: args.symbol.name,
-			defaultValue: [],
-			description: '',
-			example: '',
-			hidden: false,
-			id: ctx.getPropertyId(args.symbol.name),
-			label: args.symbol.name,
-			origin: 'user-provided',
-			propertyName: args.symbol.name,
-			required: false,
-			type: Types.PatternPropertyType.NumberArray
-		};
 	}
 
 	return;
@@ -172,11 +119,13 @@ function createBooleanProperty(
 	ctx: PropertyAnalyzeContext
 ): Types.SerializedPatternBooleanProperty | undefined {
 	return {
+		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
+		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
 		origin: 'user-provided',
 		propertyName: args.symbol.name,
@@ -208,11 +157,13 @@ function createEnumProperty(
 	const enumId = ctx.getPropertyId(args.symbol.name);
 
 	return {
+		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
 		hidden: false,
 		id: enumId,
+		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
 		origin: 'user-provided',
 		options: enumDeclaration.members.map((enumMember, index) => {
@@ -227,6 +178,7 @@ function createEnumProperty(
 
 			return {
 				contextId: init,
+				icon: undefined,
 				id: ctx.getEnumOptionId(enumId, name),
 				name,
 				ordinal: init,
@@ -244,11 +196,13 @@ function createNumberProperty(
 	ctx: PropertyAnalyzeContext
 ): Types.SerializedPatternNumberProperty {
 	return {
+		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
+		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
 		origin: 'user-provided',
 		propertyName: args.symbol.name,
@@ -266,11 +220,13 @@ function createStringProperty(
 	| Types.SerializedStringProperty {
 	if (TypescriptUtils.hasJsDocTagFromSymbol(args.symbol, 'asset')) {
 		return {
+			model: Types.ModelName.PatternProperty,
 			contextId: args.symbol.name,
 			description: '',
 			example: '',
 			hidden: false,
 			id: ctx.getPropertyId(args.symbol.name),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: args.symbol.name,
 			origin: 'user-provided',
 			propertyName: args.symbol.name,
@@ -281,11 +237,13 @@ function createStringProperty(
 
 	if (TypescriptUtils.hasJsDocTagFromSymbol(args.symbol, 'href')) {
 		return {
+			model: Types.ModelName.PatternProperty,
 			contextId: args.symbol.name,
 			description: '',
 			example: '',
 			hidden: false,
 			id: ctx.getPropertyId(args.symbol.name),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: args.symbol.name,
 			origin: 'user-provided',
 			propertyName: args.symbol.name,
@@ -295,11 +253,13 @@ function createStringProperty(
 	}
 
 	return {
+		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
+		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
 		origin: 'user-provided',
 		propertyName: args.symbol.name,
@@ -312,14 +272,18 @@ function createEventHandlerProperty(
 	args: PropertyInit,
 	ctx: PropertyAnalyzeContext
 ): Types.SerializedPatternEventHandlerProperty {
+	const eventType = ReactUtils.getEventType(args, { typechecker: ctx.program.getTypeChecker() });
+
 	return {
+		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
-		// TODO: Determine event type from static information, allow TSDoc override
-		event: { type: 'MouseEvent' },
+		// TODO: Allow TSDoc override
+		event: { type: eventType },
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
+		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
 		origin: 'user-provided',
 		propertyName: args.symbol.name,

@@ -1,140 +1,27 @@
 import * as PatternProperty from './pattern-property';
+import * as SerializedModel from './serialized-model';
 import * as UserStore from './user-store';
+import * as Message from '../message';
 
 export enum AppState {
 	Starting = 'starting',
 	Started = 'started'
 }
 
-export type SerializedAppState = 'starting' | 'started';
-
-export interface SavedProject {
-	elementActions: SerializedElementAction[];
-	elementContents: SerializedElementContent[];
-	elements: SerializedElement[];
-	id: string;
-	name: string;
-	pages: SerializedPage[];
-	patternLibrary: SerializedPatternLibrary;
-	userStore: UserStore.SerializedUserStore;
-}
-
-export interface SerializedProject extends SavedProject {
-	path: string;
-}
-
-export interface SerializedPage {
-	active: boolean;
-	id: string;
-	name: string;
-	rootId: string;
-}
-
-export type SerializedElementRole = 'root' | 'node';
-
-export interface SerializedElement {
-	containerId?: string;
-	contentIds: string[];
-	dragged: boolean;
-	focused: boolean;
-	forcedOpen: boolean;
-	highlighted: boolean;
-	id: string;
-	name: string;
-	open: boolean;
-	patternId: string;
-	placeholderHighlighted: boolean;
-	properties: SerializedElementProperty[];
-	role: SerializedElementRole;
-	selected: boolean;
-}
-
-export interface SerializedElementContent {
-	elementIds: string[];
-	forcedOpen: boolean;
-	id: string;
-	open: boolean;
-	parentElementId?: string;
-	slotId: string;
-}
-
-export enum PatternLibraryState {
-	Pristine = 'pristine',
-	Connected = 'connected',
-	Disconnected = 'disconnected'
-}
-
-export interface SerializedPatternLibrary {
-	bundle: string;
-	id: string;
-	patternProperties: PatternProperty.SerializedPatternProperty[];
-	patterns: SerializedPattern[];
-	root: SerializedPatternFolder;
-	state: PatternLibraryState;
-}
-
-export interface SerializedPatternFolder {
-	children: SerializedPatternFolder[];
-	id: string;
-	name: string;
-	patterns: string[];
-	type: 'builtin' | 'user-provided';
-}
-
 export enum PatternType {
 	Pattern = 'pattern',
 	SyntheticBox = 'synthetic:box',
+	SyntheticConditional = 'synthetic:conditional',
 	SyntheticImage = 'synthetic:image',
 	SyntheticLink = 'synthetic:link',
 	SyntheticPage = 'synthetic:page',
 	SyntheticText = 'synthetic:text'
 }
 
-export type SerializedPatternType =
-	| 'pattern'
-	| 'synthetic:box'
-	| 'synthetic:image'
-	| 'synthetic:link'
-	| 'synthetic:page'
-	| 'synthetic:text';
-
-export enum PatternOrigin {
-	BuiltIn = 'built-in',
-	UserProvided = 'user-provided'
-}
-
-export type SerializedPatternOrigin = 'built-in' | 'user-provided';
-
-export interface SerializedPattern {
-	contextId: string;
-	description: string;
-	exportName: string;
-	id: string;
-	name: string;
-	origin: SerializedPatternOrigin;
-	propertyIds: string[];
-	slots: SerializedPatternSlot[];
-	type: SerializedPatternType;
-}
-
-export interface SerializedPatternSlot {
-	contextId: string;
-	description: string;
-	example: string;
-	hidden: boolean;
-	id: string;
-	label: string;
-	propertyName: string;
-	required: boolean;
-	type: string;
-}
-
 export enum AlvaView {
 	PageDetail = 'PageDetail',
 	SplashScreen = 'SplashScreen'
 }
-
-export type SerializedAlvaView = 'PageDetail' | 'SplashScreen';
 
 export enum EditableTitleState {
 	Editable = 'Editable',
@@ -151,29 +38,41 @@ export enum SlotType {
 	Property = 'property'
 }
 
-export interface SerializedElementProperty {
-	id: string;
-	patternPropertyId: string;
-	setDefault: boolean;
-	value: ElementPropertyValue;
-}
-
 export interface RenderPage {
 	id: string;
 	name: string;
 }
 
+export type LibraryAnalysisResult = LibraryAnalysisSuccess | LibraryAnalysisError;
+
+export enum LibraryAnalysisResultType {
+	Success,
+	Error
+}
+
 export interface LibraryAnalysis {
 	bundle: string;
+	description: string;
+	id: string;
 	name: string;
 	path: string;
 	patterns: PatternAnalysis[];
 	version: string;
 }
 
+export interface LibraryAnalysisSuccess {
+	type: LibraryAnalysisResultType.Success;
+	result: LibraryAnalysis;
+}
+
+export interface LibraryAnalysisError {
+	type: LibraryAnalysisResultType.Error;
+	error: Error;
+}
+
 export interface PatternAnalysis {
 	path: string;
-	pattern: SerializedPattern;
+	pattern: SerializedModel.SerializedPattern;
 	properties: PatternProperty.SerializedPatternProperty[];
 }
 
@@ -193,22 +92,35 @@ export interface FilePayload {
 }
 
 export interface PageChangePayload {
-	elementActions: SerializedElementAction[];
-	elementContents: SerializedElementContent[];
-	elements: SerializedElement[];
+	elementActions: SerializedModel.SerializedElementAction[];
+	elementContents: SerializedModel.SerializedElementContent[];
+	elements: SerializedModel.SerializedElement[];
 	pageId: string;
-	pages: SerializedPage[];
+	pages: SerializedModel.SerializedPage[];
 	userStore: UserStore.SerializedUserStore;
 }
 
-export interface ProjectPayload {
-	contents: SerializedProject;
+export enum ProjectPayloadStatus {
+	Ok,
+	Error
+}
+
+export type ProjectPayload = ProjectPayloadError | ProjectPayloadSuccess;
+
+export interface ProjectPayloadError {
+	error: Error;
+	status: ProjectPayloadStatus;
+}
+
+export interface ProjectPayloadSuccess {
+	contents: SerializedModel.SerializedProject;
 	path: string;
+	status: ProjectPayloadStatus;
 }
 
 export interface SavePayload {
 	path: string;
-	project: SerializedProject;
+	project: SerializedModel.SerializedProject;
 }
 
 export interface SketchExportPayload {
@@ -223,6 +135,8 @@ export interface ExportPayload {
 
 export interface ImportPayload {
 	bundle: string;
+	description: string;
+	id: string;
 	name: string;
 	path: string;
 	patterns: PatternAnalysis[];
@@ -237,7 +151,7 @@ export interface LibraryNotificationPayload {
 export interface LibraryCheckPayload {
 	connected: boolean;
 	id: string;
-	path: string;
+	path: string | undefined;
 }
 
 export enum PatternFolderType {
@@ -249,10 +163,6 @@ export interface Watcher {
 	getPath(): string;
 	isActive(): boolean;
 	stop(): void;
-}
-
-export interface Renderer {
-	render(init: RenderInit, container: HTMLElement): void;
 }
 
 export interface RenderSelectArea {
@@ -273,32 +183,15 @@ export interface RenderSelectArea {
 
 export interface RenderPreviewStore {
 	mode: 'static' | 'live' | 'live-mirror';
-	elements: SerializedElement[];
+	elements: SerializedModel.SerializedElement[];
 	highlightedElementId?: string;
 	pageId: string;
-	pages: SerializedPage[];
+	pages: SerializedModel.SerializedPage[];
 	selectedElementId?: string;
-}
-
-export interface RenderInit {
-	store: RenderPreviewStore;
-	// tslint:disable-next-line:no-any
-	getChildren(props: any, render: (props: any) => any): any;
-	// tslint:disable-next-line:no-any
-	getComponent(props: any, synthetics: any): React.Component | React.SFC | undefined;
-	// tslint:disable-next-line:no-any
-	getProperties(props: any): any;
-	// tslint:disable-next-line:no-any
-	getSlots(slots: any, render: (props: any) => any): any;
-	onElementClick(e: MouseEvent, payload: { id: string }): void;
-	onElementMouseOver(e: MouseEvent, payload: { id: string | undefined }): void;
-	onElementSelect(e: MouseEvent, payload: { id: string }): void;
-	onOutsideClick(e: MouseEvent): void;
 }
 
 export interface PatternIdPayload {
 	id: string;
-	metaDown: boolean;
 }
 
 export enum ElementRole {
@@ -306,15 +199,15 @@ export enum ElementRole {
 	Node = 'node'
 }
 
-export interface SerializedAlvaApp {
-	activeView: SerializedAlvaView;
-	searchTerm: string;
-	state: SerializedAppState;
+export interface PaneSize {
+	pane: AppPane;
+	width?: number;
+	height?: number;
 }
 
 export interface EditHistoryItem {
-	app: SerializedAlvaApp;
-	project: SerializedProject;
+	app: SerializedModel.SerializedAlvaApp;
+	project: SerializedModel.SerializedProject;
 }
 
 export type ElementPropertyValue =
@@ -326,9 +219,139 @@ export type ElementPropertyValue =
 	| string
 	| string[];
 
-export interface SerializedElementAction {
+export enum RightSidebarTab {
+	Properties = 'properties',
+	ProjectSettings = 'project-settings'
+}
+
+export interface SerializedPatternLibraryFile {
+	content: Buffer;
 	id: string;
-	payload: string;
-	storeActionId: string;
-	storePropertyId: string;
+	relativePath: string;
+}
+
+export enum PatternLibraryOrigin {
+	BuiltIn = 'built-in',
+	UserProvided = 'user-provided'
+}
+
+export enum ProjectStatus {
+	None = 'none',
+	Ok = 'ok',
+	Error = 'error'
+}
+
+export enum PreviewDocumentMode {
+	Live = 'live',
+	LiveMirror = 'live-mirror',
+	Static = 'static'
+}
+
+export enum ContextMenuType {
+	LayoutMenu = 'layout-menu',
+	ElementMenu = 'element-menu'
+}
+
+export type ContextMenuRequestPayload = ElementContextMenuRequest | LayoutContextMenuRequest;
+
+export interface ElementContextMenuRequest {
+	menu: ContextMenuType.ElementMenu;
+	data: ElementContextMenuRequestPayload;
+}
+
+export interface ElementContextMenuRequestPayload {
+	element: SerializedModel.SerializedElement;
+}
+
+export interface LayoutContextMenuRequest {
+	menu: ContextMenuType.LayoutMenu;
+	data: LayoutContextMenuRequestPayload;
+}
+
+export interface LayoutContextMenuRequestPayload {
+	app: SerializedModel.SerializedAlvaApp;
+}
+
+export enum AppPane {
+	PagesPane = 'pages-pane',
+	PatternsPane = 'patterns-pane',
+	ElementsPane = 'elements-pane',
+	PropertiesPane = 'properties-pane',
+	DevelopmentPane = 'development-pane'
+}
+
+export enum ItemType {
+	None = 'none',
+	Page = 'page',
+	Element = 'element'
+}
+
+export enum HoverArea {
+	Chrome,
+	Preview
+}
+
+export enum LibraryCapability {
+	Disconnect,
+	Update,
+	Reconnect,
+	SetPath
+}
+
+export enum ElementTargetType {
+	Auto = 'auto',
+	Below = 'below',
+	Inside = 'inside'
+}
+
+export interface Point {
+	x: number;
+	y: number;
+}
+
+export interface Identifiable {
+	getId(): string;
+}
+
+export enum ElementActionPayloadType {
+	String = 'string',
+	EventPayload = 'event-payload',
+	PropertyPayload = 'property-payload'
+}
+
+export enum ModelName {
+	AlvaApp = 'AlvaApp',
+	Element = 'Element',
+	ElementAction = 'ElementAction',
+	ElementActionPayload = 'ElementActionPayload',
+	ElementContent = 'ElementContent',
+	ElementProperty = 'ElementProperty',
+	Page = 'Page',
+	Pattern = 'Pattern',
+	PatternLibrary = 'PatternLibrary',
+	PatternProperty = 'PatternProperty',
+	PatternSlot = 'PatternSlot',
+	Project = 'Project',
+	UserStore = 'UserStore',
+	UserStoreAction = 'UserStoreAction',
+	UserStoreEnhancer = 'UserStoreEnhancer',
+	UserStoreProperty = 'UserStoreProperty',
+	UserStoreReference = 'UserStoreReference'
+}
+
+declare class ModelSurface {
+	public from<V>(data: unknown, context?: unknown): unknown;
+}
+
+export { ModelSurface };
+
+export interface Sender {
+	match<T extends Message.Message>(
+		type: Message.Message['type'],
+		handler: (message: T) => void
+	): Promise<void>;
+}
+
+export enum ActionName {
+	MatchHighlightedElement = 'MatchHighlightedElement'
 }

@@ -2,7 +2,7 @@ import { PageTile } from '../../components';
 import * as MobxReact from 'mobx-react';
 import { Page, DroppablePageIndex } from '../../model';
 import * as React from 'react';
-import { ViewStore } from '../../store';
+import { WithStore } from '../../store';
 import * as Types from '../../types';
 import { EditableTitleContainer } from '../editable-title/editable-title-container';
 
@@ -16,26 +16,31 @@ export interface PageTileContainerProps {
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PageTileContainer extends React.Component<PageTileContainerProps> {
-	protected handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
-		this.props.page.setName(e.target.value);
-	}
-
-	protected handleClick(e: React.MouseEvent<HTMLElement>): void {
-		const { store } = this.props as PageTileContainerProps & { store: ViewStore };
+	private handleClick(e: React.MouseEvent<HTMLElement>): void {
+		const { store } = this.props as PageTileContainerProps & WithStore;
 
 		if (!this.props.focused) {
-			store.setActivePage(this.props.page);
+			store.getProject().setActivePage(this.props.page);
+		}
+
+		const target = e.target as HTMLElement;
+
+		store.getProject().setActivePage(this.props.page);
+
+		if (this.props.highlighted && target.matches('[data-title]')) {
+			this.props.page.setNameState(Types.EditableTitleState.Editing);
+		}
+
+		const rootElement = this.props.page.getRoot();
+
+		if (rootElement) {
+			store.setSelectedElement(rootElement);
+			store.getProject().setFocusedItem(this.props.page);
 		}
 	}
 
-	protected handleFocus(): void {
+	private handleFocus(): void {
 		this.props.page.setNameState(Types.EditableTitleState.Editing);
-	}
-
-	protected handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
-		if (this.props.page.getNameState() === Types.EditableTitleState.Editing) {
-			return;
-		}
 	}
 
 	public render(): JSX.Element {
@@ -56,7 +61,6 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 					focused={props.focused}
 					page={props.page}
 					secondary={Types.EditableTitleType.Primary}
-					value={props.page.getName()}
 				/>
 			</PageTile>
 		);

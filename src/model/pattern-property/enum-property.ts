@@ -1,6 +1,7 @@
 import * as Mobx from 'mobx';
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../../types';
+import { IconName } from '../../components';
 
 export interface PatternEnumPropertyInit {
 	contextId: string;
@@ -8,6 +9,7 @@ export interface PatternEnumPropertyInit {
 	description?: string;
 	hidden: boolean;
 	id: string;
+	inputType: Types.PatternPropertyInputType;
 	label: string;
 	options: PatternEnumPropertyOption[];
 	origin: Types.PatternPropertyOrigin;
@@ -36,6 +38,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			description: serialized.description,
 			hidden: serialized.hidden,
 			id: serialized.id,
+			inputType: serialized.inputType,
 			label: serialized.label,
 			options: serialized.options.map(serializedOption =>
 				PatternEnumPropertyOption.from(serializedOption)
@@ -91,12 +94,14 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 
 	public toJSON(): Types.SerializedPatternEnumProperty {
 		return {
+			model: this.model,
 			contextId: this.contextId,
 			defaultOptionId: this.defaultOptionId,
 			example: String(this.example),
 			description: this.description,
 			hidden: this.hidden,
 			id: this.id,
+			inputType: this.inputType,
 			label: this.label,
 			propertyName: this.propertyName,
 			options: this.options.map(option => option.toJSON()),
@@ -120,6 +125,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 
 export interface PatternEnumPropertyOptionInit {
 	contextId: string;
+	icon: IconName | undefined;
 	id: string;
 	name: string;
 	ordinal: string;
@@ -128,6 +134,7 @@ export interface PatternEnumPropertyOptionInit {
 
 export class PatternEnumPropertyOption {
 	@Mobx.observable private contextId: string;
+	@Mobx.observable private icon: IconName | undefined;
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
 	@Mobx.observable private ordinal: string;
@@ -139,6 +146,7 @@ export class PatternEnumPropertyOption {
 		this.ordinal = init.ordinal;
 		this.value = init.value;
 		this.contextId = init.contextId;
+		this.icon = init.icon;
 	}
 
 	public static from(serialized: Types.SerializedEnumOption): PatternEnumPropertyOption {
@@ -147,6 +155,10 @@ export class PatternEnumPropertyOption {
 
 	public getContextId(): string {
 		return this.contextId;
+	}
+
+	public getIcon(): IconName | undefined {
+		return this.icon;
 	}
 
 	public getId(): string {
@@ -168,6 +180,7 @@ export class PatternEnumPropertyOption {
 	public toJSON(): Types.SerializedEnumOption {
 		return {
 			contextId: this.contextId,
+			icon: this.icon,
 			id: this.id,
 			name: this.name,
 			ordinal: this.ordinal,

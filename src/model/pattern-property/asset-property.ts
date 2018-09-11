@@ -12,6 +12,7 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 			example: serialized.example,
 			hidden: serialized.hidden,
 			id: serialized.id,
+			inputType: serialized.inputType,
 			label: serialized.label,
 			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
@@ -30,12 +31,14 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 
 	public toJSON(): Types.SerializedPatternAssetProperty {
 		return {
+			model: this.model,
 			contextId: this.contextId,
 			defaultValue: this.defaultValue,
 			description: this.description,
 			example: this.example,
 			hidden: this.hidden,
 			id: this.id,
+			inputType: this.inputType,
 			label: this.label,
 			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,

@@ -1,15 +1,18 @@
 import { Color } from '../colors';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 export interface ButtonProps {
 	children?: React.ReactNode;
+	disabled?: boolean;
 	/** @description For dark backgrounds */
 	inverted?: boolean;
 	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 	/** @description Visual weight @default Primary */
 	order?: ButtonOrder;
+	buttonRole?: ButtonRole;
 	/** @description Spatial weight @default */
 	size?: ButtonSize;
 	textColor?: Color;
@@ -17,7 +20,13 @@ export interface ButtonProps {
 
 export enum ButtonOrder {
 	Primary,
-	Secondary
+	Secondary,
+	Tertiary
+}
+
+export enum ButtonRole {
+	Standalone,
+	Inline
 }
 
 export enum ButtonSize {
@@ -26,91 +35,122 @@ export enum ButtonSize {
 	Small
 }
 
-const StyledButton = styled.button`
+const BUTTON_FONT_SIZE = (props: ButtonProps): number => {
+	switch (props.size) {
+		case ButtonSize.Small:
+		case ButtonSize.Medium:
+			return 12;
+		case ButtonSize.Large:
+		default:
+			return 15;
+	}
+};
+
+const toPadding = (sizes: SpaceSize[]) => sizes.map(s => `${getSpace(s)}px`).join(' ');
+
+const BUTTON_PADDING = (props: ButtonProps): string => {
+	switch (props.size) {
+		case ButtonSize.Small:
+			return toPadding([SpaceSize.XXS, SpaceSize.M]);
+		case ButtonSize.Medium:
+			return toPadding([SpaceSize.XS, SpaceSize.L]);
+		case ButtonSize.Large:
+		default:
+			return toPadding([SpaceSize.M, SpaceSize.XXXL]);
+	}
+};
+
+const BUTTON_GROW = (props: ButtonProps): number => {
+	switch (props.buttonRole) {
+		case ButtonRole.Inline:
+			return 1;
+		case ButtonRole.Standalone:
+		default:
+			return 0;
+	}
+};
+
+const StyledBaseButton = styled.button`
+	box-sizing: border-box;
 	border: none;
-	border-radius: 3px;
 	outline: none;
-
-	${(props: ButtonProps) => {
-		switch (props.order) {
-			case ButtonOrder.Secondary:
-				return css`
-					background: transparent;
-					border: 1px solid ${Color.Grey50};
-					color: ${Color.Grey50};
-
-					&:active {
-						border-color: ${Color.Black};
-						color: ${Color.Black};
-					}
-				`;
-			case ButtonOrder.Primary:
-			default:
-				return css`
-					background: ${Color.Blue20};
-					border: 1px solid ${Color.Blue20};
-					color: ${Color.White};
-
-					&:active {
-						background: ${Color.Blue};
-						border-color: ${Color.Blue};
-					}
-				`;
-		}
-	}};
-
-	${(props: ButtonProps) => {
-		switch (props.size) {
-			case ButtonSize.Small:
-				return css`
-					font-size: 12px;
-					padding: ${getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.M)}px;
-				`;
-
-			case ButtonSize.Medium:
-				return css`
-					font-size: 12px;
-					padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.L)}px;
-				`;
-
-			case ButtonSize.Large:
-			default:
-				return css`
-					font-size: 15px;
-					padding: ${getSpace(SpaceSize.M)}px ${getSpace(SpaceSize.XXXL)}px;
-				`;
-		}
-	}};
-
-	${(props: ButtonProps) =>
-		props.inverted
-			? `
-				background: ${Color.White};
-				border-color: ${Color.White};
-
-				&:active {
-					background: ${Color.White};
-					border-color: ${Color.White};
-					opacity: 0.8;
-				}
-			`
-			: ''};
-	${(props: ButtonProps) =>
-		typeof props.textColor !== 'undefined'
-			? `
-				color: ${props.textColor};
-			`
-			: ''};
 `;
 
-export const Button: React.StatelessComponent<ButtonProps> = props => (
-	<StyledButton
-		onClick={props.onClick}
-		textColor={props.textColor}
-		order={props.order}
-		size={props.size}
-		inverted={props.inverted}
-	>
-		{props.children}
-	</StyledButton>
-);
+const DecoratedBaseButton = styled(StyledBaseButton)`
+	border-radius: ${(props: ButtonProps) => (props.buttonRole === ButtonRole.Inline ? 0 : 3)}px;
+	border-style: solid;
+	border-width: ${(props: ButtonProps) => (props.buttonRole === ButtonRole.Inline ? 0 : 1)}px;
+
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-width: ${(props: ButtonProps) => (props.buttonRole === ButtonRole.Inline ? 0 : 0.5)}px;
+	}
+`;
+
+const SizedBaseButton = styled(DecoratedBaseButton)`
+	font-size: ${BUTTON_FONT_SIZE}px;
+	padding: ${BUTTON_PADDING};
+	flex-grow: ${BUTTON_GROW};
+`;
+
+const StyledPrimaryButton = styled(SizedBaseButton)`
+	background: ${props => (props.inverted ? Color.White : Color.Blue20)};
+	border-color: ${props => (props.inverted ? Color.White : Color.Blue20)};
+	color: ${props => (props.inverted ? Color.Blue20 : Color.White)};
+
+	&:active {
+		background: ${props => (props.inverted ? '' : Color.Blue)};
+		border-color: ${props => (props.inverted ? '' : Color.Blue)};
+		opacity: ${props => (props.inverted ? 0.8 : 1)};
+	}
+`;
+
+const StyledSecondaryButton = styled(SizedBaseButton)`
+	background: transparent;
+	border-color: ${Color.Grey50};
+	color: ${Color.Grey50};
+
+	&:active {
+		border-color: ${Color.Black};
+		color: ${Color.Black};
+	}
+`;
+
+const StyledTertiaryButton = styled(SizedBaseButton)`
+	background: transparent;
+	border-color: ${Color.Grey90};
+	color: ${Color.Grey36};
+`;
+
+const getComponent = (
+	props: ButtonProps
+): typeof StyledPrimaryButton | typeof StyledPrimaryButton => {
+	switch (props.order) {
+		case ButtonOrder.Secondary:
+			return StyledSecondaryButton;
+		case ButtonOrder.Tertiary:
+			return StyledTertiaryButton;
+		case ButtonOrder.Primary:
+		default:
+			return StyledPrimaryButton;
+	}
+};
+
+export const Button: React.StatelessComponent<ButtonProps> = props => {
+	const Component = getComponent(props);
+
+	return (
+		<Component
+			onClick={props.onClick}
+			onDoubleClick={props.onDoubleClick}
+			textColor={props.textColor}
+			order={props.order}
+			buttonRole={props.buttonRole}
+			size={props.size}
+			inverted={props.inverted}
+			style={{ color: props.textColor }}
+			disabled={props.disabled}
+		>
+			{props.children}
+		</Component>
+	);
+};

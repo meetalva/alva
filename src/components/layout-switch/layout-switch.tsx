@@ -1,7 +1,7 @@
 import { Color } from '../colors';
 import { IconSize } from '../icons';
 import * as React from 'react';
-import { ChevronDown, Layout } from 'react-feather';
+import { Layout } from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
@@ -9,6 +9,7 @@ export interface LayoutSwitchProps {
 	active?: boolean;
 	onPrimaryClick?: React.MouseEventHandler<HTMLElement>;
 	onSecondaryClick?: React.MouseEventHandler<HTMLElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 	children?: React.ReactNode;
 }
 
@@ -60,12 +61,12 @@ const StyledSecondaryContainer = styled.label`
 `;
 
 export const LayoutSwitch: React.SFC<LayoutSwitchProps> = props => (
-	<StyledLayoutSwitch>
+	<StyledLayoutSwitch onDoubleClick={props.onDoubleClick}>
 		<StyledPrimaryContainer onClick={props.onPrimaryClick} active={props.active}>
 			<Layout size={IconSize.XS} strokeWidth={1.5} />
 		</StyledPrimaryContainer>
 		<StyledSecondaryContainer onClick={props.onSecondaryClick}>
-			<ChevronDown size={IconSize.XXS} style={{ zIndex: 10, pointerEvents: 'none' }} />
+			{props.children}
 		</StyledSecondaryContainer>
 	</StyledLayoutSwitch>
 );

@@ -184,9 +184,6 @@
 			true,
 			"LF"
 		],
-		"max-classes-per-file": [
-			false
-		],
 		"max-file-line-count": [
 			false
 		],
@@ -204,14 +201,6 @@
 			true,
 			{
 				"destructuring": "any"
-			}
-		],
-		"trailing-comma": [
-			true,
-			{
-				"multiline": "never",
-				"singleline": "never",
-				"esSpecCompliant": true
 			}
 		],
 		"align": [
@@ -263,7 +252,6 @@
 		"no-trailing-whitespace": [
 			true
 		],
-		"no-unnecessary-callback-wrapper": true,
 		"no-unnecessary-initializer": true,
 		"number-literal-format": true,
 		"object-literal-key-quotes": [
@@ -317,7 +305,6 @@
 			true,
 			0
 		],
-		"switch-final-break": true,
 		"type-literal-delimiter": true,
 		"variable-name": [
 			true,

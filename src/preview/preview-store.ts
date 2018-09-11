@@ -1,0 +1,395 @@
+import { ElementArea } from './element-area';
+import * as Mobx from 'mobx';
+import * as Message from '../message';
+import * as Model from '../model';
+import { Sender } from '../sender/client';
+import * as Types from '../types';
+import * as uuid from 'uuid';
+
+export type RequestIdleCallbackHandle = number;
+
+export interface RequestIdleCallbackOptions {
+	timeout: number;
+}
+
+export interface RequestIdleCallbackDeadline {
+	readonly didTimeout: boolean;
+	timeRemaining: (() => number);
+}
+
+declare global {
+	interface Window {
+		requestIdleCallback: ((
+			callback: ((deadline: RequestIdleCallbackDeadline) => void),
+			opts?: RequestIdleCallbackOptions
+		) => RequestIdleCallbackHandle);
+		cancelIdleCallback: ((handle: RequestIdleCallbackHandle) => void);
+	}
+}
+
+export interface PreviewStoreInit<V, T extends Types.PreviewDocumentMode> {
+	components: Components;
+	highlightArea: ElementArea;
+	mode: T;
+	project: Model.Project;
+	selectionArea: ElementArea;
+	synthetics: SyntheticComponents<V>;
+}
+
+export interface Components {
+	// tslint:disable-next-line:no-any
+	[id: string]: any;
+}
+
+export interface SyntheticComponents<V> {
+	'synthetic:box': V;
+	'synthetic:conditional': V;
+	'synthetic:page': V;
+	'synthetic:image': V;
+	'synthetic:link': V;
+	'synthetic:text': V;
+}
+
+export class PreviewStore<V> {
+	@Mobx.observable private components: Components;
+	@Mobx.observable private highlightArea: ElementArea;
+	@Mobx.observable private metaDown: boolean = false;
+	@Mobx.observable private mode: Types.PreviewDocumentMode;
+	@Mobx.observable private project: Model.Project;
+	@Mobx.observable private selectionArea: ElementArea;
+	@Mobx.observable private synthetics: SyntheticComponents<V>;
+	@Mobx.observable private scrollPosition: Types.Point;
+	private sender?: Sender;
+
+	public constructor(init: PreviewStoreInit<V, Types.PreviewDocumentMode>) {
+		this.mode = init.mode;
+		this.project = init.project;
+		this.components = init.components;
+		this.synthetics = init.synthetics;
+		this.selectionArea = init.selectionArea;
+		this.highlightArea = init.highlightArea;
+	}
+
+	public getActivePage(): Model.Page | undefined {
+		return this.project.getPages().find(page => page.getActive());
+	}
+
+	public getChildren<T>(element: Model.Element, render: (element: Model.Element) => T): T[] {
+		const childContent = element.getContentBySlotType(Types.SlotType.Children);
+
+		if (!childContent) {
+			return [];
+		}
+
+		return childContent.getElements().map(render);
+	}
+
+	public getComponent(element: Model.Element): V | undefined {
+		const pattern = element.getPattern();
+
+		if (!pattern) {
+			return;
+		}
+
+		const type = pattern.getType();
+
+		switch (type) {
+			case Types.PatternType.Pattern:
+				// tslint:disable-next-line:no-any
+				const component = this.components[pattern.getId()];
+
+				if (!component) {
+					throw new Error(
+						`Could not find component with id "${pattern.getId()}" for pattern "${pattern.getName()}:${pattern.getExportName()}".`
+					);
+				}
+
+				return component[pattern.getExportName()];
+			default:
+				return this.synthetics[type];
+		}
+	}
+
+	public getElementById(id: string): Model.Element | undefined {
+		return this.project.getElementById(id);
+	}
+
+	public getHighlightedElement(): Model.Element | undefined {
+		return this.project.getHighlightedElements()[0];
+	}
+
+	public getHighlightedElementContent(): Model.ElementContent | undefined {
+		return this.project.getHighlightedElementContents()[0];
+	}
+
+	public getHighlightArea(): ElementArea {
+		return this.highlightArea;
+	}
+
+	public getMetaDown(): boolean {
+		return this.metaDown;
+	}
+
+	public getProperties<T>(
+		element: Model.Element
+	): { [propName: string]: Types.ElementPropertyValue } {
+		return element.getProperties().reduce((renderProperties, elementProperty) => {
+			const patternProperty = elementProperty.getPatternProperty();
+
+			if (!patternProperty) {
+				return renderProperties;
+			}
+
+			if (patternProperty.getType() === Types.PatternPropertyType.EventHandler) {
+				// Special case:
+				// the link property should render "click" event handlers as href, too
+				const pattern = element.getPattern();
+
+				if (pattern && pattern.getType() === Types.PatternType.SyntheticLink) {
+					const elementAction = this.project.getElementActionById(
+						elementProperty.getValue() as string
+					);
+
+					const userStoreAction = elementAction
+						? this.project.getUserStore().getActionById(elementAction.getStoreActionId())
+						: undefined;
+
+					const propertyId = elementAction ? elementAction.getStorePropertyId() : undefined;
+
+					const userStoreProperty = propertyId
+						? this.project.getUserStore().getPropertyById(propertyId)
+						: undefined;
+
+					const actionType = userStoreAction ? userStoreAction.getType() : undefined;
+
+					const propertyType = userStoreProperty
+						? userStoreProperty.getValueType()
+						: undefined;
+
+					switch (actionType) {
+						case Types.UserStoreActionType.OpenExternal:
+							if (elementAction) {
+								renderProperties['href'] = elementAction.getPayload();
+								renderProperties['target'] = '_blank';
+								renderProperties['rel'] = 'noopener';
+							}
+							break;
+						case Types.UserStoreActionType.Set:
+							if (
+								userStoreProperty &&
+								propertyType === Types.UserStorePropertyValueType.Page
+							) {
+								renderProperties['href'] = `?page=${userStoreProperty.getValue()}`;
+							}
+					}
+				}
+				const property = patternProperty as Model.PatternEventHandlerProperty;
+				const event = property.getEvent();
+
+				renderProperties[patternProperty.getPropertyName()] = e => {
+					if (event.getType() === Types.PatternEventType.MouseEvent) {
+						if (this.mode !== Types.PreviewDocumentMode.Static && !this.getMetaDown()) {
+							return;
+						}
+					}
+
+					const elementAction = this.project.getElementActionById(
+						elementProperty.getValue() as string
+					);
+
+					if (!elementAction) {
+						return;
+					}
+
+					elementAction.execute({ sender: this.sender, project: this.getProject(), event: e });
+				};
+			} else {
+				renderProperties[patternProperty.getPropertyName()] = elementProperty.getValue();
+			}
+
+			return renderProperties;
+		}, {});
+	}
+
+	public getProject(): Model.Project {
+		return this.project;
+	}
+
+	public getSelectedElement(): Model.Element | undefined {
+		return this.project.getElements().find(element => element.getSelected());
+	}
+
+	public getSelectionArea(): ElementArea {
+		return this.selectionArea;
+	}
+
+	public getSlots<T>(
+		element: Model.Element,
+		render: (element: Model.Element) => T
+	): { [propName: string]: T[] } {
+		return element
+			.getContents()
+			.filter(content => content.getSlotType() !== Types.SlotType.Children)
+			.reduce((renderProperties, content) => {
+				const slot = content.getSlot();
+
+				if (slot) {
+					renderProperties[slot.getPropertyName()] = content.getElements().map(render);
+				}
+
+				return renderProperties;
+			}, {});
+	}
+
+	public getScrollPosition(): Types.Point {
+		return this.scrollPosition;
+	}
+
+	public getSender(): Sender | undefined {
+		return this.sender;
+	}
+
+	public hasHighlightedItem(): boolean {
+		return Boolean(this.getHighlightedElement() || this.getHighlightedElementContent());
+	}
+
+	public hasSelectedItem(): boolean {
+		return Boolean(this.getSelectedElement());
+	}
+
+	@Mobx.action
+	public onElementClick(e: MouseEvent, data: { element: Model.Element; node?: Element }): void {
+		if (this.getMetaDown() || this.mode === Types.PreviewDocumentMode.Static) {
+			return;
+		}
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		this.updateSelectedElement(data);
+
+		if (data.element.getRole() === Types.ElementRole.Root) {
+			this.project.unsetSelectedElement();
+		} else {
+			this.project.setSelectedElement(data.element);
+		}
+
+		if (this.sender) {
+			this.sender.send({
+				type: Message.MessageType.SelectElement,
+				id: uuid.v4(),
+				payload: { element: data.element.toJSON() }
+			});
+		}
+	}
+
+	@Mobx.action
+	public onElementMouseOver(
+		e: MouseEvent,
+		data: { element: Model.Element; node?: Element }
+	): void {
+		if (this.mode !== Types.PreviewDocumentMode.Live) {
+			return;
+		}
+
+		this.updateHighlightedElement(data);
+
+		if (data.element.getRole() === Types.ElementRole.Root) {
+			this.project.unsetHighlightedElement();
+		} else {
+			this.setHighlightedElement(data.element);
+		}
+
+		if (this.sender) {
+			this.sender.send({
+				type: Message.MessageType.HighlightElement,
+				id: uuid.v4(),
+				payload: { element: data.element.toJSON() }
+			});
+		}
+	}
+
+	@Mobx.action
+	public updateHighlightedElement(data: { element: Model.Element; node?: Element }): void {
+		if (this.mode !== Types.PreviewDocumentMode.Live) {
+			return;
+		}
+
+		this.highlightArea.setElement(data.node);
+
+		if (data.element.getRole() === Types.ElementRole.Root) {
+			this.highlightArea.hide();
+		} else {
+			this.highlightArea.show();
+		}
+	}
+
+	@Mobx.action
+	public updateSelectedElement(data: { element: Model.Element; node?: Element }): void {
+		if (this.mode !== Types.PreviewDocumentMode.Live) {
+			return;
+		}
+
+		this.selectionArea.setElement(data.node);
+
+		if (data.element.getRole() === Types.ElementRole.Root) {
+			this.selectionArea.hide();
+		} else {
+			this.selectionArea.show();
+		}
+	}
+
+	@Mobx.action
+	public onHighlightedElementRemove(data: { element: Model.Element; node?: Element }): void {
+		if (this.mode !== Types.PreviewDocumentMode.Live) {
+			return;
+		}
+
+		this.project.unsetHighlightedElement();
+		this.project.unsetHighlightedElementContent();
+	}
+
+	public onOutsideClick(e: MouseEvent): void {
+		if (this.mode !== Types.PreviewDocumentMode.Live) {
+			return;
+		}
+
+		this.project.unsetSelectedElement();
+		this.project.unsetHighlightedElement();
+		this.project.unsetHighlightedElementContent();
+	}
+
+	@Mobx.action
+	public setActivePage(page: Model.Page): void {
+		this.project.getPages().forEach(p => p.setActive(false));
+		page.setActive(true);
+	}
+
+	@Mobx.action
+	public setComponents(components: Components): void {
+		this.components = components;
+	}
+
+	@Mobx.action
+	public setHighlightedElement(element: Model.Element): void {
+		if (element.getRole() === Types.ElementRole.Root) {
+			return;
+		}
+
+		element.setHighlighted(true);
+	}
+
+	@Mobx.action
+	public setMetaDown(metaDown: boolean): void {
+		this.metaDown = metaDown;
+	}
+
+	public setSender(sender: Sender): void {
+		this.sender = sender;
+	}
+
+	@Mobx.action
+	public setScrollPosition(scrollPosition: Types.Point): void {
+		this.scrollPosition = scrollPosition;
+	}
+}

@@ -18,6 +18,7 @@ export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefi
 			example: serialized.example,
 			hidden: serialized.hidden,
 			id: serialized.id,
+			inputType: serialized.inputType,
 			label: serialized.label,
 			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
@@ -25,22 +26,21 @@ export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefi
 		});
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
+	public coerceValue(value: any): boolean {
 		return value === true || value === 'true' || value === 1;
 	}
 
 	public toJSON(): Types.SerializedPatternBooleanProperty {
 		return {
+			model: this.model,
 			contextId: this.contextId,
 			defaultValue: this.defaultValue,
 			description: this.description,
 			example: this.example,
 			hidden: this.hidden,
 			id: this.id,
+			inputType: this.inputType,
 			label: this.label,
 			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,

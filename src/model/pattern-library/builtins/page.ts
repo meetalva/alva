@@ -21,7 +21,8 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 		(language, index) =>
 			new PatternEnumPropertyOption({
 				contextId: language.value,
-				id: context.options.getGloablEnumOptionId(langEnumId, language.value),
+				icon: undefined,
+				id: context.options.getGlobalEnumOptionId(langEnumId, language.value),
 				name: language.name,
 				ordinal: '1',
 				value: language.value
@@ -35,6 +36,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 			contextId: VIEWPORT_CONTEXT_ID,
 			description: 'Adapt viewport to device',
 			id: context.options.getGlobalPropertyId(patternId, VIEWPORT_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Mobile Viewport',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'viewport',
@@ -45,6 +47,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 			defaultOptionId: defaultLanguage ? defaultLanguage.getId() : undefined,
 			hidden: false,
 			id: langEnumId,
+			inputType: Types.PatternPropertyInputType.Select,
 			label: 'Language',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			options,

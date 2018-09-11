@@ -1,19 +1,19 @@
 import { Element } from './element';
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import { PatternSlot } from '../pattern';
-import { PatternLibrary } from '../pattern-library';
 import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface ElementContentContext {
-	patternLibrary: PatternLibrary;
 	project: Project;
 }
 
 export interface ElementContentInit {
 	elementIds: string[];
 	forcedOpen: boolean;
+	highlighted: boolean;
 	id: string;
 	open: boolean;
 	parentElementId?: string;
@@ -21,25 +21,40 @@ export interface ElementContentInit {
 }
 
 export class ElementContent {
+	public readonly model = Types.ModelName.ElementContent;
+
 	@Mobx.observable private elementIds: string[] = [];
 	@Mobx.observable private forcedOpen: boolean;
 	@Mobx.observable private highlighted: boolean;
 	@Mobx.observable private id: string;
 	@Mobx.observable private open: boolean;
 	@Mobx.observable private parentElementId?: string;
-	@Mobx.observable private patternLibrary: PatternLibrary;
 	private project: Project;
 
 	@Mobx.observable private slotId: string;
+
+	@Mobx.computed
+	private get elements(): Element[] {
+		return this.elementIds
+			.map(id => this.project.getElementById(id))
+			.filter((element): element is Element => typeof element !== 'undefined');
+	}
+
+	@Mobx.computed
+	private get descendants(): Element[] {
+		return this.getElements().reduce(
+			(acc, element) => [...acc, element, ...element.getDescendants()],
+			[]
+		);
+	}
 
 	public constructor(init: ElementContentInit, context: ElementContentContext) {
 		this.forcedOpen = init.forcedOpen;
 		this.id = init.id;
 		this.open = init.open;
 		this.elementIds = init.elementIds;
+		this.highlighted = init.highlighted;
 		this.slotId = init.slotId;
-
-		this.patternLibrary = context.patternLibrary;
 		this.project = context.project;
 
 		if (init.parentElementId) {
@@ -55,6 +70,7 @@ export class ElementContent {
 			{
 				elementIds: serialized.elementIds,
 				forcedOpen: serialized.forcedOpen,
+				highlighted: serialized.highlighted,
 				id: serialized.id,
 				open: serialized.open,
 				parentElementId: serialized.parentElementId,
@@ -78,23 +94,29 @@ export class ElementContent {
 		return true;
 	}
 
+	public equals(b: ElementContent): boolean {
+		return _.isEqual(b.toJSON(), this.toJSON());
+	}
+
 	@Mobx.action
-	public clone(): ElementContent {
+	public clone(opts?: { withState: boolean }): ElementContent {
+		const withState = Boolean(opts && opts.withState);
+
 		const clonedElements = this.elementIds
 			.map(elementId => this.project.getElementById(elementId))
 			.filter((e): e is Element => typeof e !== 'undefined')
-			.map(e => e.clone());
+			.map(e => e.clone({ withState }));
 
 		const clone = new ElementContent(
 			{
 				elementIds: clonedElements.map(e => e.getId()),
-				forcedOpen: false,
+				forcedOpen: withState ? this.forcedOpen : false,
+				highlighted: withState ? this.highlighted : false,
 				id: uuid.v4(),
-				open: false,
+				open: withState ? this.open : false,
 				slotId: this.slotId
 			},
 			{
-				patternLibrary: this.patternLibrary,
 				project: this.project
 			}
 		);
@@ -108,10 +130,7 @@ export class ElementContent {
 	}
 
 	public getDescendants(): Element[] {
-		return this.getElements().reduce(
-			(acc, element) => [...acc, element, ...element.getDescendants()],
-			[]
-		);
+		return this.descendants;
 	}
 
 	public getElementIndexById(id: string): number {
@@ -119,9 +138,7 @@ export class ElementContent {
 	}
 
 	public getElements(): Element[] {
-		return this.elementIds
-			.map(id => this.project.getElementById(id))
-			.filter((element): element is Element => typeof element !== 'undefined');
+		return this.elements;
 	}
 
 	public getForcedOpen(): boolean {
@@ -152,18 +169,17 @@ export class ElementContent {
 		return this.parentElementId;
 	}
 
-	public getSlot(): PatternSlot {
-		return this.patternLibrary
-			.getSlots()
-			.find(slot => slot.getId() === this.slotId) as PatternSlot;
+	public getSlot(): PatternSlot | undefined {
+		return this.project.getPatternSlotById(this.slotId);
 	}
 
 	public getSlotId(): string {
 		return this.slotId;
 	}
 
-	public getSlotType(): Types.SlotType {
-		return this.getSlot().getType();
+	public getSlotType(): Types.SlotType | undefined {
+		const slot = this.getSlot();
+		return slot ? slot.getType() : undefined;
 	}
 
 	@Mobx.action
@@ -211,9 +227,8 @@ export class ElementContent {
 		this.parentElementId = element.getId();
 	}
 
-	@Mobx.action
-	public setPatternLibrary(patternLibrary: PatternLibrary): void {
-		this.patternLibrary = patternLibrary;
+	public setProject(project: Project): void {
+		this.project = project;
 	}
 
 	@Mobx.action
@@ -224,12 +239,24 @@ export class ElementContent {
 
 	public toJSON(): Types.SerializedElementContent {
 		return {
+			model: this.model,
 			elementIds: Array.from(this.elementIds),
 			forcedOpen: this.forcedOpen,
+			highlighted: this.highlighted,
 			id: this.id,
 			open: this.open,
 			parentElementId: this.parentElementId,
 			slotId: this.slotId
 		};
+	}
+
+	@Mobx.action
+	public update(b: ElementContent): void {
+		this.elementIds = b.elementIds;
+		this.forcedOpen = b.forcedOpen;
+		this.highlighted = b.highlighted;
+		this.open = b.open;
+		this.parentElementId = b.parentElementId;
+		this.slotId = b.slotId;
 	}
 }

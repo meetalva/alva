@@ -1,4 +1,5 @@
 import * as Types from '../../types';
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import { UserStore } from '../user-store';
 import { UserStoreProperty } from '../user-store-property';
@@ -13,6 +14,8 @@ export interface UserStoreActionInit {
 }
 
 export class UserStoreAction {
+	public readonly model = Types.ModelName.UserStoreAction;
+
 	private acceptsProperty: boolean;
 	private id: string;
 	@Mobx.observable private name: string;
@@ -48,6 +51,10 @@ export class UserStoreAction {
 		});
 	}
 
+	public equals(b: UserStoreAction): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
+	}
+
 	public getAcceptsProperty(): boolean {
 		return this.acceptsProperty;
 	}
@@ -69,6 +76,10 @@ export class UserStoreAction {
 			return;
 		}
 
+		if (this.type === Types.UserStoreActionType.SetPage) {
+			return this.userStore.getPageProperty();
+		}
+
 		return this.userStore.getPropertyById(this.userStorePropertyId);
 	}
 
@@ -81,8 +92,14 @@ export class UserStoreAction {
 		this.userStore = userStore;
 	}
 
+	@Mobx.action
+	public setUserStoreProperty(userStoreProperty: UserStoreProperty): void {
+		this.userStorePropertyId = userStoreProperty.getId();
+	}
+
 	public toJSON(): Types.SerializedUserStoreAction {
 		return {
+			model: Types.ModelName.UserStoreAction,
 			acceptsProperty: this.acceptsProperty,
 			id: this.id,
 			name: this.name,
@@ -95,6 +112,15 @@ export class UserStoreAction {
 	public unsetUserStoreProperty(): void {
 		this.userStorePropertyId = undefined;
 	}
+
+	@Mobx.action
+	public update(b: this): void {
+		this.acceptsProperty = b.acceptsProperty;
+		this.id = b.id;
+		this.name = b.name;
+		this.userStorePropertyId = b.userStorePropertyId;
+		this.type = deserializeType(b.type);
+	}
 }
 
 function deserializeType(type: Types.SerializedUserStoreActionType): Types.UserStoreActionType {
@@ -103,6 +129,8 @@ function deserializeType(type: Types.SerializedUserStoreActionType): Types.UserS
 			return Types.UserStoreActionType.Noop;
 		case 'set':
 			return Types.UserStoreActionType.Set;
+		case 'open-external':
+			return Types.UserStoreActionType.OpenExternal;
 		default:
 			throw new Error(`Unknown user store action type: ${type}`);
 	}
@@ -114,6 +142,8 @@ function serializeType(type: Types.UserStoreActionType): Types.SerializedUserSto
 			return 'noop';
 		case Types.UserStoreActionType.Set:
 			return 'set';
+		case Types.UserStoreActionType.OpenExternal:
+			return 'open-external';
 		default:
 			throw new Error(`Unknown user store action type: ${type}`);
 	}

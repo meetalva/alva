@@ -2,10 +2,9 @@ import * as React from 'react';
 import * as MobxReact from 'mobx-react';
 import * as uuid from 'uuid';
 
-import { ServerMessageType } from '../../message';
+import { MessageType } from '../../message';
 import { PageTileContainer } from './page-tile-container';
 import { Page } from '../../model/page';
-import * as Sender from '../../message/client';
 import * as Component from '../../components';
 import * as Store from '../../store';
 import * as utils from '../../utils';
@@ -74,11 +73,12 @@ export class PageListContainer extends React.Component {
 	public render(): JSX.Element {
 		const { store } = this.props as { store: Store.ViewStore };
 		const project = store.getProject();
-		const currentPage = store.getCurrentPage();
+		const currentPage = store.getActivePage();
 		const currentPageId = currentPage ? currentPage.getId() : undefined;
 		return (
 			<Component.DragArea
 				onDragStart={e => this.handleDragStart(e)}
+				onDragEnter={e => e}
 				onDragOver={e => this.handleDragOver(e)}
 				onDragLeave={e => this.handleDragLeave(e)}
 				onDrop={e => this.handleDrop(e)}
@@ -90,17 +90,17 @@ export class PageListContainer extends React.Component {
 							<PageTileContainer
 								highlighted={page.getId() === currentPageId}
 								isDroppable={page.getPageDropState()}
-								focused={page === store.getFocusedItem()}
+								focused={page === store.getProject().getFocusedItem()}
 								key={page.getId()}
 								page={page}
 							/>
 						))}
 					<Component.AddPageButton
 						onClick={() =>
-							Sender.send({
+							store.getSender().send({
 								id: uuid.v4(),
 								payload: undefined,
-								type: ServerMessageType.CreateNewPage
+								type: MessageType.CreateNewPage
 							})
 						}
 					/>

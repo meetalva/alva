@@ -1,12 +1,13 @@
 import { Element, ElementContent } from '../element';
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
-import { PatternLibrary } from '../pattern-library';
 import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface PageInit {
 	active: boolean;
+	focused: boolean;
 	id: string;
 	name: string;
 	rootId: string;
@@ -16,11 +17,9 @@ export interface PageCreateInit {
 	active: boolean;
 	id: string;
 	name: string;
-	patternLibrary: PatternLibrary;
 }
 
 export interface PageContext {
-	patternLibrary: PatternLibrary;
 	project: Project;
 }
 
@@ -34,29 +33,12 @@ export interface DroppablePageIndex {
 }
 
 export class Page {
-	@Mobx.observable private active: boolean;
+	public readonly model = Types.ModelName.Page;
 
 	@Mobx.observable private focused: boolean;
-
-	/**
-	 * Intermediary edited name
-	 */
 	@Mobx.observable private editedName: string = '';
-
-	/**
-	 * The technical unique identifier of this page
-	 */
 	@Mobx.observable private id: string;
-
-	/**
-	 * The human-friendly name of the page.
-	 * In the frontend, to be displayed instead of the ID.
-	 */
 	@Mobx.observable private name: string = 'Page';
-
-	/**
-	 * Wether the name may be edited
-	 */
 	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Editable;
 
 	// @Mobx.observable public isdroppable: boolean = false;
@@ -71,32 +53,43 @@ export class Page {
 		next: false
 	};
 
-	private patternLibrary: PatternLibrary;
-
 	private project: Project;
-
-	/**
-	 * The root element of the page, the first pattern element of the content tree.
-	 */
 	private rootId: string;
 
 	public constructor(init: PageInit, context: PageContext) {
-		this.active = init.active;
+		this.project = context.project;
 		this.id = init.id;
+
+		this.active = init.active;
 		this.rootId = init.rootId;
 		this.name = init.name;
-		this.project = context.project;
+		this.focused = init.focused;
+	}
 
-		const rootElement = this.getRoot();
+	@Mobx.computed
+	private get active(): boolean {
+		return (
+			this.project
+				.getUserStore()
+				.getPageProperty()
+				.getValue() === this.id
+		);
+	}
 
-		if (rootElement) {
-			rootElement.setPage(this);
+	private set active(active: boolean) {
+		if (active) {
+			this.project
+				.getUserStore()
+				.getPageProperty()
+				.setValue(this.id);
 		}
 	}
 
 	@Mobx.action
 	public static create(init: PageCreateInit, context: PageContext): Page {
-		const rootPattern = context.patternLibrary.getPatternByType(Types.PatternType.SyntheticPage);
+		const patternLibrary = context.project.getBuiltinPatternLibrary();
+
+		const rootPattern = patternLibrary.getPatternByType(Types.PatternType.SyntheticPage);
 
 		const rootContents = rootPattern.getSlots().map(
 			slot =>
@@ -104,6 +97,7 @@ export class Page {
 					{
 						elementIds: [],
 						forcedOpen: false,
+						highlighted: false,
 						id: uuid.v4(),
 						open: false,
 						slotId: slot.getId()
@@ -125,13 +119,12 @@ export class Page {
 				focused: false,
 				patternId: rootPattern.getId(),
 				placeholderHighlighted: false,
-				properties: [],
+				propertyValues: [],
 				role: Types.ElementRole.Root,
 				setDefaults: true,
 				selected: false
 			},
 			{
-				patternLibrary: context.patternLibrary,
 				project: context.project
 			}
 		);
@@ -142,6 +135,7 @@ export class Page {
 		return new Page(
 			{
 				active: init.active,
+				focused: false,
 				id: init.id,
 				name: init.name,
 				rootId: rootElement.getId()
@@ -150,16 +144,11 @@ export class Page {
 		);
 	}
 
-	/**
-	 * Loads and returns a page from a given JSON object.
-	 * @param jsonObject The JSON object to load from.
-	 * @param id The ID of the resulting page
-	 * @return A new page object containing the loaded data.
-	 */
 	public static from(serializedPage: Types.SerializedPage, context: PageContext): Page {
 		const page = new Page(
 			{
 				active: serializedPage.active,
+				focused: serializedPage.focused,
 				id: serializedPage.id,
 				name: serializedPage.name,
 				rootId: serializedPage.rootId
@@ -171,10 +160,29 @@ export class Page {
 	}
 
 	public clone(): Page {
-		return Page.from(this.toJSON(), {
-			project: this.project,
-			patternLibrary: this.patternLibrary
-		});
+		const rootElement = this.getRoot();
+		const rootClone = rootElement ? rootElement.clone() : undefined;
+
+		const page = new Page(
+			{
+				active: false,
+				focused: false,
+				id: uuid.v4(),
+				name: this.name,
+				rootId: rootClone ? rootClone.getId() : ''
+			},
+			{ project: this.project }
+		);
+
+		if (rootClone) {
+			this.project.importElement(rootClone);
+		}
+
+		return page;
+	}
+
+	public equals(b: Page): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
 	}
 
 	public getActive(): boolean {
@@ -216,19 +224,10 @@ export class Page {
 		return rootElement.getElementById(id);
 	}
 
-	/**
-	 * Returns the technical (internal) ID of the page.
-	 * @return The technical (internal) ID of the page.
-	 */
 	public getId(): string {
 		return this.id;
 	}
 
-	/**
-	 * Returns the human-friendly name of the page.
-	 * In the frontend, to be displayed instead of the ID.
-	 * @return The human-friendly name of the page.
-	 */
 	public getName(options?: { unedited: boolean }): string {
 		if ((!options || !options.unedited) && this.nameState === Types.EditableTitleState.Editing) {
 			return this.editedName;
@@ -236,20 +235,22 @@ export class Page {
 		return this.name;
 	}
 
-	/**
-	 * Get the editable state of the page name
-	 * @param state
-	 */
 	public getNameState(): Types.EditableTitleState {
 		return this.nameState;
 	}
 
-	/**
-	 * Returns the root element of the page, the first pattern element of the content tree.
-	 * @return The root element of the page.
-	 */
 	public getRoot(): Element | undefined {
 		return this.project.getElementById(this.rootId);
+	}
+
+	public hasElement(element: Element): boolean {
+		const rootElement = this.getRoot();
+
+		if (!rootElement) {
+			return false;
+		}
+
+		return rootElement.getDescendants().some(desc => desc.getId() === element.getId());
 	}
 
 	@Mobx.action
@@ -276,25 +277,29 @@ export class Page {
 	}
 
 	@Mobx.action
+	public setEditableName(name: string): void {
+		this.editedName = name;
+	}
+
+	@Mobx.action
 	public setFocused(focused: boolean): void {
 		this.focused = focused;
 	}
 
 	@Mobx.action
-	public setName(name: string, editNameState?: Types.EditableTitleState): void {
-		if (editNameState === Types.EditableTitleState.Editing) {
-			this.editedName = name;
-			return;
-		}
+	public setName(name: string): void {
 		this.name = name;
+		this.editedName = name;
 	}
 
 	@Mobx.action
 	public setNameState(state: Types.EditableTitleState): void {
-		if (state === Types.EditableTitleState.Editing) {
-			this.editedName = this.name;
-		}
+		this.editedName = this.name;
 		this.nameState = state;
+	}
+
+	public setProject(project: Project): void {
+		this.project = project;
 	}
 
 	public toDisk(): Types.SerializedPage {
@@ -305,10 +310,18 @@ export class Page {
 
 	public toJSON(): Types.SerializedPage {
 		return {
+			model: this.model,
 			active: this.getActive(),
+			focused: this.getFocused(),
 			id: this.getId(),
 			name: this.getName(),
 			rootId: this.rootId
 		};
+	}
+
+	public update(b: Page): void {
+		this.active = b.active;
+		this.name = b.name;
+		this.rootId = b.rootId;
 	}
 }

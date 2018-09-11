@@ -1,8 +1,14 @@
+import * as ReactUtils from './react-utils';
 import * as TypeScript from 'typescript';
 import * as TypeScriptUtils from './typescript-utils';
 
 export interface Fixtures {
 	find(name: string): string | undefined;
+}
+
+export interface Prop {
+	symbol: TypeScript.Symbol;
+	type: TypeScript.Type;
 }
 
 export const getFixtureSourceFile = (
@@ -28,7 +34,7 @@ export const getFixtureSourceFile = (
 export const getFirstPropType = (
 	sourceFile: TypeScript.SourceFile,
 	ctx: { program: TypeScript.Program }
-): TypeScript.Type => {
+): Prop => {
 	const propTypes = getPropTypes(sourceFile, ctx);
 
 	if (propTypes.length === 0) {
@@ -41,19 +47,21 @@ export const getFirstPropType = (
 export const getPropTypes = (
 	sourceFile: TypeScript.SourceFile,
 	ctx: { program: TypeScript.Program }
-): TypeScript.Type[] => {
+): Prop[] => {
 	const typeChecker = ctx.program.getTypeChecker();
+	const [exp] = TypeScriptUtils.getExports(
+		sourceFile,
+		ctx.program
+	) as TypeScriptUtils.TypescriptExport[];
 
-	return sourceFile.statements
-		.filter(statement => TypeScriptUtils.isExport(statement))
-		.filter(statement => TypeScript.isInterfaceDeclaration(statement))
-		.reduce(
-			(members, interfaceDeclaration: TypeScript.InterfaceDeclaration) => [
-				...members,
-				...interfaceDeclaration.members
-			],
-			[]
-		)
-		.map(member => typeChecker.getTypeAtLocation(member))
-		.filter((item): item is TypeScript.Type => typeof item !== 'undefined');
+	// tslint:disable-next-line:no-any
+	const reactType = ReactUtils.findReactComponentType(exp.type, {
+		program: ctx.program
+	}) as TypeScriptUtils.TypeScriptType;
+	const [props] = reactType.getTypeArguments();
+
+	return props.type.getApparentProperties().map(symbol => ({
+		symbol,
+		type: typeChecker.getTypeAtLocation((symbol.declarations as TypeScript.Declaration[])[0])
+	}));
 };

@@ -20,6 +20,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 		new PatternProperty.PatternAssetProperty({
 			contextId: SRC_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, SRC_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Image',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'src'
@@ -27,6 +28,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 		new PatternProperty.PatternStringProperty({
 			contextId: WIDTH_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, WIDTH_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Width',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'width'
@@ -34,6 +36,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 		new PatternProperty.PatternStringProperty({
 			contextId: HEIGHT_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, HEIGHT_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Height',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'height'
@@ -41,6 +44,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 		new PatternProperty.PatternStringProperty({
 			contextId: MIN_WIDTH_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, MIN_WIDTH_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Min Width',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'minWidth'
@@ -48,6 +52,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 		new PatternProperty.PatternStringProperty({
 			contextId: MIN_HEIGHT_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, MIN_HEIGHT_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Min Height',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'minHeight'
@@ -55,6 +60,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 		new PatternProperty.PatternStringProperty({
 			contextId: MAX_WIDTH_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, MAX_WIDTH_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Max Width',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'maxWidth'
@@ -62,6 +68,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 		new PatternProperty.PatternStringProperty({
 			contextId: MAX_HEIGHT_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, MAX_HEIGHT_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Max Height',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'maxHeight'
@@ -74,6 +81,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 			}),
 			hidden: false,
 			id: context.options.getGlobalPropertyId(patternId, ONCLICK_CONTEXT_ID),
+			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Interaction',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'onClick',

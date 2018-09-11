@@ -1,4 +1,5 @@
 import * as Types from '../../types';
+import * as _ from 'lodash';
 
 export interface PatternSlotInit {
 	contextId: string;
@@ -13,6 +14,8 @@ export interface PatternSlotInit {
 }
 
 export class PatternSlot {
+	public readonly model = Types.ModelName.PatternSlot;
+
 	private contextId: string;
 	private displayName: string;
 	private description: string;
@@ -50,6 +53,10 @@ export class PatternSlot {
 		});
 	}
 
+	public equals(b: PatternSlot): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
+	}
+
 	public getContextId(): string {
 		return this.contextId;
 	}
@@ -76,6 +83,7 @@ export class PatternSlot {
 
 	public toJSON(): Types.SerializedPatternSlot {
 		return {
+			model: this.model,
 			contextId: this.contextId,
 			description: this.description,
 			example: this.example,
@@ -86,6 +94,17 @@ export class PatternSlot {
 			required: this.required,
 			type: this.type
 		};
+	}
+
+	public update(b: PatternSlot): void {
+		this.contextId = b.contextId;
+		this.description = b.description;
+		this.example = b.example;
+		this.hidden = b.hidden;
+		this.displayName = b.displayName;
+		this.propertyName = b.propertyName;
+		this.required = b.required;
+		this.type = toSlotType(b.type);
 	}
 }
 

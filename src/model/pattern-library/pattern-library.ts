@@ -1,19 +1,22 @@
-import { Box, Image, Link, Page, Text } from './builtins';
-import * as Fuse from 'fuse.js';
+import { computeDifference } from '../../alva-util';
+import { Box, Conditional, Image, Link, Page, Text } from './builtins';
 import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Pattern, PatternSlot } from '../pattern';
-import { PatternFolder } from '../pattern-folder';
 import { AnyPatternProperty, PatternEnumProperty, PatternProperty } from '../pattern-property';
+import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 
 export interface PatternLibraryInit {
+	bundleId: string;
 	bundle: string;
+	description: string;
 	id: string;
+	name: string;
+	origin: Types.PatternLibraryOrigin;
 	patternProperties: AnyPatternProperty[];
 	patterns: Pattern[];
-	root?: PatternFolder;
 	state: Types.PatternLibraryState;
 }
 
@@ -28,87 +31,85 @@ export interface BuiltInResult {
 }
 
 export interface PatternLibraryCreateOptions {
-	getGloablEnumOptionId(enumId: string, contextId: string): string;
+	getGlobalEnumOptionId(enumId: string, contextId: string): string;
 	getGlobalPatternId(contextId: string): string;
 	getGlobalPropertyId(patternId: string, contextId: string): string;
 	getGlobalSlotId(patternId: string, contextId: string): string;
 }
 
 export class PatternLibrary {
+	public readonly model = Types.ModelName.PatternLibrary;
+	private readonly id: string;
+
+	@Mobx.observable private bundleId: string;
 	@Mobx.observable private bundle: string;
-	@Mobx.observable private fuse: Fuse;
-	@Mobx.observable private id: string;
-	@Mobx.observable private patternProperties: AnyPatternProperty[] = [];
-	@Mobx.observable private patterns: Pattern[] = [];
-	@Mobx.observable private root: PatternFolder;
+	@Mobx.observable private description: string;
+	@Mobx.observable private name: string;
+	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
+	@Mobx.observable private patterns: Map<string, Pattern> = new Map();
+	@Mobx.observable private origin: Types.PatternLibraryOrigin;
 	@Mobx.observable private state: Types.PatternLibraryState;
 
-	public constructor(init: PatternLibraryInit) {
-		this.bundle = init.bundle;
-		this.id = init.id || uuid.v4();
-		this.patterns = init.patterns;
-		this.patternProperties = init.patternProperties;
-		this.state = init.state;
-
-		if (init.root) {
-			this.root = init.root;
-			this.updateSearch();
-		}
+	@Mobx.computed
+	private get slots(): PatternSlot[] {
+		return this.getPatterns().reduce((acc, pattern) => [...acc, ...pattern.getSlots()], []);
 	}
 
-	public static create(options: PatternLibraryCreateOptions): PatternLibrary {
-		const patternLibrary = new PatternLibrary({
-			bundle: '',
-			id: uuid.v4(),
-			patterns: [],
-			patternProperties: [],
-			state: Types.PatternLibraryState.Pristine
-		});
+	public constructor(init: PatternLibraryInit) {
+		this.bundleId = init.bundleId;
+		this.bundle = init.bundle;
+		this.description = init.description;
+		this.id = init.id || uuid.v4();
+		this.name = init.name;
+		this.origin = init.origin;
+		init.patterns.forEach(pattern => this.patterns.set(pattern.getId(), pattern));
+		init.patternProperties.forEach(prop => this.patternProperties.set(prop.getId(), prop));
+		this.state = init.state;
+	}
 
-		const root = new PatternFolder(
-			{
-				name: 'root',
-				type: Types.PatternFolderType.Builtin
-			},
-			{ patternLibrary }
-		);
+	public static create(
+		init: PatternLibraryInit,
+		opts?: PatternLibraryCreateOptions
+	): PatternLibrary {
+		const options = opts || {
+			getGlobalEnumOptionId: () => uuid.v4(),
+			getGlobalPatternId: () => uuid.v4(),
+			getGlobalPropertyId: () => uuid.v4(),
+			getGlobalSlotId: () => uuid.v4()
+		};
 
-		patternLibrary.setRootFolder(root);
+		const patternLibrary = new PatternLibrary(init);
 
-		const syntheticFolder = new PatternFolder(
-			{
-				name: 'Built-In Components',
-				type: Types.PatternFolderType.Builtin
-			},
-			{ patternLibrary }
-		);
+		if (init.origin === Types.PatternLibraryOrigin.BuiltIn) {
+			const link = Link({ options, patternLibrary });
+			const page = Page({ options, patternLibrary });
+			const image = Image({ options, patternLibrary });
+			const text = Text({ options, patternLibrary });
+			const box = Box({ options, patternLibrary });
+			const conditional = Conditional({ options, patternLibrary });
 
-		root.addChild(syntheticFolder);
+			[
+				page.pattern,
+				text.pattern,
+				box.pattern,
+				conditional.pattern,
+				image.pattern,
+				link.pattern
+			].forEach(pattern => {
+				patternLibrary.addPattern(pattern);
+			});
 
-		const link = Link({ patternLibrary, options });
-		const page = Page({ patternLibrary, options });
-		const image = Image({ patternLibrary, options });
-		const text = Text({ patternLibrary, options });
-		const box = Box({ patternLibrary, options });
-
-		syntheticFolder.addPattern(text.pattern);
-		syntheticFolder.addPattern(box.pattern);
-		syntheticFolder.addPattern(image.pattern);
-		syntheticFolder.addPattern(link.pattern);
-
-		[page.pattern, text.pattern, box.pattern, image.pattern, link.pattern].forEach(pattern => {
-			patternLibrary.addPattern(pattern);
-		});
-
-		[
-			...page.properties,
-			...image.properties,
-			...text.properties,
-			...box.properties,
-			...link.properties
-		].forEach(property => {
-			patternLibrary.addProperty(property);
-		});
+			[
+				...page.properties,
+				...image.properties,
+				...text.properties,
+				...box.properties,
+				...conditional.properties,
+				...link.properties
+			].forEach(property => {
+				patternLibrary.addProperty(property);
+			});
+		}
 
 		return patternLibrary;
 	}
@@ -117,14 +118,16 @@ export class PatternLibrary {
 		const state = deserializeState(serialized.state);
 
 		const patternLibrary = new PatternLibrary({
+			bundleId: serialized.bundleId,
 			bundle: serialized.bundle,
+			description: serialized.description,
 			id: serialized.id,
+			name: serialized.name,
+			origin: deserializeOrigin(serialized.origin),
 			patterns: [],
 			patternProperties: serialized.patternProperties.map(p => PatternProperty.from(p)),
 			state
 		});
-
-		patternLibrary.setRootFolder(PatternFolder.from(serialized.root, { patternLibrary }));
 
 		serialized.patterns.forEach(pattern => {
 			patternLibrary.addPattern(Pattern.from(pattern, { patternLibrary }));
@@ -133,65 +136,89 @@ export class PatternLibrary {
 		return patternLibrary;
 	}
 
-	public static import(
-		analysis: Types.LibraryAnalysis,
-		previousLibrary?: PatternLibrary
-	): PatternLibrary {
-		const patternLibrary = PatternLibrary.create({
-			getGloablEnumOptionId: (enumId, contextId) =>
-				previousLibrary ? previousLibrary.assignEnumOptionId(enumId, contextId) : uuid.v4(),
-			getGlobalPatternId: contextId =>
-				previousLibrary ? previousLibrary.assignPatternId(contextId) : uuid.v4(),
-			getGlobalPropertyId: (patternId, contextId) =>
-				previousLibrary ? previousLibrary.assignPropertyId(patternId, contextId) : uuid.v4(),
-			getGlobalSlotId: (patternId, contextId) =>
-				previousLibrary ? previousLibrary.assignSlotId(patternId, contextId) : uuid.v4()
+	@Mobx.action
+	public import(analysis: Types.LibraryAnalysis, { project }: { project: Project }): void {
+		const patternsBefore = this.getPatterns();
+
+		const patternChanges = computeDifference({
+			before: patternsBefore,
+			after: analysis.patterns.map(item => Pattern.from(item.pattern, { patternLibrary: this }))
 		});
 
-		const folder = new PatternFolder(
-			{ name: analysis.name, type: Types.PatternFolderType.UserProvided },
-			{ patternLibrary }
-		);
+		patternChanges.removed.map(change => {
+			this.removePattern(change.before);
+		});
 
-		analysis.patterns
-			.map(item => Pattern.from(item.pattern, { patternLibrary }))
-			.forEach(pattern => {
-				patternLibrary.addPattern(pattern);
-				folder.addPattern(pattern);
+		patternChanges.added.map(change => {
+			this.addPattern(change.after);
+		});
+
+		patternChanges.changed.map(change => {
+			change.before.update(change.after, { patternLibrary: this });
+		});
+
+		const propMap: Map<string, Pattern> = new Map();
+
+		const props = analysis.patterns.reduce((p: AnyPatternProperty[], patternAnalysis) => {
+			const pattern = Pattern.from(patternAnalysis.pattern, { patternLibrary: this });
+
+			patternAnalysis.properties.forEach(prop => {
+				const patternProperty = PatternProperty.from(prop);
+				p.push(patternProperty);
+				propMap.set(patternProperty.getId(), pattern);
 			});
+			return p;
+		}, []);
 
-		analysis.patterns.forEach(item => {
-			item.properties
-				.map(property => PatternProperty.from(property))
-				.forEach(property => patternLibrary.addProperty(property));
+		const propChanges = computeDifference({
+			before: this.getPatternProperties(),
+			after: props
 		});
 
-		patternLibrary.getRoot().addChild(folder);
-		patternLibrary.setState(Types.PatternLibraryState.Connected);
-		patternLibrary.setBundle(analysis.bundle);
+		propChanges.removed.map(change => {
+			this.removeProperty(change.before);
+		});
 
-		patternLibrary.updateSearch();
+		propChanges.added.map(change => {
+			const pattern = propMap.get(change.after.getId());
+			const p = pattern ? this.getPatternById(pattern.getId()) : undefined;
 
-		return patternLibrary;
+			this.addProperty(change.after);
+
+			if (p) {
+				p.addProperty(change.after);
+			}
+		});
+
+		propChanges.changed.map(change => change.before.update(change.after));
+
+		this.setState(Types.PatternLibraryState.Connected);
+
+		this.setBundle(analysis.bundle);
+		this.setBundleId(analysis.id);
+	}
+	public equals(b: PatternLibrary): boolean {
+		return isEqual(this.toJSON(), b.toJSON());
 	}
 
-	public static isEqual(a: PatternLibrary, b: PatternLibrary): boolean {
-		return isEqual(a.toJSON(), b.toJSON());
-	}
-
+	@Mobx.action
 	public addPattern(pattern: Pattern): void {
-		this.patterns.push(pattern);
-		this.updateSearch();
+		this.patterns.set(pattern.getId(), pattern);
 	}
 
+	@Mobx.action
 	public addProperty(property: AnyPatternProperty): void {
-		this.patternProperties.push(property);
+		if (property.getPropertyName() === 'thing') {
+			console.log('addProperty', property);
+		}
+
+		this.patternProperties.set(property.getId(), property);
 	}
 
 	public assignEnumOptionId(enumId: string, contextId: string): string {
 		const enumProperty = this.getPatternPropertyById(enumId) as PatternEnumProperty;
 
-		if (!enumProperty) {
+		if (!enumProperty || typeof enumProperty.getOptionByContextId !== 'function') {
 			return uuid.v4();
 		}
 
@@ -222,80 +249,99 @@ export class PatternLibrary {
 		return slot ? slot.getId() : uuid.v4();
 	}
 
+	public getDescription(): string {
+		return this.description;
+	}
+
 	public getBundle(): string {
 		return this.bundle;
+	}
+
+	public getBundleId(): string {
+		return this.bundleId;
+	}
+
+	public getCapabilites(): Types.LibraryCapability[] {
+		const isUserProvided = this.origin === Types.PatternLibraryOrigin.UserProvided;
+
+		if (!isUserProvided) {
+			return [];
+		}
+
+		const isConnected = this.state === Types.PatternLibraryState.Connected;
+
+		return [
+			isConnected && Types.LibraryCapability.Disconnect,
+			isConnected && Types.LibraryCapability.Update,
+			isConnected && Types.LibraryCapability.SetPath,
+			Types.LibraryCapability.Reconnect
+		].filter(
+			(capability): capability is Types.LibraryCapability => typeof capability !== 'undefined'
+		);
 	}
 
 	public getId(): string {
 		return this.id;
 	}
 
+	public getName(): string {
+		return this.name;
+	}
+
+	public getOrigin(): Types.PatternLibraryOrigin {
+		return this.origin;
+	}
+
 	public getPatternByContextId(contextId: string): Pattern | undefined {
-		return this.patterns.find(pattern => pattern.getContextId() === contextId);
+		return this.getPatterns().find(pattern => pattern.getContextId() === contextId);
 	}
 
 	public getPatternById(id: string): Pattern | undefined {
-		return this.patterns.find(pattern => pattern.getId() === id);
+		return this.patterns.get(id);
 	}
 
 	public getPatternByType(type: Types.PatternType): Pattern {
-		return this.patterns.find(pattern => pattern.getType() === type) as Pattern;
+		return this.getPatterns().find(pattern => pattern.getType() === type) as Pattern;
 	}
 
 	public getPatternProperties(): AnyPatternProperty[] {
-		return this.patternProperties;
+		return [...this.patternProperties.values()];
 	}
 
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
-		return this.patternProperties.find(patternProperty => patternProperty.getId() === id);
+		return this.patternProperties.get(id);
 	}
 
-	public getPatterns(): Pattern[] {
-		return this.patterns;
+	public getPatternSlotById(id: string): PatternSlot | undefined {
+		return this.getSlots().find(slot => slot.getId() === id);
 	}
 
-	public getRoot(): PatternFolder {
-		return this.root;
+	public getPatterns(ids?: string[]): Pattern[] {
+		if (typeof ids === 'undefined') {
+			return [...this.patterns.values()];
+		}
+
+		return ids
+			.map(id => this.getPatternById(id))
+			.filter((pattern): pattern is Pattern => typeof pattern !== 'undefined');
 	}
 
 	public getSlots(): PatternSlot[] {
-		return this.patterns.reduce((acc, pattern) => [...acc, ...pattern.getSlots()], []);
+		return this.slots;
 	}
 
 	public getState(): Types.PatternLibraryState {
 		return this.state;
 	}
 
-	public query(term: string): string[] {
-		if (term.trim().length === 0) {
-			return this.root.getDescendants().map(item => item.getId());
-		}
-
-		return this.fuse
-			.search<Types.SerializedPattern | Types.SerializedPatternFolder>(term)
-			.map(match => match.id);
-	}
-
 	@Mobx.action
 	public removePattern(pattern: Pattern): void {
-		const index = this.patterns.indexOf(pattern);
-
-		if (index === -1) {
-			return;
-		}
-
-		this.patterns.splice(index, 1);
+		this.patterns.delete(pattern.getId());
 	}
 
 	@Mobx.action
 	public removeProperty(property: AnyPatternProperty): void {
-		const index = this.patternProperties.indexOf(property);
-
-		if (index === -1) {
-			return;
-		}
-
-		this.patternProperties.splice(index, 1);
+		this.patternProperties.delete(property.getId());
 	}
 
 	@Mobx.action
@@ -304,8 +350,18 @@ export class PatternLibrary {
 	}
 
 	@Mobx.action
-	public setRootFolder(root: PatternFolder): void {
-		this.root = root;
+	public setBundleId(bundleId: string): void {
+		this.bundleId = bundleId;
+	}
+
+	@Mobx.action
+	public setDescription(description: string): void {
+		this.description = description;
+	}
+
+	@Mobx.action
+	public setName(name: string): void {
+		this.name = name;
 	}
 
 	@Mobx.action
@@ -315,22 +371,47 @@ export class PatternLibrary {
 
 	public toJSON(): Types.SerializedPatternLibrary {
 		return {
+			model: this.model,
+			bundleId: this.bundleId,
 			bundle: this.bundle,
+			description: this.description,
 			id: this.id,
-			patterns: this.patterns.map(p => p.toJSON()),
-			patternProperties: this.patternProperties.map(p => p.toJSON()),
-			root: this.root.toJSON(),
+			name: this.name,
+			origin: serializeOrigin(this.origin),
+			patterns: this.getPatterns().map(p => p.toJSON()),
+			patternProperties: this.getPatternProperties().map(p => p.toJSON()),
 			state: this.state
 		};
 	}
 
 	@Mobx.action
-	public updateSearch(): void {
-		const registry = this.root.getDescendants().map(item => item.toJSON());
+	public update(b: PatternLibrary): void {
+		this.bundleId = b.bundleId;
+		this.bundle = b.bundle;
+		this.description = b.description;
+		this.name = b.name;
+		this.origin = b.origin;
+		this.state = this.state;
 
-		this.fuse = new Fuse(registry, {
-			keys: ['name']
+		const patternChanges = computeDifference<Pattern>({
+			before: this.getPatterns(),
+			after: b.getPatterns()
 		});
+
+		patternChanges.added.forEach(change => this.addPattern(change.after));
+		patternChanges.changed.forEach(change =>
+			change.before.update(change.after, { patternLibrary: this })
+		);
+		patternChanges.removed.forEach(change => this.removePattern(change.before));
+
+		const propertyChanges = computeDifference<AnyPatternProperty>({
+			before: this.getPatternProperties(),
+			after: b.getPatternProperties()
+		});
+
+		propertyChanges.added.forEach(change => this.addProperty(change.after));
+		propertyChanges.changed.forEach(change => change.before.update(change.after));
+		propertyChanges.removed.forEach(change => this.removeProperty(change.before));
 	}
 }
 
@@ -345,4 +426,26 @@ function deserializeState(
 		case 'disconnected':
 			return Types.PatternLibraryState.Disconnected;
 	}
+}
+
+function deserializeOrigin(
+	input: Types.SerializedPatternLibraryOrigin
+): Types.PatternLibraryOrigin {
+	switch (input) {
+		case 'built-in':
+			return Types.PatternLibraryOrigin.BuiltIn;
+		case 'user-provided':
+			return Types.PatternLibraryOrigin.UserProvided;
+	}
+	throw new Error(`Unknown pattern library origin: ${input}`);
+}
+
+function serializeOrigin(input: Types.PatternLibraryOrigin): Types.SerializedPatternLibraryOrigin {
+	switch (input) {
+		case Types.PatternLibraryOrigin.BuiltIn:
+			return 'built-in';
+		case Types.PatternLibraryOrigin.UserProvided:
+			return 'user-provided';
+	}
+	throw new Error(`Unknown pattern library origin: ${input}`);
 }

@@ -1,12 +1,13 @@
 {
 	"compilerOptions": {
+		"skipLibCheck": true,
 		"allowJs": false,
 		"allowSyntheticDefaultImports": false,
 		"alwaysStrict": true,
 		"checkJs": false,
 		"declaration": true,
 		"downlevelIteration": true,
-		"emitDecoratorMetadata": false,
+		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": false,

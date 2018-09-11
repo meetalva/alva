@@ -9,6 +9,7 @@ import * as Types from '../../types';
 import * as TypeScriptUtils from '../typescript-utils';
 import * as ts from 'typescript';
 import * as Util from 'util';
+import * as uuid from 'uuid';
 import { Compiler } from 'webpack';
 
 const loadPatternplateConfig = require('@patternplate/load-config');
@@ -48,23 +49,36 @@ type PatternAnalyzerPredicate = (
 export async function analyze(
 	path: string,
 	options: AnalyzeOptions
-): Promise<Types.LibraryAnalysis> {
-	const pkg = await readPkg(path);
-	const patterns = await analyzePatterns({ cwd: path, options });
+): Promise<Types.LibraryAnalysisResult> {
+	try {
+		const id = uuid.v4();
+		const pkg = await readPkg(path);
+		const patterns = await analyzePatterns({ cwd: path, options });
 
-	const getBundle = async () => {
-		const compiler = await createPatternCompiler(patterns, { cwd: path });
-		await Util.promisify(compiler.run).bind(compiler)();
-		return (compiler.outputFileSystem as typeof Fs).readFileSync('/components.js').toString();
-	};
+		const getBundle = async () => {
+			const compiler = await createPatternCompiler(patterns, { cwd: path, id });
+			await Util.promisify(compiler.run).bind(compiler)();
+			return (compiler.outputFileSystem as typeof Fs).readFileSync(`/${id}.js`).toString();
+		};
 
-	return {
-		bundle: await getBundle(),
-		name: pkg.name || 'Unnamed Library',
-		patterns,
-		path,
-		version: pkg.version || '1.0.0'
-	};
+		return {
+			type: Types.LibraryAnalysisResultType.Success,
+			result: {
+				id,
+				bundle: await getBundle(),
+				name: pkg.name || 'Unnamed Library',
+				description: pkg.description || '',
+				patterns,
+				path,
+				version: pkg.version || '1.0.0'
+			}
+		};
+	} catch (error) {
+		return {
+			type: Types.LibraryAnalysisResultType.Error,
+			error
+		};
+	}
 }
 
 async function analyzePatterns(context: {
@@ -93,14 +107,18 @@ async function analyzePatterns(context: {
 
 async function createPatternCompiler(
 	patterns: Types.PatternAnalysis[],
-	context: { cwd: string }
+	context: { cwd: string; id: string }
 ): Promise<Compiler> {
 	const compilerPatterns = patterns.map(({ path: patternPath, pattern }) => ({
 		id: pattern.id,
 		path: patternPath
 	}));
 
-	return createCompiler(compilerPatterns, { cwd: context.cwd, infrastructure: false });
+	return createCompiler(compilerPatterns, {
+		cwd: context.cwd,
+		infrastructure: false,
+		id: context.id
+	});
 }
 
 function getPatternAnalyzer(program: ts.Program, options: AnalyzeOptions): PatternAnalyzer {
@@ -160,6 +178,7 @@ function analyzePatternExport(
 	return {
 		path: ctx.candidate.artifactPath,
 		pattern: {
+			model: Types.ModelName.Pattern,
 			contextId,
 			description: ctx.candidate.description,
 			exportName,

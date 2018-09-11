@@ -7,6 +7,7 @@ export interface DragAreaProps {
 	onChange?: React.FormEventHandler<HTMLElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onContextMenu?: React.MouseEventHandler<HTMLElement>;
+	onDragEnter: React.DragEventHandler<HTMLElement>;
 	onDragStart: React.DragEventHandler<HTMLElement>;
 	onDragLeave: React.DragEventHandler<HTMLElement>;
 	onDragOver: React.DragEventHandler<HTMLElement>;
@@ -28,6 +29,7 @@ export const DragArea: React.SFC<DragAreaProps> = props => (
 		onChange={props.onChange}
 		onClick={props.onClick}
 		onContextMenu={props.onContextMenu}
+		onDragEnter={props.onDragEnter}
 		onDragStart={props.onDragStart}
 		onDragLeave={props.onDragLeave}
 		onDragOver={props.onDragOver}

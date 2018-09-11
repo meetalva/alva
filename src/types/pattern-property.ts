@@ -1,3 +1,6 @@
+import { IconName } from '../components';
+import { ModelName } from './types';
+
 export enum PatternPropertyType {
 	Asset = 'asset',
 	Boolean = 'boolean',
@@ -28,6 +31,14 @@ export enum PatternPropertyOrigin {
 
 export type SerializedPatternPropertyOrigin = 'built-in' | 'user-provided';
 
+export enum PatternPropertyInputType {
+	Default = 'default',
+	Select = 'select',
+	RadioGroup = 'radio-group'
+}
+
+export type SerializedPatternPropertyInputType = 'default' | 'select' | 'radio-group';
+
 export type SerializedPatternProperty =
 	| SerializedPatternAssetProperty
 	| SerializedPatternBooleanProperty
@@ -40,11 +51,13 @@ export type SerializedPatternProperty =
 	| SerializedHrefProperty;
 
 export interface SerializedPropertyBase {
+	model: ModelName.PatternProperty;
 	contextId: string;
 	description: string;
 	example: string;
 	hidden: boolean;
 	id: string;
+	inputType: PatternPropertyInputType;
 	label: string;
 	origin: SerializedPatternPropertyOrigin;
 	propertyName: string;
@@ -70,6 +83,7 @@ export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
 
 export interface SerializedEnumOption {
 	contextId: string;
+	icon: IconName | undefined;
 	id: string;
 	name: string;
 	ordinal: string;
@@ -77,11 +91,19 @@ export interface SerializedEnumOption {
 }
 
 export enum PatternEventType {
-	ChangeEvent,
-	MouseEvent
+	Event = 'event',
+	InputEvent = 'input-event',
+	ChangeEvent = 'change-event',
+	FocusEvent = 'focus-event',
+	MouseEvent = 'mouse-event'
 }
 
-export type SerializedPatternEventType = 'ChangeEvent' | 'MouseEvent';
+export type SerializedPatternEventType =
+	| 'Event'
+	| 'InputEvent'
+	| 'ChangeEvent'
+	| 'FocusEvent'
+	| 'MouseEvent';
 
 export type PatternEvent = PatternChangeEvent | PatternMouseEvent;
 

@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
@@ -9,6 +10,7 @@ export interface PatternPropertyInit<T> {
 	example?: string;
 	hidden?: boolean;
 	id?: string;
+	inputType: Types.PatternPropertyInputType;
 	label: string;
 	origin: Types.PatternPropertyOrigin;
 	propertyName: string;
@@ -16,12 +18,15 @@ export interface PatternPropertyInit<T> {
 }
 
 export abstract class PatternPropertyBase<T> {
+	public readonly model = Types.ModelName.PatternProperty;
+
 	@Mobx.observable protected contextId: string;
 	@Mobx.observable protected defaultValue: T;
 	@Mobx.observable protected description: string;
 	@Mobx.observable protected example: string;
 	@Mobx.observable protected hidden: boolean = false;
 	@Mobx.observable protected id: string;
+	@Mobx.observable protected inputType: Types.PatternPropertyInputType;
 	@Mobx.observable protected label: string;
 	@Mobx.observable protected origin: Types.PatternPropertyOrigin;
 	@Mobx.observable protected propertyName: string;
@@ -31,6 +36,7 @@ export abstract class PatternPropertyBase<T> {
 	public constructor(init: PatternPropertyInit<T>) {
 		this.contextId = init.contextId;
 		this.id = init.id || uuid.v4();
+		this.inputType = init.inputType;
 		this.label = init.label;
 		this.origin = init.origin;
 		this.propertyName = init.propertyName;
@@ -53,6 +59,14 @@ export abstract class PatternPropertyBase<T> {
 
 	// tslint:disable-next-line:no-any
 	public abstract coerceValue(value: any): T;
+
+	public equals(b: this): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
+	}
+
+	public hasDefault(): boolean {
+		return typeof this.defaultValue !== 'undefined';
+	}
 
 	public getContextId(): string {
 		return this.contextId;
@@ -78,6 +92,10 @@ export abstract class PatternPropertyBase<T> {
 		return this.id;
 	}
 
+	public getInputType(): Types.PatternPropertyInputType {
+		return this.inputType;
+	}
+
 	public getLabel(): string {
 		return this.label;
 	}
@@ -95,7 +113,9 @@ export abstract class PatternPropertyBase<T> {
 	}
 
 	public abstract toJSON(): Types.SerializedPatternProperty;
-	public abstract update(patternProperty: PatternPropertyBase<T>): void;
+	public abstract update(
+		patternProperty: PatternPropertyBase<T> | Types.SerializedPatternProperty
+	): void;
 }
 
 export function deserializeOrigin(

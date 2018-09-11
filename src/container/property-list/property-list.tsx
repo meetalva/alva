@@ -3,7 +3,6 @@ import { partition } from 'lodash';
 import * as Model from '../../model';
 import { PropertyListItem } from './property-list-item';
 import * as React from 'react';
-import { Space, SpaceSize } from '../../components/space';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
 
@@ -24,15 +23,13 @@ export class PropertyListContainer extends React.Component {
 		);
 
 		return (
-			<div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+			<div>
 				{regularProps.map(elementProperty => (
 					<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
 				))}
-				<Space sizeTop={SpaceSize.L}>
-					{eventHandlerProps.map(elementProperty => (
-						<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
-					))}
-				</Space>
+				{eventHandlerProps.map(elementProperty => (
+					<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
+				))}
 			</div>
 		);
 	}

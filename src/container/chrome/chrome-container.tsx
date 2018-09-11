@@ -1,16 +1,12 @@
 import * as AlvaUtil from '../../alva-util';
 import { ChromeSwitch } from './chrome-switch';
 import { BugReport, Chrome, CopySize, ViewSwitch } from '../../components';
-import { ServerMessageType } from '../../message';
+import { MessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
-import * as Sender from '../../message/client';
-import * as Types from '../../types';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
-
-import { EditableTitleContainer } from '../editable-title/editable-title-container';
 
 export interface InjectedChromeContainerProps {
 	page: Page;
@@ -26,36 +22,25 @@ export const ChromeContainer = MobxReact.inject('store')(
 			return null;
 		}
 
-		const page = store.getCurrentPage();
+		const page = store.getActivePage();
 
 		if (!page) {
 			return null;
 		}
 
-		const index = project.getPageIndex(page);
-		const pages = project.getPages();
+		const nextPage = project.getNextPage();
+		const previousPage = project.getPreviousPage();
 
-		if (typeof index !== 'number') {
-			return null;
-		}
+		const toPreviousPage = previousPage
+			? () => project.setActivePage(previousPage)
+			: AlvaUtil.noop;
+		const toNextPage = nextPage ? () => project.setActivePage(nextPage) : AlvaUtil.noop;
 
-		const toPreviousPage = () => {
-			store.setActivePageByIndex(index - 1);
-			store.unsetSelectedElement();
-		};
-
-		const toNextPage = () => {
-			store.setActivePageByIndex(index + 1);
-			store.unsetSelectedElement();
-		};
-
-		const previous = index > 0 ? toPreviousPage : AlvaUtil.noop;
-		const next = index < pages.length ? toNextPage : AlvaUtil.noop;
 		return (
 			<Chrome
-				onDoubleClick={() => {
-					Sender.send({
-						type: ServerMessageType.Maximize,
+				onDoubleClick={e => {
+					props.store.getSender().send({
+						type: MessageType.Maximize,
 						id: uuid.v4(),
 						payload: undefined
 					});
@@ -65,26 +50,24 @@ export const ChromeContainer = MobxReact.inject('store')(
 				<ViewSwitch
 					fontSize={CopySize.M}
 					justify="center"
-					leftVisible={index > 0}
-					rightVisible={index < pages.length - 1}
-					onLeftClick={previous}
-					onRightClick={next}
+					leftVisible={typeof previousPage !== 'undefined'}
+					rightVisible={typeof nextPage !== 'undefined'}
+					onLeftClick={toPreviousPage}
+					onRightClick={toNextPage}
 				>
-					<EditableTitleContainer
-						focused={props.focused}
-						page={page}
-						secondary={Types.EditableTitleType.Secondary}
-						value={page ? page.getName() : ''}
-					/>
+					{page.getName()}
 				</ViewSwitch>
 				<BugReport
-					title="Found a bug?"
+					title="Found a bug"
 					onClick={() => {
-						Sender.send({
-							type: ServerMessageType.OpenExternalURL,
+						props.store.getSender().send({
+							type: MessageType.OpenExternalURL,
 							id: uuid.v4(),
 							payload: 'https://github.com/meetalva/alva/labels/type%3A%20bug'
 						});
+					}}
+					onDoubleClick={event => {
+						event.stopPropagation();
 					}}
 				/>
 				{props.children}

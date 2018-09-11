@@ -221,7 +221,7 @@
     "webpack": "4.6.0",
     "webpack-dev-middleware": "3.2.0",
     "webpack-hot-middleware": "2.22.3",
-    "ws": "5.1.1",
+    "ws": "6.0.0",
     "yargs-parser": "10.1.0"
   },
   "homepage": "https://meetalva.github.io/"

@@ -7,24 +7,10 @@
 		{
 			"type": "chrome",
 			"request": "attach",
-			"name": "Attach to main browser instance",
+			"name": "Attach to browser",
 			"port": 9222,
 			"webRoot": "${workspaceFolder}",
-			"windows": {
-				"url": "${workspaceFolder}\\build\\electron\\renderer\\app.html"
-			},
-			"url": "${workspaceFolder}/build/electron/renderer/app.html"
-		},
-		{
-			"type": "chrome",
-			"request": "attach",
-			"name": "Attach to preview browser instance",
-			"port": 9222,
-			"webRoot": "${workspaceFolder}",
-			"windows": {
-				"url": "${workspaceFolder}\\build\\electron\\renderer\\preview.html"
-			},
-			"url": "${workspaceFolder}/build/electron/renderer/preview.html"
+			"urlFilter": "http://localhost:*/"
 		},
 		{
 			"name": "Attach to electron host application",

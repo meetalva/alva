@@ -659,8 +659,11 @@ export class Project {
 		if (position > this.pages.length) {
 			return false;
 		}
-		this.removePage(page);
-		this.pages.splice(position, 0, page);
+
+		const pageIndex = this.getPageIndex(page);
+		this.pageList.splice(pageIndex, 1);
+
+		this.pageList.splice(position, 0, page.getId());
 		return true;
 	}
 

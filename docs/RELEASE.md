@@ -36,4 +36,4 @@ tags:
 	3. Title should be the tag name (Exp: v0.6.1)
 	4. Add the release notes from the changelog.md for the specific version in the description
 	5. New contributors should be mentioned additionally
-5. Upload the files from the `upload-for-github-release` folder
+5. Upload the files from the `upload-for-github-release` folders

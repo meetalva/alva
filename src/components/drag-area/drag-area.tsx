@@ -2,7 +2,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export interface DragAreaProps {
-	innerRef?: React.Ref<HTMLElement | null>;
 	onBlur?: React.FocusEventHandler<HTMLElement>;
 	onChange?: React.FormEventHandler<HTMLElement>;
 	onClick?: React.MouseEventHandler<HTMLElement>;
@@ -15,6 +14,8 @@ export interface DragAreaProps {
 	onKeyDown?: React.KeyboardEventHandler<HTMLElement>;
 	onMouseLeave?: React.MouseEventHandler<HTMLElement>;
 	onMouseOver?: React.MouseEventHandler<HTMLElement>;
+	// tslint:disable-next-line:no-any
+	innerRef?(instance: any): void;
 }
 
 const StyledDragArea = styled.div`
@@ -23,21 +24,7 @@ const StyledDragArea = styled.div`
 `;
 
 export const DragArea: React.SFC<DragAreaProps> = props => (
-	<StyledDragArea
-		data-drag-root
-		onBlur={props.onBlur}
-		onChange={props.onChange}
-		onClick={props.onClick}
-		onContextMenu={props.onContextMenu}
-		onDragEnter={props.onDragEnter}
-		onDragStart={props.onDragStart}
-		onDragLeave={props.onDragLeave}
-		onDragOver={props.onDragOver}
-		onDrop={props.onDrop}
-		onKeyDown={props.onKeyDown}
-		onMouseLeave={props.onMouseLeave}
-		onMouseOver={props.onMouseOver}
-	>
+	<StyledDragArea data-drag-root {...props}>
 		{props.children}
 	</StyledDragArea>
 );

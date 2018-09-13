@@ -23,6 +23,15 @@ export interface PageContext {
 	project: Project;
 }
 
+/**
+ * UI Interface to define where a drag drop
+ * should take place.
+ */
+export interface DroppablePageIndex {
+	back: boolean;
+	next: boolean;
+}
+
 export class Page {
 	public readonly model = Types.ModelName.Page;
 
@@ -31,6 +40,18 @@ export class Page {
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string = 'Page';
 	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Editable;
+
+	// @Mobx.observable public isdroppable: boolean = false;
+
+	/**
+	 * UI property flags to highlight the area
+	 * where the page can be dropped.
+	 */
+	@Mobx.observable
+	private droppablePageIndex: DroppablePageIndex = {
+		back: false,
+		next: false
+	};
 
 	private project: Project;
 	private rootId: string;
@@ -177,6 +198,13 @@ export class Page {
 
 		return rootElement.getContentById(id);
 	}
+	/**
+	 * It return an object containing the states of
+	 * of the back and next page drag areas.
+	 */
+	public getPageDropState(): DroppablePageIndex {
+		return this.droppablePageIndex;
+	}
 
 	public getFocused(): boolean {
 		return this.focused;
@@ -228,6 +256,24 @@ export class Page {
 	@Mobx.action
 	public setActive(active: boolean): void {
 		this.active = active;
+	}
+
+	/**
+	 * Sets the value of the current state for
+	 * the back page droppable area.
+	 */
+	@Mobx.action
+	public setDroppableBackState(isdroppable: boolean): void {
+		this.droppablePageIndex.back = isdroppable;
+	}
+
+	/**
+	 * Sets the value of the current state for
+	 * the next page droppable area.
+	 */
+	@Mobx.action
+	public setDroppableNextState(isdroppable: boolean): void {
+		this.droppablePageIndex.next = isdroppable;
 	}
 
 	@Mobx.action

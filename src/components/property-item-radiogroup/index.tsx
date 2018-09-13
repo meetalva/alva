@@ -75,22 +75,37 @@ const StyledInput = styled.input`
 `;
 
 export const RadiogroupItem: React.StatelessComponent<RadiogroupItemProps> = props => (
-	<StyledItem icon={props.icon} id={props.id} active={props.active} name={props.name} title={props.name}>
-		{props.icon ? (
-			<Icon name={props.icon} size={IconSize.S} />
-		) : (
-			props.name
-		)}
-		<StyledInput type="radio" id={props.id} name="radiogroup" value={props.id} onChange={props.onChange} />
+	<StyledItem
+		icon={props.icon}
+		id={props.id}
+		active={props.active}
+		name={props.name}
+		title={props.name}
+	>
+		{props.icon ? <Icon name={props.icon} size={IconSize.S} /> : props.name}
+		<StyledInput
+			type="radio"
+			id={props.id}
+			name="radiogroup"
+			value={props.id}
+			onChange={props.onChange}
+		/>
 	</StyledItem>
 );
 
-
-export const PropertyItemRadiogroup: React.StatelessComponent<PropertyItemRadiogroupProps> = props => (
+export const PropertyItemRadiogroup: React.StatelessComponent<
+	PropertyItemRadiogroupProps
+> = props => (
 	<PropertyItem description={props.description} label={props.label}>
 		<StyledRadioGroup>
 			{props.values.map(value => (
-				<RadiogroupItem name={value.name} icon={value.icon} id={value.id} onChange={props.onChange} active={value.id === props.selectedValue} />
+				<RadiogroupItem
+					name={value.name}
+					icon={value.icon}
+					id={value.id}
+					onChange={props.onChange}
+					active={value.id === props.selectedValue}
+				/>
 			))}
 		</StyledRadioGroup>
 	</PropertyItem>

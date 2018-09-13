@@ -5,9 +5,10 @@ import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
+
 import * as Store from '../../store';
-import styled from 'styled-components';
 import * as Types from '../../types';
+import * as utils from '../../alva-util';
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -16,7 +17,6 @@ export class ElementList extends React.Component {
 	private globalDragEndListener?: (e: DragEvent) => void;
 	private globalDropListener?: (e: DragEvent) => void;
 	private globalKeyDownListener?: (e: KeyboardEvent) => void;
-	private ref: HTMLElement | null;
 
 	public componentDidMount(): void {
 		const { store } = this.props as { store: Store.ViewStore };
@@ -54,7 +54,7 @@ export class ElementList extends React.Component {
 	private handleChange(e: React.FormEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLInputElement;
-		const changedElement = elementFromTarget(e.target, { sibling: false, store });
+		const changedElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		if (changedElement) {
 			changedElement.setName(target.value);
@@ -63,9 +63,8 @@ export class ElementList extends React.Component {
 
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
-
 		const target = e.target as HTMLElement;
-		const icon = above(target, `svg[${Components.ElementAnchors.icon}]`);
+		const icon = utils.above(target, `svg[${Components.ElementAnchors.icon}]`);
 
 		// Skip and deselect elements if the root itself is clicked
 		if (target.getAttribute('data-drag-root')) {
@@ -73,9 +72,9 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		const element = elementFromTarget(e.target, { sibling: false, store });
-		const targetContent = elementContentFromTarget(e.target, { store });
-		const label = above(e.target, `[${Components.ElementAnchors.label}]`);
+		const element = utils.elementFromTarget(e.target, { sibling: false, store });
+		const targetContent = utils.elementContentFromTarget(e.target, { store });
+		const label = utils.above(e.target, `[${Components.ElementAnchors.label}]`);
 
 		if (!element) {
 			return;
@@ -104,7 +103,7 @@ export class ElementList extends React.Component {
 
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
-		const element = elementFromTarget(e.target, { sibling: false, store });
+		const element = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		if (element) {
 			store.requestContextMenu({
@@ -118,7 +117,7 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
 		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
-		const targetElement = elementFromTarget(e.target, { sibling: false, store });
+		const targetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		if (!targetElement) {
 			return;
@@ -141,11 +140,11 @@ export class ElementList extends React.Component {
 
 		const target = e.target as HTMLElement;
 		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
-		const visualTargetElement = elementFromTarget(e.target, { sibling: false, store });
+		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		const targetContent = isSibling
 			? visualTargetElement && visualTargetElement.getContainer()
-			: elementContentFromTarget(e.target, { store });
+			: utils.elementContentFromTarget(e.target, { store });
 
 		const draggedElement = store.getDraggedElement();
 
@@ -169,11 +168,11 @@ export class ElementList extends React.Component {
 
 		const target = e.target as HTMLElement;
 		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
-		const visualTargetElement = elementFromTarget(e.target, { sibling: false, store });
+		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		const targetContent = isSibling
 			? visualTargetElement && visualTargetElement.getContainer()
-			: elementContentFromTarget(e.target, { store });
+			: utils.elementContentFromTarget(e.target, { store });
 
 		const draggedElement = store.getDraggedElement();
 
@@ -192,7 +191,7 @@ export class ElementList extends React.Component {
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
-		const draggedElement = elementFromTarget(e.target, { sibling: false, store });
+		const draggedElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		if (!draggedElement) {
 			e.preventDefault();
@@ -222,20 +221,18 @@ export class ElementList extends React.Component {
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
-
 		const target = e.target as HTMLElement;
 		const isSiblingDrop = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
 
 		const draggedElement = store.getDraggedElement();
-		const visualTargetElement = elementFromTarget(e.target, { sibling: false, store });
-
+		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 		if (!draggedElement || !visualTargetElement) {
 			return;
 		}
 
 		const targetContent = isSiblingDrop
 			? visualTargetElement.getContainer()
-			: elementContentFromTarget(e.target, { store });
+			: utils.elementContentFromTarget(e.target, { store });
 
 		if (!targetContent) {
 			return;
@@ -245,14 +242,13 @@ export class ElementList extends React.Component {
 			if (!isSiblingDrop) {
 				return targetContent.getElements().length;
 			}
-			return calculateDropIndex({
+			return utils.calculateDropIndex({
 				target: visualTargetElement,
 				dragged: draggedElement
 			});
 		};
 
 		const index = getDropIndex();
-
 		if (index === -1) {
 			return;
 		}
@@ -275,15 +271,13 @@ export class ElementList extends React.Component {
 
 	private handleKeyDown(e: KeyboardEvent): void {
 		const { store } = this.props as { store: Store.ViewStore };
-		const node = e.target as Node;
-		const contains = (target: Node) => (this.ref ? this.ref.contains(target) : false);
 
 		// Only handle key events if either
 		// (1) it is global, thus fires on body
 		// (2) is a node inside the page element list
-		if (e.target !== document.body && !contains(node)) {
-			return;
-		}
+		// if (e.target !== document.body && !contains(node)) {
+		// 	return;
+		// }
 
 		switch (e.keyCode) {
 			case 13: {
@@ -318,8 +312,8 @@ export class ElementList extends React.Component {
 
 	private handleMouseLeave(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
-		const element = elementFromTarget(e.target as HTMLElement, { sibling: false, store });
-		const targetContent = elementContentFromTarget(e.target, { store });
+		const element = utils.elementFromTarget(e.target as HTMLElement, { sibling: false, store });
+		const targetContent = utils.elementContentFromTarget(e.target, { store });
 
 		if (targetContent) {
 			targetContent.setHighlighted(false);
@@ -332,9 +326,12 @@ export class ElementList extends React.Component {
 
 	private handleMouseOver(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
-		const targetElement = elementFromTarget(e.target as HTMLElement, { sibling: false, store });
-		const targetContent = elementContentFromTarget(e.target, { store });
-		const label = above(e.target, `[${Components.ElementAnchors.label}]`);
+		const targetElement = utils.elementFromTarget(e.target as HTMLElement, {
+			sibling: false,
+			store
+		});
+		const targetContent = utils.elementContentFromTarget(e.target, { store });
+		const label = utils.above(e.target, `[${Components.ElementAnchors.label}]`);
 
 		Mobx.transaction(() => {
 			if (
@@ -360,33 +357,37 @@ export class ElementList extends React.Component {
 		});
 	}
 
+	private getDragAnchors(): Components.DragAreaAnchorProps {
+		const { store } = this.props as { store: Store.ViewStore };
+		const page: Model.Page | undefined = store.getActivePage();
+		const rootElement = page && page.getRoot();
+
+		const childrenContent =
+			rootElement && rootElement.getContentBySlotType(Types.SlotType.Children);
+		const childrenId = childrenContent ? childrenContent.getId() : 'no-child-element';
+		const rootElId = rootElement ? rootElement.getId() : 'no-root-element';
+
+		return {
+			[Components.DragAreaAnchors.content]: childrenId,
+			[Components.DragAreaAnchors.element]: rootElId
+		};
+	}
+
 	public render(): JSX.Element | null {
 		const { store } = this.props as { store: Store.ViewStore };
 		const page: Model.Page | undefined = store.getActivePage();
-
 		if (!page) {
 			return null;
 		}
-
 		const rootElement = page.getRoot();
-
 		if (!rootElement) {
 			return null;
 		}
-
-		const childrenContent = rootElement.getContentBySlotType(Types.SlotType.Children);
-
-		const anchors = {
-			[Components.ElementAnchors.content]: childrenContent ? childrenContent.getId() : '',
-			[Components.ElementAnchors.element]: rootElement.getId()
-		};
-
 		const childContent = rootElement.getContentBySlotType(Types.SlotType.Children);
 
 		return (
-			<StyledDragRoot
-				data-drag-root
-				{...anchors}
+			<Components.DragArea
+				anchors={this.getDragAnchors()}
 				onBlur={e => this.handleBlur(e)}
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}
@@ -399,7 +400,6 @@ export class ElementList extends React.Component {
 				onKeyDown={e => this.handleKeyDown(e.nativeEvent)}
 				onMouseLeave={e => this.handleMouseLeave(e)}
 				onMouseOver={e => this.handleMouseOver(e)}
-				innerRef={ref => (this.ref = ref)}
 			>
 				<Components.Element.ElementChildren>
 					{childContent ? <ElementContentContainer content={childContent} /> : null}
@@ -408,102 +408,7 @@ export class ElementList extends React.Component {
 					element={store.getDraggedElement()}
 					innerRef={ref => (this.dragImg = ref)}
 				/>
-			</StyledDragRoot>
+			</Components.DragArea>
 		);
 	}
-}
-
-const StyledDragRoot = styled.div`
-	height: 100%;
-	width: 100%;
-`;
-
-function above(node: EventTarget, selector: string): HTMLElement | null {
-	let el = node as HTMLElement;
-	let ended = false;
-
-	while (el && !ended) {
-		if (el.matches(selector)) {
-			break;
-		}
-
-		if (el.parentElement !== null) {
-			el = el.parentElement;
-		} else {
-			ended = true;
-			break;
-		}
-	}
-
-	return ended ? null : el;
-}
-
-function elementContentFromTarget(
-	target: EventTarget,
-	options: { store: Store.ViewStore }
-): Model.ElementContent | undefined {
-	const el = above(target, `[${Components.ElementAnchors.content}]`);
-
-	if (!el) {
-		return;
-	}
-
-	const id = el.getAttribute(Components.ElementAnchors.content);
-
-	if (typeof id !== 'string') {
-		return;
-	}
-
-	return options.store.getContentById(id);
-}
-
-export function elementFromTarget(
-	target: EventTarget,
-	options: { sibling: boolean; store: Store.ViewStore }
-): Model.Element | undefined {
-	const el = above(target, `[${Components.ElementAnchors.element}]`);
-
-	if (!el) {
-		return;
-	}
-
-	const id = el.getAttribute(Components.ElementAnchors.element);
-
-	if (typeof id !== 'string') {
-		return;
-	}
-
-	const element = options.store.getElementById(id);
-
-	if (!element) {
-		return;
-	}
-
-	return options.sibling ? element.getParent() : element;
-}
-
-function calculateDropIndex(init: { dragged: Model.Element; target: Model.Element }): number {
-	const { dragged, target } = init;
-
-	// We definitely know the drop target has a parent, thus an index
-	const newIndex = target.getIndex() as number;
-
-	// The dragged element is dropped into another
-	// leaf list than it was dragged from.
-	// True for (1) new elements, (2) elements dragged to other parents
-	if (dragged.getContainer() !== target.getContainer()) {
-		return newIndex;
-	}
-
-	// If the dragged element has a parent, it has an index
-	const currentIndex = dragged.getIndex();
-
-	// The dragged element is dropped in the same leaf
-	// list as it was dragged from.
-	// Offset the index by the element itself missing from the new list.
-	if (newIndex > currentIndex) {
-		return newIndex - 1;
-	}
-
-	return newIndex;
 }

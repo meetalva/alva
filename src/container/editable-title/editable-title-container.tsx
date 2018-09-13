@@ -30,7 +30,7 @@ export class EditableTitleContainer extends React.Component<EditableTitleContain
 		}
 
 		this.editNameState = Types.EditableTitleState.Editable;
-		this.props.page.setName(this.props.page.getName());
+		this.props.page.setName(this.props.page.getEditedName());
 
 		store.commit();
 	}

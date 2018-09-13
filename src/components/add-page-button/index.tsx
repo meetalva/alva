@@ -18,7 +18,7 @@ const StyledAddPageButton = styled.button`
 	border: 1px solid ${Color.Grey80};
 	border-radius: 6px;
 	background-color: transparent;
-	margin: ${getSpace(SpaceSize.S)}px;
+	margin: ${getSpace(SpaceSize.XS)}px;
 	display: flex;
 	align-items: center;
 	justify-content: center;

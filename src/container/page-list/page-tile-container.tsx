@@ -1,6 +1,6 @@
 import { PageTile } from '../../components';
 import * as MobxReact from 'mobx-react';
-import { Page } from '../../model';
+import { Page, DroppablePageIndex } from '../../model';
 import * as React from 'react';
 import { WithStore } from '../../store';
 import * as Types from '../../types';
@@ -9,6 +9,7 @@ import { EditableTitleContainer } from '../editable-title/editable-title-contain
 export interface PageTileContainerProps {
 	focused: boolean;
 	highlighted: boolean;
+	isDroppable: DroppablePageIndex;
 	page: Page;
 }
 
@@ -48,6 +49,10 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 			<PageTile
 				focused={props.focused}
 				highlighted={props.highlighted}
+				isDroppable={{
+					back: props.isDroppable.back,
+					next: props.isDroppable.next
+				}}
 				id={props.page.getId()}
 				onClick={e => this.handleClick(e)}
 				onFocus={e => this.handleFocus()}

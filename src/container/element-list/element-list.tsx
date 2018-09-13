@@ -8,7 +8,7 @@ import * as React from 'react';
 
 import * as Store from '../../store';
 import * as Types from '../../types';
-import * as utils from '../../utils';
+import * as utils from '../../alva-util';
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -65,7 +65,7 @@ export class ElementList extends React.Component {
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
-		const icon = above(target, `svg[${Components.ElementAnchors.icon}]`);
+		const icon = utils.above(target, `svg[${Components.ElementAnchors.icon}]`);
 
 		// Skip and deselect elements if the root itself is clicked
 		if (target.getAttribute('data-drag-root')) {
@@ -73,9 +73,9 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		const element = elementFromTarget(e.target, { sibling: false, store });
-		const targetContent = elementContentFromTarget(e.target, { store });
-		const label = above(e.target, `[${Components.ElementAnchors.label}]`);
+		const element = utils.elementFromTarget(e.target, { sibling: false, store });
+		const targetContent = utils.elementContentFromTarget(e.target, { store });
+		const label = utils.above(e.target, `[${Components.ElementAnchors.label}]`);
 
 		if (!element) {
 			return;
@@ -104,7 +104,7 @@ export class ElementList extends React.Component {
 
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
-		const element = elementFromTarget(e.target, { sibling: false, store });
+		const element = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		if (element) {
 			store.requestContextMenu({
@@ -118,7 +118,7 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
 		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
-		const targetElement = elementFromTarget(e.target, { sibling: false, store });
+		const targetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		if (!targetElement) {
 			return;
@@ -141,7 +141,7 @@ export class ElementList extends React.Component {
 
 		const target = e.target as HTMLElement;
 		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
-		const visualTargetElement = elementFromTarget(e.target, { sibling: false, store });
+		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		const targetContent = isSibling
 			? visualTargetElement && visualTargetElement.getContainer()
@@ -169,11 +169,11 @@ export class ElementList extends React.Component {
 
 		const target = e.target as HTMLElement;
 		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
-		const visualTargetElement = elementFromTarget(e.target, { sibling: false, store });
+		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		const targetContent = isSibling
 			? visualTargetElement && visualTargetElement.getContainer()
-			: elementContentFromTarget(e.target, { store });
+			: utils.elementContentFromTarget(e.target, { store });
 
 		const draggedElement = store.getDraggedElement();
 
@@ -327,9 +327,12 @@ export class ElementList extends React.Component {
 
 	private handleMouseOver(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
-		const targetElement = elementFromTarget(e.target as HTMLElement, { sibling: false, store });
-		const targetContent = elementContentFromTarget(e.target, { store });
-		const label = above(e.target, `[${Components.ElementAnchors.label}]`);
+		const targetElement = utils.elementFromTarget(e.target as HTMLElement, {
+			sibling: false,
+			store
+		});
+		const targetContent = utils.elementContentFromTarget(e.target, { store });
+		const label = utils.above(e.target, `[${Components.ElementAnchors.label}]`);
 
 		Mobx.transaction(() => {
 			if (
@@ -398,68 +401,4 @@ export class ElementList extends React.Component {
 			</Components.DragArea>
 		);
 	}
-}
-
-function above(node: EventTarget, selector: string): HTMLElement | null {
-	let el = node as HTMLElement;
-	let ended = false;
-
-	while (el && !ended) {
-		if (el.matches(selector)) {
-			break;
-		}
-
-		if (el.parentElement !== null) {
-			el = el.parentElement;
-		} else {
-			ended = true;
-			break;
-		}
-	}
-
-	return ended ? null : el;
-}
-
-function elementContentFromTarget(
-	target: EventTarget,
-	options: { store: Store.ViewStore }
-): Model.ElementContent | undefined {
-	const el = above(target, `[${Components.ElementAnchors.content}]`);
-
-	if (!el) {
-		return;
-	}
-
-	const id = el.getAttribute(Components.ElementAnchors.content);
-
-	if (typeof id !== 'string') {
-		return;
-	}
-
-	return options.store.getContentById(id);
-}
-
-export function elementFromTarget(
-	target: EventTarget,
-	options: { sibling: boolean; store: Store.ViewStore }
-): Model.Element | undefined {
-	const el = above(target, `[${Components.ElementAnchors.element}]`);
-
-	if (!el) {
-		return;
-	}
-
-	const id = el.getAttribute(Components.ElementAnchors.element);
-
-	if (typeof id !== 'string') {
-		return;
-	}
-
-	const element = options.store.getElementById(id);
-
-	if (!element) {
-		return;
-	}
-
-	return options.sibling ? element.getParent() : element;
 }

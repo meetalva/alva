@@ -10,7 +10,7 @@ import * as Components from '../../components';
 import * as Model from '../../model';
 import * as Store from '../../store';
 import * as Types from '../../types';
-import * as utils from '../../utils';
+import * as utils from '../../alva-util';
 
 @MobxReact.inject('store')
 @MobxReact.observer

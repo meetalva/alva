@@ -25,7 +25,6 @@ export interface DragAreaProps {
 	onKeyDown?: React.KeyboardEventHandler<HTMLElement>;
 	onMouseLeave?: React.MouseEventHandler<HTMLElement>;
 	onMouseOver?: React.MouseEventHandler<HTMLElement>;
-	innerRef?(instance: HTMLElement | null): void;
 }
 
 const StyledDragArea = styled.div`

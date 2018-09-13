@@ -73,30 +73,30 @@ export class PageListContainer extends React.Component {
 		store.commit();
 	}
 
+	private getDragAreaAnchors(): Components.DragAreaAnchorProps {
+		const { store } = this.props as { store: Store.ViewStore };
+		const currentPage: Model.Page | undefined = store.getActivePage();
+
+		const rootEl = currentPage && currentPage.getRoot();
+
+		const childrenContent = rootEl && rootEl.getContentBySlotType(Types.SlotType.Children);
+		const contentId = childrenContent ? childrenContent.getId() : '';
+		const rootElId = rootEl ? rootEl.getId() : 'no-root-element';
+
+		return {
+			[Components.DragAreaAnchors.content]: contentId,
+			[Components.DragAreaAnchors.element]: rootElId
+		};
+	}
+
 	public render(): JSX.Element | null {
 		const { store } = this.props as { store: Store.ViewStore };
-		const project = store.getProject();
+		const project: Model.Project = store.getProject();
 		const currentPage: Model.Page | undefined = store.getActivePage();
-		if (!currentPage) {
-			return null;
-		}
-
-		const currentPageId = currentPage.getId();
-		const rootEl = currentPage.getRoot();
-
-		if (!rootEl) {
-			return null;
-		}
-
-		const childrenContent = rootEl.getContentBySlotType(Types.SlotType.Children);
-		const contentId = childrenContent ? childrenContent.getId() : '';
-
+		const currentPageId = currentPage ? currentPage.getId() : '';
 		return (
 			<Components.DragArea
-				anchors={{
-					[Components.DragAreaAnchors.content]: contentId,
-					[Components.DragAreaAnchors.element]: rootEl.getId()
-				}}
+				anchors={this.getDragAreaAnchors()}
 				onDragStart={e => this.handleDragStart(e)}
 				onDragEnter={e => e}
 				onDragOver={e => this.handleDragOver(e)}

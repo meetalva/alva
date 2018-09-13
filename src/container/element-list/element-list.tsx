@@ -17,7 +17,6 @@ export class ElementList extends React.Component {
 	private globalDragEndListener?: (e: DragEvent) => void;
 	private globalDropListener?: (e: DragEvent) => void;
 	private globalKeyDownListener?: (e: KeyboardEvent) => void;
-	private ref: HTMLElement | null;
 
 	public componentDidMount(): void {
 		const { store } = this.props as { store: Store.ViewStore };
@@ -358,6 +357,22 @@ export class ElementList extends React.Component {
 		});
 	}
 
+	private getDragAnchors(): Components.DragAreaAnchorProps {
+		const { store } = this.props as { store: Store.ViewStore };
+		const page: Model.Page | undefined = store.getActivePage();
+		const rootElement = page && page.getRoot();
+
+		const childrenContent =
+			rootElement && rootElement.getContentBySlotType(Types.SlotType.Children);
+		const childrenId = childrenContent ? childrenContent.getId() : 'no-child-element';
+		const rootElId = rootElement ? rootElement.getId() : 'no-root-element';
+
+		return {
+			[Components.DragAreaAnchors.content]: childrenId,
+			[Components.DragAreaAnchors.element]: rootElId
+		};
+	}
+
 	public render(): JSX.Element | null {
 		const { store } = this.props as { store: Store.ViewStore };
 		const page: Model.Page | undefined = store.getActivePage();
@@ -368,15 +383,11 @@ export class ElementList extends React.Component {
 		if (!rootElement) {
 			return null;
 		}
-		const childrenContent = rootElement.getContentBySlotType(Types.SlotType.Children);
 		const childContent = rootElement.getContentBySlotType(Types.SlotType.Children);
 
 		return (
 			<Components.DragArea
-				anchors={{
-					[Components.DragAreaAnchors.content]: childrenContent ? childrenContent.getId() : '',
-					[Components.DragAreaAnchors.element]: rootElement.getId()
-				}}
+				anchors={this.getDragAnchors()}
 				onBlur={e => this.handleBlur(e)}
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}
@@ -389,7 +400,6 @@ export class ElementList extends React.Component {
 				onKeyDown={e => this.handleKeyDown(e.nativeEvent)}
 				onMouseLeave={e => this.handleMouseLeave(e)}
 				onMouseOver={e => this.handleMouseOver(e)}
-				innerRef={ref => (this.ref = ref)}
 			>
 				<Components.Element.ElementChildren>
 					{childContent ? <ElementContentContainer content={childContent} /> : null}

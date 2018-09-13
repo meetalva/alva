@@ -4,7 +4,7 @@ export interface SyntheticBoxProps {
 	alignItems: '';
 	flex: boolean;
 	flexBasis: number;
-	column: boolean;
+	flexDirection: 'column' | 'string';
 	wrap: boolean;
 	flexGrow: number | 'inherit' | 'initial' | 'revert' | 'unset' | undefined;
 	flexShrink: number;
@@ -22,9 +22,8 @@ export const SyntheticBox: React.SFC<SyntheticBoxProps> = props => (
 			display: props.flex ? 'flex' : 'block',
 			flexBasis: props.flexBasis,
 			// tslint:disable-next-line:no-any
-			flexDirection: props.column ? 'column' : (null as any),
-			// tslint:disable-next-line:no-any
-			flexWrap: props.wrap ? 'wrap' : ('nowrap' as any),
+			flexDirection: props.flexDirection as any,
+			flexWrap: props.wrap ? 'wrap' : 'nowrap',
 			flexGrow: props.flexGrow,
 			flexShrink: props.flexShrink,
 			justifyContent: props.justifyContent,

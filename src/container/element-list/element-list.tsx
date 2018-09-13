@@ -358,29 +358,22 @@ export class ElementList extends React.Component {
 	public render(): JSX.Element | null {
 		const { store } = this.props as { store: Store.ViewStore };
 		const page: Model.Page | undefined = store.getActivePage();
-
 		if (!page) {
 			return null;
 		}
-
 		const rootElement = page.getRoot();
-
 		if (!rootElement) {
 			return null;
 		}
-
 		const childrenContent = rootElement.getContentBySlotType(Types.SlotType.Children);
-
-		const foo: Components.DragAreaAnchorProps = {
-			[Components.DragAreaAnchors.content]: childrenContent ? childrenContent.getId() : '',
-			[Components.DragAreaAnchors.element]: rootElement.getId()
-		};
-
 		const childContent = rootElement.getContentBySlotType(Types.SlotType.Children);
 
 		return (
 			<Components.DragArea
-				anchors={foo}
+				anchors={{
+					[Components.DragAreaAnchors.content]: childrenContent ? childrenContent.getId() : '',
+					[Components.DragAreaAnchors.element]: rootElement.getId()
+				}}
 				onBlur={e => this.handleBlur(e)}
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}

@@ -6,7 +6,10 @@ import { MessageType } from '../../message';
 import { PageTileContainer } from './page-tile-container';
 import { Page } from '../../model/page';
 import * as Components from '../../components';
+
+import * as Model from '../../model';
 import * as Store from '../../store';
+import * as Types from '../../types';
 import * as utils from '../../utils';
 
 @MobxReact.inject('store')
@@ -70,16 +73,29 @@ export class PageListContainer extends React.Component {
 		store.commit();
 	}
 
-	public render(): JSX.Element {
+	public render(): JSX.Element | null {
 		const { store } = this.props as { store: Store.ViewStore };
 		const project = store.getProject();
-		const currentPage = store.getActivePage();
-		const currentPageId = currentPage ? currentPage.getId() : undefined;
+		const currentPage: Model.Page | undefined = store.getActivePage();
+		if (!currentPage) {
+			return null;
+		}
+
+		const currentPageId = currentPage.getId();
+		const rootEl = currentPage.getRoot();
+
+		if (!rootEl) {
+			return null;
+		}
+
+		const childrenContent = rootEl.getContentBySlotType(Types.SlotType.Children);
+		const contentId = childrenContent ? childrenContent.getId() : '';
+
 		return (
 			<Components.DragArea
 				anchors={{
-					[Components.DragAreaAnchors.element]: '12343',
-					[Components.DragAreaAnchors.content]: '11111'
+					[Components.DragAreaAnchors.content]: contentId,
+					[Components.DragAreaAnchors.element]: rootEl.getId()
 				}}
 				onDragStart={e => this.handleDragStart(e)}
 				onDragEnter={e => e}

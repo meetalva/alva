@@ -128,24 +128,6 @@ function main(): void {
 			}
 		);
 
-		Mobx.autorun(
-			() => {
-				const selectionArea = store.getSelectionArea();
-				const selectionNode = document.getElementById('preview-selection') as HTMLElement;
-				selectionArea.write(selectionNode, { scrollPositon: store.getScrollPosition() });
-			},
-			{ scheduler: window.requestAnimationFrame }
-		);
-
-		Mobx.autorun(
-			() => {
-				const highlightNode = document.getElementById('preview-highlight') as HTMLElement;
-				const highlightArea = store.getHighlightArea();
-				highlightArea.write(highlightNode, { scrollPositon: store.getScrollPosition() });
-			},
-			{ scheduler: window.requestAnimationFrame }
-		);
-
 		Mobx.reaction(
 			() => store.getMetaDown(),
 			metaDown => {
@@ -177,6 +159,21 @@ function main(): void {
 				scheduler: window.requestIdleCallback
 			}
 		);
+
+		const selectionNode = document.getElementById('preview-selection') as HTMLElement;
+		const highlightNode = document.getElementById('preview-highlight') as HTMLElement;
+
+		const updateHighlightAndSelectionAreas = () => {
+			const selectionArea = store.getSelectionArea();
+			selectionArea.write(selectionNode, { scrollPositon: store.getScrollPosition() });
+
+			const highlightArea = store.getHighlightArea();
+			highlightArea.write(highlightNode, { scrollPositon: store.getScrollPosition() });
+
+			window.requestAnimationFrame(updateHighlightAndSelectionAreas);
+		};
+
+		window.requestAnimationFrame(updateHighlightAndSelectionAreas);
 	}
 }
 

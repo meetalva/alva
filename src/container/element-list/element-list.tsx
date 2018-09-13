@@ -371,17 +371,16 @@ export class ElementList extends React.Component {
 
 		const childrenContent = rootElement.getContentBySlotType(Types.SlotType.Children);
 
-		const anchors = {
-			[Components.ElementAnchors.content]: childrenContent ? childrenContent.getId() : '',
-			[Components.ElementAnchors.element]: rootElement.getId()
+		const foo: Components.DragAreaAnchorProps = {
+			[Components.DragAreaAnchors.content]: childrenContent ? childrenContent.getId() : '',
+			[Components.DragAreaAnchors.element]: rootElement.getId()
 		};
 
 		const childContent = rootElement.getContentBySlotType(Types.SlotType.Children);
-		console.log('********');
 
 		return (
 			<Components.DragArea
-				{...anchors}
+				anchors={foo}
 				onBlur={e => this.handleBlur(e)}
 				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}

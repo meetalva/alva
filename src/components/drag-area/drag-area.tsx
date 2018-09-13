@@ -1,7 +1,18 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+export enum DragAreaAnchors {
+	element = 'data-id',
+	content = 'data-content-id'
+}
+
+export interface DragAreaAnchorProps {
+	[DragAreaAnchors.element]: string;
+	[DragAreaAnchors.content]: string;
+}
+
 export interface DragAreaProps {
+	anchors: DragAreaAnchorProps;
 	onDragEnter: React.DragEventHandler<HTMLElement>;
 	onDragStart: React.DragEventHandler<HTMLElement>;
 	onDragLeave: React.DragEventHandler<HTMLElement>;
@@ -23,7 +34,12 @@ const StyledDragArea = styled.div`
 `;
 
 export const DragArea: React.SFC<DragAreaProps> = props => (
-	<StyledDragArea data-drag-root {...props}>
+	<StyledDragArea
+		data-drag-root
+		data-content-id={props.anchors['data-content-id']}
+		data-id={props.anchors['data-id']}
+		{...props}
+	>
 		{props.children}
 	</StyledDragArea>
 );

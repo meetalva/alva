@@ -5,7 +5,7 @@ import * as uuid from 'uuid';
 import { MessageType } from '../../message';
 import { PageTileContainer } from './page-tile-container';
 import { Page } from '../../model/page';
-import * as Component from '../../components';
+import * as Components from '../../components';
 import * as Store from '../../store';
 import * as utils from '../../utils';
 
@@ -76,14 +76,18 @@ export class PageListContainer extends React.Component {
 		const currentPage = store.getActivePage();
 		const currentPageId = currentPage ? currentPage.getId() : undefined;
 		return (
-			<Component.DragArea
+			<Components.DragArea
+				anchors={{
+					[Components.DragAreaAnchors.element]: '12343',
+					[Components.DragAreaAnchors.content]: '11111'
+				}}
 				onDragStart={e => this.handleDragStart(e)}
 				onDragEnter={e => e}
 				onDragOver={e => this.handleDragOver(e)}
 				onDragLeave={e => this.handleDragLeave(e)}
 				onDrop={e => this.handleDrop(e)}
 			>
-				<Component.Layout inset={Component.SpaceSize.XS} wrap={Component.LayoutWrap.Wrap}>
+				<Components.Layout inset={Components.SpaceSize.XS} wrap={Components.LayoutWrap.Wrap}>
 					{project
 						.getPages()
 						.map(page => (
@@ -95,7 +99,7 @@ export class PageListContainer extends React.Component {
 								page={page}
 							/>
 						))}
-					<Component.AddPageButton
+					<Components.AddPageButton
 						onClick={() =>
 							store.getSender().send({
 								id: uuid.v4(),
@@ -104,8 +108,8 @@ export class PageListContainer extends React.Component {
 							})
 						}
 					/>
-				</Component.Layout>
-			</Component.DragArea>
+				</Components.Layout>
+			</Components.DragArea>
 		);
 	}
 }

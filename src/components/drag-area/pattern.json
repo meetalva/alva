@@ -1,0 +1,7 @@
+{
+	"name": "drag-area",
+	"displayName": "Drag Area",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": ["globals"]
+}

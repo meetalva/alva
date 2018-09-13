@@ -2,6 +2,8 @@ import { Color } from '../colors';
 import * as React from 'react';
 import styled from 'styled-components';
 
+import { SpaceSize } from '../space';
+
 export enum LayoutDirection {
 	Row = 'row',
 	Column = 'column'
@@ -26,6 +28,7 @@ export interface LayoutProps {
 	border?: LayoutBorder;
 	className?: string;
 	direction?: LayoutDirection;
+	inset?: SpaceSize;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	side?: LayoutSide;
 	children?: React.ReactNode;
@@ -52,6 +55,7 @@ export interface LayoutProps {
 	border?: LayoutBorder;
 	className?: string;
 	direction?: LayoutDirection;
+	inset?: SpaceSize;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	wrap?: LayoutWrap;
 	children?: React.ReactNode;
@@ -71,13 +75,18 @@ const StyledLayout = styled.div`
 		props.side === LayoutSide.Left && props.border === LayoutBorder.Side ? 1 : 0}px;
 	border-left-width: ${props =>
 		props.side === LayoutSide.Right && props.border === LayoutBorder.Side ? 1 : 0}px;
-
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-right-width: ${props =>
 			props.side === LayoutSide.Left && props.border === LayoutBorder.Side ? 0.5 : 0}px;
 		border-left-width: ${props =>
 			props.side === LayoutSide.Right && props.border === LayoutBorder.Side ? 0.5 : 0}px;
 	}
+	${(props: LayoutProps) => {
+		if (!props.inset) {
+			return '';
+		}
+		return `padding: ${props.inset}px`;
+	}};
 `;
 
 const StyledMainArea = styled(StyledLayout)`
@@ -144,6 +153,7 @@ export const Layout: React.StatelessComponent<LayoutProps> = props => (
 	<StyledLayout
 		className={props.className}
 		direction={props.direction}
+		inset={props.inset}
 		border={props.border}
 		onClick={props.onClick}
 		wrap={props.wrap}

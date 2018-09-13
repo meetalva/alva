@@ -655,6 +655,19 @@ export class Project {
 	}
 
 	@Mobx.action
+	public reArrangePagesIndex(position: number, page: Page): boolean {
+		if (position > this.pages.length) {
+			return false;
+		}
+
+		const pageIndex = this.getPageIndex(page);
+		this.pageList.splice(pageIndex, 1);
+
+		this.pageList.splice(position, 0, page.getId());
+		return true;
+	}
+
+	@Mobx.action
 	public setId(id: string): void {
 		this.id = name;
 	}

@@ -4,6 +4,7 @@ import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 import { tag } from '../tag';
+import { TargetSignal } from '../drag-area';
 
 export const ElementAnchors = {
 	element: 'data-id',
@@ -111,50 +112,6 @@ const StyledElementLabel = styled(div)`
 		height: 100%;
 		width: 100vw;
 		background: inherit;
-	}
-`;
-
-interface StyledPlaceholderProps {
-	visible: boolean;
-}
-
-const PLACEHOLDER_SCALE = (props: StyledPlaceholderProps): number => (props.visible ? 1 : 0);
-
-const StyledPlaceholder = styled.div`
-	position: relative;
-	height: ${getSpace(SpaceSize.S)}px;
-	width: 100%;
-	margin-top: -${getSpace(SpaceSize.XS)}px;
-	margin-bottom: -${getSpace(SpaceSize.XS)}px;
-	z-index: 10;
-
-	&::before {
-		content: '';
-		display: block;
-		position: absolute;
-		height: 6px;
-		width: 6px;
-		left: 0;
-		top: 3px;
-		border-radius: 3px;
-		background: ${Color.Blue40};
-		transform: scale(${PLACEHOLDER_SCALE});
-		transition: transform 0.2s;
-		z-index: 20;
-	}
-
-	&::after {
-		content: '';
-		display: block;
-		position: absolute;
-		height: 2px;
-		width: calc(100% - 6px);
-		left: ${getSpace(SpaceSize.XS)};
-		top: 5px;
-		background: ${Color.Blue40};
-		transform: scaleY(${PLACEHOLDER_SCALE});
-		transition: transform 0.2s;
-		z-index: 20;
 	}
 `;
 
@@ -283,7 +240,7 @@ export class Element extends React.Component<ElementProps> {
 			>
 				{props.placeholder &&
 					props.dragging && (
-						<StyledPlaceholder
+						<TargetSignal
 							{...{ [ElementAnchors.placeholder]: true }}
 							visible={Boolean(props.placeholderHighlighted)}
 						/>

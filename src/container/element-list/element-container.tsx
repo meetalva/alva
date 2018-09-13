@@ -38,7 +38,6 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 					Components.ElementCapability.Editable,
 					contents.some(content => content.acceptsChildren()) &&
 						Components.ElementCapability.Openable
-					// tslint:disable-next-line:no-unnecessary-callback-wrapper
 				].filter((item): item is Components.ElementCapability => Boolean(item))}
 				dragging={store.getDragging()}
 				id={props.element.getId()}

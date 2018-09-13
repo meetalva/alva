@@ -377,10 +377,10 @@ export class ElementList extends React.Component {
 		};
 
 		const childContent = rootElement.getContentBySlotType(Types.SlotType.Children);
+		console.log('********');
 
 		return (
 			<Components.DragArea
-				data-drag-root
 				{...anchors}
 				onBlur={e => this.handleBlur(e)}
 				onChange={e => this.handleChange(e)}

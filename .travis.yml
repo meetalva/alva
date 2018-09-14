@@ -9,5 +9,6 @@ install: npm ci
 
 script:
   - commitlint-travis
+  - npm test
   - npm run lint
   - npm run build

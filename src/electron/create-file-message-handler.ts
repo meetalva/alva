@@ -131,18 +131,19 @@ export async function createFileMessageHandler(
 
 				const publish = message.payload ? message.payload.publish : false;
 
-				const targetPath = !publish
-					? ctx.project.getPath()
-					: await showSaveDialog({
-							title: 'Save Alva File',
-							defaultPath: 'New Project.alva',
-							filters: [
-								{
-									name: 'Alva File',
-									extensions: ['alva']
-								}
-							]
-					  });
+				const getSelectedPath = () =>
+					showSaveDialog({
+						title: 'Save Alva File',
+						defaultPath: 'New Project.alva',
+						filters: [
+							{
+								name: 'Alva File',
+								extensions: ['alva']
+							}
+						]
+					});
+
+				const targetPath = !publish ? ctx.project.getPath() : await getSelectedPath();
 
 				if (!targetPath) {
 					return;
@@ -154,10 +155,11 @@ export async function createFileMessageHandler(
 				const result = await Persistence.persist(targetPath, ctx.project);
 
 				ctx.project.setName(
-					ctx.project.getDraft()
+					isPathInside(ctx.appPath, targetPath)
 						? 'New Project'
 						: Path.basename(ctx.project.getPath(), Path.extname(targetPath))
 				);
+
 				ctx.project.setDraft(ctx.project.getDraft() ? !publish : false);
 
 				injection.sender.send({

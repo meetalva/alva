@@ -120,16 +120,16 @@ export class ElementList extends React.Component {
 		const target = e.target as HTMLElement;
 		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
 		const targetElement = utils.elementFromTarget(e.target, { sibling: false, store });
+		const targetContent = utils.elementContentFromTarget(e.target, { store });
 
 		if (!targetElement) {
 			return;
 		}
 
 		targetElement.setHighlighted(false);
-		const content = targetElement.getContentBySlotType(Types.SlotType.Children);
 
-		if (content) {
-			content.setHighlighted(false);
+		if (targetContent) {
+			targetContent.setHighlighted(false);
 		}
 
 		if (isSibling) {

@@ -14,14 +14,19 @@ export function createLibraryMenu(
 	injection: LibraryMenuInjection
 ): Electron.MenuItemConstructorOptions {
 	const project = ctx.project;
+	const hasProject = typeof ctx.project !== 'undefined';
+	const onDetailView = ctx.app.getActiveView() !== Types.AlvaView.SplashScreen;
 	const libraries = project ? project.getPatternLibraries() : [];
+	const hasConnectedLibrary = libraries.some(
+		lib => lib.getState() === Types.PatternLibraryState.Connected
+	);
 
 	return {
 		label: '&Library',
 		submenu: [
 			{
 				label: '&Connect New Library',
-				enabled: typeof ctx.project !== 'undefined',
+				enabled: hasProject && onDetailView,
 				accelerator: 'CmdOrCtrl+Shift+C',
 				click: () => {
 					if (typeof ctx.project === 'undefined') {
@@ -37,9 +42,7 @@ export function createLibraryMenu(
 			},
 			{
 				label: '&Update All Libraries',
-				enabled:
-					typeof ctx.project !== 'undefined' &&
-					libraries.some(lib => lib.getState() === Types.PatternLibraryState.Connected),
+				enabled: hasProject && onDetailView && hasConnectedLibrary,
 				accelerator: 'CmdOrCtrl+U',
 				click: () => {
 					if (!project) {

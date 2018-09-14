@@ -13,6 +13,7 @@ import { createLibraryMessageHandler } from './create-library-message-handler';
 
 export interface ServerMessageHandlerContext {
 	app: undefined | Model.AlvaApp;
+	appPath: string;
 	port: undefined | number;
 	project: undefined | Model.Project;
 	win: undefined | Electron.BrowserWindow;

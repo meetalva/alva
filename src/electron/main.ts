@@ -10,6 +10,7 @@ const importFresh = require('import-fresh');
 
 const CONTEXT: AppContext = Mobx.observable({
 	app: undefined,
+	appPath: Electron.app.getPath('userData'),
 	base: '',
 	port: undefined,
 	project: undefined,

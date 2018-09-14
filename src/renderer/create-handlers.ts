@@ -26,6 +26,7 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 		M.MessageType.ConnectPatternLibraryResponse,
 		Handlers.connectPatternLibrary(ctx)
 	);
+	sender.match<M.SaveResult>(M.MessageType.SaveResult, Handlers.processSave(ctx));
 	sender.match<M.CreateNewPage>(M.MessageType.CreateNewPage, Handlers.createNewPage(ctx));
 	sender.match<M.HighlightElement>(M.MessageType.HighlightElement, Handlers.highlightElement(ctx));
 	sender.match<M.KeyboardChange>(M.MessageType.KeyboardChange, Handlers.keyboardChange(ctx));

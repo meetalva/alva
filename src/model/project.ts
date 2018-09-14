@@ -19,6 +19,7 @@ import * as isPlainObject from 'is-plain-object';
 import * as uuid from 'uuid';
 
 export interface ProjectProperties {
+	draft: boolean;
 	id?: string;
 	name: string;
 	pages: Page[];
@@ -29,6 +30,7 @@ export interface ProjectProperties {
 
 export interface ProjectCreateInit {
 	name: string;
+	draft: boolean;
 	path: string;
 }
 
@@ -36,6 +38,8 @@ export class Project {
 	public readonly model = Types.ModelName.Project;
 
 	private batch: number = 1;
+
+	@Mobx.observable private draft: boolean;
 
 	@Mobx.observable private elements: Map<string, Element> = new Map();
 
@@ -163,6 +167,7 @@ export class Project {
 		this.id = init.id ? init.id : uuid.v4();
 		this.path = init.path;
 		this.userStore = init.userStore;
+		this.draft = init.draft;
 
 		init.pages.forEach(page => {
 			this.addPage(page);
@@ -207,7 +212,8 @@ export class Project {
 			pages: [],
 			path: init.path,
 			patternLibraries: [Project.createBuiltinPatternLibrary()],
-			userStore
+			userStore,
+			draft: init.draft
 		});
 
 		project.addPage(
@@ -215,7 +221,7 @@ export class Project {
 				{
 					active: true,
 					id: uuid.v4(),
-					name: 'Untitled Page'
+					name: 'Page 1'
 				},
 				{ project }
 			)
@@ -229,6 +235,7 @@ export class Project {
 		const userStore = UserStore.from(serialized.userStore);
 
 		const project = new Project({
+			draft: Boolean(serialized.draft),
 			id: serialized.id,
 			name: serialized.name,
 			path: serialized.path,
@@ -519,6 +526,14 @@ export class Project {
 		return this.userStore;
 	}
 
+	public getDraft(): boolean {
+		return this.draft;
+	}
+
+	public setDraft(draft: boolean): void {
+		this.draft = draft;
+	}
+
 	public getElementPropertyById(id: string): ElementProperty | undefined {
 		return this.elementProperties.get(id);
 	}
@@ -702,13 +717,14 @@ export class Project {
 
 	public toJSON(): Types.SerializedProject {
 		return {
+			draft: this.draft,
 			model: this.model,
 			elements: this.getElements().map(e => e.toJSON()),
 			elementActions: this.getElementActions().map(e => e.toJSON()),
 			elementContents: this.getElementContents().map(e => e.toJSON()),
 			id: this.id,
 			name: this.name,
-			pages: this.pages.map(p => p.toJSON()),
+			pages: this.pages.filter(Boolean).map(p => p.toJSON()),
 			path: this.path,
 			patternLibraries: this.getPatternLibraries().map(p => p.toJSON()),
 			userStore: this.userStore.toJSON()

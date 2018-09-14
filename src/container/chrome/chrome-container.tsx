@@ -56,6 +56,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 					onLeftClick={toPreviousPage}
 					onRightClick={toNextPage}
 				>
+					<ProjectName name={project.getName()} draft={project.getDraft()} /> —{' '}
 					{page.getName()}
 				</ViewSwitch>
 				<div style={{ display: 'flex', justifySelf: 'right', alignItems: 'center' }}>
@@ -94,3 +95,11 @@ export const ChromeContainer = MobxReact.inject('store')(
 		);
 	})
 );
+
+export interface ProjectNameProps {
+	draft: boolean;
+	name: string;
+}
+
+const ProjectName: React.SFC<ProjectNameProps> = props =>
+	props.draft ? <i>{props.name}</i> : <>{props.name}</>;

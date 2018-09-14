@@ -196,16 +196,20 @@ export class PatternLibrary {
 
 		propChanges.changed.map(change => change.before.update(change.after));
 
+		const touchedPatterns = [...patternChanges.added, ...patternChanges.changed].map(
+			change => change.after
+		);
+
 		// TODO: This might be solved via a bigger refactoring that
 		// computes available element contents from pattern slots directly
-		patternsAfter.forEach(pattern => {
+		touchedPatterns.forEach(pattern => {
 			project.getElementsByPattern(pattern).forEach(element => {
 				const contents = element.getContents();
 
 				pattern
 					.getSlots()
 					// Check if there is a corresponding element content for each pattern slot
-					.filter(slot => !contents.some(content => content.getSlot() === slot))
+					.filter(slot => !contents.some(content => content.getSlotId() === slot.getId()))
 					.forEach(slot => {
 						// No element content, create a new one and add it to element
 						const content = ElementContent.fromSlot(slot, { project });

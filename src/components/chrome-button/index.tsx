@@ -34,7 +34,7 @@ const StyledIcon = styled.div`
 
 export const ChromeButton: React.StatelessComponent<ChromeButtonProps> = props => (
 	<StyledChromeButton {...props}>
-		{props.icon ? <StyledIcon>{props.icon}</StyledIcon> : ''}
+		{props.icon && <StyledIcon>{props.icon}</StyledIcon>}
 		<div>{props.title}</div>
 	</StyledChromeButton>
 );

@@ -3,7 +3,7 @@ import { Copy } from '../copy';
 import { IconSize } from '../icons';
 import * as React from 'react';
 import { Plus } from 'react-feather';
-import { getSpace, SpaceSize } from '../space';
+import { Space, getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
 export interface AddButtonProps {
@@ -11,6 +11,10 @@ export interface AddButtonProps {
 	text: string;
 	margin?: boolean;
 }
+
+const StyledSpace = styled(Space)`
+	width: 100%;
+`;
 
 const StyledAddButton = styled.button`
 	position: relative;
@@ -20,7 +24,6 @@ const StyledAddButton = styled.button`
 	border: 1px solid ${Color.Grey90};
 	border-radius: 6px;
 	background-color: transparent;
-	margin: ${(props: AddButtonProps) => (props.margin ? `${getSpace(SpaceSize.XS)}px` : '0')};
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -45,8 +48,10 @@ const StyledIcon = styled(Plus)`
 `;
 
 export const AddButton: React.SFC<AddButtonProps> = props => (
-	<StyledAddButton margin={props.margin} text={props.text} onClick={props.onClick}>
-		<StyledIcon size={IconSize.XS} color={Color.Grey50} />
-		<Copy textColor={Color.Grey50}>{props.text}</Copy>
-	</StyledAddButton>
+	<StyledSpace size={props.margin ? SpaceSize.XS : 0} {...props}>
+		<StyledAddButton onClick={props.onClick}>
+			<StyledIcon size={IconSize.XS} color={Color.Grey50} />
+			<Copy textColor={Color.Grey50}>{props.text}</Copy>
+		</StyledAddButton>
+	</StyledSpace>
 );

@@ -406,9 +406,7 @@ export class ElementList extends React.Component {
 			>
 				<Components.Element.ElementChildren>
 					{childContent ? <ElementContentContainer content={childContent} /> : null}
-					{hasChildren ? (
-						''
-					) : (
+					{!hasChildren && (
 						<Components.EmptyState
 							headline="Elements"
 							copy="Drop components here from the library below"

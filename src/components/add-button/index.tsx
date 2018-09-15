@@ -8,7 +8,6 @@ import styled from 'styled-components';
 
 export interface AddButtonProps {
 	onClick?: React.MouseEventHandler<HTMLElement>;
-	text: string;
 	margin?: boolean;
 }
 
@@ -51,7 +50,7 @@ export const AddButton: React.SFC<AddButtonProps> = props => (
 	<StyledSpace size={props.margin ? SpaceSize.XS : 0} {...props}>
 		<StyledAddButton onClick={props.onClick}>
 			<StyledIcon size={IconSize.XS} color={Color.Grey50} />
-			<Copy textColor={Color.Grey50}>{props.text}</Copy>
+			<Copy textColor={Color.Grey50}>{props.children}</Copy>
 		</StyledAddButton>
 	</StyledSpace>
 );

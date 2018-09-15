@@ -4,7 +4,7 @@ import { AddButton } from '.';
 
 const AddButtonDemo: React.StatelessComponent = (): JSX.Element => (
 	<DemoContainer title="Add Page Button">
-		<AddButton text="Add Page" />
+		<AddButton>Add Page</AddButton>
 	</DemoContainer>
 );
 

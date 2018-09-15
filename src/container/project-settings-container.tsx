@@ -43,7 +43,6 @@ export class ProjectSettingsContainer extends React.Component {
 						<LibrarySettingsContainer key={library.getId()} library={library} />
 					))}
 				<Components.AddButton
-					text="Connect Library"
 					onClick={() =>
 						store.getSender().send({
 							id: uuid.v4(),
@@ -51,7 +50,9 @@ export class ProjectSettingsContainer extends React.Component {
 							type: MessageType.ConnectPatternLibraryRequest
 						})
 					}
-				/>
+				>
+					Connect Library
+				</Components.AddButton>
 			</div>
 		);
 	}

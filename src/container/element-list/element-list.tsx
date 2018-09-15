@@ -10,6 +10,8 @@ import * as Store from '../../store';
 import * as Types from '../../types';
 import * as utils from '../../alva-util';
 
+import { Images } from '../../components/icons';
+
 @MobxReact.inject('store')
 @MobxReact.observer
 export class ElementList extends React.Component {
@@ -384,6 +386,7 @@ export class ElementList extends React.Component {
 			return null;
 		}
 		const childContent = rootElement.getContentBySlotType(Types.SlotType.Children);
+		const hasChildren = childContent && childContent.getElements().length > 0;
 
 		return (
 			<Components.DragArea
@@ -403,6 +406,15 @@ export class ElementList extends React.Component {
 			>
 				<Components.Element.ElementChildren>
 					{childContent ? <ElementContentContainer content={childContent} /> : null}
+					{hasChildren ? (
+						''
+					) : (
+						<Components.EmptyState
+							headline="Elements"
+							copy="Drop components here from the library below"
+							image={Images.EmptyElements}
+						/>
+					)}
 				</Components.Element.ElementChildren>
 				<ElementDragImage
 					element={store.getDraggedElement()}

@@ -155,7 +155,7 @@ export async function createFileMessageHandler(
 				const result = await Persistence.persist(targetPath, ctx.project);
 
 				ctx.project.setName(
-					isPathInside(ctx.appPath, targetPath)
+					isPathInside(targetPath, ctx.appPath)
 						? 'New Project'
 						: Path.basename(ctx.project.getPath(), Path.extname(targetPath))
 				);

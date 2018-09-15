@@ -74,58 +74,20 @@ export function createFileMenu(
 				type: 'separator'
 			},
 			{
-				label: '&Export',
-				submenu: [
-					{
-						label: 'Export Page as Sketch',
-						enabled: Boolean(activePage),
-						click: async () => {
-							if (!activePage) {
-								return;
-							}
-
-							injection.sender.send({
-								id: uuid.v4(),
-								type: MessageType.ExportSketchPage,
-								payload: { path: undefined }
-							});
-						}
-					},
-					{
-						label: 'Export Page as PNG',
-						enabled: Boolean(activePage),
-						click: async () => {
-							if (!activePage) {
-								return;
-							}
-
-							injection.sender.send({
-								id: uuid.v4(),
-								type: MessageType.ExportPngPage,
-								payload: { path: undefined }
-							});
-						}
-					},
-					{
-						type: 'separator'
-					},
-					{
-						label: 'Export Project as HTML',
-						enabled: Boolean(activePage),
-						accelerator: 'CmdOrCtrl+Shift+E',
-						click: async () => {
-							if (!ctx.project) {
-								return;
-							}
-
-							injection.sender.send({
-								id: uuid.v4(),
-								type: MessageType.ExportHtmlProject,
-								payload: { path: undefined }
-							});
-						}
+				label: 'Export Prototype as HTML',
+				enabled: Boolean(activePage),
+				accelerator: 'CmdOrCtrl+E',
+				click: async () => {
+					if (!ctx.project) {
+						return;
 					}
-				]
+
+					injection.sender.send({
+						id: uuid.v4(),
+						type: MessageType.ExportHtmlProject,
+						payload: { path: undefined }
+					});
+				}
 			},
 			{
 				type: 'separator',

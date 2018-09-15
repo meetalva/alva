@@ -115,7 +115,9 @@ export class PageListContainer extends React.Component {
 								page={page}
 							/>
 						))}
-					<Components.AddPageButton
+					<Components.AddButton
+						text="Add Page"
+						margin={true}
 						onClick={() =>
 							store.getSender().send({
 								id: uuid.v4(),

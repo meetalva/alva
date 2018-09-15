@@ -10,14 +10,16 @@ export interface LinkProps {
 	disabled?: boolean;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	uppercase?: boolean;
+	underline?: boolean;
 }
 
 const StyledLink: StyledComponentClass<LinkProps, {}> = styled.a`
 	font-family: ${fonts().NORMAL_FONT};
 	${(props: LinkProps) => (props.color ? `color: ${props.color}` : 'color: inherit')};
-	${(props: LinkProps) => (props.onClick ? 'cursor: pointer;' : 'cursor: auto;')} ${(
-		props: LinkProps
-	) => (props.uppercase ? 'text-transform: uppercase;' : '')};
+	${(props: LinkProps) =>
+		props.underline ? 'text-decoration: underline' : 'text-decoration: none'};
+	${(props: LinkProps) => (props.onClick ? 'cursor: pointer' : 'cursor: auto')};
+	${(props: LinkProps) => (props.uppercase ? 'text-transform: uppercase' : '')};
 `;
 
 export const Link: React.StatelessComponent<LinkProps> = props => (
@@ -27,6 +29,7 @@ export const Link: React.StatelessComponent<LinkProps> = props => (
 		disabled={props.disabled}
 		onClick={props.onClick}
 		uppercase={props.uppercase}
+		underline={props.underline}
 	>
 		{props.children}
 	</StyledLink>

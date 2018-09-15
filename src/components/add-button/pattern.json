@@ -1,0 +1,8 @@
+{
+	"name": "add-button",
+	"description": "Button to add a page or library",
+	"displayName": "Add Button",
+	"version": "1.0.0",
+	"tags": ["atom", "button"],
+	"flag": "alpha"
+}

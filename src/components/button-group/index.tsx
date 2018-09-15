@@ -10,6 +10,10 @@ const StyledButtonGroup = styled.div`
 	margin-top: ${getSpace(SpaceSize.XS)}px;
 	border-top: 1px solid ${Color.Grey90};
 
+	&:active {
+		background: ${Color.Grey97};
+	}
+
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-top-width: 0.5px;
 	}

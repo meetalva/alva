@@ -1,4 +1,4 @@
-export * from './add-page-button';
+export * from './add-button';
 export * from './bug-report';
 export * from './button';
 export * from './button-group';
@@ -10,6 +10,7 @@ export * from './drag-area';
 export * from './editable-title';
 export * from './element';
 export * from './element-slot';
+export * from './empty-state';
 export * from './fonts';
 export * from './global-styles';
 export * from './headline';

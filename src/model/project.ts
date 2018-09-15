@@ -180,9 +180,9 @@ export class Project {
 			{
 				bundle: '',
 				bundleId: '',
-				description: 'Basic building blocks available to every new Alva project',
+				description: 'Built-in components for basic layouts and logic',
 				id: uuid.v4(),
-				name: 'Built-In Components',
+				name: 'Essentials',
 				origin: Types.PatternLibraryOrigin.BuiltIn,
 				patternProperties: [],
 				patterns: [],

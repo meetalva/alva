@@ -7,6 +7,7 @@ const StyledPreviewWrapper = styled.div`
 	justify-content: center;
 	flex-grow: 1;
 	flex-shrink: 0;
+	user-select: none;
 `;
 
 const StyledPreviewPane = styled.div`

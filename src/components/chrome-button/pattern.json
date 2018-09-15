@@ -1,0 +1,8 @@
+{
+	"name": "chrome-button",
+	"displayName": "Chrome Button",
+	"description": "Button in the chrome",
+	"version": "1.0.0",
+	"tags": ["chrome-button"],
+	"flag": "alpha"
+}

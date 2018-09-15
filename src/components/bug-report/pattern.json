@@ -1,8 +1,0 @@
-{
-	"name": "bug-report",
-	"displayName": "Bug Report",
-	"description": "Button to report a bug as Github Issue",
-	"version": "1.0.0",
-	"tags": ["bug", "bug-report"],
-	"flag": "alpha"
-}

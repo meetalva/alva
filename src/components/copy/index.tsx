@@ -21,7 +21,6 @@ export enum CopySize {
 const StyledCopy = styled.p`
 	margin: 0;
 	line-height: 1.5;
-	user-select: none;
 	cursor: default;
 	${(props: StyledCopyProps) =>
 		typeof props.size !== 'undefined' ? `font-size: ${props.size}px;` : 'font-size: 12px'};

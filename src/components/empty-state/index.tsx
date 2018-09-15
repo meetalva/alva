@@ -12,12 +12,13 @@ export interface EmptyStateProps {
 	highlighted?: boolean;
 }
 
-const StyledEmptyState = styled(Space)`
+const StyledEmptyState = styled.div`
 	text-align: center;
+	padding: ${getSpace(SpaceSize.XXXL)}px;
 `;
 
 export const EmptyState: React.StatelessComponent<EmptyStateProps> = props => (
-	<StyledEmptyState size={SpaceSize.XXXL}>
+	<StyledEmptyState>
 		<Headline order={4} textColor={props.highlighted ? Color.Blue : Color.Black}>
 			{props.headline}
 		</Headline>

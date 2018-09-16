@@ -27,17 +27,16 @@ export class ElementArea {
 		this.isVisible = true;
 	}
 
-	public write(element: HTMLElement, context: { scrollPositon: Types.Point }): void {
-		if (!this.element) {
-			return;
-		}
-
-		const rect = this.element.getBoundingClientRect();
+	public write(element: HTMLElement, _: { scrollPositon: Types.Point }): void {
+		const rect = this.element
+			? this.element.getBoundingClientRect()
+			: { top: 0, left: 0, width: 0, height: 0 };
 
 		element.style.top = `${rect.top}px`;
 		element.style.left = `${rect.left}px`;
 		element.style.width = `${rect.width}px`;
 		element.style.height = `${rect.height}px`;
-		element.style.display = this.isVisible ? 'block' : 'none';
+
+		element.style.display = !this.isVisible || (!rect.height && !rect.width) ? 'none' : 'block';
 	}
 }

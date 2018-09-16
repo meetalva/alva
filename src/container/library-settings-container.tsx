@@ -17,7 +17,6 @@ export class LibrarySettingsContainer extends React.Component<LibrarySettingsCon
 		const capabilities = props.library.getCapabilites();
 		const mayUpdate = capabilities.includes(Types.LibraryCapability.Update);
 		const mayReconnect = capabilities.includes(Types.LibraryCapability.Reconnect);
-		const mayEdit = capabilities.includes(Types.LibraryCapability.SetPath);
 
 		return (
 			<Components.PropertyBox
@@ -30,11 +29,6 @@ export class LibrarySettingsContainer extends React.Component<LibrarySettingsCon
 						<LibraryStateIndicator state={props.library.getState()} />
 						<Components.PropertyBoxBar>
 							<Components.ButtonGroup>
-								<Components.ButtonGroup.ButtonLeft>
-									<Components.ButtonGroupButton disabled={!mayEdit}>
-										Details
-									</Components.ButtonGroupButton>
-								</Components.ButtonGroup.ButtonLeft>
 								<Components.ButtonGroup.ButtonRight>
 									<>
 										{mayUpdate && (

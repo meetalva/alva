@@ -1,0 +1,8 @@
+{
+	"name": "empty-state",
+	"displayName": "Empty State",
+	"description": "Explanation of todos in case of an empty state",
+	"version": "1.0.0",
+	"tags": ["empty-state"],
+	"flag": "alpha"
+}

@@ -115,7 +115,8 @@ export class PageListContainer extends React.Component {
 								page={page}
 							/>
 						))}
-					<Components.AddPageButton
+					<Components.AddButton
+						margin={true}
 						onClick={() =>
 							store.getSender().send({
 								id: uuid.v4(),
@@ -123,7 +124,9 @@ export class PageListContainer extends React.Component {
 								type: MessageType.CreateNewPage
 							})
 						}
-					/>
+					>
+						Add Page
+					</Components.AddButton>
 				</Components.Layout>
 			</Components.DragArea>
 		);

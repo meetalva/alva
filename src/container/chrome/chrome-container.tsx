@@ -1,12 +1,13 @@
 import * as AlvaUtil from '../../alva-util';
 import { ChromeSwitch } from './chrome-switch';
-import { BugReport, Chrome, CopySize, ViewSwitch } from '../../components';
+import { ChromeButton, Chrome, CopySize, IconSize, ViewSwitch } from '../../components';
 import { MessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
+import { LogOut } from 'react-feather';
 
 export interface InjectedChromeContainerProps {
 	page: Page;
@@ -57,19 +58,37 @@ export const ChromeContainer = MobxReact.inject('store')(
 				>
 					{page.getName()}
 				</ViewSwitch>
-				<BugReport
-					title="Found a bug"
-					onClick={() => {
-						props.store.getSender().send({
-							type: MessageType.OpenExternalURL,
-							id: uuid.v4(),
-							payload: 'https://github.com/meetalva/alva/labels/type%3A%20bug'
-						});
-					}}
-					onDoubleClick={event => {
-						event.stopPropagation();
-					}}
-				/>
+				<div style={{ display: 'flex', justifySelf: 'right', alignItems: 'center' }}>
+					<ChromeButton
+						title="Found a Bug?"
+						onClick={() => {
+							props.store.getSender().send({
+								type: MessageType.OpenExternalURL,
+								id: uuid.v4(),
+								payload: 'https://github.com/meetalva/alva/labels/type%3A%20bug'
+							});
+						}}
+						onDoubleClick={event => {
+							event.stopPropagation();
+						}}
+					/>
+					<ChromeButton
+						title="Export"
+						icon={
+							<LogOut size={IconSize.XS} strokeWidth={1.5} style={{ display: 'block' }} />
+						}
+						onClick={() => {
+							props.store.getSender().send({
+								id: uuid.v4(),
+								type: MessageType.ExportHtmlProject,
+								payload: { path: undefined }
+							});
+						}}
+						onDoubleClick={event => {
+							event.stopPropagation();
+						}}
+					/>
+				</div>
 				{props.children}
 			</Chrome>
 		);

@@ -1,3 +1,9 @@
 {
-	"typescript.tsdk": "./node_modules/typescript/lib"
+	"typescript.tsdk": "./node_modules/typescript/lib",
+	"jest.debugCodeLens.showWhenTestStateIn": [
+		"fail",
+		"unknown",
+		"pass",
+		"skip"
+	  ]
 }

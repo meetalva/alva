@@ -24,9 +24,10 @@ jobs:
       - run: npm run build
 
   build:
+    macos:
+      xcode: "9.3.0"
     docker:
       - image: circleci/node:8
-    parallelism: 4
 
     working_directory: ~/repo
 

@@ -4,7 +4,7 @@
   "description": "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
   "main": "./build/electron/main.js",
   "scripts": {
-    "build": "npm run lint && tsc --project . && webpack",
+    "build": "tsc --project . && webpack",
     "build:clean": "npm run clean && npm run build",
     "build:electron": "electron-builder -mwl && node ./scripts/dist-postprocess.js",
     "clean": "rm -rf build && rm -rf dist",
@@ -16,7 +16,7 @@
     "start": "npm run build && run-electron build/electron/main.js --remote-debugging-port=9222 --inspect=9223",
     "start:clean": "npm run clean && npm run start",
     "precommit": "lint-staged",
-    "watch": "npm run build && concurrently \"run-electron build/electron/main.js --hot --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\" \"webpack -w\" \"webpack-dev-server --config webpack.renderer.js\"",
+    "watch": "concurrently \"run-electron build/electron/main.js --hot --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\" \"webpack -w\" \"webpack-dev-server --config webpack.renderer.js\"",
     "watch:clean": "npm run clean && npm run watch",
     "watch:tests": "jest --watch",
     "test": "jest"

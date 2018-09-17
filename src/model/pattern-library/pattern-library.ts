@@ -236,10 +236,6 @@ export class PatternLibrary {
 
 	@Mobx.action
 	public addProperty(property: AnyPatternProperty): void {
-		if (property.getPropertyName() === 'thing') {
-			console.log('addProperty', property);
-		}
-
 		this.patternProperties.set(property.getId(), property);
 	}
 

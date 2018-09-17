@@ -28,6 +28,34 @@ export class Sender {
 		this.receiveIpcHandlers.push(receiveHandler);
 	}
 
+	public transaction<T extends Message.Message>(
+		message: Message.Message,
+		{ type }: { type: T['type'] }
+	): Promise<T> {
+		return new Promise<T>(resolve => {
+			const transaction = uuid.v4();
+			let done = false;
+
+			this.match(type, msg => {
+				if (!isMessage(msg) || done) {
+					return;
+				}
+
+				if (transaction !== msg.transaction) {
+					return;
+				}
+
+				done = true;
+				resolve(msg as T);
+			});
+
+			this.send({
+				...message,
+				transaction
+			});
+		});
+	}
+
 	public request<T extends Message.RequestResponsePair>(
 		message: T['request'],
 		responseType: T['response']['type']

@@ -358,7 +358,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public executePageAddNew(): Model.Page | undefined {
-		const name = 'Untitled Page';
+		const name = 'Page';
 
 		const count = this.project.getPages().filter(p => p.getName().startsWith(name)).length;
 
@@ -721,32 +721,9 @@ export class ViewStore {
 	public save(): void {
 		this.sender.send({
 			id: uuid.v4(),
-			payload: undefined,
+			payload: { publish: false },
 			type: MessageType.Save
 		});
-		// TODO TODO: send rework saving
-		/* const savedProjects = this.getSavedProjects();
-		const savedProject = savedProjects[savedProjects.length - 1];
-
-		if (savedProject && Model.Project.equals(savedProject, this.project.toDisk())) {
-			return;
-		}
-
-		if (this.project) {
-			const serializedProject = this.project.toJSON();
-			this.addSavedProject(this.project);
-
-			const payload = {
-				path: this.project.getPath(),
-				project: serializedProject
-			};
-
-			this.sender.send({
-				id: uuid.v4(),
-				payload,
-				type: MessageType.Save
-			});
-		} */
 	}
 
 	@Mobx.action

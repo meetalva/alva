@@ -63,6 +63,7 @@ export enum MessageType {
 	Redo = 'redo',
 	Reload = 'reload',
 	Save = 'save',
+	SaveResult = 'save-result',
 	SetPane = 'set-pane',
 	ShowError = 'show-error',
 	SketchExportRequest = 'sketch-export-request',
@@ -137,6 +138,7 @@ export type Message =
 	| Redo
 	| Reload
 	| Save
+	| SaveResult
 	| SetPane
 	| ShowError
 	| SketchExportRequest
@@ -268,7 +270,11 @@ export type ProjectResponse = Envelope<
 >;
 export type Redo = EmptyEnvelope<MessageType.Redo>;
 export type Reload = Envelope<MessageType.Reload, { forced: boolean } | undefined>;
-export type Save = Envelope<MessageType.Save, undefined>;
+export type Save = Envelope<MessageType.Save, { publish: boolean } | undefined>;
+export type SaveResult = Envelope<
+	MessageType.SaveResult,
+	{ draft: boolean; result: Types.PersistencePersistResult; name: string }
+>;
 export type SetPane = Envelope<MessageType.SetPane, { pane: Types.AppPane; visible: boolean }>;
 export type ShowError = Envelope<MessageType.ShowError, { message: string; stack: string }>;
 export type SketchExportRequest = Envelope<

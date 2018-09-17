@@ -3,6 +3,7 @@ import { MainMenuContext } from '.';
 import { MessageType } from '../../message';
 import { Sender } from '../../sender/server';
 import * as uuid from 'uuid';
+import * as Types from '../../types';
 
 export interface FileMenuInjection {
 	sender: Sender;
@@ -13,6 +14,9 @@ export function createFileMenu(
 	injection: FileMenuInjection
 ): Electron.MenuItemConstructorOptions {
 	const activePage = ctx.project && ctx.project.getPages().find(p => p.getActive());
+	const hasPage = typeof activePage !== 'undefined';
+	const hasProject = typeof ctx.project !== 'undefined';
+	const onDetailView = ctx.app.getActiveView() !== Types.AlvaView.SplashScreen;
 
 	return {
 		label: '&File',
@@ -44,7 +48,7 @@ export function createFileMenu(
 			},
 			{
 				label: 'New &Page',
-				enabled: typeof ctx.project !== 'undefined',
+				enabled: hasProject && onDetailView,
 				accelerator: 'CmdOrCtrl+Shift+N',
 				click: () => {
 					injection.sender.send({
@@ -59,14 +63,35 @@ export function createFileMenu(
 			},
 			{
 				label: '&Save',
-				enabled: typeof ctx.project !== 'undefined',
+				enabled: hasProject && onDetailView,
 				accelerator: 'CmdOrCtrl+S',
 				role: 'save',
 				click: async () => {
+					if (!ctx.project) {
+						return;
+					}
+
 					injection.sender.send({
 						type: MessageType.Save,
 						id: uuid.v4(),
-						payload: undefined
+						payload: { publish: ctx.project.getDraft() }
+					});
+				}
+			},
+			{
+				label: '&Save As',
+				enabled: hasProject && onDetailView,
+				accelerator: 'CmdOrCtrl+Shift+S',
+				role: 'save',
+				click: async () => {
+					if (!ctx.project) {
+						return;
+					}
+
+					injection.sender.send({
+						type: MessageType.Save,
+						id: uuid.v4(),
+						payload: { publish: true }
 					});
 				}
 			},
@@ -75,7 +100,7 @@ export function createFileMenu(
 			},
 			{
 				label: 'Export Prototype as HTML',
-				enabled: Boolean(activePage),
+				enabled: hasPage && onDetailView,
 				accelerator: 'CmdOrCtrl+E',
 				click: async () => {
 					if (!ctx.project) {

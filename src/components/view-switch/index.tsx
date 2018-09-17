@@ -148,7 +148,7 @@ export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 			size={IconSize.XS}
 			visible={props.leftVisible}
 		/>
-		<StyledTitle>{props.children}</StyledTitle>
+		<StyledTitle grow>{props.children}</StyledTitle>
 		<StyledChevron
 			color={Color.Grey60}
 			is={ChevronRight}

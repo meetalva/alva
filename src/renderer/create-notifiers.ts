@@ -297,6 +297,7 @@ function getParentByMember(
 			return project.getUserStore();
 		case 'Element':
 		case 'ElementContent':
+		case 'Page':
 		case 'Pattern':
 		case 'PatternLibrary':
 		case 'PatternEnumProperty':
@@ -316,6 +317,8 @@ function getObjectsByName(name: string, { project }: { project: Model.Project })
 			return project.getElements();
 		case 'ElementContent':
 			return project.getElementContents();
+		case 'Page':
+			return project.getPages();
 		case 'PatternLibrary':
 			return project.getPatternLibraries();
 		case 'PatternEnumProperty':

@@ -2,17 +2,20 @@ import * as Fs from 'fs';
 import * as Message from '../message';
 import * as MimeTypes from 'mime-types';
 import * as Model from '../model';
-import { Persistence, PersistenceState } from '../persistence';
+import * as Path from 'path';
+import { Persistence } from '../persistence';
 import { showOpenDialog } from './show-open-dialog';
 import { showSaveDialog } from './show-save-dialog';
 import * as Types from '../types';
 import * as Util from 'util';
+import * as uuid from 'uuid';
 
 import {
 	ServerMessageHandlerContext,
 	ServerMessageHandlerInjection
 } from './create-server-message-handler';
 
+const isPathInside = require('is-path-inside');
 const readFile = Util.promisify(Fs.readFile);
 
 export async function createFileMessageHandler(
@@ -22,38 +25,27 @@ export async function createFileMessageHandler(
 	return async function fileMessageHandler(message: Message.Message): Promise<void> {
 		switch (message.type) {
 			case Message.MessageType.CreateNewFileRequest: {
-				const path = await showSaveDialog({
-					title: 'Create New Alva File',
-					defaultPath: 'Untitled Project.alva',
-					filters: [
-						{
-							name: 'Alva File',
-							extensions: ['alva']
-						}
-					]
+				const draftPath = Path.join(ctx.appPath, `${uuid.v4()}.alva`);
+
+				ctx.project = Model.Project.create({
+					draft: true,
+					name: 'New Project',
+					path: draftPath
 				});
 
-				if (path) {
-					const project = Model.Project.create({
-						name: 'Untitled Project',
-						path
-					});
+				await Persistence.persist(draftPath, ctx.project);
+				injection.ephemeralStore.setProjectPath(draftPath);
 
-					ctx.project = project;
+				injection.sender.send({
+					type: Message.MessageType.CreateNewFileResponse,
+					id: message.id,
+					payload: {
+						path: draftPath,
+						contents: ctx.project.toJSON(),
+						status: Types.ProjectPayloadStatus.Ok
+					}
+				});
 
-					await Persistence.persist(path, project);
-					injection.ephemeralStore.setProjectPath(path);
-
-					injection.sender.send({
-						type: Message.MessageType.CreateNewFileResponse,
-						id: message.id,
-						payload: {
-							path,
-							contents: project.toJSON(),
-							status: Types.ProjectPayloadStatus.Ok
-						}
-					});
-				}
 				break;
 			}
 			case Message.MessageType.OpenFileRequest: {
@@ -66,7 +58,7 @@ export async function createFileMessageHandler(
 
 				const projectResult = await Persistence.read<Types.SavedProject>(path);
 
-				if (projectResult.state === PersistenceState.Error) {
+				if (projectResult.state === Types.PersistenceState.Error) {
 					if (!silent) {
 						injection.sender.send({
 							type: Message.MessageType.ShowError,
@@ -137,8 +129,49 @@ export async function createFileMessageHandler(
 					return;
 				}
 
+				const publish = message.payload ? message.payload.publish : false;
+
+				const getSelectedPath = () =>
+					showSaveDialog({
+						title: 'Save Alva File',
+						defaultPath: 'New Project.alva',
+						filters: [
+							{
+								name: 'Alva File',
+								extensions: ['alva']
+							}
+						]
+					});
+
+				const targetPath = !publish ? ctx.project.getPath() : await getSelectedPath();
+
+				if (!targetPath) {
+					return;
+				}
+
+				ctx.project.setPath(targetPath);
 				injection.ephemeralStore.setProjectPath(ctx.project.getPath());
-				await Persistence.persist(ctx.project.getPath(), ctx.project);
+
+				const result = await Persistence.persist(targetPath, ctx.project);
+
+				ctx.project.setName(
+					isPathInside(targetPath, ctx.appPath)
+						? 'New Project'
+						: Path.basename(ctx.project.getPath(), Path.extname(targetPath))
+				);
+
+				ctx.project.setDraft(ctx.project.getDraft() ? !publish : false);
+
+				injection.sender.send({
+					id: uuid.v4(),
+					transaction: message.transaction,
+					type: Message.MessageType.SaveResult,
+					payload: {
+						result,
+						draft: ctx.project.getDraft(),
+						name: ctx.project.getName()
+					}
+				});
 			}
 		}
 	};

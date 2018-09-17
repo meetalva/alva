@@ -103,6 +103,7 @@ export interface SavedProject {
 }
 
 export interface SerializedProject extends SavedProject {
+	draft: boolean;
 	path: string;
 }
 

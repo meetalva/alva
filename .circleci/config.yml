@@ -1,5 +1,28 @@
 version: 2
 jobs:
+  release:
+    macos:
+      xcode: "9.3.0"
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          - v1-dependencies-
+
+      - run: npm ci
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+
+      - run: npm test
+      - run: npm run lint
+      - run: npm run build
+
   build:
     docker:
       - image: circleci/node:8

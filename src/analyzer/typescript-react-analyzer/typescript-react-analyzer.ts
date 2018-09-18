@@ -197,12 +197,12 @@ function analyzePatternExport(
 	};
 }
 
-// tslint:disable-next-line:no-any
 async function findPatternCandidates({
 	cwd,
 	pkg
 }: {
 	cwd: string;
+	// tslint:disable-next-line:no-any
 	pkg: any;
 }): Promise<PatternCandidate[]> {
 	const entry = Path.join(cwd, getTypingsEntry(pkg));

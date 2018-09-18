@@ -80,14 +80,11 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 			}
 
 			/**
-			 * Do not send messages as long as matchHighlighhtedElement is running
-			 * TODO: Generalize this to skip message sending as long as any matcher is running
+			 * Do not send messages as long as known/named transactions are running
+			 * TODO: Generalize this
 			 */
-			if (
-				transactions[0] &&
-				(transactions[0] as { name: string | undefined }).name ===
-					Types.ActionName.MatchHighlightedElement
-			) {
+			// tslint:disable-next-line:no-any
+			if (transactions.some((t: any) => t.name in Types.ActionName)) {
 				return;
 			}
 

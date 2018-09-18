@@ -35,6 +35,10 @@ export function analyze(
 				typechecker
 			}) as Ts.Declaration;
 
+			if (!declaration) {
+				return;
+			}
+
 			if (!Ts.isPropertySignature(declaration) && !Ts.isMethodSignature(declaration)) {
 				return;
 			}

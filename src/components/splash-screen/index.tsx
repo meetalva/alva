@@ -1,30 +1,55 @@
 import * as React from 'react';
-import { PageInset } from '../space';
 import styled from 'styled-components';
+import { Color } from '../colors';
+import { getSpace, SpaceSize } from '../space';
 
 const StyledSplashScreen = styled.div`
 	box-sizing: border-box;
 	display: flex;
 	width: 100%;
+	margin-top: -40px;
 	height: 100vh;
-	align-items: center;
+	align-items: stretch;
 	justify-content: center;
-	padding: 0 ${PageInset.XL}px;
-	transform: translateY(-54px);
 	-webkit-app-region: drag;
 `;
 
 const StyledLeftSection = styled.div`
-	flex-basis: 45%;
+	flex-shrink: 0;
+	flex-grow: 0;
+	width: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+const StyledRightSection = styled.div`
+	flex-shrink: 0;
+	flex-grow: 0;
+	width: 50%;
+	background-color: ${Color.White};
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+
+const StyledBox = styled.div`
+	max-width: 480px;
+	padding: ${getSpace(SpaceSize.XL)}px;
 `;
 
 export interface SplashScreenProps {
-	children?: React.ReactNode;
+	leftSection?: React.ReactNode;
+	rightSection?: React.ReactNode;
 }
 
 export const SplashScreen: React.StatelessComponent<SplashScreenProps> = props => (
 	<StyledSplashScreen>
-		<StyledLeftSection>{props.children}</StyledLeftSection>
+		<StyledLeftSection>
+			<StyledBox>{props.leftSection}</StyledBox>
+		</StyledLeftSection>
+		<StyledRightSection>
+			<StyledBox>{props.rightSection}</StyledBox>
+		</StyledRightSection>
 	</StyledSplashScreen>
 );
 

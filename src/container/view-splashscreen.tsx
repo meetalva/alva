@@ -13,18 +13,25 @@ export class ViewSplashscreen extends React.Component {
 
 		return (
 			<SplashScreenContainer
-				onPrimaryButtonClick={() => {
+				onCreateClick={() => {
 					props.store.getSender().send({
 						type: MessageType.CreateNewFileRequest,
 						id: uuid.v4(),
 						payload: undefined
 					});
 				}}
-				onSecondaryButtonClick={() => {
+				onOpenClick={() => {
 					props.store.getSender().send({
 						type: MessageType.OpenFileRequest,
 						id: uuid.v4(),
 						payload: undefined
+					});
+				}}
+				onGuideClick={() => {
+					props.store.getSender().send({
+						type: MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: 'https://meetalva.io/doc/docs/guides/start'
 					});
 				}}
 			/>

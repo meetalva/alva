@@ -20,9 +20,13 @@ interface StyledHeadlineProps {
 const StyledHeadline = styled.div`
 	margin-top: 0;
 	font-family: ${fonts().NORMAL_FONT};
-	font-weight: 500;
+	font-weight: 300;
 	cursor: default;
 	${(props: StyledHeadlineProps) => (props.textColor ? `color: ${props.textColor};` : '')};
+
+	b {
+		font-weight: 700;
+	}
 
 	${(props: HeadlineProps) => {
 		switch (props.order) {

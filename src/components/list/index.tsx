@@ -103,7 +103,7 @@ export class List extends React.Component<ListProps> {
 	public render(): JSX.Element {
 		return (
 			<div>
-				<Headline order={3} key="headline">
+				<Headline type="primary" order={3} key="headline">
 					{this.props.headline}
 				</Headline>
 				{this.props.children}

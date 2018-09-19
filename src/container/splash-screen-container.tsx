@@ -24,10 +24,10 @@ export function SplashScreenContainer(props: SplashScreenProps): JSX.Element {
 			leftSection={
 				<>
 					<Space sizeBottom={SpaceSize.XXL}>
-						<Headline textColor={Color.Grey20} order={2}>
-							<b>You’re new here?</b>
-							<br /> Get started with our easy-to-learn guides.
+						<Headline tagName="h1" type="secondary" textColor={Color.Grey20} order={2}>
+							You’re new here?
 						</Headline>
+						<Copy size={CopySize.M}>Get started with our easy-to-learn guides.</Copy>
 					</Space>
 					<Button onClick={props.onGuideClick} order={ButtonOrder.Primary}>
 						See Guides
@@ -37,7 +37,7 @@ export function SplashScreenContainer(props: SplashScreenProps): JSX.Element {
 			rightSection={
 				<>
 					<Space sizeBottom={SpaceSize.L}>
-						<Headline textColor={Color.Grey20} order={3}>
+						<Headline type="secondary" tagName="h2" textColor={Color.Grey20} order={3}>
 							Create or Open
 						</Headline>
 					</Space>

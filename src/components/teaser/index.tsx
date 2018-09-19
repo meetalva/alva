@@ -29,7 +29,9 @@ const StyledConnectLibrary = styled.div`
 export const Teaser: React.SFC<TeaserProps> = props => (
 	<StyledConnectLibrary>
 		<Space sizeBottom={SpaceSize.S}>
-			<Headline order={3}>{props.headline}</Headline>
+			<Headline type="primary" order={3}>
+				{props.headline}
+			</Headline>
 		</Space>
 		<Space sizeBottom={SpaceSize.L}>
 			<Copy>{props.description}</Copy>

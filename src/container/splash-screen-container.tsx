@@ -1,44 +1,61 @@
-import {
-	Button,
-	ButtonOrder,
-	Color,
-	Copy,
-	CopySize,
-	Headline,
-	Link,
-	Space,
-	SpaceSize,
-	SplashScreen
-} from '../components';
+import * as Components from '../components';
 import * as React from 'react';
 
 export interface SplashScreenProps {
-	onPrimaryButtonClick?: React.MouseEventHandler<HTMLElement>;
-	onSecondaryButtonClick?: React.MouseEventHandler<HTMLElement>;
+	onCreateClick?: React.MouseEventHandler<HTMLElement>;
+	onOpenClick?: React.MouseEventHandler<HTMLElement>;
+	onGuideClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 export function SplashScreenContainer(props: SplashScreenProps): JSX.Element {
 	return (
-		<SplashScreen>
-			<Space sizeBottom={SpaceSize.L}>
-				<Headline textColor={Color.Grey20} order={2}>
-					Getting started with Alva
-				</Headline>
-			</Space>
-			<Space sizeBottom={SpaceSize.XXXL}>
-				<Copy size={CopySize.M} textColor={Color.Grey20}>
-					You can open an existing Alva file or create a new one. An .alva file includes the
-					connected component library, so you can easily share it with everyone.
-				</Copy>
-			</Space>
-			<Space sizeBottom={SpaceSize.S}>
-				<Button onClick={props.onPrimaryButtonClick} order={ButtonOrder.Primary}>
-					Create New Alva File
-				</Button>
-			</Space>
-			<Link color={Color.Grey50} onClick={props.onSecondaryButtonClick}>
-				<Copy size={CopySize.S}>Open Existing Alva File</Copy>
-			</Link>
-		</SplashScreen>
+		<Components.SplashScreen>
+			<Components.SplashScreenSection type="primary">
+				<Components.Space sizeBottom={Components.SpaceSize.XXL}>
+					<Components.Headline
+						tagName="h1"
+						type="secondary"
+						textColor={Components.Color.Grey20}
+						order={2}
+					>
+						You’re new here?
+					</Components.Headline>
+					<Components.Headline type="primary" tagName="div" order={2}>
+						Get started with our easy-to-learn guides.
+					</Components.Headline>
+				</Components.Space>
+				<Components.Button onClick={props.onGuideClick} order={Components.ButtonOrder.Primary}>
+					See Guides
+				</Components.Button>
+			</Components.SplashScreenSection>
+			<Components.SplashScreenSection type="secondary">
+				<Components.Headline
+					type="secondary"
+					tagName="h2"
+					textColor={Components.Color.Grey20}
+					order={3}
+				>
+					Create or Open
+				</Components.Headline>
+				<Components.Space sizeBottom={Components.SpaceSize.XXXL}>
+					<Components.Copy size={Components.CopySize.M} textColor={Components.Color.Grey20}>
+						Start using an existing Alva file with an included library or create a new one.
+					</Components.Copy>
+				</Components.Space>
+				<Components.Space sizeBottom={Components.SpaceSize.S}>
+					<Components.Button
+						onClick={props.onCreateClick}
+						order={Components.ButtonOrder.Secondary}
+					>
+						Create New Alva File
+					</Components.Button>
+				</Components.Space>
+				<Components.Link color={Components.Color.Grey50} onClick={props.onOpenClick}>
+					<Components.Copy size={Components.CopySize.S}>
+						Open Existing Alva File
+					</Components.Copy>
+				</Components.Link>
+			</Components.SplashScreenSection>
+		</Components.SplashScreen>
 	);
 }

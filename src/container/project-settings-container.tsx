@@ -17,7 +17,9 @@ export class ProjectSettingsContainer extends React.Component {
 		return (
 			<div>
 				<Components.Space sizeBottom={SpaceSize.XS}>
-					<Components.Headline order={3}>Connected Libraries</Components.Headline>
+					<Components.Headline type="primary" order={3}>
+						Connected Libraries
+					</Components.Headline>
 					<Components.Copy textColor={Color.Grey50}>
 						You can connect one or multiple React component libraries.
 					</Components.Copy>

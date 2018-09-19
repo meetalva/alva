@@ -34,7 +34,9 @@ export const PropertyAction: React.SFC = props => <>{props.children}</>;
 
 export const PropertyBox: React.SFC<PropertyBoxProps> = props => (
 	<StyledPropertyBox>
-		<Headline order={4}>{props.headline}</Headline>
+		<Headline type="primary" order={4}>
+			{props.headline}
+		</Headline>
 		<Copy textColor={Color.Grey50}>{props.copy}</Copy>
 		{props.children}
 	</StyledPropertyBox>

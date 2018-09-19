@@ -52,6 +52,7 @@ const StyledHeadline = styled.div`
 					return css`
 						font-size: 38px;
 						line-height: 45px;
+						margin: 0;
 					`;
 				case 1:
 				default:

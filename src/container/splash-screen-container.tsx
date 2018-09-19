@@ -20,7 +20,7 @@ export function SplashScreenContainer(props: SplashScreenProps): JSX.Element {
 					>
 						You’re new here?
 					</Components.Headline>
-					<Components.Headline type="primary" tagName="div" order={3}>
+					<Components.Headline type="primary" tagName="div" order={2}>
 						Get started with our easy-to-learn guides.
 					</Components.Headline>
 				</Components.Space>

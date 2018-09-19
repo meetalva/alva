@@ -31,7 +31,7 @@ export class ViewSplashscreen extends React.Component {
 					props.store.getSender().send({
 						type: MessageType.OpenExternalURL,
 						id: uuid.v4(),
-						payload: 'https://meetalva.io/doc/docs/guides/start'
+						payload: 'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
 					});
 				}}
 			/>

@@ -74,7 +74,8 @@ export enum MessageType {
 	UpdatePatternLibraryResponse = 'update-pattern-library-response',
 	ChangeUserStore = 'user-store-change',
 	SelectElement = 'select-element',
-	HighlightElement = 'highlight-element'
+	HighlightElement = 'highlight-element',
+	WindowClose = 'window-close'
 }
 
 export type Message =
@@ -149,7 +150,8 @@ export type Message =
 	| UpdatePatternLibraryResponse
 	| ChangeUserStore
 	| SelectElement
-	| HighlightElement;
+	| HighlightElement
+	| WindowClose;
 
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
 export type AppLoaded = EmptyEnvelope<MessageType.AppLoaded>;
@@ -419,3 +421,4 @@ export type MobxUpdateMessage = Envelope<MessageType.MobxUpdate, MobxUpdatePaylo
 export type MobxAddMessage = Envelope<MessageType.MobxAdd, MobxAddPayload>;
 export type MobxDeleteMessage = Envelope<MessageType.MobxDelete, MobxDeletePayload>;
 export type MobxSpliceMessage = Envelope<MessageType.MobxSplice, MobxSplicePayload>;
+export type WindowClose = EmptyEnvelope<MessageType.WindowClose>;

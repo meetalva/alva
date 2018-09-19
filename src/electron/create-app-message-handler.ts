@@ -6,6 +6,7 @@ import { checkForUpdates } from './auto-updater';
 import { showError } from './show-error';
 import { showContextMenu } from './show-context-menu';
 import * as Types from '../types';
+import { showDiscardDialog, DiscardDialogResult } from './show-discard-dialog';
 
 import {
 	ServerMessageHandlerContext,
@@ -16,6 +17,7 @@ export async function createAppMessageHandler(
 	ctx: ServerMessageHandlerContext,
 	injection: ServerMessageHandlerInjection
 ): Promise<(message: Message.Message) => Promise<void>> {
+	// tslint:disable-next-line:cyclomatic-complexity
 	return async function appMessageHandler(message: Message.Message): Promise<void> {
 		switch (message.type) {
 			case Message.MessageType.CheckForUpdatesRequest: {
@@ -99,6 +101,49 @@ export async function createAppMessageHandler(
 				// TODO: Replace with app.sync
 				ctx.app = Model.AlvaApp.from(message.payload.app);
 				break;
+			}
+			case Message.MessageType.WindowClose: {
+				if (!ctx.project || !ctx.project.getDraft()) {
+					if (ctx.win) {
+						ctx.win.destroy();
+					}
+					return;
+				}
+
+				const result = await showDiscardDialog(ctx.project);
+
+				switch (result) {
+					case DiscardDialogResult.Discard:
+						injection.ephemeralStore.clear();
+						ctx.project = undefined;
+						if (ctx.win) {
+							ctx.win.hide();
+						}
+						break;
+					case DiscardDialogResult.Save:
+						const saveResult = await injection.sender.transaction(
+							{
+								id: uuid.v4(),
+								type: Message.MessageType.Save,
+								payload: { publish: true }
+							},
+							{ type: Message.MessageType.SaveResult }
+						);
+
+						if (saveResult.payload.result === Types.PersistenceState.Error) {
+							return showError(saveResult.payload.result.error);
+						}
+
+						// Give the user some time to realize we saved
+						setTimeout(() => {
+							ctx.win && ctx.win.hide();
+							ctx.project = undefined;
+						}, 1000);
+						break;
+					case DiscardDialogResult.Cancel:
+					default:
+						return;
+				}
 			}
 		}
 	};

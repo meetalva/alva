@@ -9,6 +9,8 @@ import { showSaveDialog } from './show-save-dialog';
 import * as Types from '../types';
 import * as Util from 'util';
 import * as uuid from 'uuid';
+import { showDiscardDialog, DiscardDialogResult } from './show-discard-dialog';
+import { showError } from './show-error';
 
 import {
 	ServerMessageHandlerContext,
@@ -22,9 +24,30 @@ export async function createFileMessageHandler(
 	ctx: ServerMessageHandlerContext,
 	injection: ServerMessageHandlerInjection
 ): Promise<(message: Message.Message) => Promise<void>> {
+	// tslint:disable-next-line:cyclomatic-complexity
 	return async function fileMessageHandler(message: Message.Message): Promise<void> {
 		switch (message.type) {
 			case Message.MessageType.CreateNewFileRequest: {
+				// Prompt the user to save if there has been a project previously
+				if (ctx.project) {
+					const discardResult = await showDiscardDialog(ctx.project);
+
+					if (discardResult === DiscardDialogResult.Save) {
+						const saveResult = await injection.sender.transaction(
+							{
+								id: uuid.v4(),
+								type: Message.MessageType.Save,
+								payload: { publish: true }
+							},
+							{ type: Message.MessageType.SaveResult }
+						);
+
+						if (saveResult.payload.result === Types.PersistenceState.Error) {
+							return showError(saveResult.payload.result.error);
+						}
+					}
+				}
+
 				const draftPath = Path.join(ctx.appPath, `${uuid.v4()}.alva`);
 
 				ctx.project = Model.Project.create({

@@ -353,5 +353,6 @@ export interface Sender {
 }
 
 export enum ActionName {
-	MatchHighlightedElement = 'MatchHighlightedElement'
+	MatchHighlightedElement = 'MatchHighlightedElement',
+	OpenFile = 'OpenFile'
 }

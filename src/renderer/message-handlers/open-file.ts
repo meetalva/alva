@@ -1,3 +1,4 @@
+import * as Mobx from 'mobx';
 import * as M from '../../message';
 import * as Model from '../../model';
 import * as Path from 'path';
@@ -11,36 +12,37 @@ export function openFile({
 	history
 }: MessageHandlerContext): MessageHandler<M.OpenFileResponse | M.NewFileResponse> {
 	return m => {
-		if (m.payload.status === Types.ProjectPayloadStatus.Error) {
-			return;
-		}
+		Mobx.runInAction(Types.ActionName.OpenFile, () => {
+			if (m.payload.status === Types.ProjectPayloadStatus.Error) {
+				return;
+			}
 
-		const payload = m.payload as Types.ProjectPayloadSuccess;
+			const payload = m.payload as Types.ProjectPayloadSuccess;
 
-		history.clear();
+			history.clear();
 
-		const projectResult = createProject(payload.contents);
+			const projectResult = createProject(payload.contents);
 
-		if (projectResult.status === ProjectCreateStatus.Error) {
-			store.getSender().send({
-				id: uuid.v4(),
-				payload: {
-					message: `Sorry, we had trouble reading the project in file "${Path.basename(
-						payload.path
-					)}".\n Parsing the project failed with: ${projectResult.error.message}`,
-					stack: projectResult.error.stack || ''
-				},
-				type: M.MessageType.ShowError
-			});
+			if (projectResult.status === ProjectCreateStatus.Error) {
+				store.getSender().send({
+					id: uuid.v4(),
+					payload: {
+						message: `Sorry, we had trouble reading the project in file "${Path.basename(
+							payload.path
+						)}".\n Parsing the project failed with: ${projectResult.error.message}`,
+						stack: projectResult.error.stack || ''
+					},
+					type: M.MessageType.ShowError
+				});
 
-			return;
-		}
+				return;
+			}
 
-		store.setProject(projectResult.project);
-		app.setActiveView(Types.AlvaView.PageDetail);
-		store.getProject().setFocusedItem(store.getActivePage());
-
-		store.commit();
+			store.setProject(projectResult.project);
+			app.setActiveView(Types.AlvaView.PageDetail);
+			store.getProject().setFocusedItem(store.getActivePage());
+			store.commit();
+		});
 	};
 }
 

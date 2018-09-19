@@ -129,7 +129,7 @@
     "concurrently": "3.5.1",
     "css-loader": "1.0.0",
     "devtron": "1.4.0",
-    "electron": "2.0.2",
+    "electron": "2.0.10",
     "electron-builder": "20.28.4",
     "electron-devtools-installer": "2.2.4",
     "fixturez": "1.1.0",

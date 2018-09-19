@@ -64,7 +64,14 @@ export class TypeScriptType {
 		}
 
 		const typeDeclaration = symbol.declarations && symbol.declarations[0];
+
 		if (!typeDeclaration) {
+			return;
+		}
+
+		// Danger zone: this.typeChecker.getTypeAtLocation
+		// assumes typeDeclaration has a parent
+		if (!typeDeclaration.parent) {
 			return;
 		}
 

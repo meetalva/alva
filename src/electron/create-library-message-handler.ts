@@ -72,7 +72,15 @@ export async function createLibraryMessageHandler(
 
 				const paths = await showOpenDialog({
 					title: 'Connnect Pattern Library',
-					properties: ['openDirectory']
+					message:
+						'Select a package.json file in the root of a library you want to connect to Alva',
+					properties: ['openFile'],
+					filters: [
+						{
+							name: 'package.json',
+							extensions: ['json']
+						}
+					]
 				});
 
 				const path = Array.isArray(paths) ? paths[0] : undefined;

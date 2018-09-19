@@ -11,13 +11,14 @@ import * as ts from 'typescript';
 import * as Util from 'util';
 import * as uuid from 'uuid';
 import { Compiler } from 'webpack';
+import * as resolve from 'resolve';
+import { last } from 'lodash';
 
-const loadPatternplateConfig = require('@patternplate/load-config');
-const loadPatternplateMeta = require('@patternplate/load-meta');
+const precinct = require('precinct');
 
 export interface PatternCandidate {
 	artifactPath: string;
-	declarationPath: string | undefined;
+	declarationPath: string;
 	description: string;
 	displayName: string;
 	id: string;
@@ -47,16 +48,17 @@ type PatternAnalyzerPredicate = (
 ) => Types.PatternAnalysis | undefined;
 
 export async function analyze(
-	path: string,
+	pkgPath: string,
 	options: AnalyzeOptions
 ): Promise<Types.LibraryAnalysisResult> {
 	try {
 		const id = uuid.v4();
-		const pkg = await readPkg(path);
-		const patterns = await analyzePatterns({ cwd: path, options });
+		const pkg = await readPkg(pkgPath);
+		const cwd = Path.dirname(pkgPath);
+		const patterns = await analyzePatterns({ pkgPath, options, pkg, cwd });
 
 		const getBundle = async () => {
-			const compiler = await createPatternCompiler(patterns, { cwd: path, id });
+			const compiler = await createPatternCompiler(patterns, { cwd, id });
 			await Util.promisify(compiler.run).bind(compiler)();
 			return (compiler.outputFileSystem as typeof Fs).readFileSync(`/${id}.js`).toString();
 		};
@@ -69,7 +71,7 @@ export async function analyze(
 				name: pkg.name || 'Unnamed Library',
 				description: pkg.description || '',
 				patterns,
-				path,
+				path: pkgPath,
 				version: pkg.version || '1.0.0'
 			}
 		};
@@ -83,10 +85,12 @@ export async function analyze(
 
 async function analyzePatterns(context: {
 	cwd: string;
+	pkgPath: string;
 	options: AnalyzeOptions;
+	pkg: unknown;
 }): Promise<Types.PatternAnalysis[]> {
-	const patternCandidates = await findPatternCandidates(context.cwd);
-	const declarationPaths = patternCandidates.map(p => p.declarationPath || p.sourcePath);
+	const patternCandidates = await findPatternCandidates({ cwd: context.cwd, pkg: context.pkg });
+	const declarationPaths = patternCandidates.map(p => p.declarationPath);
 
 	const optionsPath = ts.findConfigFile(context.cwd, Fs.existsSync);
 	const options = optionsPath
@@ -126,7 +130,7 @@ function getPatternAnalyzer(program: ts.Program, options: AnalyzeOptions): Patte
 		candidate: PatternCandidate,
 		predicate: PatternAnalyzerPredicate
 	): Types.PatternAnalysis[] => {
-		const sourceFile = program.getSourceFile(candidate.declarationPath || candidate.sourcePath);
+		const sourceFile = program.getSourceFile(candidate.declarationPath);
 
 		if (!sourceFile) {
 			return [];
@@ -193,36 +197,111 @@ function analyzePatternExport(
 	};
 }
 
-async function findPatternCandidates(path: string): Promise<PatternCandidate[]> {
-	const patternplateConfig = await loadPatternplateConfig({ cwd: path });
-	const { config, filepath } = patternplateConfig;
-	const cwd = filepath ? Path.dirname(filepath) : path;
+async function findPatternCandidates({
+	cwd,
+	pkg
+}: {
+	cwd: string;
+	// tslint:disable-next-line:no-any
+	pkg: any;
+}): Promise<PatternCandidate[]> {
+	const entry = Path.join(cwd, getTypingsEntry(pkg));
+	const declarationsList = getImportsFromPath(entry, {
+		extensions: ['.d.ts'],
+		deep: true,
+		init: new Set()
+	});
 
-	const { patterns } = await loadPatternplateMeta({ entry: config.entry, cwd });
-
-	return patterns.map(pattern => {
-		const sourceDirname = Path.dirname(pattern.source);
-		const sourceExtname = Path.extname(pattern.source);
-
-		const sourcePath = pattern.manifest.main
-			? Path.resolve(cwd, Path.dirname(pattern.path), pattern.manifest.main)
-			: Path.resolve(cwd, sourceDirname, `index${sourceExtname}`);
-
-		const relSourcePath = Path.relative(Path.join(cwd, pattern.source), sourcePath);
-		const artifactDirname = Path.dirname(Path.resolve(cwd, pattern.artifact, relSourcePath));
-		const artifactBasename = Path.basename(sourcePath, Path.extname(sourcePath));
-		const artifactExtname = Path.extname(pattern.artifact);
-
-		const artifactPath = Path.join(artifactDirname, `${artifactBasename}${artifactExtname}`);
-		const declarationPath = Path.join(artifactDirname, `${artifactBasename}.d.ts`);
+	return [...declarationsList].map(declarationPath => {
+		const artifactPath = setExtname(declarationPath, '.js');
+		const significantPath = getSignificantPath(Path.relative(cwd, declarationPath));
+		const dName = last(significantPath);
 
 		return {
-			artifactPath: Fs.existsSync(artifactPath) ? artifactPath : undefined,
-			declarationPath: Fs.existsSync(declarationPath) ? declarationPath : undefined,
-			description: pattern.manifest.description || '',
-			displayName: pattern.manifest.displayName || pattern.manifest.name,
-			id: pattern.id,
-			sourcePath
+			artifactPath,
+			declarationPath,
+			description: '',
+			displayName: dName ? Path.basename(dName, Path.extname(dName)) : 'Unknown Pattern',
+			id: significantPath.join('/'),
+			sourcePath: Path.dirname(declarationPath)
 		};
 	});
+}
+
+function getImportsFromPath(
+	path: string,
+	config: { extensions: string[]; init: Set<string>; deep: boolean } = {
+		init: new Set(),
+		deep: true,
+		extensions: []
+	}
+): Set<string> {
+	const basedir = Path.dirname(path);
+
+	const dependencyList: string[] = precinct
+		.paperwork(path)
+		.filter((p: string) => p.startsWith('.'))
+		.map((p: string) =>
+			resolve.sync(p, {
+				basedir,
+				extensions: config.extensions
+			})
+		);
+
+	if (!config.deep) {
+		return new Set(dependencyList);
+	}
+
+	return dependencyList.reduce((acc: Set<string>, dependency: string) => {
+		if (config.init.has(dependency)) {
+			return acc;
+		}
+		acc.add(dependency);
+		getImportsFromPath(dependency, { ...config, init: acc });
+		return acc;
+	}, config.init);
+}
+
+function getSignificantPath(input: string): string[] {
+	const stripped = Path.basename(input, Path.extname(input));
+
+	if (stripped === 'index' || stripped === 'index.d') {
+		return Path.dirname(input)
+			.split(Path.sep)
+			.filter(p => p !== '..');
+	}
+
+	return input.split(Path.sep).filter(p => p !== '..');
+}
+
+// tslint:disable-next-line:no-any
+function getTypingsEntry(pkg: { [key: string]: unknown }): string {
+	if (typeof pkg['alva:typings'] === 'string') {
+		return pkg['alva:typings'] as string;
+	}
+
+	if (typeof pkg.typings === 'string') {
+		return pkg.typings;
+	}
+
+	if (typeof pkg['alva:main'] === 'string') {
+		return setExtname(pkg['alva:main'] as string, '.d.ts');
+	}
+
+	if (typeof pkg.main === 'string') {
+		return setExtname(pkg.main, '.d.ts');
+	}
+
+	return './index.d.ts';
+}
+
+function setExtname(input: string, ext: string): string {
+	const candidate = Path.basename(input, Path.extname(input));
+
+	const basename =
+		Path.extname(candidate) === '.d'
+			? Path.basename(candidate, Path.extname(candidate))
+			: candidate;
+
+	return Path.join(Path.dirname(input), `${basename}${ext}`);
 }

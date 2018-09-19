@@ -66,7 +66,7 @@ There is no such thing as out-dated and static PNG screens, as the current versi
 
 * **Language**: TypeScript
 * **View Library**: React
-* **Styleguide**: [patternplate](https://patternplate.github.io/)
+* Must be a valid NPM package exporting components via a central entry point
 
 > :information_source: We plan to support more technologies and setups in the future.
 
@@ -76,9 +76,9 @@ There is no such thing as out-dated and static PNG screens, as the current versi
 * **Language**: TypeScript
 * **View Library**: React
 
-* Must be a valid `patternplate` pattern (have `demo.tsx`, `pattern.json`)
+* Must be reachable from the central package entry point
 * Must be exported via `export`
-* Must by typed as `React.SFC`, `React.ComponentClass`, `React.PureComponent`, `React.StatelessComponent`, `React.SFC`
+* Must by typed as `React.SFC`, `React.ComponentClass`, `React.PureComponent`, `React.StatelessComponent`, `React.SFC`, `React.ComponentType`
 * Must be built with `declarations`, so a `index.d.ts` is available
 * In order to accept children elements in Alva, the `children` prop has to be typed explicitly
 
@@ -92,13 +92,10 @@ There is no such thing as out-dated and static PNG screens, as the current versi
 
 ### Pattern
 
-* **name**: `pattern.json` `.name` or TSDoc `@name` - Name of pattern in pattern list
-* **description**  `pattern.json` `.description` or TSDoc `@description` - Short description in pattern list
-
 ### Pattern Property
 
 * **name**: TSDoc `@name [name]` - Used in the property pane as input label
-* **default**: TSDoc `@defaul [value]` - Preset value for this property when creating new elements
+* **default**: TSDoc `@default [value]` - Preset value for this property when creating new elements
 * **description**: TSDoc `@description [description]` - Used as help text in property pane
 * **example**: TSDoc `@example [value]` - Example used as input placeholder if applicable
 * **ignore**: TSDoc `@ignore` - Do not show this property

@@ -3,54 +3,62 @@ import styled from 'styled-components';
 import { Color } from '../colors';
 import { getSpace, SpaceSize } from '../space';
 
-const StyledSplashScreen = styled.div`
-	box-sizing: border-box;
-	display: flex;
-	width: 100%;
-	margin-top: -40px;
-	height: 100vh;
+export type SplashScrenType = 'primary' | 'secondary';
+export interface SplashScreenSectionProps {
+	type: SplashScrenType;
+}
+
+interface StyledSectionProps {
+	type: SplashScrenType;
+}
+
+const StyledContainer = styled.div`
+	position: relative;
+	display: grid;
+	grid-template-columns: 50vw 50vw;
+	grid-template-rows: 30vh 70vh;
+	grid-column-gap: ${getSpace(SpaceSize.XL)}px;
 	align-items: stretch;
-	justify-content: center;
-	-webkit-app-region: drag;
 `;
 
-const StyledLeftSection = styled.div`
-	flex-shrink: 0;
-	flex-grow: 0;
-	width: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-`;
-const StyledRightSection = styled.div`
-	flex-shrink: 0;
-	flex-grow: 0;
-	width: 50%;
-	background-color: ${Color.White};
-	display: flex;
-	align-items: center;
-	justify-content: center;
+const StyledSection = styled.div`
+	grid-row-start: 2;
+	justify-self: center;
+	padding: 0 ${getSpace(SpaceSize.XL)}px;
+	${(props: StyledSectionProps) => {
+		switch (props.type) {
+			case 'secondary':
+				return `
+				:after {
+					content: "";
+						position: absolute;
+						top: -40px;
+						left: 0;
+						z-index: -1;
+						width: 100vw;
+						height: calc(100% + 40px);
+						background-color: ${Color.White};
+						transform: translatex(50%);
+					}
+				`;
+			default:
+				return '';
+		}
+	}};
 `;
 
 const StyledBox = styled.div`
 	max-width: 480px;
-	padding: ${getSpace(SpaceSize.XL)}px;
 `;
 
-export interface SplashScreenProps {
-	leftSection?: React.ReactNode;
-	rightSection?: React.ReactNode;
-}
+export const SplashScreenSection: React.SFC<SplashScreenSectionProps> = props => (
+	<StyledSection type={props.type}>
+		<StyledBox>{props.children}</StyledBox>
+	</StyledSection>
+);
 
-export const SplashScreen: React.StatelessComponent<SplashScreenProps> = props => (
-	<StyledSplashScreen>
-		<StyledLeftSection>
-			<StyledBox>{props.leftSection}</StyledBox>
-		</StyledLeftSection>
-		<StyledRightSection>
-			<StyledBox>{props.rightSection}</StyledBox>
-		</StyledRightSection>
-	</StyledSplashScreen>
+export const SplashScreen: React.SFC<{}> = props => (
+	<StyledContainer>{props.children}</StyledContainer>
 );
 
 export default SplashScreen;

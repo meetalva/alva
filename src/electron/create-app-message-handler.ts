@@ -1,4 +1,7 @@
 import * as Electron from 'electron';
+import * as Fs from 'fs';
+import * as Os from 'os';
+import * as Path from 'path';
 import * as Message from '../message';
 import * as Model from '../model';
 import * as uuid from 'uuid';
@@ -144,6 +147,40 @@ export async function createAppMessageHandler(
 					default:
 						return;
 				}
+				break;
+			}
+			case Message.MessageType.ChromeScreenShot: {
+				if (!ctx.win) {
+					return;
+				}
+
+				ctx.win.webContents.printToPDF(
+					{
+						marginsType: 1,
+						printBackground: true,
+						pageSize: {
+							// px => micron
+							width: message.payload.width * 265,
+							height: message.payload.height * 265
+							// tslint:disable-next-line:no-any
+						} as any
+					},
+					(err, data) => {
+						if (err) {
+							return console.error(err.message);
+						}
+
+						const targetPath = Path.join(Os.tmpdir(), `${uuid.v4()}.pdf`);
+
+						Fs.writeFile(targetPath, data, error => {
+							if (error) {
+								return console.error(error);
+							}
+
+							Electron.shell.openExternal(`file://${targetPath}`);
+						});
+					}
+				);
 			}
 		}
 	};

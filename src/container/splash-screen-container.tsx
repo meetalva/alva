@@ -1,15 +1,4 @@
-import {
-	Button,
-	ButtonOrder,
-	Color,
-	Copy,
-	CopySize,
-	Headline,
-	Link,
-	Space,
-	SpaceSize,
-	SplashScreen
-} from '../components';
+import * as Components from '../components';
 import * as React from 'react';
 
 export interface SplashScreenProps {
@@ -20,40 +9,58 @@ export interface SplashScreenProps {
 
 export function SplashScreenContainer(props: SplashScreenProps): JSX.Element {
 	return (
-		<SplashScreen
+		<Components.SplashScreen
 			leftSection={
 				<>
-					<Space sizeBottom={SpaceSize.XXL}>
-						<Headline tagName="h1" type="secondary" textColor={Color.Grey20} order={2}>
+					<Components.Space sizeBottom={Components.SpaceSize.XXL}>
+						<Components.Headline
+							tagName="h1"
+							type="secondary"
+							textColor={Components.Color.Grey20}
+							order={2}
+						>
 							You’re new here?
-						</Headline>
-						<Copy size={CopySize.M}>Get started with our easy-to-learn guides.</Copy>
-					</Space>
-					<Button onClick={props.onGuideClick} order={ButtonOrder.Primary}>
+						</Components.Headline>
+						<Components.Headline type="primary" tagName="div" order={4}>
+							Get started with our easy-to-learn guides.
+						</Components.Headline>
+					</Components.Space>
+					<Components.Button
+						onClick={props.onGuideClick}
+						order={Components.ButtonOrder.Primary}
+					>
 						See Guides
-					</Button>
+					</Components.Button>
 				</>
 			}
 			rightSection={
 				<>
-					<Space sizeBottom={SpaceSize.L}>
-						<Headline type="secondary" tagName="h2" textColor={Color.Grey20} order={3}>
-							Create or Open
-						</Headline>
-					</Space>
-					<Space sizeBottom={SpaceSize.XXXL}>
-						<Copy size={CopySize.M} textColor={Color.Grey20}>
+					<Components.Headline
+						type="secondary"
+						tagName="h2"
+						textColor={Components.Color.Grey20}
+						order={3}
+					>
+						Create or Open
+					</Components.Headline>
+					<Components.Space sizeBottom={Components.SpaceSize.XXXL}>
+						<Components.Copy size={Components.CopySize.M} textColor={Components.Color.Grey20}>
 							Start using an existing Alva file with an included library or create a new one.
-						</Copy>
-					</Space>
-					<Space sizeBottom={SpaceSize.S}>
-						<Button onClick={props.onCreateClick} order={ButtonOrder.Secondary}>
+						</Components.Copy>
+					</Components.Space>
+					<Components.Space sizeBottom={Components.SpaceSize.S}>
+						<Components.Button
+							onClick={props.onCreateClick}
+							order={Components.ButtonOrder.Secondary}
+						>
 							Create New Alva File
-						</Button>
-					</Space>
-					<Link color={Color.Grey50} onClick={props.onOpenClick}>
-						<Copy size={CopySize.S}>Open Existing Alva File</Copy>
-					</Link>
+						</Components.Button>
+					</Components.Space>
+					<Components.Link color={Components.Color.Grey50} onClick={props.onOpenClick}>
+						<Components.Copy size={Components.CopySize.S}>
+							Open Existing Alva File
+						</Components.Copy>
+					</Components.Link>
 				</>
 			}
 		/>

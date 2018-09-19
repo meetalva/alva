@@ -34,6 +34,19 @@ export function startRenderer(): void {
 
 	// tslint:disable-next-line:no-any
 	(window as any).store = store;
+
+	// tslint:disable-next-line:no-any
+	(window as any).screenshot = () => {
+		sender.send({
+			id: uuid.v4(),
+			type: MessageType.ChromeScreenShot,
+			payload: {
+				width: window.innerWidth,
+				height: window.innerHeight
+			}
+		});
+	};
+
 	console.log('Access ViewStore at .store');
 
 	createListeners({ store });

@@ -75,7 +75,8 @@ export enum MessageType {
 	ChangeUserStore = 'user-store-change',
 	SelectElement = 'select-element',
 	HighlightElement = 'highlight-element',
-	WindowClose = 'window-close'
+	WindowClose = 'window-close',
+	ChromeScreenShot = 'chrome-screenshot',
 }
 
 export type Message =
@@ -151,7 +152,8 @@ export type Message =
 	| ChangeUserStore
 	| SelectElement
 	| HighlightElement
-	| WindowClose;
+	| WindowClose
+	| ChromeScreenShot;
 
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
 export type AppLoaded = EmptyEnvelope<MessageType.AppLoaded>;
@@ -422,3 +424,10 @@ export type MobxAddMessage = Envelope<MessageType.MobxAdd, MobxAddPayload>;
 export type MobxDeleteMessage = Envelope<MessageType.MobxDelete, MobxDeletePayload>;
 export type MobxSpliceMessage = Envelope<MessageType.MobxSplice, MobxSplicePayload>;
 export type WindowClose = EmptyEnvelope<MessageType.WindowClose>;
+export type ChromeScreenShot = Envelope<
+	MessageType.ChromeScreenShot,
+	{
+		width: number;
+		height: number;
+	}
+>;

@@ -25,8 +25,8 @@ export class PropertiesSwitch extends React.Component {
 					onClick={() => app.setRightSidebarTab(Types.RightSidebarTab.Properties)}
 				/>
 				<Components.TabSwitch
-					label="Project Settings"
-					title="Show Project Settings"
+					label="Libraries"
+					title="Show Libraries"
 					type={Components.TabSwitchType.Tab}
 					active={
 						app.getRightSidebarTab() === Types.RightSidebarTab.ProjectSettings

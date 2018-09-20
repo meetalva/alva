@@ -21,7 +21,8 @@ export function createAppMenu(
 		role: 'app',
 		submenu: [
 			{
-				label: 'About Alva'
+				label: 'About Alva',
+				role: 'about'
 			},
 			{
 				label: 'Check for Updates',

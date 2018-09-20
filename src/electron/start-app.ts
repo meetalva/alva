@@ -68,23 +68,33 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 
 	server.on('client-message', e => sender.send(e));
 
+	let openFileViaAppStartMessage = true;
+
 	Mobx.reaction(
 		() => ctx.fileToOpen,
-		() => {
-			if (!ctx.fileToOpen) {
+		async () => {
+			const lastOpenedFile = await ephemeralStore.getProjectPath();
+			const fileToOpen = ctx.fileToOpen || lastOpenedFile;
+
+			if (!fileToOpen) {
 				return;
 			}
 
 			// TODO: Move check to persistence.read and return appropriate error message.
-			if (!Fs.existsSync(ctx.fileToOpen)) {
+			if (!Fs.existsSync(fileToOpen)) {
 				return;
 			}
 
-			sender.send({
-				id: uuid.v4(),
-				type: Message.MessageType.OpenFileRequest,
-				payload: { path: ctx.fileToOpen }
-			});
+			if (openFileViaAppStartMessage) {
+				await ephemeralStore.setProjectPath(fileToOpen);
+				openFileViaAppStartMessage = false;
+			} else {
+				sender.send({
+					id: uuid.v4(),
+					type: Message.MessageType.OpenFileRequest,
+					payload: { path: fileToOpen }
+				});
+			}
 		},
 		{
 			fireImmediately: true

@@ -8,6 +8,7 @@ import * as getPort from 'get-port';
 import * as Message from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
+import * as Fs from 'fs';
 import { Sender } from '../sender/server';
 import { showMainMenu } from './show-main-menu';
 import { createServer } from '../server';
@@ -71,6 +72,11 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 		() => ctx.fileToOpen,
 		() => {
 			if (!ctx.fileToOpen) {
+				return;
+			}
+
+			// TODO: Move check to persistence.read and return appropriate error message.
+			if (!Fs.existsSync(ctx.fileToOpen)) {
 				return;
 			}
 

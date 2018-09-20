@@ -49,6 +49,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 			id: langEnumId,
 			inputType: Types.PatternPropertyInputType.Select,
 			label: 'Language',
+			description: 'Define in which language your website is.',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			options,
 			propertyName: 'lang',

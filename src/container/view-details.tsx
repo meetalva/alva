@@ -122,7 +122,7 @@ export class ViewDetails extends React.Component {
 									props.store.getSender().send({
 										type: MessageType.OpenExternalURL,
 										id: uuid.v4(),
-										payload: 'http://meetalva.github.io/example/example.alva'
+										payload: 'https://media.meetalva.io/file/Website.alva'
 									})
 								}
 							/>

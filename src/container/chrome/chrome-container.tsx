@@ -61,6 +61,19 @@ export const ChromeContainer = MobxReact.inject('store')(
 				</ViewSwitch>
 				<div style={{ display: 'flex', justifySelf: 'right', alignItems: 'center' }}>
 					<ChromeButton
+						title="Help"
+						onClick={() => {
+							props.store.getSender().send({
+								type: MessageType.OpenExternalURL,
+								id: uuid.v4(),
+								payload: 'https://meetalva.io/doc/docs/start'
+							});
+						}}
+						onDoubleClick={event => {
+							event.stopPropagation();
+						}}
+					/>
+					<ChromeButton
 						title="Found a Bug?"
 						onClick={() => {
 							props.store.getSender().send({

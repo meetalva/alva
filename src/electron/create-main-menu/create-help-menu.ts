@@ -7,16 +7,27 @@ export function createHelpMenu(ctx: MainMenuContext): Electron.MenuItemConstruct
 		role: 'help',
 		submenu: [
 			{
-				label: '&Github'
+				label: '&Help and Getting Started',
+				click: () => {
+					Electron.shell.openExternal(
+						'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
+					);
+				}
 			},
 			{
-				label: '&Quickstart'
+				label: '&Github',
+				click: () => {
+					Electron.shell.openExternal('https://github.com/meetalva/alva');
+				}
 			},
 			{
-				label: '&Feedback'
+				label: '&Feedback: hey@meetalva.io',
+				click: () => {
+					Electron.shell.openExternal('mailto:hey@meetalva.io');
+				}
 			},
 			{
-				label: '&Learn More',
+				label: '&Alva Website',
 				click: () => {
 					Electron.shell.openExternal('https://meetalva.io/');
 				}

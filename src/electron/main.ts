@@ -17,10 +17,16 @@ const CONTEXT: AppContext = Mobx.observable({
 	sender: undefined,
 	win: undefined,
 	hot: undefined,
-	middlewares: []
+	middlewares: [],
+	fileToOpen: undefined
 });
 
 async function main(): Promise<void> {
+	if (process.argv.length > 1) {
+		const fileToOpenArg = process.argv[1];
+		CONTEXT.fileToOpen = fileToOpenArg;
+	}
+
 	const args = yargsParser(process.argv.slice(2));
 	CONTEXT.hot = args.hot || false;
 	CONTEXT.base = args.base || '';
@@ -66,6 +72,16 @@ async function main(): Promise<void> {
 		await main();
 	});
 }
+
+Electron.app.on('open-file', async (event, path) => {
+	event.preventDefault();
+
+	if (!path) {
+		return;
+	}
+
+	CONTEXT.fileToOpen = path;
+});
 
 Electron.app.on('ready', main);
 

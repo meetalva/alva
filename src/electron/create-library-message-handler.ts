@@ -71,7 +71,7 @@ export async function createLibraryMessageHandler(
 				}
 
 				const paths = await showOpenDialog({
-					title: 'Connnect Pattern Library',
+					title: 'Connect Pattern Library',
 					message:
 						'Select a package.json file in the root of a library you want to connect to Alva',
 					properties: ['openFile'],
@@ -231,7 +231,7 @@ function showAnalysisError(error: Error): void {
 
 	Electron.dialog.showMessageBox(
 		{
-			message: 'Sorry, this seems to be an uncompatible library.',
+			message: 'Sorry, this seems to be an incompatible library.',
 			detail: 'Learn more about supported component libraries on github.com/meetalva',
 			buttons: ['OK', 'Learn more', 'Report a Bug']
 		},

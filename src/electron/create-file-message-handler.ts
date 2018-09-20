@@ -29,7 +29,7 @@ export async function createFileMessageHandler(
 		switch (message.type) {
 			case Message.MessageType.CreateNewFileRequest: {
 				// Prompt the user to save if there has been a project previously
-				if (ctx.project) {
+				if (ctx.project && ctx.project.getDraft()) {
 					const discardResult = await showDiscardDialog(ctx.project);
 
 					if (discardResult === DiscardDialogResult.Save) {
@@ -45,6 +45,10 @@ export async function createFileMessageHandler(
 						if (saveResult.payload.result === Types.PersistenceState.Error) {
 							return showError(saveResult.payload.result.error);
 						}
+					}
+
+					if (discardResult === DiscardDialogResult.Cancel) {
+						return;
 					}
 				}
 

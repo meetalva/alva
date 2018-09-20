@@ -17,7 +17,8 @@ const CONTEXT: AppContext = Mobx.observable({
 	sender: undefined,
 	win: undefined,
 	hot: undefined,
-	middlewares: []
+	middlewares: [],
+	fileToOpen: undefined
 });
 
 async function main(): Promise<void> {
@@ -66,6 +67,16 @@ async function main(): Promise<void> {
 		await main();
 	});
 }
+
+Electron.app.on('open-file', async (event, path) => {
+	event.preventDefault();
+
+	if (!path) {
+		return;
+	}
+
+	CONTEXT.fileToOpen = path;
+});
 
 Electron.app.on('ready', main);
 

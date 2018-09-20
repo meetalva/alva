@@ -26,6 +26,7 @@ export interface AppContext {
 	sender: undefined | Sender;
 	win: undefined | Electron.BrowserWindow;
 	middlewares: Express.RequestHandler[];
+	fileToOpen: string | undefined;
 }
 
 export async function startApp(ctx: AppContext): Promise<{ emitter: Events.EventEmitter }> {
@@ -66,6 +67,24 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 
 	server.on('client-message', e => sender.send(e));
 
+	Mobx.reaction(
+		() => ctx.fileToOpen,
+		() => {
+			if (!ctx.fileToOpen) {
+				return;
+			}
+
+			sender.send({
+				id: uuid.v4(),
+				type: Message.MessageType.OpenFileRequest,
+				payload: { path: ctx.fileToOpen }
+			});
+		},
+		{
+			fireImmediately: true
+		}
+	);
+
 	const onClose = e => {
 		e.preventDefault();
 		sender.send({
@@ -74,22 +93,6 @@ export async function startApp(ctx: AppContext): Promise<{ emitter: Events.Event
 			payload: undefined
 		});
 	};
-
-	Electron.app.on('will-finish-launching', () => {
-		Electron.app.on('open-file', async (event, path) => {
-			event.preventDefault();
-
-			if (!path) {
-				return;
-			}
-
-			sender.send({
-				id: uuid.v4(),
-				type: Message.MessageType.OpenFileRequest,
-				payload: { path }
-			});
-		});
-	});
 
 	Electron.app.on('before-quit', async () => {
 		await Mobx.when(() => typeof ctx.project === 'undefined');

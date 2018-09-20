@@ -20,7 +20,6 @@ const StyledPropertyBox = styled.div`
 	user-select: none;
 	cursor: default;
 	margin-bottom: ${getSpace(SpaceSize.S)}px;
-	overflow: hidden;
 `;
 
 const StyledPropertyBoxBar = styled.div`

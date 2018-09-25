@@ -22,12 +22,13 @@ const CONTEXT: AppContext = Mobx.observable({
 });
 
 async function main(): Promise<void> {
-	if (process.argv.length > 1) {
-		const fileToOpenArg = process.argv[1];
-		CONTEXT.fileToOpen = fileToOpenArg;
+	const args = yargsParser(process.argv.slice(2));
+	const fileToOpen = args._.length > 0 ? args._[0] : '';
+
+	if (fileToOpen && Path.extname(fileToOpen) === '.alva') {
+		CONTEXT.fileToOpen = fileToOpen;
 	}
 
-	const args = yargsParser(process.argv.slice(2));
 	CONTEXT.hot = args.hot || false;
 	CONTEXT.base = args.base || '';
 

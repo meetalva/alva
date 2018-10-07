@@ -29,8 +29,8 @@ See the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) for more info
 
 * bugs / feature requests: https://github.com/meetalva/alva/issues
 * website: https://meetalva.io
-* sprint board: https://github.com/meetalva/alva/projects/2
-* backlog board: https://github.com/meetalva/alva/projects/3
+* sprint board: https://github.com/meetalva/alva/projects/6
+* roadmap: https://github.com/meetalva/alva/projects/7
 
 ## Setup for contributors
 

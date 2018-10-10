@@ -46,6 +46,10 @@ export async function createWindow(ctx: { port: number }): Promise<ElectronWindo
 		e.preventDefault();
 	});
 
+	win.webContents.on('new-window', e => {
+		e.preventDefault();
+	});
+
 	// Install development tools in dev mode
 	if (electronIsDev) {
 		require('devtron').install();

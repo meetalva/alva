@@ -695,7 +695,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public removePage(page: Model.Page): void {
-		const index = this.project.getPageIndex(page);
+		const index = page.getIndex();
 
 		if (this.project.getPages().length > 1) {
 			if (index !== 0) {

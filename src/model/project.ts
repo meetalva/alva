@@ -383,7 +383,7 @@ export class Project {
 			return;
 		}
 
-		const nextIndex = this.getPageIndex(page) + 1;
+		const nextIndex = page.getIndex() + 1;
 
 		if (typeof nextIndex !== 'number' || Number.isNaN(nextIndex)) {
 			return;
@@ -452,10 +452,6 @@ export class Project {
 		return this.pages.find(page => page.getId() === id);
 	}
 
-	public getPageIndex(page: Page): number {
-		return this.pages.indexOf(page);
-	}
-
 	public getPages(): Page[] {
 		return this.pages;
 	}
@@ -503,7 +499,7 @@ export class Project {
 			return;
 		}
 
-		const previousIndex = this.getPageIndex(page) - 1;
+		const previousIndex = page.getIndex() - 1;
 
 		if (typeof previousIndex !== 'number' || Number.isNaN(previousIndex)) {
 			return;
@@ -564,20 +560,28 @@ export class Project {
 
 	@Mobx.action
 	public movePageAfter(opts: { page: Page; targetPage: Page }): void {
-		const targetAvailable = this.pages.some(p => p.getId() === opts.targetPage.getId());
+		this.movePage({ ...opts, offset: 1 });
+	}
 
-		if (!targetAvailable) {
+	@Mobx.action
+	public movePageBefore(opts: { page: Page; targetPage: Page }): void {
+		this.movePage({ ...opts, offset: 0 });
+	}
+
+	@Mobx.action
+	public movePage(opts: { page: Page; targetPage: Page; offset: number }): void {
+		const targetAvailable = this.pages.some(p => p.getId() === opts.targetPage.getId());
+		const pageAvailable = this.pages.some(p => p.getId() === opts.page.getId());
+
+		if (!targetAvailable || !pageAvailable) {
 			return;
 		}
 
 		const index = this.pages.findIndex(p => opts.page.getId() === p.getId());
-
-		if (index > -1) {
-			this.pages.splice(index, 1);
-		}
+		this.pageList.splice(index, 1);
 
 		const targetIndex = this.pages.findIndex(p => opts.targetPage.getId() === p.getId());
-		this.pages.splice(targetIndex + 1, 0, opts.page);
+		this.pageList.splice(targetIndex + opts.offset, 0, opts.page.getId());
 	}
 
 	@Mobx.action
@@ -675,8 +679,7 @@ export class Project {
 			return false;
 		}
 
-		const pageIndex = this.getPageIndex(page);
-		this.pageList.splice(pageIndex, 1);
+		this.pageList.splice(page.getIndex(), 1);
 
 		this.pageList.splice(position, 0, page.getId());
 		return true;

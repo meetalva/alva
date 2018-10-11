@@ -41,8 +41,6 @@ export class Page {
 	@Mobx.observable private name: string = 'Page';
 	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Editable;
 
-	// @Mobx.observable public isdroppable: boolean = false;
-
 	/**
 	 * UI property flags to highlight the area
 	 * where the page can be dropped.
@@ -228,6 +226,10 @@ export class Page {
 		return this.id;
 	}
 
+	public getIndex(): number {
+		return this.project.getPages().indexOf(this);
+	}
+
 	public getName(options?: { unedited: boolean }): string {
 		if ((!options || !options.unedited) && this.nameState === Types.EditableTitleState.Editing) {
 			return this.editedName;
@@ -258,22 +260,14 @@ export class Page {
 		this.active = active;
 	}
 
-	/**
-	 * Sets the value of the current state for
-	 * the back page droppable area.
-	 */
 	@Mobx.action
-	public setDroppableBackState(isdroppable: boolean): void {
-		this.droppablePageIndex.back = isdroppable;
+	public setDroppableBackState(droppable: boolean): void {
+		this.droppablePageIndex.back = droppable;
 	}
 
-	/**
-	 * Sets the value of the current state for
-	 * the next page droppable area.
-	 */
 	@Mobx.action
-	public setDroppableNextState(isdroppable: boolean): void {
-		this.droppablePageIndex.next = isdroppable;
+	public setDroppableNextState(droppable: boolean): void {
+		this.droppablePageIndex.next = droppable;
 	}
 
 	@Mobx.action

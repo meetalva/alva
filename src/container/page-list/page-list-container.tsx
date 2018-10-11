@@ -15,9 +15,7 @@ import * as utils from '../../alva-util';
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PageListContainer extends React.Component {
-	private dropTargetIndex: number;
-	private draggedIndex: number;
-	private draggedPage: Page;
+	private draggedPage?: Page;
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
@@ -28,48 +26,60 @@ export class PageListContainer extends React.Component {
 		}
 
 		this.draggedPage = draggedPage;
-		this.draggedIndex = store.getProject().getPageIndex(draggedPage);
 		e.dataTransfer.effectAllowed = 'copy';
 	}
 
 	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const validDropTarget = utils.pageFromTarget(e.target, store);
+
 		if (!validDropTarget) {
 			e.preventDefault();
 			return;
 		}
+
 		validDropTarget.setDroppableBackState(false);
 		validDropTarget.setDroppableNextState(false);
 	}
 
 	private handleDragOver(e: React.DragEvent<HTMLElement>): void {
-		const { store } = this.props as { store: Store.ViewStore };
-		const validDropTarget = utils.pageFromTarget(e.target, store);
+		e.preventDefault();
 
-		if (!validDropTarget) {
-			e.preventDefault();
+		const { store } = this.props as { store: Store.ViewStore };
+		const dropTarget = utils.pageFromTarget(e.target, store);
+
+		if (!dropTarget || !this.draggedPage) {
 			return;
 		}
-		this.dropTargetIndex = store.getProject().getPageIndex(validDropTarget);
-		if (this.draggedIndex >= this.dropTargetIndex) {
-			validDropTarget.setDroppableBackState(true);
-		} else {
-			validDropTarget.setDroppableNextState(true);
-		}
 
-		e.dataTransfer.dropEffect = 'copy';
+		if (this.draggedPage.getIndex() > dropTarget.getIndex()) {
+			dropTarget.setDroppableBackState(true);
+			e.dataTransfer.dropEffect = 'copy';
+		} else if (this.draggedPage.getIndex() < dropTarget.getIndex()) {
+			dropTarget.setDroppableNextState(true);
+			e.dataTransfer.dropEffect = 'copy';
+		}
 	}
 
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const project = store.getProject();
+		const dropTarget = utils.pageFromTarget(e.target, store);
 
-		project.getPages().forEach((page: Page) => {
-			page.setDroppableBackState(false);
-			page.setDroppableNextState(false);
-		});
-		project.reArrangePagesIndex(this.dropTargetIndex, this.draggedPage);
+		if (!dropTarget || !this.draggedPage) {
+			this.draggedPage = undefined;
+			e.preventDefault();
+			return;
+		}
+
+		if (dropTarget.getPageDropState().next) {
+			project.movePageAfter({ page: this.draggedPage, targetPage: dropTarget });
+			dropTarget.setDroppableNextState(false);
+		} else if (dropTarget.getPageDropState().back) {
+			project.movePageBefore({ page: this.draggedPage, targetPage: dropTarget });
+			dropTarget.setDroppableBackState(false);
+		}
+
 		store.commit();
 	}
 

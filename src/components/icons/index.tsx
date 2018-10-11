@@ -90,7 +90,7 @@ const icons: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
 export const Images: { readonly [key: string]: JSX.Element[][] | JSX.Element[] } = {
 	EmptyElements: [
 		[
-			<svg width="66" height="65">
+			<svg width="66" height="65" key="EmptyElements">
 				<defs>
 					<rect id="b" width="60" height="22" rx="3" />
 					<filter
@@ -113,7 +113,7 @@ export const Images: { readonly [key: string]: JSX.Element[][] | JSX.Element[] }
 						/>
 					</filter>
 				</defs>
-				<g fill="none" fill-rule="evenodd">
+				<g fill="none" fillRule="evenodd">
 					<path
 						d="M37.44.36l-8.43 5.48 7.76 4.56.67-10.04zm-5.5 32.6c-1.74-7.89-1.05-17.85 1.67-25.1l-.93-.35c-2.8 7.43-3.5 17.6-1.7 25.67l.97-.21z"
 						fill="#000"

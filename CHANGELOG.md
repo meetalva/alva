@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.8.1"></a>
+## [0.8.1](https://github.com/meetalva/alva/compare/v0.8.0...v0.8.1) (2018-10-25)
+
+
+### Bug Fixes
+
+* correct user visible spelling errors ([27d59a4](https://github.com/meetalva/alva/commit/27d59a4))
+* **menu:** readd the function to open the programm info window with `About Alva` ([bd0cf5e](https://github.com/meetalva/alva/commit/bd0cf5e))
+* do not open main file in development ([#629](https://github.com/meetalva/alva/issues/629)) ([f9a7509](https://github.com/meetalva/alva/commit/f9a7509))
+* honor back/next state on page drops correctly ([#636](https://github.com/meetalva/alva/issues/636)) ([aa67120](https://github.com/meetalva/alva/commit/aa67120))
+* prevent new windows from user interactions ([6dfe0ab](https://github.com/meetalva/alva/commit/6dfe0ab))
+* silence some dev warnings ([#635](https://github.com/meetalva/alva/issues/635)) ([a7e70af](https://github.com/meetalva/alva/commit/a7e70af))
+
+
+
 <a name="0.8.0"></a>
 # [0.8.0](https://github.com/meetalva/alva/compare/v0.6.0...v0.8.0) (2018-09-20)
 

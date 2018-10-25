@@ -1,6 +1,6 @@
 {
   "name": "meetalva",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
   "main": "./build/electron/main.js",
   "scripts": {

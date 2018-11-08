@@ -10,17 +10,22 @@ import opn = require('opn');
 export class NodeHost implements Types.Host {
 	public type = Types.HostType.Node;
 
+	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
 
-	public static async fromProcess(process: NodeJS.Process): Promise<NodeHost> {
+	public static async fromProcess(
+		process: NodeJS.Process,
+		forced?: Partial<Types.HostFlags>
+	): Promise<NodeHost> {
 		const host = new NodeHost();
 		host.process = process;
+		host.forced = forced;
 		return host;
 	}
 
 	public async getFlags(): Promise<Types.HostFlags> {
 		const yargsParser = require('yargs-parser');
-		return yargsParser(this.process.argv.slice(2));
+		return { ...yargsParser(this.process.argv.slice(2)), ...this.forced };
 	}
 
 	public async getPort(requested: number): Promise<number> {

@@ -1,8 +1,5 @@
 import * as React from 'react';
 import * as MobxReact from 'mobx-react';
-import * as uuid from 'uuid';
-
-import { MessageType } from '../../message';
 import { PageTileContainer } from './page-tile-container';
 import { Page } from '../../model/page';
 import * as Components from '../../components';
@@ -125,16 +122,7 @@ export class PageListContainer extends React.Component {
 								page={page}
 							/>
 						))}
-					<Components.AddButton
-						margin={true}
-						onClick={() =>
-							store.getSender().send({
-								id: uuid.v4(),
-								payload: undefined,
-								type: MessageType.CreateNewPage
-							})
-						}
-					>
+					<Components.AddButton margin={true} onClick={() => store.executePageAddNew()}>
 						Add Page
 					</Components.AddButton>
 				</Components.Layout>

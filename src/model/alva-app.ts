@@ -17,6 +17,8 @@ export class AlvaApp {
 	public readonly model = Types.ModelName.AlvaApp;
 	private id: string = uuid.v4();
 
+	@Mobx.observable private hostType: Types.HostType;
+
 	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
 	@Mobx.observable private hoverArea: Types.HoverArea = Types.HoverArea.Chrome;
 	@Mobx.observable private paneSelectOpen: boolean = false;
@@ -70,8 +72,20 @@ export class AlvaApp {
 		return this.activeView;
 	}
 
+	public isActiveView(candidateView: Types.AlvaView): boolean {
+		return this.activeView === candidateView;
+	}
+
 	public getHasFocusedInput(): boolean {
 		return this.hasFocusedInput;
+	}
+
+	public getHostType(): Types.HostType {
+		return this.hostType;
+	}
+
+	public isHostType(candidateType: Types.HostType): boolean {
+		return this.hostType === candidateType;
 	}
 
 	public getHoverArea(): Types.HoverArea {
@@ -118,6 +132,11 @@ export class AlvaApp {
 	@Mobx.action
 	public setHasFocusedInput(hasFocusedInput: boolean): void {
 		this.hasFocusedInput = hasFocusedInput;
+	}
+
+	@Mobx.action
+	public setHostType(hostType: Types.HostType): void {
+		this.hostType = hostType;
 	}
 
 	@Mobx.action

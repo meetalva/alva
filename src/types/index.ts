@@ -5,3 +5,6 @@ export * from './pattern-property';
 export * from './types';
 export * from './user-store';
 export * from './persistence';
+export * from './hosts';
+export * from './server';
+export * from './sender';

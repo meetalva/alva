@@ -1,125 +1,128 @@
-import { createRendererRoute } from './create-renderer-route';
-import { createConnectionHandler } from './create-connection-handler';
-import { createLibrariesRoute } from './create-libraries-route';
-import { createPreviewRoute } from './create-preview-route';
-import { createScreenshotRoute } from './create-screenshot-route';
-import { createScriptsRoute } from './create-scripts-route';
-import { createSketchRoute } from './create-sketch-route';
-import { createStaticRoute } from './create-static-route';
-import { createServerMessageHandler } from './create-server-message-handler';
-import { EventEmitter } from 'events';
+// tslint:disable:no-non-null-assertion
+// tslint:disable:no-duplicate-imports
 import * as express from 'express';
 import * as Http from 'http';
-import * as Message from '../message';
-import * as Model from '../model';
+import * as Util from 'util';
 import * as WS from 'ws';
-import { isMessage } from '../sender/is-message';
-import { Sender } from '../sender/server';
+import * as Routes from './routes';
+import * as Sender from '../sender';
+import { MessageType as M } from '../message';
+import * as Matchers from './matchers';
+import * as Types from '../types';
 
-export interface AppContext {
-	base: undefined | string;
-	hot: undefined | boolean;
-	project: undefined | Model.Project;
-	port: undefined | number;
-	sender: undefined | Sender;
-	win: undefined | unknown;
-	middlewares: express.RequestHandler[];
-}
-
-export interface ServerOptions {
-	context: AppContext;
-	port: number;
-	sender: Sender;
-}
-
-export interface AlvaServerInit {
-	options: ServerOptions;
-	server: Http.Server;
+interface AlvaServerInit {
 	app: express.Express;
-	webSocketServer: WS.Server;
+	host: Types.Host;
+	dataHost: Types.DataHost;
+	http: Http.Server;
+	ws: WS.Server;
+	options: {
+		port: number;
+	};
 }
 
-export class AlvaServer extends EventEmitter {
-	private options: ServerOptions;
+export class AlvaServer implements Types.AlvaServer {
 	private app: express.Express;
-	private server: Http.Server;
-	private webSocketServer: WS.Server;
+	private http: Http.Server;
+	private ws: WS.Server;
+	public readonly dataHost: Types.DataHost;
+	public readonly host: Types.Host;
+	public readonly sender: Sender.Sender;
+	public readonly port: number;
 
-	public constructor(init: AlvaServerInit) {
-		super();
-		this.app = init.app;
-		this.options = init.options;
-		this.server = init.server;
-		this.webSocketServer = init.webSocketServer;
-
-		this.options.context.middlewares.forEach(middleware => this.app.use(middleware));
-
-		this.app.get('/', createRendererRoute(this.options.context));
-		this.app.get('/preview.html', createPreviewRoute(this.options.context));
-		this.app.use('/static', createStaticRoute(this.options.context));
-
-		this.app.use(
-			'/sketch',
-			createSketchRoute({
-				previewLocation: `http://localhost:${this.options.port}/sketch`,
-				context: this.options.context
-			})
-		);
-
-		this.app.use(
-			'/screenshots',
-			createScreenshotRoute({
-				previewLocation: `http://localhost:${this.options.port}/static`,
-				context: this.options.context
-			})
-		);
-
-		this.app.use('/scripts', createScriptsRoute());
-		this.app.use('/libraries', createLibrariesRoute(this.options.context));
-
-		this.webSocketServer.on('connection', createConnectionHandler({ emitter: this }));
-		this.on('message', createServerMessageHandler({ webSocketServer: this.webSocketServer }));
+	public get address(): string {
+		return `http://localhost:${this.port}/`;
 	}
 
-	public start(): Promise<void> {
-		return new Promise((resolve, reject) => {
-			this.server.once('error', reject);
-			this.server.listen(this.options.port, 'localhost', () => resolve());
+	public get endpoint(): string {
+		return `ws://localhost:${this.port}/`;
+	}
+
+	private constructor(init: AlvaServerInit) {
+		this.app = init.app;
+		this.http = init.http;
+		this.ws = init.ws;
+		this.port = init.options.port;
+
+		this.sender = new Sender.Sender({
+			autostart: false,
+			endpoint: this.endpoint
 		});
+
+		this.host = init.host;
+		this.dataHost = init.dataHost;
+
+		this.ws.on('connection', connection => {
+			connection.on('message', envelope => {
+				this.ws.clients.forEach(client => {
+					if (client !== connection) {
+						client.send(envelope);
+					}
+				});
+			});
+		});
+
+		/** Splash view, recent project list */
+		this.app.get('/', Routes.mainRouteFactory(this));
+
+		/** Project preview view */
+		this.app.get('/preview/:id', Routes.previewRouteFactory(this));
+
+		/** Project edit view */
+		this.app.get('/project/:id', Routes.projectRouteFactory(this));
+
+		/** Scripts required for client side application */
+		this.app.get('/scripts/*', Routes.scriptsRouteFactory(this));
+
+		this.sender.match(M.CreateNewFileRequest, Matchers.createNewFileRequest(this));
+		this.sender.match(M.OpenExternalURL, Matchers.openExternalUrl(this));
+		this.sender.match(M.OpenFileRequest, Matchers.openFileRequest(this));
+	}
+
+	public static async fromHosts({
+		host,
+		dataHost
+	}: {
+		host: Types.Host;
+		dataHost: Types.DataHost;
+	}): Promise<AlvaServer> {
+		const flags = await host.getFlags();
+		const port = await host.getPort(flags.port);
+
+		const app = express();
+		const http = Http.createServer(app);
+		const ws = new WS.Server({ server: http });
+
+		return new AlvaServer({
+			app,
+			host,
+			dataHost,
+			http,
+			ws,
+			options: { port }
+		});
+	}
+
+	public async start(): Promise<void> {
+		const listen = Util.promisify(this.http.listen.bind(this.http));
+
+		this.host.log(`Starting Alva server on port ${this.port}..`);
+		await listen(this.port, 'localhost');
+
+		await this.sender.start();
+		this.host.log(`Started Alva server on ${this.address}.`);
 	}
 
 	public stop(): Promise<void> {
-		return new Promise(resolve => this.server.close(resolve));
+		this.host.log(`Stopping Alva server on ${this.address}.`);
+
+		return new Promise(resolve =>
+			this.ws.close(() => {
+				this.http.close(() => {
+					this.host.log(`Stopped Alva server on ${this.address}.`);
+					resolve();
+				});
+			})
+		);
 	}
-
-	public emit(name: 'client-message' | 'message', message: Message.Message): boolean {
-		if (!isMessage(message)) {
-			return false;
-		}
-
-		return super.emit(name, message);
-	}
-
-	public on(name: 'client-message' | 'message', handler: (e: Message.Message) => void): this {
-		// tslint:disable-next-line:no-any
-		super.on(name, (message: any) => {
-			if (!isMessage(message)) {
-				return;
-			}
-			handler(message);
-		});
-		return this;
-	}
-}
-
-export function createServer(options: ServerOptions): AlvaServer {
-	const app = express();
-	const server = Http.createServer(app);
-
-	return new AlvaServer({
-		options,
-		app,
-		server,
-		webSocketServer: new WS.Server({ server })
-	});
 }

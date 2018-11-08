@@ -1,11 +1,11 @@
 import * as Express from 'express';
 import * as Path from 'path';
 import * as PreviewDocument from '../preview-document';
-import { Sender } from '../sender/server';
+import { Sender } from '../sender';
 import * as Model from '../model';
 
 export interface StaticRouteOptions {
-	project: Model.Project | undefined;
+	projects: Map<string, Model.Project>;
 	sender: Sender | undefined;
 }
 
@@ -13,12 +13,13 @@ export function createStaticRoute(options: StaticRouteOptions): Express.RequestH
 	return async function staticRoute(req: Express.Request, res: Express.Response): Promise<void> {
 		res.type('html');
 
-		if (!options.project) {
-			res.send(404);
+		const project = options.projects.get(req.params.id);
+
+		if (!project) {
+			res.sendStatus(404);
 			return;
 		}
 
-		const project = options.project;
 		const firstPage = project.getPages()[0];
 
 		const id = Path.basename(req.path, Path.extname(req.path));

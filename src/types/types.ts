@@ -1,7 +1,6 @@
 import * as PatternProperty from './pattern-property';
 import * as SerializedModel from './serialized-model';
 import * as UserStore from './user-store';
-import * as Message from '../message';
 
 export enum AppState {
 	Starting = 'starting',
@@ -344,13 +343,6 @@ declare class ModelSurface {
 }
 
 export { ModelSurface };
-
-export interface Sender {
-	match<T extends Message.Message>(
-		type: Message.Message['type'],
-		handler: (message: T) => void
-	): Promise<void>;
-}
 
 export enum ActionName {
 	MatchHighlightedElement = 'MatchHighlightedElement',

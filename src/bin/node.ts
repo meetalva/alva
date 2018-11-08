@@ -7,10 +7,14 @@ const importFresh = require('import-fresh');
 const clearModule = require('clear-module');
 const serverPath = require.resolve('../server');
 
-async function main(): Promise<void> {
+export interface ForcedFlags {
+	port?: number;
+}
+
+async function main(forced?: ForcedFlags): Promise<void> {
 	const AlvaServer = importFresh(serverPath).AlvaServer as typeof Server.AlvaServer;
 
-	const nodeHost = await Hosts.NodeHost.fromProcess(process);
+	const nodeHost = await Hosts.NodeHost.fromProcess(process, forced);
 	const localDataHost = await Hosts.LocalDataHost.fromHost(nodeHost);
 
 	const alvaServer = await AlvaServer.fromHosts({
@@ -23,13 +27,14 @@ async function main(): Promise<void> {
 	const restarter = await Hosts.RestartListener.fromProcess(process);
 
 	const onRestart = async () => {
+		const port = alvaServer.port;
 		await alvaServer.stop();
 
 		const sourceDirectory = await nodeHost.resolveFrom(Types.HostBase.Source, '.');
 		clearModule.match(new RegExp(`^${sourceDirectory}`));
 
 		restarter.unsubscribe();
-		await main();
+		await main({ port });
 	};
 
 	restarter.subscribe(onRestart);

@@ -55,7 +55,7 @@ export const Conditional = (context: BuiltInContext): BuiltInResult => {
 		pattern: new Pattern(
 			{
 				contextId: PATTERN_CONTEXT_ID,
-				description: 'for conditional rendering',
+				description: 'for Show and Hide Logic',
 				exportName: 'default',
 				id: patternId,
 				name: 'Conditional',

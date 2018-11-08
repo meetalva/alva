@@ -8,6 +8,7 @@ import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
 import { LogOut } from 'react-feather';
+import * as Types from '../../types';
 
 export interface InjectedChromeContainerProps {
 	page: Page;
@@ -17,9 +18,10 @@ export interface InjectedChromeContainerProps {
 export const ChromeContainer = MobxReact.inject('store')(
 	MobxReact.observer((props): JSX.Element | null => {
 		const { store } = props as InjectedChromeContainerProps;
+		const app = store.getApp();
 		const project = store.getProject();
 
-		if (!project) {
+		if (!project || app.getActiveView() !== Types.AlvaView.PageDetail) {
 			return null;
 		}
 

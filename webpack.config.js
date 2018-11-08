@@ -10,7 +10,7 @@ module.exports = {
 		previewRenderer: require.resolve('./src/preview-renderer/index.ts'),
 		renderer: [
 			require.resolve('./src/renderer/index.tsx'),
-			'webpack-hot-middleware/client'
+			// 'webpack-hot-middleware/client'
 		],
 		Mobx: require.resolve('mobx')
 	},
@@ -33,7 +33,7 @@ module.exports = {
 		extensions: ['.ts', '.tsx', '.js']
 	},
 	plugins: [
-		new webpack.HotModuleReplacementPlugin(),
+		// new webpack.HotModuleReplacementPlugin(),
 		new MonacoWebpackPlugin({
 			languages: ['typescript'],
 			output: '/scripts/'

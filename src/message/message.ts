@@ -75,8 +75,9 @@ export enum MessageType {
 	ChangeUserStore = 'user-store-change',
 	SelectElement = 'select-element',
 	HighlightElement = 'highlight-element',
+	WindowOpen = 'window-open',
 	WindowClose = 'window-close',
-	ChromeScreenShot = 'chrome-screenshot',
+	ChromeScreenShot = 'chrome-screenshot'
 }
 
 export type Message =
@@ -153,8 +154,10 @@ export type Message =
 	| SelectElement
 	| HighlightElement
 	| WindowClose
+	| WindowOpen
 	| ChromeScreenShot;
 
+export type CreateNewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
 export type AppLoaded = EmptyEnvelope<MessageType.AppLoaded>;
 export type AppRequest = EmptyEnvelope<MessageType.AppRequest>;
@@ -429,5 +432,14 @@ export type ChromeScreenShot = Envelope<
 	{
 		width: number;
 		height: number;
+	}
+>;
+
+export type WindowOpen = Envelope<
+	MessageType.WindowOpen,
+	{
+		windowId: string;
+		projectId: string;
+		projectPath: string;
 	}
 >;

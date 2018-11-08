@@ -1,4 +1,4 @@
-import { Sender } from '../sender/client';
+import { Sender } from '../sender';
 import { isEqual } from 'lodash';
 import { MessageType } from '../message';
 import * as Mobx from 'mobx';

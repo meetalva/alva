@@ -1,19 +1,17 @@
 import * as Express from 'express';
-import * as PreviewDocument from '../preview-document';
-import { Sender } from '../sender';
-import * as Types from '../types';
-import * as Model from '../model';
+import * as PreviewDocument from '../../preview-document';
+import * as Types from '../../types';
 
-export interface PreviewRouteOptions {
-	sender: Sender | undefined;
-	projects: Map<string, Model.Project>;
-}
-
-export function createPreviewRoute(options: PreviewRouteOptions): Express.RequestHandler {
+export function previewRouteFactory(server: Types.AlvaServer): Express.RequestHandler {
 	return async function previewRoute(req: Express.Request, res: Express.Response): Promise<void> {
 		res.type('html');
 
-		const project = options.projects.get(req.params.id);
+		if (typeof req.params.id !== 'string') {
+			res.sendStatus(404);
+			return;
+		}
+
+		const project = await server.dataHost.getProject(req.params.id);
 
 		if (!project) {
 			res.sendStatus(404);

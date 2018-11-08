@@ -5,10 +5,10 @@ import { ElementList } from './element-list';
 import { ViewStore } from '../../store';
 import * as Model from '../../model';
 import * as Type from '../../types';
-import { Sender } from '../../sender/client';
+import { Sender } from '../../sender';
 import * as uuid from 'uuid';
 
-jest.mock('../../sender/client');
+jest.mock('../../sender');
 
 test('un-highlight highlighted element content onDragLeave', () => {
 	const app = new Model.AlvaApp();

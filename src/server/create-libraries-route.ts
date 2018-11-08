@@ -1,11 +1,11 @@
 import * as Express from 'express';
-import { Sender } from '../sender/server';
+import { Sender } from '../sender';
 import * as Model from '../model';
 import * as Path from 'path';
 
 export interface LibrariesRouteOptions {
 	sender: Sender | undefined;
-	project: Model.Project | undefined;
+	projects: Map<string, Model.Project>;
 }
 
 export function createLibrariesRoute(options: LibrariesRouteOptions): Express.RequestHandler {
@@ -13,13 +13,17 @@ export function createLibrariesRoute(options: LibrariesRouteOptions): Express.Re
 		req: Express.Request,
 		res: Express.Response
 	): Promise<void> {
-		if (!options.project) {
-			res.send(404);
+		res.type('html');
+
+		const project = options.projects.get(req.params.id);
+
+		if (!project) {
+			res.sendStatus(404);
 			return;
 		}
 
 		const id = Path.basename(req.path, Path.extname(req.path));
-		const patternLibrary = options.project.getPatternLibraryById(id);
+		const patternLibrary = project.getPatternLibraryById(id);
 
 		if (typeof patternLibrary === 'undefined') {
 			res.sendStatus(404);

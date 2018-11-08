@@ -83,7 +83,9 @@ export class ViewDetails extends React.Component {
 					<PreviewPaneWrapper
 						isDragging={props.store.getDragging()}
 						key="center"
-						previewFrame={`http://localhost:${props.store.getServerPort()}/preview.html`}
+						previewFrame={`http://localhost:${props.store.getServerPort()}/preview/${props.store
+							.getProject()
+							.getId()}`}
 					/>
 					<AppPane
 						pane={Types.AppPane.DevelopmentPane}

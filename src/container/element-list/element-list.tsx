@@ -287,13 +287,10 @@ export class ElementList extends React.Component {
 				e.stopPropagation();
 
 				const editableElement = store.getNameEditableElement();
-				const selectedElement = store.getSelectedElement();
 
 				if (editableElement) {
 					store.executeElementRename(editableElement);
 					store.setNameEditableElement();
-				} else {
-					store.setNameEditableElement(selectedElement);
 				}
 				break;
 			}

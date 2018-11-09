@@ -31,7 +31,7 @@ const StyledButtonGroup = styled.div`
 	}
 `;
 
-export const ButtonGroupButton = props => (
+export const ButtonGroupButton: React.SFC<Button.ButtonProps> = props => (
 	<Button.Button
 		{...props}
 		order={Button.ButtonOrder.Tertiary}

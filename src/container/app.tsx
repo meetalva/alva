@@ -7,14 +7,13 @@ import { ViewDetails } from './view-details';
 import { ViewSplashscreen } from './view-splashscreen';
 import * as Types from '../types';
 
-Components.globalStyles();
-
 @MobxReact.inject('store')
 @MobxReact.observer
 export class App extends React.Component {
 	public render(): JSX.Element | null {
 		return (
 			<Components.Layout direction={Components.LayoutDirection.Column}>
+				<Components.GlobalStyle />
 				<Components.FixedArea top={0} right={0} left={0} z={10}>
 					<ChromeContainer />
 				</Components.FixedArea>

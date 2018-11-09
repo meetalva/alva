@@ -1,11 +1,9 @@
-import globalStyles from './global-styles';
+import { GlobalStyle } from './global-styles';
 import { Headline } from './headline';
 import * as Icon from './icons';
 import * as React from 'react';
 import { Space, SpaceSize } from './space';
 import styled from 'styled-components';
-
-globalStyles();
 
 export interface DemoContainerProps {
 	className?: string;
@@ -20,6 +18,7 @@ const StyledDemoContainer = styled.div`
 
 const DemoContainer: React.StatelessComponent<DemoContainerProps> = props => (
 	<StyledDemoContainer className={props.className}>
+		<GlobalStyle />
 		<Space size={SpaceSize.L}>
 			{props.title && <Headline type="primary">{props.title}</Headline>}
 		</Space>

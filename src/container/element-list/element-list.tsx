@@ -15,7 +15,7 @@ import { Images } from '../../components/icons';
 @MobxReact.inject('store')
 @MobxReact.observer
 export class ElementList extends React.Component {
-	private dragImg: HTMLElement | null;
+	private dragImg: React.RefObject<any> = React.createRef();
 	private globalDragEndListener?: (e: DragEvent) => void;
 	private globalDropListener?: (e: DragEvent) => void;
 	private globalKeyDownListener?: (e: KeyboardEvent) => void;
@@ -210,9 +210,9 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		if (this.dragImg) {
+		if (this.dragImg.current) {
 			e.dataTransfer.effectAllowed = 'copy';
-			e.dataTransfer.setDragImage(this.dragImg, 75, 15);
+			e.dataTransfer.setDragImage(this.dragImg.current, 75, 15);
 		}
 
 		Mobx.transaction(() => {
@@ -414,10 +414,7 @@ export class ElementList extends React.Component {
 						/>
 					)}
 				</Components.Element.ElementChildren>
-				<ElementDragImage
-					element={store.getDraggedElement()}
-					innerRef={ref => (this.dragImg = ref)}
-				/>
+				<ElementDragImage element={store.getDraggedElement()} dragRef={this.dragImg} />
 			</Components.DragArea>
 		);
 	}

@@ -39,14 +39,7 @@ export function openFileRequest(
 				type: Message.MessageType.OpenFileResponse,
 				id: message.id,
 				transaction: message.transaction,
-				payload: {
-					status: Types.ProjectPayloadStatus.Ok,
-					path: selectedPath,
-					contents: {
-						path: selectedPath,
-						...response.payload.project
-					}
-				}
+				payload: response.payload
 			});
 		} catch (err) {
 			if (!silent) {

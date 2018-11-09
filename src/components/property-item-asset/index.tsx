@@ -18,6 +18,7 @@ export interface PropertyItemAssetProps {
 	onInputBlur?: React.ChangeEventHandler<HTMLInputElement>;
 	onInputChange?: React.ChangeEventHandler<HTMLInputElement>;
 	placeholder?: string;
+	renderChoose?(): JSX.Element;
 }
 
 export enum PropertyItemAssetInputType {
@@ -106,7 +107,11 @@ export const PropertyItemAsset: React.StatelessComponent<PropertyItemAssetProps>
 
 				<ButtonGroup>
 					<ButtonGroup.ButtonLeft>
-						<ButtonGroupButton onClick={props.onChooseClick}>Choose</ButtonGroupButton>
+						{props.renderChoose ? (
+							props.renderChoose()
+						) : (
+							<ButtonGroupButton onClick={props.onChooseClick}>Choose</ButtonGroupButton>
+						)}
 					</ButtonGroup.ButtonLeft>
 					<ButtonGroup.ButtonRight>
 						<ButtonGroupButton

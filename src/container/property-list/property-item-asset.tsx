@@ -5,6 +5,8 @@ import * as Model from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
+import * as Types from '../../types';
+import { FileInput, FileFormat } from '../file-input';
 
 export interface PropertyItemAssetProps {
 	property: Model.ElementProperty;
@@ -29,6 +31,9 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 			imageSrc && imageSrc.startsWith('data:')
 				? Components.PropertyItemAssetInputType.File
 				: Components.PropertyItemAssetInputType.Url;
+
+		const app = props.store.getApp();
+		const needsInput = app.isHostType(Types.HostType.Electron) === false;
 
 		return (
 			<Components.PropertyItemAsset
@@ -65,6 +70,23 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 					});
 				}}
 				placeholder="Or enter URL"
+				renderChoose={
+					needsInput
+						? () => (
+								<Components.ButtonGroupButton as="label">
+									Choose
+									<FileInput
+										accept="image/*"
+										format={FileFormat.Binary}
+										onChange={(result: string) => {
+											property.setValue(result);
+											props.store.commit();
+										}}
+									/>
+								</Components.ButtonGroupButton>
+						  )
+						: undefined
+				}
 			/>
 		);
 	}

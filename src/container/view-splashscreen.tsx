@@ -11,7 +11,6 @@ import * as Types from '../types';
 export class ViewSplashscreen extends React.Component {
 	public render(): JSX.Element {
 		const props = this.props as { store: ViewStore };
-		const sender = props.store.getSender();
 		const openFileRequestId = uuid.v4();
 
 		return (
@@ -41,45 +40,15 @@ export class ViewSplashscreen extends React.Component {
 						payload: 'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
 					});
 				}}
-				onOpenFile={e => {
-					if (e.target.files === null) {
-						return;
-					}
-
-					const file = e.target.files[0];
-
-					if (!file) {
-						return;
-					}
-
-					const reader = new FileReader();
-					reader.readAsText(file, 'UTF-8');
-
-					reader.onload = async o => {
-						if (!o.target) {
-							return;
+				onOpenFile={contents => {
+					props.store.getSender().send({
+						type: MessageType.UseFileRequest,
+						id: openFileRequestId,
+						payload: {
+							silent: false,
+							contents
 						}
-
-						props.store.getSender().send({
-							type: MessageType.UseFileRequest,
-							id: openFileRequestId,
-							payload: {
-								silent: false,
-								contents: reader.result as string
-							}
-						});
-					};
-
-					reader.onerror = err => {
-						sender.send({
-							type: MessageType.OpenFileResponse,
-							id: openFileRequestId,
-							payload: {
-								error: new Error('Error reading file'),
-								status: Types.ProjectPayloadStatus.Error
-							}
-						});
-					};
+					});
 				}}
 			/>
 		);

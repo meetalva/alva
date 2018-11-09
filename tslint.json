@@ -12,6 +12,7 @@
 		"no-console": false,
 		"variable-name": false,
 		"no-var-requires": false,
-		"no-implicit-dependencies": false
+		"no-implicit-dependencies": false,
+		"no-this-assignment": false
 	}
 }

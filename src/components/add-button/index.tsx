@@ -9,6 +9,8 @@ import styled from 'styled-components';
 export interface AddButtonProps {
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	margin?: boolean;
+	title?: string;
+	disabled?: boolean;
 }
 
 const StyledSpace = styled(Space)`
@@ -27,6 +29,7 @@ const StyledAddButton = styled.button`
 	align-items: center;
 	justify-content: center;
 	transition: border 0.2s;
+	opacity ${(props: AddButtonProps) => (props.disabled ? 0.3 : 1)};
 	user-select: none;
 
 	&:hover {
@@ -48,7 +51,7 @@ const StyledIcon = styled(Plus)`
 
 export const AddButton: React.SFC<AddButtonProps> = props => (
 	<StyledSpace size={props.margin ? SpaceSize.XS : 0} {...props}>
-		<StyledAddButton onClick={props.onClick}>
+		<StyledAddButton onClick={props.onClick} title={props.title} disabled={props.disabled}>
 			<StyledIcon size={IconSize.XS} color={Color.Grey50} />
 			<Copy textColor={Color.Grey50}>{props.children}</Copy>
 		</StyledAddButton>

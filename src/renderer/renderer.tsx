@@ -40,8 +40,8 @@ export function startRenderer(): void {
 
 	store.setServerPort(parseInt(window.location.port, 10));
 
-	if (data.type) {
-		app.setHostType(data.type);
+	if (data.host) {
+		app.setHostType(data.host);
 	}
 
 	if (data.view) {

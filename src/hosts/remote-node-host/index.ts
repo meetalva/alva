@@ -2,13 +2,13 @@ import * as Os from 'os';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import * as Util from 'util';
-import * as Types from '../types';
+import * as Types from '../../types';
 import * as getPort from 'get-port';
 
 import opn = require('opn');
 
-export class NodeHost implements Types.Host {
-	public type = Types.HostType.Node;
+export class RemoteNodeHost implements Types.Host {
+	public type = Types.HostType.RemoteServer;
 
 	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
@@ -16,8 +16,8 @@ export class NodeHost implements Types.Host {
 	public static async fromProcess(
 		process: NodeJS.Process,
 		forced?: Partial<Types.HostFlags>
-	): Promise<NodeHost> {
-		const host = new NodeHost();
+	): Promise<RemoteNodeHost> {
+		const host = new RemoteNodeHost();
 		host.process = process;
 		host.forced = forced;
 		return host;
@@ -40,7 +40,7 @@ export class NodeHost implements Types.Host {
 		const getBasePath = (b: Types.HostBase): string => {
 			switch (b) {
 				case Types.HostBase.Source:
-					return Path.resolve(__dirname, '..');
+					return Path.resolve(__dirname, '..', '..');
 				case Types.HostBase.AppData:
 					return Path.resolve(Os.tmpdir(), 'alva');
 				case Types.HostBase.UserData:

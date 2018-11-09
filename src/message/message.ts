@@ -206,6 +206,7 @@ export type ConnectedPatternLibraryNotification = Envelope<
 export type ConnectPatternLibraryRequest = Envelope<
 	MessageType.ConnectPatternLibraryRequest,
 	{
+		projectId: string;
 		library: string | undefined;
 	}
 >;

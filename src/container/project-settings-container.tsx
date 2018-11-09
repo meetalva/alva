@@ -13,6 +13,7 @@ import * as uuid from 'uuid';
 export class ProjectSettingsContainer extends React.Component {
 	public render(): JSX.Element | null {
 		const { store } = this.props as WithStore;
+		const app = store.getApp();
 
 		return (
 			<div>
@@ -45,10 +46,16 @@ export class ProjectSettingsContainer extends React.Component {
 						<LibrarySettingsContainer key={library.getId()} library={library} />
 					))}
 				<Components.AddButton
+					title={
+						app.hasFileAccess()
+							? ''
+							: 'Local library connect not available without file access'
+					}
+					disabled={!app.hasFileAccess()}
 					onClick={() =>
 						store.getSender().send({
 							id: uuid.v4(),
-							payload: { library: undefined },
+							payload: { library: undefined, projectId: store.getProject().getId() },
 							type: MessageType.ConnectPatternLibraryRequest
 						})
 					}

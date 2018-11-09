@@ -35,6 +35,12 @@ export class ViewDetails extends React.Component {
 				.getEnhancer()
 				.getJavaScript() === 'undefined';
 
+		const onlyBuiltin = props.store
+			.getPatternLibraries()
+			.every(lib => lib.getOrigin() === Types.PatternLibraryOrigin.BuiltIn);
+
+		const mayConnect = props.store.getApp().hasFileAccess();
+
 		return (
 			<React.Fragment>
 				<AppPane
@@ -115,20 +121,19 @@ export class ViewDetails extends React.Component {
 						<div style={{ flexShrink: 0, height: 40 }}>
 							<PropertiesSwitch />
 						</div>
-						{props.store
-							.getPatternLibraries()
-							.every(lib => lib.getOrigin() === Types.PatternLibraryOrigin.BuiltIn) && (
-							<ConnectPaneContainer
-								onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
-								onSecondaryButtonClick={() =>
-									props.store.getSender().send({
-										type: MessageType.OpenExternalURL,
-										id: uuid.v4(),
-										payload: 'https://media.meetalva.io/file/Website.alva'
-									})
-								}
-							/>
-						)}
+						{onlyBuiltin &&
+							mayConnect && (
+								<ConnectPaneContainer
+									onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
+									onSecondaryButtonClick={() =>
+										props.store.getSender().send({
+											type: MessageType.OpenExternalURL,
+											id: uuid.v4(),
+											payload: 'https://media.meetalva.io/file/Website.alva'
+										})
+									}
+								/>
+							)}
 						<Components.PropertyPane>
 							{props.store.getApp().getRightSidebarTab() ===
 								Types.RightSidebarTab.Properties && <PropertyListContainer />}

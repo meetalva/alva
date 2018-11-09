@@ -10,7 +10,9 @@ export function openFile({
 	store,
 	app,
 	history
-}: MessageHandlerContext): MessageHandler<M.OpenFileResponse | M.NewFileResponse> {
+}: MessageHandlerContext): MessageHandler<
+	M.OpenFileResponse | M.NewFileResponse | M.UseFileResponse
+> {
 	return m => {
 		Mobx.runInAction(Types.ActionName.OpenFile, () => {
 			if (m.payload.status === Types.ProjectPayloadStatus.Error) {

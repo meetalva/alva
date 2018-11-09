@@ -9,4 +9,9 @@ export interface Sender {
 	send(message: Message.Message): void;
 
 	pass(envelope: string): void;
+
+	transaction<T extends Message.Message, V extends Message.Message>(
+		message: Message.Message,
+		{ type }: { type: V['type'] }
+	): Promise<V>;
 }

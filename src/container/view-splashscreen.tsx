@@ -4,7 +4,6 @@ import * as React from 'react';
 import { SplashScreenContainer } from './splash-screen-container';
 import * as uuid from 'uuid';
 import { ViewStore } from '../store';
-import * as Yaml from 'js-yaml';
 import * as Types from '../types';
 
 @MobxReact.inject('store')
@@ -25,6 +24,10 @@ export class ViewSplashscreen extends React.Component {
 					});
 				}}
 				onOpenClick={() => {
+					if (!props.store.getApp().isHostType(Types.HostType.Electron)) {
+						return;
+					}
+
 					props.store.getSender().send({
 						type: MessageType.OpenFileRequest,
 						id: openFileRequestId,
@@ -39,7 +42,6 @@ export class ViewSplashscreen extends React.Component {
 					});
 				}}
 				onOpenFile={e => {
-					// TODO: Move to fallback host?
 					if (e.target.files === null) {
 						return;
 					}
@@ -53,23 +55,17 @@ export class ViewSplashscreen extends React.Component {
 					const reader = new FileReader();
 					reader.readAsText(file, 'UTF-8');
 
-					reader.onload = o => {
+					reader.onload = async o => {
 						if (!o.target) {
 							return;
 						}
 
-						const contents = Yaml.safeLoad(
-							reader.result as string
-						) as Types.SerializedProject;
-
-						// TODO: Send to server for temporary storage
-						sender.send({
-							type: MessageType.OpenFileResponse,
+						props.store.getSender().send({
+							type: MessageType.UseFileRequest,
 							id: openFileRequestId,
 							payload: {
-								contents,
-								path: file.name,
-								status: Types.ProjectPayloadStatus.Ok
+								silent: false,
+								contents: reader.result as string
 							}
 						});
 					};

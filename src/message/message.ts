@@ -70,6 +70,8 @@ export enum MessageType {
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
 	Undo = 'undo',
+	UseFileRequest = 'use-file',
+	UseFileResponse = 'use-file-response',
 	UpdatePatternLibraryRequest = 'update-pattern-library-request',
 	UpdatePatternLibraryResponse = 'update-pattern-library-response',
 	ChangeUserStore = 'user-store-change',
@@ -155,7 +157,9 @@ export type Message =
 	| HighlightElement
 	| WindowClose
 	| WindowOpen
-	| ChromeScreenShot;
+	| ChromeScreenShot
+	| UseFileRequest
+	| UseFileResponse;
 
 export type CreateNewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -280,7 +284,7 @@ export type Reload = Envelope<MessageType.Reload, { forced: boolean } | undefine
 export type Save = Envelope<MessageType.Save, { publish: boolean } | undefined>;
 export type SaveResult = Envelope<
 	MessageType.SaveResult,
-	{ draft: boolean; result: Types.PersistencePersistResult; name: string }
+	{ draft: boolean; result: Types.PersistenceSerializeResult; name: string }
 >;
 export type SetPane = Envelope<MessageType.SetPane, { pane: Types.AppPane; visible: boolean }>;
 export type ShowError = Envelope<MessageType.ShowError, { message: string; stack: string }>;
@@ -443,3 +447,10 @@ export type WindowOpen = Envelope<
 		projectPath: string;
 	}
 >;
+
+export type UseFileRequest = Envelope<
+	MessageType.UseFileRequest,
+	{ contents: string; silent: boolean }
+>;
+
+export type UseFileResponse = Envelope<MessageType.UseFileResponse, Types.ProjectPayload>;

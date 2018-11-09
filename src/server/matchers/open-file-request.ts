@@ -1,7 +1,5 @@
 import * as Message from '../../message';
-import * as Model from '../../model';
 import * as Types from '../../types';
-import { Persistence } from '../../persistence';
 
 export function openFileRequest(
 	server: Types.AlvaServer
@@ -9,46 +7,59 @@ export function openFileRequest(
 	return async message => {
 		const suggestedPath = message.payload ? message.payload.path : undefined;
 		const selectedPath = await server.host.selectFile(suggestedPath);
-		const silent = message.payload ? message.payload.silent : false;
+		const silent =
+			message.payload && typeof message.payload.silent === 'boolean'
+				? message.payload.silent
+				: false;
 
 		if (!selectedPath) {
 			return;
 		}
 
-		const projectResult = await Persistence.read<Types.SavedProject>(selectedPath);
+		try {
+			const { contents } = await server.host.readFile(selectedPath);
 
-		if (projectResult.state === Types.PersistenceState.Error) {
+			const response = await server.sender.transaction<
+				Message.UseFileRequest,
+				Message.UseFileResponse
+			>(
+				{
+					type: Message.MessageType.UseFileRequest,
+					id: message.id,
+					transaction: message.transaction,
+					payload: {
+						silent,
+						contents
+					}
+				},
+				{ type: Message.MessageType.UseFileResponse }
+			);
+
+			server.sender.send({
+				type: Message.MessageType.OpenFileResponse,
+				id: message.id,
+				transaction: message.transaction,
+				payload: {
+					status: Types.ProjectPayloadStatus.Ok,
+					path: selectedPath,
+					contents: {
+						path: selectedPath,
+						...response.payload.project
+					}
+				}
+			});
+		} catch (err) {
 			if (!silent) {
 				server.sender.send({
 					type: Message.MessageType.ShowError,
+					transaction: message.transaction,
 					id: message.id,
 					payload: {
-						message: [projectResult.error.message].join('\n'),
-						stack: projectResult.error.stack || ''
+						message: [err.message].join('\n'),
+						stack: err.stack || ''
 					}
 				});
 			}
-
-			return server.sender.send({
-				type: Message.MessageType.OpenFileResponse,
-				id: message.id,
-				payload: { error: projectResult.error, status: Types.ProjectPayloadStatus.Error }
-			});
 		}
-
-		const savedProject = projectResult.contents;
-		const project = savedProject as Types.SerializedProject;
-
-		if (typeof project === 'object') {
-			project.path = selectedPath;
-		}
-
-		server.dataHost.addProject(Model.Project.from(project));
-
-		server.sender.send({
-			type: Message.MessageType.OpenFileResponse,
-			id: message.id,
-			payload: { path: selectedPath, contents: project, status: Types.ProjectPayloadStatus.Ok }
-		});
 	};
 }

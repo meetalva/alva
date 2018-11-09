@@ -16,13 +16,13 @@ const StyledDraggedElement = styled.div`
 
 export class DraggedElementImage extends React.Component<{
 	element?: Model.Element;
-	innerRef(ref: HTMLElement): void;
+	ref: React.RefObject<any>;
 }> {
 	public render(): JSX.Element {
 		const { props } = this;
 
 		return (
-			<StyledDraggedElement innerRef={props.innerRef}>
+			<StyledDraggedElement ref={props.ref}>
 				{props.element && props.element.getName()}
 			</StyledDraggedElement>
 		);

@@ -16,6 +16,7 @@ export interface ButtonProps {
 	/** @description Spatial weight @default */
 	size?: ButtonSize;
 	textColor?: Color;
+	as?: keyof JSX.IntrinsicElements;
 }
 
 export enum ButtonOrder {
@@ -121,9 +122,12 @@ const StyledTertiaryButton = styled(SizedBaseButton)`
 	color: ${Color.Grey36};
 `;
 
-const getComponent = (
-	props: ButtonProps
-): typeof StyledPrimaryButton | typeof StyledPrimaryButton => {
+export type AnyButton =
+	| typeof StyledPrimaryButton
+	| typeof StyledTertiaryButton
+	| typeof StyledSecondaryButton;
+
+const getComponent = (props: ButtonProps): AnyButton => {
 	switch (props.order) {
 		case ButtonOrder.Secondary:
 			return StyledSecondaryButton;
@@ -149,6 +153,7 @@ export const Button: React.StatelessComponent<ButtonProps> = props => {
 			inverted={props.inverted}
 			style={{ color: props.textColor }}
 			disabled={props.disabled}
+			as={props.as}
 		>
 			{props.children}
 		</Component>

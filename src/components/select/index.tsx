@@ -19,9 +19,7 @@ const StyledChevron = styled(Icon).attrs({ name: IconName.ArrowFillRight })`
 // tslint:disable-next-line:no-empty
 const NOOP = () => {};
 
-export const ChevronIcon: React.SFC = props => (
-	<StyledChevron {...props} name={IconName.ArrowFillRight} />
-);
+export const ChevronIcon: React.SFC = props => <StyledChevron {...props} />;
 
 export interface SelectProps {
 	autoFocus?: boolean;

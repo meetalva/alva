@@ -13,15 +13,21 @@ export class LocalDataHost implements Types.DataHost {
 		return new LocalDataHost({ host });
 	}
 
-	private async readMemory(): Promise<{ projects: { [id: string]: string } }> {
+	private async readMemory(): Promise<{
+		projects: { [id: string]: string };
+		connections: { [id: string]: string[] };
+	}> {
 		const path = await this.host.resolveFrom(Types.HostBase.UserData, 'projects.json');
 		const file = await this.host.readFile(path).catch(() => undefined);
 		return Promise.resolve()
-			.then(() => (file ? JSON.parse(file.contents) : { projects: {} }))
-			.catch(() => ({ projects: {} }));
+			.then(() => (file ? JSON.parse(file.contents) : { projects: {}, connections: {} }))
+			.catch(() => ({ projects: {}, connections: {} }));
 	}
 
-	private async writeMemory(memory: { projects: { [id: string]: string } }): Promise<void> {
+	private async writeMemory(memory: {
+		projects: { [id: string]: string };
+		connections: { [id: string]: string[] };
+	}): Promise<void> {
 		const path = await this.host.resolveFrom(Types.HostBase.UserData, 'projects.json');
 		const parent = Path.dirname(path);
 
@@ -48,5 +54,20 @@ export class LocalDataHost implements Types.DataHost {
 
 		const file = await this.host.readFile(projectPath);
 		return Model.Project.from(JSON.parse(file.contents));
+	}
+
+	public async addConnection(
+		project: Model.Project,
+		library: Model.PatternLibrary
+	): Promise<void> {
+		const memory = await this.readMemory();
+		const previous = memory[project.getId()] || [];
+		memory[project.getId()] = [...previous, library.getId()];
+		await this.writeMemory(memory);
+	}
+
+	public async getConnections(project: Model.Project): Promise<string[]> {
+		const memory = await this.readMemory();
+		return memory[project.getId()] || [];
 	}
 }

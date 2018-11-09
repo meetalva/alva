@@ -5,8 +5,17 @@ export function openFileRequest(
 	server: Types.AlvaServer
 ): (message: Message.OpenFileRequest) => Promise<void> {
 	return async message => {
-		const suggestedPath = message.payload ? message.payload.path : undefined;
-		const selectedPath = await server.host.selectFile(suggestedPath);
+		const selectedPath = await server.host.selectFile({
+			title: 'Open Alva File',
+			properties: ['openFile'],
+			filters: [
+				{
+					name: 'Alva File',
+					extensions: ['alva']
+				}
+			]
+		});
+
 		const silent =
 			message.payload && typeof message.payload.silent === 'boolean'
 				? message.payload.silent

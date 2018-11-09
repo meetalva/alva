@@ -1,9 +1,9 @@
 import * as Model from '../model';
 
 export enum HostType {
-	Browser = 'browser',
-	Node = 'node',
-	Electron = 'electron'
+	LocalServer = 'local-server',
+	RemoteServer = 'remote-server',
+	LocalElectron = 'electron'
 }
 
 import * as Types from '../types';
@@ -21,6 +21,21 @@ export enum HostBase {
 	Source,
 	AppData,
 	UserData
+}
+
+export interface HostSelectFileOptions {
+	title?: string;
+	message?: string;
+	properties?: (
+		| 'openFile'
+		| 'openDirectory'
+		| 'multiSelections'
+		| 'showHiddenFiles'
+		| 'createDirectory'
+		| 'promptToCreate'
+		| 'noResolveAliases'
+		| 'treatPackageAsDirectory')[];
+	filters?: ({ name?: string; extensions?: string[] })[];
 }
 
 export abstract class Host {
@@ -62,7 +77,7 @@ export abstract class Host {
 		throw new Error('host.open: not implemented');
 	}
 
-	public async selectFile(suggestion?: string): Promise<void | string> {
+	public async selectFile(opts: HostSelectFileOptions): Promise<void | string> {
 		throw new Error('host.selectFile: not implemented');
 	}
 }
@@ -74,5 +89,16 @@ export abstract class DataHost {
 
 	public async getProject(id: string): Promise<Model.Project | undefined> {
 		throw new Error('context.getProject: not implemented');
+	}
+
+	public async addConnection(
+		project: Model.Project,
+		library: Model.PatternLibrary
+	): Promise<void> {
+		throw new Error('context.addConnection: not implemented');
+	}
+
+	public async getConnections(project: Model.Project): Promise<string[]> {
+		throw new Error('context.getConnections: not implemented');
 	}
 }

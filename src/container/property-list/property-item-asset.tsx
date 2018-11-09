@@ -5,7 +5,6 @@ import * as Model from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
-import * as Types from '../../types';
 import { FileInput, FileFormat } from '../file-input';
 
 export interface PropertyItemAssetProps {
@@ -33,7 +32,7 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 				: Components.PropertyItemAssetInputType.Url;
 
 		const app = props.store.getApp();
-		const needsInput = app.isHostType(Types.HostType.Electron) === false;
+		const needsInput = !app.hasFileAccess();
 
 		return (
 			<Components.PropertyItemAsset

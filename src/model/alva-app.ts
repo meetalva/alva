@@ -68,6 +68,10 @@ export class AlvaApp {
 		});
 	}
 
+	public hasFileAccess(): boolean {
+		return [Types.HostType.LocalElectron, Types.HostType.LocalServer].includes(this.hostType);
+	}
+
 	public getActiveView(): Types.AlvaView {
 		return this.activeView;
 	}

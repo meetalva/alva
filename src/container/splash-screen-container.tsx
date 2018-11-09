@@ -2,7 +2,6 @@ import * as Components from '../components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewStore } from '../store';
-import * as Types from '../types';
 import { FileInput } from './file-input';
 
 export interface SplashScreenProps {
@@ -69,7 +68,7 @@ export class SplashScreenContainer extends React.Component<SplashScreenProps> {
 						<label>
 							<Components.Copy size={Components.CopySize.S}>
 								Open Existing Alva File
-								{!app.isHostType(Types.HostType.Electron) && (
+								{!app.hasFileAccess() && (
 									<FileInput accept=".alva" onChange={props.onOpenFile} />
 								)}
 							</Components.Copy>

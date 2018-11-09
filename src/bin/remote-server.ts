@@ -14,7 +14,7 @@ export interface ForcedFlags {
 async function main(forced?: ForcedFlags): Promise<void> {
 	const AlvaServer = importFresh(serverPath).AlvaServer as typeof Server.AlvaServer;
 
-	const nodeHost = await Hosts.NodeHost.fromProcess(process, forced);
+	const nodeHost = await Hosts.RemoteNodeHost.fromProcess(process, forced);
 	const localDataHost = await Hosts.LocalDataHost.fromHost(nodeHost);
 
 	const alvaServer = await AlvaServer.fromHosts({

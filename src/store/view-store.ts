@@ -139,6 +139,7 @@ export class ViewStore {
 			type: MessageType.ConnectPatternLibraryRequest,
 			id: uuid.v4(),
 			payload: {
+				projectId: this.project.getId(),
 				library: library ? library.getId() : undefined
 			}
 		});

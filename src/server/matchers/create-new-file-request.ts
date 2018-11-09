@@ -1,35 +1,45 @@
-import * as Path from 'path';
 import * as Message from '../../message';
 import * as Model from '../../model';
 import * as Types from '../../types';
-import * as uuid from 'uuid';
+import { Persistence } from '../../persistence';
 
 export function createNewFileRequest(
 	server: Types.AlvaServer
 ): (message: Message.CreateNewFileRequest) => Promise<void> {
 	return async message => {
-		const draftPath = await server.host.resolveFrom(Types.HostBase.AppData, `${uuid.v4()}.alva`);
-
-		const drafProject = Model.Project.create({
+		const draftProject = Model.Project.create({
 			draft: true,
 			name: 'New Project',
-			path: draftPath
+			path: ''
 		});
 
-		await server.host.mkdir(Path.dirname(draftPath));
-		await server.host.writeFile(draftPath, JSON.stringify(drafProject.toDisk()));
+		const serializeResult = await Persistence.serialize(draftProject);
 
-		await server.dataHost.addProject(drafProject);
+		if (serializeResult.state !== Types.PersistenceState.Success) {
+			return;
+		}
 
-		// TODO: Scope sync to projects by id
-		drafProject.sync(server.sender);
+		const response = await server.sender.transaction(
+			{
+				type: Message.MessageType.UseFileRequest,
+				id: message.id,
+				transaction: message.transaction,
+				payload: {
+					silent: false,
+					contents: serializeResult.contents
+				}
+			},
+			{
+				type: Message.MessageType.UseFileResponse
+			}
+		);
 
 		server.sender.send({
 			id: message.id,
 			type: Message.MessageType.CreateNewFileResponse,
 			payload: {
-				path: draftPath,
-				contents: drafProject.toJSON(),
+				path: response.payload.project.path,
+				contents: response.payload.project,
 				status: Types.ProjectPayloadStatus.Ok
 			}
 		});

@@ -33,6 +33,7 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 	sender.match<M.Log>(M.MessageType.Log, Handlers.log(ctx));
 	sender.match<M.NewFileResponse>(M.MessageType.CreateNewFileResponse, Handlers.openFile(ctx));
 	sender.match<M.OpenFileResponse>(M.MessageType.OpenFileResponse, Handlers.openFile(ctx));
+	sender.match<M.UseFileResponse>(M.MessageType.UseFileResponse, Handlers.openFile(ctx));
 	sender.match<M.ProjectRequest>(M.MessageType.ProjectRequest, Handlers.projectRequest(ctx));
 	sender.match<M.SelectElement>(M.MessageType.SelectElement, Handlers.selectElement(ctx));
 	sender.match<M.SetPane>(M.MessageType.SetPane, Handlers.setPane(ctx));

@@ -4,8 +4,10 @@ import * as Message from '../message';
 import { isMessage } from './is-message';
 import { isMessageType } from './is-message-type';
 import * as Serde from './serde';
+import * as uuid from 'uuid';
 
-const WS = typeof window !== 'undefined' ? WebSocket : (require('ws') as typeof WebSocket);
+// tslint:disable-next-line:no-eval
+const WS = typeof window !== 'undefined' ? WebSocket : (eval('require("ws")') as typeof WebSocket);
 
 export interface SenderInit {
 	endpoint: string;
@@ -119,6 +121,48 @@ export class Sender {
 		const base = this.matchers.has(type) ? this.matchers.get(type)! : [];
 
 		this.matchers.set(type, [...base, handler]);
+	}
+
+	public async unmatch<T extends Message.Message>(
+		type: Message.Message['type'],
+		handler: (message: T) => void
+	): Promise<void> {
+		if (!this.matchers.has(type)) {
+			return;
+		}
+
+		this.matchers.set(type, this.matchers.get(type)!.filter(m => m !== handler));
+	}
+
+	public transaction<T extends Message.Message>(
+		message: Message.Message,
+		{ type }: { type: T['type'] }
+	): Promise<T> {
+		return new Promise<T>(resolve => {
+			const transaction = uuid.v4();
+			let done = false;
+
+			const match = (msg: T) => {
+				if (!isMessage(msg) || done) {
+					return;
+				}
+
+				if (transaction !== msg.transaction) {
+					return;
+				}
+
+				done = true;
+				this.unmatch(type, match);
+				resolve(msg as T);
+			};
+
+			this.match(type, match);
+
+			this.send({
+				...message,
+				transaction
+			});
+		});
 	}
 }
 

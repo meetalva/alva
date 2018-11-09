@@ -1,5 +1,5 @@
 import * as Components from '../../components';
-import { MessageType } from '../../message';
+import * as Message from '../../message';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
@@ -48,20 +48,20 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 
 					const sender = props.store.getSender();
 
-					sender.receive(message => {
-						if (
-							message.type === MessageType.AssetReadResponse &&
-							message.id === transactionId
-						) {
-							property.setValue(message.payload);
-							props.store.commit();
+					sender.match<Message.AssetReadResponse>(
+						Message.MessageType.AssetReadResponse,
+						message => {
+							if (message.id === transactionId) {
+								property.setValue(message.payload);
+								props.store.commit();
+							}
 						}
-					});
+					);
 
 					sender.send({
 						id: transactionId,
 						payload: undefined,
-						type: MessageType.AssetReadRequest
+						type: Message.MessageType.AssetReadRequest
 					});
 				}}
 				placeholder="Or enter URL"

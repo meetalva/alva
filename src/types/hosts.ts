@@ -1,4 +1,5 @@
 import * as Model from '../model';
+import * as Message from '../message';
 
 export enum HostType {
 	LocalServer = 'local-server',
@@ -36,6 +37,17 @@ export interface HostSelectFileOptions {
 		| 'noResolveAliases'
 		| 'treatPackageAsDirectory')[];
 	filters?: ({ name?: string; extensions?: string[] })[];
+}
+
+export interface HostMessageButton {
+	label: string;
+	message?: Message.Message;
+}
+
+export interface HostMessageOptions {
+	message: string;
+	detail?: string;
+	buttons: HostMessageButton[];
 }
 
 export abstract class Host {
@@ -79,6 +91,10 @@ export abstract class Host {
 
 	public async selectFile(opts: HostSelectFileOptions): Promise<void | string> {
 		throw new Error('host.selectFile: not implemented');
+	}
+
+	public async showMessage(opts: HostMessageOptions): Promise<HostMessageButton | undefined> {
+		throw new Error('host.showMessage: not implemented');
 	}
 }
 

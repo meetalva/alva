@@ -66,6 +66,7 @@ export enum MessageType {
 	SaveResult = 'save-result',
 	SetPane = 'set-pane',
 	ShowError = 'show-error',
+	ShowMessage = 'show-message',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
@@ -146,6 +147,7 @@ export type Message =
 	| SaveResult
 	| SetPane
 	| ShowError
+	| ShowMessage
 	| SketchExportRequest
 	| SketchExportResponse
 	| StartAppMessage
@@ -455,3 +457,15 @@ export type UseFileRequest = Envelope<
 >;
 
 export type UseFileResponse = Envelope<MessageType.UseFileResponse, Types.ProjectPayload>;
+
+export type ShowMessage = Envelope<
+	MessageType.ShowMessage,
+	{
+		message: string;
+		detail?: string;
+		buttons: {
+			label: string;
+			message?: Message;
+		}[];
+	}
+>;

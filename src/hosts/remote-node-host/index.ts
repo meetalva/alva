@@ -5,8 +5,6 @@ import * as Util from 'util';
 import * as Types from '../../types';
 import * as getPort from 'get-port';
 
-import opn = require('opn');
-
 export class RemoteNodeHost implements Types.Host {
 	public type = Types.HostType.RemoteServer;
 
@@ -78,7 +76,7 @@ export class RemoteNodeHost implements Types.Host {
 	}
 
 	public async open(uri: string): Promise<void> {
-		opn(uri);
+		return;
 	}
 
 	public async selectFile(): Promise<void> {

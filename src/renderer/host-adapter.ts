@@ -21,11 +21,11 @@ export class HostAdapter {
 }
 
 export class BrowserHost implements Partial<Types.Host> {
-	async open(url: string): Promise<void> {
+	public async open(url: string): Promise<void> {
 		window.open(url, '_blank');
 	}
 
-	async showMessage(opts: Types.HostMessageOptions): Promise<undefined> {
+	public async showMessage(opts: Types.HostMessageOptions): Promise<undefined> {
 		// TODO: implement custom dialogs
 		alert([opts.message, opts.detail].filter(Boolean).join('\n'));
 		return;

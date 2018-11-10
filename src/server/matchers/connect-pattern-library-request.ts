@@ -1,9 +1,9 @@
 import * as Message from '../../message';
+import { MessageType } from '../../message';
 import * as Types from '../../types';
 import * as Model from '../../model';
 import * as uuid from 'uuid';
 import * as Analyzer from '../../analyzer';
-import { MessageType } from '../../message';
 
 export function connectPatternLibrary(
 	server: Types.AlvaServer

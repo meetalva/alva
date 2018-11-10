@@ -12,6 +12,7 @@ import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';
 import * as Types from '../types';
+import { HostAdapter } from './host-adapter';
 
 let app: Model.AlvaApp;
 let history;
@@ -50,6 +51,11 @@ export function startRenderer(): void {
 
 	if (data.project) {
 		store.setProject(Model.Project.from(data.project));
+	}
+
+	if (app.isHostType(Types.HostType.RemoteServer)) {
+		const adapter = HostAdapter.fromSender(store.getSender());
+		adapter.start();
 	}
 
 	// TODO: Show "404" if no project was found but details are requested

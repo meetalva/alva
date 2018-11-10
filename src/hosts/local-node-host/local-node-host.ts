@@ -4,11 +4,14 @@ import * as Path from 'path';
 import * as Util from 'util';
 import * as Types from '../../types';
 import * as getPort from 'get-port';
+import * as dargs from 'dargs';
+import * as Electron from 'electron';
 
 import opn = require('opn');
+const execa = require('execa');
 
-export class RemoteNodeHost implements Types.Host {
-	public type = Types.HostType.RemoteServer;
+export class LocalNodeHost implements Types.Host {
+	public type = Types.HostType.LocalServer;
 
 	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
@@ -16,8 +19,8 @@ export class RemoteNodeHost implements Types.Host {
 	public static async fromProcess(
 		process: NodeJS.Process,
 		forced?: Partial<Types.HostFlags>
-	): Promise<RemoteNodeHost> {
-		const host = new RemoteNodeHost();
+	): Promise<LocalNodeHost> {
+		const host = new LocalNodeHost();
 		host.process = process;
 		host.forced = forced;
 		return host;
@@ -81,11 +84,41 @@ export class RemoteNodeHost implements Types.Host {
 		opn(uri);
 	}
 
-	public async selectFile(): Promise<void> {
-		return;
+	public async selectFile(opts: Types.HostSelectFileOptions = {}): Promise<void> {
+		const electron = (require('electron') as any) as string;
+		const openDialog = require.resolve('./open-dialog');
+
+		const options: Electron.OpenDialogOptions = {
+			title: opts.title,
+			properties: opts.properties
+		};
+
+		const args = dargs(options);
+
+		const result = await execa(electron, [openDialog, ...args]);
+		const files = JSON.parse(result.stdout);
+
+		if (!Array.isArray(files)) {
+			return;
+		}
+
+		const file = files[0];
+		return file;
 	}
 
-	public async showMessage(): Promise<undefined> {
-		return;
+	public async showMessage(
+		opts: Types.HostMessageOptions
+	): Promise<Types.HostMessageButton | undefined> {
+		const electron = (require('electron') as any) as string;
+
+		const options: Electron.MessageBoxOptions = {
+			message: opts.message,
+			detail: opts.detail,
+			buttons: opts.buttons.map(b => b.label)
+		};
+
+		const args = dargs(options);
+		const result = await execa(electron, [require.resolve('./message-box'), ...args]);
+		return opts.buttons[JSON.parse(result.stdout)];
 	}
 }

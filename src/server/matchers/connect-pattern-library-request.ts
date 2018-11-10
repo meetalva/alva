@@ -3,8 +3,7 @@ import * as Types from '../../types';
 import * as Model from '../../model';
 import * as uuid from 'uuid';
 import * as Analyzer from '../../analyzer';
-
-const newGithubIssue = require('new-github-issue-url');
+import { MessageType } from '../../message';
 
 export function connectPatternLibrary(
 	server: Types.AlvaServer
@@ -45,11 +44,7 @@ export function connectPatternLibrary(
 		const analysisResult = await performAnalysis(path, { previousLibrary });
 
 		if (analysisResult.type === Types.LibraryAnalysisResultType.Error) {
-			showAnalysisError(analysisResult.error);
-			return;
-		}
-
-		if (typeof analysisResult === 'undefined') {
+			showAnalysisError(server, analysisResult.error);
 			return;
 		}
 
@@ -105,37 +100,104 @@ async function performAnalysis(
 	});
 }
 
-function showAnalysisError(error: Error): void {
-	console.error(error);
-
-	Electron.dialog.showMessageBox(
-		{
+function showAnalysisError(server: Types.AlvaServer, error: Error): void {
+	server.sender.send({
+		type: MessageType.ShowMessage,
+		id: uuid.v4(),
+		payload: {
 			message: 'Sorry, this seems to be an incompatible library.',
 			detail: 'Learn more about supported component libraries on github.com/meetalva',
-			buttons: ['OK', 'Learn more', 'Report a Bug']
-		},
-		response => {
-			if (response === 1) {
-				Electron.shell.openExternal(
-					'https://github.com/meetalva/alva#pattern-library-requirements'
-				);
+			buttons: [
+				{
+					label: 'OK'
+				},
+				{
+					label: 'Learn more',
+					message: {
+						type: MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: 'https://github.com/meetalva/alva#pattern-library-requirements'
+					}
+				},
+				{
+					label: 'Report a Bug',
+					message: {
+						type: MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: newGithubIssue({
+							user: 'meetalva',
+							repo: 'alva',
+							title: 'New bug report',
+							body: `Hey there, I just encountered the following error with Alva:\n\n\`\`\`\n${
+								error.message
+							}\n\`\`\`\n\n<details><summary>Stack Trace</summary>\n\n\`\`\`\n${
+								error.stack
+							}\n\`\`\`\n\n</details>`,
+							labels: ['type: bug']
+						})
+					}
+				}
+			]
+		}
+	});
+}
+
+export interface NewGithubIssuePayload {
+	body?: string;
+	title?: string;
+	labels?: string[];
+	template?: string;
+	milestone?: string;
+	assignee?: string;
+	projects?: string[];
+}
+
+export type NewGithubIssueOptions = NewGithubIssueOptionsShortHand | NewGithubIssueOptionsLongHand;
+
+export interface NewGithubIssueOptionsShortHand extends NewGithubIssuePayload {
+	repoUrl: string;
+}
+
+export interface NewGithubIssueOptionsLongHand extends NewGithubIssuePayload {
+	user: string;
+	repo: string;
+}
+
+const URLSearchParams = require('url-search-params');
+
+function newGithubIssue(options): string {
+	let repoUrl;
+
+	if (options.repoUrl) {
+		repoUrl = options.repoUrl;
+	} else if (options.user && options.repo) {
+		repoUrl = `https://github.com/${options.user}/${options.repo}`;
+	} else {
+		throw new Error(
+			'You need to specify either the `repoUrl` option or both the `user` and `repo` options'
+		);
+	}
+
+	const types = ['body', 'title', 'labels', 'template', 'milestone', 'assignee', 'projects'];
+
+	const params = types.reduce((ps, type) => {
+		let value = options[type];
+
+		if (value === undefined) {
+			return ps;
+		}
+
+		if (type === 'labels' || type === 'projects') {
+			if (!Array.isArray(value)) {
+				throw new TypeError(`The \`${type}\` option should be an array`);
 			}
 
-			if (response === 2) {
-				Electron.shell.openExternal(
-					newGithubIssue({
-						user: 'meetalva',
-						repo: 'alva',
-						title: 'New bug report',
-						body: `Hey there, I just encountered the following error with Alva ${Electron.app.getVersion()}:\n\n\`\`\`\n${
-							error.message
-						}\n\`\`\`\n\n<details><summary>Stack Trace</summary>\n\n\`\`\`\n${
-							error.stack
-						}\n\`\`\`\n\n</details>`,
-						labels: ['type: bug']
-					})
-				);
-			}
+			value = value.join(',');
 		}
-	);
+
+		ps.set(type, value);
+		return ps;
+	}, new URLSearchParams());
+
+	return `${repoUrl}/issues/new?${params.toString()}`;
 }

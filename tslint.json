@@ -13,6 +13,7 @@
 		"variable-name": false,
 		"no-var-requires": false,
 		"no-implicit-dependencies": false,
-		"no-this-assignment": false
+		"no-this-assignment": false,
+		"no-duplicate-imports": false
 	}
 }

@@ -62,6 +62,10 @@ export class AlvaServer implements Types.AlvaServer {
 			});
 		});
 
+		this.ws.on('error', e => {
+			console.log(e);
+		});
+
 		/** Splash view, recent project list */
 		this.app.get('/', Routes.mainRouteFactory(this));
 
@@ -118,6 +122,8 @@ export class AlvaServer implements Types.AlvaServer {
 
 	public stop(): Promise<void> {
 		this.host.log(`Stopping Alva server on ${this.address}.`);
+
+		this.sender.stop();
 
 		return new Promise(resolve =>
 			this.ws.close(() => {

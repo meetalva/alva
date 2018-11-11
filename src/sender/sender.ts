@@ -5,6 +5,7 @@ import { isMessage } from './is-message';
 import { isMessageType } from './is-message-type';
 import * as Serde from './serde';
 import * as uuid from 'uuid';
+import { EventEmitter } from 'electron';
 
 // tslint:disable-next-line:no-eval
 const WS = typeof window !== 'undefined' ? WebSocket : (eval('require("ws")') as typeof WebSocket);
@@ -21,6 +22,7 @@ export class Sender {
 	private connection: WebSocket;
 	private queue: Set<string> = new Set();
 	private matchers: Map<Message.MessageType, Matcher[]> = new Map();
+	private retry: number = 0;
 
 	private get ready(): boolean {
 		if (!this.connection) {
@@ -38,56 +40,90 @@ export class Sender {
 		}
 	}
 
+	private onConnectionMessage = (e: MessageEvent): void => {
+		const header = Serde.getMessageHeader(e.data);
+
+		if (header.status === Serde.MessageHeaderStatus.Error) {
+			console.error(header);
+			return;
+		}
+
+		if (!isMessageType(header.type)) {
+			return;
+		}
+
+		const matchers = this.matchers.get(header.type);
+
+		if (!matchers) {
+			return;
+		}
+
+		const body = Serde.getMessageBody(e.data);
+
+		if (!body) {
+			return;
+		}
+
+		// tslint:disable-next-line:no-any
+		const parseResult = AlvaUtil.parseJSON<any>(body);
+
+		if (parseResult.type === AlvaUtil.ParseResultType.Error) {
+			return;
+		}
+
+		if (!isMessage(parseResult.result)) {
+			return;
+		}
+
+		if (parseResult.result.type !== header.type) {
+			return;
+		}
+
+		matchers.forEach(matcher => matcher(parseResult.result));
+	};
+
+	private onConnectionClose = (e: CloseEvent) => {
+		if (e.code === 1000) {
+			return;
+		}
+
+		this.restart();
+	};
+
 	public async start(): Promise<void> {
-		this.connection = new WS(this.endpoint);
+		try {
+			this.connection = new WS(this.endpoint);
+			this.connection.addEventListener('message', this.onConnectionMessage);
+			this.connection.addEventListener('close', this.onConnectionClose);
+		} catch (err) {
+			return this.restart();
+		}
+
 		await onReady(this.connection);
-
-		this.connection.addEventListener('message', e => {
-			const header = Serde.getMessageHeader(e.data);
-
-			if (header.status === Serde.MessageHeaderStatus.Error) {
-				console.error(header);
-				return;
-			}
-
-			if (!isMessageType(header.type)) {
-				return;
-			}
-
-			const matchers = this.matchers.get(header.type);
-
-			if (!matchers) {
-				return;
-			}
-
-			const body = Serde.getMessageBody(e.data);
-
-			if (!body) {
-				return;
-			}
-
-			// tslint:disable-next-line:no-any
-			const parseResult = AlvaUtil.parseJSON<any>(body);
-
-			if (parseResult.type === AlvaUtil.ParseResultType.Error) {
-				return;
-			}
-
-			if (!isMessage(parseResult.result)) {
-				return;
-			}
-
-			if (parseResult.result.type !== header.type) {
-				return;
-			}
-
-			matchers.forEach(matcher => matcher(parseResult.result));
-		});
 
 		this.queue.forEach(async message => {
 			this.pass(message);
 			this.queue.delete(message);
 		});
+
+		this.retry = 0;
+	}
+
+	public async stop(): Promise<void> {
+		if (this.connection && (this.connection as any).removeAllListeners) {
+			((this.connection as any) as EventEmitter).removeAllListeners();
+		}
+	}
+
+	public async restart(): Promise<void> {
+		if (this.retry >= 10) {
+			throw new Error(`Aborted Sennder reconnecting after 10 tries`);
+		}
+
+		this.retry++;
+		await this.stop();
+		await wait(Math.pow(50, this.retry));
+		return this.start();
 	}
 
 	public pass(envelope: string): void {
@@ -175,4 +211,8 @@ function onReady(connection: WebSocket): Promise<void> {
 				return resolve(undefined);
 		}
 	});
+}
+
+function wait(delay: number): Promise<void> {
+	return new Promise(r => setTimeout(() => r(), delay));
 }

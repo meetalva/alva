@@ -116,13 +116,13 @@ export class Sender {
 	}
 
 	public async restart(): Promise<void> {
-		if (this.retry >= 10) {
-			throw new Error(`Aborted Sennder reconnecting after 10 tries`);
+		if (this.retry >= 12) {
+			throw new Error(`Aborted Sennder reconnecting after 12 tries`);
 		}
 
 		this.retry++;
 		await this.stop();
-		await wait(Math.pow(50, this.retry));
+		await wait(Math.pow(2, this.retry));
 		return this.start();
 	}
 

@@ -1,8 +1,7 @@
 import { Color } from '../colors';
+import { SpaceSize } from '../space';
 import * as React from 'react';
 import styled from 'styled-components';
-
-import { SpaceSize } from '../space';
 
 export enum LayoutDirection {
 	Row = 'row',
@@ -22,6 +21,11 @@ export enum LayoutBorder {
 export enum LayoutWrap {
 	Wrap = 'Wrap',
 	NoWrap = 'NoWrap'
+}
+
+export enum LayoutHeight {
+	Full = '100%',
+	Auto = 'auto'
 }
 
 export interface LayoutProps {
@@ -59,11 +63,13 @@ export interface LayoutProps {
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	wrap?: LayoutWrap;
 	children?: React.ReactNode;
+	height?: LayoutHeight;
 }
 
-const StyledLayout = styled.div`
+export const Layout = styled.div`
 	display: flex;
 	width: 100%;
+	height: ${(props: LayoutProps) => props.height};
 	box-sizing: border-box;
 	flex-direction: ${(props: LayoutProps) =>
 		props.direction === LayoutDirection.Column ? 'column' : 'row'};
@@ -89,75 +95,16 @@ const StyledLayout = styled.div`
 	}};
 `;
 
-const StyledMainArea = styled(StyledLayout)`
+export const MaiArea = styled(Layout).attrs({ height: LayoutHeight.Full })`
 	box-sizing: border-box;
-	height: 100vh;
-	padding-top: 40px;
 	-webkit-font-smoothing: antialiased;
 `;
 
-const StyledSideBar = styled(StyledLayout)`
+export const SideBar = styled(Layout).attrs({ height: LayoutHeight.Full })`
 	flex-basis: 240px;
-	height: 100%;
 	overflow-y: auto;
 `;
 
-export interface FixedAreaProps {
-	top?: number;
-	right?: number;
-	bottom?: number;
-	left?: number;
-	z?: number;
-	children?: React.ReactNode;
-}
-
-const StyledFixedArea = styled.div`
-	position: fixed;
-	top: ${(props: FixedAreaProps) => (typeof props.top === 'undefined' ? 'auto' : props.top)};
-	right: ${(props: FixedAreaProps) => (typeof props.right === 'undefined' ? 'auto' : props.right)};
-	bottom: ${(props: FixedAreaProps) =>
-		typeof props.bottom === 'undefined' ? 'auto' : props.bottom};
-	left: ${(props: FixedAreaProps) => (typeof props.left === 'undefined' ? 'auto' : props.left)};
-	z-index: ${props => (typeof props.z === 'undefined' ? '' : props.z)};
-`;
-
-const StyledRelativeArea = styled.div`
+export const RelativeArea = styled.div`
 	position: relative;
 `;
-
-export const FixedArea: React.StatelessComponent<FixedAreaProps> = props => (
-	<StyledFixedArea {...props} />
-);
-
-export const RelativeArea: React.StatelessComponent = props => <StyledRelativeArea {...props} />;
-
-export const MainArea: React.StatelessComponent<MainAreaProps> = props => (
-	<StyledMainArea className={props.className} direction={props.direction} border={props.border}>
-		{props.children}
-	</StyledMainArea>
-);
-
-export const SideBar: React.StatelessComponent<SideBarProps> = props => (
-	<StyledSideBar
-		className={props.className}
-		direction={props.direction}
-		border={props.border}
-		onClick={props.onClick}
-		side={props.side}
-	>
-		{props.children}
-	</StyledSideBar>
-);
-
-export const Layout: React.StatelessComponent<LayoutProps> = props => (
-	<StyledLayout
-		className={props.className}
-		direction={props.direction}
-		inset={props.inset}
-		border={props.border}
-		onClick={props.onClick}
-		wrap={props.wrap}
-	>
-		{props.children}
-	</StyledLayout>
-);

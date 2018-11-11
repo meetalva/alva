@@ -12,19 +12,20 @@ import * as Types from '../types';
 export class App extends React.Component {
 	public render(): JSX.Element | null {
 		return (
-			<Components.Layout direction={Components.LayoutDirection.Column}>
+			<Components.Layout
+				direction={Components.LayoutDirection.Column}
+				height={Components.LayoutHeight.Full}
+			>
 				<Components.GlobalStyle />
-				<Components.FixedArea top={0} right={0} left={0} z={10}>
-					<ChromeContainer />
-				</Components.FixedArea>
-				<Components.MainArea>
+				<ChromeContainer />
+				<Components.MaiArea>
 					<AppView view={Types.AlvaView.SplashScreen}>
 						<ViewSplashscreen />
 					</AppView>
 					<AppView view={Types.AlvaView.PageDetail}>
 						<ViewDetails />
 					</AppView>
-				</Components.MainArea>
+				</Components.MaiArea>
 				<Components.IconRegistry />
 			</Components.Layout>
 		);

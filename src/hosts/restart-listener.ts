@@ -4,6 +4,11 @@ export interface RestartListenerInit {
 	readline: Readline.ReadLine;
 }
 
+const readline = Readline.createInterface({
+	input: process.stdin,
+	terminal: false
+});
+
 export class RestartListener {
 	private readline: Readline.ReadLine;
 	private listener: () => void;
@@ -13,12 +18,7 @@ export class RestartListener {
 	}
 
 	public static async fromProcess(process: NodeJS.Process): Promise<RestartListener> {
-		return new RestartListener({
-			readline: Readline.createInterface({
-				input: process.stdin,
-				terminal: false
-			})
-		});
+		return new RestartListener({ readline });
 	}
 
 	private onRs = (line: string): void => {
@@ -38,6 +38,6 @@ export class RestartListener {
 	}
 
 	public unsubscribe(): void {
-		this.readline.removeListener('line', this.onRs);
+		this.readline.removeAllListeners();
 	}
 }

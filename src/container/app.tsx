@@ -19,6 +19,7 @@ export class App extends React.Component {
 
 		return (
 			<Components.Layout
+				onContextMenu={e => e.preventDefault()}
 				direction={Components.LayoutDirection.Column}
 				height={Components.LayoutHeight.Full}
 			>

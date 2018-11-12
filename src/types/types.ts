@@ -247,11 +247,10 @@ export enum PreviewDocumentMode {
 }
 
 export enum ContextMenuType {
-	LayoutMenu = 'layout-menu',
 	ElementMenu = 'element-menu'
 }
 
-export type ContextMenuRequestPayload = ElementContextMenuRequest | LayoutContextMenuRequest;
+export type ContextMenuRequestPayload = ElementContextMenuRequest;
 
 export interface ElementContextMenuRequest {
 	menu: ContextMenuType.ElementMenu;
@@ -260,11 +259,6 @@ export interface ElementContextMenuRequest {
 
 export interface ElementContextMenuRequestPayload {
 	element: SerializedModel.SerializedElement;
-}
-
-export interface LayoutContextMenuRequest {
-	menu: ContextMenuType.LayoutMenu;
-	data: LayoutContextMenuRequestPayload;
 }
 
 export interface LayoutContextMenuRequestPayload {

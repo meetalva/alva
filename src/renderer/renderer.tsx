@@ -54,7 +54,7 @@ export function startRenderer(): void {
 	}
 
 	if (app.isHostType(Types.HostType.RemoteServer)) {
-		const adapter = HostAdapter.fromSender(store.getSender());
+		const adapter = HostAdapter.fromStore(store);
 		adapter.start();
 	}
 

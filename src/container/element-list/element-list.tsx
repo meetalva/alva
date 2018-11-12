@@ -104,6 +104,8 @@ export class ElementList extends React.Component {
 	}
 
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
+		e.preventDefault();
+
 		const { store } = this.props as { store: Store.ViewStore };
 		const element = utils.elementFromTarget(e.target, { sibling: false, store });
 

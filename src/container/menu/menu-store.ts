@@ -46,7 +46,7 @@ export class MenuStore {
 
 function flatten(menus: Types.MenuItem[], init: { map: MenuMap; depth: number }): MenuMap {
 	return menus.reduce((acc, menu) => {
-		if (menu.hasOwnProperty('id')) {
+		if (menu.hasOwnProperty('id') && typeof menu.id !== 'undefined') {
 			acc.set(menu.id, { menu, active: false, depth: init.depth });
 		}
 

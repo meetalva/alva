@@ -158,16 +158,25 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 					opacity: props.menu.enabled === false ? 0.3 : 1
 				}}
 				onMouseEnter={() => {
-					if (props.menu.enabled === false) {
+					if (props.menu.enabled === false || !menu.menu.id) {
 						return;
 					}
 					props.menuStore.toggle(menu.menu.id, true);
 				}}
-				onMouseLeave={() => props.menuStore.toggle(menu.menu.id, false)}
+				onMouseLeave={() => {
+					if (!menu.menu.id) {
+						return;
+					}
+					props.menuStore.toggle(menu.menu.id, false);
+				}}
 				onClick={e => {
 					e.preventDefault();
 
 					if (props.menu.enabled === false) {
+						return;
+					}
+
+					if (!menu.menu.id) {
 						return;
 					}
 
@@ -237,6 +246,11 @@ class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }>
 					if (props.menu.enabled === false) {
 						return;
 					}
+
+					if (!menu.menu.id) {
+						return;
+					}
+
 					props.menuStore.toggle(menu.menu.id, false);
 					if (menu.menu.hasOwnProperty('click')) {
 						const actionable = menu.menu as Types.ActionableMenuItem;
@@ -328,6 +342,10 @@ class NestedMenuItem extends React.Component<NestedMenuItemProps> {
 					}
 
 					if (props.menu.enabled === false) {
+						return;
+					}
+
+					if (!menu.menu.id) {
 						return;
 					}
 

@@ -27,6 +27,7 @@ export class App extends React.Component {
 					<MenuContainer.Menu
 						variant={MenuContainer.MenuVariant.Horizontal}
 						menus={[
+							// TODO: Connect to store more cleanly
 							Menu.appMenu(ctx),
 							Menu.fileMenu(ctx),
 							Menu.editMenu(ctx),

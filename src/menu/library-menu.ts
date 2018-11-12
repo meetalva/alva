@@ -27,6 +27,8 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				enabled: hasProject && onDetailView,
 				accelerator: 'CmdOrCtrl+Shift+C',
 				click: sender => {
+					console.log(ctx);
+
 					if (typeof ctx.project === 'undefined') {
 						return;
 					}

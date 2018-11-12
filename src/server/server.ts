@@ -53,11 +53,34 @@ export class AlvaServer implements Types.AlvaServer {
 		this.dataHost = init.dataHost;
 
 		this.ws.on('connection', connection => {
-			connection.on('message', envelope => {
-				this.ws.clients.forEach(client => {
-					if (client !== connection) {
-						client.send(envelope);
+			this.ws.clients.forEach(client => {
+				if (client === connection) {
+					return;
+				}
+
+				const queue = new Set();
+
+				connection.on('message', envelope => {
+					if (client.readyState === WS.CONNECTING) {
+						queue.add(envelope);
+
+						if (queue.size === 1) {
+							client.addEventListener('open', () => {
+								queue.forEach(m => {
+									client.send(m);
+									queue.delete(m);
+								});
+							});
+						}
+
+						return;
 					}
+
+					if (client.readyState !== WS.OPEN) {
+						return;
+					}
+
+					client.send(envelope);
 				});
 			});
 		});

@@ -60,19 +60,20 @@ export class AlvaServer implements Types.AlvaServer {
 
 				const queue = new Set();
 
+				const onClientOpen = () => {
+					queue.forEach(m => {
+						client.send(m);
+						queue.delete(m);
+					});
+
+					client.removeEventListener('open', onClientOpen);
+				};
+
+				client.addEventListener('open', onClientOpen);
+
 				connection.on('message', envelope => {
 					if (client.readyState === WS.CONNECTING) {
 						queue.add(envelope);
-
-						if (queue.size === 1) {
-							client.addEventListener('open', () => {
-								queue.forEach(m => {
-									client.send(m);
-									queue.delete(m);
-								});
-							});
-						}
-
 						return;
 					}
 

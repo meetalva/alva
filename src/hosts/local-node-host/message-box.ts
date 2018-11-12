@@ -10,7 +10,7 @@ Electron.app.on('ready', () => {
 	Electron.app.focus();
 
 	Electron.dialog.showMessageBox(flags, response => {
-		console.log(JSON.stringify(response));
+		console.log(JSON.stringify(response || -1));
 		process.nextTick(() => {
 			Electron.app.exit();
 		});

@@ -80,7 +80,8 @@ export enum MessageType {
 	HighlightElement = 'highlight-element',
 	WindowOpen = 'window-open',
 	WindowClose = 'window-close',
-	ChromeScreenShot = 'chrome-screenshot'
+	ChromeScreenShot = 'chrome-screenshot',
+	ToggleFullScreen = 'toggle-fullscreen'
 }
 
 export type Message =
@@ -161,7 +162,8 @@ export type Message =
 	| WindowOpen
 	| ChromeScreenShot
 	| UseFileRequest
-	| UseFileResponse;
+	| UseFileResponse
+	| ToggleFullScreen;
 
 export type CreateNewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -469,3 +471,5 @@ export type ShowMessage = Envelope<
 		}[];
 	}
 >;
+
+export type ToggleFullScreen = EmptyEnvelope<MessageType.ToggleFullScreen>;

@@ -218,7 +218,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			label: 'Grow',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'flexGrow',
-			defaultValue: 1
+			defaultValue: 0
 		}),
 		new PatternNumberProperty({
 			contextId: FLEX_SHRINK_CONTEXT_ID,

@@ -27,10 +27,14 @@ export class HostAdapter {
 
 	public start() {
 		this.host.start();
-		this.sender.match(M.MessageType.OpenExternalURL, m => this.host.open(m.payload));
-		this.sender.match(M.MessageType.ShowMessage, m => this.host.showMessage(m.payload));
+		this.sender.match<M.OpenExternalURL>(M.MessageType.OpenExternalURL, m =>
+			this.host.open(m.payload)
+		);
+		this.sender.match<M.ShowMessage>(M.MessageType.ShowMessage, m =>
+			this.host.showMessage(m.payload)
+		);
 
-		this.sender.match(M.MessageType.ContextMenuRequest, m => {
+		this.sender.match<M.ContextMenuRequest>(M.MessageType.ContextMenuRequest, m => {
 			if (m.payload.menu === Types.ContextMenuType.ElementMenu) {
 				const element = this.store.getProject().getElementById(m.payload.data.element.id);
 
@@ -89,7 +93,7 @@ export class BrowserHost implements Partial<Types.Host> {
 
 	public async showContextMenu(opts: {
 		items: Types.ContextMenuItem[];
-		position: { x: 0; y: 0 };
+		position: { x: number; y: number };
 	}): Promise<undefined> {
 		opts.items.forEach(item => this.menuStore.add(item, { depth: 0, active: false }));
 		this.menuStore.position = opts.position;

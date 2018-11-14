@@ -114,7 +114,7 @@ export class AlvaServer implements Types.AlvaServer {
 		const listen = Util.promisify(this.http.listen.bind(this.http));
 
 		this.host.log(`Starting Alva server on port ${this.port}..`);
-		await listen(this.port, 'localhost');
+		await listen(this.port);
 
 		await this.sender.start();
 		this.host.log(`Started Alva server on ${this.address}.`);

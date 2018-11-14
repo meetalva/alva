@@ -1,6 +1,9 @@
 import * as Types from '../types';
 import { MessageType } from '../message';
 import * as uuid from 'uuid';
+import { FileInput } from '../container/file-input';
+import * as React from 'react';
+import * as Store from '../store';
 
 const ids = {
 	file: uuid.v4(),
@@ -45,6 +48,41 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 						id: uuid.v4(),
 						payload: undefined
 					});
+				},
+				// TODO: Inject more deps
+				render: (props: {
+					sender: Types.Sender;
+					style: React.CSSProperties;
+					menu: Types.MenuItem;
+					menuStore: Store.MenuStore;
+					onMouseEnter: React.MouseEventHandler<HTMLElement>;
+					onMouseLeave: React.MouseEventHandler<HTMLElement>;
+				}) => {
+					return (
+						<label
+							style={props.style}
+							onClick={e => e.stopPropagation()}
+							onMouseEnter={props.onMouseEnter}
+							onMouseLeave={props.onMouseLeave}
+						>
+							Open
+							<FileInput
+								accept=".alva"
+								onChange={contents => {
+									props.menuStore.clear();
+
+									props.sender.send({
+										type: MessageType.UseFileRequest,
+										id: uuid.v4(),
+										payload: {
+											silent: false,
+											contents
+										}
+									});
+								}}
+							/>
+						</label>
+					);
 				}
 			},
 			{

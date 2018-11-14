@@ -69,11 +69,14 @@ export class AlvaServer implements Types.AlvaServer {
 		/** Splash view, recent project list */
 		this.app.get('/', Routes.mainRouteFactory(this));
 
-		/** Project preview view */
-		this.app.get('/preview/:id', Routes.previewRouteFactory(this));
-
 		/** Project edit view */
 		this.app.get('/project/:id', Routes.projectRouteFactory(this));
+
+		/** Project preview view */
+		this.app.get('/project/preview/:id', Routes.previewRouteFactory(this));
+
+		/** Project export */
+		this.app.get('/project/export/:id', Routes.exportRouteFactory(this));
 
 		/** Scripts required for client side application */
 		this.app.get('/scripts/*', Routes.scriptsRouteFactory(this));
@@ -82,6 +85,7 @@ export class AlvaServer implements Types.AlvaServer {
 		this.sender.match(M.CreateNewFileRequest, Matchers.createNewFileRequest(this));
 		this.sender.match(M.OpenExternalURL, Matchers.openExternalUrl(this));
 		this.sender.match(M.OpenFileRequest, Matchers.openFileRequest(this));
+		this.sender.match(M.Save, Matchers.save(this));
 		this.sender.match(M.ShowMessage, Matchers.showMessage(this));
 		this.sender.match(M.UseFileRequest, Matchers.useFileRequest(this));
 	}

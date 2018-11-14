@@ -7,6 +7,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as Menu from '../container/menu';
 import { Persistence } from '../persistence';
+import * as Path from 'path';
 
 export class HostAdapter {
 	private sender: Types.Sender;
@@ -55,13 +56,7 @@ export class HostAdapter {
 				return;
 			}
 
-			const blob = new Blob([serializeResult.contents], { type: 'text/plain;charset=utf-8' });
-			const url = URL.createObjectURL(blob);
-
-			const a = document.createElement('a');
-			a.download = `${project.getName()}.alva`;
-			a.href = url;
-			a.click();
+			await this.host.saveFile(`${project.getName()}.alva`, serializeResult.contents);
 		});
 
 		this.sender.match<M.ContextMenuRequest>(M.MessageType.ContextMenuRequest, m => {
@@ -81,6 +76,20 @@ export class HostAdapter {
 					})
 				});
 			}
+		});
+
+		this.sender.match<M.ExportHtmlProject>(M.MessageType.ExportHtmlProject, async m => {
+			const project = this.store.getProject();
+
+			if (project.getId() !== m.payload.projectId) {
+				return;
+			}
+
+			const name = m.payload.path ? Path.basename(m.payload.path) : `${project.getName()}.html`;
+			await this.host.download(
+				name,
+				`http://localhost:${this.store.getServerPort()}/project/export/${project.getId()}`
+			);
 		});
 	}
 }
@@ -111,6 +120,23 @@ export class BrowserHost implements Partial<Types.Host> {
 		);
 	}
 
+	public download(name: string, url: string): Promise<void> {
+		return new Promise(resolve => {
+			const a = document.createElement('a');
+			a.download = name;
+			a.href = url;
+
+			document.body.appendChild(a);
+			a.click();
+
+			window.requestIdleCallback(() => {
+				document.body.removeChild(a);
+				URL.revokeObjectURL(url);
+				resolve();
+			});
+		});
+	}
+
 	public async open(url: string): Promise<void> {
 		window.open(url, '_blank');
 	}
@@ -119,6 +145,13 @@ export class BrowserHost implements Partial<Types.Host> {
 		// TODO: implement custom dialogs
 		alert([opts.message, opts.detail].filter(Boolean).join('\n'));
 		return;
+	}
+
+	public async saveFile(path: string, contents: string): Promise<void> {
+		const blob = new Blob([contents], { type: 'text/plain;charset=utf-8' });
+		const url = URL.createObjectURL(blob);
+		await this.download(Path.basename(path), url);
+		URL.revokeObjectURL(url);
 	}
 
 	public async showContextMenu(opts: {

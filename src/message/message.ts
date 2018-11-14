@@ -328,7 +328,7 @@ export type UpdatePatternLibraryResponse = Envelope<
 >;
 export type ExportHtmlProject = Envelope<
 	MessageType.ExportHtmlProject,
-	{ path: string | undefined }
+	{ path: string | undefined; projectId: string }
 >;
 export type ExportPngPage = Envelope<MessageType.ExportPngPage, { path: string | undefined }>;
 export type ExportSketchPage = Envelope<MessageType.ExportSketchPage, { path: string | undefined }>;

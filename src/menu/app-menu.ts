@@ -40,6 +40,7 @@ export const appMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				}
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator',
 				visible: isElectron
 			},
@@ -51,6 +52,7 @@ export const appMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				submenu: []
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator',
 				visible: isElectron
 			},
@@ -75,6 +77,7 @@ export const appMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				visible: isElectron
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator',
 				visible: isElectron
 			},

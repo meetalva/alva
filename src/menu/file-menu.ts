@@ -48,6 +48,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				}
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator'
 			},
 			{
@@ -64,6 +65,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				}
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator'
 			},
 			{
@@ -104,6 +106,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				}
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator'
 			},
 			{
@@ -124,6 +127,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				}
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator',
 				visible: isElectron
 			},

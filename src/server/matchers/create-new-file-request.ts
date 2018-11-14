@@ -15,6 +15,7 @@ export function createNewFileRequest(
 
 		const serializeResult = await Persistence.serialize(draftProject);
 
+		// TODO: error handling
 		if (serializeResult.state !== Types.PersistenceState.Success) {
 			return;
 		}

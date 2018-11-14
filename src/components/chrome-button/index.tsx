@@ -22,6 +22,7 @@ const StyledChromeButton = styled.div`
 	height: 21px;
 	box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 0.5px 2px 0 rgba(0, 0, 0, 0.3);
 	color: ${Color.Grey50};
+	white-space: nowrap;
 
 	&:active {
 		background: ${Color.Grey90};

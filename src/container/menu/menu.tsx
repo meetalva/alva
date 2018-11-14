@@ -139,32 +139,49 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 			return null;
 		}
 
+		const style: React.CSSProperties = {
+			padding: '2.5px 15px 2.5px 20px',
+			boxSizing: 'border-box',
+			whiteSpace: 'nowrap',
+			background: menu.active ? Components.Color.Blue : 'transparent',
+			color: menu.active ? Components.Color.White : Components.Color.Black,
+			display: 'flex',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+			alignSelf: 'center',
+			opacity: props.menu.enabled === false ? 0.3 : 1
+		};
+
+		const onMouseEnter = () => {
+			if (props.menu.enabled === false || !menu.menu.id) {
+				return;
+			}
+			props.menuStore.toggle(menu.menu.id, true);
+		};
+
+		const onMouseLeave = () => {
+			if (!menu.menu.id) {
+				return;
+			}
+			props.menuStore.toggle(menu.menu.id, false);
+		};
+
+		if (typeof (menu.menu as any).render === 'function') {
+			return (menu.menu as any).render({
+				menu,
+				menuStore: props.menuStore,
+				sender: props.store.getSender(),
+				style,
+				onMouseEnter,
+				onMouseLeave
+			});
+		}
+
 		return (
 			<li
-				style={{
-					padding: '2.5px 15px 2.5px 20px',
-					boxSizing: 'border-box',
-					whiteSpace: 'nowrap',
-					background: menu.active ? Components.Color.Blue : 'transparent',
-					color: menu.active ? Components.Color.White : Components.Color.Black,
-					display: 'flex',
-					justifyContent: 'space-between',
-					alignItems: 'center',
-					alignSelf: 'center',
-					opacity: props.menu.enabled === false ? 0.3 : 1
-				}}
-				onMouseEnter={() => {
-					if (props.menu.enabled === false || !menu.menu.id) {
-						return;
-					}
-					props.menuStore.toggle(menu.menu.id, true);
-				}}
-				onMouseLeave={() => {
-					if (!menu.menu.id) {
-						return;
-					}
-					props.menuStore.toggle(menu.menu.id, false);
-				}}
+				style={style}
+				onMouseEnter={onMouseEnter}
+				onMouseLeave={onMouseLeave}
 				onClick={e => {
 					e.preventDefault();
 

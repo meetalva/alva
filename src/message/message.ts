@@ -99,7 +99,7 @@ export type Message =
 	| ConnectedPatternLibraryNotification
 	| ContentRequest
 	| ContentResponse
-	| ContextMenuRequst
+	| ContextMenuRequest
 	| CopyPageElement
 	| CreateNewPage
 	| CreateScriptBundleRequest
@@ -222,7 +222,7 @@ export type ConnectPatternLibraryResponse = Envelope<
 		previousLibraryId: string | undefined;
 	}
 >;
-export type ContextMenuRequst = Envelope<
+export type ContextMenuRequest = Envelope<
 	MessageType.ContextMenuRequest,
 	Types.ContextMenuRequestPayload
 >;

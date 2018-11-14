@@ -23,6 +23,7 @@ export const windowMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				role: 'minimize'
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator'
 			},
 			{

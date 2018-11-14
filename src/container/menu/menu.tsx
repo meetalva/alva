@@ -45,12 +45,8 @@ export class Menu extends React.Component<MenuProps> {
 						background: Components.Color.White
 					}}
 				>
-					{props.menus.map((menu, index) => (
-						<GenericMenuItem
-							variant={MenuVariant.Horizontal}
-							key={[index, JSON.stringify(menu)].join('-')}
-							menu={menu}
-						/>
+					{props.menus.map(menu => (
+						<GenericMenuItem variant={MenuVariant.Horizontal} key={menu.id} menu={menu} />
 					))}
 					{this.menuStore.activeMenu && (
 						<div
@@ -91,15 +87,13 @@ export class SubMenu extends React.Component<SubMenuProps> {
 					boxShadow: `0 5px 10px rgba(0,0,0,.01)`
 				}}
 			>
-				{props.menus.map((menu, index) => (
-					<div style={{ position: 'relative' }}>
-						<GenericMenuItem
-							variant={MenuVariant.Vertical}
-							key={[index, JSON.stringify(menu)].join('-')}
-							menu={menu}
-						/>
-					</div>
-				))}
+				{props.menus.map(menu => {
+					return (
+						<div style={{ position: 'relative' }} key={menu.id}>
+							<GenericMenuItem variant={MenuVariant.Vertical} menu={menu} />
+						</div>
+					);
+				})}
 			</ul>
 		);
 	}

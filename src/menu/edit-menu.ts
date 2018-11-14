@@ -56,6 +56,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => ({
 			}
 		},
 		{
+			id: uuid.v4(),
 			type: 'separator'
 		},
 		{
@@ -139,6 +140,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => ({
 			}
 		},
 		{
+			id: uuid.v4(),
 			type: 'separator'
 		},
 		{
@@ -157,6 +159,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => ({
 			}
 		},
 		{
+			id: uuid.v4(),
 			type: 'separator'
 		},
 		{
@@ -166,6 +169,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => ({
 			role: 'selectall'
 		},
 		{
+			id: uuid.v4(),
 			type: 'separator'
 		},
 		{

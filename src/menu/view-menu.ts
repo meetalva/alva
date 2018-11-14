@@ -68,6 +68,7 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				}
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator'
 			},
 			{
@@ -109,6 +110,7 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				}
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator'
 			},
 			{
@@ -188,6 +190,7 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				}
 			},
 			{
+				id: uuid.v4(),
 				type: 'separator',
 				visible: isElectron
 			},

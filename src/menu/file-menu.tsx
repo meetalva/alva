@@ -160,7 +160,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 					sender.send({
 						id: uuid.v4(),
 						type: MessageType.ExportHtmlProject,
-						payload: { path: undefined }
+						payload: { path: undefined, projectId: ctx.project.getId() }
 					});
 				}
 			},

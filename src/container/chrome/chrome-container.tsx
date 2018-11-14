@@ -97,7 +97,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 							props.store.getSender().send({
 								id: uuid.v4(),
 								type: MessageType.ExportHtmlProject,
-								payload: { path: undefined }
+								payload: { path: undefined, projectId: store.getProject().getId() }
 							});
 						}}
 						onDoubleClick={event => {

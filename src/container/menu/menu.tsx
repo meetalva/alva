@@ -2,8 +2,7 @@ import * as React from 'react';
 import * as Types from '../../types';
 import * as Components from '../../components';
 import * as MobxReact from 'mobx-react';
-import { MenuStore } from './menu-store';
-import { ViewStore } from '../../store';
+import * as Store from '../../store';
 
 export interface MenuProps {
 	variant: MenuVariant;
@@ -27,7 +26,7 @@ export enum MenuVariant {
 
 @MobxReact.observer
 export class Menu extends React.Component<MenuProps> {
-	private menuStore = new MenuStore(this.props.menus);
+	private menuStore = new Store.MenuStore(this.props.menus);
 
 	public render(): JSX.Element | null {
 		const { props } = this;
@@ -99,7 +98,7 @@ export class SubMenu extends React.Component<SubMenuProps> {
 	}
 }
 
-class GenericMenuItem extends React.Component<GenericMenuItemProps> {
+export class GenericMenuItem extends React.Component<GenericMenuItemProps> {
 	public render(): JSX.Element | null {
 		const { props } = this;
 
@@ -130,7 +129,10 @@ class GenericMenuItem extends React.Component<GenericMenuItemProps> {
 @MobxReact.observer
 class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 	public render(): JSX.Element | null {
-		const props = this.props as NestedMenuItemProps & { menuStore: MenuStore; store: ViewStore };
+		const props = this.props as NestedMenuItemProps & {
+			menuStore: Store.MenuStore;
+			store: Store.ViewStore;
+		};
 		const menu = props.menuStore.get(props.menu.id);
 
 		if (!menu) {
@@ -198,8 +200,8 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }> {
 	public render(): JSX.Element | null {
 		const props = this.props as { menu: Types.CheckboxMenuItem } & {
-			menuStore: MenuStore;
-			store: ViewStore;
+			menuStore: Store.MenuStore;
+			store: Store.ViewStore;
 		};
 		const menu = props.menuStore.get(props.menu.id);
 
@@ -301,7 +303,7 @@ interface NestedMenuItemProps {
 @MobxReact.observer
 class NestedMenuItem extends React.Component<NestedMenuItemProps> {
 	public render(): JSX.Element | null {
-		const props = this.props as NestedMenuItemProps & { menuStore: MenuStore };
+		const props = this.props as NestedMenuItemProps & { menuStore: Store.MenuStore };
 		const menu = props.menuStore.get(props.menu.id);
 
 		if (!menu) {
@@ -386,6 +388,7 @@ function parseAccelerator(accelerator: string): string {
 				case 'Right':
 					return '→';
 				case 'Delete':
+				case 'Backspace':
 					return '⌫';
 				default:
 					return item;

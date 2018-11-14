@@ -1,5 +1,5 @@
 import * as Mobx from 'mobx';
-import * as Types from '../../types';
+import * as Types from '../types';
 
 export interface MenuMapEntry {
 	menu: Types.MenuItem;
@@ -10,10 +10,16 @@ export type MenuMap = Map<string, MenuMapEntry>;
 
 export class MenuStore {
 	@Mobx.observable private menus: MenuMap = new Map();
+	@Mobx.observable public position: { x: number; y: number } = { x: 0, y: 0 };
 
 	@Mobx.computed
 	get activeMenu(): MenuMapEntry | undefined {
 		return [...this.menus].map(([, m]) => m).find(m => m.active);
+	}
+
+	@Mobx.computed
+	get topLevel(): Types.MenuItem[] {
+		return [...this.menus].filter(([, m]) => m.depth === 0).map(([, m]) => m.menu);
 	}
 
 	constructor(menus: Types.MenuItem[]) {
@@ -30,6 +36,11 @@ export class MenuStore {
 	}
 
 	@Mobx.action
+	public reset(): void {
+		this.menus.clear();
+	}
+
+	@Mobx.action
 	public toggle(id: string, forced?: boolean): void {
 		const entry = this.menus.get(id);
 
@@ -41,6 +52,11 @@ export class MenuStore {
 
 			entry.active = typeof forced !== 'undefined' ? forced : !entry.active;
 		}
+	}
+
+	@Mobx.action
+	public add(menu: Types.MenuItem, meta: { active: boolean; depth: number }): void {
+		this.menus.set(menu.id, { menu, ...meta });
 	}
 }
 

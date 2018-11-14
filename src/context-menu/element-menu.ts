@@ -10,7 +10,8 @@ const ids = {
 	pasteInside: uuid.v4(),
 	duplicate: uuid.v4(),
 	selectAll: uuid.v4(),
-	delete: uuid.v4()
+	delete: uuid.v4(),
+	sep: uuid.v4()
 };
 
 export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.ContextMenuItem[] => {
@@ -105,6 +106,7 @@ export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.Context
 			}
 		},
 		{
+			id: ids.sep,
 			type: 'separator'
 		},
 		...(!ctx.element.getNameEditable() ? defaultPasteItems : [])

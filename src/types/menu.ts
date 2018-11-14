@@ -49,7 +49,7 @@ export interface ServiceMenuItem {
 }
 
 export interface SeperatorMenuItem {
-	id?: string;
+	id: string;
 	type?: 'separator';
 	visible?: boolean;
 }

@@ -722,7 +722,7 @@ export class ViewStore {
 	public save(): void {
 		this.sender.send({
 			id: uuid.v4(),
-			payload: { publish: false },
+			payload: { publish: false, projectId: this.project.getId() },
 			type: MessageType.Save
 		});
 	}

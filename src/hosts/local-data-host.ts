@@ -1,9 +1,11 @@
 import * as Types from '../types';
 import * as Model from '../model';
 import * as Path from 'path';
+import { Persistence } from '../persistence';
 
 export class LocalDataHost implements Types.DataHost {
 	private host: Types.Host;
+	private cache: Map<string, Model.Project> = new Map();
 
 	private constructor({ host }: { host: Types.Host }) {
 		this.host = host;
@@ -42,6 +44,7 @@ export class LocalDataHost implements Types.DataHost {
 		const memory = await this.readMemory();
 		memory.projects[project.getId()] = project.getPath();
 		await this.writeMemory(memory);
+		this.cache.set(project.getId(), project);
 	}
 
 	public async getProject(id: string): Promise<Model.Project | undefined> {
@@ -52,8 +55,20 @@ export class LocalDataHost implements Types.DataHost {
 			return;
 		}
 
+		if (this.cache.has(id)) {
+			return this.cache.get(id);
+		}
+
 		const file = await this.host.readFile(projectPath);
-		return Model.Project.from(JSON.parse(file.contents));
+
+		const parsed = await Persistence.parse<Types.SerializedProject>(file.contents);
+
+		if (parsed.state === Types.PersistenceState.Error) {
+			// TODO: Error handling
+			return;
+		}
+
+		return Model.Project.from(parsed.contents);
 	}
 
 	public async addConnection(

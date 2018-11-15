@@ -286,7 +286,7 @@ export type ProjectResponse = Envelope<
 >;
 export type Redo = EmptyEnvelope<MessageType.Redo>;
 export type Reload = Envelope<MessageType.Reload, { forced: boolean } | undefined>;
-export type Save = Envelope<MessageType.Save, { publish: boolean } | undefined>;
+export type Save = Envelope<MessageType.Save, { publish: boolean; projectId: string }>;
 export type SaveResult = Envelope<
 	MessageType.SaveResult,
 	{ draft: boolean; result: Types.PersistenceSerializeResult; name: string }

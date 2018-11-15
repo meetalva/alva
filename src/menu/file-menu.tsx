@@ -121,7 +121,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 					sender.send({
 						type: MessageType.Save,
 						id: uuid.v4(),
-						payload: { publish: ctx.project.getDraft() }
+						payload: { publish: ctx.project.getDraft(), projectId: ctx.project.getId() }
 					});
 				}
 			},
@@ -139,7 +139,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 					sender.send({
 						type: MessageType.Save,
 						id: uuid.v4(),
-						payload: { publish: true }
+						payload: { publish: true, projectId: ctx.project.getId() }
 					});
 				}
 			},

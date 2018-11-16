@@ -39,6 +39,8 @@ export class Project {
 
 	private batch: number = 1;
 
+	private syncing: boolean = false;
+
 	@Mobx.observable private draft: boolean;
 
 	@Mobx.observable private elements: Map<string, Element> = new Map();
@@ -735,6 +737,12 @@ export class Project {
 	}
 
 	public sync(sender: Types.Sender): void {
+		if (this.syncing) {
+			return;
+		}
+
+		this.syncing = true;
+
 		sender.match<Message.MobxUpdateMessage>(Message.MessageType.MobxUpdate, message => {
 			if (
 				message.payload.change.hasOwnProperty('key') &&

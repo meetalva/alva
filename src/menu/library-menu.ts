@@ -16,6 +16,10 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			.getPatternLibraries()
 			.filter(l => l.getOrigin() !== Types.PatternLibraryOrigin.BuiltIn).length > 0;
 	const onDetailView = ctx.app && ctx.app.isActiveView(Types.AlvaView.PageDetail);
+	const hasFileAccess =
+		ctx.app &&
+		(ctx.app.isHostType(Types.HostType.LocalElectron) ||
+			ctx.app.isHostType(Types.HostType.LocalServer));
 
 	return {
 		id: ids.library,
@@ -24,7 +28,7 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.connect,
 				label: '&Connect New Library',
-				enabled: hasProject && onDetailView,
+				enabled: hasProject && onDetailView && hasFileAccess,
 				accelerator: 'CmdOrCtrl+Shift+C',
 				click: sender => {
 					if (typeof ctx.project === 'undefined') {
@@ -41,7 +45,7 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.update,
 				label: '&Update All Libraries',
-				enabled: hasProject && onDetailView && hasConnectedLibrary,
+				enabled: hasProject && onDetailView && hasConnectedLibrary && hasFileAccess,
 				accelerator: 'CmdOrCtrl+U',
 				click: sender => {
 					if (!ctx.project) {

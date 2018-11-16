@@ -27,7 +27,6 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.reload,
 				label: '&Reload',
-				enabled: isLocal,
 				accelerator: 'CmdOrCtrl+R',
 				click: sender => {
 					sender.send({
@@ -41,9 +40,6 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				id: ids.forceReload,
 				label: '&Force Reload',
 				accelerator: 'CmdOrCtrl+Shift+R',
-				visible: isLocal,
-				// TODO: implement
-				// enabled: isConnected,
 				click: sender => {
 					sender.send({
 						id: uuid.v4(),
@@ -57,9 +53,9 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.fullscreen,
 				label: 'Toggle &Full Screen',
+				visible: isElectron,
 				accelerator: 'Ctrl+Command+F',
 				click: sender => {
-					// TODO: Implement receiver part
 					sender.send({
 						id: uuid.v4(),
 						type: Message.MessageType.ToggleFullScreen,

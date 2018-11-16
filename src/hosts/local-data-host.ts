@@ -68,7 +68,10 @@ export class LocalDataHost implements Types.DataHost {
 			return;
 		}
 
-		return Model.Project.from(parsed.contents);
+		const project = Model.Project.from(parsed.contents);
+		this.cache.set(project.getId(), project);
+
+		return project;
 	}
 
 	public async addConnection(

@@ -91,6 +91,10 @@ export class HostAdapter {
 				`http://localhost:${this.store.getServerPort()}/project/export/${project.getId()}`
 			);
 		});
+
+		this.sender.match<M.Reload>(M.MessageType.Reload, async m => {
+			await this.host.reload();
+		});
 	}
 }
 
@@ -139,6 +143,10 @@ export class BrowserHost implements Partial<Types.Host> {
 
 	public async open(url: string): Promise<void> {
 		window.open(url, '_blank');
+	}
+
+	public async reload(): Promise<void> {
+		window.location.reload();
 	}
 
 	public async showMessage(opts: Types.HostMessageOptions): Promise<undefined> {

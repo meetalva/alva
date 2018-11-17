@@ -14,6 +14,12 @@ export function openFile({
 	M.OpenFileResponse | M.NewFileResponse | M.UseFileResponse
 > {
 	return m => {
+		const senders = m.sender || [];
+
+		if (senders[0] !== store.getSender().id) {
+			return;
+		}
+
 		Mobx.runInAction(Types.ActionName.OpenFile, () => {
 			if (m.payload.status === Types.ProjectPayloadStatus.Error) {
 				return;

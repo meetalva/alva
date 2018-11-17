@@ -199,3 +199,9 @@ export interface SerializedElementActionPayload {
 export enum SerialializationType {
 	Set = 'Set'
 }
+
+export interface ClipboardPayload {
+	type: SerializedItemType;
+	item: SerializedItem;
+	project: SerializedProject;
+}

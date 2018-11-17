@@ -36,6 +36,7 @@ export function openFileRequest(
 					type: Message.MessageType.UseFileRequest,
 					id: message.id,
 					transaction: message.transaction,
+					sender: message.sender,
 					payload: {
 						silent,
 						contents
@@ -48,7 +49,8 @@ export function openFileRequest(
 				type: Message.MessageType.OpenFileResponse,
 				id: message.id,
 				transaction: message.transaction,
-				payload: response.payload
+				payload: response.payload,
+				sender: message.sender
 			});
 		} catch (err) {
 			if (!silent) {

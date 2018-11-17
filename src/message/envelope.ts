@@ -1,6 +1,7 @@
 export interface Envelope<V, T> {
 	id: string;
 	transaction?: string;
+	sender?: string[];
 	payload: T;
 	type: V;
 }

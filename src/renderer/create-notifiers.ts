@@ -17,6 +17,8 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 	};
 
 	const sender = store.getSender();
+	const project = store.getProject();
+	const projectId = project ? project.getId() : '';
 
 	Mobx.autorun(() => {
 		const metaDown = store.getMetaDown();
@@ -112,6 +114,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 							id: uuid.v4(),
 							type: Message.MessageType.MobxUpdate,
 							payload: {
+								projectId,
 								// tslint:disable-next-line:no-any
 								id: (objectChange.object as any).id,
 								name: objectChange.object.constructor.name,
@@ -143,6 +146,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 							type: Message.MessageType.MobxUpdate,
 							payload: {
 								// tslint:disable-next-line:no-any
+								projectId,
 								id: parent.getId(),
 								name: name.parentName,
 								change: {
@@ -191,6 +195,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 						id: uuid.v4(),
 						type: Message.MessageType.MobxAdd,
 						payload: {
+							projectId,
 							id: parent.getId(),
 							name: name.parentName,
 							memberName: name.memberName,
@@ -223,6 +228,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 						id: uuid.v4(),
 						type: Message.MessageType.MobxDelete,
 						payload: {
+							projectId,
 							id: parent.getId(),
 							name: name.parentName,
 							memberName: name.memberName,
@@ -260,6 +266,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 						id: uuid.v4(),
 						type: Message.MessageType.MobxSplice,
 						payload: {
+							projectId,
 							id: parent.getId(),
 							name: name.parentName,
 							memberName: name.memberName,

@@ -88,14 +88,6 @@ function main(): void {
 
 		project.sync(sender);
 
-		sender.match<Message.NewFileResponse>(Message.MessageType.CreateNewFileResponse, message => {
-			window.location.reload();
-		});
-
-		sender.match<Message.OpenFileResponse>(Message.MessageType.OpenFileResponse, message => {
-			window.location.reload();
-		});
-
 		sender.match<Message.KeyboardChange>(Message.MessageType.KeyboardChange, message => {
 			store.setMetaDown(message.payload.metaDown);
 		});
@@ -159,7 +151,7 @@ function main(): void {
 
 				sender.send({
 					id: uuid.v4(),
-					payload: { userStore: userStore.toJSON() },
+					payload: { userStore: userStore.toJSON(), projectId: project.getId() },
 					type: Message.MessageType.ChangeUserStore
 				});
 			},

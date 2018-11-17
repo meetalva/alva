@@ -362,6 +362,22 @@ export class Project {
 		return this.highlightedElementContents;
 	}
 
+	public getItem(
+		id: string,
+		type: Types.ItemType | Types.SerializedItemType
+	): Element | Page | undefined {
+		switch (type) {
+			case Types.ItemType.Page:
+			case 'page':
+				return this.getPageById(id);
+			case Types.ItemType.Element:
+			case 'element':
+				return this.getElementById(id);
+			default:
+				return;
+		}
+	}
+
 	public getFocusedItem(): Element | Page | undefined {
 		return this.focusedItem;
 	}
@@ -744,6 +760,10 @@ export class Project {
 		this.syncing = true;
 
 		sender.match<Message.MobxUpdateMessage>(Message.MessageType.MobxUpdate, message => {
+			if (message.payload.projectId !== this.id) {
+				return;
+			}
+
 			if (
 				message.payload.change.hasOwnProperty('key') &&
 				!message.payload.change.hasOwnProperty('mapKey')
@@ -796,6 +816,10 @@ export class Project {
 		});
 
 		sender.match<Message.MobxAddMessage>(Message.MessageType.MobxAdd, message => {
+			if (message.payload.projectId !== this.id) {
+				return;
+			}
+
 			const parent = this.getObject(message.payload.name, message.payload.id);
 			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
 
@@ -822,6 +846,10 @@ export class Project {
 		});
 
 		sender.match<Message.MobxDeleteMessage>(Message.MessageType.MobxDelete, message => {
+			if (message.payload.projectId !== this.id) {
+				return;
+			}
+
 			const parent = this.getObject(message.payload.name, message.payload.id);
 
 			if (!parent) {
@@ -839,6 +867,10 @@ export class Project {
 		});
 
 		sender.match<Message.MobxSpliceMessage>(Message.MessageType.MobxSplice, message => {
+			if (message.payload.projectId !== this.id) {
+				return;
+			}
+
 			const parent = this.getObject(message.payload.name, message.payload.id);
 			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
 

@@ -38,7 +38,9 @@ export function createNewFileRequest(
 		server.sender.send({
 			id: message.id,
 			type: Message.MessageType.CreateNewFileResponse,
-			payload: response.payload
+			payload: response.payload,
+			transaction: message.transaction,
+			sender: message.sender
 		});
 	};
 }

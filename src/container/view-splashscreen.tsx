@@ -11,6 +11,7 @@ import { ViewStore } from '../store';
 export class ViewSplashscreen extends React.Component {
 	public render(): JSX.Element {
 		const props = this.props as { store: ViewStore };
+		const transaction = uuid.v4();
 		const openFileRequestId = uuid.v4();
 
 		return (
@@ -18,6 +19,7 @@ export class ViewSplashscreen extends React.Component {
 				onCreateClick={() => {
 					props.store.getSender().send({
 						type: MessageType.CreateNewFileRequest,
+						transaction,
 						id: uuid.v4(),
 						payload: undefined
 					});
@@ -25,6 +27,7 @@ export class ViewSplashscreen extends React.Component {
 				onOpenClick={() => {
 					props.store.getSender().send({
 						type: MessageType.OpenFileRequest,
+						transaction,
 						id: openFileRequestId,
 						payload: undefined
 					});
@@ -39,6 +42,7 @@ export class ViewSplashscreen extends React.Component {
 				onOpenFile={contents => {
 					props.store.getSender().send({
 						type: MessageType.UseFileRequest,
+						transaction,
 						id: openFileRequestId,
 						payload: {
 							silent: false,

@@ -47,6 +47,7 @@ export function useFileRequest(
 			type: Message.MessageType.UseFileResponse,
 			id: message.id,
 			transaction: message.transaction,
+			sender: message.sender,
 			payload: {
 				path: draftProject.getPath(),
 				contents: draftProject.toJSON(),

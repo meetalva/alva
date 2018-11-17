@@ -53,6 +53,7 @@ export function startRenderer(): void {
 
 	if (data.project) {
 		store.setProject(Model.Project.from(data.project));
+		store.commit();
 	}
 
 	if (app.isHostType(Types.HostType.RemoteServer)) {

@@ -17,7 +17,6 @@ const ids = {
 };
 
 export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
-	const isLocal = ctx.app && !ctx.app.isHostType(Types.HostType.RemoteServer);
 	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.LocalElectron);
 
 	return {

@@ -2,12 +2,11 @@ import * as Types from '../types';
 import * as M from '../message';
 import * as Store from '../store';
 import * as ContextMenu from '../context-menu';
-import * as MobxReact from 'mobx-react';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as Menu from '../container/menu';
 import { Persistence } from '../persistence';
 import * as Path from 'path';
+import { BrowserHost } from '../hosts/browser-host';
+import * as Serde from '../sender/serde';
+import * as uuid from 'uuid';
 
 export class HostAdapter {
 	private sender: Types.Sender;
@@ -92,82 +91,128 @@ export class HostAdapter {
 			);
 		});
 
-		this.sender.match<M.Reload>(M.MessageType.Reload, async m => {
-			await this.host.reload();
+		this.sender.match<M.Reload>(M.MessageType.Reload, () => this.host.reload());
+
+		this.sender.match<M.Copy>(M.MessageType.Copy, async m => {
+			const project = this.store.getProject();
+
+			if (project.getId() !== m.payload.projectId) {
+				return;
+			}
+
+			const item = project.getItem(m.payload.itemId, m.payload.itemType);
+
+			if (!item) {
+				return;
+			}
+
+			this.host.writeClipboard(
+				Serde.serialize({
+					type: M.MessageType.Clipboard,
+					id: uuid.v4(),
+					payload: {
+						type: m.payload.itemType,
+						item: item.toJSON(),
+						project: project.toJSON()
+					}
+				})
+			);
+		});
+
+		this.sender.match<M.CopyElement>(M.MessageType.CopyElement, async m => {
+			const project = this.store.getProject();
+			const item = project.getElementById(m.payload);
+
+			if (!item) {
+				return;
+			}
+
+			this.host.writeClipboard(
+				Serde.serialize({
+					type: M.MessageType.Clipboard,
+					id: uuid.v4(),
+					payload: {
+						type: 'element',
+						item: item.toJSON(),
+						project: project.toJSON()
+					}
+				})
+			);
+		});
+
+		this.sender.match<M.CutElement>(M.MessageType.CutElement, async m => {
+			const project = this.store.getProject();
+			const item = project.getElementById(m.payload);
+
+			if (!item) {
+				return;
+			}
+
+			this.host.writeClipboard(
+				Serde.serialize({
+					type: M.MessageType.Clipboard,
+					id: uuid.v4(),
+					payload: {
+						type: 'element',
+						item: item.toJSON(),
+						project: project.toJSON()
+					}
+				})
+			);
+		});
+
+		this.sender.match<M.Paste>(M.MessageType.Paste, async m => {
+			const contents = await this.host.readClipboard();
+
+			if (!contents) {
+				return;
+			}
+
+			const message = Serde.deserialize(contents);
+
+			if (!message || message.type !== M.MessageType.Clipboard) {
+				return;
+			}
+
+			const targetType = m.payload ? m.payload.targetType : Types.ElementTargetType.Auto;
+
+			const targetId = m.payload ? m.payload.id : '';
+			const itemType = deserializeItemType(message.payload.type);
+
+			switch (itemType) {
+				case Types.ItemType.Element:
+					this.sender.send({
+						id: uuid.v4(),
+						type: M.MessageType.PasteElement,
+						payload: {
+							element: message.payload.item as Types.SerializedElement,
+							project: message.payload.project,
+							targetType,
+							targetId
+						}
+					});
+					break;
+				case Types.ItemType.Page:
+					this.sender.send({
+						id: uuid.v4(),
+						type: M.MessageType.PastePage,
+						payload: {
+							page: message.payload.item as Types.SerializedPage,
+							project: message.payload.project
+						}
+					});
+			}
 		});
 	}
 }
 
-export class BrowserHost implements Partial<Types.Host> {
-	private container: HTMLElement;
-	private menuStore: Store.MenuStore;
-	private store: Store.ViewStore;
-
-	constructor(init: { store: Store.ViewStore }) {
-		this.container = document.createElement('div');
-		this.container.style.position = 'fixed';
-		this.container.style.top = '100vh';
-		this.container.style.zIndex = '97';
-
-		this.menuStore = new Store.MenuStore([]);
-		this.store = init.store;
-	}
-
-	public start() {
-		document.body.appendChild(this.container);
-
-		ReactDOM.render(
-			<MobxReact.Provider store={this.store} menuStore={this.menuStore}>
-				<Menu.ContextMenu />
-			</MobxReact.Provider>,
-			this.container
-		);
-	}
-
-	public download(name: string, url: string): Promise<void> {
-		return new Promise(resolve => {
-			const a = document.createElement('a');
-			a.download = name;
-			a.href = url;
-
-			document.body.appendChild(a);
-			a.click();
-
-			window.requestIdleCallback(() => {
-				document.body.removeChild(a);
-				URL.revokeObjectURL(url);
-				resolve();
-			});
-		});
-	}
-
-	public async open(url: string): Promise<void> {
-		window.open(url, '_blank');
-	}
-
-	public async reload(): Promise<void> {
-		window.location.reload();
-	}
-
-	public async showMessage(opts: Types.HostMessageOptions): Promise<undefined> {
-		// TODO: implement custom dialogs
-		alert([opts.message, opts.detail].filter(Boolean).join('\n'));
-		return;
-	}
-
-	public async saveFile(path: string, contents: string): Promise<void> {
-		const blob = new Blob([contents], { type: 'text/plain;charset=utf-8' });
-		const url = URL.createObjectURL(blob);
-		await this.download(Path.basename(path), url);
-		URL.revokeObjectURL(url);
-	}
-
-	public async showContextMenu(opts: {
-		items: Types.ContextMenuItem[];
-		position: { x: number; y: number };
-	}): Promise<undefined> {
-		opts.items.forEach(item => this.menuStore.add(item, { depth: 0, active: false }));
-		this.menuStore.position = opts.position;
-		return;
+function deserializeItemType(type: Types.SerializedItemType): Types.ItemType {
+	switch (type) {
+		case 'element':
+			return Types.ItemType.Element;
+		case 'page':
+			return Types.ItemType.Page;
+		case 'none':
+			return Types.ItemType.None;
 	}
 }

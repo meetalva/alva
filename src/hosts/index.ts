@@ -1,3 +1,4 @@
+export * from './browser-host';
 export * from './local-node-host';
 export * from './local-data-host';
 export * from './restart-listener';

@@ -100,7 +100,7 @@ export type Message =
 	| ContentRequest
 	| ContentResponse
 	| ContextMenuRequest
-	| CopyPageElement
+	| CopyElement
 	| CreateNewPage
 	| CreateScriptBundleRequest
 	| CreateScriptBundleResponse
@@ -230,9 +230,9 @@ export type ContentRequest = EmptyEnvelope<MessageType.ContentRequest>;
 export type ContentResponse = Envelope<MessageType.ContentResponse, string>;
 export type Copy = Envelope<
 	MessageType.Copy,
-	{ type: Types.SerializedItemType; id: string } | undefined
+	{ itemType: Types.SerializedItemType; projectId: string; itemId: string }
 >;
-export type CopyPageElement = Envelope<MessageType.CopyElement, string>;
+export type CopyElement = Envelope<MessageType.CopyElement, string>;
 export type CreateNewPage = Envelope<MessageType.CreateNewPage, undefined>;
 export type CreateScriptBundleRequest = Envelope<
 	MessageType.CreateScriptBundleRequest,
@@ -340,7 +340,7 @@ export type ChangeProject = Envelope<
 
 export type ChangeUserStore = Envelope<
 	MessageType.ChangeUserStore,
-	{ userStore: Types.SerializedUserStore }
+	{ userStore: Types.SerializedUserStore; projectId: string }
 >;
 
 export type HighlightElement = Envelope<
@@ -353,22 +353,17 @@ export type SelectElement = Envelope<
 	{ element: Types.SerializedElement | undefined }
 >;
 
-export type Clipboard = Envelope<
-	MessageType.Clipboard,
-	{
-		type: Types.SerializedItemType;
-		item: Types.SerializedItem;
-		project: Types.SerializedProject;
-	}
->;
+export type Clipboard = Envelope<MessageType.Clipboard, Types.ClipboardPayload>;
 
 export interface MobxUpdatePayload {
+	projectId: string;
 	id: string;
 	name: string;
 	change: MobxUpdateChange;
 }
 
 export interface MobxAddPayload<T = unknown> {
+	projectId: string;
 	id: string;
 	name: string;
 	memberName: string;
@@ -377,6 +372,7 @@ export interface MobxAddPayload<T = unknown> {
 }
 
 export interface MobxDeletePayload {
+	projectId: string;
 	id: string;
 	name: string;
 	memberName: string;
@@ -387,6 +383,7 @@ export interface MobxDeletePayload {
 }
 
 export interface MobxSplicePayload<T = unknown> {
+	projectId: string;
 	id: string;
 	name: string;
 	memberName: string;

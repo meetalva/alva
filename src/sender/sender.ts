@@ -18,6 +18,7 @@ export interface SenderInit {
 export type Matcher = (message: Message.Message) => void;
 
 export class Sender {
+	public readonly id: string;
 	private endpoint: string;
 	private connection: WebSocket;
 	private queue: Set<string> = new Set();
@@ -33,6 +34,7 @@ export class Sender {
 	}
 
 	public constructor(init: SenderInit) {
+		this.id = uuid.v4();
 		this.endpoint = init.endpoint;
 
 		if (init.autostart !== false) {
@@ -147,6 +149,8 @@ export class Sender {
 			matchers.forEach(matcher => matcher(message));
 		}
 
+		const base: string[] = Array.isArray(message.sender) ? message.sender : [];
+		message.sender = [...base, this.id];
 		this.connection.send(Serde.serialize(message));
 	}
 

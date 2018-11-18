@@ -133,8 +133,6 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 	private handleAction = (
 		e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<unknown> | KeyboardEvent
 	): void => {
-		e.preventDefault();
-
 		const props = this.props as NestedMenuItemProps & {
 			menuStore: Store.MenuStore;
 			store: Store.ViewStore;
@@ -154,6 +152,11 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 			return;
 		}
 
+		if (props.store.getApp().getHasFocusedInput()) {
+			return;
+		}
+
+		e.preventDefault();
 		props.menuStore.toggle(menu.menu.id, false);
 
 		if (menu.menu.hasOwnProperty('click')) {

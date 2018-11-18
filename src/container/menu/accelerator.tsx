@@ -11,13 +11,15 @@ const collisions = {
 const accelerators: Map<string, (e: KeyboardEvent) => void> = new Map();
 const keys = ['Control', 'Option', 'Shift', 'Command'];
 
-window.addEventListener('keydown', e => {
-	const accelerator = acceleratorFromEvent(e);
-	const action = accelerators.get(accelerator);
-	if (action) {
-		action(e);
-	}
-});
+if (typeof window !== 'undefined') {
+	window.addEventListener('keydown', e => {
+		const accelerator = acceleratorFromEvent(e);
+		const action = accelerators.get(accelerator);
+		if (action) {
+			action(e);
+		}
+	});
+}
 
 export interface AcceleratorIndicatorProps {
 	accelerator: string;
@@ -25,11 +27,18 @@ export interface AcceleratorIndicatorProps {
 }
 
 export class AcceleratorIndicator extends React.Component<AcceleratorIndicatorProps> {
-	public render(): JSX.Element | null {
-		const signs = parseAccelerator(this.props.accelerator);
+	public componentDidMount() {
 		const key = simplifyAccelerator(this.props.accelerator);
 		accelerators.set(key, this.props.onAccelerator);
+	}
 
+	public componentWillUnmount() {
+		const key = simplifyAccelerator(this.props.accelerator);
+		accelerators.delete(key);
+	}
+
+	public render(): JSX.Element | null {
+		const signs = parseAccelerator(this.props.accelerator);
 		return <div>{signs}</div>;
 	}
 }

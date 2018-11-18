@@ -23,7 +23,8 @@ export class PageListContainer extends React.Component {
 		}
 
 		this.draggedPage = draggedPage;
-		e.dataTransfer.effectAllowed = 'copy';
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('text', JSON.stringify(draggedPage.toJSON()));
 	}
 
 	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
@@ -51,10 +52,10 @@ export class PageListContainer extends React.Component {
 
 		if (this.draggedPage.getIndex() > dropTarget.getIndex()) {
 			dropTarget.setDroppableBackState(true);
-			e.dataTransfer.dropEffect = 'copy';
+			e.dataTransfer.dropEffect = 'move';
 		} else if (this.draggedPage.getIndex() < dropTarget.getIndex()) {
 			dropTarget.setDroppableNextState(true);
-			e.dataTransfer.dropEffect = 'copy';
+			e.dataTransfer.dropEffect = 'move';
 		}
 	}
 

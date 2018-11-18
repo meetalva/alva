@@ -16,10 +16,7 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			.getPatternLibraries()
 			.filter(l => l.getOrigin() !== Types.PatternLibraryOrigin.BuiltIn).length > 0;
 	const onDetailView = ctx.app && ctx.app.isActiveView(Types.AlvaView.PageDetail);
-	const hasFileAccess =
-		ctx.app &&
-		(ctx.app.isHostType(Types.HostType.LocalElectron) ||
-			ctx.app.isHostType(Types.HostType.LocalServer));
+	const hasFileAccess = ctx.app && ctx.app.hasFileAccess();
 
 	return {
 		id: ids.library,

@@ -56,7 +56,7 @@ export function startRenderer(): void {
 		store.commit();
 	}
 
-	if (app.isHostType(Types.HostType.RemoteServer)) {
+	if (app.isHostType(Types.HostType.Node)) {
 		const adapter = HostAdapter.fromStore(store);
 		adapter.start();
 	}

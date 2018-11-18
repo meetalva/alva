@@ -13,7 +13,7 @@ export const rendererDocument = (data: RenderDocumentData) => `<!doctype html>
 <html>
 <head>
 	<title>Alva</title>
-	<meta name="viewport" content="width=device-width, user-scalable=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 </head>
 <body>
 	<div id="app" style="overflow: hidden; width: 100%; height: 100%;"></div>

@@ -1,7 +1,7 @@
-#!/usr/bin/env node
 import * as Server from '../server';
 import * as Hosts from '../hosts';
 import * as Types from '../types';
+import * as Serde from '../sender/serde';
 
 const importFresh = require('import-fresh');
 const clearModule = require('clear-module');
@@ -14,30 +14,41 @@ export interface ForcedFlags {
 async function main(forced?: ForcedFlags): Promise<void> {
 	const AlvaServer = importFresh(serverPath).AlvaServer as typeof Server.AlvaServer;
 
-	const nodeHost = await Hosts.RemoteNodeHost.fromProcess(process, forced);
-	const localDataHost = await Hosts.LocalDataHost.fromHost(nodeHost);
+	const electronHost = await Hosts.ElectronHost.fromProcess(process, forced);
+	const localDataHost = await Hosts.LocalDataHost.fromHost(electronHost);
 
 	const alvaServer = await AlvaServer.fromHosts({
-		host: nodeHost,
+		host: electronHost,
 		dataHost: localDataHost
 	});
 
 	await alvaServer.start();
-
-	const restarter = await Hosts.RestartListener.fromProcess(process);
+	await electronHost.start(alvaServer);
 
 	const onRestart = async () => {
 		const port = alvaServer.port;
 		await alvaServer.stop();
 
-		const sourceDirectory = await nodeHost.resolveFrom(Types.HostBase.Source, '.');
+		const sourceDirectory = await electronHost.resolveFrom(Types.HostBase.Source, '.');
 		clearModule.match(new RegExp(`^${sourceDirectory}`));
 
-		restarter.unsubscribe();
 		await main({ port });
 	};
 
-	restarter.subscribe(onRestart);
+	const onMessage = envelope => {
+		const message = Serde.deserialize(envelope);
+
+		if (!message) {
+			return;
+		}
+
+		if (message.type === 'reload') {
+			onRestart();
+			process.removeListener('message' as any, onMessage);
+		}
+	};
+
+	process.on('message', onMessage);
 }
 
 main().catch(err => {

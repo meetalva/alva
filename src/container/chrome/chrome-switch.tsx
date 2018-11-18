@@ -35,7 +35,7 @@ export class ChromeSwitch extends React.Component {
 		const withOffset =
 			typeof navigator !== 'undefined' &&
 			navigator.platform === 'MacIntel' &&
-			app.isHostType(Types.HostType.LocalElectron);
+			app.isHostType(Types.HostType.Electron);
 		const marginLeft = withOffset ? Components.getSpace(Components.SpaceSize.XXL * 2) : 0;
 
 		return (

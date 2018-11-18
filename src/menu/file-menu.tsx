@@ -19,8 +19,8 @@ const ids = {
 export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 	const hasProject = typeof ctx.project !== 'undefined';
 	const onDetailView = ctx.app && ctx.app.isActiveView(Types.AlvaView.PageDetail);
-	const isLocal = ctx.app && !ctx.app.isHostType(Types.HostType.RemoteServer);
-	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.LocalElectron);
+	const isLocal = ctx.app && !ctx.app.isHostType(Types.HostType.Node);
+	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.Electron);
 
 	return {
 		id: ids.file,

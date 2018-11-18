@@ -4,21 +4,42 @@ import * as Path from 'path';
 import * as Util from 'util';
 import * as Types from '../../types';
 import * as getPort from 'get-port';
+import * as Electron from 'electron';
+import { createWindow } from './create-window';
 
-export class RemoteNodeHost implements Types.Host {
-	public type = Types.HostType.RemoteServer;
+export interface ElectronHostInit {
+	process: NodeJS.Process;
+	forced?: Partial<Types.HostFlags>;
+}
+
+export class ElectronHost implements Types.Host {
+	public type = Types.HostType.Electron;
 
 	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
+	private windows: Map<string | number, Electron.BrowserWindow> = new Map();
+
+	private constructor(init: ElectronHostInit) {
+		this.process = init.process;
+		this.forced = init.forced;
+	}
 
 	public static async fromProcess(
 		process: NodeJS.Process,
 		forced?: Partial<Types.HostFlags>
-	): Promise<RemoteNodeHost> {
-		const host = new RemoteNodeHost();
-		host.process = process;
-		host.forced = forced;
-		return host;
+	): Promise<ElectronHost> {
+		return new ElectronHost({
+			process,
+			forced
+		});
+	}
+
+	public async start(server: Types.AlvaServer): Promise<void> {
+		Electron.app.commandLine.appendSwitch('--enable-viewport-meta', 'true');
+		Electron.app.commandLine.appendSwitch('--disable-pinch', 'true');
+
+		const win = await createWindow(`http://localhost:${server.port}`);
+		this.windows.set(win.id, win);
 	}
 
 	public async getFlags(): Promise<Types.HostFlags> {

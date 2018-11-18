@@ -51,6 +51,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				},
 				// TODO: Inject more deps
 				render: (props: {
+					accelerator: JSX.Element | null;
 					sender: Types.Sender;
 					style: React.CSSProperties;
 					menu: Types.MenuItem;
@@ -66,6 +67,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 							onMouseLeave={props.onMouseLeave}
 						>
 							Open
+							{/* Can't trigger file inputs programmatically: props.accelerator */}
 							<FileInput
 								accept=".alva"
 								onChange={contents => {

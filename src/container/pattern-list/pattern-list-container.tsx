@@ -14,7 +14,6 @@ export class PatternListContainer extends React.Component {
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		if (this.dragImg.current) {
-			e.dataTransfer.effectAllowed = 'copy';
 			e.dataTransfer.setDragImage(this.dragImg.current, 75, 15);
 		}
 	}

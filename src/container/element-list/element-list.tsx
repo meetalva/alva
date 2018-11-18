@@ -194,7 +194,8 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		e.dataTransfer.dropEffect = 'copy';
+		const dropEffect = draggedElement.getParent() ? 'move' : 'copy';
+		e.dataTransfer.dropEffect = dropEffect;
 	}
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
@@ -217,7 +218,8 @@ export class ElementList extends React.Component {
 		}
 
 		if (this.dragImg.current) {
-			e.dataTransfer.effectAllowed = 'copy';
+			e.dataTransfer.effectAllowed = 'move';
+			e.dataTransfer.setData('text', JSON.stringify(draggedElement.toJSON()));
 			e.dataTransfer.setDragImage(this.dragImg.current, 75, 15);
 		}
 

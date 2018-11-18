@@ -11,6 +11,7 @@ import * as Types from '../types';
 
 export interface HostFlags {
 	port?: number;
+	localhost?: boolean;
 }
 
 export interface HostFile {
@@ -95,6 +96,13 @@ export abstract class Host {
 
 	public async showMessage(opts: HostMessageOptions): Promise<HostMessageButton | undefined> {
 		throw new Error('host.showMessage: not implemented');
+	}
+
+	public async showContextMenu(opts: {
+		items: Types.ContextMenuItem[];
+		position: { x: number; y: number };
+	}): Promise<undefined> {
+		throw new Error('host.showContextMenu: not implemented');
 	}
 }
 

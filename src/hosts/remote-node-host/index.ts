@@ -23,9 +23,14 @@ export class RemoteNodeHost implements Types.Host {
 
 	public async getFlags(): Promise<Types.HostFlags> {
 		const yargsParser = require('yargs-parser');
-		return { ...yargsParser(this.process.argv.slice(2)), ...this.forced };
+		return {
+			...yargsParser(this.process.argv.slice(2), {
+				number: ['port'],
+				boolean: ['localhost']
+			}),
+			...this.forced
+		};
 	}
-
 	public async getPort(requested: number): Promise<number> {
 		return getPort({ port: requested });
 	}
@@ -84,6 +89,10 @@ export class RemoteNodeHost implements Types.Host {
 	}
 
 	public async showMessage(): Promise<undefined> {
+		return;
+	}
+
+	public async showContextMenu(): Promise<undefined> {
 		return;
 	}
 }

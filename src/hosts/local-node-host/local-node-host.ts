@@ -28,7 +28,13 @@ export class LocalNodeHost implements Types.Host {
 
 	public async getFlags(): Promise<Types.HostFlags> {
 		const yargsParser = require('yargs-parser');
-		return { ...yargsParser(this.process.argv.slice(2)), ...this.forced };
+		return {
+			...yargsParser(this.process.argv.slice(2), {
+				number: ['port'],
+				boolean: ['localhost']
+			}),
+			...this.forced
+		};
 	}
 
 	public async getPort(requested: number): Promise<number> {
@@ -120,5 +126,9 @@ export class LocalNodeHost implements Types.Host {
 		const args = dargs(options);
 		const result = await execa(electron, [require.resolve('./message-box'), ...args]);
 		return opts.buttons[JSON.parse(result.stdout)];
+	}
+
+	public async showContextMenu(_): Promise<undefined> {
+		return;
 	}
 }

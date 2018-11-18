@@ -13,6 +13,7 @@ import * as Types from '../types';
 interface AlvaServerInit {
 	app: express.Express;
 	host: Types.Host;
+	interface?: string;
 	dataHost: Types.DataHost;
 	http: Http.Server;
 	ws: WS.Server;
@@ -29,6 +30,7 @@ export class AlvaServer implements Types.AlvaServer {
 	public readonly host: Types.Host;
 	public readonly sender: Sender.Sender;
 	public readonly port: number;
+	public readonly interface?: string;
 
 	public get address(): string {
 		return `http://localhost:${this.port}/`;
@@ -43,6 +45,7 @@ export class AlvaServer implements Types.AlvaServer {
 		this.http = init.http;
 		this.ws = init.ws;
 		this.port = init.options.port;
+		this.interface = init.interface;
 
 		this.sender = new Sender.Sender({
 			autostart: false,
@@ -88,6 +91,7 @@ export class AlvaServer implements Types.AlvaServer {
 		this.sender.match(M.Save, Matchers.save(this));
 		this.sender.match(M.ShowMessage, Matchers.showMessage(this));
 		this.sender.match(M.UseFileRequest, Matchers.useFileRequest(this));
+		this.sender.match(M.ContextMenuRequest, Matchers.showContextMenu(this));
 	}
 
 	public static async fromHosts({
@@ -104,9 +108,12 @@ export class AlvaServer implements Types.AlvaServer {
 		const http = Http.createServer(app);
 		const ws = new WS.Server({ server: http });
 
+		const serverInterface = flags.localhost !== false ? 'localhost' : undefined;
+
 		return new AlvaServer({
 			app,
 			host,
+			interface: serverInterface,
 			dataHost,
 			http,
 			ws,
@@ -116,9 +123,10 @@ export class AlvaServer implements Types.AlvaServer {
 
 	public async start(): Promise<void> {
 		const listen = Util.promisify(this.http.listen.bind(this.http));
+		const interfaces = this.interface ? `${this.interface} interface` : 'all interfaces';
 
-		this.host.log(`Starting Alva server on port ${this.port}..`);
-		await listen(this.port);
+		this.host.log(`Starting Alva server on port ${this.port} and ${interfaces}...`);
+		await listen(this.port, this.interface);
 
 		await this.sender.start();
 		this.host.log(`Started Alva server on ${this.address}.`);

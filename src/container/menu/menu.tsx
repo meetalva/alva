@@ -3,6 +3,7 @@ import * as Types from '../../types';
 import * as Components from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as Store from '../../store';
+import { AcceleratorIndicator } from './accelerator';
 
 export interface MenuProps {
 	variant: MenuVariant;
@@ -15,6 +16,7 @@ export interface GenericMenuItemProps {
 }
 
 export interface SubMenuProps {
+	visible: boolean;
 	variant: MenuVariant;
 	menus: Types.MenuItem[];
 }
@@ -73,7 +75,7 @@ export class SubMenu extends React.Component<SubMenuProps> {
 			<ul
 				style={{
 					position: 'absolute',
-					top: '100%',
+					top: props.visible ? '100%' : '-100vh',
 					left: 0,
 					listStyle: 'none',
 					margin: 0,
@@ -128,6 +130,40 @@ export class GenericMenuItem extends React.Component<GenericMenuItemProps> {
 @MobxReact.inject('menuStore', 'store')
 @MobxReact.observer
 class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
+	private handleAction = (
+		e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<unknown> | KeyboardEvent
+	): void => {
+		e.preventDefault();
+
+		const props = this.props as NestedMenuItemProps & {
+			menuStore: Store.MenuStore;
+			store: Store.ViewStore;
+		};
+
+		const menu = props.menuStore.get(props.menu.id);
+
+		if (!menu) {
+			return;
+		}
+
+		if (props.menu.enabled === false) {
+			return;
+		}
+
+		if (!menu.menu.id) {
+			return;
+		}
+
+		props.menuStore.toggle(menu.menu.id, false);
+
+		if (menu.menu.hasOwnProperty('click')) {
+			const actionable = menu.menu as Types.ActionableMenuItem;
+			if (typeof actionable.click !== 'undefined') {
+				actionable.click(props.store.getSender());
+			}
+		}
+	};
+
 	public render(): JSX.Element | null {
 		const props = this.props as NestedMenuItemProps & {
 			menuStore: Store.MenuStore;
@@ -182,30 +218,14 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 				style={style}
 				onMouseEnter={onMouseEnter}
 				onMouseLeave={onMouseLeave}
-				onClick={e => {
-					e.preventDefault();
-
-					if (props.menu.enabled === false) {
-						return;
-					}
-
-					if (!menu.menu.id) {
-						return;
-					}
-
-					props.menuStore.toggle(menu.menu.id, false);
-
-					if (menu.menu.hasOwnProperty('click')) {
-						const actionable = menu.menu as Types.ActionableMenuItem;
-						if (typeof actionable.click !== 'undefined') {
-							actionable.click(props.store.getSender());
-						}
-					}
-				}}
+				onClick={this.handleAction}
 			>
 				{props.menu.label.replace(/\&([a-zA-Z].)/, '$1')}
 				{props.menu.accelerator && (
-					<AcceleratorIndicator accelerator={props.menu.accelerator} />
+					<AcceleratorIndicator
+						accelerator={props.menu.accelerator}
+						onAccelerator={this.handleAction}
+					/>
 				)}
 			</li>
 		);
@@ -215,6 +235,37 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 @MobxReact.inject('menuStore', 'store')
 @MobxReact.observer
 class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }> {
+	private handleAction = e => {
+		e.preventDefault();
+
+		const props = this.props as { menu: Types.CheckboxMenuItem } & {
+			menuStore: Store.MenuStore;
+			store: Store.ViewStore;
+		};
+
+		const menu = props.menuStore.get(props.menu.id);
+
+		if (!menu) {
+			return;
+		}
+
+		if (props.menu.enabled === false) {
+			return;
+		}
+
+		if (!menu.menu.id) {
+			return;
+		}
+
+		props.menuStore.toggle(menu.menu.id, false);
+		if (menu.menu.hasOwnProperty('click')) {
+			const actionable = menu.menu as Types.ActionableMenuItem;
+			if (typeof actionable.click !== 'undefined') {
+				actionable.click(props.store.getSender());
+			}
+		}
+	};
+
 	public render(): JSX.Element | null {
 		const props = this.props as { menu: Types.CheckboxMenuItem } & {
 			menuStore: Store.MenuStore;
@@ -253,25 +304,7 @@ class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }>
 					}
 					props.menuStore.toggle(props.menu.id, false);
 				}}
-				onClick={e => {
-					e.preventDefault();
-
-					if (props.menu.enabled === false) {
-						return;
-					}
-
-					if (!menu.menu.id) {
-						return;
-					}
-
-					props.menuStore.toggle(menu.menu.id, false);
-					if (menu.menu.hasOwnProperty('click')) {
-						const actionable = menu.menu as Types.ActionableMenuItem;
-						if (typeof actionable.click !== 'undefined') {
-							actionable.click(props.store.getSender());
-						}
-					}
-				}}
+				onClick={this.handleAction}
 			>
 				{props.menu.checked ? (
 					<div
@@ -289,7 +322,10 @@ class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }>
 				) : null}
 				{props.menu.label.replace(/\&([a-zA-Z].)/, '$1')}
 				{props.menu.accelerator && (
-					<AcceleratorIndicator accelerator={props.menu.accelerator} />
+					<AcceleratorIndicator
+						accelerator={props.menu.accelerator}
+						onAccelerator={this.handleAction}
+					/>
 				)}
 			</li>
 		);
@@ -319,6 +355,43 @@ interface NestedMenuItemProps {
 @MobxReact.inject('menuStore')
 @MobxReact.observer
 class NestedMenuItem extends React.Component<NestedMenuItemProps> {
+	private handleAction = (
+		e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<unknown>
+	): void => {
+		e.preventDefault();
+
+		const props = this.props as NestedMenuItemProps & { menuStore: Store.MenuStore };
+
+		if (props.menu.enabled === false) {
+			return;
+		}
+
+		props.menuStore.toggle(props.menu.id);
+	};
+
+	private handleMouseEnter = (e: React.MouseEvent<HTMLElement>): void => {
+		const props = this.props as NestedMenuItemProps & { menuStore: Store.MenuStore };
+		const menu = props.menuStore.get(props.menu.id);
+
+		if (!menu) {
+			return;
+		}
+
+		if (!props.menuStore.activeMenu) {
+			return;
+		}
+
+		if (props.menu.enabled === false) {
+			return;
+		}
+
+		if (!menu.menu.id) {
+			return;
+		}
+
+		props.menuStore.toggle(menu.menu.id, true);
+	};
+
 	public render(): JSX.Element | null {
 		const props = this.props as NestedMenuItemProps & { menuStore: Store.MenuStore };
 		const menu = props.menuStore.get(props.menu.id);
@@ -340,76 +413,16 @@ class NestedMenuItem extends React.Component<NestedMenuItemProps> {
 					color: menu.active ? Components.Color.White : Components.Color.Black,
 					opacity: props.menu.enabled === false ? 0.3 : 1
 				}}
-				onClick={e => {
-					e.preventDefault();
-
-					if (props.menu.enabled === false) {
-						return;
-					}
-
-					props.menuStore.toggle(props.menu.id);
-				}}
-				onMouseEnter={() => {
-					if (!props.menuStore.activeMenu) {
-						return;
-					}
-
-					if (props.menu.enabled === false) {
-						return;
-					}
-
-					if (!menu.menu.id) {
-						return;
-					}
-
-					props.menuStore.toggle(menu.menu.id, true);
-				}}
+				onClick={this.handleAction}
+				onMouseEnter={this.handleMouseEnter}
 			>
 				{props.menu.label.replace(/\&([a-zA-Z].)/, '$1')}
-				{menu.active && <SubMenu variant={MenuVariant.Vertical} menus={props.menu.submenu} />}
+				<SubMenu
+					variant={MenuVariant.Vertical}
+					menus={props.menu.submenu}
+					visible={menu.active}
+				/>
 			</li>
 		);
 	}
-}
-
-export interface AcceleratorIndicatorProps {
-	accelerator: string;
-}
-
-class AcceleratorIndicator extends React.Component<AcceleratorIndicatorProps> {
-	public render(): JSX.Element | null {
-		return <div>{parseAccelerator(this.props.accelerator)}</div>;
-	}
-}
-
-function parseAccelerator(accelerator: string): string {
-	return accelerator
-		.split('+')
-		.map(item => {
-			switch (item) {
-				case 'Cmd':
-				case 'Command':
-				case 'CommandOrCtrl':
-				case 'CmdOrCtrl':
-					return '⌘';
-				case 'Ctrl':
-				case 'Control':
-					return '⌃';
-				case 'Shift':
-					return '⇧';
-				case 'Alt':
-				case 'Option':
-					return '⌥';
-				case 'Left':
-					return '←';
-				case 'Right':
-					return '→';
-				case 'Delete':
-				case 'Backspace':
-					return '⌫';
-				default:
-					return item;
-			}
-		})
-		.join('');
 }

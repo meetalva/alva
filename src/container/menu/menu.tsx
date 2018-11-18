@@ -202,15 +202,27 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 			props.menuStore.toggle(menu.menu.id, false);
 		};
 
+		const accelerator = props.menu.accelerator ? (
+			<AcceleratorIndicator
+				accelerator={props.menu.accelerator}
+				onAccelerator={this.handleAction}
+			/>
+		) : null;
+
 		if (typeof (menu.menu as any).render === 'function') {
-			return (menu.menu as any).render({
-				menu,
-				menuStore: props.menuStore,
-				sender: props.store.getSender(),
-				style,
-				onMouseEnter,
-				onMouseLeave
-			});
+			return (
+				<>
+					{(menu.menu as any).render({
+						accelerator,
+						menu,
+						menuStore: props.menuStore,
+						sender: props.store.getSender(),
+						style,
+						onMouseEnter,
+						onMouseLeave
+					})}
+				</>
+			);
 		}
 
 		return (
@@ -221,12 +233,7 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 				onClick={this.handleAction}
 			>
 				{props.menu.label.replace(/\&([a-zA-Z].)/, '$1')}
-				{props.menu.accelerator && (
-					<AcceleratorIndicator
-						accelerator={props.menu.accelerator}
-						onAccelerator={this.handleAction}
-					/>
-				)}
+				{accelerator}
 			</li>
 		);
 	}

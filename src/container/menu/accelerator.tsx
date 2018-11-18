@@ -2,6 +2,7 @@ import * as React from 'react';
 
 const collisions = {
 	'Command+N': () => 'Option+Command+N',
+	'Command+O': () => 'Option+Command+O',
 	'Shift+Command+N': () => 'Option+Shift+Command+N',
 	'Option+Command+Left': () => 'Option+Shift+Command+Left',
 	'Option+Command+Right': () => 'Option+Shift+Command+Right'

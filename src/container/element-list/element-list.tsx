@@ -112,6 +112,7 @@ export class ElementList extends React.Component {
 		if (element) {
 			store.requestContextMenu({
 				menu: Types.ContextMenuType.ElementMenu,
+				projectId: store.getProject().getId(),
 				data: { element: element.toJSON() },
 				position: {
 					x: e.clientX,

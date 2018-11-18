@@ -254,6 +254,7 @@ export type ContextMenuRequestPayload = ElementContextMenuRequest;
 
 export interface ElementContextMenuRequest {
 	menu: ContextMenuType.ElementMenu;
+	projectId: string;
 	data: ElementContextMenuRequestPayload;
 	position: {
 		x: number;

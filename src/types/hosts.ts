@@ -2,9 +2,8 @@ import * as Model from '../model';
 import * as Message from '../message';
 
 export enum HostType {
-	LocalServer = 'local-server',
-	RemoteServer = 'remote-server',
-	LocalElectron = 'electron'
+	Node = 'node',
+	Electron = 'electron'
 }
 
 import * as Types from '../types';

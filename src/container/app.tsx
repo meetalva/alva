@@ -24,7 +24,7 @@ export class App extends React.Component {
 				height={Components.LayoutHeight.Full}
 			>
 				<Components.GlobalStyle />
-				{!props.store.getApp().isHostType(Types.HostType.LocalElectron) && (
+				{!props.store.getApp().isHostType(Types.HostType.Electron) && (
 					<MenuContainer.Menu
 						variant={MenuContainer.MenuVariant.Horizontal}
 						menus={[

@@ -17,7 +17,7 @@ const ids = {
 };
 
 export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
-	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.LocalElectron);
+	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.Electron);
 
 	return {
 		id: ids.view,

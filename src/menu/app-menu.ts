@@ -14,8 +14,8 @@ const ids = {
 };
 
 export const appMenu = (ctx: Types.MenuContext): Types.MenuItem => {
-	const isLocal = ctx.app && !ctx.app.isHostType(Types.HostType.RemoteServer);
-	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.LocalElectron);
+	const isLocal = ctx.app && !ctx.app.isHostType(Types.HostType.Node);
+	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.Electron);
 
 	return {
 		label: 'Alva',

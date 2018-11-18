@@ -8,7 +8,7 @@ const ids = {
 };
 
 export const windowMenu = (ctx: Types.MenuContext): Types.MenuItem => {
-	const isElectron = ctx.app ? ctx.app.isHostType(Types.HostType.LocalElectron) : false;
+	const isElectron = ctx.app ? ctx.app.isHostType(Types.HostType.Electron) : false;
 
 	return {
 		id: ids.window,

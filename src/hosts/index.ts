@@ -1,5 +1,5 @@
+export * from './electron-host';
 export * from './browser-host';
-export * from './local-node-host';
 export * from './local-data-host';
 export * from './restart-listener';
-export * from './remote-node-host';
+export * from './node-host';

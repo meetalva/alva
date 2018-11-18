@@ -42,6 +42,7 @@ const StyledPatternListItem = styled.div`
 	border-radius: 3px;
 	transition: box-shadow 0.2s, color 0.2s;
 	color: ${Color.Grey20};
+	touch-action: none;
 
 	&:hover {
 		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);

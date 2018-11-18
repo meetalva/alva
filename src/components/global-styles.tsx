@@ -12,4 +12,15 @@ export const GlobalStyle = createGlobalStyle`
 		font-family: ${fonts().NORMAL_FONT};
 		font-size: 12px;
 	}
+
+	.dnd-poly-drag-image {
+		opacity: .5 !important;
+	}
+
+	@supports (-webkit-overflow-scrolling: touch) {
+		body,
+		html {
+			position: fixed;
+		}
+	}
 `;

@@ -29,15 +29,33 @@ export class HostAdapter {
 	public start() {
 		this.host.start();
 
-		this.sender.match<M.OpenExternalURL>(M.MessageType.OpenExternalURL, m =>
-			this.host.open(m.payload)
-		);
+		this.sender.match<M.OpenExternalURL>(M.MessageType.OpenExternalURL, m => {
+			const senders = m.sender ? m.sender : [];
 
-		this.sender.match<M.ShowMessage>(M.MessageType.ShowMessage, m =>
-			this.host.showMessage(m.payload)
-		);
+			if (!senders.includes(this.sender.id)) {
+				return;
+			}
+
+			this.host.open(m.payload);
+		});
+
+		this.sender.match<M.ShowMessage>(M.MessageType.ShowMessage, m => {
+			const senders = m.sender ? m.sender : [];
+
+			if (!senders.includes(this.sender.id)) {
+				return;
+			}
+
+			this.host.showMessage(m.payload);
+		});
 
 		this.sender.match<M.Save>(M.MessageType.Save, async m => {
+			const senders = m.sender ? m.sender : [];
+
+			if (!senders.includes(this.sender.id)) {
+				return;
+			}
+
 			if (!m.payload || !m.payload.publish) {
 				return;
 			}
@@ -59,6 +77,12 @@ export class HostAdapter {
 		});
 
 		this.sender.match<M.ContextMenuRequest>(M.MessageType.ContextMenuRequest, m => {
+			const senders = m.sender ? m.sender : [];
+
+			if (!senders.includes(this.sender.id)) {
+				return;
+			}
+
 			if (m.payload.menu === Types.ContextMenuType.ElementMenu) {
 				const element = this.store.getProject().getElementById(m.payload.data.element.id);
 
@@ -78,6 +102,12 @@ export class HostAdapter {
 		});
 
 		this.sender.match<M.ExportHtmlProject>(M.MessageType.ExportHtmlProject, async m => {
+			const senders = m.sender ? m.sender : [];
+
+			if (!senders.includes(this.sender.id)) {
+				return;
+			}
+
 			const project = this.store.getProject();
 
 			if (project.getId() !== m.payload.projectId) {
@@ -91,9 +121,21 @@ export class HostAdapter {
 			);
 		});
 
-		this.sender.match<M.Reload>(M.MessageType.Reload, () => this.host.reload());
+		this.sender.match<M.Reload>(M.MessageType.Reload, m => {
+			const senders = m.sender ? m.sender : [];
+
+			if (senders.includes(this.sender.id)) {
+				this.host.reload();
+			}
+		});
 
 		this.sender.match<M.Copy>(M.MessageType.Copy, async m => {
+			const senders = m.sender ? m.sender : [];
+
+			if (!senders.includes(this.sender.id)) {
+				return;
+			}
+
 			const project = this.store.getProject();
 
 			if (project.getId() !== m.payload.projectId) {
@@ -120,6 +162,12 @@ export class HostAdapter {
 		});
 
 		this.sender.match<M.CopyElement>(M.MessageType.CopyElement, async m => {
+			const senders = m.sender ? m.sender : [];
+
+			if (!senders.includes(this.sender.id)) {
+				return;
+			}
+
 			const project = this.store.getProject();
 			const item = project.getElementById(m.payload);
 
@@ -141,6 +189,12 @@ export class HostAdapter {
 		});
 
 		this.sender.match<M.CutElement>(M.MessageType.CutElement, async m => {
+			const senders = m.sender ? m.sender : [];
+
+			if (!senders.includes(this.sender.id)) {
+				return;
+			}
+
 			const project = this.store.getProject();
 			const item = project.getElementById(m.payload);
 
@@ -162,6 +216,12 @@ export class HostAdapter {
 		});
 
 		this.sender.match<M.Paste>(M.MessageType.Paste, async m => {
+			const senders = m.sender ? m.sender : [];
+
+			if (!senders.includes(this.sender.id)) {
+				return;
+			}
+
 			const contents = await this.host.readClipboard();
 
 			if (!contents) {

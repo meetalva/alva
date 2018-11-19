@@ -7,6 +7,8 @@ import * as Menu from '../container/menu';
 import * as Path from 'path';
 
 export class BrowserHost implements Partial<Types.Host> {
+	public type = Types.HostType.Browser;
+
 	private container: HTMLElement;
 	private menuStore: Store.MenuStore;
 	private store: Store.ViewStore;

@@ -78,6 +78,9 @@ export class AlvaServer implements Types.AlvaServer {
 		/** Project preview view */
 		this.app.get('/project/preview/:id', Routes.previewRouteFactory(this));
 
+		/** Component library scripts */
+		this.app.get('/project/:projectId/library/:libraryId', Routes.libraryRouteFactory(this));
+
 		/** Project export */
 		this.app.get('/project/export/:id', Routes.exportRouteFactory(this));
 

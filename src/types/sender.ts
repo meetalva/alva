@@ -1,7 +1,14 @@
 import * as Message from '../message';
 
 export interface Sender {
+	readonly id: string;
+
 	match<T extends Message.Message>(
+		type: Message.Message['type'],
+		handler: (message: T) => void
+	): Promise<void>;
+
+	unmatch<T extends Message.Message>(
 		type: Message.Message['type'],
 		handler: (message: T) => void
 	): Promise<void>;

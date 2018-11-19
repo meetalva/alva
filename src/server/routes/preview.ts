@@ -18,12 +18,17 @@ export function previewRouteFactory(server: Types.AlvaServer): Express.RequestHa
 			return;
 		}
 
+		// TODO: Formalize this better - this means
+		// we want to sync a project if it is actually used
+		// in an edit interface
+		project.sync(server.sender);
+
 		const userLibraries = project
 			.getPatternLibraries()
 			.filter(lib => lib.getOrigin() === Types.PatternLibraryOrigin.UserProvided);
 
 		const script = lib =>
-			`<script src="/libraries/${lib.getId()}.js" data-bundle="${lib.getBundleId()}"></script>`;
+			`<script src="/project/${project.getId()}/library/${lib.getId()}" data-bundle="${lib.getBundleId()}"></script>`;
 
 		res.send(
 			PreviewDocument.previewDocument({

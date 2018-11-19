@@ -32,7 +32,7 @@ export class Pattern {
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
 	@Mobx.observable private origin: Types.PatternOrigin;
-	@Mobx.observable private patternLibrary: PatternLibrary;
+	private patternLibrary: PatternLibrary;
 	@Mobx.observable private propertyIds: Set<string> = new Set();
 	@Mobx.observable private slots: Map<string, PatternSlot> = new Map();
 	@Mobx.observable private type: Types.PatternType;

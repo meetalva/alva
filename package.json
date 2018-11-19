@@ -191,6 +191,7 @@
     "mobile-drag-drop": "2.3.0-rc.1",
     "mobx": "5.0.3",
     "mobx-react": "5.2.3",
+    "mobx-utils": "5.1.0",
     "monaco-editor": "0.13.1",
     "new-github-issue-url": "0.1.2",
     "node-fetch": "2.1.2",

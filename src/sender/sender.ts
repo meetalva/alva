@@ -144,14 +144,15 @@ export class Sender implements Types.Sender {
 			return;
 		}
 
+		const base: string[] = Array.isArray(message.sender) ? message.sender : [];
+		message.sender = [...base, this.id];
+
 		const matchers = this.matchers.get(message.type);
 
 		if (matchers) {
 			matchers.forEach(matcher => matcher(message));
 		}
 
-		const base: string[] = Array.isArray(message.sender) ? message.sender : [];
-		message.sender = [...base, this.id];
 		this.connection.send(Serde.serialize(message));
 	}
 

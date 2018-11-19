@@ -15,6 +15,7 @@ import { UserStore } from './user-store';
 import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-enhancer';
 import { UserStoreReference } from './user-store-reference';
 import * as uuid from 'uuid';
+import * as ModelTree from '../model-tree';
 
 export interface ProjectProperties {
 	draft: boolean;
@@ -772,19 +773,6 @@ export class Project {
 		return getByPath(path.split('/'), this);
 	}
 
-	public getModel(name: string): typeof Element | typeof Page | typeof ElementContent | undefined {
-		switch (name) {
-			case 'Element':
-				return Element;
-			case 'ElementContent':
-				return ElementContent;
-			case 'Page':
-				return Page;
-			default:
-				return;
-		}
-	}
-
 	public sync(sender: Types.Sender): void {
 		if (this.syncing) {
 			return;
@@ -817,7 +805,9 @@ export class Project {
 				case 'add':
 				case 'update': {
 					const ValueModel =
-						typeof c.newValue === 'object' ? this.getModel(c.newValue.model) : undefined;
+						typeof c.newValue === 'object'
+							? ModelTree.getModelByName(c.newValue.model as Types.ModelName)
+							: undefined;
 					const value = ValueModel
 						? (ValueModel as any).from(c.newValue, { project: this })
 						: c.newValue;
@@ -837,7 +827,9 @@ export class Project {
 				case 'add':
 				case 'update': {
 					const ValueModel =
-						typeof c.newValue === 'object' ? this.getModel(c.newValue.model) : undefined;
+						typeof c.newValue === 'object'
+							? ModelTree.getModelByName(c.newValue.model as Types.ModelName)
+							: undefined;
 					const value = ValueModel
 						? (ValueModel as any).from(c.newValue, { project: this })
 						: c.newValue;

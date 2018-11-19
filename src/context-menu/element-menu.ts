@@ -74,7 +74,6 @@ export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.Context
 					type: M.CutElement,
 					payload: ctx.element.getId()
 				});
-				// Electron.Menu.sendActionToFirstResponder('cut:');
 			}
 		},
 		{
@@ -88,7 +87,6 @@ export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.Context
 					type: M.CopyElement,
 					payload: ctx.element.getId()
 				});
-				Electron.Menu.sendActionToFirstResponder('copy:');
 			}
 		},
 		{
@@ -102,7 +100,6 @@ export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.Context
 					type: M.DeleteElement,
 					payload: ctx.element.getId()
 				});
-				// Electron.Menu.sendActionToFirstResponder('delete:');
 			}
 		},
 		{

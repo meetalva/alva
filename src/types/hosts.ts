@@ -2,6 +2,7 @@ import * as Model from '../model';
 import * as Message from '../message';
 
 export enum HostType {
+	Browser = 'browser',
 	Node = 'node',
 	Electron = 'electron'
 }

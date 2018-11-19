@@ -31,10 +31,6 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				accelerator: 'CmdOrCtrl+Z',
 				enabled: typeof ctx.project !== 'undefined',
 				click: sender => {
-					// TODO: Move into Electron host adapter
-					// if (app.getHasFocusedInput()) {
-					// 	return Electron.Menu.sendActionToFirstResponder('undo:');
-					// }
 					sender.send({
 						id: uuid.v4(),
 						type: MessageType.Undo,
@@ -48,11 +44,6 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				accelerator: 'Shift+CmdOrCtrl+Z',
 				enabled: typeof ctx.project !== 'undefined',
 				click: sender => {
-					// TODO: Move into Electron host adapter
-					// if (app.getHasFocusedInput()) {
-					// 	return Electron.Menu.sendActionToFirstResponder('redo:');
-					// }
-					//
 					sender.send({
 						id: uuid.v4(),
 						payload: undefined,
@@ -70,11 +61,6 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				enabled: typeof ctx.project !== 'undefined' && hasClipboard,
 				accelerator: 'CmdOrCtrl+X',
 				click: sender => {
-					// TODO: Move into Electron host adapter
-					// if (app.getHasFocusedInput()) {
-					// 	return Electron.Menu.sendActionToFirstResponder('cut:');
-					// }
-					//
 					sender.send({
 						id: uuid.v4(),
 						payload: undefined,
@@ -88,11 +74,6 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				enabled: typeof ctx.project !== 'undefined' && hasClipboard,
 				accelerator: 'CmdOrCtrl+C',
 				click: sender => {
-					// TODO: Move into Electron host adapter
-					// if (app.getHasFocusedInput()) {
-					// 	return Electron.Menu.sendActionToFirstResponder('copy:');
-					// }
-
 					if (!ctx.project) {
 						return;
 					}
@@ -121,11 +102,6 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				enabled: typeof ctx.project !== 'undefined' && hasClipboard,
 				accelerator: 'CmdOrCtrl+V',
 				click: sender => {
-					// TODO: Move into Electron host adapter
-					// if (app.getHasFocusedInput()) {
-					// 	return Electron.Menu.sendActionToFirstResponder('paste:');
-					// }
-					//
 					sender.send({
 						id: uuid.v4(),
 						payload: undefined,
@@ -199,10 +175,6 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				enabled: typeof ctx.project !== 'undefined',
 				accelerator: process.platform === 'darwin' ? 'Backspace' : 'Delete',
 				click: sender => {
-					// TODO: Move to Electron Host Adapter
-					// if (app.getHasFocusedInput()) {
-					// 	return Electron.Menu.sendActionToFirstResponder('delete:');
-					// }
 					sender.send({
 						id: uuid.v4(),
 						payload: undefined,

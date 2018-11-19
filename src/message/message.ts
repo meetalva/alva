@@ -1,5 +1,6 @@
 import { Envelope, EmptyEnvelope } from './envelope';
 import * as Types from '../types';
+import * as Mobx from 'mobx';
 
 export enum MessageType {
 	ActivatePage = 'activate-page',
@@ -46,10 +47,7 @@ export enum MessageType {
 	KeyboardChange = 'keyboard-change',
 	Log = 'log',
 	Maximize = 'maximize',
-	MobxAdd = 'mobx-add',
-	MobxDelete = 'mobx-delete',
-	MobxUpdate = 'mobx-update',
-	MobxSplice = 'mobx-splice',
+	ProjectUpdate = 'project-update',
 	OpenExternalURL = 'open-external-url',
 	OpenFileRequest = 'open-file-request',
 	OpenFileResponse = 'open-file-response',
@@ -128,10 +126,6 @@ export type Message =
 	| KeyboardChange
 	| Log
 	| Maximize
-	| MobxAddMessage
-	| MobxDeleteMessage
-	| MobxUpdateMessage
-	| MobxSpliceMessage
 	| OpenExternalURL
 	| OpenFileRequest
 	| OpenFileResponse
@@ -163,7 +157,8 @@ export type Message =
 	| ChromeScreenShot
 	| UseFileRequest
 	| UseFileResponse
-	| ToggleFullScreen;
+	| ToggleFullScreen
+	| ProjectUpdate;
 
 export type CreateNewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -355,83 +350,6 @@ export type SelectElement = Envelope<
 
 export type Clipboard = Envelope<MessageType.Clipboard, Types.ClipboardPayload>;
 
-export interface MobxUpdatePayload {
-	projectId: string;
-	id: string;
-	name: string;
-	change: MobxUpdateChange;
-}
-
-export interface MobxAddPayload<T = unknown> {
-	projectId: string;
-	id: string;
-	name: string;
-	memberName: string;
-	valueModel: Types.ModelName | undefined;
-	change: MobxAddChange<T>;
-}
-
-export interface MobxDeletePayload {
-	projectId: string;
-	id: string;
-	name: string;
-	memberName: string;
-	change: {
-		type: Types.MobxChangeType.Delete;
-		key: string;
-	};
-}
-
-export interface MobxSplicePayload<T = unknown> {
-	projectId: string;
-	id: string;
-	name: string;
-	memberName: string;
-	valueModel: Types.ModelName | undefined;
-	change: MobxSpliceChange<T>;
-}
-
-export interface MobxAddChange<T> {
-	type: Types.MobxChangeType.Add;
-	key: string;
-	newValue: T;
-}
-
-export interface MobxSpliceChange<T> {
-	type: Types.MobxChangeType.Splice;
-	index: number;
-	added: T[];
-	removed: T[];
-}
-
-export type MobxUpdateChange =
-	| MobxArrayUpdatePayload
-	| MobxMapUpdatePayload
-	| MobxObjectUpdatePayload;
-
-export interface MobxArrayUpdatePayload<T = unknown> {
-	type: Types.MobxChangeType.Update;
-	index: number;
-	newValue: T;
-}
-
-export interface MobxMapUpdatePayload<T = unknown> {
-	type: Types.MobxChangeType.Update;
-	key: string;
-	mapKey: string;
-	newValue: T;
-}
-
-export interface MobxObjectUpdatePayload<T = unknown> {
-	type: Types.MobxChangeType.Update;
-	key: string;
-	newValue: T;
-}
-
-export type MobxUpdateMessage = Envelope<MessageType.MobxUpdate, MobxUpdatePayload>;
-export type MobxAddMessage = Envelope<MessageType.MobxAdd, MobxAddPayload>;
-export type MobxDeleteMessage = Envelope<MessageType.MobxDelete, MobxDeletePayload>;
-export type MobxSpliceMessage = Envelope<MessageType.MobxSplice, MobxSplicePayload>;
 export type WindowClose = EmptyEnvelope<MessageType.WindowClose>;
 export type ChromeScreenShot = Envelope<
 	MessageType.ChromeScreenShot,
@@ -470,3 +388,19 @@ export type ShowMessage = Envelope<
 >;
 
 export type ToggleFullScreen = EmptyEnvelope<MessageType.ToggleFullScreen>;
+
+export type MobxMapChange = Mobx.IMapDidChange;
+export type MobxChange =
+	| Mobx.IObjectDidChange
+	| Mobx.IArrayChange
+	| Mobx.IArraySplice
+	| Mobx.IMapDidChange;
+
+export type ProjectUpdate = Envelope<
+	MessageType.ProjectUpdate,
+	{
+		change: MobxChange;
+		path: string;
+		projectId: string;
+	}
+>;

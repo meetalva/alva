@@ -6,6 +6,7 @@ import { isMessageType } from './is-message-type';
 import * as Serde from './serde';
 import * as uuid from 'uuid';
 import { EventEmitter } from 'electron';
+import * as Types from '../types';
 
 // tslint:disable-next-line:no-eval
 const WS = typeof window !== 'undefined' ? WebSocket : (eval('require("ws")') as typeof WebSocket);
@@ -17,7 +18,7 @@ export interface SenderInit {
 
 export type Matcher = (message: Message.Message) => void;
 
-export class Sender {
+export class Sender implements Types.Sender {
 	public readonly id: string;
 	private endpoint: string;
 	private connection: WebSocket;

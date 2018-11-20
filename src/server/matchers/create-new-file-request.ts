@@ -25,6 +25,7 @@ export function createNewFileRequest(
 				type: Message.MessageType.UseFileRequest,
 				id: message.id,
 				transaction: message.transaction,
+				sender: message.sender,
 				payload: {
 					silent: false,
 					contents: serializeResult.contents

@@ -16,7 +16,10 @@ export function openFile({
 	return m => {
 		const senders = m.sender || [];
 
-		if (senders.includes(store.getSender().id)) {
+		console.log(store.getSender().id);
+		console.log(senders);
+
+		if (!senders.includes(store.getSender().id)) {
 			return;
 		}
 

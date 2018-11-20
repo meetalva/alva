@@ -179,8 +179,6 @@ export class Sender implements Types.Sender {
 			return;
 		}
 
-		const envelope = Serde.serialize(message);
-
 		if (!this.ready) {
 			if (this.window) {
 				const m = message;
@@ -190,7 +188,7 @@ export class Sender implements Types.Sender {
 				this.window.postMessage(e, '*');
 			}
 
-			this.queue.add(envelope);
+			this.queue.add(Serde.serialize(message));
 			return;
 		}
 
@@ -202,6 +200,8 @@ export class Sender implements Types.Sender {
 		if (matchers) {
 			matchers.forEach(matcher => matcher(message));
 		}
+
+		const envelope = Serde.serialize(message);
 
 		if (this.window) {
 			this.window.postMessage(envelope, '*');

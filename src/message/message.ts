@@ -345,7 +345,7 @@ export type HighlightElement = Envelope<
 
 export type SelectElement = Envelope<
 	MessageType.SelectElement,
-	{ element: Types.SerializedElement | undefined }
+	{ element: Types.SerializedElement | undefined; projectId: string }
 >;
 
 export type Clipboard = Envelope<MessageType.Clipboard, Types.ClipboardPayload>;

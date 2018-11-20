@@ -56,7 +56,7 @@ export class Sender implements Types.Sender {
 			this.endpoint = ini.endpoint;
 		}
 
-		if (init.hasOwnProperty('endpoint')) {
+		if (init.hasOwnProperty('window')) {
 			const ini = init as PostMessageInit;
 			this.window = ini.window;
 		}
@@ -179,8 +179,18 @@ export class Sender implements Types.Sender {
 			return;
 		}
 
+		const envelope = Serde.serialize(message);
+
 		if (!this.ready) {
-			this.queue.add(Serde.serialize(message));
+			if (this.window) {
+				const m = message;
+				const base: string[] = Array.isArray(message.sender) ? message.sender : [];
+				m.sender = [...base, this.id];
+				const e = Serde.serialize(message);
+				this.window.postMessage(e, '*');
+			}
+
+			this.queue.add(envelope);
 			return;
 		}
 
@@ -192,8 +202,6 @@ export class Sender implements Types.Sender {
 		if (matchers) {
 			matchers.forEach(matcher => matcher(message));
 		}
-
-		const envelope = Serde.serialize(message);
 
 		if (this.window) {
 			this.window.postMessage(envelope, '*');

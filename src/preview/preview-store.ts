@@ -286,7 +286,7 @@ export class PreviewStore<V> {
 			this.sender.send({
 				type: Message.MessageType.SelectElement,
 				id: uuid.v4(),
-				payload: { element: data.element.toJSON() }
+				payload: { element: data.element.toJSON(), projectId: this.project.getId() }
 			});
 		}
 	}

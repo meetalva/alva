@@ -82,7 +82,9 @@ function main(): void {
 	// (4) Connect to the Alva server for updates
 	// - when mode is "live", used for editable preview
 	if (mode === Types.PreviewDocumentMode.Live) {
-		const sender = new Sender({ endpoint: `ws://${window.location.host}` });
+		const sender = new Sender(
+			store.framed ? { window: window.parent } : { endpoint: `ws://${window.location.host}` }
+		);
 
 		store.setSender(sender);
 

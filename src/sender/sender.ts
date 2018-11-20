@@ -11,16 +11,30 @@ import * as Types from '../types';
 // tslint:disable-next-line:no-eval
 const WS = typeof window !== 'undefined' ? WebSocket : (eval('require("ws")') as typeof WebSocket);
 
-export interface SenderInit {
+export interface WebSocketInit {
 	endpoint: string;
 	autostart?: boolean;
 }
+
+export interface PostMessageInit {
+	window: Window;
+	autostart?: boolean;
+}
+
+export interface MixedInit {
+	endpoint: string;
+	window: Window;
+	autostart?: boolean;
+}
+
+export type SenderInit = WebSocketInit | PostMessageInit | MixedInit;
 
 export type Matcher = (message: Message.Message) => void;
 
 export class Sender implements Types.Sender {
 	public readonly id: string;
 	private endpoint: string;
+	private window: Window;
 	private connection: WebSocket;
 	private queue: Set<string> = new Set();
 	private matchers: Map<Message.MessageType, Matcher[]> = new Map();
@@ -36,18 +50,34 @@ export class Sender implements Types.Sender {
 
 	public constructor(init: SenderInit) {
 		this.id = uuid.v4();
-		this.endpoint = init.endpoint;
+
+		if (init.hasOwnProperty('endpoint')) {
+			const ini = init as WebSocketInit;
+			this.endpoint = ini.endpoint;
+		}
+
+		if (init.hasOwnProperty('endpoint')) {
+			const ini = init as PostMessageInit;
+			this.window = ini.window;
+		}
 
 		if (init.autostart !== false) {
 			this.start();
 		}
 	}
 
-	private onConnectionMessage = (e: MessageEvent): void => {
+	private onClose = (e: CloseEvent) => {
+		if (e.code === 1000) {
+			return;
+		}
+
+		this.restart();
+	};
+
+	private onMessage = (e: MessageEvent): void => {
 		const header = Serde.getMessageHeader(e.data);
 
 		if (header.status === Serde.MessageHeaderStatus.Error) {
-			console.error(header);
 			return;
 		}
 
@@ -85,31 +115,35 @@ export class Sender implements Types.Sender {
 		matchers.forEach(matcher => matcher(parseResult.result));
 	};
 
-	private onConnectionClose = (e: CloseEvent) => {
-		if (e.code === 1000) {
-			return;
-		}
-
-		this.restart();
-	};
-
 	public async start(): Promise<void> {
-		try {
-			this.connection = new WS(this.endpoint);
-			this.connection.addEventListener('message', this.onConnectionMessage);
-			this.connection.addEventListener('close', this.onConnectionClose);
-		} catch (err) {
-			return this.restart();
+		if (typeof window !== 'undefined') {
+			window.addEventListener('message', this.onMessage);
 		}
 
-		await onReady(this.connection);
+		if (this.endpoint) {
+			try {
+				this.connection = new WS(this.endpoint);
+				this.connection.addEventListener('message', this.onMessage);
+				this.connection.addEventListener('close', this.onClose);
+			} catch (err) {
+				return this.restart();
+			}
 
-		this.queue.forEach(async message => {
-			this.pass(message);
-			this.queue.delete(message);
-		});
+			await onReady(this.connection);
 
-		this.retry = 0;
+			this.queue.forEach(async message => {
+				this.pass(message);
+				this.queue.delete(message);
+			});
+
+			this.retry = 0;
+		}
+	}
+
+	public setWindow(win: Window): void {
+		if (typeof window !== 'undefined') {
+			this.window = win;
+		}
 	}
 
 	public async stop(): Promise<void> {
@@ -130,7 +164,13 @@ export class Sender implements Types.Sender {
 	}
 
 	public pass(envelope: string): void {
-		this.connection.send(envelope);
+		if (this.connection) {
+			this.connection.send(envelope);
+		}
+
+		if (this.window) {
+			this.window.postMessage(envelope, '*');
+		}
 	}
 
 	public async send(message: Message.Message): Promise<void> {
@@ -153,7 +193,15 @@ export class Sender implements Types.Sender {
 			matchers.forEach(matcher => matcher(message));
 		}
 
-		this.connection.send(Serde.serialize(message));
+		const envelope = Serde.serialize(message);
+
+		if (this.window) {
+			this.window.postMessage(envelope, '*');
+		}
+
+		if (this.connection) {
+			this.connection.send(envelope);
+		}
 	}
 
 	public async match<T extends Message.Message>(

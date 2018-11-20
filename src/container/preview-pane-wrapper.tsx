@@ -18,6 +18,17 @@ export interface PreviewPaneProps {
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
+	private frame: HTMLIFrameElement | null = null;
+
+	public componentDidMount() {
+		const props = this.props as PreviewPaneProps & WithStore;
+		const sender = props.store.getSender();
+
+		if (this.frame && this.frame.contentWindow) {
+			sender.setWindow(this.frame.contentWindow);
+		}
+	}
+
 	public render(): JSX.Element {
 		const props = this.props as PreviewPaneProps & WithStore;
 		const app = props.store.getApp();
@@ -25,6 +36,7 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 		return (
 			<PreviewPane>
 				<PreviewFrame
+					ref={frame => (this.frame = frame)}
 					src={setSearch(props.previewFrame, { mode: Types.PreviewDocumentMode.Live })}
 					offCanvas={false}
 					onMouseEnter={() => app.setHoverArea(Types.HoverArea.Preview)}

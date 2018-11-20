@@ -36,6 +36,9 @@ export function useFileRequest(
 		const draftPath = await server.host.resolveFrom(Types.HostBase.AppData, `${uuid.v4()}.alva`);
 		const draftProject = Model.Project.from(projectResult.contents);
 		draftProject.setPath(draftPath);
+		draftProject.setId(
+			Buffer.from([draftProject.getId(), draftPath].join(':'), 'utf-8').toString('base64')
+		);
 
 		await server.host.mkdir(Path.dirname(draftPath));
 		await server.host.writeFile(draftPath, JSON.stringify(draftProject.toDisk()));

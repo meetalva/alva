@@ -704,7 +704,7 @@ export class Project {
 
 	@Mobx.action
 	public setId(id: string): void {
-		this.id = name;
+		this.id = id;
 	}
 
 	@Mobx.action

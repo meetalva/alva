@@ -356,6 +356,7 @@ export interface Dependencies {
 export interface LibraryDependency {
 	id: string;
 	bundleId: string;
+	bundleHash: string;
 	origin: SerializedModel.SerializedPatternLibraryOrigin;
 }
 

@@ -2,6 +2,7 @@ import * as M from '../../message';
 import * as Model from '../../model';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 import * as Types from '../../types';
+import * as uuid from 'uuid';
 
 export function pasteElement({
 	app,
@@ -41,6 +42,27 @@ export function pasteElement({
 		const contextProject = Model.Project.from(m.payload.project);
 		const sourceElement = Model.Element.from(m.payload.element, { project: contextProject });
 
+		const missingLibraries = sourceElement
+			.getLibraryDependencies()
+			.filter(lib => lib.getOrigin() === Types.PatternLibraryOrigin.UserProvided)
+			.filter(lib => !project.getPatternLibraryByContextId(lib.contextId));
+
+		if (missingLibraries.length > 0) {
+			store.getSender().send({
+				type: M.MessageType.ShowError,
+				id: uuid.v4(),
+				payload: {
+					message: `Could not paste element "${sourceElement.getName()}"`,
+					stack: [
+						`Element "${sourceElement.getName()}" requires the following pattern libraries to be connected`,
+						'',
+						...missingLibraries.map(l => `- ${l.getName()}@${l.getVersion()}`)
+					].join('\n')
+				}
+			});
+			return;
+		}
+
 		const clonedElement = sourceElement.clone({ target: project, withState: true });
 		project.importElement(clonedElement);
 
@@ -63,5 +85,8 @@ export function pasteElement({
 
 		store.commit();
 		project.setSelectedElement(clonedElement);
+
+		console.log(clonedElement.getPattern());
+		console.log(clonedElement.getContentBySlotType(Types.SlotType.Children));
 	};
 }

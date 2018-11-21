@@ -189,6 +189,7 @@ export class Project {
 				bundleId: '',
 				description: 'Built-in components for basic layouts and logic',
 				id: uuid.v4(),
+				version: '1.0.0',
 				name: 'Essentials',
 				origin: Types.PatternLibraryOrigin.BuiltIn,
 				patternProperties: [],
@@ -492,6 +493,10 @@ export class Project {
 
 	public getPatternLibraryById(id: string): PatternLibrary | undefined {
 		return this.patternLibraries.get(id);
+	}
+
+	public getPatternLibraryByContextId(contextid: string): PatternLibrary | undefined {
+		return [...this.patternLibraries.values()].find(p => p.contextId === contextid);
 	}
 
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {

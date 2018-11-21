@@ -49,6 +49,20 @@ export class HostAdapter {
 			this.host.showMessage(m.payload);
 		});
 
+		this.sender.match<M.ShowError>(M.MessageType.ShowError, m => {
+			const senders = m.sender ? m.sender : [];
+
+			if (!senders.includes(this.sender.id)) {
+				return;
+			}
+
+			this.host.showMessage({
+				message: m.payload.message,
+				detail: m.payload.stack,
+				buttons: []
+			});
+		});
+
 		this.sender.match<M.Save>(M.MessageType.Save, async m => {
 			const senders = m.sender ? m.sender : [];
 
@@ -148,8 +162,6 @@ export class HostAdapter {
 				return;
 			}
 
-			const dependencies = item.getDependencies();
-
 			this.host.writeClipboard(
 				Serde.serialize({
 					type: M.MessageType.Clipboard,
@@ -157,7 +169,6 @@ export class HostAdapter {
 					payload: {
 						type: m.payload.itemType,
 						item: item.toJSON(),
-						dependencies,
 						project: project.toJSON()
 					}
 				})
@@ -185,7 +196,6 @@ export class HostAdapter {
 					payload: {
 						type: 'element',
 						item: item.toJSON(),
-						dependencies: item.getDependencies(),
 						project: project.toJSON()
 					}
 				})
@@ -213,7 +223,6 @@ export class HostAdapter {
 					payload: {
 						type: 'element',
 						item: item.toJSON(),
-						dependencies: item.getDependencies(),
 						project: project.toJSON()
 					}
 				})

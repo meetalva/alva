@@ -84,6 +84,7 @@ export interface SerializedPatternLibrary {
 	description: string;
 	id: string;
 	name: string;
+	version: string;
 	origin: SerializedPatternLibraryOrigin;
 	patternProperties: PatternProperty.SerializedPatternProperty[];
 	patterns: SerializedPattern[];
@@ -203,6 +204,5 @@ export enum SerialializationType {
 export interface ClipboardPayload {
 	type: SerializedItemType;
 	item: SerializedItem;
-	dependencies: Types.Dependencies;
 	project: SerializedProject;
 }

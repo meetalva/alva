@@ -8,6 +8,7 @@ import { AnyPatternProperty, PatternEnumProperty, PatternProperty } from '../pat
 import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
+const md5 = require('md5');
 
 export interface PatternLibraryInit {
 	bundleId: string;
@@ -15,6 +16,7 @@ export interface PatternLibraryInit {
 	description: string;
 	id: string;
 	name: string;
+	version: string;
 	origin: Types.PatternLibraryOrigin;
 	patternProperties: AnyPatternProperty[];
 	patterns: Pattern[];
@@ -46,6 +48,7 @@ export class PatternLibrary {
 	@Mobx.observable private bundle: string;
 	@Mobx.observable private description: string;
 	@Mobx.observable private name: string;
+	@Mobx.observable private version: string;
 	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
 	@Mobx.observable private patterns: Map<string, Pattern> = new Map();
 	@Mobx.observable private origin: Types.PatternLibraryOrigin;
@@ -56,12 +59,18 @@ export class PatternLibrary {
 		return this.getPatterns().reduce((acc, pattern) => [...acc, ...pattern.getSlots()], []);
 	}
 
+	@Mobx.computed
+	public get contextId(): string {
+		return [this.name, this.version].join('@');
+	}
+
 	public constructor(init: PatternLibraryInit) {
 		this.bundleId = init.bundleId;
 		this.bundle = init.bundle;
 		this.description = init.description;
 		this.id = init.id || uuid.v4();
 		this.name = init.name;
+		this.version = init.version;
 		this.origin = init.origin;
 		init.patterns.forEach(pattern => this.patterns.set(pattern.getId(), pattern));
 		init.patternProperties.forEach(prop => this.patternProperties.set(prop.getId(), prop));
@@ -124,6 +133,7 @@ export class PatternLibrary {
 			description: serialized.description,
 			id: serialized.id,
 			name: serialized.name,
+			version: serialized.version,
 			origin: deserializeOrigin(serialized.origin),
 			patterns: [],
 			patternProperties: serialized.patternProperties.map(p => PatternProperty.from(p)),
@@ -285,6 +295,10 @@ export class PatternLibrary {
 		return this.bundleId;
 	}
 
+	public getBundleHash(): string {
+		return md5(this.bundle);
+	}
+
 	public getCapabilites(): Types.LibraryCapability[] {
 		const isUserProvided = this.origin === Types.PatternLibraryOrigin.UserProvided;
 
@@ -310,6 +324,10 @@ export class PatternLibrary {
 
 	public getName(): string {
 		return this.name;
+	}
+
+	public getVersion(): string {
+		return this.version;
 	}
 
 	public getOrigin(): Types.PatternLibraryOrigin {
@@ -401,6 +419,7 @@ export class PatternLibrary {
 			description: this.description,
 			id: this.id,
 			name: this.name,
+			version: this.version,
 			origin: serializeOrigin(this.origin),
 			patterns: this.getPatterns().map(p => p.toJSON()),
 			patternProperties: this.getPatternProperties().map(p => p.toJSON()),

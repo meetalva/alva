@@ -116,17 +116,13 @@ export class ElementContent {
 	public clone(opts: { withState: boolean; target?: Project }): ElementContent {
 		const withState = Boolean(opts && opts.withState);
 		const target = opts && opts.target ? opts.target : this.project;
-		const builtins = target.getBuiltinPatternLibrary();
 		const previousPattern = this.getParentElement()!.getPattern()!;
-		const wasBuiltin = previousPattern.getOrigin() === Types.PatternOrigin.BuiltIn;
-		const nextPattern = wasBuiltin
-			? builtins.getPatternByContextId(previousPattern.getContextId())
-			: target.getPatternById(previousPattern.getId());
+		const previousLibrary = previousPattern.getPatternLibrary();
+		const nextLibrary = target.getPatternLibraryByContextId(previousLibrary.contextId)!;
+		const nextPattern = nextLibrary.getPatternByContextId(previousPattern.getContextId());
 
 		const previousSlot = this.getSlot()!;
-		const nextSlot = wasBuiltin
-			? nextPattern!.getSlotByContextId(previousSlot.getContextId())!
-			: nextPattern!.getSlotById(previousSlot.getId())!;
+		const nextSlot = nextPattern!.getSlotByContextId(previousSlot.getContextId())!;
 
 		const clonedElements = this.elementIds
 			.map(elementId => this.project.getElementById(elementId))

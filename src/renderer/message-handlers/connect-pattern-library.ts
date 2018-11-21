@@ -19,6 +19,7 @@ export function connectPatternLibrary({
 		const library = Model.PatternLibrary.create({
 			id: uuid.v4(),
 			name: analysis.name,
+			version: analysis.version,
 			origin: Types.PatternLibraryOrigin.UserProvided,
 			patternProperties: [],
 			patterns: [],

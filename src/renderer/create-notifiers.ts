@@ -63,16 +63,28 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 		});
 	}, opts);
 
-	let sending: MobxUtils.IDisposer;
+	let stopProjectSync: MobxUtils.IDisposer;
 
 	Mobx.autorun(() => {
 		const project = store.getProject();
 
-		if (typeof sending === 'function') {
-			sending();
+		if (typeof stopProjectSync === 'function') {
+			stopProjectSync();
 		}
 
-		sending = MobxUtils.deepObserve<Model.Project>(project, onChange(sender));
+		stopProjectSync = MobxUtils.deepObserve<Model.Project>(project, onProjectChange(sender));
+	});
+
+	let stopAppSync: MobxUtils.IDisposer;
+
+	Mobx.autorun(() => {
+		const app = store.getApp();
+
+		if (typeof stopAppSync === 'function') {
+			stopAppSync();
+		}
+
+		stopAppSync = MobxUtils.deepObserve<Model.AlvaApp>(app, onAppChange(sender));
 	});
 }
 
@@ -81,9 +93,11 @@ type MobxChange =
 	| Mobx.IArrayChange
 	| Mobx.IArraySplice
 	| Mobx.IMapDidChange;
-type ProjectChangeHandler = (change: MobxChange, path: string, project: Model.Project) => void;
 
-function onChange(sender: Types.Sender): ProjectChangeHandler {
+type ProjectChangeHandler = (change: MobxChange, path: string, project: Model.Project) => void;
+type AppChangeHandler = (change: MobxChange, path: string, app: Model.AlvaApp) => void;
+
+function onProjectChange(sender: Types.Sender): ProjectChangeHandler {
 	return (change, path, project) => {
 		sender.send({
 			id: uuid.v4(),
@@ -92,6 +106,20 @@ function onChange(sender: Types.Sender): ProjectChangeHandler {
 				change,
 				path,
 				projectId: project.getId()
+			}
+		});
+	};
+}
+
+function onAppChange(sender: Types.Sender): AppChangeHandler {
+	return (change, path, app) => {
+		sender.send({
+			id: uuid.v4(),
+			type: Message.MessageType.AppUpdate,
+			payload: {
+				change,
+				path,
+				appId: app.getId()
 			}
 		});
 	};

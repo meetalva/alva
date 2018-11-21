@@ -17,7 +17,8 @@ const ids = {
 
 export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.Electron);
-	const hasBrowserClipboard = typeof (navigator as any).clipboard !== 'undefined';
+	const hasBrowserClipboard =
+		typeof navigator !== 'undefined' && typeof (navigator as any).clipboard !== 'undefined';
 	const hasClipboard = isElectron || hasBrowserClipboard;
 
 	return {

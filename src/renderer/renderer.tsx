@@ -30,18 +30,23 @@ export function startRenderer(): void {
 		endpoint: `ws://${window.location.host}/`
 	});
 
-	sender.send({
-		id: uuid.v4(),
-		type: MessageType.AppLoaded,
-		payload: undefined
-	});
-
 	app = new Model.AlvaApp();
 
 	history = new Model.EditHistory();
 	store = new ViewStore({ app, history, sender });
 
 	store.setServerPort(parseInt(window.location.port, 10));
+
+	const project = store.getProject();
+
+	sender.send({
+		id: uuid.v4(),
+		type: MessageType.WindowFocused,
+		payload: {
+			app: app.toJSON(),
+			projectId: project ? project.getId() : undefined
+		}
+	});
 
 	if (data.host) {
 		app.setHostType(data.host);

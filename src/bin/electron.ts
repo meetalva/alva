@@ -14,7 +14,11 @@ export interface ForcedFlags {
 async function main(forced?: ForcedFlags): Promise<void> {
 	const AlvaServer = importFresh(serverPath).AlvaServer as typeof Server.AlvaServer;
 
-	const electronHost = await Hosts.ElectronHost.fromProcess(process, forced);
+	const electronHost = await Hosts.ElectronHost.from({
+		process,
+		forced
+	});
+
 	const localDataHost = await Hosts.LocalDataHost.fromHost(electronHost);
 
 	const alvaServer = await AlvaServer.fromHosts({
@@ -23,7 +27,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 	});
 
 	await alvaServer.start();
-	await electronHost.start(alvaServer);
+	await electronHost.start(alvaServer, localDataHost);
 
 	const onRestart = async () => {
 		const port = alvaServer.port;

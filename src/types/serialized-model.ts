@@ -169,9 +169,11 @@ export interface LegacySerializedElementProperty {
 }
 
 export interface SerializedAlvaApp {
+	id: string;
 	model: Types.ModelName.AlvaApp;
 	activeView: SerializedAlvaView;
 	hasFocusedInput: boolean;
+	hostType: string;
 	panes: SerializedAppPane[];
 	paneSizes: SerializedPaneSize[];
 	rightSidebarTab: SerializedRightSidebarTab;

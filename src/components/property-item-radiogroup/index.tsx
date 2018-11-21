@@ -103,6 +103,7 @@ export const PropertyItemRadiogroup: React.StatelessComponent<
 					name={value.name}
 					icon={value.icon}
 					id={value.id}
+					key={value.id}
 					onChange={props.onChange}
 					active={value.id === props.selectedValue}
 				/>

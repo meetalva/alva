@@ -85,14 +85,11 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 						return;
 					}
 
-					const dependencies = item.getDependencies();
-
 					sender.send({
 						id: uuid.v4(),
 						payload: {
 							itemId: item.getId(),
 							itemType,
-							dependencies,
 							projectId: ctx.project.getId()
 						},
 						type: MessageType.Copy

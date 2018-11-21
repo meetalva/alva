@@ -227,7 +227,6 @@ export interface CopyPayload {
 	itemType: Types.SerializedItemType;
 	projectId: string;
 	itemId: string;
-	dependencies: Types.Dependencies;
 }
 export type Copy = Envelope<MessageType.Copy, CopyPayload>;
 export type CopyElement = Envelope<MessageType.CopyElement, string>;

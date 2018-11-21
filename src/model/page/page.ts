@@ -4,6 +4,7 @@ import * as Mobx from 'mobx';
 import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
+import { PatternLibrary } from '../pattern-library';
 
 export interface PageInit {
 	active: boolean;
@@ -157,9 +158,11 @@ export class Page {
 		return page;
 	}
 
-	public clone(): Page {
+	public clone(opts?: { target: Project; withState: boolean }): Page {
+		const target = opts ? opts.target : this.project;
+		const withState = Boolean(opts && opts.withState);
 		const rootElement = this.getRoot();
-		const rootClone = rootElement ? rootElement.clone() : undefined;
+		const rootClone = rootElement ? rootElement.clone({ target, withState }) : undefined;
 
 		const page = new Page(
 			{
@@ -319,10 +322,9 @@ export class Page {
 		this.rootId = b.rootId;
 	}
 
-	public getDependencies(): Types.Dependencies {
-		return {
-			patterns: [],
-			libraries: []
-		};
+	public getLibraryDependencies(): PatternLibrary[] {
+		const rootElement = this.getRoot();
+
+		return rootElement ? rootElement.getLibraryDependencies() : [];
 	}
 }

@@ -10,6 +10,7 @@ import { Project } from '../project';
 import * as Types from '../../types';
 import { UserStoreReference } from '../user-store-reference';
 import * as uuid from 'uuid';
+import { PatternLibrary } from '../pattern-library';
 
 export interface ElementInit {
 	containerId?: string;
@@ -236,8 +237,15 @@ export class Element {
 	}
 
 	@Mobx.action
-	public clone(opts?: { withState: boolean }): Element {
+	public clone(opts?: { withState: boolean; target?: Project }): Element {
+		const target = opts && opts.target ? opts.target : this.project;
 		const withState = Boolean(opts && opts.withState);
+		const builtins = target.getBuiltinPatternLibrary();
+		const previousPattern = this.getPattern()!;
+		const wasBuiltin = previousPattern.getOrigin() === Types.PatternOrigin.BuiltIn;
+		const nextPattern = wasBuiltin
+			? builtins.getPatternByContextId(previousPattern.getContextId())
+			: target.getPatternById(previousPattern.getId());
 
 		const clonedActions: Map<string, ElementAction> = this.properties
 			.filter(prop => {
@@ -267,18 +275,26 @@ export class Element {
 		const clonedContents = [...this.contentIds]
 			.map(contentId => this.project.getElementContentById(contentId))
 			.filter((content): content is ElementContent => typeof content !== 'undefined')
-			.map(content => content.clone({ withState }));
+			.map(content => content.clone({ withState, target }));
 
 		const propertyValues: [string, Types.ElementPropertyValue][] = [
 			...this.propertyValues.entries()
 		].map(([id, value]) => {
 			const clonedAction = clonedActions.get(id);
 
+			const previousProperty = previousPattern.getPropertyById(id);
+
+			const nextProperty = wasBuiltin
+				? nextPattern!.getPropertyByContextId(previousProperty!.getContextId())
+				: nextPattern!.getPropertyById(id);
+
+			const nextId = nextProperty!.getId();
+
 			if (clonedAction) {
-				return [id, clonedAction.getId()] as [string, string];
+				return [nextId, clonedAction.getId()] as [string, string];
 			}
 
-			return [id, value] as [string, Types.ElementPropertyValue];
+			return [nextId, value] as [string, Types.ElementPropertyValue];
 		});
 
 		const clone = new Element(
@@ -292,14 +308,14 @@ export class Element {
 				name: this.name,
 				open: withState ? this.open : false,
 				forcedOpen: withState ? this.forcedOpen : false,
-				patternId: this.patternId,
+				patternId: nextPattern!.getId(),
 				placeholderHighlighted: withState ? this.placeholderHighlighted : false,
 				propertyValues,
 				role: this.role,
 				selected: withState ? this.selected : false
 			},
 			{
-				project: this.project
+				project: target
 			}
 		);
 
@@ -334,19 +350,19 @@ export class Element {
 			.filter((ref): ref is UserStoreReference => typeof ref !== 'undefined');
 
 		clonedReferences.forEach(clonedReference => {
-			this.project.getUserStore().addReference(clonedReference);
+			target.getUserStore().addReference(clonedReference);
 		});
 
 		clonedContents.forEach(clonedContent => {
 			clonedContent.setParentElement(clone);
-			this.project.addElementContent(clonedContent);
+			target.addElementContent(clonedContent);
 		});
 
 		[...clonedActions.values()].forEach(clonedAction => {
-			this.project.addElementAction(clonedAction);
+			target.addElementAction(clonedAction);
 		});
 
-		this.project.addElement(clone);
+		target.addElement(clone);
 		return clone;
 	}
 
@@ -528,6 +544,29 @@ export class Element {
 
 	public getPattern(): Pattern | undefined {
 		return this.project.getPatternById(this.patternId);
+	}
+
+	@Mobx.action
+	public setPattern(pattern: Pattern): void {
+		const previousPattern = this.getPattern();
+		this.patternId = pattern.getId();
+
+		if (previousPattern) {
+			pattern.getProperties().forEach(prop => {
+				const previousProp =
+					pattern.getOrigin() === Types.PatternOrigin.BuiltIn
+						? previousPattern.getPropertyByContextId(prop.getContextId())
+						: previousPattern.getPropertyById(prop.getId());
+
+				if (!previousProp) {
+					return;
+				}
+
+				const previousValue = this.getPropertyValue(previousProp.getId());
+				this.propertyValues.delete(previousProp.getId());
+				this.propertyValues.set(prop.getId(), previousValue);
+			});
+		}
 	}
 
 	public getPlaceholderHighlighted(): boolean {
@@ -739,6 +778,32 @@ export class Element {
 		this.forcedOpen = b.forcedOpen;
 		this.shouldPlaceholderHighlight = b.placeholderHighlighted;
 		this.selected = b.selected;
+	}
+
+	public getDependencies(): Types.Dependencies {
+		const patterns = [this.getPattern(), ...this.getDescendants().map(d => d.getPattern())]
+			.filter((p): p is Pattern => typeof p !== 'undefined')
+			.map(p => ({
+				id: p.getId(),
+				contextId: p.getContextId(),
+				libraryId: p.getPatternLibrary().getId(),
+				origin: p.getOrigin(),
+				type: p.getType()
+			}));
+
+		const libraries = patterns
+			.map(p => this.project.getPatternLibraryById(p.libraryId))
+			.filter((p): p is PatternLibrary => typeof p !== 'undefined')
+			.map(l => ({
+				id: l.getId(),
+				bundleId: l.getBundleId(),
+				origin: l.getOrigin()
+			}));
+
+		return {
+			patterns,
+			libraries
+		};
 	}
 }
 

@@ -18,7 +18,11 @@ export function pasteElement({
 			return;
 		}
 
-		project.startBatch();
+		const senders = m.sender || [];
+
+		if (!senders.includes(store.getSender().id)) {
+			return;
+		}
 
 		const activePage = store.getActivePage() as Model.Page;
 
@@ -34,18 +38,10 @@ export function pasteElement({
 			return;
 		}
 
-		const contextProject = m.payload.project
-			? Model.Project.from(m.payload.project)
-			: store.getProject();
+		const contextProject = Model.Project.from(m.payload.project);
+		const sourceElement = Model.Element.from(m.payload.element, { project: contextProject });
 
-		const sourceElement = Model.Element.from(m.payload.element, {
-			project: contextProject
-		});
-
-		project.endBatch();
-
-		const clonedElement = sourceElement.clone();
-
+		const clonedElement = sourceElement.clone({ target: project, withState: true });
 		project.importElement(clonedElement);
 
 		switch (m.payload.targetType) {

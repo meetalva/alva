@@ -1,5 +1,6 @@
 import * as Types from '../../types';
 import * as _ from 'lodash';
+import * as uuid from 'uuid';
 
 export interface PatternSlotInit {
 	contextId: string;
@@ -50,6 +51,20 @@ export class PatternSlot {
 			propertyName: serialized.propertyName,
 			required: serialized.required,
 			type: toSlotType(serialized.type)
+		});
+	}
+
+	public clone(_): PatternSlot {
+		return new PatternSlot({
+			contextId: this.contextId,
+			description: this.description,
+			displayName: this.displayName,
+			example: this.example,
+			hidden: this.hidden,
+			id: uuid.v4(),
+			propertyName: this.propertyName,
+			required: this.required,
+			type: toSlotType(this.type)
 		});
 	}
 

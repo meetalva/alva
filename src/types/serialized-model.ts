@@ -203,5 +203,6 @@ export enum SerialializationType {
 export interface ClipboardPayload {
 	type: SerializedItemType;
 	item: SerializedItem;
+	dependencies: Types.Dependencies;
 	project: SerializedProject;
 }

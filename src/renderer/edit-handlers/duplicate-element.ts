@@ -17,6 +17,12 @@ export function duplicateElement({
 			return;
 		}
 
+		const senders = m.sender || [];
+
+		if (!senders.includes(store.getSender().id)) {
+			return;
+		}
+
 		switch (project.getFocusedItemType()) {
 			case Types.ItemType.Element:
 				store.duplicateElementById(m.payload);

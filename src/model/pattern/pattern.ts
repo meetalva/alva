@@ -104,10 +104,18 @@ export class Pattern {
 		return this.origin;
 	}
 
+	public getPatternLibrary(): PatternLibrary {
+		return this.patternLibrary;
+	}
+
 	public getProperties(): PatternProperty.AnyPatternProperty[] {
 		return this.getPropertyIds()
 			.map(propertyId => this.patternLibrary.getPatternPropertyById(propertyId))
 			.filter((p): p is PatternProperty.AnyPatternProperty => typeof p !== 'undefined');
+	}
+
+	public getPropertyById(id: string): PatternProperty.AnyPatternProperty | undefined {
+		return this.getProperties().find(p => p.getId() === id);
 	}
 
 	public getPropertyByContextId(
@@ -122,6 +130,14 @@ export class Pattern {
 
 	public getSlots(): PatternSlot[] {
 		return [...this.slots.values()];
+	}
+
+	public getSlotByContextId(contextId: string): PatternSlot | undefined {
+		return this.getSlots().find(slot => slot.getContextId() === contextId);
+	}
+
+	public getSlotById(contextId: string): PatternSlot | undefined {
+		return this.getSlots().find(slot => slot.getContextId() === contextId);
 	}
 
 	public getType(): Types.PatternType {

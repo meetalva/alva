@@ -318,4 +318,11 @@ export class Page {
 		this.name = b.name;
 		this.rootId = b.rootId;
 	}
+
+	public getDependencies(): Types.Dependencies {
+		return {
+			patterns: [],
+			libraries: []
+		};
+	}
 }

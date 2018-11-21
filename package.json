@@ -186,6 +186,7 @@
     "js-yaml": "3.11.0",
     "loader-utils": "1.1.0",
     "lodash": "4.17.5",
+    "md5": "2.2.1",
     "memory-fs": "0.4.1",
     "mime-types": "2.1.18",
     "mobile-drag-drop": "2.3.0-rc.1",

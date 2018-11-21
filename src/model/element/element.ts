@@ -240,12 +240,10 @@ export class Element {
 	public clone(opts?: { withState: boolean; target?: Project }): Element {
 		const target = opts && opts.target ? opts.target : this.project;
 		const withState = Boolean(opts && opts.withState);
-		const builtins = target.getBuiltinPatternLibrary();
 		const previousPattern = this.getPattern()!;
-		const wasBuiltin = previousPattern.getOrigin() === Types.PatternOrigin.BuiltIn;
-		const nextPattern = wasBuiltin
-			? builtins.getPatternByContextId(previousPattern.getContextId())
-			: target.getPatternById(previousPattern.getId());
+		const previousLibrary = previousPattern.getPatternLibrary();
+		const nextLibrary = target.getPatternLibraryByContextId(previousLibrary.contextId)!;
+		const nextPattern = nextLibrary.getPatternByContextId(previousPattern.getContextId());
 
 		const clonedActions: Map<string, ElementAction> = this.properties
 			.filter(prop => {
@@ -281,13 +279,8 @@ export class Element {
 			...this.propertyValues.entries()
 		].map(([id, value]) => {
 			const clonedAction = clonedActions.get(id);
-
 			const previousProperty = previousPattern.getPropertyById(id);
-
-			const nextProperty = wasBuiltin
-				? nextPattern!.getPropertyByContextId(previousProperty!.getContextId())
-				: nextPattern!.getPropertyById(id);
-
+			const nextProperty = nextPattern!.getPropertyByContextId(previousProperty!.getContextId());
 			const nextId = nextProperty!.getId();
 
 			if (clonedAction) {
@@ -780,7 +773,7 @@ export class Element {
 		this.selected = b.selected;
 	}
 
-	public getDependencies(): Types.Dependencies {
+	public getLibraryDependencies(): PatternLibrary[] {
 		const patterns = [this.getPattern(), ...this.getDescendants().map(d => d.getPattern())]
 			.filter((p): p is Pattern => typeof p !== 'undefined')
 			.map(p => ({
@@ -791,19 +784,12 @@ export class Element {
 				type: p.getType()
 			}));
 
-		const libraries = patterns
-			.map(p => this.project.getPatternLibraryById(p.libraryId))
-			.filter((p): p is PatternLibrary => typeof p !== 'undefined')
-			.map(l => ({
-				id: l.getId(),
-				bundleId: l.getBundleId(),
-				origin: l.getOrigin()
-			}));
-
-		return {
-			patterns,
-			libraries
-		};
+		return _.uniqBy(
+			patterns
+				.map(p => this.project.getPatternLibraryById(p.libraryId))
+				.filter((p): p is PatternLibrary => typeof p !== 'undefined'),
+			'id'
+		);
 	}
 }
 

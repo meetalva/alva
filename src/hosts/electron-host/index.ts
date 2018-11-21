@@ -6,6 +6,10 @@ import * as Types from '../../types';
 import * as getPort from 'get-port';
 import * as Electron from 'electron';
 import { createWindow } from './create-window';
+import * as M from '../../message';
+import * as Mobx from 'mobx';
+import * as Model from '../../model';
+import * as Menu from '../../menu';
 
 export interface ElectronHostInit {
 	process: NodeJS.Process;
@@ -17,29 +21,92 @@ export class ElectronHost implements Types.Host {
 
 	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
+	private server: Types.AlvaServer;
+	private dataHost: Types.DataHost;
+
 	private windows: Map<string | number, Electron.BrowserWindow> = new Map();
+
+	@Mobx.observable private apps: Map<string, Model.AlvaApp> = new Map();
+	@Mobx.observable private focusedAppId: string | undefined;
+	@Mobx.observable private focusedProjectId: string | undefined;
+
+	@Mobx.computed
+	public get focusedApp(): Model.AlvaApp | undefined {
+		return this.focusedAppId ? this.apps.get(this.focusedAppId) : undefined;
+	}
+
+	@Mobx.computed
+	public get focusedProject(): Promise<Model.Project | undefined> {
+		return this.focusedProjectId
+			? this.dataHost.getProject(this.focusedProjectId)
+			: Promise.resolve(undefined);
+	}
 
 	private constructor(init: ElectronHostInit) {
 		this.process = init.process;
 		this.forced = init.forced;
 	}
 
-	public static async fromProcess(
-		process: NodeJS.Process,
-		forced?: Partial<Types.HostFlags>
-	): Promise<ElectronHost> {
-		return new ElectronHost({
-			process,
-			forced
-		});
+	public static async from(init: ElectronHostInit): Promise<ElectronHost> {
+		return new ElectronHost(init);
 	}
 
-	public async start(server: Types.AlvaServer): Promise<void> {
+	public async start(server: Types.AlvaServer, dataHost: Types.DataHost): Promise<void> {
+		this.server = server;
+		this.dataHost = dataHost;
+
+		this.server.sender.match<M.WindowFocused>(M.MessageType.WindowFocused, m => {
+			const app = Model.AlvaApp.from(m.payload.app);
+			this.apps.set(app.getId(), app);
+			this.focusedAppId = app.getId();
+			this.focusedProjectId = m.payload.projectId;
+		});
+
+		this.server.sender.match<M.ChangeApp>(M.MessageType.ChangeApp, m => {
+			const app = Model.AlvaApp.from(m.payload.app);
+			this.apps.set(app.getId(), app);
+		});
+
 		Electron.app.commandLine.appendSwitch('--enable-viewport-meta', 'true');
 		Electron.app.commandLine.appendSwitch('--disable-pinch', 'true');
 
-		const win = await createWindow(`http://localhost:${server.port}`);
+		const win = await createWindow(`http://localhost:${server.port}/`);
 		this.windows.set(win.id, win);
+
+		Mobx.autorun(async () => {
+			const ctx = {
+				app: this.focusedApp,
+				project: await this.focusedProject
+			};
+
+			const toElectronAction = (item: Types.MenuItem): Electron.MenuItemConstructorOptions[] => {
+				if (typeof (item as any).click === 'function') {
+					const actionable = item as Types.ActionableMenuItem;
+					const onClick = actionable.click!;
+					actionable.click = () => onClick(server.sender);
+				}
+
+				if (Array.isArray((item as any).submenu)) {
+					const nested = item as Types.NestedMenuItem;
+					(nested as any).submenu = nested.submenu.map(m => toElectronAction(m));
+				}
+
+				return item as any;
+			};
+
+			const template = [
+				Menu.appMenu(ctx),
+				Menu.fileMenu(ctx),
+				Menu.editMenu(ctx),
+				Menu.libraryMenu(ctx),
+				Menu.viewMenu(ctx),
+				Menu.windowMenu(ctx),
+				Menu.helpMenu(ctx)
+			].map(toElectronAction);
+
+			const menu = Electron.Menu.buildFromTemplate(template as any);
+			Electron.Menu.setApplicationMenu(menu);
+		});
 	}
 
 	public async getFlags(): Promise<Types.HostFlags> {

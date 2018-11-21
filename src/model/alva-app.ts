@@ -6,6 +6,7 @@ export interface AlvaAppInit {
 	id?: string;
 	activeView: Types.AlvaView;
 	hasFocusedInput: boolean;
+	hostType: Types.HostType;
 	panes: Set<Types.AppPane>;
 	paneSizes: Types.PaneSize[];
 	rightSidebarTab: Types.RightSidebarTab;
@@ -48,14 +49,17 @@ export class AlvaApp {
 			this.searchTerm = init.searchTerm;
 			this.state = init.state;
 			this.hasFocusedInput = init.hasFocusedInput;
+			this.hostType = init.hostType;
 			init.paneSizes.forEach(paneSize => this.setPaneSize(paneSize));
 		}
 	}
 
 	public static from(serialized: Types.SerializedAlvaApp): AlvaApp {
 		return new AlvaApp({
+			id: serialized.id,
 			activeView: deserializeView(serialized.activeView),
 			hasFocusedInput: serialized.hasFocusedInput,
+			hostType: serialized.hostType as Types.HostType,
 			panes: new Set(serialized.panes.map(deserializePane)),
 			paneSizes: serialized.paneSizes.map(p => ({
 				width: p.width,
@@ -192,9 +196,11 @@ export class AlvaApp {
 
 	public toJSON(): Types.SerializedAlvaApp {
 		return {
+			id: this.id,
 			model: this.model,
 			activeView: serializeView(this.activeView),
 			hasFocusedInput: this.hasFocusedInput,
+			hostType: this.hostType,
 			panes: [...this.panes.values()].map(serializePane),
 			paneSizes: [...this.paneSizes.values()].map(paneSize => ({
 				width: paneSize.width,

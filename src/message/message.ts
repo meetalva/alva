@@ -47,6 +47,7 @@ export enum MessageType {
 	KeyboardChange = 'keyboard-change',
 	Log = 'log',
 	Maximize = 'maximize',
+	AppUpdate = 'app-update',
 	ProjectUpdate = 'project-update',
 	OpenExternalURL = 'open-external-url',
 	OpenFileRequest = 'open-file-request',
@@ -78,6 +79,8 @@ export enum MessageType {
 	HighlightElement = 'highlight-element',
 	WindowOpen = 'window-open',
 	WindowClose = 'window-close',
+	WindowFocused = 'window-focused',
+	WindowBlured = 'window-blured',
 	ChromeScreenShot = 'chrome-screenshot',
 	ToggleFullScreen = 'toggle-fullscreen'
 }
@@ -158,7 +161,10 @@ export type Message =
 	| UseFileRequest
 	| UseFileResponse
 	| ToggleFullScreen
-	| ProjectUpdate;
+	| ProjectUpdate
+	| AppUpdate
+	| WindowBlured
+	| WindowFocused;
 
 export type CreateNewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -404,5 +410,30 @@ export type ProjectUpdate = Envelope<
 		change: MobxChange;
 		path: string;
 		projectId: string;
+	}
+>;
+
+export type AppUpdate = Envelope<
+	MessageType.AppUpdate,
+	{
+		change: MobxChange;
+		path: string;
+		appId: string;
+	}
+>;
+
+export type WindowFocused = Envelope<
+	MessageType.WindowFocused,
+	{
+		app: Types.SerializedAlvaApp;
+		projectId?: string;
+	}
+>;
+
+export type WindowBlured = Envelope<
+	MessageType.WindowBlured,
+	{
+		app: Types.SerializedAlvaApp;
+		projectId?: string;
 	}
 >;

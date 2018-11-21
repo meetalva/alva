@@ -16,9 +16,6 @@ export function openFile({
 	return m => {
 		const senders = m.sender || [];
 
-		console.log(store.getSender().id);
-		console.log(senders);
-
 		if (!senders.includes(store.getSender().id)) {
 			return;
 		}

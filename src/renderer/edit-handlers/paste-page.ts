@@ -14,7 +14,11 @@ export function pastePage({ store }: MessageHandlerContext): MessageHandler<M.Pa
 			return;
 		}
 
-		project.startBatch();
+		const senders = m.sender || [];
+
+		if (!senders.includes(store.getSender().id)) {
+			return;
+		}
 
 		const pages = store.getPages();
 		const activePage = (store.getActivePage() || pages[pages.length - 1]) as Model.Page;
@@ -24,7 +28,6 @@ export function pastePage({ store }: MessageHandlerContext): MessageHandler<M.Pa
 			: store.getProject();
 
 		const sourcePage = Model.Page.from(m.payload.page, { project: contextProject });
-		project.endBatch();
 
 		const clonedPage = sourcePage.clone();
 

@@ -347,3 +347,22 @@ export enum ActionName {
 	MatchHighlightedElement = 'MatchHighlightedElement',
 	OpenFile = 'OpenFile'
 }
+
+export interface Dependencies {
+	patterns: PatternDependency[];
+	libraries: LibraryDependency[];
+}
+
+export interface LibraryDependency {
+	id: string;
+	bundleId: string;
+	origin: SerializedModel.SerializedPatternLibraryOrigin;
+}
+
+export interface PatternDependency {
+	id: string;
+	contextId: string;
+	libraryId: string;
+	origin: SerializedModel.SerializedPatternOrigin;
+	type: SerializedModel.SerializedPatternType;
+}

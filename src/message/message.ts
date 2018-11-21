@@ -223,10 +223,13 @@ export type ContextMenuRequest = Envelope<
 >;
 export type ContentRequest = EmptyEnvelope<MessageType.ContentRequest>;
 export type ContentResponse = Envelope<MessageType.ContentResponse, string>;
-export type Copy = Envelope<
-	MessageType.Copy,
-	{ itemType: Types.SerializedItemType; projectId: string; itemId: string }
->;
+export interface CopyPayload {
+	itemType: Types.SerializedItemType;
+	projectId: string;
+	itemId: string;
+	dependencies: Types.Dependencies;
+}
+export type Copy = Envelope<MessageType.Copy, CopyPayload>;
 export type CopyElement = Envelope<MessageType.CopyElement, string>;
 export type CreateNewPage = Envelope<MessageType.CreateNewPage, undefined>;
 export type CreateScriptBundleRequest = Envelope<
@@ -265,7 +268,7 @@ export type PasteElement = Envelope<
 	MessageType.PasteElement,
 	{
 		element: Types.SerializedElement;
-		project?: Types.SerializedProject;
+		project: Types.SerializedProject;
 		targetType: Types.ElementTargetType;
 		targetId?: string;
 	}

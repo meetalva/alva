@@ -148,6 +148,8 @@ export class HostAdapter {
 				return;
 			}
 
+			const dependencies = item.getDependencies();
+
 			this.host.writeClipboard(
 				Serde.serialize({
 					type: M.MessageType.Clipboard,
@@ -155,6 +157,7 @@ export class HostAdapter {
 					payload: {
 						type: m.payload.itemType,
 						item: item.toJSON(),
+						dependencies,
 						project: project.toJSON()
 					}
 				})
@@ -182,6 +185,7 @@ export class HostAdapter {
 					payload: {
 						type: 'element',
 						item: item.toJSON(),
+						dependencies: item.getDependencies(),
 						project: project.toJSON()
 					}
 				})
@@ -209,6 +213,7 @@ export class HostAdapter {
 					payload: {
 						type: 'element',
 						item: item.toJSON(),
+						dependencies: item.getDependencies(),
 						project: project.toJSON()
 					}
 				})
@@ -235,12 +240,11 @@ export class HostAdapter {
 			}
 
 			const targetType = m.payload ? m.payload.targetType : Types.ElementTargetType.Auto;
-
 			const targetId = m.payload ? m.payload.id : '';
 			const itemType = deserializeItemType(message.payload.type);
 
 			switch (itemType) {
-				case Types.ItemType.Element:
+				case Types.ItemType.Element: {
 					this.sender.send({
 						id: uuid.v4(),
 						type: M.MessageType.PasteElement,
@@ -252,6 +256,7 @@ export class HostAdapter {
 						}
 					});
 					break;
+				}
 				case Types.ItemType.Page:
 					this.sender.send({
 						id: uuid.v4(),

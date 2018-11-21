@@ -312,10 +312,6 @@ export class Project {
 
 	@Mobx.action
 	public addPage(page: Page): void {
-		// if (!this.pageList.includes(page.getId())) {
-		// 	this.pageList.push(page.getId());
-		// }
-
 		this.internalPages.set(page.getId(), page);
 		page.setProject(this);
 	}

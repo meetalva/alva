@@ -99,4 +99,12 @@ export class NodeHost implements Types.Host {
 	public async showContextMenu(): Promise<undefined> {
 		return;
 	}
+
+	public async writeClipboard(input: string): Promise<void> {
+		return;
+	}
+
+	public async readClipboard(): Promise<string | undefined> {
+		return;
+	}
 }

@@ -219,7 +219,7 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 						accelerator,
 						menu,
 						menuStore: props.menuStore,
-						sender: props.store.getSender(),
+						app: props.store.getApp(),
 						style,
 						onMouseEnter,
 						onMouseLeave
@@ -271,7 +271,6 @@ class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }>
 		if (menu.menu.hasOwnProperty('click')) {
 			const actionable = menu.menu as Types.ActionableMenuItem;
 			if (typeof actionable.click !== 'undefined') {
-				console.log(props.store.getApp());
 				actionable.click(props.store.getApp());
 			}
 		}

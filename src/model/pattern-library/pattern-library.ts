@@ -61,7 +61,7 @@ export class PatternLibrary {
 
 	@Mobx.computed
 	public get contextId(): string {
-		return [this.name, this.version].join('@');
+		return [this.name, this.version || '1.0.0'].join('@');
 	}
 
 	public constructor(init: PatternLibraryInit) {

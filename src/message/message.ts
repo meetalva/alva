@@ -298,7 +298,7 @@ export type Reload = Envelope<MessageType.Reload, { forced: boolean } | undefine
 export type Save = Envelope<MessageType.Save, { publish: boolean; projectId: string }>;
 export type SaveResult = Envelope<
 	MessageType.SaveResult,
-	{ draft: boolean; result: Types.PersistenceSerializeResult; name: string }
+	{ project: Types.SerializedProject; previous: string }
 >;
 export type SetPane = Envelope<MessageType.SetPane, { pane: Types.AppPane; visible: boolean }>;
 export type ShowError = Envelope<
@@ -387,7 +387,7 @@ export type WindowOpen = Envelope<
 
 export type UseFileRequest = Envelope<
 	MessageType.UseFileRequest,
-	{ contents: string; silent: boolean; replace: boolean }
+	{ contents: string; silent: boolean; replace: boolean; path?: string }
 >;
 
 export type UseFileResponse = Envelope<

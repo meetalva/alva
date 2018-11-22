@@ -42,7 +42,6 @@ export function useFileRequest(
 			return;
 		}
 
-		const draftPath = await server.host.resolveFrom(Types.HostBase.AppData, `${uuid.v4()}.alva`);
 		const result = Model.Project.toResult(projectResult.contents);
 
 		if (result.status !== 'ok') {
@@ -66,15 +65,20 @@ export function useFileRequest(
 
 		const draftProject = result.result;
 
-		draftProject.setPath(draftPath);
-		draftProject.setId(
-			Buffer.from([draftProject.getId(), draftPath].join(':'), 'utf-8').toString('base64')
-		);
+		if (!message.payload.path) {
+			const draftPath = await server.host.resolveFrom(
+				Types.HostBase.AppData,
+				`${uuid.v4()}.alva`
+			);
+			draftProject.setPath(draftPath);
 
-		await server.host.mkdir(Path.dirname(draftPath));
-		await server.host.writeFile(draftPath, JSON.stringify(draftProject.toDisk()));
+			await server.host.mkdir(Path.dirname(draftPath));
+			await server.host.writeFile(draftPath, JSON.stringify(draftProject.toDisk()));
+		} else {
+			draftProject.setPath(message.payload.path);
+		}
+
 		await server.dataHost.addProject(draftProject);
-
 		draftProject.sync(server.sender);
 
 		return sender.send({

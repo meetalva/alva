@@ -40,6 +40,12 @@ export interface HostSelectFileOptions {
 	filters?: ({ name?: string; extensions?: string[] })[];
 }
 
+export interface HostSelectSaveFileOptions {
+	title?: string;
+	defaultPath?: string;
+	filters?: ({ name?: string; extensions?: string[] })[];
+}
+
 export interface HostMessageButton {
 	label: string;
 	message?: Message.Message;
@@ -97,6 +103,10 @@ export abstract class Host {
 
 	public async selectFile(opts: HostSelectFileOptions): Promise<void | string> {
 		throw new Error('host.selectFile: not implemented');
+	}
+
+	public async selectSaveFile(opts: HostSelectSaveFileOptions): Promise<void | string> {
+		throw new Error('host.selectSaveFile: not implemented');
 	}
 
 	public async showMessage(opts: HostMessageOptions): Promise<HostMessageButton | undefined> {

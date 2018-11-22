@@ -45,6 +45,7 @@ export function openFileRequest(
 					sender: message.sender,
 					payload: {
 						silent,
+						path: selectedPath,
 						replace: message.payload.replace,
 						contents
 					}

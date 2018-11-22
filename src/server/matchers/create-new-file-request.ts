@@ -66,6 +66,7 @@ export function createNewFileRequest(
 		}
 
 		const p = response.payload.project as Types.ProjectPayloadSuccess;
+		const replacement = Model.Project.from(p.contents);
 
 		if (!message.payload.replace) {
 			sender.send({
@@ -73,7 +74,7 @@ export function createNewFileRequest(
 				type: Message.MessageType.OpenWindow,
 				payload: {
 					view: Types.AlvaView.PageDetail,
-					projectId: p.contents.id
+					projectId: replacement.getId()
 				},
 				transaction: message.transaction,
 				sender: message.sender

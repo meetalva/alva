@@ -27,7 +27,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 	});
 
 	await alvaServer.start();
-	await electronHost.start(alvaServer, localDataHost);
+	await electronHost.start(alvaServer);
 
 	const onRestart = async () => {
 		const port = alvaServer.port;

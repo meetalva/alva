@@ -14,7 +14,7 @@ export async function createWindow(address: string): Promise<Electron.BrowserWin
 		title: 'Alva',
 		webPreferences: {
 			nodeIntegration: false,
-			preload: require.resolve('./preload')
+			preload: require.resolve('./create-window-preload')
 		}
 	});
 

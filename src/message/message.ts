@@ -301,7 +301,10 @@ export type SaveResult = Envelope<
 	{ draft: boolean; result: Types.PersistenceSerializeResult; name: string }
 >;
 export type SetPane = Envelope<MessageType.SetPane, { pane: Types.AppPane; visible: boolean }>;
-export type ShowError = Envelope<MessageType.ShowError, { message: string; stack: string }>;
+export type ShowError = Envelope<
+	MessageType.ShowError,
+	{ message: string; detail: string; error?: { message: string; stack: string }; help?: string }
+>;
 export type SketchExportRequest = Envelope<
 	MessageType.SketchExportRequest,
 	Types.SketchExportPayload

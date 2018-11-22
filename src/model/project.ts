@@ -272,6 +272,22 @@ export class Project {
 		return project;
 	}
 
+	public static toResult(
+		serialized: Types.SerializedProject
+	): { status: 'ok'; result: Project } | { status: 'error'; error: Error } {
+		try {
+			return {
+				status: 'ok',
+				result: Project.from(serialized)
+			};
+		} catch (error) {
+			return {
+				status: 'error',
+				error
+			};
+		}
+	}
+
 	public static equals(a: Types.SavedProject, b: Types.SavedProject): boolean;
 	public static equals(a: Types.SavedProject | Project, b: Types.SavedProject | Project): boolean {
 		const toData = input => (input instanceof Project ? input.toDisk() : input);

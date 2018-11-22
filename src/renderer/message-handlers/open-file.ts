@@ -33,8 +33,12 @@ export function openFile({
 					payload: {
 						message: `Sorry, we had trouble reading the project in file "${Path.basename(
 							payload.path
-						)}".\n Parsing the project failed with: ${projectResult.error.message}`,
-						stack: projectResult.error.stack || ''
+						)}".`,
+						detail: `Parsing the project failed with: ${projectResult.error.message}`,
+						error: {
+							message: projectResult.error.message,
+							stack: projectResult.error.stack || ''
+						}
 					},
 					type: M.MessageType.ShowError
 				});

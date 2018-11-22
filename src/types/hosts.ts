@@ -46,6 +46,7 @@ export interface HostMessageButton {
 }
 
 export interface HostMessageOptions {
+	type?: 'info' | 'warning' | 'error';
 	message: string;
 	detail?: string;
 	buttons: HostMessageButton[];

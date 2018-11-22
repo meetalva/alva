@@ -21,7 +21,7 @@ export class ElectronHost implements Types.Host {
 	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
 	private menu: ElectronMainMenu;
-
+	private sender: Types.Sender;
 	private windows: Map<string | number, Electron.BrowserWindow> = new Map();
 
 	private constructor(init: ElectronHostInit) {
@@ -35,6 +35,8 @@ export class ElectronHost implements Types.Host {
 	}
 
 	public async start(server: Types.AlvaServer): Promise<void> {
+		this.sender = server.sender;
+
 		Electron.app.commandLine.appendSwitch('--enable-viewport-meta', 'true');
 		Electron.app.commandLine.appendSwitch('--disable-pinch', 'true');
 
@@ -150,7 +152,25 @@ export class ElectronHost implements Types.Host {
 		});
 	}
 
-	public async showMessage(): Promise<undefined> {
+	public async showMessage(opts: Types.HostMessageOptions): Promise<undefined> {
+		const result = Electron.dialog.showMessageBox({
+			type: opts.type,
+			message: opts.message,
+			detail: opts.detail,
+			buttons: opts.buttons.map(button => button.label)
+		});
+
+		if (!result) {
+			return;
+		}
+
+		const button = opts.buttons[result];
+
+		if (!button || !button.message) {
+			return;
+		}
+
+		this.sender.send(button.message);
 		return;
 	}
 

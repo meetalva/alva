@@ -56,7 +56,11 @@ export function createNewFileRequest(
 				id: message.id,
 				payload: {
 					message: [p.error.message].join('\n'),
-					stack: p.error.stack || ''
+					detail: p.error.stack || '',
+					error: {
+						message: p.error.message,
+						stack: p.error.stack || ''
+					}
 				}
 			});
 		}

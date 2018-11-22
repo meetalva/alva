@@ -36,7 +36,7 @@ export function pastePage({ store }: MessageHandlerContext): MessageHandler<M.Pa
 				id: uuid.v4(),
 				payload: {
 					message: `Could not paste page "${sourcePage.getName()}"`,
-					stack: [
+					detail: [
 						`Page "${sourcePage.getName()}" requires the following pattern libraries to be connected`,
 						'',
 						...missingLibraries.map(l => `- ${l.getName()}@${l.getVersion()}`)

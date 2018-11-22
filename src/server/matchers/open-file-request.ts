@@ -62,7 +62,7 @@ export function openFileRequest(
 					id: message.id,
 					payload: {
 						message: [p.error.message].join('\n'),
-						stack: p.error.stack || ''
+						detail: p.error.stack || ''
 					}
 				});
 			}
@@ -101,7 +101,7 @@ export function openFileRequest(
 					id: message.id,
 					payload: {
 						message: [err.message].join('\n'),
-						stack: err.stack || ''
+						detail: err.stack || ''
 					}
 				});
 			}

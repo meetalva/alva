@@ -12,7 +12,6 @@ export function openFile({
 	history
 }: MessageHandlerContext): MessageHandler<M.UseFileResponse> {
 	return m => {
-		console.log(m.payload.replace);
 		if (!m.payload.replace) {
 			return;
 		}

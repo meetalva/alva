@@ -9,6 +9,7 @@ import { createWindow } from './create-window';
 import { ElectronMainMenu } from './electron-main-menu';
 import * as M from '../../message';
 import { AlvaApp } from '../../model';
+import * as ContextMenu from '../../context-menu';
 
 export interface ElectronHostInit {
 	process: NodeJS.Process;
@@ -54,6 +55,37 @@ export class ElectronHost implements Types.Host {
 
 		server.sender.match<M.ToggleDevTools>(M.MessageType.ToggleDevTools, async () => {
 			await this.toggleDevTools();
+		});
+
+		server.sender.match<M.ContextMenuRequest>(M.MessageType.ContextMenuRequest, async m => {
+			if (m.payload.menu === Types.ContextMenuType.ElementMenu) {
+				const project = await server.dataHost.getProject(m.payload.projectId);
+
+				if (!project) {
+					return;
+				}
+
+				const element = project.getElementById(m.payload.data.element.id);
+
+				if (!element) {
+					return;
+				}
+
+				const app = await this.getApp();
+
+				if (!app) {
+					return;
+				}
+
+				await this.showContextMenu({
+					position: m.payload.position,
+					items: ContextMenu.elementContextMenu({
+						app,
+						project,
+						element
+					})
+				});
+			}
 		});
 
 		this.createWindow(`http://localhost:${server.port}/`);
@@ -174,8 +206,22 @@ export class ElectronHost implements Types.Host {
 		return;
 	}
 
-	public async showContextMenu(): Promise<undefined> {
-		return;
+	public async showContextMenu(opts: {
+		items: Types.ContextMenuItem[];
+		position: { x: number; y: number };
+	}): Promise<void> {
+		const focusedWindow = Electron.BrowserWindow.getFocusedWindow();
+
+		if (!focusedWindow || focusedWindow === null) {
+			return;
+		}
+
+		Electron.Menu.buildFromTemplate(
+			opts.items.map(o => ({
+				...o,
+				click: () => (o as any).click(this.sender)
+			}))
+		).popup({ window: focusedWindow });
 	}
 
 	public async toggleDevTools(): Promise<void> {

@@ -106,7 +106,7 @@ export abstract class Host {
 	public async showContextMenu(opts: {
 		items: Types.ContextMenuItem[];
 		position: { x: number; y: number };
-	}): Promise<undefined> {
+	}): Promise<void> {
 		throw new Error('host.showContextMenu: not implemented');
 	}
 

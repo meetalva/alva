@@ -82,7 +82,8 @@ export enum MessageType {
 	WindowFocused = 'window-focused',
 	WindowBlured = 'window-blured',
 	ChromeScreenShot = 'chrome-screenshot',
-	ToggleFullScreen = 'toggle-fullscreen'
+	ToggleFullScreen = 'toggle-fullscreen',
+	ToggleDevTools = 'toggle-dev-tools'
 }
 
 export type Message =
@@ -164,7 +165,8 @@ export type Message =
 	| ProjectUpdate
 	| AppUpdate
 	| WindowBlured
-	| WindowFocused;
+	| WindowFocused
+	| ToggleDevTools;
 
 export type CreateNewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -437,3 +439,5 @@ export type WindowBlured = Envelope<
 		projectId?: string;
 	}
 >;
+
+export type ToggleDevTools = EmptyEnvelope<MessageType.ToggleDevTools>;

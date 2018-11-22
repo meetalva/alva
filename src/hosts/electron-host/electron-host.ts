@@ -153,4 +153,12 @@ export class ElectronHost implements Types.Host {
 			window.webContents.toggleDevTools();
 		}
 	}
+
+	public async writeClipboard(input: string): Promise<void> {
+		Electron.clipboard.writeText(input);
+	}
+
+	public async readClipboard(): Promise<string | undefined> {
+		return Electron.clipboard.readText();
+	}
 }

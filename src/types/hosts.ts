@@ -108,6 +108,14 @@ export abstract class Host {
 	}): Promise<undefined> {
 		throw new Error('host.showContextMenu: not implemented');
 	}
+
+	public async writeClipboard(input: string): Promise<void> {
+		throw new Error('host.writeClipboard: not implemented');
+	}
+
+	public async readClipboard(): Promise<string | undefined> {
+		throw new Error('host.readClipboard: not implemented');
+	}
 }
 
 export abstract class DataHost {

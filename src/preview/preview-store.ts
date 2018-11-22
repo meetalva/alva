@@ -287,8 +287,8 @@ export class PreviewStore<V> {
 			this.project.setSelectedElement(data.element);
 		}
 
-		if (this.app || this.sender) {
-			(this.app || this.sender).send({
+		if (this.sender) {
+			this.sender.send({
 				appId: this.app ? this.app.getId() : undefined,
 				type: Message.MessageType.SelectElement,
 				id: uuid.v4(),
@@ -314,8 +314,8 @@ export class PreviewStore<V> {
 			this.setHighlightedElement(data.element);
 		}
 
-		if (this.app || this.sender) {
-			(this.app || this.sender).send({
+		if (this.sender) {
+			this.sender.send({
 				appId: this.app ? this.app.getId() : undefined,
 				type: Message.MessageType.HighlightElement,
 				id: uuid.v4(),

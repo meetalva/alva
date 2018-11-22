@@ -10,6 +10,8 @@ import { ElectronMainMenu } from './electron-main-menu';
 import * as M from '../../message';
 import { AlvaApp } from '../../model';
 import * as ContextMenu from '../../context-menu';
+import * as Url from 'url';
+import * as uuid from 'uuid';
 
 export interface ElectronHostInit {
 	process: NodeJS.Process;
@@ -23,6 +25,7 @@ export class ElectronHost implements Types.Host {
 	private process: NodeJS.Process;
 	private menu: ElectronMainMenu;
 	private sender: Types.Sender;
+	private dataHost: Types.DataHost;
 	private windows: Map<string | number, Electron.BrowserWindow> = new Map();
 
 	private constructor(init: ElectronHostInit) {
@@ -37,6 +40,7 @@ export class ElectronHost implements Types.Host {
 
 	public async start(server: Types.AlvaServer): Promise<void> {
 		this.sender = server.sender;
+		this.dataHost = server.dataHost;
 
 		Electron.app.commandLine.appendSwitch('--enable-viewport-meta', 'true');
 		Electron.app.commandLine.appendSwitch('--disable-pinch', 'true');
@@ -144,8 +148,62 @@ export class ElectronHost implements Types.Host {
 		const win = await createWindow(address);
 		this.windows.set(win.id, win);
 
-		win.on('close', () => {
+		win.on('close', async e => {
+			if (!this.windows.get(win.id)) {
+				return;
+			}
+
+			e.preventDefault();
+			const parsed = Url.parse(win.webContents.getURL());
+			const [prefix, id] = (parsed.pathname || '').split('/').filter(Boolean);
+			const project = await this.dataHost.getProject(id);
+
+			if (prefix === 'project' && project && project.getDraft()) {
+				const saveId = uuid.v4();
+				const cancelId = uuid.v4();
+				const discardId = uuid.v4();
+
+				const result = await this.showMessage({
+					type: 'warning',
+					message: `Do you want to save the changes you made to ${project.getName()}?`,
+					detail: "Your changes will be lost if you don't save them.",
+					buttons: [
+						{
+							label: 'Save',
+							id: saveId
+						},
+						{
+							label: 'Cancel',
+							id: cancelId
+						},
+						{
+							label: "Don't Save",
+							id: discardId
+						}
+					]
+				});
+
+				if (result && result.id === cancelId) {
+					return;
+				}
+
+				if (result && result.id === saveId) {
+					await this.sender.transaction<M.Save, M.SaveResult>(
+						{
+							type: M.MessageType.Save,
+							id: uuid.v4(),
+							payload: {
+								publish: false,
+								projectId: project.getId()
+							}
+						},
+						{ type: M.MessageType.SaveResult }
+					);
+				}
+			}
+
 			this.windows.delete(win.id);
+			win.close();
 		});
 
 		return win;
@@ -244,7 +302,9 @@ export class ElectronHost implements Types.Host {
 		});
 	}
 
-	public async showMessage(opts: Types.HostMessageOptions): Promise<undefined> {
+	public async showMessage(
+		opts: Types.HostMessageOptions
+	): Promise<undefined | Types.HostMessageButton> {
 		const result = Electron.dialog.showMessageBox({
 			type: opts.type,
 			message: opts.message,
@@ -252,18 +312,21 @@ export class ElectronHost implements Types.Host {
 			buttons: opts.buttons.map(button => button.label)
 		});
 
-		if (!result) {
+		if (typeof result === 'undefined') {
 			return;
 		}
 
 		const button = opts.buttons[result];
 
-		if (!button || !button.message) {
+		if (!button) {
 			return;
 		}
 
-		this.sender.send(button.message);
-		return;
+		if (button.message && button) {
+			this.sender.send(button.message);
+		}
+
+		return button;
 	}
 
 	public async showContextMenu(opts: {

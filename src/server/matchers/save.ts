@@ -17,18 +17,18 @@ export function save(server: Types.AlvaServer): (message: Message.Save) => Promi
 
 		const name = project.getName() !== project.toJSON().id ? project.getName() : 'New Project';
 
-		const targetPath = !message.payload.publish
-			? project.getPath()
-			: await server.host.selectSaveFile({
-					title: 'Save Alva File',
-					defaultPath: `${name}.alva`,
-					filters: [
-						{
-							name: 'Alva File',
-							extensions: ['alva']
-						}
-					]
-			  });
+		const targetPath =
+			project.getPath() ||
+			(await server.host.selectSaveFile({
+				title: 'Save Alva File',
+				defaultPath: `${name}.alva`,
+				filters: [
+					{
+						name: 'Alva File',
+						extensions: ['alva']
+					}
+				]
+			}));
 
 		if (!targetPath) {
 			return;

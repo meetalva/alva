@@ -47,7 +47,7 @@ export function pasteElement({
 				id: uuid.v4(),
 				payload: {
 					message: `Could not paste element "${sourceElement.getName()}"`,
-					stack: [
+					detail: [
 						`Element "${sourceElement.getName()}" requires the following pattern libraries to be connected`,
 						'',
 						...missingLibraries.map(l => `- ${l.getName()}@${l.getVersion()}`)
@@ -79,8 +79,5 @@ export function pasteElement({
 
 		store.commit();
 		project.setSelectedElement(clonedElement);
-
-		console.log(clonedElement.getPattern());
-		console.log(clonedElement.getContentBySlotType(Types.SlotType.Children));
 	};
 }

@@ -14,6 +14,10 @@ export type MessageHandler<T extends M.Message = M.Message> = (msg: T) => void;
 
 export function createHandlers(ctx: MessageHandlerContext): void {
 	const app = ctx.app;
+	const sender = ctx.store.getSender();
+
+	sender.match<M.HighlightElement>(M.MessageType.HighlightElement, Handlers.highlightElement(ctx));
+	sender.match<M.KeyboardChange>(M.MessageType.KeyboardChange, Handlers.keyboardChange(ctx));
 
 	app.match<M.ActivatePage>(M.MessageType.ActivatePage, Handlers.activatePage(ctx));
 	app.match<M.AppRequest>(M.MessageType.AppRequest, Handlers.appRequest(ctx));
@@ -28,14 +32,12 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 	);
 	app.match<M.SaveResult>(M.MessageType.SaveResult, Handlers.processSave(ctx));
 	app.match<M.CreateNewPage>(M.MessageType.CreateNewPage, Handlers.createNewPage(ctx));
-	app.match<M.HighlightElement>(M.MessageType.HighlightElement, Handlers.highlightElement(ctx));
-	app.match<M.KeyboardChange>(M.MessageType.KeyboardChange, Handlers.keyboardChange(ctx));
 	app.match<M.Log>(M.MessageType.Log, Handlers.log(ctx));
 
 	app.match<M.UseFileResponse>(M.MessageType.UseFileResponse, Handlers.openFile(ctx));
 
 	app.match<M.ProjectRequest>(M.MessageType.ProjectRequest, Handlers.projectRequest(ctx));
-	app.match<M.SelectElement>(M.MessageType.SelectElement, Handlers.selectElement(ctx));
+	sender.match<M.SelectElement>(M.MessageType.SelectElement, Handlers.selectElement(ctx));
 	app.match<M.SetPane>(M.MessageType.SetPane, Handlers.setPane(ctx));
 	app.match<M.StartAppMessage>(M.MessageType.StartApp, Handlers.startApp(ctx));
 	app.match<M.UpdatePatternLibraryResponse>(

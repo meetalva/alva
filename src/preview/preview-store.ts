@@ -51,6 +51,7 @@ export interface SyntheticComponents<V> {
 }
 
 export class PreviewStore<V> {
+	@Mobx.observable private app: Model.AlvaApp;
 	@Mobx.observable private components: Components;
 	@Mobx.observable private highlightArea: ElementArea;
 	@Mobx.observable private metaDown: boolean = false;
@@ -209,7 +210,11 @@ export class PreviewStore<V> {
 						return;
 					}
 
-					elementAction.execute({ sender: this.sender, project: this.getProject(), event: e });
+					elementAction.execute({
+						sender: this.app || this.sender,
+						project: this.getProject(),
+						event: e
+					});
 				};
 			} else {
 				renderProperties[patternProperty.getPropertyName()] = elementProperty.getValue();
@@ -282,8 +287,9 @@ export class PreviewStore<V> {
 			this.project.setSelectedElement(data.element);
 		}
 
-		if (this.sender) {
-			this.sender.send({
+		if (this.app || this.sender) {
+			(this.app || this.sender).send({
+				appId: this.app ? this.app.getId() : undefined,
 				type: Message.MessageType.SelectElement,
 				id: uuid.v4(),
 				payload: { element: data.element.toJSON(), projectId: this.project.getId() }
@@ -308,8 +314,9 @@ export class PreviewStore<V> {
 			this.setHighlightedElement(data.element);
 		}
 
-		if (this.sender) {
-			this.sender.send({
+		if (this.app || this.sender) {
+			(this.app || this.sender).send({
+				appId: this.app ? this.app.getId() : undefined,
 				type: Message.MessageType.HighlightElement,
 				id: uuid.v4(),
 				payload: { element: data.element.toJSON() }
@@ -399,5 +406,10 @@ export class PreviewStore<V> {
 	@Mobx.action
 	public setScrollPosition(scrollPosition: Types.Point): void {
 		this.scrollPosition = scrollPosition;
+	}
+
+	@Mobx.action
+	public setApp(app: Model.AlvaApp): void {
+		this.app = app;
 	}
 }

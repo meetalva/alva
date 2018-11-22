@@ -38,13 +38,33 @@ export class ElectronHost implements Types.Host {
 		Electron.app.commandLine.appendSwitch('--enable-viewport-meta', 'true');
 		Electron.app.commandLine.appendSwitch('--disable-pinch', 'true');
 
+		Electron.app.on('window-all-closed', () => {
+			if (process.platform !== 'darwin') {
+				Electron.app.quit();
+			}
+		});
+
+		Electron.app.on('activate', async () => {
+			if (process.platform === 'darwin' && this.windows.size === 0) {
+				this.addWindow(server.port);
+			}
+		});
+
 		server.sender.match<M.ToggleDevTools>(M.MessageType.ToggleDevTools, async () => {
 			await this.toggleDevTools();
 		});
 
-		const win = await createWindow(`http://localhost:${server.port}/`);
-		this.windows.set(win.id, win);
+		this.addWindow(server.port);
 		this.menu.start(server);
+	}
+
+	public async addWindow(port: number): Promise<void> {
+		const win = await createWindow(`http://localhost:${port}/`);
+		this.windows.set(win.id, win);
+
+		win.on('close', () => {
+			this.windows.delete(win.id);
+		});
 	}
 
 	public async getFlags(): Promise<Types.HostFlags> {

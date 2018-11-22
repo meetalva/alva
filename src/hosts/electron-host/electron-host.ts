@@ -220,7 +220,7 @@ export class ElectronHost implements Types.Host {
 		return;
 	}
 
-	public selectFile(opts): Promise<void> {
+	public selectFile(opts): Promise<void | string> {
 		return new Promise(resolve => {
 			Electron.dialog.showOpenDialog(opts, paths => {
 				if (!paths) {
@@ -228,6 +228,18 @@ export class ElectronHost implements Types.Host {
 				}
 
 				resolve(paths[0]);
+			});
+		});
+	}
+
+	public selectSaveFile(opts): Promise<void | string> {
+		return new Promise(resolve => {
+			Electron.dialog.showSaveDialog(opts, path => {
+				if (!path) {
+					return resolve();
+				}
+
+				resolve(path);
 			});
 		});
 	}

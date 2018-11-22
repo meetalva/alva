@@ -92,6 +92,10 @@ export class NodeHost implements Types.Host {
 		return;
 	}
 
+	public async selectSaveFile(): Promise<void> {
+		return;
+	}
+
 	public async showMessage(): Promise<undefined> {
 		return;
 	}

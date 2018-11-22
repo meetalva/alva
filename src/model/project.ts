@@ -400,11 +400,17 @@ export class Project {
 	}
 
 	public getId(): string {
-		return this.id;
+		return this.path
+			? Buffer.from([this.id, this.path].join(':'), 'utf-8').toString('base64')
+			: this.id;
 	}
 
 	public getName(): string {
 		return this.name;
+	}
+
+	public hasFriendlyName(): boolean {
+		return this.name !== this.id;
 	}
 
 	public getNextPage(): Page | undefined {
@@ -564,6 +570,13 @@ export class Project {
 		this.draft = draft;
 	}
 
+	public setId(raw: string): void {
+		const [id] = Buffer.from(raw, 'base64')
+			.toString('utf-8')
+			.split(':');
+		this.id = id;
+	}
+
 	public getElementPropertyById(id: string): ElementProperty | undefined {
 		return this.elementProperties.get(id);
 	}
@@ -720,11 +733,6 @@ export class Project {
 	}
 
 	@Mobx.action
-	public setId(id: string): void {
-		this.id = id;
-	}
-
-	@Mobx.action
 	public setName(name: string): void {
 		this.name = name;
 	}
@@ -809,7 +817,7 @@ export class Project {
 	private onProjectUpdate(m: Message.ProjectUpdate) {
 		const { change, path, projectId } = m.payload;
 
-		if (projectId !== this.id) {
+		if (projectId !== this.getId()) {
 			return;
 		}
 

@@ -19,6 +19,8 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 	sender.match<M.HighlightElement>(M.MessageType.HighlightElement, Handlers.highlightElement(ctx));
 	sender.match<M.KeyboardChange>(M.MessageType.KeyboardChange, Handlers.keyboardChange(ctx));
 
+	app.match<M.SaveResult>(M.MessageType.SaveResult, Handlers.save(ctx));
+
 	app.match<M.ActivatePage>(M.MessageType.ActivatePage, Handlers.activatePage(ctx));
 	app.match<M.AppRequest>(M.MessageType.AppRequest, Handlers.appRequest(ctx));
 	app.match<M.ChangeUserStore>(M.MessageType.ChangeUserStore, Handlers.changeUserStore(ctx));
@@ -30,7 +32,6 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 		M.MessageType.ConnectPatternLibraryResponse,
 		Handlers.connectPatternLibrary(ctx)
 	);
-	app.match<M.SaveResult>(M.MessageType.SaveResult, Handlers.processSave(ctx));
 	app.match<M.CreateNewPage>(M.MessageType.CreateNewPage, Handlers.createNewPage(ctx));
 	app.match<M.Log>(M.MessageType.Log, Handlers.log(ctx));
 

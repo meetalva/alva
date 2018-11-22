@@ -88,6 +88,54 @@ export class ElectronHost implements Types.Host {
 			}
 		});
 
+		server.sender.match<M.Undo>(M.MessageType.Undo, async () => {
+			const app = await this.getApp();
+
+			if (app && app.getHasFocusedInput()) {
+				Electron.Menu.sendActionToFirstResponder('undo:');
+			}
+		});
+
+		server.sender.match<M.Redo>(M.MessageType.Redo, async () => {
+			const app = await this.getApp();
+
+			if (app && app.getHasFocusedInput()) {
+				Electron.Menu.sendActionToFirstResponder('redo:');
+			}
+		});
+
+		server.sender.match<M.Cut>(M.MessageType.Cut, async () => {
+			const app = await this.getApp();
+
+			if (app && app.getHasFocusedInput()) {
+				Electron.Menu.sendActionToFirstResponder('cut:');
+			}
+		});
+
+		server.sender.match<M.Copy>(M.MessageType.Copy, async () => {
+			const app = await this.getApp();
+
+			if (app && app.getHasFocusedInput()) {
+				Electron.Menu.sendActionToFirstResponder('copy:');
+			}
+		});
+
+		server.sender.match<M.Paste>(M.MessageType.Paste, async () => {
+			const app = await this.getApp();
+
+			if (app && app.getHasFocusedInput()) {
+				Electron.Menu.sendActionToFirstResponder('paste:');
+			}
+		});
+
+		server.sender.match<M.DeleteSelected>(M.MessageType.DeleteSelected, async () => {
+			const app = await this.getApp();
+
+			if (app && app.getHasFocusedInput()) {
+				Electron.Menu.sendActionToFirstResponder('delete:');
+			}
+		});
+
 		this.createWindow(`http://localhost:${server.port}/`);
 		this.menu.start(server);
 	}

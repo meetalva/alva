@@ -7,6 +7,10 @@ export function createNewFileRequest(
 	server: Types.AlvaServer
 ): (message: Message.CreateNewFileRequest) => Promise<void> {
 	return async message => {
+		const app = await server.host.getApp();
+		const sender = app || server.sender;
+		const appId = message.appId || (app ? app.getId() : undefined);
+
 		const draftProject = Model.Project.create({
 			draft: true,
 			name: 'New Project',
@@ -22,6 +26,7 @@ export function createNewFileRequest(
 
 		const response = await server.sender.transaction(
 			{
+				appId,
 				type: Message.MessageType.UseFileRequest,
 				id: message.id,
 				transaction: message.transaction,
@@ -36,7 +41,8 @@ export function createNewFileRequest(
 			}
 		);
 
-		server.sender.send({
+		sender.send({
+			appId,
 			id: message.id,
 			type: Message.MessageType.CreateNewFileResponse,
 			payload: response.payload,

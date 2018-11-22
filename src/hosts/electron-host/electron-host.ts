@@ -8,6 +8,7 @@ import * as Electron from 'electron';
 import { createWindow } from './create-window';
 import { ElectronMainMenu } from './electron-main-menu';
 import * as M from '../../message';
+import { AlvaApp } from '../../model';
 
 export interface ElectronHostInit {
 	process: NodeJS.Process;
@@ -56,8 +57,13 @@ export class ElectronHost implements Types.Host {
 			...this.forced
 		};
 	}
+
 	public async getPort(requested: number): Promise<number> {
 		return getPort({ port: requested });
+	}
+
+	public async getApp(): Promise<AlvaApp | undefined> {
+		return this.menu.focusedApp;
 	}
 
 	public async log(message?: unknown, ...optionalParams: unknown[]): Promise<void> {

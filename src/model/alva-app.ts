@@ -1,6 +1,7 @@
 import * as Mobx from 'mobx';
 import * as Types from '../types';
 import * as uuid from 'uuid';
+import * as M from '../message';
 
 export interface AlvaAppInit {
 	id?: string;
@@ -40,6 +41,8 @@ export class AlvaApp {
 	@Mobx.observable private paneSizes: Map<Types.AppPane, Types.PaneSize> = new Map();
 
 	@Mobx.observable private hasFocusedInput: boolean = false;
+
+	private sender?: Types.Sender;
 
 	public constructor(init?: AlvaAppInit) {
 		if (init) {
@@ -194,6 +197,10 @@ export class AlvaApp {
 		this.state = state;
 	}
 
+	public setSender(sender: Types.Sender): void {
+		this.sender = sender;
+	}
+
 	public toJSON(): Types.SerializedAlvaApp {
 		return {
 			id: this.id,
@@ -221,6 +228,28 @@ export class AlvaApp {
 		this.rightSidebarTab = b.rightSidebarTab;
 		this.searchTerm = b.searchTerm;
 		this.state = b.state;
+	}
+
+	public send(message: M.Message): void {
+		if (!this.sender) {
+			return;
+		}
+
+		message.appId = this.id;
+		this.sender.send(message);
+	}
+
+	public match<T extends M.Message>(t: T['type'], h: (m: T) => void): void {
+		if (!this.sender) {
+			return;
+		}
+
+		this.sender.match(t, m => {
+			if (m.appId !== this.id) {
+				return;
+			}
+			h(m as any);
+		});
 	}
 }
 

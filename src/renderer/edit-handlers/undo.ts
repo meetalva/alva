@@ -7,12 +7,6 @@ export function undo({ app, store }: MessageHandlerContext): MessageHandler<M.Un
 			return;
 		}
 
-		const senders = m.sender || [];
-
-		if (!senders.includes(store.getSender().id)) {
-			return;
-		}
-
 		store.undo();
 	};
 }

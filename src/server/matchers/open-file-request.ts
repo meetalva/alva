@@ -5,6 +5,10 @@ export function openFileRequest(
 	server: Types.AlvaServer
 ): (message: Message.OpenFileRequest) => Promise<void> {
 	return async message => {
+		const app = await server.host.getApp();
+		const sender = app || server.sender;
+		const appId = message.appId || (app ? app.getId() : undefined);
+
 		const selectedPath = await server.host.selectFile({
 			title: 'Open Alva File',
 			properties: ['openFile'],
@@ -33,6 +37,7 @@ export function openFileRequest(
 				Message.UseFileResponse
 			>(
 				{
+					appId,
 					type: Message.MessageType.UseFileRequest,
 					id: message.id,
 					transaction: message.transaction,
@@ -45,7 +50,8 @@ export function openFileRequest(
 				{ type: Message.MessageType.UseFileResponse }
 			);
 
-			server.sender.send({
+			sender.send({
+				appId,
 				type: Message.MessageType.OpenFileResponse,
 				id: message.id,
 				transaction: message.transaction,
@@ -54,7 +60,8 @@ export function openFileRequest(
 			});
 		} catch (err) {
 			if (!silent) {
-				server.sender.send({
+				sender.send({
+					appId,
 					type: Message.MessageType.ShowError,
 					transaction: message.transaction,
 					id: message.id,

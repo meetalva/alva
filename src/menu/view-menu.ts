@@ -27,8 +27,8 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				id: ids.reload,
 				label: '&Reload',
 				accelerator: 'CmdOrCtrl+R',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						type: Message.MessageType.Reload,
 						payload: undefined
@@ -39,8 +39,8 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				id: ids.forceReload,
 				label: '&Force Reload',
 				accelerator: 'CmdOrCtrl+Shift+R',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						type: Message.MessageType.Reload,
 						payload: {
@@ -54,8 +54,8 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: 'Toggle &Full Screen',
 				visible: isElectron,
 				accelerator: 'Ctrl+Command+F',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						type: Message.MessageType.ToggleFullScreen,
 						payload: undefined
@@ -71,11 +71,11 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: 'Previous Page',
 				accelerator: 'CmdOrCtrl+Alt+Left',
 				enabled: ctx.project && typeof ctx.project.getPreviousPage() !== 'undefined',
-				click: sender => {
+				click: app => {
 					const previousPage = ctx.project && ctx.project.getPreviousPage();
 
 					if (previousPage) {
-						sender.send({
+						app.send({
 							id: uuid.v4(),
 							payload: {
 								id: previousPage.getId()
@@ -90,11 +90,11 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: 'Next Page',
 				accelerator: 'CmdOrCtrl+Alt+Right',
 				enabled: ctx.project && typeof ctx.project.getNextPage() !== 'undefined',
-				click: sender => {
+				click: app => {
 					const nextPage = ctx.project && ctx.project.getNextPage();
 
 					if (ctx.project && nextPage) {
-						sender.send({
+						app.send({
 							id: uuid.v4(),
 							payload: {
 								id: nextPage.getId()
@@ -115,8 +115,8 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				checked: ctx.app && ctx.app.getPanes().has(Types.AppPane.PagesPane),
 				enabled: ctx.app && ctx.app.getActiveView() === Types.AlvaView.PageDetail,
 				accelerator: 'CmdOrCtrl+Alt+1',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						payload: {
 							pane: Types.AppPane.PagesPane,
@@ -133,8 +133,8 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				checked: ctx.app && ctx.app.getPanes().has(Types.AppPane.ElementsPane),
 				enabled: ctx.app && ctx.app.getActiveView() === Types.AlvaView.PageDetail,
 				accelerator: 'CmdOrCtrl+Alt+2',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						payload: {
 							pane: Types.AppPane.ElementsPane,
@@ -151,8 +151,8 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				checked: ctx.app && ctx.app.getPanes().has(Types.AppPane.PropertiesPane),
 				enabled: ctx.app && ctx.app.getActiveView() === Types.AlvaView.PageDetail,
 				accelerator: 'CmdOrCtrl+Alt+3',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						payload: {
 							pane: Types.AppPane.PropertiesPane,
@@ -171,8 +171,8 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				checked: ctx.app && ctx.app.getPanes().has(Types.AppPane.DevelopmentPane),
 				enabled: ctx.app && ctx.app.getActiveView() === Types.AlvaView.PageDetail,
 				accelerator: 'CmdOrCtrl+Alt+4',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						payload: {
 							pane: Types.AppPane.DevelopmentPane,
@@ -194,8 +194,8 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: 'Toggle &Developer Tools',
 				visible: isElectron,
 				accelerator: 'Alt+Command+I',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: Message.MessageType.ToggleDevTools

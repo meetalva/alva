@@ -35,6 +35,10 @@ export class NodeHost implements Types.Host {
 		return getPort({ port: requested });
 	}
 
+	public async getApp(): Promise<undefined> {
+		return;
+	}
+
 	public async log(message?: unknown, ...optionalParams: unknown[]): Promise<void> {
 		console.log(message, ...optionalParams);
 	}

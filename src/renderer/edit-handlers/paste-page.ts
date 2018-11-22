@@ -16,12 +16,6 @@ export function pastePage({ store }: MessageHandlerContext): MessageHandler<M.Pa
 			return;
 		}
 
-		const senders = m.sender || [];
-
-		if (!senders.includes(store.getSender().id)) {
-			return;
-		}
-
 		const pages = store.getPages();
 		const activePage = (store.getActivePage() || pages[pages.length - 1]) as Model.Page;
 

@@ -32,11 +32,13 @@ export class ElectronMainMenu {
 			this.apps.set(app.getId(), app);
 			this.focusedAppId = app.getId();
 			this.focusedProjectId = m.payload.projectId;
+			app.setSender(server.sender);
 		});
 
 		server.sender.match<M.ChangeApp>(M.MessageType.ChangeApp, m => {
 			const app = Model.AlvaApp.from(m.payload.app);
 			this.apps.set(app.getId(), app);
+			app.setSender(server.sender);
 		});
 
 		Mobx.autorun(async () => {
@@ -49,7 +51,12 @@ export class ElectronMainMenu {
 				if (typeof (item as any).click === 'function') {
 					const actionable = item as Types.ActionableMenuItem;
 					const onClick = actionable.click!;
-					actionable.click = () => onClick(server.sender);
+					actionable.click = () => {
+						if (!this.focusedApp) {
+							return;
+						}
+						onClick(this.focusedApp);
+					};
 				}
 
 				if (Array.isArray((item as any).submenu)) {

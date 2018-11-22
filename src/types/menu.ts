@@ -1,5 +1,4 @@
 import * as Message from '../message';
-import { Sender } from './sender';
 import { AlvaApp, Project, Element } from '../model';
 
 export type MenuItem = ContentMenuItem | SeperatorMenuItem;
@@ -19,7 +18,7 @@ export type MenuItemRole =
 
 export interface ActionableMenuItem {
 	id: string;
-	click?(sender: Sender): void;
+	click?(app: AlvaApp): void;
 	accelerator?: string;
 	enabled?: boolean;
 	label: string;
@@ -30,7 +29,7 @@ export interface ActionableMenuItem {
 
 export interface CheckboxMenuItem {
 	id: string;
-	click?(sender: Sender): void;
+	click?(app: AlvaApp): void;
 	accelerator?: string;
 	enabled?: boolean;
 	checked: boolean;

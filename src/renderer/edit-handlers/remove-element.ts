@@ -10,12 +10,6 @@ export function removeElement({
 			return;
 		}
 
-		const senders = m.sender || [];
-
-		if (!senders.includes(store.getSender().id)) {
-			return;
-		}
-
 		store.removeElementById(m.payload);
 	};
 }

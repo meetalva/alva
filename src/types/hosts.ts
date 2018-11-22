@@ -62,6 +62,10 @@ export abstract class Host {
 		throw new Error('host.getPort: not implemented');
 	}
 
+	public async getApp(): Promise<Model.AlvaApp | undefined> {
+		throw new Error('host.getApp: not implemented');
+	}
+
 	public async log(message?: unknown, ...optionalParams: unknown[]): Promise<void> {
 		throw new Error('host.log: not implemented');
 	}

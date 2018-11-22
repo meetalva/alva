@@ -31,8 +31,8 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: '&Undo',
 				accelerator: 'CmdOrCtrl+Z',
 				enabled: typeof ctx.project !== 'undefined',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						type: MessageType.Undo,
 						payload: undefined
@@ -44,8 +44,8 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: '&Redo',
 				accelerator: 'Shift+CmdOrCtrl+Z',
 				enabled: typeof ctx.project !== 'undefined',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: MessageType.Redo
@@ -61,8 +61,8 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: '&Cut',
 				enabled: typeof ctx.project !== 'undefined' && hasClipboard,
 				accelerator: 'CmdOrCtrl+X',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: MessageType.Cut
@@ -74,7 +74,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: 'C&opy',
 				enabled: typeof ctx.project !== 'undefined' && hasClipboard,
 				accelerator: 'CmdOrCtrl+C',
-				click: sender => {
+				click: app => {
 					if (!ctx.project) {
 						return;
 					}
@@ -86,7 +86,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 						return;
 					}
 
-					sender.send({
+					app.send({
 						id: uuid.v4(),
 						payload: {
 							itemId: item.getId(),
@@ -102,8 +102,8 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: '&Paste',
 				enabled: typeof ctx.project !== 'undefined' && hasClipboard,
 				accelerator: 'CmdOrCtrl+V',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: MessageType.Paste
@@ -120,14 +120,14 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 					ctx.project &&
 					ctx.project.getSelectedElement(),
 				accelerator: 'CmdOrCtrl+Shift+V',
-				click: sender => {
+				click: app => {
 					const selectedElement = ctx.project && ctx.project.getSelectedElement();
 
 					if (!selectedElement) {
 						return;
 					}
 
-					sender.send({
+					app.send({
 						id: uuid.v4(),
 						payload: {
 							targetType: Types.ElementTargetType.Inside,
@@ -148,8 +148,8 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				// 					typeof selectedElement !== 'undefined' ||
 				// 					(typeof activePage !== 'undefined' && !app.getHasFocusedInput()),
 				accelerator: 'CmdOrCtrl+D',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: MessageType.DuplicateSelected
@@ -175,8 +175,8 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: '&Delete',
 				enabled: typeof ctx.project !== 'undefined',
 				accelerator: process.platform === 'darwin' ? 'Backspace' : 'Delete',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						id: uuid.v4(),
 						payload: undefined,
 						type: MessageType.DeleteSelected

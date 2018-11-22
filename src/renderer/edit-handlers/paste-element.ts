@@ -19,12 +19,6 @@ export function pasteElement({
 			return;
 		}
 
-		const senders = m.sender || [];
-
-		if (!senders.includes(store.getSender().id)) {
-			return;
-		}
-
 		const activePage = store.getActivePage() as Model.Page;
 
 		if (!activePage) {

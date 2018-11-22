@@ -18,8 +18,8 @@ export const helpMenu = (ctx: Types.MenuContext): Types.MenuItem => ({
 		{
 			id: ids.gettingStarted,
 			label: '&Help and Getting Started',
-			click: sender => {
-				sender.send({
+			click: app => {
+				app.send({
 					type: Message.MessageType.OpenExternalURL,
 					id: uuid.v4(),
 					payload: 'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
@@ -29,8 +29,8 @@ export const helpMenu = (ctx: Types.MenuContext): Types.MenuItem => ({
 		{
 			id: ids.github,
 			label: '&Github',
-			click: sender => {
-				sender.send({
+			click: app => {
+				app.send({
 					type: Message.MessageType.OpenExternalURL,
 					id: uuid.v4(),
 					payload: 'https://github.com/meetalva/alva'
@@ -40,8 +40,8 @@ export const helpMenu = (ctx: Types.MenuContext): Types.MenuItem => ({
 		{
 			id: ids.feedback,
 			label: '&Feedback: hey@meetalva.io',
-			click: sender => {
-				sender.send({
+			click: app => {
+				app.send({
 					type: Message.MessageType.OpenExternalURL,
 					id: uuid.v4(),
 					payload: 'mailto:hey@meetalva.io'
@@ -51,8 +51,8 @@ export const helpMenu = (ctx: Types.MenuContext): Types.MenuItem => ({
 		{
 			id: ids.site,
 			label: '&Alva Website',
-			click: sender => {
-				sender.send({
+			click: app => {
+				app.send({
 					type: Message.MessageType.OpenExternalURL,
 					id: uuid.v4(),
 					payload: 'https://meetalva.io/'

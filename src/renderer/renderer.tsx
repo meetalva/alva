@@ -101,6 +101,17 @@ export function startRenderer(): void {
 				`/project/${store.getProject().getId()}`
 			);
 		}
+
+		const project = store.getProject();
+
+		app.send({
+			type: MessageType.WindowFocused,
+			id: uuid.v4(),
+			payload: {
+				projectId: project ? project.getId() : undefined,
+				app: app.toJSON()
+			}
+		});
 	});
 
 	window.addEventListener('popstate', event => app.update(Model.AlvaApp.from(event.state)));

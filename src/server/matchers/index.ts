@@ -1,6 +1,7 @@
 export * from './connect-pattern-library-request';
 export * from './copy';
 export * from './create-new-file-request';
+export * from './export-html-project';
 export * from './open-external-url';
 export * from './open-file-request';
 export * from './open-window';

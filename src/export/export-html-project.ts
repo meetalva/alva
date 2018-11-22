@@ -13,7 +13,7 @@ export async function exportHtmlProject({
 	port?: number;
 }): Promise<Types.ExportResult> {
 	const fs = new MemoryFileSystem() as typeof Fs;
-	const response = await fetch(`http://localhost:${port}/static/`);
+	const response = await fetch(`http://localhost:${port}/project/export/${project.getId()}/`);
 	const doc = await response.buffer();
 
 	fs.writeFileSync(`/${project.getId()}.html`, doc);

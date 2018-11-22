@@ -134,6 +134,7 @@ export class ElectronHost implements Types.Host {
 	}
 
 	public async open(uri: string): Promise<void> {
+		Electron.shell.openExternal(uri);
 		return;
 	}
 

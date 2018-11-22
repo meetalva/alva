@@ -94,7 +94,8 @@ export class ChromeSwitch extends React.Component {
 									...base,
 									width: 125,
 									left: -38,
-									overflow: 'hidden'
+									overflow: 'hidden',
+									zIndex: 2
 								}),
 								option: base => ({
 									padding: '3px 6px'

@@ -1,5 +1,6 @@
 import * as Message from '../../message';
 import * as Types from '../../types';
+import * as uuid from 'uuid';
 
 export function openFileRequest(
 	server: Types.AlvaServer
@@ -44,20 +45,53 @@ export function openFileRequest(
 					sender: message.sender,
 					payload: {
 						silent,
+						replace: message.payload.replace,
 						contents
 					}
 				},
 				{ type: Message.MessageType.UseFileResponse }
 			);
 
-			sender.send({
-				appId,
-				type: Message.MessageType.OpenFileResponse,
-				id: message.id,
-				transaction: message.transaction,
-				payload: response.payload,
-				sender: message.sender
-			});
+			if (response.payload.project.status === Types.ProjectPayloadStatus.Error) {
+				const p = response.payload.project as Types.ProjectPayloadError;
+
+				sender.send({
+					appId,
+					type: Message.MessageType.ShowError,
+					transaction: message.transaction,
+					id: message.id,
+					payload: {
+						message: [p.error.message].join('\n'),
+						stack: p.error.stack || ''
+					}
+				});
+			}
+
+			if (response.payload.project.status === Types.ProjectPayloadStatus.Ok) {
+				const p = response.payload.project as Types.ProjectPayloadSuccess;
+
+				if (!message.payload.replace) {
+					sender.send({
+						id: uuid.v4(),
+						type: Message.MessageType.OpenWindow,
+						payload: {
+							view: Types.AlvaView.PageDetail,
+							projectId: p.contents.id
+						},
+						transaction: message.transaction,
+						sender: message.sender
+					});
+				}
+
+				sender.send({
+					appId,
+					type: Message.MessageType.OpenFileResponse,
+					id: message.id,
+					transaction: message.transaction,
+					payload: response.payload.project,
+					sender: message.sender
+				});
+			}
 		} catch (err) {
 			if (!silent) {
 				sender.send({

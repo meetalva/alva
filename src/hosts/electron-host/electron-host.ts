@@ -46,7 +46,7 @@ export class ElectronHost implements Types.Host {
 
 		Electron.app.on('activate', async () => {
 			if (process.platform === 'darwin' && this.windows.size === 0) {
-				this.addWindow(server.port);
+				this.createWindow(`http://localhost:${server.port}/`);
 			}
 		});
 
@@ -54,17 +54,19 @@ export class ElectronHost implements Types.Host {
 			await this.toggleDevTools();
 		});
 
-		this.addWindow(server.port);
+		this.createWindow(`http://localhost:${server.port}/`);
 		this.menu.start(server);
 	}
 
-	public async addWindow(port: number): Promise<void> {
-		const win = await createWindow(`http://localhost:${port}/`);
+	public async createWindow(address: string): Promise<Electron.BrowserWindow> {
+		const win = await createWindow(address);
 		this.windows.set(win.id, win);
 
 		win.on('close', () => {
 			this.windows.delete(win.id);
 		});
+
+		return win;
 	}
 
 	public async getFlags(): Promise<Types.HostFlags> {

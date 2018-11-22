@@ -100,4 +100,8 @@ export class BrowserHost implements Partial<Types.Host> {
 
 		return clipboard.readText();
 	}
+
+	public async createWindow(address: string): Promise<void> {
+		window.open(address, '_blank');
+	}
 }

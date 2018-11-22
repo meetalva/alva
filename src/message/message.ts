@@ -83,7 +83,8 @@ export enum MessageType {
 	WindowBlured = 'window-blured',
 	ChromeScreenShot = 'chrome-screenshot',
 	ToggleFullScreen = 'toggle-fullscreen',
-	ToggleDevTools = 'toggle-dev-tools'
+	ToggleDevTools = 'toggle-dev-tools',
+	OpenWindow = 'open-window'
 }
 
 export type Message =
@@ -166,9 +167,12 @@ export type Message =
 	| AppUpdate
 	| WindowBlured
 	| WindowFocused
-	| ToggleDevTools;
+	| ToggleDevTools
+	| OpenWindow
+	| CreateNewFileRequest
+	| OpenFileRequest;
 
-export type CreateNewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
+export type CreateNewFileRequest = Envelope<MessageType.CreateNewFileRequest, { replace: boolean }>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
 export type AppLoaded = EmptyEnvelope<MessageType.AppLoaded>;
 export type AppRequest = EmptyEnvelope<MessageType.AppRequest>;
@@ -262,7 +266,7 @@ export type Maximize = EmptyEnvelope<MessageType.Maximize>;
 export type OpenExternalURL = Envelope<MessageType.OpenExternalURL, string>;
 export type OpenFileRequest = Envelope<
 	MessageType.OpenFileRequest,
-	{ path: string; silent?: boolean } | undefined
+	{ path?: string; silent?: boolean; replace: boolean }
 >;
 export type OpenFileResponse = Envelope<MessageType.OpenFileResponse, Types.ProjectPayload>;
 export type PageChange = Envelope<MessageType.PageChange, Types.PageChangePayload>;
@@ -380,10 +384,16 @@ export type WindowOpen = Envelope<
 
 export type UseFileRequest = Envelope<
 	MessageType.UseFileRequest,
-	{ contents: string; silent: boolean }
+	{ contents: string; silent: boolean; replace: boolean }
 >;
 
-export type UseFileResponse = Envelope<MessageType.UseFileResponse, Types.ProjectPayload>;
+export type UseFileResponse = Envelope<
+	MessageType.UseFileResponse,
+	{
+		project: Types.ProjectPayload;
+		replace: boolean;
+	}
+>;
 
 export type ShowMessage = Envelope<
 	MessageType.ShowMessage,
@@ -441,3 +451,11 @@ export type WindowBlured = Envelope<
 >;
 
 export type ToggleDevTools = EmptyEnvelope<MessageType.ToggleDevTools>;
+
+export type OpenWindow = Envelope<
+	MessageType.OpenWindow,
+	{
+		view: Types.AlvaView;
+		projectId: string;
+	}
+>;

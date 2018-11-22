@@ -2,6 +2,7 @@ import * as Message from '../../message';
 import * as Model from '../../model';
 import * as Types from '../../types';
 import { Persistence } from '../../persistence';
+import * as uuid from 'uuid';
 
 export function createNewFileRequest(
 	server: Types.AlvaServer
@@ -24,7 +25,10 @@ export function createNewFileRequest(
 			return;
 		}
 
-		const response = await server.sender.transaction(
+		const response = await server.sender.transaction<
+			Message.UseFileRequest,
+			Message.UseFileResponse
+		>(
 			{
 				appId,
 				type: Message.MessageType.UseFileRequest,
@@ -33,6 +37,7 @@ export function createNewFileRequest(
 				sender: message.sender,
 				payload: {
 					silent: false,
+					replace: message.payload.replace,
 					contents: serializeResult.contents
 				}
 			},
@@ -41,11 +46,41 @@ export function createNewFileRequest(
 			}
 		);
 
+		if (response.payload.project.status === Types.ProjectPayloadStatus.Error) {
+			const p = response.payload.project as Types.ProjectPayloadError;
+
+			sender.send({
+				appId,
+				type: Message.MessageType.ShowError,
+				transaction: message.transaction,
+				id: message.id,
+				payload: {
+					message: [p.error.message].join('\n'),
+					stack: p.error.stack || ''
+				}
+			});
+		}
+
+		const p = response.payload.project as Types.ProjectPayloadSuccess;
+
+		if (!message.payload.replace) {
+			sender.send({
+				id: uuid.v4(),
+				type: Message.MessageType.OpenWindow,
+				payload: {
+					view: Types.AlvaView.PageDetail,
+					projectId: p.contents.id
+				},
+				transaction: message.transaction,
+				sender: message.sender
+			});
+		}
+
 		sender.send({
 			appId,
 			id: message.id,
 			type: Message.MessageType.CreateNewFileResponse,
-			payload: response.payload,
+			payload: p,
 			transaction: message.transaction,
 			sender: message.sender
 		});

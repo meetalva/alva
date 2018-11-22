@@ -35,7 +35,9 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 					app.send({
 						type: MessageType.CreateNewFileRequest,
 						id: uuid.v4(),
-						payload: undefined
+						payload: {
+							replace: app.isActiveView(Types.AlvaView.SplashScreen)
+						}
 					});
 				}
 			},
@@ -47,7 +49,9 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 					app.send({
 						type: MessageType.OpenFileRequest,
 						id: uuid.v4(),
-						payload: undefined
+						payload: {
+							replace: true
+						}
 					});
 				},
 				// TODO: Inject more deps
@@ -79,6 +83,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 										id: uuid.v4(),
 										payload: {
 											silent: false,
+											replace: true,
 											contents
 										}
 									});

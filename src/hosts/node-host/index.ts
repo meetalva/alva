@@ -107,4 +107,8 @@ export class NodeHost implements Types.Host {
 	public async readClipboard(): Promise<string | undefined> {
 		return;
 	}
+
+	public async createWindow(): Promise<void> {
+		return;
+	}
 }

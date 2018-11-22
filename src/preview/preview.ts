@@ -94,6 +94,11 @@ function main(): void {
 			store.setMetaDown(message.payload.metaDown);
 		});
 
+		sender.match<Message.ChangeApp>(Message.MessageType.ChangeApp, m => {
+			const app = Model.AlvaApp.from(m.payload.app);
+			store.setApp(app);
+		});
+
 		Mobx.autorun(() => {
 			Array.prototype.slice
 				.call(document.querySelectorAll('script[data-bundle]'), 0)

@@ -8,6 +8,7 @@ export function highlightElement({
 	store
 }: MessageHandlerContext): MessageHandler<M.HighlightElement> {
 	return m => {
+		console.log(m);
 		Mobx.runInAction(Types.ActionName.MatchHighlightedElement, () => {
 			const project = store.getProject();
 

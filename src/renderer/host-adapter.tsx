@@ -255,6 +255,7 @@ export class HostAdapter {
 			switch (itemType) {
 				case Types.ItemType.Element: {
 					this.sender.send({
+						appId: m.appId,
 						id: uuid.v4(),
 						type: M.MessageType.PasteElement,
 						payload: {
@@ -268,6 +269,7 @@ export class HostAdapter {
 				}
 				case Types.ItemType.Page:
 					this.sender.send({
+						appId: m.appId,
 						id: uuid.v4(),
 						type: M.MessageType.PastePage,
 						payload: {

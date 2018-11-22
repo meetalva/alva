@@ -7,6 +7,7 @@ import * as Path from 'path';
 import { BrowserHost } from '../hosts/browser-host';
 import * as Serde from '../sender/serde';
 import * as uuid from 'uuid';
+import * as AlvaUtil from '../alva-util';
 
 export class HostAdapter {
 	private sender: Types.Sender;
@@ -38,10 +39,46 @@ export class HostAdapter {
 		});
 
 		this.sender.match<M.ShowError>(M.MessageType.ShowError, m => {
+			const buttons: (Types.HostMessageButton | undefined)[] = [
+				{
+					label: 'OK'
+				},
+				m.payload.help
+					? {
+							label: 'Learn more',
+							message: {
+								type: M.MessageType.OpenExternalURL,
+								id: uuid.v4(),
+								payload: m.payload.help
+							}
+					  }
+					: undefined,
+				{
+					label: 'Report a Bug',
+					message: {
+						type: M.MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: AlvaUtil.newIssueUrl({
+							user: 'meetalva',
+							repo: 'alva',
+							title: 'New bug report',
+							body: m.payload.error
+								? `Hey there, I just encountered the following error with Alva:\n\n\`\`\`\n${
+										m.payload.error.message
+								  }\n\`\`\`\n\n<details><summary>Stack Trace</summary>\n\n\`\`\`\n${
+										m.payload.error.stack
+								  }\n\`\`\`\n\n</details>`
+								: '',
+							labels: ['type: bug']
+						})
+					}
+				}
+			];
+
 			this.host.showMessage({
 				message: m.payload.message,
-				detail: m.payload.stack,
-				buttons: []
+				detail: m.payload.detail,
+				buttons: buttons.filter((b): b is Types.HostMessageButton => typeof b !== 'undefined')
 			});
 		});
 

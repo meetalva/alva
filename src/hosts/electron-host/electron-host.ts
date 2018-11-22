@@ -135,8 +135,16 @@ export class ElectronHost implements Types.Host {
 		return;
 	}
 
-	public async selectFile(): Promise<void> {
-		return;
+	public selectFile(opts): Promise<void> {
+		return new Promise(resolve => {
+			Electron.dialog.showOpenDialog(opts, paths => {
+				if (!paths) {
+					return resolve();
+				}
+
+				resolve(paths[0]);
+			});
+		});
 	}
 
 	public async showMessage(): Promise<undefined> {

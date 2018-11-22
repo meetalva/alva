@@ -31,7 +31,6 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 
 	public render(): JSX.Element {
 		const props = this.props as PreviewPaneProps & WithStore;
-		const app = props.store.getApp();
 
 		return (
 			<PreviewPane>
@@ -39,11 +38,9 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 					ref={frame => (this.frame = frame)}
 					src={setSearch(props.previewFrame, { mode: Types.PreviewDocumentMode.Live })}
 					offCanvas={false}
-					onMouseEnter={() => app.setHoverArea(Types.HoverArea.Preview)}
 					onMouseLeave={() => {
 						props.store.getProject().unsetHighlightedElement();
 						props.store.getProject().unsetHighlightedElementContent();
-						app.setHoverArea(Types.HoverArea.Chrome);
 					}}
 				/>
 				<Overlay isVisisble={props.isDragging}>

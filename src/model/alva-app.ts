@@ -22,7 +22,6 @@ export class AlvaApp {
 	@Mobx.observable private hostType: Types.HostType;
 
 	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
-	@Mobx.observable private hoverArea: Types.HoverArea = Types.HoverArea.Chrome;
 	@Mobx.observable private paneSelectOpen: boolean = false;
 
 	@Mobx.observable
@@ -99,10 +98,6 @@ export class AlvaApp {
 		return this.hostType === candidateType;
 	}
 
-	public getHoverArea(): Types.HoverArea {
-		return this.hoverArea;
-	}
-
 	public getId(): string {
 		return this.id;
 	}
@@ -158,11 +153,6 @@ export class AlvaApp {
 	@Mobx.action
 	public setPaneSize(size: Types.PaneSize): void {
 		this.paneSizes.set(size.pane, size);
-	}
-
-	@Mobx.action
-	public setHoverArea(hoverArea: Types.HoverArea): void {
-		this.hoverArea = hoverArea;
 	}
 
 	@Mobx.action

@@ -33,6 +33,8 @@ async function main(): Promise<void> {
 	cp.stdout.pipe(process.stdout);
 	cp.stderr.pipe(process.stderr);
 
+	cp.on('exit', code => process.exit(code));
+
 	const restarter = await Hosts.RestartListener.fromProcess(process);
 
 	restarter.subscribe(() => {

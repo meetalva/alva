@@ -2,6 +2,8 @@ import * as uuid from 'uuid';
 import { MessageType } from '../message';
 import * as Types from '../types';
 
+const pkg = require('../../package.json');
+
 const ids = {
 	app: uuid.v4(),
 	about: uuid.v4(),
@@ -25,7 +27,30 @@ export const appMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				label: 'About Alva',
 				role: 'about',
-				id: ids.about
+				id: ids.about,
+				click: sender => {
+					setTimeout(() => {
+						if (isElectron || !ctx.app) {
+							return;
+						}
+
+						sender.send({
+							id: uuid.v4(),
+							payload: {
+								message: `Alva – v${pkg.version}`,
+								detail: [
+									'',
+									pkg.description,
+									'',
+									`Host: ${ctx.app.getHostType()}`,
+									`License: ${pkg.license}`
+								].join('\n'),
+								buttons: []
+							},
+							type: MessageType.ShowMessage
+						});
+					}, 100);
+				}
 			},
 			{
 				id: ids.updates,

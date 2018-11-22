@@ -58,9 +58,12 @@ export function useFileRequest(
 			transaction: message.transaction,
 			sender: message.sender,
 			payload: {
-				path: draftProject.getPath(),
-				contents: draftProject.toJSON(),
-				status: Types.ProjectPayloadStatus.Ok
+				project: {
+					path: draftProject.getPath(),
+					contents: draftProject.toJSON(),
+					status: Types.ProjectPayloadStatus.Ok
+				},
+				replace: message.payload.replace
 			}
 		});
 	};

@@ -10,16 +10,19 @@ export function openFile({
 	store,
 	app,
 	history
-}: MessageHandlerContext): MessageHandler<
-	M.OpenFileResponse | M.NewFileResponse | M.UseFileResponse
-> {
+}: MessageHandlerContext): MessageHandler<M.UseFileResponse> {
 	return m => {
+		console.log(m.payload.replace);
+		if (!m.payload.replace) {
+			return;
+		}
+
 		Mobx.runInAction(Types.ActionName.OpenFile, () => {
-			if (m.payload.status === Types.ProjectPayloadStatus.Error) {
+			if (m.payload.project.status === Types.ProjectPayloadStatus.Error) {
 				return;
 			}
 
-			const payload = m.payload as Types.ProjectPayloadSuccess;
+			const payload = m.payload.project as Types.ProjectPayloadSuccess;
 
 			history.clear();
 

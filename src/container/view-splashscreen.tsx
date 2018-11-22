@@ -4,7 +4,6 @@ import * as React from 'react';
 import { SplashScreenContainer } from './splash-screen-container';
 import * as uuid from 'uuid';
 import { ViewStore } from '../store';
-// import * as Types from '../types';
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -22,7 +21,9 @@ export class ViewSplashscreen extends React.Component {
 						type: MessageType.CreateNewFileRequest,
 						transaction,
 						id: uuid.v4(),
-						payload: undefined
+						payload: {
+							replace: true
+						}
 					});
 				}}
 				onOpenClick={() => {
@@ -30,7 +31,9 @@ export class ViewSplashscreen extends React.Component {
 						type: MessageType.OpenFileRequest,
 						transaction,
 						id: openFileRequestId,
-						payload: undefined
+						payload: {
+							replace: true
+						}
 					});
 				}}
 				onGuideClick={() => {
@@ -47,6 +50,7 @@ export class ViewSplashscreen extends React.Component {
 						id: openFileRequestId,
 						payload: {
 							silent: false,
+							replace: true,
 							contents
 						}
 					});

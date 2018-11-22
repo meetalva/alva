@@ -279,6 +279,21 @@ export class HostAdapter {
 					});
 			}
 		});
+
+		this.sender.match<M.OpenWindow>(M.MessageType.OpenWindow, async m => {
+			const port = this.store.getServerPort();
+
+			switch (m.payload.view) {
+				case Types.AlvaView.PageDetail:
+					await this.host.createWindow(
+						`http://localhost:${port}/project/${m.payload.projectId}`
+					);
+					return;
+				case Types.AlvaView.SplashScreen:
+					await this.host.createWindow(`http://localhost:${port}/`);
+					return;
+			}
+		});
 	}
 }
 

@@ -95,6 +95,7 @@ export class AlvaServer implements Types.AlvaServer {
 		this.sender.match(M.OpenWindow, Matchers.openWindow(this));
 		this.sender.match(M.Paste, Matchers.paste(this));
 		this.sender.match(M.Save, Matchers.save(this));
+		this.sender.match(M.ShowError, Matchers.showError(this));
 		this.sender.match(M.ShowMessage, Matchers.showMessage(this));
 		this.sender.match(M.UseFileRequest, Matchers.useFileRequest(this));
 		this.sender.match(M.ContextMenuRequest, Matchers.showContextMenu(this));

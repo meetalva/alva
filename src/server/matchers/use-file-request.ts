@@ -30,7 +30,11 @@ export function useFileRequest(
 					id: message.id,
 					payload: {
 						message: [projectResult.error.message].join('\n'),
-						stack: projectResult.error.stack || ''
+						detail: projectResult.error.stack || '',
+						error: {
+							message: projectResult.error.message,
+							stack: projectResult.error.stack || ''
+						}
 					}
 				});
 			}
@@ -39,7 +43,29 @@ export function useFileRequest(
 		}
 
 		const draftPath = await server.host.resolveFrom(Types.HostBase.AppData, `${uuid.v4()}.alva`);
-		const draftProject = Model.Project.from(projectResult.contents);
+		const result = Model.Project.toResult(projectResult.contents);
+
+		if (result.status !== 'ok') {
+			sender.send({
+				appId,
+				type: Message.MessageType.ShowError,
+				transaction: message.transaction,
+				id: message.id,
+				payload: {
+					message: `Sorry, we had trouble reading this project`,
+					detail: `Parsing it failed with: ${result.error.message}`,
+					error: {
+						message: result.error.message,
+						stack: result.error.stack || ''
+					}
+				}
+			});
+
+			return;
+		}
+
+		const draftProject = result.result;
+
 		draftProject.setPath(draftPath);
 		draftProject.setId(
 			Buffer.from([draftProject.getId(), draftPath].join(':'), 'utf-8').toString('base64')

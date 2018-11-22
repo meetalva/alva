@@ -4,7 +4,6 @@ import * as Types from '../../types';
 import * as Model from '../../model';
 import * as uuid from 'uuid';
 import * as Analyzer from '../../analyzer';
-import * as AlvaUtil from '../../alva-util';
 
 export function connectPatternLibrary(
 	server: Types.AlvaServer
@@ -109,42 +108,16 @@ async function performAnalysis(
 
 function showAnalysisError(server: Types.AlvaServer, error: Error): void {
 	server.sender.send({
-		type: MessageType.ShowMessage,
+		type: MessageType.ShowError,
 		id: uuid.v4(),
 		payload: {
 			message: 'Sorry, this seems to be an incompatible library.',
 			detail: 'Learn more about supported component libraries on github.com/meetalva',
-			buttons: [
-				{
-					label: 'OK'
-				},
-				{
-					label: 'Learn more',
-					message: {
-						type: MessageType.OpenExternalURL,
-						id: uuid.v4(),
-						payload: 'https://github.com/meetalva/alva#pattern-library-requirements'
-					}
-				},
-				{
-					label: 'Report a Bug',
-					message: {
-						type: MessageType.OpenExternalURL,
-						id: uuid.v4(),
-						payload: AlvaUtil.newIssueUrl({
-							user: 'meetalva',
-							repo: 'alva',
-							title: 'New bug report',
-							body: `Hey there, I just encountered the following error with Alva:\n\n\`\`\`\n${
-								error.message
-							}\n\`\`\`\n\n<details><summary>Stack Trace</summary>\n\n\`\`\`\n${
-								error.stack
-							}\n\`\`\`\n\n</details>`,
-							labels: ['type: bug']
-						})
-					}
-				}
-			]
+			help: 'https://github.com/meetalva/alva#pattern-library-requirements',
+			error: {
+				message: error.message,
+				stack: error.stack || ''
+			}
 		}
 	});
 }

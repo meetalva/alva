@@ -30,32 +30,14 @@ export class HostAdapter {
 		this.host.start();
 
 		this.sender.match<M.OpenExternalURL>(M.MessageType.OpenExternalURL, m => {
-			const senders = m.sender ? m.sender : [];
-
-			if (!senders.includes(this.sender.id)) {
-				return;
-			}
-
 			this.host.open(m.payload);
 		});
 
 		this.sender.match<M.ShowMessage>(M.MessageType.ShowMessage, m => {
-			const senders = m.sender ? m.sender : [];
-
-			if (!senders.includes(this.sender.id)) {
-				return;
-			}
-
 			this.host.showMessage(m.payload);
 		});
 
 		this.sender.match<M.ShowError>(M.MessageType.ShowError, m => {
-			const senders = m.sender ? m.sender : [];
-
-			if (!senders.includes(this.sender.id)) {
-				return;
-			}
-
 			this.host.showMessage({
 				message: m.payload.message,
 				detail: m.payload.stack,
@@ -64,12 +46,6 @@ export class HostAdapter {
 		});
 
 		this.sender.match<M.Save>(M.MessageType.Save, async m => {
-			const senders = m.sender ? m.sender : [];
-
-			if (!senders.includes(this.sender.id)) {
-				return;
-			}
-
 			if (!m.payload || !m.payload.publish) {
 				return;
 			}

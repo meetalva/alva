@@ -7,12 +7,6 @@ export function redo({ app, store }: MessageHandlerContext): MessageHandler<M.Re
 			return;
 		}
 
-		const senders = m.sender || [];
-
-		if (!senders.includes(store.getSender().id)) {
-			return;
-		}
-
 		store.redo();
 	};
 }

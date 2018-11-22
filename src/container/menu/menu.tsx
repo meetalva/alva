@@ -162,7 +162,7 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 		if (menu.menu.hasOwnProperty('click')) {
 			const actionable = menu.menu as Types.ActionableMenuItem;
 			if (typeof actionable.click !== 'undefined') {
-				actionable.click(props.store.getSender());
+				actionable.click(props.store.getApp());
 			}
 		}
 	};
@@ -271,7 +271,8 @@ class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }>
 		if (menu.menu.hasOwnProperty('click')) {
 			const actionable = menu.menu as Types.ActionableMenuItem;
 			if (typeof actionable.click !== 'undefined') {
-				actionable.click(props.store.getSender());
+				console.log(props.store.getApp());
+				actionable.click(props.store.getApp());
 			}
 		}
 	};

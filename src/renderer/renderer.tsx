@@ -31,6 +31,7 @@ export function startRenderer(): void {
 	});
 
 	app = new Model.AlvaApp();
+	app.setSender(sender);
 
 	history = new Model.EditHistory();
 	store = new ViewStore({ app, history, sender });

@@ -4,6 +4,7 @@ import * as uuid from 'uuid';
 import { FileInput } from '../container/file-input';
 import * as React from 'react';
 import * as Store from '../store';
+import { AlvaApp } from '../model';
 
 const ids = {
 	file: uuid.v4(),
@@ -30,8 +31,8 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				id: ids.new,
 				label: '&New',
 				accelerator: 'CmdOrCtrl+N',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						type: MessageType.CreateNewFileRequest,
 						id: uuid.v4(),
 						payload: undefined
@@ -42,8 +43,8 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				id: ids.open,
 				label: '&Open',
 				accelerator: 'CmdOrCtrl+O',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						type: MessageType.OpenFileRequest,
 						id: uuid.v4(),
 						payload: undefined
@@ -52,7 +53,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				// TODO: Inject more deps
 				render: (props: {
 					accelerator: JSX.Element | null;
-					sender: Types.Sender;
+					app: AlvaApp;
 					style: React.CSSProperties;
 					menu: Types.MenuItem;
 					menuStore: Store.MenuStore;
@@ -73,7 +74,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 								onChange={contents => {
 									props.menuStore.clear();
 
-									props.sender.send({
+									props.app.send({
 										type: MessageType.UseFileRequest,
 										id: uuid.v4(),
 										payload: {
@@ -96,8 +97,8 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: 'New &Page',
 				enabled: hasProject && onDetailView,
 				accelerator: 'CmdOrCtrl+Shift+N',
-				click: sender => {
-					sender.send({
+				click: app => {
+					app.send({
 						type: MessageType.CreateNewPage,
 						id: uuid.v4(),
 						payload: undefined
@@ -115,12 +116,12 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				accelerator: 'CmdOrCtrl+S',
 				visible: isLocal,
 				role: 'save',
-				click: sender => {
+				click: app => {
 					if (!ctx.project) {
 						return;
 					}
 
-					sender.send({
+					app.send({
 						type: MessageType.Save,
 						id: uuid.v4(),
 						payload: { publish: ctx.project.getDraft(), projectId: ctx.project.getId() }
@@ -133,12 +134,12 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				enabled: hasProject && onDetailView,
 				accelerator: 'CmdOrCtrl+Shift+S',
 				role: 'save',
-				click: async sender => {
+				click: async app => {
 					if (!ctx.project) {
 						return;
 					}
 
-					sender.send({
+					app.send({
 						type: MessageType.Save,
 						id: uuid.v4(),
 						payload: { publish: true, projectId: ctx.project.getId() }
@@ -154,12 +155,12 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: 'Export Prototype as HTML',
 				enabled: onDetailView && hasProject,
 				accelerator: 'CmdOrCtrl+E',
-				click: async sender => {
+				click: async app => {
 					if (!ctx.project) {
 						return;
 					}
 
-					sender.send({
+					app.send({
 						id: uuid.v4(),
 						type: MessageType.ExportHtmlProject,
 						payload: { path: undefined, projectId: ctx.project.getId() }

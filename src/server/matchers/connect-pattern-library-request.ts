@@ -9,6 +9,10 @@ export function connectPatternLibrary(
 	server: Types.AlvaServer
 ): (message: Message.ConnectPatternLibraryRequest) => Promise<void> {
 	return async message => {
+		const app = await server.host.getApp();
+		const sender = app || server.sender;
+		const appId = message.appId || (app ? app.getId() : undefined);
+
 		const project = await server.dataHost.getProject(message.payload.projectId);
 
 		if (!project) {
@@ -49,7 +53,8 @@ export function connectPatternLibrary(
 		}
 
 		if (!previousLibrary) {
-			server.sender.send({
+			sender.send({
+				appId,
 				type: Message.MessageType.ConnectPatternLibraryResponse,
 				id: message.id,
 				payload: {
@@ -59,7 +64,8 @@ export function connectPatternLibrary(
 				}
 			});
 		} else {
-			server.sender.send({
+			sender.send({
+				appId,
 				type: Message.MessageType.UpdatePatternLibraryResponse,
 				id: message.id,
 				payload: {

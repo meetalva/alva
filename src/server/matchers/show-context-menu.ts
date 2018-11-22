@@ -6,6 +6,12 @@ export function showContextMenu(
 	server: Types.AlvaServer
 ): (message: Message.ContextMenuRequest) => Promise<void> {
 	return async m => {
+		const app = await server.host.getApp();
+
+		if (!app) {
+			return;
+		}
+
 		if (m.payload.menu === Types.ContextMenuType.ElementMenu) {
 			const project = await server.dataHost.getProject(m.payload.projectId);
 
@@ -22,7 +28,7 @@ export function showContextMenu(
 			server.host.showContextMenu({
 				position: m.payload.position,
 				items: ContextMenu.elementContextMenu({
-					app: {} as any, // ?
+					app,
 					project,
 					element
 				})

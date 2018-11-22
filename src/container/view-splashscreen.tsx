@@ -11,13 +11,14 @@ import { ViewStore } from '../store';
 export class ViewSplashscreen extends React.Component {
 	public render(): JSX.Element {
 		const props = this.props as { store: ViewStore };
+		const app = props.store.getApp();
 		const transaction = uuid.v4();
 		const openFileRequestId = uuid.v4();
 
 		return (
 			<SplashScreenContainer
 				onCreateClick={() => {
-					props.store.getSender().send({
+					app.send({
 						type: MessageType.CreateNewFileRequest,
 						transaction,
 						id: uuid.v4(),
@@ -25,7 +26,7 @@ export class ViewSplashscreen extends React.Component {
 					});
 				}}
 				onOpenClick={() => {
-					props.store.getSender().send({
+					app.send({
 						type: MessageType.OpenFileRequest,
 						transaction,
 						id: openFileRequestId,
@@ -33,14 +34,14 @@ export class ViewSplashscreen extends React.Component {
 					});
 				}}
 				onGuideClick={() => {
-					props.store.getSender().send({
+					app.send({
 						type: MessageType.OpenExternalURL,
 						id: uuid.v4(),
 						payload: 'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
 					});
 				}}
 				onOpenFile={contents => {
-					props.store.getSender().send({
+					app.send({
 						type: MessageType.UseFileRequest,
 						transaction,
 						id: openFileRequestId,

@@ -9,6 +9,10 @@ export function useFileRequest(
 	server: Types.AlvaServer
 ): (message: Message.UseFileRequest) => Promise<void> {
 	return async message => {
+		const app = await server.host.getApp();
+		const sender = app || server.sender;
+		const appId = message.appId || (app ? app.getId() : undefined);
+
 		const projectResult = await Persistence.parse<Types.SerializedProject>(
 			message.payload.contents
 		);
@@ -20,7 +24,8 @@ export function useFileRequest(
 
 		if (projectResult.state === Types.PersistenceState.Error) {
 			if (!silent) {
-				server.sender.send({
+				sender.send({
+					appId,
 					type: Message.MessageType.ShowError,
 					id: message.id,
 					payload: {
@@ -46,8 +51,9 @@ export function useFileRequest(
 
 		draftProject.sync(server.sender);
 
-		return server.sender.send({
+		return sender.send({
 			type: Message.MessageType.UseFileResponse,
+			appId,
 			id: message.id,
 			transaction: message.transaction,
 			sender: message.sender,

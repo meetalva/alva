@@ -7,6 +7,7 @@ import * as getPort from 'get-port';
 import * as Electron from 'electron';
 import { createWindow } from './create-window';
 import { ElectronMainMenu } from './electron-main-menu';
+import * as M from '../../message';
 
 export interface ElectronHostInit {
 	process: NodeJS.Process;
@@ -35,6 +36,10 @@ export class ElectronHost implements Types.Host {
 	public async start(server: Types.AlvaServer): Promise<void> {
 		Electron.app.commandLine.appendSwitch('--enable-viewport-meta', 'true');
 		Electron.app.commandLine.appendSwitch('--disable-pinch', 'true');
+
+		server.sender.match<M.ToggleDevTools>(M.MessageType.ToggleDevTools, async () => {
+			await this.toggleDevTools();
+		});
 
 		const win = await createWindow(`http://localhost:${server.port}/`);
 		this.windows.set(win.id, win);
@@ -114,5 +119,12 @@ export class ElectronHost implements Types.Host {
 
 	public async showContextMenu(): Promise<undefined> {
 		return;
+	}
+
+	public async toggleDevTools(): Promise<void> {
+		const window = Electron.BrowserWindow.getFocusedWindow();
+		if (window) {
+			window.webContents.toggleDevTools();
+		}
 	}
 }

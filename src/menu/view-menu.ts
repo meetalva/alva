@@ -195,7 +195,11 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				visible: isElectron,
 				accelerator: 'Alt+Command+I',
 				click: sender => {
-					// TODO: Sender ToggleDevTools message
+					sender.send({
+						id: uuid.v4(),
+						payload: undefined,
+						type: Message.MessageType.ToggleDevTools
+					});
 				}
 			}
 		]

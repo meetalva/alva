@@ -81,7 +81,13 @@ export const ChromeContainer = MobxReact.inject('store')(
 							props.store.getSender().send({
 								type: MessageType.OpenExternalURL,
 								id: uuid.v4(),
-								payload: 'https://github.com/meetalva/alva/labels/type%3A%20bug'
+								payload: AlvaUtil.newIssueUrl({
+									user: 'meetalva',
+									repo: 'alva',
+									title: 'New bug report',
+									body: `Hey there, I just encountered the following error with Alva:`,
+									labels: ['type: bug']
+								})
 							});
 						}}
 						onDoubleClick={event => {

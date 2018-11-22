@@ -47,6 +47,7 @@ export interface HostSelectSaveFileOptions {
 }
 
 export interface HostMessageButton {
+	id?: string;
 	label: string;
 	message?: Message.Message;
 }

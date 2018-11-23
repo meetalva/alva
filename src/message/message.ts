@@ -3,6 +3,12 @@ import * as Types from '../types';
 import * as Mobx from 'mobx';
 
 export enum MessageType {
+	UpdateAvailable = 'update-available',
+	UpdateUnavailable = 'update-unavailable',
+	UpdateError = 'update-error',
+	UpdateDownload = 'update-download',
+	UpdateDownloadProgress = 'update-download-progress',
+	UpdateDownloaded = 'update-downloaded',
 	ActivatePage = 'activate-page',
 	AppLoaded = 'app-loaded',
 	AppRequest = 'app-request',
@@ -170,7 +176,13 @@ export type Message =
 	| ToggleDevTools
 	| OpenWindow
 	| CreateNewFileRequest
-	| OpenFileRequest;
+	| OpenFileRequest
+	| UpdateAvailable
+	| UpdateError
+	| UpdateDownloadProgress
+	| UpdateDownloaded
+	| UpdateUnavailable
+	| UpdateDownload;
 
 export type CreateNewFileRequest = Envelope<MessageType.CreateNewFileRequest, { replace: boolean }>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -404,6 +416,7 @@ export type ShowMessage = Envelope<
 		message: string;
 		detail?: string;
 		buttons: {
+			id?: string;
 			label: string;
 			message?: Message;
 		}[];
@@ -462,3 +475,30 @@ export type OpenWindow = Envelope<
 		projectId: string;
 	}
 >;
+
+export type UpdateAvailable = Envelope<
+	MessageType.UpdateAvailable,
+	{
+		readonly version: string;
+		readonly releaseName?: string | null;
+		readonly releaseNotes?: string | null;
+		readonly releaseDate: string;
+	}
+>;
+
+export type UpdateUnavailable = EmptyEnvelope<MessageType.UpdateUnavailable>;
+
+export type UpdateError = Envelope<
+	MessageType.UpdateError,
+	{
+		error: {
+			message: string;
+		};
+	}
+>;
+
+export type UpdateDownloadProgress = Envelope<MessageType.UpdateDownloadProgress, unknown>;
+
+export type UpdateDownloaded = Envelope<MessageType.UpdateDownloaded, unknown>;
+
+export type UpdateDownload = EmptyEnvelope<MessageType.UpdateDownload>;

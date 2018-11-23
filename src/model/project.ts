@@ -158,10 +158,9 @@ export class Project {
 
 	@Mobx.computed
 	private get pages(): Page[] {
-		return [...this.internalPages.values()];
-		/* return this.pageList
-			.map(id => this.internalPages.get(id))
-			.filter((page): page is Page => typeof page !== 'undefined'); */
+		return [...this.internalPages.values()]
+			.filter(p => this.pageList.includes(p.getId()))
+			.sort((a, b) => this.pageList.indexOf(a.getId()) - this.pageList.indexOf(b.getId()));
 	}
 
 	public constructor(init: ProjectProperties) {
@@ -247,11 +246,14 @@ export class Project {
 			userStore
 		});
 
-		project.startBatch();
-
 		serialized.patternLibraries.forEach(p => project.addPatternLibrary(PatternLibrary.from(p)));
 
-		serialized.pages.forEach(page => project.addPage(Page.from(page, { project })));
+		// Legacy bridge: Use page array order of no pagelist is found
+		const pageList = serialized.pageList || serialized.pages.map(p => p.id);
+
+		serialized.pages
+			.sort((a, b) => pageList.indexOf(a.id) - pageList.indexOf(b.id))
+			.forEach(page => project.addPage(Page.from(page, { project })));
 
 		serialized.elements.forEach(element =>
 			project.addElement(Element.from(element, { project }))
@@ -266,8 +268,6 @@ export class Project {
 		});
 
 		userStore.getPageProperty().setProject(project);
-
-		project.endBatch();
 
 		return project;
 	}
@@ -330,6 +330,7 @@ export class Project {
 	@Mobx.action
 	public addPage(page: Page): void {
 		this.internalPages.set(page.getId(), page);
+		this.pageList.push(page.getId());
 		page.setProject(this);
 	}
 
@@ -770,6 +771,7 @@ export class Project {
 			id: this.id,
 			name: this.name,
 			pages: this.pages.filter(Boolean).map(p => p.toJSON()),
+			pageList: this.pageList,
 			path: this.path,
 			patternLibraries: this.getPatternLibraries().map(p => p.toJSON()),
 			userStore: this.userStore.toJSON()

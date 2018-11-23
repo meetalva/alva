@@ -99,6 +99,7 @@ export interface SavedProject {
 	id: string;
 	name: string;
 	pages: SerializedPage[];
+	pageList: string[];
 	patternLibraries: SerializedPatternLibrary[];
 	userStore: UserStore.SerializedUserStore;
 }

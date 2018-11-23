@@ -6,12 +6,8 @@ import * as Types from '../../types';
 import * as getPort from 'get-port';
 import * as Electron from 'electron';
 import { createWindow } from './create-window';
-import { ElectronMainMenu } from './electron-main-menu';
-import * as M from '../../message';
 import { AlvaApp } from '../../model';
-import * as ContextMenu from '../../context-menu';
-import * as Url from 'url';
-import * as uuid from 'uuid';
+import * as Mobx from 'mobx';
 
 export interface ElectronHostInit {
 	process: NodeJS.Process;
@@ -23,132 +19,24 @@ export class ElectronHost implements Types.Host {
 
 	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
-	private menu: ElectronMainMenu;
 	private sender: Types.Sender;
-	private dataHost: Types.DataHost;
 	private windows: Map<string | number, Electron.BrowserWindow> = new Map();
+	private app: AlvaApp | undefined;
 
 	private constructor(init: ElectronHostInit) {
 		this.process = init.process;
 		this.forced = init.forced;
-		this.menu = new ElectronMainMenu();
 	}
 
 	public static async from(init: ElectronHostInit): Promise<ElectronHost> {
 		return new ElectronHost(init);
 	}
 
-	public async start(server: Types.AlvaServer): Promise<void> {
-		this.sender = server.sender;
-		this.dataHost = server.dataHost;
-
-		Electron.app.commandLine.appendSwitch('--enable-viewport-meta', 'true');
-		Electron.app.commandLine.appendSwitch('--disable-pinch', 'true');
-
-		Electron.app.on('window-all-closed', () => {
-			if (process.platform !== 'darwin') {
-				Electron.app.quit();
-			}
-		});
-
-		Electron.app.on('activate', async () => {
-			if (process.platform === 'darwin' && this.windows.size === 0) {
-				this.createWindow(`http://localhost:${server.port}/`);
-			}
-		});
-
-		server.sender.match<M.ToggleDevTools>(M.MessageType.ToggleDevTools, async () => {
-			await this.toggleDevTools();
-		});
-
-		server.sender.match<M.ContextMenuRequest>(M.MessageType.ContextMenuRequest, async m => {
-			if (m.payload.menu === Types.ContextMenuType.ElementMenu) {
-				const project = await server.dataHost.getProject(m.payload.projectId);
-
-				if (!project) {
-					return;
-				}
-
-				const element = project.getElementById(m.payload.data.element.id);
-
-				if (!element) {
-					return;
-				}
-
-				const app = await this.getApp();
-
-				if (!app) {
-					return;
-				}
-
-				await this.showContextMenu({
-					position: m.payload.position,
-					items: ContextMenu.elementContextMenu({
-						app,
-						project,
-						element
-					})
-				});
-			}
-		});
-
-		server.sender.match<M.Undo>(M.MessageType.Undo, async () => {
-			const app = await this.getApp();
-
-			if (app && app.getHasFocusedInput()) {
-				Electron.Menu.sendActionToFirstResponder('undo:');
-			}
-		});
-
-		server.sender.match<M.Redo>(M.MessageType.Redo, async () => {
-			const app = await this.getApp();
-
-			if (app && app.getHasFocusedInput()) {
-				Electron.Menu.sendActionToFirstResponder('redo:');
-			}
-		});
-
-		server.sender.match<M.Cut>(M.MessageType.Cut, async () => {
-			const app = await this.getApp();
-
-			if (app && app.getHasFocusedInput()) {
-				Electron.Menu.sendActionToFirstResponder('cut:');
-			}
-		});
-
-		server.sender.match<M.Copy>(M.MessageType.Copy, async () => {
-			const app = await this.getApp();
-
-			if (app && app.getHasFocusedInput()) {
-				Electron.Menu.sendActionToFirstResponder('copy:');
-			}
-		});
-
-		server.sender.match<M.Paste>(M.MessageType.Paste, async () => {
-			const app = await this.getApp();
-
-			if (app && app.getHasFocusedInput()) {
-				Electron.Menu.sendActionToFirstResponder('paste:');
-			}
-		});
-
-		server.sender.match<M.DeleteSelected>(M.MessageType.DeleteSelected, async () => {
-			const app = await this.getApp();
-
-			if (app && app.getHasFocusedInput()) {
-				Electron.Menu.sendActionToFirstResponder('delete:');
-			}
-		});
-
-		this.createWindow(`http://localhost:${server.port}/`);
-		this.menu.start(server);
-	}
-
 	public async createWindow(address: string): Promise<Electron.BrowserWindow> {
 		const win = await createWindow(address);
 		this.windows.set(win.id, win);
 
-		win.on('close', async e => {
+		/* win.on('close', async e => {
 			if (!this.windows.get(win.id)) {
 				return;
 			}
@@ -204,7 +92,7 @@ export class ElectronHost implements Types.Host {
 
 			this.windows.delete(win.id);
 			win.close();
-		});
+		}); */
 
 		return win;
 	}
@@ -222,10 +110,6 @@ export class ElectronHost implements Types.Host {
 
 	public async getPort(requested: number): Promise<number> {
 		return getPort({ port: requested });
-	}
-
-	public async getApp(): Promise<AlvaApp | undefined> {
-		return this.menu.focusedApp;
 	}
 
 	public async log(message?: unknown, ...optionalParams: unknown[]): Promise<void> {
@@ -360,5 +244,14 @@ export class ElectronHost implements Types.Host {
 
 	public async readClipboard(): Promise<string | undefined> {
 		return Electron.clipboard.readText();
+	}
+
+	public async getApp(): Promise<AlvaApp | undefined> {
+		return this.app;
+	}
+
+	@Mobx.action
+	public setApp(app: AlvaApp | undefined): void {
+		this.app = app;
 	}
 }

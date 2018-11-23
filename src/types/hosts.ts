@@ -70,10 +70,6 @@ export abstract class Host {
 		throw new Error('host.getPort: not implemented');
 	}
 
-	public async getApp(): Promise<Model.AlvaApp | undefined> {
-		throw new Error('host.getApp: not implemented');
-	}
-
 	public async log(message?: unknown, ...optionalParams: unknown[]): Promise<void> {
 		throw new Error('host.log: not implemented');
 	}
@@ -131,6 +127,14 @@ export abstract class Host {
 
 	public async createWindow(_): Promise<Electron.BrowserWindow | void> {
 		throw new Error('host.createWindow: not implemented');
+	}
+
+	public async toggleDevTools(): Promise<void> {
+		throw new Error('host.toggleDevTools: not implemented');
+	}
+
+	public async getApp(): Promise<Model.AlvaApp | undefined> {
+		throw new Error('host.getApp: not implemented');
 	}
 }
 

@@ -2,6 +2,7 @@ import * as Server from '../server';
 import * as Hosts from '../hosts';
 import * as Types from '../types';
 import * as Serde from '../sender/serde';
+import { ElectronAdapter } from '../adapters/electron-adapter';
 
 const importFresh = require('import-fresh');
 const clearModule = require('clear-module');
@@ -26,8 +27,10 @@ async function main(forced?: ForcedFlags): Promise<void> {
 		dataHost: localDataHost
 	});
 
+	const adapter = new ElectronAdapter({ server: alvaServer });
+
 	await alvaServer.start();
-	await electronHost.start(alvaServer);
+	await adapter.start();
 
 	const onRestart = async () => {
 		const port = alvaServer.port;
@@ -54,6 +57,10 @@ async function main(forced?: ForcedFlags): Promise<void> {
 
 	process.on('message', onMessage);
 }
+
+process.on('unhandledRejection', (p, error) => {
+	console.trace(error);
+});
 
 main().catch(err => {
 	throw err;

@@ -50,6 +50,10 @@ async function main(forced?: ForcedFlags): Promise<void> {
 	process.on('message', onMessage);
 }
 
+process.on('unhandledRejection', (p, error) => {
+	console.trace(error);
+});
+
 main().catch(err => {
 	throw err;
 });

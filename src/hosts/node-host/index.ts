@@ -115,4 +115,8 @@ export class NodeHost implements Types.Host {
 	public async createWindow(): Promise<void> {
 		return;
 	}
+
+	public async toggleDevTools(): Promise<void> {
+		return;
+	}
 }

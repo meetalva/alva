@@ -9,7 +9,7 @@ import * as Serde from '../sender/serde';
 import * as uuid from 'uuid';
 import * as AlvaUtil from '../alva-util';
 
-export class HostAdapter {
+export class BrowserAdapter {
 	private sender: Types.Sender;
 	private store: Store.ViewStore;
 	private host: BrowserHost;
@@ -23,8 +23,8 @@ export class HostAdapter {
 		});
 	}
 
-	public static fromStore(store: Store.ViewStore): HostAdapter {
-		return new HostAdapter({ sender: store.getSender(), store });
+	public static fromStore(store: Store.ViewStore): BrowserAdapter {
+		return new BrowserAdapter({ sender: store.getSender(), store });
 	}
 
 	public start() {

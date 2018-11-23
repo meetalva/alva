@@ -12,7 +12,7 @@ import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';
 import * as Types from '../types';
-import { HostAdapter } from './host-adapter';
+import { BrowserAdapter } from '../adapters/browser-adapter';
 
 let app: Model.AlvaApp;
 let history;
@@ -63,7 +63,7 @@ export function startRenderer(): void {
 	}
 
 	if (app.isHostType(Types.HostType.Node)) {
-		const adapter = HostAdapter.fromStore(store);
+		const adapter = BrowserAdapter.fromStore(store);
 		adapter.start();
 	}
 

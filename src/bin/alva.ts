@@ -34,6 +34,7 @@ async function main(): Promise<void> {
 	cp.stderr.pipe(process.stderr);
 
 	cp.on('exit', code => process.exit(code));
+	process.on('exit', () => cp.kill());
 
 	const restarter = await Hosts.RestartListener.fromProcess(process);
 
@@ -41,6 +42,10 @@ async function main(): Promise<void> {
 		send({ type: Message.MessageType.Reload, payload: undefined, id: uuid.v4() });
 	});
 }
+
+process.on('unhandledRejection', (p, error) => {
+	console.trace(error);
+});
 
 main().catch(err => {
 	throw err;

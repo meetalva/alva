@@ -10,8 +10,6 @@ export async function build({ path, host }: { path: string; host: Types.Host }):
 	host.log(`Starting build to ${path}...`);
 
 	await Fs.mkdirp(path);
-	await Fs.mkdirp(Path.join(path, 'project'));
-	await Fs.mkdirp(Path.join(path, 'preview'));
 
 	const renderDoc = RendererDocument.rendererDocument({
 		payload: {

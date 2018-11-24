@@ -13,6 +13,8 @@ import { ViewStore } from '../store';
 import * as uuid from 'uuid';
 import * as Types from '../types';
 import { BrowserAdapter } from '../adapters/browser-adapter';
+import * as Fs from 'fs';
+import * as BrowserFs from 'browserfs';
 
 let app: Model.AlvaApp;
 let history;
@@ -20,17 +22,26 @@ let store: ViewStore;
 
 window.requestIdleCallback = window.requestIdleCallback || window.requestAnimationFrame;
 
-export function startRenderer(): void {
+export async function startRenderer(): Promise<void> {
 	console.log('App starting...');
 	const el = document.getElementById('data') as HTMLElement;
 	const payload = el.textContent === null ? '{}' : el.textContent;
 	const data = JSON.parse(decodeURIComponent(payload));
 
+	app = new Model.AlvaApp();
+
+	if (data.host) {
+		app.setHostType(data.host);
+	}
+
+	if (data.view) {
+		app.setActiveView(data.view);
+	}
+
 	const sender = new Sender({
-		endpoint: `ws://${window.location.host}/`
+		endpoint: !app.isHostType(Types.HostType.Browser) ? `ws://${window.location.host}/` : ''
 	});
 
-	app = new Model.AlvaApp();
 	app.setSender(sender);
 
 	history = new Model.EditHistory();
@@ -49,28 +60,48 @@ export function startRenderer(): void {
 		}
 	});
 
-	if (data.host) {
-		app.setHostType(data.host);
-	}
+	const fs = await getBrowserFs();
 
-	if (data.view) {
-		app.setActiveView(data.view);
+	const adapter = BrowserAdapter.fromStore(store, { fs });
+
+	if (!app.isHostType(Types.HostType.Electron)) {
+		adapter.start();
+
+		Mobx.autorun(() => {
+			const sender = store.getSender();
+			const app = store.getApp();
+
+			adapter.host.setApp(app);
+			adapter.host.setSender(sender);
+		});
 	}
 
 	if (data.project) {
-		store.setProject(Model.Project.from(data.project));
+		const p = Model.Project.from(data.project);
+		adapter.dataHost.addProject(p);
+		store.setProject(p);
 		store.commit();
-	}
+	} else {
+		// Entering with project url but no data passed from server,
+		// e.g. when in static mode
+		const fragments = (window.location.pathname || '').split('/').filter(Boolean);
+		const id = fragments[fragments.length - 1];
 
-	if (app.isHostType(Types.HostType.Node)) {
-		const adapter = BrowserAdapter.fromStore(store);
-		adapter.start();
+		if (fragments[0] === 'project' && id) {
+			const project = await adapter.dataHost.getProject(id);
+
+			if (project) {
+				store.setProject(project);
+				store.setActiveAppView(Types.AlvaView.PageDetail);
+				store.commit();
+			}
+		}
 	}
 
 	// TODO: Show "404" if no project was found but details are requested
 
-	// tslint:disable-next-line:no-any
 	(window as any).store = store;
+	(window as any).adapter = adapter;
 
 	// tslint:disable-next-line:no-any
 	(window as any).screenshot = () => {
@@ -126,6 +157,27 @@ export function startRenderer(): void {
 		</MobxReact.Provider>,
 		document.getElementById('app')
 	);
+}
+
+function getBrowserFs(): Promise<typeof Fs> {
+	return new Promise((resolve, reject) => {
+		const container = {};
+		BrowserFs.install(container);
+
+		BrowserFs.configure(
+			{
+				fs: 'IndexedDB',
+				options: {}
+			},
+			err => {
+				if (err) {
+					return reject(err);
+				}
+
+				resolve((container as any).require('fs'));
+			}
+		);
+	});
 }
 
 if (module.hot) {

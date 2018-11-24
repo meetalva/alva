@@ -1,0 +1,32 @@
+import * as M from '../message';
+import * as T from '../types';
+import * as Serde from '../sender/serde';
+import * as uuid from 'uuid';
+
+export function copy({ host, dataHost }: T.MatcherContext): T.Matcher<M.Copy> {
+	return async m => {
+		const project = await dataHost.getProject(m.payload.projectId);
+
+		if (!project) {
+			return;
+		}
+
+		const item = project.getItem(m.payload.itemId, m.payload.itemType);
+
+		if (!item) {
+			return;
+		}
+
+		return host.writeClipboard(
+			Serde.serialize({
+				type: M.MessageType.Clipboard,
+				id: uuid.v4(),
+				payload: {
+					type: m.payload.itemType,
+					item: item.toJSON(),
+					project: project.toJSON()
+				}
+			})
+		);
+	};
+}

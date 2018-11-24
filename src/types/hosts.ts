@@ -10,8 +10,10 @@ export enum HostType {
 import * as Types from '../types';
 
 export interface HostFlags {
+	_: string[];
 	port?: number;
 	localhost?: boolean;
+	serve?: boolean;
 }
 
 export interface HostFile {
@@ -90,6 +92,10 @@ export abstract class Host {
 		throw new Error('host.readFile: not implemented');
 	}
 
+	public async saveFile(path: string, contents: Buffer | string): Promise<void> {
+		throw new Error('host.saveFile: not implemented');
+	}
+
 	public async writeFile(path: string, contents: Buffer | string): Promise<void> {
 		throw new Error('host.writeFile: not implemented');
 	}
@@ -136,6 +142,14 @@ export abstract class Host {
 	public async getApp(): Promise<Model.AlvaApp | undefined> {
 		throw new Error('host.getApp: not implemented');
 	}
+
+	public async getSender(): Promise<Types.Sender> {
+		throw new Error('host.getSender: not implemented');
+	}
+
+	public setSender(sender: Types.Sender): void {
+		throw new Error('host.setSender: not implemented');
+	}
 }
 
 export abstract class DataHost {
@@ -158,3 +172,11 @@ export abstract class DataHost {
 		throw new Error('context.getConnections: not implemented');
 	}
 }
+
+export interface MatcherContext {
+	host: Types.Host;
+	dataHost: Types.DataHost;
+	port: number;
+}
+
+export type Matcher<T extends Message.Message> = (m: T) => Promise<void>;

@@ -10,6 +10,7 @@ export class NodeHost implements Types.Host {
 
 	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
+	private sender: Types.Sender;
 
 	public static async fromProcess(
 		process: NodeJS.Process,
@@ -31,7 +32,8 @@ export class NodeHost implements Types.Host {
 			...this.forced
 		};
 	}
-	public async getPort(requested: number): Promise<number> {
+
+	public async getPort(requested?: number): Promise<number> {
 		return getPort({ port: requested });
 	}
 
@@ -79,9 +81,21 @@ export class NodeHost implements Types.Host {
 		};
 	}
 
+	public async saveFile(path: string, data: unknown): Promise<void> {
+		return;
+	}
+
 	public async writeFile(path: string, data: unknown): Promise<void> {
 		const writeFile = Util.promisify(Fs.writeFile);
 		return writeFile(path, data);
+	}
+
+	public async getSender(): Promise<Types.Sender> {
+		return this.sender;
+	}
+
+	public setSender(sender: Types.Sender) {
+		this.sender = sender;
 	}
 
 	public async open(uri: string): Promise<void> {

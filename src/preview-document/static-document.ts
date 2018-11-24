@@ -46,6 +46,7 @@ const doc = (config: StaticDocumentConfig) => `<!doctype html>
 	<textarea data-data="alva" style="display: none">${encodeURIComponent(
 		AlvaUtil.toJSON({
 			data: config.data,
+			transferType: Types.PreviewTransferType.Inline,
 			mode: Types.PreviewDocumentMode.Static
 		})
 	)}</textarea>

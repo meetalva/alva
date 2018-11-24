@@ -1,6 +1,8 @@
 import * as Electron from 'electron';
 import * as Types from '../../types';
 import * as M from '../../message';
+import * as Matchers from '../../matchers';
+import { MessageType as MT } from '../../message';
 import * as ContextMenu from '../../context-menu';
 import { ElectronUpdater, UpdateCheckStatus } from './electron-updater';
 import { ElectronMainMenu } from './electron-main-menu';
@@ -26,7 +28,9 @@ export class ElectronAdapter {
 
 	public async start(): Promise<void> {
 		const server = this.server;
+		const sender = this.server.sender;
 		const host = this.server.host;
+		const context = { dataHost: server.dataHost, host, port: server.port };
 
 		Electron.app.on('window-all-closed', () => {
 			if (process.platform !== 'darwin') {
@@ -39,6 +43,20 @@ export class ElectronAdapter {
 				host.createWindow(`http://localhost:${server.port}/`);
 			}
 		});
+
+		sender.match(MT.ConnectPatternLibraryRequest, Matchers.connectPatternLibrary(context));
+		sender.match(MT.Copy, Matchers.copy(context));
+		sender.match(MT.CreateNewFileRequest, Matchers.createNewFileRequest(context));
+		sender.match(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
+		sender.match(MT.OpenExternalURL, Matchers.openExternalUrl(context));
+		sender.match(MT.OpenFileRequest, Matchers.openFileRequest(context));
+		sender.match(MT.OpenWindow, Matchers.openWindow(context));
+		sender.match(MT.Paste, Matchers.paste(context));
+		sender.match(MT.Save, Matchers.save(context, { passive: false }));
+		sender.match(MT.ShowError, Matchers.showError(context));
+		sender.match(MT.ShowMessage, Matchers.showMessage(context));
+		sender.match(MT.UseFileRequest, Matchers.useFileRequest(context));
+		sender.match(MT.ContextMenuRequest, Matchers.showContextMenu(context));
 
 		server.sender.match<M.ToggleDevTools>(M.MessageType.ToggleDevTools, async () => {
 			await host.toggleDevTools();

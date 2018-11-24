@@ -152,6 +152,10 @@ export class ElectronHost implements Types.Host {
 		};
 	}
 
+	public async saveFile(path: string, data: unknown): Promise<void> {
+		return;
+	}
+
 	public async writeFile(path: string, data: unknown): Promise<void> {
 		const writeFile = Util.promisify(Fs.writeFile);
 		return writeFile(path, data);
@@ -253,5 +257,13 @@ export class ElectronHost implements Types.Host {
 	@Mobx.action
 	public setApp(app: AlvaApp | undefined): void {
 		this.app = app;
+	}
+
+	public async getSender(): Promise<Types.Sender> {
+		return this.sender;
+	}
+
+	public setSender(sender: Types.Sender) {
+		this.sender = sender;
 	}
 }

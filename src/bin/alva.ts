@@ -7,8 +7,6 @@ import * as Serde from '../sender/serde';
 
 const yargsParser = require('yargs-parser');
 const electron = (require('electron') as any) as string;
-const electronEntry = require.resolve('./electron');
-const nodeEntry = require.resolve('./node');
 
 function sendTo(cp: ChildProcess.ChildProcess) {
 	return (payload: Message.Message): void => {
@@ -23,10 +21,11 @@ async function main(): Promise<void> {
 	const flags = yargsParser(process.argv.slice(2));
 
 	const spawn =
-		flags.host === 'node'
+		flags.host !== 'electron'
 			? ChildProcess.fork
 			: (entry, args, opts) => ChildProcess.spawn(electron, [entry, ...args], opts);
-	const entry = flags.host === 'node' ? nodeEntry : electronEntry;
+
+	const entry = getEntry(flags.host);
 	const cp = spawn(entry, process.argv.slice(2), { stdio: ['pipe', 'pipe', 'pipe', 'ipc'] });
 	const send = sendTo(cp);
 
@@ -41,6 +40,17 @@ async function main(): Promise<void> {
 	restarter.subscribe(() => {
 		send({ type: Message.MessageType.Reload, payload: undefined, id: uuid.v4() });
 	});
+}
+
+function getEntry(host: string = 'electron'): string {
+	switch (host) {
+		case 'node':
+		case 'static':
+		case 'electron':
+			return require.resolve(`./${host}`);
+		default:
+			throw new Error(`Unknown --host: ${host}`);
+	}
 }
 
 process.on('unhandledRejection', (p, error) => {

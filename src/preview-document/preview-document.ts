@@ -1,8 +1,17 @@
 import * as Types from '../types';
 import * as AlvaUtil from '../alva-util';
 
-export interface PreviewDocumentConfig {
+export type PreviewDocumentConfig = PreviewDocumentConfigInline | PreviewDocumentConfigMessage;
+
+export interface PreviewDocumentConfigInline {
+	transferType: Types.PreviewTransferType.Inline;
 	data: Types.SerializedProject;
+	scripts: string[];
+}
+
+export interface PreviewDocumentConfigMessage {
+	transferType: Types.PreviewTransferType.Message;
+	data?: unknown;
 	scripts: string[];
 }
 
@@ -44,6 +53,7 @@ export const previewDocument = (config: PreviewDocumentConfig) => `<!doctype htm
 	<textarea data-data="alva" style="display: none">${encodeURIComponent(
 		AlvaUtil.toJSON({
 			data: config.data,
+			transferType: config.transferType,
 			mode: Types.PreviewDocumentMode.Live
 		})
 	)}</textarea>

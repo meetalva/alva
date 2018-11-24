@@ -2,6 +2,7 @@ import * as Server from '../server';
 import * as Hosts from '../hosts';
 import * as Types from '../types';
 import * as Serde from '../sender/serde';
+import { NodeAdapter } from '../adapters/node-adapter';
 
 const importFresh = require('import-fresh');
 const clearModule = require('clear-module');
@@ -22,7 +23,10 @@ async function main(forced?: ForcedFlags): Promise<void> {
 		dataHost: localDataHost
 	});
 
+	const adapter = new NodeAdapter({ server: alvaServer });
+
 	await alvaServer.start();
+	await adapter.start();
 
 	const onRestart = async () => {
 		const port = alvaServer.port;

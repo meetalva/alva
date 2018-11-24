@@ -274,15 +274,17 @@ export class Project {
 
 	public static toResult(
 		serialized: Types.SerializedProject
-	): { status: 'ok'; result: Project } | { status: 'error'; error: Error } {
+	):
+		| { status: Types.ProjectStatus.Ok; result: Project }
+		| { status: Types.ProjectStatus.Error; error: Error } {
 		try {
 			return {
-				status: 'ok',
+				status: Types.ProjectStatus.Ok,
 				result: Project.from(serialized)
 			};
 		} catch (error) {
 			return {
-				status: 'error',
+				status: Types.ProjectStatus.Error,
 				error
 			};
 		}

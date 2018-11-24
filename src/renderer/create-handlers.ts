@@ -17,7 +17,9 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 	const sender = ctx.store.getSender();
 
 	sender.match<M.HighlightElement>(M.MessageType.HighlightElement, Handlers.highlightElement(ctx));
+	sender.match<M.SelectElement>(M.MessageType.SelectElement, Handlers.selectElement(ctx));
 	sender.match<M.KeyboardChange>(M.MessageType.KeyboardChange, Handlers.keyboardChange(ctx));
+	sender.match<M.ProjectRequest>(M.MessageType.ProjectRequest, Handlers.projectRequest(ctx));
 
 	app.match<M.SaveResult>(M.MessageType.SaveResult, Handlers.save(ctx));
 
@@ -37,8 +39,6 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 
 	app.match<M.UseFileResponse>(M.MessageType.UseFileResponse, Handlers.openFile(ctx));
 
-	app.match<M.ProjectRequest>(M.MessageType.ProjectRequest, Handlers.projectRequest(ctx));
-	sender.match<M.SelectElement>(M.MessageType.SelectElement, Handlers.selectElement(ctx));
 	app.match<M.SetPane>(M.MessageType.SetPane, Handlers.setPane(ctx));
 	app.match<M.StartAppMessage>(M.MessageType.StartApp, Handlers.startApp(ctx));
 	app.match<M.UpdatePatternLibraryResponse>(

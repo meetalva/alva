@@ -367,3 +367,8 @@ export interface PatternDependency {
 	origin: SerializedModel.SerializedPatternOrigin;
 	type: SerializedModel.SerializedPatternType;
 }
+
+export enum PreviewTransferType {
+	Inline = 'inline',
+	Message = 'message'
+}

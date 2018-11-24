@@ -27,17 +27,85 @@ declare global {
 	}
 }
 
-function main(): void {
+async function main(): Promise<void> {
 	const data = getInitialData();
 
 	if (!data) {
 		return;
 	}
 
-	// (1) Deserialize Project from HTML-embedded data payload
 	const mode =
 		data.mode === 'live' ? Types.PreviewDocumentMode.Live : Types.PreviewDocumentMode.Static;
-	const project = Model.Project.from(data.data);
+
+	const transferType =
+		data.transferType === 'inline'
+			? Types.PreviewTransferType.Inline
+			: Types.PreviewTransferType.Message;
+
+	const endpoint =
+		mode === Types.PreviewDocumentMode.Live ? `ws://${window.location.host}` : undefined;
+
+	const sender = new Sender(
+		framed() ? { window: window.parent } : { endpoint, window: window.parent }
+	);
+
+	const projectResult =
+		transferType === Types.PreviewTransferType.Inline
+			? // (1a) Deserialize Project from HTML-embedded data payload
+			  Model.Project.toResult(data.data)
+			: // (1b) Request project from edit interface
+			  await sender
+					.transaction<Message.ProjectRequest, Message.ProjectResponse>(
+						{
+							id: uuid.v4(),
+							type: Message.MessageType.ProjectRequest,
+							payload: undefined
+						},
+						{
+							type: Message.MessageType.ProjectResponse
+						}
+					)
+					.then(response => {
+						if (response.payload.status === Types.ProjectStatus.Ok && response.payload.data) {
+							return Model.Project.toResult(response.payload.data);
+						}
+
+						if (
+							response.payload.status === Types.ProjectStatus.Ok &&
+							!response.payload.data
+						) {
+							const err: { status: Types.ProjectStatus.Error; error: Error } = {
+								status: Types.ProjectStatus.Error,
+								error: new Error(`Received empty project`)
+							};
+
+							return err;
+						}
+
+						const err: { status: Types.ProjectStatus.Error; error: Error } = {
+							status: Types.ProjectStatus.Error,
+							error: (response.payload as any).error as Error
+						};
+
+						return err;
+					});
+
+	if (projectResult.status === Types.ProjectStatus.Error) {
+		console.error(projectResult.error);
+		return;
+	}
+
+	const project = projectResult.result;
+
+	project
+		.getPatternLibraries()
+		.filter(library => library.getOrigin() === Types.PatternLibraryOrigin.UserProvided)
+		.forEach(library => {
+			const script = document.createElement('script');
+			script.dataset.bundle = library.getBundleId();
+			script.textContent = library.getBundle();
+			document.body.appendChild(script);
+		});
 
 	// (2) Collect components from library scripts
 	const components = getComponents(project);
@@ -82,12 +150,7 @@ function main(): void {
 	// (4) Connect to the Alva server for updates
 	// - when mode is "live", used for editable preview
 	if (mode === Types.PreviewDocumentMode.Live) {
-		const sender = new Sender(
-			store.framed ? { window: window.parent } : { endpoint: `ws://${window.location.host}` }
-		);
-
 		store.setSender(sender);
-
 		project.sync(sender);
 
 		sender.match<Message.KeyboardChange>(Message.MessageType.KeyboardChange, message => {
@@ -195,3 +258,11 @@ window.rpc = {
 		};
 	}
 };
+
+function framed(): boolean {
+	try {
+		return window.self !== window.top;
+	} catch (e) {
+		return true;
+	}
+}

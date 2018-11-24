@@ -86,7 +86,7 @@ export class BrowserHost implements Types.Host {
 		await Promise.all(
 			path.split('/').map(async f => {
 				fragments.push(f);
-				const p = fragments.map(f => (f === '' ? '/' : f)).join('');
+				const p = fragments.map(f => `${f}/`).join('');
 
 				if (!await this.exists(p)) {
 					await _mkdir(p);

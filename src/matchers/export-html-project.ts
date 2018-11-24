@@ -11,6 +11,7 @@ export function exportHtmlProject({
 	port
 }: T.MatcherContext): T.Matcher<M.ExportHtmlProject> {
 	return async m => {
+		console.log(m);
 		const app = await host.getApp();
 		const sender = app || (await host.getSender());
 		const appId = m.appId || (app ? app.getId() : undefined);
@@ -34,7 +35,7 @@ export function exportHtmlProject({
 				]
 			}));
 
-		if (!targetPath) {
+		if (!targetPath && host.type !== T.HostType.Browser) {
 			return;
 		}
 
@@ -61,9 +62,9 @@ export function exportHtmlProject({
 			return;
 		}
 
-		const fsResult = await dumpFirstFile(host, htmlExport.fs, targetPath);
+		const firstFileResult = await getFirstFile(htmlExport.fs);
 
-		if (fsResult.type === FsResultType.FsError) {
+		if (firstFileResult.type === FsResultType.FsError) {
 			sender.send({
 				appId,
 				type: M.MessageType.ShowError,
@@ -71,14 +72,34 @@ export function exportHtmlProject({
 				id: uuid.v4(),
 				payload: {
 					message: `HTML Export for ${project.getName()} failed.`,
-					detail: `It threw the following error: ${fsResult.error.message}`,
+					detail: `It threw the following error: ${firstFileResult.error.message}`,
 					error: {
-						message: fsResult.error.message,
-						stack: fsResult.error.stack || ''
+						message: firstFileResult.error.message,
+						stack: firstFileResult.error.stack || ''
 					}
 				}
 			});
 			return;
+		}
+
+		try {
+			await host.writeFile(`${project.getName()}.html`, firstFileResult.payload);
+			await host.saveFile(`${project.getName()}.html`, firstFileResult.payload);
+		} catch (err) {
+			sender.send({
+				appId,
+				type: M.MessageType.ShowError,
+				transaction: m.transaction,
+				id: uuid.v4(),
+				payload: {
+					message: `HTML Export for ${project.getName()} failed.`,
+					detail: `It threw the following error: ${err.message}`,
+					error: {
+						message: err.message,
+						stack: err.stack || ''
+					}
+				}
+			});
 		}
 	};
 }
@@ -109,32 +130,6 @@ async function getFirstFile(fs: typeof Fs): Promise<FsResult<Buffer>> {
 			type: FsResultType.FsSuccess,
 			payload: firstFileContents
 		};
-	} catch (err) {
-		return {
-			type: FsResultType.FsError,
-			error: err
-		};
-	}
-}
-
-async function dumpFirstFile(
-	host: T.Host,
-	fs: typeof Fs,
-	targetPath: string
-): Promise<FsResult<void>> {
-	const firstFileResult = await getFirstFile(fs);
-
-	if (firstFileResult.type === FsResultType.FsError) {
-		return firstFileResult;
-	}
-
-	return writeFile(host, targetPath, firstFileResult.payload);
-}
-
-async function writeFile(host: T.Host, path: string, contents: Buffer): Promise<FsResult<void>> {
-	try {
-		host.writeFile(path, contents);
-		return { type: FsResultType.FsSuccess, payload: undefined };
 	} catch (err) {
 		return {
 			type: FsResultType.FsError,

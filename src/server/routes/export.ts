@@ -31,7 +31,7 @@ export function exportRouteFactory(server: Types.AlvaServer): Express.RequestHan
 		firstPage.setActive(true);
 
 		res.send(
-			PreviewDocument.staticDocument({
+			await PreviewDocument.staticDocument({
 				data: project.toJSON(),
 				scripts: project
 					.getPatternLibraries()

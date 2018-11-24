@@ -86,13 +86,7 @@ export class ViewDetails extends React.Component {
 					</Components.SideBar>
 				</AppPane>
 				<div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column' }}>
-					<PreviewPaneWrapper
-						isDragging={props.store.getDragging()}
-						key="center"
-						previewFrame={`http://localhost:${props.store.getServerPort()}/preview/${props.store
-							.getProject()
-							.getId()}`}
-					/>
+					<PreviewPaneWrapper isDragging={props.store.getDragging()} key="center" />
 					<AppPane
 						pane={Types.AppPane.DevelopmentPane}
 						defaultSize={{ width: '100%', height: 500 }}

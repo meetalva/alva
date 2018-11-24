@@ -1,7 +1,6 @@
 import * as Fs from 'fs-extra';
 import * as Path from 'path';
 import * as RendererDocument from '../../renderer/renderer-document';
-import * as PreviewDocument from '../../preview-document';
 import * as Types from '../../types';
 
 export async function build({ path, host }: { path: string; host: Types.Host }): Promise<void> {
@@ -21,21 +20,10 @@ export async function build({ path, host }: { path: string; host: Types.Host }):
 		}
 	});
 
-	const previewDoc = PreviewDocument.previewDocument({
-		transferType: Types.PreviewTransferType.Message,
-		scripts: []
-	});
-
 	await Fs.copy(Path.join(base, 'build', 'scripts'), Path.join(path, 'scripts'));
 
 	await host.writeFile(Path.join(path, 'index.html'), renderDoc);
 	await host.writeFile(Path.join(path, '200.html'), renderDoc);
-
-	await host.writeFile(Path.join(path, 'project', 'index.html'), renderDoc);
-	await host.writeFile(Path.join(path, 'project', '200.html'), renderDoc);
-
-	await host.writeFile(Path.join(path, 'preview', 'index.html'), previewDoc);
-	await host.writeFile(Path.join(path, 'preview', '200.html'), previewDoc);
 
 	host.log(`Built to ${path}...`);
 }

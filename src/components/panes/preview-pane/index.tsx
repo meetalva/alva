@@ -21,7 +21,8 @@ export interface PreviewFrameProps {
 	offCanvas: boolean;
 	onMouseEnter?: React.MouseEventHandler<HTMLElement>;
 	onMouseLeave?: React.MouseEventHandler<HTMLElement>;
-	src: string;
+	src?: string;
+	srcDoc?: string;
 }
 
 export interface PreviewPaneProps {

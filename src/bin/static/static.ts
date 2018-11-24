@@ -24,10 +24,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 		const server = Http.createServer((request, response) => {
 			return serveHandler(request, response, {
 				public: Path.resolve(process.cwd(), path),
-				rewrites: [
-					{ source: 'preview/*', destination: '/preview/index.html' },
-					{ source: 'project/*', destination: '/project/index.html' }
-				]
+				rewrites: [{ source: '**/*', destination: '/200.html' }]
 			});
 		});
 

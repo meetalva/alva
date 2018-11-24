@@ -1,4 +1,3 @@
-import { setSearch } from '../alva-util';
 import { PreviewFrame, PreviewPane } from '../components';
 import { Copy, CopySize } from '../components/copy';
 import { IconSize } from '../components/icons';
@@ -8,12 +7,22 @@ import * as React from 'react';
 import { Layout } from 'react-feather';
 import { Space, SpaceSize } from '../components/space';
 import { WithStore } from '../store';
+import * as PreviewDocument from '../preview-document/preview-document';
 import * as Types from '../types';
+import * as _ from 'lodash';
+import * as Model from '../model';
 
 export interface PreviewPaneProps {
 	isDragging: boolean;
-	previewFrame: string;
 }
+
+const getSrcDoc = _.memoize((_, project: Model.Project) =>
+	PreviewDocument.previewDocument({
+		transferType: Types.PreviewTransferType.Inline,
+		data: project.toJSON(),
+		scripts: []
+	})
+);
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -29,14 +38,19 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 		}
 	}
 
-	public render(): JSX.Element {
+	public render(): JSX.Element | null {
 		const props = this.props as PreviewPaneProps & WithStore;
+		const project = props.store.getProject();
+
+		if (!project) {
+			return null;
+		}
 
 		return (
 			<PreviewPane>
 				<PreviewFrame
 					ref={frame => (this.frame = frame)}
-					src={setSearch(props.previewFrame, { mode: Types.PreviewDocumentMode.Live })}
+					srcDoc={getSrcDoc(project.getId(), project)}
 					offCanvas={false}
 					onMouseLeave={() => {
 						props.store.getProject().unsetHighlightedElement();

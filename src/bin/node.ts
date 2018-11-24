@@ -32,7 +32,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 		const port = alvaServer.port;
 		await alvaServer.stop();
 
-		const sourceDirectory = await nodeHost.resolveFrom(Types.HostBase.Source, '.');
+		const sourceDirectory = await nodeHost.resolveFrom(Types.HostBase.Source, '..');
 		clearModule.match(new RegExp(`^${sourceDirectory}`));
 
 		await main({ port });

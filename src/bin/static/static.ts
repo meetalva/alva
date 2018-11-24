@@ -2,8 +2,11 @@ import * as Http from 'http';
 import * as Path from 'path';
 import * as Hosts from '../../hosts';
 import * as Serde from '../../sender/serde';
+import * as Persistence from '../../persistence';
 import * as Types from '../../types';
 import { build } from './build';
+import * as Fs from 'fs-extra';
+import * as Model from '../../model';
 
 const clearModule = require('clear-module');
 const serveHandler = require('serve-handler');
@@ -35,7 +38,23 @@ async function main(forced?: ForcedFlags): Promise<void> {
 		});
 	}
 
-	await build({ path, host: nodeHost });
+	const projectPath = flags.project ? Path.resolve(process.cwd(), flags.project) : undefined;
+	const projectFile = projectPath ? String(await Fs.readFile(projectPath)) : undefined;
+	const projectData = projectFile
+		? await Persistence.Persistence.parse<Types.SerializedProject>(projectFile)
+		: undefined;
+	const projectResult = projectData ? Model.Project.fromResult(projectData) : undefined;
+
+	if (projectResult && projectResult.status === Types.ProjectStatus.Error) {
+		throw projectResult.error;
+	}
+
+	if (projectResult) {
+		const p = projectResult.result;
+		console.log(`Embedding ${p.getName()} at http://localhost:${port}/project/${p.getId()}`);
+	}
+
+	await build({ path, host: nodeHost, project: projectResult ? projectResult.result : undefined });
 
 	const onRestart = async () => {
 		const sourceDirectory = await nodeHost.resolveFrom(Types.HostBase.Source, '.');

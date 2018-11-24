@@ -11,7 +11,6 @@ export function exportHtmlProject({
 	port
 }: T.MatcherContext): T.Matcher<M.ExportHtmlProject> {
 	return async m => {
-		console.log(m);
 		const app = await host.getApp();
 		const sender = app || (await host.getSender());
 		const appId = m.appId || (app ? app.getId() : undefined);
@@ -35,7 +34,7 @@ export function exportHtmlProject({
 				]
 			}));
 
-		if (!targetPath && host.type !== T.HostType.Browser) {
+		if (!targetPath && host.type === T.HostType.Electron) {
 			return;
 		}
 
@@ -82,9 +81,10 @@ export function exportHtmlProject({
 			return;
 		}
 
+		await host.saveFile(`${project.getName()}.html`, firstFileResult.payload.toString());
+
 		try {
-			await host.writeFile(`${project.getName()}.html`, firstFileResult.payload);
-			await host.saveFile(`${project.getName()}.html`, firstFileResult.payload);
+			await host.writeFile(`${project.getName()}.html`, firstFileResult.payload.toString());
 		} catch (err) {
 			sender.send({
 				appId,

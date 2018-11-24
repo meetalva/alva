@@ -44,9 +44,9 @@ export class BrowserAdapter {
 			sender.match(MT.UseFileRequest, Matchers.useFileRequest(context));
 			sender.match(MT.CreateNewFileRequest, Matchers.createNewFileRequest(context));
 			sender.match(MT.OpenFileRequest, Matchers.openFileRequest(context));
-			sender.match(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
 		}
 
+		sender.match(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
 		sender.match(MT.Copy, Matchers.copy(context));
 		sender.match(MT.OpenExternalURL, Matchers.openExternalUrl(context));
 		sender.match(MT.OpenWindow, Matchers.openWindow(context));

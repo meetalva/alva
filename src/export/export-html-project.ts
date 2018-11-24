@@ -23,6 +23,7 @@ export async function exportHtmlProject({
 	fs.writeFileSync(
 		`/${project.getId()}.html`,
 		await PreviewDocument.staticDocument({
+			port,
 			data: previewProject.toJSON(),
 			scripts: previewProject
 				.getPatternLibraries()

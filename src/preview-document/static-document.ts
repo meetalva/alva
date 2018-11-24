@@ -1,25 +1,28 @@
-import * as Fs from 'fs';
 import * as Path from 'path';
 import * as Types from '../types';
 import * as AlvaUtil from '../alva-util';
+import * as fetch from 'isomorphic-fetch';
 
 export interface StaticDocumentConfig {
 	data: Types.SerializedProject;
+	port?: number;
 	scripts: string[];
 }
 
-export const staticDocument = (config: StaticDocumentConfig): string => {
+export const staticDocument = async (config: StaticDocumentConfig): Promise<string> => {
 	const SCRIPT_PATHS = [
-		require.resolve('../scripts/Mobx'),
-		require.resolve('../scripts/previewRenderer'),
-		require.resolve('../scripts/preview')
-	];
+		'/scripts/Mobx.js',
+		'/scripts/previewRenderer.js',
+		'/scripts/preview.js'
+	].map(p => (typeof window !== 'undefined' ? p : `http://localhost:${config.port || 80}/${p}`));
 
 	// Read preview scripts from disk
-	const scripts = SCRIPT_PATHS.map(scriptPath => ({
-		basename: Path.basename(scriptPath, Path.extname(scriptPath)),
-		content: Fs.readFileSync(scriptPath)
-	})).map(script => `<script data-script="${script.basename}">${script.content}</script>`);
+	const scripts = (await Promise.all(
+		SCRIPT_PATHS.map(async scriptPath => ({
+			basename: Path.basename(scriptPath, Path.extname(scriptPath)),
+			content: await fetch(scriptPath).then(r => r.text())
+		}))
+	)).map(script => `<script data-script="${script.basename}">${script.content}</script>`);
 
 	config.scripts = [...config.scripts, ...scripts];
 	return doc(config);

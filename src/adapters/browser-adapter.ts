@@ -2,7 +2,6 @@ import * as Types from '../types';
 import * as M from '../message';
 import { MessageType as MT } from '../message';
 import * as Store from '../store';
-import * as Path from 'path';
 import { BrowserHost } from '../hosts/browser-host';
 import { BrowserDataHost } from '../hosts/browser-data-host';
 import * as Matchers from '../matchers/browser';
@@ -45,6 +44,7 @@ export class BrowserAdapter {
 			sender.match(MT.UseFileRequest, Matchers.useFileRequest(context));
 			sender.match(MT.CreateNewFileRequest, Matchers.createNewFileRequest(context));
 			sender.match(MT.OpenFileRequest, Matchers.openFileRequest(context));
+			sender.match(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
 		}
 
 		sender.match(MT.Copy, Matchers.copy(context));
@@ -55,26 +55,6 @@ export class BrowserAdapter {
 		sender.match(MT.ShowError, Matchers.showError(context));
 		sender.match(MT.ShowMessage, Matchers.showMessage(context));
 		sender.match(MT.ContextMenuRequest, Matchers.showContextMenu(context));
-
-		this.sender.match<M.ExportHtmlProject>(MT.ExportHtmlProject, async m => {
-			const senders = m.sender ? m.sender : [];
-
-			if (!senders.includes(this.sender.id)) {
-				return;
-			}
-
-			const project = this.store.getProject();
-
-			if (project.getId() !== m.payload.projectId) {
-				return;
-			}
-
-			const name = m.payload.path ? Path.basename(m.payload.path) : `${project.getName()}.html`;
-			await this.host.download(
-				name,
-				`http://localhost:${this.store.getServerPort()}/project/export/${project.getId()}`
-			);
-		});
 
 		this.sender.match<M.Reload>(MT.Reload, m => {
 			const senders = m.sender ? m.sender : [];

@@ -2,8 +2,17 @@ import * as Fs from 'fs-extra';
 import * as Path from 'path';
 import * as RendererDocument from '../../renderer/renderer-document';
 import * as Types from '../../types';
+import * as Model from '../../model';
 
-export async function build({ path, host }: { path: string; host: Types.Host }): Promise<void> {
+export async function build({
+	path,
+	host,
+	project
+}: {
+	path: string;
+	host: Types.Host;
+	project?: Model.Project;
+}): Promise<void> {
 	const pkgDir = require('pkg-dir');
 	const base = await pkgDir(__dirname);
 
@@ -14,7 +23,8 @@ export async function build({ path, host }: { path: string; host: Types.Host }):
 	const renderDoc = RendererDocument.rendererDocument({
 		payload: {
 			host: Types.HostType.Browser,
-			view: Types.AlvaView.SplashScreen
+			view: project ? Types.AlvaView.PageDetail : Types.AlvaView.SplashScreen,
+			project
 		}
 	});
 

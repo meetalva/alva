@@ -12,6 +12,7 @@ import * as Types from '../types';
 export interface HostFlags {
 	_: string[];
 	port?: number;
+	project?: string;
 	localhost?: boolean;
 	serve?: boolean;
 }

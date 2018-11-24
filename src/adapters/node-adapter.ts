@@ -20,7 +20,6 @@ export class NodeAdapter {
 		sender.match(M.ConnectPatternLibraryRequest, Matchers.connectPatternLibrary(context));
 		sender.match(M.Copy, Matchers.copy(context));
 		sender.match(M.CreateNewFileRequest, Matchers.createNewFileRequest(context));
-		sender.match(M.ExportHtmlProject, Matchers.exportHtmlProject(context));
 		sender.match(M.OpenExternalURL, Matchers.openExternalUrl(context));
 		sender.match(M.OpenFileRequest, Matchers.openFileRequest(context));
 		sender.match(M.OpenWindow, Matchers.openWindow(context));

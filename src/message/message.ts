@@ -50,6 +50,7 @@ export enum MessageType {
 	ExportPngPage = 'export-png-page',
 	ExportSketchPage = 'export-sketch-page',
 	ExportHtmlProject = 'export-html-project',
+	ExportHtmlProjectResult = 'export-html-project-result',
 	KeyboardChange = 'keyboard-change',
 	Log = 'log',
 	Maximize = 'maximize',

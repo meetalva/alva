@@ -290,6 +290,18 @@ export class Project {
 		}
 	}
 
+	public static fromResult(
+		result: Types.PersistenceParseResult<Types.SerializedProject>
+	):
+		| { status: Types.ProjectStatus.Ok; result: Project }
+		| { status: Types.ProjectStatus.Error; error: Error } {
+		if (result.state === Types.PersistenceState.Error) {
+			return { status: Types.ProjectStatus.Error, error: result.error };
+		}
+
+		return Project.toResult(result.contents);
+	}
+
 	public static equals(a: Types.SavedProject, b: Types.SavedProject): boolean;
 	public static equals(a: Types.SavedProject | Project, b: Types.SavedProject | Project): boolean {
 		const toData = input => (input instanceof Project ? input.toDisk() : input);

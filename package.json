@@ -10,7 +10,7 @@
     "clean": "rm -rf build && rm -rf dist",
     "commit": "commit",
     "commitmsg": "commitlint -e $GIT_PARAMS",
-    "deploy": "surge --project .static --domain alva-branch-$CIRCLE_BRANCH.surge.sh",
+    "deploy": "surge .static \"alva-branch-$CIRCLE_BRANCH.surge.sh\"",
     "dist": "node ./scripts/dist-preprocess.js",
     "docs": "typedoc src",
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",

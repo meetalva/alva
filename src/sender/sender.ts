@@ -41,6 +41,10 @@ export class Sender implements Types.Sender {
 	private retry: number = 0;
 
 	private get ready(): boolean {
+		if (!this.endpoint) {
+			return true;
+		}
+
 		if (!this.connection) {
 			return false;
 		}
@@ -232,15 +236,15 @@ export class Sender implements Types.Sender {
 		this.matchers.set(type, this.matchers.get(type)!.filter(m => m !== handler));
 	}
 
-	public transaction<T extends Message.Message>(
+	public transaction<T extends Message.Message, V extends Message.Message>(
 		message: Message.Message,
-		{ type }: { type: T['type'] }
-	): Promise<T> {
-		return new Promise<T>(resolve => {
+		{ type }: { type: V['type'] }
+	): Promise<V> {
+		return new Promise<V>(resolve => {
 			const transaction = uuid.v4();
 			let done = false;
 
-			const match = (msg: T) => {
+			const match = (msg: V) => {
 				if (!isMessage(msg) || done) {
 					return;
 				}
@@ -251,7 +255,7 @@ export class Sender implements Types.Sender {
 
 				done = true;
 				this.unmatch(type, match);
-				resolve(msg as T);
+				resolve(msg as V);
 			};
 
 			this.match(type, match);

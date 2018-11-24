@@ -6,8 +6,6 @@ import * as Util from 'util';
 import * as WS from 'ws';
 import * as Routes from './routes';
 import * as Sender from '../sender';
-import { MessageType as M } from '../message';
-import * as Matchers from './matchers';
 import * as Types from '../types';
 
 interface AlvaServerInit {
@@ -51,6 +49,7 @@ export class AlvaServer implements Types.AlvaServer {
 			autostart: false,
 			endpoint: this.endpoint
 		});
+		init.host.setSender(this.sender);
 
 		this.host = init.host;
 		this.dataHost = init.dataHost;
@@ -76,7 +75,7 @@ export class AlvaServer implements Types.AlvaServer {
 		this.app.get('/project/:id', Routes.projectRouteFactory(this));
 
 		/** Project preview view */
-		this.app.get('/project/preview/:id', Routes.previewRouteFactory(this));
+		this.app.get('/preview/:id', Routes.previewRouteFactory(this));
 
 		/** Component library scripts */
 		this.app.get('/project/:projectId/library/:libraryId', Routes.libraryRouteFactory(this));
@@ -86,20 +85,6 @@ export class AlvaServer implements Types.AlvaServer {
 
 		/** Scripts required for client side application */
 		this.app.get('/scripts/*', Routes.scriptsRouteFactory(this));
-
-		this.sender.match(M.ConnectPatternLibraryRequest, Matchers.connectPatternLibrary(this));
-		this.sender.match(M.Copy, Matchers.copy(this));
-		this.sender.match(M.CreateNewFileRequest, Matchers.createNewFileRequest(this));
-		this.sender.match(M.ExportHtmlProject, Matchers.exportHtmlProject(this));
-		this.sender.match(M.OpenExternalURL, Matchers.openExternalUrl(this));
-		this.sender.match(M.OpenFileRequest, Matchers.openFileRequest(this));
-		this.sender.match(M.OpenWindow, Matchers.openWindow(this));
-		this.sender.match(M.Paste, Matchers.paste(this));
-		this.sender.match(M.Save, Matchers.save(this));
-		this.sender.match(M.ShowError, Matchers.showError(this));
-		this.sender.match(M.ShowMessage, Matchers.showMessage(this));
-		this.sender.match(M.UseFileRequest, Matchers.useFileRequest(this));
-		this.sender.match(M.ContextMenuRequest, Matchers.showContextMenu(this));
 	}
 
 	public static async fromHosts({

@@ -24,6 +24,7 @@ export function projectRequest({ store }: MessageHandlerContext): MessageHandler
 		sender.send({
 			id: m.id,
 			type: M.MessageType.ProjectResponse,
+			transaction: m.transaction,
 			payload: {
 				data: data.toJSON(),
 				status: Types.ProjectStatus.Ok

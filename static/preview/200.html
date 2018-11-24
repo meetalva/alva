@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width" />
+	<title></title>
+	<style>
+		html, body {
+			margin: 0;
+			background: white;
+		}
+		#preview {
+			background: white;
+		}
+		#preview-highlight,
+		#preview-selection {
+			box-sizing: border-box;
+			pointer-events: none;
+			position: fixed;
+		}
+		#preview-highlight {
+			z-index: 100;
+			border: 2px solid #42BFFE;
+		}
+		#preview-selection {
+			z-index: 101;
+			border: 1px solid rgba(255, 255, 255, 0.5);
+			mix-blend-mode: difference;
+		}
+	</style>
+</head>
+<body>
+	<div id="preview"></div>
+	<div id="preview-selection"></div>
+	<div id="preview-highlight"></div>
+	<textarea data-data="alva" style="display: none">%7B%22transferType%22%3A%22message%22%2C%22mode%22%3A%22live%22%7D</textarea>
+	
+	<script src="/scripts/Mobx.js" data-script="Mobx"></script>
+	<script src="/scripts/previewRenderer.js" data-script="previewRenderer"></script>
+	<script src="/scripts/preview.js" data-script="preview"></script>
+</body>
+</html>

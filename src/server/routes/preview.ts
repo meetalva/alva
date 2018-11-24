@@ -33,6 +33,7 @@ export function previewRouteFactory(server: Types.AlvaServer): Express.RequestHa
 		res.send(
 			PreviewDocument.previewDocument({
 				data: project.toJSON(),
+				transferType: Types.PreviewTransferType.Inline,
 				scripts: userLibraries.map(script)
 			})
 		);

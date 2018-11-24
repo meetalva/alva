@@ -2,6 +2,7 @@ import * as Types from '../types';
 
 export interface InitialData {
 	data: Types.SerializedProject;
+	transferType: 'inline' | 'message';
 	mode: 'static' | 'live';
 }
 

@@ -62,14 +62,6 @@ export class PreviewStore<V> {
 	@Mobx.observable private scrollPosition: Types.Point;
 	private sender?: Sender;
 
-	public get framed() {
-		try {
-			return window.self !== window.top;
-		} catch (e) {
-			return true;
-		}
-	}
-
 	public constructor(init: PreviewStoreInit<V, Types.PreviewDocumentMode>) {
 		this.mode = init.mode;
 		this.project = init.project;

@@ -2,7 +2,7 @@
   "name": "meetalva",
   "version": "0.8.1",
   "description": "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
-  "main": "./build/electron/main.js",
+  "main": "./build/bin/electron.js",
   "scripts": {
     "build": "tsc --project . && webpack",
     "build:clean": "npm run clean && npm run build",

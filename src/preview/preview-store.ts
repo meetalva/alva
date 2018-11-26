@@ -264,7 +264,11 @@ export class PreviewStore<V> {
 
 	@Mobx.action
 	public onElementClick(e: MouseEvent, data: { element: Model.Element; node?: Element }): void {
-		if (this.getMetaDown() || this.mode === Types.PreviewDocumentMode.Static) {
+		if (this.mode !== Types.PreviewDocumentMode.Static) {
+			e.preventDefault();
+		}
+
+		if (e.metaKey || this.mode === Types.PreviewDocumentMode.Static) {
 			return;
 		}
 

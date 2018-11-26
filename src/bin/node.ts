@@ -59,5 +59,7 @@ process.on('unhandledRejection', (p, error) => {
 });
 
 main().catch(err => {
-	throw err;
+	process.nextTick(() => {
+		throw err;
+	});
 });

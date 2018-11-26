@@ -21,7 +21,14 @@ async function main(forced?: ForcedFlags): Promise<void> {
 	const nodeHost = await Hosts.NodeHost.fromProcess(process, forced);
 	const flags = await nodeHost.getFlags();
 	const port = await nodeHost.getPort(flags.port);
-	const path = Path.resolve(process.cwd(), flags._[0] || process.cwd());
+
+	const out = (flags as any).out;
+
+	if (typeof out !== 'string') {
+		throw new Error('--out is required to determin path to build to');
+	}
+
+	const path = Path.resolve(process.cwd(), out);
 
 	if (flags.serve) {
 		const server = Http.createServer((request, response) => {
@@ -88,5 +95,7 @@ process.on('unhandledRejection', (p, error) => {
 });
 
 main().catch(err => {
-	throw err;
+	setTimeout(() => {
+		throw err;
+	});
 });

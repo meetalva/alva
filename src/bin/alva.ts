@@ -33,6 +33,8 @@ async function main(): Promise<void> {
 	cp.stderr.pipe(process.stderr);
 
 	cp.on('exit', code => process.exit(code));
+	cp.on('error', () => process.exit(1));
+
 	process.on('exit', () => cp.kill());
 
 	const restarter = await Hosts.RestartListener.fromProcess(process);
@@ -58,5 +60,7 @@ process.on('unhandledRejection', (p, error) => {
 });
 
 main().catch(err => {
-	throw err;
+	process.nextTick(() => {
+		throw err;
+	});
 });

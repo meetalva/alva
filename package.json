@@ -16,7 +16,7 @@
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
     "start": "npm run build && node build/bin/alva --host=electron",
     "start:clean": "npm run clean && npm run start",
-    "static": "node build/bin/alva .static --host=static",
+    "static": "node build/bin/alva --out=.static --host=static",
     "precommit": "lint-staged",
     "watch": "concurrently \"node build/bin/alva --host=electron\" \"tsc --project . --watch\" \"webpack -w\" \"webpack-dev-server --config webpack.renderer.js\"",
     "watch:clean": "npm run clean && npm run watch",

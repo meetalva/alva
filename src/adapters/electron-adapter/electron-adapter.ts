@@ -47,6 +47,7 @@ export class ElectronAdapter {
 
 		sender.match(MT.ConnectPatternLibraryRequest, Matchers.connectPatternLibrary(context));
 		sender.match(MT.Copy, Matchers.copy(context));
+		sender.match(MT.Cut, Matchers.cut(context));
 		sender.match(MT.CreateNewFileRequest, Matchers.createNewFileRequest(context));
 		sender.match(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
 		sender.match(MT.OpenExternalURL, Matchers.openExternalUrl(context));

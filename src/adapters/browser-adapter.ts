@@ -48,6 +48,7 @@ export class BrowserAdapter {
 
 		sender.match(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
 		sender.match(MT.Copy, Matchers.copy(context));
+		sender.match(MT.Cut, Matchers.cut(context));
 		sender.match(MT.OpenExternalURL, Matchers.openExternalUrl(context));
 		sender.match(MT.OpenWindow, Matchers.openWindow(context));
 		sender.match(MT.Paste, Matchers.paste(context));

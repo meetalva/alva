@@ -126,7 +126,7 @@ export class NodeHost implements Types.Host {
 		return;
 	}
 
-	public async createWindow(): Promise<void> {
+	public async createWindow(): Promise<undefined> {
 		return;
 	}
 

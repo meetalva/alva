@@ -21,17 +21,18 @@ export function save(
 		const name = project.getName() !== project.toJSON().id ? project.getName() : 'New Project';
 
 		const targetPath =
-			project.getPath() ||
-			(await host.selectSaveFile({
-				title: 'Save Alva File',
-				defaultPath: `${name}.alva`,
-				filters: [
-					{
-						name: 'Alva File',
-						extensions: ['alva']
-					}
-				]
-			}));
+			(!project.getDraft() ? project.getPath() : '') || m.payload.publish === false
+				? ''
+				: await host.selectSaveFile({
+						title: 'Save Alva File',
+						defaultPath: `${name}.alva`,
+						filters: [
+							{
+								name: 'Alva File',
+								extensions: ['alva']
+							}
+						]
+				  });
 
 		if (!targetPath) {
 			return;

@@ -60,6 +60,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 
 process.on('unhandledRejection', (p, error) => {
 	console.trace(error);
+	console.log(JSON.stringify(error));
 });
 
 main().catch(err => {

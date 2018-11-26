@@ -4,35 +4,34 @@ import { Persistence } from '../persistence';
 import * as Path from 'path';
 import * as uuid from 'uuid';
 
-export function save(
+export function saveAs(
 	{ host, dataHost }: T.MatcherContext,
 	config: { passive: boolean }
-): T.Matcher<M.Save> {
+): T.Matcher<M.SaveAs> {
 	return async m => {
 		const app = await host.getApp();
 		const sender = app || (await host.getSender());
 		const appId = m.appId || (app ? app.getId() : undefined);
 		const project = await dataHost.getProject(m.payload.projectId);
 
-		if (!project) {
+		if (!project || !app) {
 			return;
 		}
 
 		const name = project.getName() !== project.toJSON().id ? project.getName() : 'New Project';
 
-		const targetPath =
-			(!project.getDraft() ? project.getPath() : '') || m.payload.publish === false
-				? ''
-				: await host.selectSaveFile({
-						title: 'Save Alva File',
-						defaultPath: `${name}.alva`,
-						filters: [
-							{
-								name: 'Alva File',
-								extensions: ['alva']
-							}
-						]
-				  });
+		const targetPath = app.isHostType(T.HostType.Electron)
+			? await host.selectSaveFile({
+					title: 'Save Alva File',
+					defaultPath: `${name}.alva`,
+					filters: [
+						{
+							name: 'Alva File',
+							extensions: ['alva']
+						}
+					]
+			  })
+			: project.getPath() || (await host.resolveFrom(T.HostBase.AppData, `${uuid.v4()}.alva`));
 
 		if (!targetPath) {
 			return;
@@ -60,9 +59,9 @@ export function save(
 		}
 
 		project.setPath(targetPath);
-		project.setDraft(project.getDraft() ? !m.payload.publish : false);
+		project.setDraft(false);
 
-		if (!project.getDraft()) {
+		if (app.isHostType(T.HostType.Electron)) {
 			project.setName(Path.basename(targetPath, Path.extname(targetPath)));
 		}
 
@@ -75,6 +74,7 @@ export function save(
 		try {
 			await host.mkdir(Path.dirname(targetPath));
 			await host.writeFile(targetPath, serializeResult.contents);
+			await host.saveFile(`${project.getName()}.alva`, serializeResult.contents);
 
 			if (config.passive) {
 				return;

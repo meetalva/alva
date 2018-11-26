@@ -25,6 +25,7 @@ export class NodeAdapter {
 		sender.match(M.OpenWindow, Matchers.openWindow(context));
 		sender.match(M.Paste, Matchers.paste(context));
 		sender.match(M.Save, Matchers.save(context, { passive: false }));
+		sender.match(M.SaveAs, Matchers.saveAs(context, { passive: false }));
 		sender.match(M.ShowError, Matchers.showError(context));
 		sender.match(M.ShowMessage, Matchers.showMessage(context));
 		sender.match(M.UseFileRequest, Matchers.useFileRequest(context));

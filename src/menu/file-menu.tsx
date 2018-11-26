@@ -20,7 +20,6 @@ const ids = {
 export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 	const hasProject = typeof ctx.project !== 'undefined';
 	const onDetailView = ctx.app && ctx.app.isActiveView(Types.AlvaView.PageDetail);
-	const isLocal = ctx.app && !ctx.app.isHostType(Types.HostType.Node);
 	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.Electron);
 
 	return {
@@ -119,7 +118,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				label: '&Save',
 				enabled: hasProject && onDetailView,
 				accelerator: 'CmdOrCtrl+S',
-				visible: isLocal,
+				visible: isElectron,
 				role: 'save',
 				click: app => {
 					if (!ctx.project) {
@@ -148,9 +147,9 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 					}
 
 					app.send({
-						type: MessageType.Save,
+						type: MessageType.SaveAs,
 						id: uuid.v4(),
-						payload: { publish: true, projectId: ctx.project.getId() }
+						payload: { projectId: ctx.project.getId() }
 					});
 				}
 			},

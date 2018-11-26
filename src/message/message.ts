@@ -69,6 +69,7 @@ export enum MessageType {
 	Redo = 'redo',
 	Reload = 'reload',
 	Save = 'save',
+	SaveAs = 'save-as',
 	SaveResult = 'save-result',
 	SetPane = 'set-pane',
 	ShowError = 'show-error',
@@ -151,6 +152,7 @@ export type Message =
 	| Redo
 	| Reload
 	| Save
+	| SaveAs
 	| SaveResult
 	| SetPane
 	| ShowError
@@ -309,6 +311,7 @@ export type ProjectResponse = Envelope<
 export type Redo = EmptyEnvelope<MessageType.Redo>;
 export type Reload = Envelope<MessageType.Reload, { forced: boolean } | undefined>;
 export type Save = Envelope<MessageType.Save, { publish: boolean; projectId: string }>;
+export type SaveAs = Envelope<MessageType.SaveAs, { projectId: string }>;
 export type SaveResult = Envelope<
 	MessageType.SaveResult,
 	{ project: Types.SerializedProject; previous: string }

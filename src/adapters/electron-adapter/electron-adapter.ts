@@ -54,6 +54,7 @@ export class ElectronAdapter {
 		sender.match(MT.OpenWindow, Matchers.openWindow(context));
 		sender.match(MT.Paste, Matchers.paste(context));
 		sender.match(MT.Save, Matchers.save(context, { passive: false }));
+		sender.match(MT.SaveAs, Matchers.saveAs(context, { passive: false }));
 		sender.match(MT.ShowError, Matchers.showError(context));
 		sender.match(MT.ShowMessage, Matchers.showMessage(context));
 		sender.match(MT.UseFileRequest, Matchers.useFileRequest(context));

@@ -14,11 +14,11 @@
     "dist": "node ./scripts/dist-preprocess.js",
     "docs": "typedoc src",
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
-    "start": "npm run build && run-electron build/electron/main.js --remote-debugging-port=9222 --inspect=9223",
+    "start": "npm run build && node build/bin/alva --host=electron",
     "start:clean": "npm run clean && npm run start",
     "static": "node build/bin/alva .static --host=static",
     "precommit": "lint-staged",
-    "watch": "concurrently \"run-electron build/electron/main.js --hot --remote-debugging-port=9222 --inspect=9223\" \"tsc --project . --watch\" \"webpack -w\" \"webpack-dev-server --config webpack.renderer.js\"",
+    "watch": "concurrently \"node build/bin/alva --host=electron\" \"tsc --project . --watch\" \"webpack -w\" \"webpack-dev-server --config webpack.renderer.js\"",
     "watch:clean": "npm run clean && npm run watch",
     "watch:tests": "jest --watch",
     "test": "jest"

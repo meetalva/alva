@@ -19,6 +19,7 @@ const StyledContainer = styled.div`
 	grid-template-rows: 30vh 70vh;
 	grid-column-gap: ${getSpace(SpaceSize.XL)}px;
 	align-items: stretch;
+	-webkit-app-region: drag;
 `;
 
 const StyledSection = styled.div`

@@ -40,7 +40,8 @@ export class ElectronAdapter {
 
 		Electron.app.on('activate', async () => {
 			if (process.platform === 'darwin' && this.windows.size === 0) {
-				host.createWindow(`http://localhost:${server.port}/`);
+				const win = await host.createWindow(`http://localhost:${server.port}/`);
+				this.addWindow(win);
 			}
 		});
 
@@ -223,7 +224,8 @@ export class ElectronAdapter {
 			}
 		});
 
-		host.createWindow(`http://localhost:${server.port}/`);
+		const win = await host.createWindow(`http://localhost:${server.port}/`);
+		this.addWindow(win);
 
 		this.menu.start();
 		this.updater.start();
@@ -233,5 +235,15 @@ export class ElectronAdapter {
 
 	public async getApp(): Promise<AlvaApp | undefined> {
 		return this.menu.focusedApp;
+	}
+
+	public addWindow(win?: Electron.BrowserWindow): void {
+		if (win) {
+			this.windows.set(win.id, win);
+
+			win.on('close', () => {
+				this.windows.delete(win.id);
+			});
+		}
 	}
 }

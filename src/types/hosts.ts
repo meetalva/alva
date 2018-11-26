@@ -132,7 +132,7 @@ export abstract class Host {
 		throw new Error('host.readClipboard: not implemented');
 	}
 
-	public async createWindow(_): Promise<Electron.BrowserWindow | void> {
+	public async createWindow(_): Promise<Electron.BrowserWindow | undefined> {
 		throw new Error('host.createWindow: not implemented');
 	}
 

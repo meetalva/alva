@@ -20,12 +20,12 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 	sender.match<M.SelectElement>(M.MessageType.SelectElement, Handlers.selectElement(ctx));
 	sender.match<M.KeyboardChange>(M.MessageType.KeyboardChange, Handlers.keyboardChange(ctx));
 	sender.match<M.ProjectRequest>(M.MessageType.ProjectRequest, Handlers.projectRequest(ctx));
+	sender.match<M.ChangeUserStore>(M.MessageType.ChangeUserStore, Handlers.changeUserStore(ctx));
 
 	app.match<M.SaveResult>(M.MessageType.SaveResult, Handlers.save(ctx));
 
 	app.match<M.ActivatePage>(M.MessageType.ActivatePage, Handlers.activatePage(ctx));
 	app.match<M.AppRequest>(M.MessageType.AppRequest, Handlers.appRequest(ctx));
-	app.match<M.ChangeUserStore>(M.MessageType.ChangeUserStore, Handlers.changeUserStore(ctx));
 	app.match<M.CheckLibraryResponse>(
 		M.MessageType.CheckLibraryResponse,
 		Handlers.checkPatternLibrary(ctx)

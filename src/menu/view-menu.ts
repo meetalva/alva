@@ -26,26 +26,13 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.reload,
 				label: '&Reload',
+				visible: !isElectron,
 				accelerator: 'CmdOrCtrl+R',
 				click: app => {
 					app.send({
 						id: uuid.v4(),
 						type: Message.MessageType.Reload,
 						payload: undefined
-					});
-				}
-			},
-			{
-				id: ids.forceReload,
-				label: '&Force Reload',
-				accelerator: 'CmdOrCtrl+Shift+R',
-				click: app => {
-					app.send({
-						id: uuid.v4(),
-						type: Message.MessageType.Reload,
-						payload: {
-							forced: true
-						}
 					});
 				}
 			},

@@ -129,7 +129,10 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 					app.send({
 						type: MessageType.Save,
 						id: uuid.v4(),
-						payload: { publish: ctx.project.getDraft(), projectId: ctx.project.getId() }
+						payload: {
+							publish: ctx.project.getDraft(),
+							projectId: ctx.project.getId()
+						}
 					});
 				}
 			},

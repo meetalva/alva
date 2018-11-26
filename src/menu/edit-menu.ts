@@ -62,9 +62,24 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				enabled: typeof ctx.project !== 'undefined' && hasClipboard,
 				accelerator: 'CmdOrCtrl+X',
 				click: app => {
+					if (!ctx.project) {
+						return;
+					}
+
+					const item = ctx.project.getFocusedItem();
+					const itemType = ctx.project.getFocusedItemType();
+
+					if (!item) {
+						return;
+					}
+
 					app.send({
 						id: uuid.v4(),
-						payload: undefined,
+						payload: {
+							item: item.toJSON(),
+							itemType,
+							projectId: ctx.project.getId()
+						},
 						type: MessageType.Cut
 					});
 				}

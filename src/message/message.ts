@@ -266,7 +266,10 @@ export type CreateScriptBundleResponse = Envelope<
 	MessageType.CreateScriptBundleResponse,
 	Types.FilePayload[]
 >;
-export type Cut = EmptyEnvelope<MessageType.Cut>;
+export type Cut = Envelope<
+	MessageType.Cut,
+	{ projectId: string; item: Types.SerializedItem; itemType: Types.SerializedItemType }
+>;
 export type DeleteSelected = EmptyEnvelope<MessageType.DeleteSelected>;
 export type KeyboardChange = Envelope<MessageType.KeyboardChange, { metaDown: boolean }>;
 export type NewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;

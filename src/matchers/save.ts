@@ -12,39 +12,42 @@ export function save(
 		const app = await host.getApp(m.appId || '');
 
 		if (!app) {
-			host.log(`save: received message without resolveable app: ${m}`);
+			host.log(`save: received message without resolveable app:`, m);
 			return;
 		}
 
 		const project = await dataHost.getProject(m.payload.projectId);
 
 		if (!project) {
+			host.log(`save: received message without resolveable project:`, m);
 			return;
 		}
 
 		const name = project.getName() !== project.toJSON().id ? project.getName() : 'New Project';
 
-		const targetPath =
-			(!project.getDraft() ? project.getPath() : '') || m.payload.publish === false
-				? ''
-				: await host.selectSaveFile({
-						title: 'Save Alva File',
-						defaultPath: `${name}.alva`,
-						filters: [
-							{
-								name: 'Alva File',
-								extensions: ['alva']
-							}
-						]
-				  });
+		const targetPath = m.payload.publish
+			? await host.selectSaveFile({
+					title: 'Save Alva File',
+					defaultPath: `${name}.alva`,
+					filters: [
+						{
+							name: 'Alva File',
+							extensions: ['alva']
+						}
+					]
+			  })
+			: project.getPath();
 
 		if (!targetPath) {
+			host.log(`save: not target path:`, m);
 			return;
 		}
 
 		const serializeResult = await Persistence.serialize(project);
 
 		if (serializeResult.state !== T.PersistenceState.Success) {
+			host.log(serializeResult.error.message);
+
 			app.send({
 				type: M.MessageType.ShowError,
 				transaction: m.transaction,
@@ -93,6 +96,8 @@ export function save(
 				}
 			});
 		} catch (err) {
+			host.log(err.message);
+
 			app.send({
 				type: M.MessageType.ShowError,
 				transaction: m.transaction,

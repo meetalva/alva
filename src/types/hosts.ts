@@ -181,7 +181,7 @@ export abstract class DataHost {
 export interface MatcherContext {
 	host: Types.Host;
 	dataHost: Types.DataHost;
-	port: number;
+	location: Types.Location;
 }
 
 export type Matcher<T extends Message.Message> = (m: T) => Promise<void>;

@@ -21,4 +21,6 @@ export interface Sender {
 		message: Message.Message,
 		{ type }: { type: V['type'] }
 	): Promise<V>;
+
+	setLog(log: undefined | typeof console.log): void;
 }

@@ -436,6 +436,10 @@ export class ViewStore {
 		return typeof this.draggedElement !== 'undefined';
 	}
 
+	public getEditHistory(): Model.EditHistory {
+		return this.editHistory;
+	}
+
 	public getElementActions(): Model.ElementAction[] {
 		if (!this.project) {
 			return [];

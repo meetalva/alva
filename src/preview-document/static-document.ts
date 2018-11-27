@@ -5,7 +5,7 @@ import * as fetch from 'isomorphic-fetch';
 
 export interface StaticDocumentConfig {
 	data: Types.SerializedProject;
-	port?: number;
+	location: Types.Location;
 	scripts: string[];
 }
 
@@ -14,7 +14,7 @@ export const staticDocument = async (config: StaticDocumentConfig): Promise<stri
 		'/scripts/Mobx.js',
 		'/scripts/previewRenderer.js',
 		'/scripts/preview.js'
-	].map(p => (typeof window !== 'undefined' ? p : `http://localhost:${config.port || 80}/${p}`));
+	].map(p => `${location.origin}/${p}`);
 
 	// Read preview scripts from disk
 	const scripts = (await Promise.all(

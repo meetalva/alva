@@ -31,7 +31,7 @@ export class ElectronAdapter {
 		const server = this.server;
 		const sender = this.server.sender;
 		const host = this.server.host;
-		const context = { dataHost: server.dataHost, host, port: server.port };
+		const context = { dataHost: server.dataHost, host, location: server.location };
 
 		Electron.app.on('window-all-closed', () => {
 			if (process.platform !== 'darwin') {
@@ -41,7 +41,7 @@ export class ElectronAdapter {
 
 		Electron.app.on('activate', async () => {
 			if (process.platform === 'darwin' && this.windows.size === 0) {
-				const win = await host.createWindow(`http://localhost:${server.port}/`);
+				const win = await host.createWindow(server.location.origin);
 				this.addWindow(win);
 			}
 		});
@@ -248,17 +248,19 @@ export class ElectronAdapter {
 			}
 		});
 
+		const useFileResponse = Matchers.useFileResponse(context);
+
 		server.sender.match<M.UseFileResponse>(MT.UseFileResponse, async m => {
 			if (
 				this.windows.size > 0 ||
 				m.payload.project.status === Types.ProjectPayloadStatus.Error ||
 				!m.payload.replace
 			) {
-				return;
+				return useFileResponse(m);
 			}
 
 			const project = Project.from((m.payload.project as Types.ProjectPayloadSuccess).contents);
-			await host.createWindow(`http://localhost:${server.port}/project/${project.getId()}`);
+			await host.createWindow(`${server.location.origin}/project/${project.getId()}`);
 			this.addWindow(win);
 		});
 
@@ -270,7 +272,7 @@ export class ElectronAdapter {
 			}
 		});
 
-		const win = await host.createWindow(`http://localhost:${server.port}/`);
+		const win = await host.createWindow(server.location.origin);
 		this.addWindow(win);
 
 		this.menu.start();

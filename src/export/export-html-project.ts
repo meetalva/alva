@@ -7,10 +7,10 @@ const MemoryFileSystem = require('memory-fs');
 
 export async function exportHtmlProject({
 	project,
-	port
+	location
 }: {
 	project: Model.Project;
-	port?: number;
+	location: Types.Location;
 }): Promise<Types.ExportResult> {
 	const fs = new MemoryFileSystem() as typeof Fs;
 
@@ -23,7 +23,7 @@ export async function exportHtmlProject({
 	fs.writeFileSync(
 		`/${project.getId()}.html`,
 		await PreviewDocument.staticDocument({
-			port,
+			location,
 			data: previewProject.toJSON(),
 			scripts: previewProject
 				.getPatternLibraries()

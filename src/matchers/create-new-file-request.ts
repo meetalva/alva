@@ -2,7 +2,6 @@ import * as M from '../message';
 import * as Model from '../model';
 import * as T from '../types';
 import { Persistence } from '../persistence';
-import * as uuid from 'uuid';
 
 export function createNewFileRequest({
 	host
@@ -80,20 +79,6 @@ export function createNewFileRequest({
 		}
 
 		const p = response.payload.project as T.ProjectPayloadSuccess;
-		const replacement = Model.Project.from(p.contents);
-
-		if (!m.payload.replace) {
-			app.send({
-				id: uuid.v4(),
-				type: M.MessageType.OpenWindow,
-				payload: {
-					view: T.AlvaView.PageDetail,
-					projectId: replacement.getId()
-				},
-				transaction: m.transaction,
-				sender: m.sender
-			});
-		}
 
 		app.send({
 			id: m.id,

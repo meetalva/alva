@@ -26,6 +26,8 @@ export class BrowserAdapter {
 			host: this.host,
 			store: this.store
 		});
+
+		this.sender.setLog(this.host.log);
 	}
 
 	public static fromStore(store: Store.ViewStore, ctx: { fs: typeof Fs }): BrowserAdapter {
@@ -35,22 +37,30 @@ export class BrowserAdapter {
 	public async start() {
 		await this.host.start();
 		const app = this.store.getApp();
-
-		const sender = this.sender;
-		const port = this.store.getServerPort();
-		const context: Types.MatcherContext = { host: this.host, dataHost: this.dataHost, port };
+		const context: Types.MatcherContext = {
+			host: this.host,
+			dataHost: this.dataHost,
+			location: window.location
+		};
 
 		if (app.isHostType(Types.HostType.Browser)) {
-			sender.match(MT.UseFileRequest, Matchers.useFileRequest(context));
-			sender.match(MT.CreateNewFileRequest, Matchers.createNewFileRequest(context));
-			sender.match(MT.OpenFileRequest, Matchers.openFileRequest(context));
+			app.match<M.UseFileRequest>(MT.UseFileRequest, Matchers.useFileRequest(context));
+			app.match<M.UseFileResponse>(MT.UseFileResponse, Matchers.useFileResponse(context));
+			app.match<M.CreateNewFileRequest>(
+				MT.CreateNewFileRequest,
+				Matchers.createNewFileRequest(context)
+			);
+			app.match<M.OpenFileRequest>(MT.OpenFileRequest, Matchers.openFileRequest(context));
 		}
 
 		app.match<M.ExportHtmlProject>(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
 		app.match<M.Copy>(MT.Copy, Matchers.copy(context));
 		app.match<M.Cut>(MT.Cut, Matchers.cut(context));
 		app.match<M.OpenExternalURL>(MT.OpenExternalURL, Matchers.openExternalUrl(context));
-		app.match<M.OpenWindow>(MT.OpenWindow, Matchers.openWindow(context));
+		app.match<M.OpenWindow>(
+			MT.OpenWindow,
+			Matchers.openWindow({ ...context, location: window.location })
+		);
 		app.match<M.Paste>(MT.Paste, Matchers.paste(context));
 		app.match<M.Save>(MT.Save, Matchers.save(context, { passive: true }));
 		app.match<M.SaveAs>(MT.SaveAs, Matchers.saveAs(context, { passive: true }));

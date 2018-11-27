@@ -38,6 +38,23 @@ export class AlvaServer implements Types.AlvaServer {
 		return `ws://localhost:${this.port}/`;
 	}
 
+	public get location(): Types.Location {
+		const port = typeof this.port !== 'undefined' && this.port !== 80 ? `:${this.port}` : '';
+		const stringPort = typeof this.port !== 'undefined' ? String(this.port) : '80';
+
+		return {
+			hash: '',
+			host: `localhost${port}`,
+			hostname: 'localhost',
+			href: `http://localhost${port}`,
+			origin: `http://localhost${port}`,
+			pathname: '/',
+			port: stringPort,
+			protocol: 'http:',
+			search: ''
+		};
+	}
+
 	private constructor(init: AlvaServerInit) {
 		this.app = init.app;
 		this.http = init.http;

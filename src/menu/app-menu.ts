@@ -16,7 +16,6 @@ const ids = {
 };
 
 export const appMenu = (ctx: Types.MenuContext): Types.MenuItem => {
-	const isLocal = ctx.app && !ctx.app.isHostType(Types.HostType.Node);
 	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.Electron);
 
 	return {
@@ -55,7 +54,7 @@ export const appMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.updates,
 				label: 'Check for Updates',
-				visible: isLocal,
+				visible: isElectron,
 				click: sender => {
 					sender.send({
 						id: uuid.v4(),

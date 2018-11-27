@@ -1,3 +1,4 @@
+export * from './add-app';
 export * from './copy';
 export * from './create-new-file-request';
 export * from './cut';

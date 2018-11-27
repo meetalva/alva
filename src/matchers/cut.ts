@@ -8,7 +8,6 @@ export function cut({ host, dataHost }: T.MatcherContext): T.Matcher<M.Cut> {
 		const project = await dataHost.getProject(m.payload.projectId);
 
 		if (!project) {
-			console.log('!project');
 			return;
 		}
 

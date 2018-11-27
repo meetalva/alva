@@ -8,12 +8,14 @@ export function copy({ host, dataHost }: T.MatcherContext): T.Matcher<M.Copy> {
 		const project = await dataHost.getProject(m.payload.projectId);
 
 		if (!project) {
+			host.log(`copy: no resolveable project for ${m}`);
 			return;
 		}
 
 		const item = project.getItem(m.payload.itemId, m.payload.itemType);
 
 		if (!item) {
+			host.log(`copy: no resolveable item for ${m}`);
 			return;
 		}
 

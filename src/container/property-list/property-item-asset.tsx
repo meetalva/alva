@@ -50,7 +50,7 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 				onChooseClick={() => {
 					const transactionId = uuid.v4();
 
-					const sender = props.store.getSender();
+					const sender = props.store.getApp();
 
 					sender.match<Message.AssetReadResponse>(
 						Message.MessageType.AssetReadResponse,

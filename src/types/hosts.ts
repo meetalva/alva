@@ -140,8 +140,12 @@ export abstract class Host {
 		throw new Error('host.toggleDevTools: not implemented');
 	}
 
-	public async getApp(): Promise<Model.AlvaApp | undefined> {
+	public async getApp(id: string): Promise<Model.AlvaApp | undefined> {
 		throw new Error('host.getApp: not implemented');
+	}
+
+	public async addApp(app: Model.AlvaApp): Promise<void> {
+		throw new Error('host.addApp: not implemented');
 	}
 
 	public async getSender(): Promise<Types.Sender> {

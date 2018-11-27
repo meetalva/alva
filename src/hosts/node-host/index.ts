@@ -4,6 +4,7 @@ import * as Path from 'path';
 import * as Util from 'util';
 import * as Types from '../../types';
 import * as getPort from 'get-port';
+import * as Model from '../../model';
 
 export class NodeHost implements Types.Host {
 	public type = Types.HostType.Node;
@@ -11,6 +12,7 @@ export class NodeHost implements Types.Host {
 	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
 	private sender: Types.Sender;
+	private apps: Map<string, Model.AlvaApp> = new Map();
 
 	public static async fromProcess(
 		process: NodeJS.Process,
@@ -37,8 +39,12 @@ export class NodeHost implements Types.Host {
 		return getPort({ port: requested });
 	}
 
-	public async getApp(): Promise<undefined> {
-		return;
+	public async getApp(id: string): Promise<Model.AlvaApp | undefined> {
+		return this.apps.get(id);
+	}
+
+	public async addApp(app: Model.AlvaApp): Promise<void> {
+		this.apps.set(app.getId(), app);
 	}
 
 	public async log(message?: unknown, ...optionalParams: unknown[]): Promise<void> {

@@ -2,15 +2,18 @@ import * as M from '../message';
 import * as T from '../types';
 
 export function showMessage({ host }: T.MatcherContext): T.Matcher<M.ShowMessage> {
-	return async message => {
-		const app = await host.getApp();
-		const sender = app || (await host.getSender());
-		const appId = message.appId || (app ? app.getId() : undefined);
+	return async m => {
+		const app = await host.getApp(m.appId || '');
 
-		const button = await host.showMessage(message.payload);
+		if (!app) {
+			host.log(`showMessage: received message without resolveable app: ${m}`);
+			return;
+		}
+
+		const button = await host.showMessage(m.payload);
 
 		if (button && button.message) {
-			sender.send({ ...button.message, appId });
+			app.send({ ...button.message, appId: app.getId() });
 		}
 	};
 }

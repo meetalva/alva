@@ -5,9 +5,12 @@ import * as uuid from 'uuid';
 
 export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFileRequest> {
 	return async m => {
-		const app = await host.getApp();
-		const sender = app || (await host.getSender());
-		const appId = m.appId || (app ? app.getId() : undefined);
+		const app = await host.getApp(m.appId || '');
+
+		if (!app) {
+			host.log(`openFileRequest: received message without resolveable app: ${m}`);
+			return;
+		}
 
 		const selectedPath =
 			m.payload.path ||
@@ -31,12 +34,8 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 		try {
 			const { contents } = await host.readFile(selectedPath);
 
-			const response = await (await host.getSender()).transaction<
-				M.UseFileRequest,
-				M.UseFileResponse
-			>(
+			const response = await app.transaction<M.UseFileRequest, M.UseFileResponse>(
 				{
-					appId,
 					type: M.MessageType.UseFileRequest,
 					id: m.id,
 					transaction: m.transaction,
@@ -54,8 +53,7 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 			if (response.payload.project.status === T.ProjectPayloadStatus.Error) {
 				const p = response.payload.project as T.ProjectPayloadError;
 
-				sender.send({
-					appId,
+				app.send({
 					type: M.MessageType.ShowError,
 					transaction: m.transaction,
 					id: m.id,
@@ -71,7 +69,7 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 				const project = Model.Project.from(p.contents);
 
 				if (!m.payload.replace) {
-					sender.send({
+					app.send({
 						id: uuid.v4(),
 						type: M.MessageType.OpenWindow,
 						payload: {
@@ -83,8 +81,7 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 					});
 				}
 
-				sender.send({
-					appId,
+				app.send({
 					type: M.MessageType.OpenFileResponse,
 					id: m.id,
 					transaction: m.transaction,
@@ -94,8 +91,7 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 			}
 		} catch (err) {
 			if (!silent) {
-				sender.send({
-					appId,
+				app.send({
 					type: M.MessageType.ShowError,
 					transaction: m.transaction,
 					id: m.id,

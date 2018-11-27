@@ -59,21 +59,28 @@ export class ElectronAdapter {
 			});
 		});
 
-		sender.match(MT.ConnectPatternLibraryRequest, Matchers.connectPatternLibrary(context));
-		sender.match(MT.Copy, Matchers.copy(context));
-		sender.match(MT.Cut, Matchers.cut(context));
-		sender.match(MT.CreateNewFileRequest, Matchers.createNewFileRequest(context));
-		sender.match(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
-		sender.match(MT.OpenExternalURL, Matchers.openExternalUrl(context));
-		sender.match(MT.OpenFileRequest, Matchers.openFileRequest(context));
-		sender.match(MT.OpenWindow, Matchers.openWindow(context));
-		sender.match(MT.Paste, Matchers.paste(context));
-		sender.match(MT.Save, Matchers.save(context, { passive: false }));
-		sender.match(MT.SaveAs, Matchers.saveAs(context, { passive: false }));
-		sender.match(MT.ShowError, Matchers.showError(context));
-		sender.match(MT.ShowMessage, Matchers.showMessage(context));
-		sender.match(MT.UseFileRequest, Matchers.useFileRequest(context));
-		sender.match(MT.ContextMenuRequest, Matchers.showContextMenu(context));
+		sender.match<M.ConnectPatternLibraryRequest>(
+			MT.ConnectPatternLibraryRequest,
+			Matchers.connectPatternLibrary(context)
+		);
+		sender.match<M.Copy>(MT.Copy, Matchers.copy(context));
+		sender.match<M.Cut>(MT.Cut, Matchers.cut(context));
+		sender.match<M.CreateNewFileRequest>(
+			MT.CreateNewFileRequest,
+			Matchers.createNewFileRequest(context)
+		);
+		sender.match<M.ExportHtmlProject>(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
+		sender.match<M.OpenExternalURL>(MT.OpenExternalURL, Matchers.openExternalUrl(context));
+		sender.match<M.OpenFileRequest>(MT.OpenFileRequest, Matchers.openFileRequest(context));
+		sender.match<M.OpenWindow>(MT.OpenWindow, Matchers.openWindow(context));
+		sender.match<M.Paste>(MT.Paste, Matchers.paste(context));
+		sender.match<M.Save>(MT.Save, Matchers.save(context, { passive: false }));
+		sender.match<M.SaveAs>(MT.SaveAs, Matchers.saveAs(context, { passive: false }));
+		sender.match<M.ShowError>(MT.ShowError, Matchers.showError(context));
+		sender.match<M.ShowMessage>(MT.ShowMessage, Matchers.showMessage(context));
+		sender.match<M.UseFileRequest>(MT.UseFileRequest, Matchers.useFileRequest(context));
+		sender.match<M.ContextMenuRequest>(MT.ContextMenuRequest, Matchers.showContextMenu(context));
+		sender.match<M.ChangeApp>(MT.ChangeApp, Matchers.addApp(context));
 
 		server.sender.match<M.ToggleDevTools>(M.MessageType.ToggleDevTools, async () => {
 			await host.toggleDevTools();

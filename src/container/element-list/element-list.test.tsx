@@ -11,7 +11,7 @@ import * as uuid from 'uuid';
 jest.mock('../../sender');
 
 test('un-highlight highlighted element content onDragLeave', () => {
-	const app = new Model.AlvaApp();
+	const app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender: {} as any });
 	const history = new Model.EditHistory();
 	const sender = new Sender({
 		endpoint: ''

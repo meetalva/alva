@@ -5,9 +5,12 @@ import * as uuid from 'uuid';
 
 export function paste({ host }: T.MatcherContext): T.Matcher<M.Paste> {
 	return async m => {
-		const app = await host.getApp();
-		const sender = app || (await host.getSender());
-		const appId = m.appId || (app ? app.getId() : undefined);
+		const app = await host.getApp(m.appId || '');
+
+		if (!app) {
+			host.log(`paste: received message without resolveable app: ${m}`);
+			return;
+		}
 
 		const contents = await host.readClipboard();
 
@@ -27,8 +30,7 @@ export function paste({ host }: T.MatcherContext): T.Matcher<M.Paste> {
 
 		switch (itemType) {
 			case T.ItemType.Element: {
-				sender.send({
-					appId,
+				app.send({
 					id: uuid.v4(),
 					type: M.MessageType.PasteElement,
 					payload: {
@@ -41,8 +43,7 @@ export function paste({ host }: T.MatcherContext): T.Matcher<M.Paste> {
 				break;
 			}
 			case T.ItemType.Page:
-				sender.send({
-					appId,
+				app.send({
 					id: uuid.v4(),
 					type: M.MessageType.PastePage,
 					payload: {

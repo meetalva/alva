@@ -16,8 +16,24 @@ export interface AlvaAppInit {
 }
 
 export class AlvaApp {
+	public static Defaults: AlvaAppInit = {
+		activeView: Types.AlvaView.SplashScreen,
+		hasFocusedInput: false,
+		hostType: Types.HostType.Electron,
+		panes: new Set([
+			Types.AppPane.PagesPane,
+			Types.AppPane.ElementsPane,
+			Types.AppPane.PropertiesPane
+		]),
+		paneSizes: [],
+		rightSidebarTab: Types.RightSidebarTab.Properties,
+		searchTerm: '',
+		state: Types.AppState.Starting
+	};
+
 	public readonly model = Types.ModelName.AlvaApp;
-	private id: string = uuid.v4();
+
+	private id: string;
 
 	@Mobx.observable private hostType: Types.HostType;
 
@@ -41,37 +57,39 @@ export class AlvaApp {
 
 	@Mobx.observable private hasFocusedInput: boolean = false;
 
-	private sender?: Types.Sender;
+	private sender: Types.Sender;
 
-	public constructor(init?: AlvaAppInit) {
-		if (init) {
-			this.id = init.id || uuid.v4();
-			this.activeView = init.activeView;
-			this.panes = init.panes;
-			this.searchTerm = init.searchTerm;
-			this.state = init.state;
-			this.hasFocusedInput = init.hasFocusedInput;
-			this.hostType = init.hostType;
-			init.paneSizes.forEach(paneSize => this.setPaneSize(paneSize));
-		}
+	public constructor(init: AlvaAppInit, ctx: { sender: Types.Sender }) {
+		this.id = init.id || uuid.v4();
+		this.activeView = init.activeView;
+		this.panes = init.panes;
+		this.searchTerm = init.searchTerm;
+		this.state = init.state;
+		this.hasFocusedInput = init.hasFocusedInput;
+		this.hostType = init.hostType;
+		this.sender = ctx.sender;
+		init.paneSizes.forEach(paneSize => this.setPaneSize(paneSize));
 	}
 
-	public static from(serialized: Types.SerializedAlvaApp): AlvaApp {
-		return new AlvaApp({
-			id: serialized.id,
-			activeView: deserializeView(serialized.activeView),
-			hasFocusedInput: serialized.hasFocusedInput,
-			hostType: serialized.hostType as Types.HostType,
-			panes: new Set(serialized.panes.map(deserializePane)),
-			paneSizes: serialized.paneSizes.map(p => ({
-				width: p.width,
-				height: p.height,
-				pane: deserializePane(p.pane)
-			})),
-			rightSidebarTab: deserializeRightSidebarTab(serialized.rightSidebarTab),
-			searchTerm: serialized.searchTerm,
-			state: deserializeState(serialized.state)
-		});
+	public static from(serialized: Types.SerializedAlvaApp, ctx: { sender: Types.Sender }): AlvaApp {
+		return new AlvaApp(
+			{
+				id: serialized.id,
+				activeView: deserializeView(serialized.activeView),
+				hasFocusedInput: serialized.hasFocusedInput,
+				hostType: serialized.hostType as Types.HostType,
+				panes: new Set(serialized.panes.map(deserializePane)),
+				paneSizes: serialized.paneSizes.map(p => ({
+					width: p.width,
+					height: p.height,
+					pane: deserializePane(p.pane)
+				})),
+				rightSidebarTab: deserializeRightSidebarTab(serialized.rightSidebarTab),
+				searchTerm: serialized.searchTerm,
+				state: deserializeState(serialized.state)
+			},
+			ctx
+		);
 	}
 
 	public hasFileAccess(): boolean {
@@ -230,16 +248,20 @@ export class AlvaApp {
 	}
 
 	public match<T extends M.Message>(t: T['type'], h: (m: T) => void): void {
-		if (!this.sender) {
-			return;
-		}
-
 		this.sender.match(t, m => {
 			if (m.appId !== this.id) {
 				return;
 			}
 			h(m as any);
 		});
+	}
+
+	public async transaction<T extends M.Message, V extends M.Message>(
+		message: M.Message,
+		{ type }: { type: V['type'] }
+	): Promise<V> {
+		message.appId = this.id;
+		return this.sender.transaction(message, { type });
 	}
 }
 

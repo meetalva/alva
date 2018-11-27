@@ -7,9 +7,10 @@ export function showContextMenu({
 	dataHost
 }: T.MatcherContext): T.Matcher<M.ContextMenuRequest> {
 	return async m => {
-		const app = await host.getApp();
+		const app = await host.getApp(m.appId || '');
 
 		if (!app) {
+			host.log(`showContextMenu: received message without resolveable app: ${m}`);
 			return;
 		}
 

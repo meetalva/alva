@@ -135,7 +135,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public connectPatternLibrary(library?: Model.PatternLibrary): void {
-		this.sender.send({
+		this.getApp().send({
 			type: MessageType.ConnectPatternLibraryRequest,
 			id: uuid.v4(),
 			payload: {
@@ -711,7 +711,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public requestContextMenu(payload: Types.ContextMenuRequestPayload): void {
-		this.sender.send({
+		this.getApp().send({
 			id: uuid.v4(),
 			type: MessageType.ContextMenuRequest,
 			payload
@@ -720,7 +720,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public save(): void {
-		this.sender.send({
+		this.getApp().send({
 			id: uuid.v4(),
 			payload: { publish: false, projectId: this.project.getId() },
 			type: MessageType.Save
@@ -889,7 +889,7 @@ export class ViewStore {
 	}
 
 	public updatePatternLibrary(library: Model.PatternLibrary): void {
-		this.sender.send({
+		this.getApp().send({
 			type: MessageType.UpdatePatternLibraryRequest,
 			payload: {
 				id: library.getId()

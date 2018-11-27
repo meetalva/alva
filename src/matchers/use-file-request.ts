@@ -24,6 +24,7 @@ export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<
 			if (!silent) {
 				app.send({
 					type: M.MessageType.ShowError,
+					transaction: m.transaction,
 					id: m.id,
 					payload: {
 						message: [projectResult.error.message].join('\n'),

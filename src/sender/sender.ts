@@ -33,12 +33,14 @@ export type Matcher = (message: Message.Message) => void;
 
 export class Sender implements Types.Sender {
 	public readonly id: string;
+
 	private endpoint: string;
 	private window: Window;
 	private connection: WebSocket;
 	private queue: Set<string> = new Set();
 	private matchers: Map<Message.MessageType, Matcher[]> = new Map();
 	private retry: number = 0;
+	private _log?: (msg: any, ...p: any[]) => void;
 
 	private get ready(): boolean {
 		if (!this.endpoint) {
@@ -50,6 +52,12 @@ export class Sender implements Types.Sender {
 		}
 
 		return this.connection.readyState === WS.OPEN;
+	}
+
+	private log(msg: any, ...p: any[]) {
+		if (this._log) {
+			this._log(msg, ...p);
+		}
 	}
 
 	public constructor(init: SenderInit) {
@@ -116,6 +124,7 @@ export class Sender implements Types.Sender {
 			return;
 		}
 
+		this.log('↓', parseResult.result);
 		matchers.forEach(matcher => matcher(parseResult.result));
 	};
 
@@ -148,6 +157,10 @@ export class Sender implements Types.Sender {
 		if (typeof window !== 'undefined') {
 			this.window = win;
 		}
+	}
+
+	public setLog(log: () => void) {
+		this._log = log;
 	}
 
 	public async stop(): Promise<void> {
@@ -206,6 +219,8 @@ export class Sender implements Types.Sender {
 		}
 
 		const envelope = Serde.serialize(message);
+
+		this.log('↑', message);
 
 		if (this.window) {
 			this.window.postMessage(envelope, '*');

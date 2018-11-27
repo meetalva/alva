@@ -33,6 +33,7 @@ export function exportRouteFactory(server: Types.AlvaServer): Express.RequestHan
 		res.send(
 			await PreviewDocument.staticDocument({
 				data: project.toJSON(),
+				location: server.location,
 				scripts: project
 					.getPatternLibraries()
 					.map(lib => `<script data-bundle="${lib.getBundleId()}">${lib.getBundle()}</script>`)

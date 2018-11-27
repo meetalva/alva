@@ -8,7 +8,7 @@ import * as Fs from 'fs';
 export function exportHtmlProject({
 	host,
 	dataHost,
-	port
+	location
 }: T.MatcherContext): T.Matcher<M.ExportHtmlProject> {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
@@ -44,7 +44,7 @@ export function exportHtmlProject({
 
 		const htmlExport = await Export.exportHtmlProject({
 			project,
-			port
+			location
 		});
 
 		if (htmlExport.type === T.ExportResultType.ExportError) {

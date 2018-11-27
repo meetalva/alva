@@ -37,8 +37,6 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 	app.match<M.CreateNewPage>(M.MessageType.CreateNewPage, Handlers.createNewPage(ctx));
 	app.match<M.Log>(M.MessageType.Log, Handlers.log(ctx));
 
-	app.match<M.UseFileResponse>(M.MessageType.UseFileResponse, Handlers.openFile(ctx));
-
 	app.match<M.SetPane>(M.MessageType.SetPane, Handlers.setPane(ctx));
 	app.match<M.StartAppMessage>(M.MessageType.StartApp, Handlers.startApp(ctx));
 	app.match<M.UpdatePatternLibraryResponse>(

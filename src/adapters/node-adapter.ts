@@ -6,17 +6,21 @@ import { MessageType as MT } from '../message';
 export class NodeAdapter {
 	private host: Types.Host;
 	private dataHost: Types.DataHost;
-	private port: number;
+	private location: Types.Location;
 
 	public constructor(init: { server: Types.AlvaServer }) {
 		this.host = init.server.host;
 		this.dataHost = init.server.dataHost;
-		this.port = init.server.port;
+		this.location = init.server.location;
 	}
 
 	public async start(): Promise<void> {
 		const sender = await this.host.getSender();
-		const context = { dataHost: this.dataHost, host: this.host, port: this.port };
+		const context = {
+			dataHost: this.dataHost,
+			host: this.host,
+			location: this.location
+		};
 
 		sender.match<M.ConnectPatternLibraryRequest>(
 			MT.ConnectPatternLibraryRequest,
@@ -37,6 +41,7 @@ export class NodeAdapter {
 		sender.match<M.ShowError>(MT.ShowError, Matchers.showError(context));
 		sender.match<M.ShowMessage>(MT.ShowMessage, Matchers.showMessage(context));
 		sender.match<M.UseFileRequest>(MT.UseFileRequest, Matchers.useFileRequest(context));
+		sender.match<M.UseFileResponse>(MT.UseFileResponse, Matchers.useFileResponse(context));
 		sender.match<M.ContextMenuRequest>(MT.ContextMenuRequest, Matchers.showContextMenu(context));
 		sender.match<M.ChangeApp>(MT.ChangeApp, Matchers.addApp(context));
 	}

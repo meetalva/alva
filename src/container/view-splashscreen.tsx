@@ -22,7 +22,7 @@ export class ViewSplashscreen extends React.Component {
 						transaction,
 						id: uuid.v4(),
 						payload: {
-							replace: true
+							replace: false
 						}
 					});
 				}}
@@ -32,7 +32,7 @@ export class ViewSplashscreen extends React.Component {
 						transaction,
 						id: openFileRequestId,
 						payload: {
-							replace: true
+							replace: false
 						}
 					});
 				}}
@@ -50,7 +50,7 @@ export class ViewSplashscreen extends React.Component {
 						id: openFileRequestId,
 						payload: {
 							silent: false,
-							replace: true,
+							replace: false,
 							contents
 						}
 					});

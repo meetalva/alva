@@ -1,3 +1,4 @@
+import * as Model from '../model';
 import * as M from '../message';
 import * as T from '../types';
 import * as uuid from 'uuid';
@@ -8,16 +9,18 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 		const sender = app || (await host.getSender());
 		const appId = m.appId || (app ? app.getId() : undefined);
 
-		const selectedPath = await host.selectFile({
-			title: 'Open Alva File',
-			properties: ['openFile'],
-			filters: [
-				{
-					name: 'Alva File',
-					extensions: ['alva']
-				}
-			]
-		});
+		const selectedPath =
+			m.payload.path ||
+			(await host.selectFile({
+				title: 'Open Alva File',
+				properties: ['openFile'],
+				filters: [
+					{
+						name: 'Alva File',
+						extensions: ['alva']
+					}
+				]
+			}));
 
 		const silent = m.payload && typeof m.payload.silent === 'boolean' ? m.payload.silent : false;
 
@@ -65,6 +68,7 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 
 			if (response.payload.project.status === T.ProjectPayloadStatus.Ok) {
 				const p = response.payload.project as T.ProjectPayloadSuccess;
+				const project = Model.Project.from(p.contents);
 
 				if (!m.payload.replace) {
 					sender.send({
@@ -72,7 +76,7 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 						type: M.MessageType.OpenWindow,
 						payload: {
 							view: T.AlvaView.PageDetail,
-							projectId: p.contents.id
+							projectId: project.getId()
 						},
 						transaction: m.transaction,
 						sender: m.sender
@@ -84,7 +88,7 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 					type: M.MessageType.OpenFileResponse,
 					id: m.id,
 					transaction: m.transaction,
-					payload: response.payload.project,
+					payload: p,
 					sender: m.sender
 				});
 			}

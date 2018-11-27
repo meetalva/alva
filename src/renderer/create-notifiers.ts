@@ -5,7 +5,6 @@ import { ViewStore } from '../store';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 import * as MobxUtils from 'mobx-utils';
-// import * as isPlainObject from 'is-plain-object';
 
 export interface NotifierContext {
 	app: Model.AlvaApp;
@@ -17,12 +16,10 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 		scheduler: window.requestIdleCallback
 	};
 
-	const sender = store.getSender();
-
 	Mobx.autorun(() => {
 		const metaDown = store.getMetaDown();
 
-		sender.send({
+		app.send({
 			id: uuid.v4(),
 			payload: {
 				metaDown
@@ -34,7 +31,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 	Mobx.autorun(() => {
 		const patternLibraries = store.getPatternLibraries();
 
-		sender.send({
+		app.send({
 			id: uuid.v4(),
 			payload: {
 				patternLibraries: patternLibraries.map(l => l.toJSON())
@@ -42,7 +39,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 			type: Message.MessageType.ChangePatternLibraries
 		});
 
-		sender.send({
+		app.send({
 			id: uuid.v4(),
 			payload: {
 				libraries: patternLibraries
@@ -54,7 +51,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 	}, opts);
 
 	Mobx.autorun(() => {
-		sender.send({
+		app.send({
 			id: uuid.v4(),
 			payload: {
 				app: store.getApp().toJSON()
@@ -72,7 +69,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 			stopProjectSync();
 		}
 
-		stopProjectSync = MobxUtils.deepObserve<Model.Project>(project, onProjectChange(sender));
+		stopProjectSync = MobxUtils.deepObserve<Model.Project>(project, onProjectChange(app));
 	});
 
 	let stopAppSync: MobxUtils.IDisposer;
@@ -84,7 +81,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 			stopAppSync();
 		}
 
-		stopAppSync = MobxUtils.deepObserve<Model.AlvaApp>(app, onAppChange(sender));
+		stopAppSync = MobxUtils.deepObserve<Model.AlvaApp>(app, onAppChange(app));
 	});
 }
 
@@ -97,9 +94,9 @@ type MobxChange =
 type ProjectChangeHandler = (change: MobxChange, path: string, project: Model.Project) => void;
 type AppChangeHandler = (change: MobxChange, path: string, app: Model.AlvaApp) => void;
 
-function onProjectChange(sender: Types.Sender): ProjectChangeHandler {
+function onProjectChange(app: Model.AlvaApp): ProjectChangeHandler {
 	return (change, path, project) => {
-		sender.send({
+		app.send({
 			id: uuid.v4(),
 			type: Message.MessageType.ProjectUpdate,
 			payload: {
@@ -111,9 +108,9 @@ function onProjectChange(sender: Types.Sender): ProjectChangeHandler {
 	};
 }
 
-function onAppChange(sender: Types.Sender): AppChangeHandler {
+function onAppChange(app: Model.AlvaApp): AppChangeHandler {
 	return (change, path, app) => {
-		sender.send({
+		app.send({
 			id: uuid.v4(),
 			type: Message.MessageType.AppUpdate,
 			payload: {

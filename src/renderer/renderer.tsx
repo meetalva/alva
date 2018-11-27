@@ -51,7 +51,7 @@ export async function startRenderer(): Promise<void> {
 
 	const project = store.getProject();
 
-	sender.send({
+	app.send({
 		id: uuid.v4(),
 		type: MessageType.WindowFocused,
 		payload: {
@@ -105,7 +105,7 @@ export async function startRenderer(): Promise<void> {
 
 	// tslint:disable-next-line:no-any
 	(window as any).screenshot = () => {
-		sender.send({
+		app.send({
 			id: uuid.v4(),
 			type: MessageType.ChromeScreenShot,
 			payload: {

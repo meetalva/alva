@@ -28,7 +28,11 @@ export async function startRenderer(): Promise<void> {
 	const payload = el.textContent === null ? '{}' : el.textContent;
 	const data = JSON.parse(decodeURIComponent(payload));
 
-	app = new Model.AlvaApp();
+	const endpoint =
+		data && data.host !== Types.HostType.Browser ? `ws://${window.location.host}/` : '';
+	const sender = new Sender({ endpoint });
+
+	app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender });
 
 	if (data.host) {
 		app.setHostType(data.host);
@@ -37,10 +41,6 @@ export async function startRenderer(): Promise<void> {
 	if (data.view) {
 		app.setActiveView(data.view);
 	}
-
-	const sender = new Sender({
-		endpoint: !app.isHostType(Types.HostType.Browser) ? `ws://${window.location.host}/` : ''
-	});
 
 	app.setSender(sender);
 
@@ -71,7 +71,7 @@ export async function startRenderer(): Promise<void> {
 			const sender = store.getSender();
 			const app = store.getApp();
 
-			adapter.host.setApp(app);
+			adapter.host.addApp(app);
 			adapter.host.setSender(sender);
 		});
 	}
@@ -145,7 +145,9 @@ export async function startRenderer(): Promise<void> {
 		});
 	});
 
-	window.addEventListener('popstate', event => app.update(Model.AlvaApp.from(event.state)));
+	window.addEventListener('popstate', event =>
+		app.update(Model.AlvaApp.from(event.state, { sender }))
+	);
 
 	createListeners({ store });
 	createHandlers({ app, history, store });

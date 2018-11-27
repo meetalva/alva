@@ -95,7 +95,7 @@ export const Layout = styled.div`
 	}};
 `;
 
-export const MaiArea = styled(Layout).attrs({ height: LayoutHeight.Full })`
+export const MainArea = styled(Layout).attrs({ height: LayoutHeight.Full })`
 	box-sizing: border-box;
 	-webkit-font-smoothing: antialiased;
 `;

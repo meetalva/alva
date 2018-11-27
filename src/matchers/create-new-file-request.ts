@@ -8,9 +8,12 @@ export function createNewFileRequest({
 	host
 }: T.MatcherContext): T.Matcher<M.CreateNewFileRequest> {
 	return async m => {
-		const app = await host.getApp();
-		const sender = app || (await host.getSender());
-		const appId = m.appId || (app ? app.getId() : undefined);
+		const app = await host.getApp(m.appId || '');
+
+		if (!app) {
+			host.log(`createNewFileRequest: received message without resolveable app: ${m}`);
+			return;
+		}
 
 		const draftProject = Model.Project.create({
 			draft: true,
@@ -20,17 +23,28 @@ export function createNewFileRequest({
 
 		const serializeResult = await Persistence.serialize(draftProject);
 
-		// TODO: error handling
 		if (serializeResult.state !== T.PersistenceState.Success) {
+			const err = serializeResult.error;
+			host.log(err.message);
+
+			app.send({
+				type: M.MessageType.ShowError,
+				transaction: m.transaction,
+				id: m.id,
+				payload: {
+					message: [err.message].join('\n'),
+					detail: err.stack || '',
+					error: {
+						message: err.message,
+						stack: err.stack || ''
+					}
+				}
+			});
 			return;
 		}
 
-		const response = await (await host.getSender()).transaction<
-			M.UseFileRequest,
-			M.UseFileResponse
-		>(
+		const response = await app.transaction<M.UseFileRequest, M.UseFileResponse>(
 			{
-				appId,
 				type: M.MessageType.UseFileRequest,
 				id: m.id,
 				transaction: m.transaction,
@@ -48,9 +62,9 @@ export function createNewFileRequest({
 
 		if (response.payload.project.status === T.ProjectPayloadStatus.Error) {
 			const p = response.payload.project as T.ProjectPayloadError;
+			host.log(p.error.message);
 
-			sender.send({
-				appId,
+			app.send({
 				type: M.MessageType.ShowError,
 				transaction: m.transaction,
 				id: m.id,
@@ -69,7 +83,7 @@ export function createNewFileRequest({
 		const replacement = Model.Project.from(p.contents);
 
 		if (!m.payload.replace) {
-			sender.send({
+			app.send({
 				id: uuid.v4(),
 				type: M.MessageType.OpenWindow,
 				payload: {
@@ -81,8 +95,7 @@ export function createNewFileRequest({
 			});
 		}
 
-		sender.send({
-			appId,
+		app.send({
 			id: m.id,
 			type: M.MessageType.CreateNewFileResponse,
 			payload: p,

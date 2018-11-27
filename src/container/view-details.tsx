@@ -120,7 +120,7 @@ export class ViewDetails extends React.Component {
 								<ConnectPaneContainer
 									onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
 									onSecondaryButtonClick={() =>
-										props.store.getSender().send({
+										props.store.getApp().send({
 											type: MessageType.OpenExternalURL,
 											id: uuid.v4(),
 											payload: 'https://media.meetalva.io/file/Website.alva'

@@ -19,13 +19,14 @@ function sendTo(cp: ChildProcess.ChildProcess) {
 
 async function main(): Promise<void> {
 	const flags = yargsParser(process.argv.slice(2));
+	const host = flags.host || 'electron';
 
 	const spawn =
-		flags.host !== 'electron'
+		host !== 'electron'
 			? ChildProcess.fork
 			: (entry, args, opts) => ChildProcess.spawn(electron, [entry, ...args], opts);
 
-	const entry = getEntry(flags.host);
+	const entry = getEntry(host);
 	const cp = spawn(entry, process.argv.slice(2), { stdio: ['pipe', 'pipe', 'pipe', 'ipc'] });
 	const send = sendTo(cp);
 

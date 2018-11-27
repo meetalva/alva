@@ -30,7 +30,7 @@ export class ProjectSettingsContainer extends React.Component {
 						underline={true}
 						color={Color.Grey50}
 						onClick={() =>
-							store.getSender().send({
+							store.getApp().send({
 								type: MessageType.OpenExternalURL,
 								id: uuid.v4(),
 								payload: 'https://github.com/meetalva/alva#pattern-requirements'
@@ -53,7 +53,7 @@ export class ProjectSettingsContainer extends React.Component {
 					}
 					disabled={!app.hasFileAccess()}
 					onClick={() =>
-						store.getSender().send({
+						store.getApp().send({
 							id: uuid.v4(),
 							payload: { library: undefined, projectId: store.getProject().getId() },
 							type: MessageType.ConnectPatternLibraryRequest

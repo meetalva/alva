@@ -46,19 +46,20 @@ export class BrowserAdapter {
 			sender.match(MT.OpenFileRequest, Matchers.openFileRequest(context));
 		}
 
-		sender.match(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
-		sender.match(MT.Copy, Matchers.copy(context));
-		sender.match(MT.Cut, Matchers.cut(context));
-		sender.match(MT.OpenExternalURL, Matchers.openExternalUrl(context));
-		sender.match(MT.OpenWindow, Matchers.openWindow(context));
-		sender.match(MT.Paste, Matchers.paste(context));
-		sender.match(MT.Save, Matchers.save(context, { passive: true }));
-		sender.match(MT.SaveAs, Matchers.saveAs(context, { passive: true }));
-		sender.match(MT.ShowError, Matchers.showError(context));
-		sender.match(MT.ShowMessage, Matchers.showMessage(context));
-		sender.match(MT.ContextMenuRequest, Matchers.showContextMenu(context));
+		app.match<M.ExportHtmlProject>(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
+		app.match<M.Copy>(MT.Copy, Matchers.copy(context));
+		app.match<M.Cut>(MT.Cut, Matchers.cut(context));
+		app.match<M.OpenExternalURL>(MT.OpenExternalURL, Matchers.openExternalUrl(context));
+		app.match<M.OpenWindow>(MT.OpenWindow, Matchers.openWindow(context));
+		app.match<M.Paste>(MT.Paste, Matchers.paste(context));
+		app.match<M.Save>(MT.Save, Matchers.save(context, { passive: true }));
+		app.match<M.SaveAs>(MT.SaveAs, Matchers.saveAs(context, { passive: true }));
+		app.match<M.ShowError>(MT.ShowError, Matchers.showError(context));
+		app.match<M.ShowMessage>(MT.ShowMessage, Matchers.showMessage(context));
+		app.match<M.ContextMenuRequest>(MT.ContextMenuRequest, Matchers.showContextMenu(context));
+		app.match<M.ChangeApp>(MT.ChangeApp, Matchers.addApp(context));
 
-		this.sender.match<M.Reload>(MT.Reload, m => {
+		app.match<M.Reload>(MT.Reload, m => {
 			const senders = m.sender ? m.sender : [];
 
 			if (senders.includes(this.sender.id)) {

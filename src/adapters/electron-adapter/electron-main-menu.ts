@@ -31,7 +31,7 @@ export class ElectronMainMenu {
 
 	public start(): void {
 		this.server.sender.match<M.WindowFocused>(M.MessageType.WindowFocused, m => {
-			const app = Model.AlvaApp.from(m.payload.app);
+			const app = Model.AlvaApp.from(m.payload.app, { sender: this.server.sender });
 			this.apps.set(app.getId(), app);
 			this.focusedAppId = app.getId();
 			this.focusedProjectId = m.payload.projectId;
@@ -39,7 +39,7 @@ export class ElectronMainMenu {
 		});
 
 		this.server.sender.match<M.ChangeApp>(M.MessageType.ChangeApp, m => {
-			const app = Model.AlvaApp.from(m.payload.app);
+			const app = Model.AlvaApp.from(m.payload.app, { sender: this.server.sender });
 			this.apps.set(app.getId(), app);
 			app.setSender(this.server.sender);
 		});
@@ -50,7 +50,9 @@ export class ElectronMainMenu {
 				project: await this.focusedProject
 			};
 
-			((this.server.host as any) as ElectronHost).setApp(this.focusedApp);
+			if (this.focusedApp) {
+				((this.server.host as any) as ElectronHost).addApp(this.focusedApp);
+			}
 
 			const toElectronAction = (item: Types.MenuItem): Electron.MenuItemConstructorOptions[] => {
 				if (typeof (item as any).click === 'function') {

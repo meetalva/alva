@@ -649,7 +649,7 @@ export class ViewStore {
 		}
 
 		this.unsetDraggedElement();
-		this.setApp(Model.AlvaApp.from(item.app));
+		this.setApp(Model.AlvaApp.from(item.app, { sender: this.getSender() }));
 		this.getProject().update(project);
 	}
 
@@ -864,7 +864,7 @@ export class ViewStore {
 		}
 
 		const project = Model.Project.from(item.project);
-		const app = Model.AlvaApp.from(item.app);
+		const app = Model.AlvaApp.from(item.app, { sender: this.getSender() });
 
 		if (this.project && isEqual(project.toJSON(), this.project.toJSON())) {
 			return;

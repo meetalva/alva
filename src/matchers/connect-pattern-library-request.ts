@@ -10,13 +10,17 @@ export function connectPatternLibrary({
 	dataHost
 }: T.MatcherContext): T.Matcher<M.ConnectPatternLibraryRequest> {
 	return async m => {
-		const app = await host.getApp();
-		const sender = app || (await host.getSender());
-		const appId = m.appId || (app ? app.getId() : undefined);
+		const app = await host.getApp(m.appId || '');
+
+		if (!app) {
+			host.log(`connectPatternLibrary: received message without resolveable app: ${m}`);
+			return;
+		}
 
 		const project = await dataHost.getProject(m.payload.projectId);
 
 		if (!project) {
+			host.log(`connectPatternLibrary: received message without resolveable project: ${m}`);
 			return;
 		}
 
@@ -49,7 +53,7 @@ export function connectPatternLibrary({
 		const analysisResult = await performAnalysis(path, { previousLibrary });
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
-			sender.send({
+			app.send({
 				type: MessageType.ShowError,
 				id: uuid.v4(),
 				payload: {
@@ -66,8 +70,7 @@ export function connectPatternLibrary({
 		}
 
 		if (!previousLibrary) {
-			sender.send({
-				appId,
+			app.send({
 				type: M.MessageType.ConnectPatternLibraryResponse,
 				id: m.id,
 				payload: {
@@ -77,8 +80,7 @@ export function connectPatternLibrary({
 				}
 			});
 		} else {
-			sender.send({
-				appId,
+			app.send({
 				type: M.MessageType.UpdatePatternLibraryResponse,
 				id: m.id,
 				payload: {

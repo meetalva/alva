@@ -9,9 +9,13 @@ export function save(
 	config: { passive: boolean }
 ): T.Matcher<M.Save> {
 	return async m => {
-		const app = await host.getApp();
-		const sender = app || (await host.getSender());
-		const appId = m.appId || (app ? app.getId() : undefined);
+		const app = await host.getApp(m.appId || '');
+
+		if (!app) {
+			host.log(`save: received message without resolveable app: ${m}`);
+			return;
+		}
+
 		const project = await dataHost.getProject(m.payload.projectId);
 
 		if (!project) {
@@ -41,8 +45,7 @@ export function save(
 		const serializeResult = await Persistence.serialize(project);
 
 		if (serializeResult.state !== T.PersistenceState.Success) {
-			sender.send({
-				appId,
+			app.send({
 				type: M.MessageType.ShowError,
 				transaction: m.transaction,
 				id: m.id,
@@ -80,8 +83,7 @@ export function save(
 				return;
 			}
 
-			sender.send({
-				appId,
+			app.send({
 				type: M.MessageType.SaveResult,
 				transaction: m.transaction,
 				id: uuid.v4(),
@@ -91,8 +93,7 @@ export function save(
 				}
 			});
 		} catch (err) {
-			sender.send({
-				appId,
+			app.send({
 				type: M.MessageType.ShowError,
 				transaction: m.transaction,
 				id: m.id,

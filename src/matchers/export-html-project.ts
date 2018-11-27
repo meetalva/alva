@@ -11,9 +11,13 @@ export function exportHtmlProject({
 	port
 }: T.MatcherContext): T.Matcher<M.ExportHtmlProject> {
 	return async m => {
-		const app = await host.getApp();
-		const sender = app || (await host.getSender());
-		const appId = m.appId || (app ? app.getId() : undefined);
+		const app = await host.getApp(m.appId || '');
+
+		if (!app) {
+			host.log(`exportHtmlProject: received message without resolveable app: ${m}`);
+			return;
+		}
+
 		const project = await dataHost.getProject(m.payload.projectId);
 
 		if (!project) {
@@ -44,8 +48,7 @@ export function exportHtmlProject({
 		});
 
 		if (htmlExport.type === T.ExportResultType.ExportError) {
-			sender.send({
-				appId,
+			app.send({
 				type: M.MessageType.ShowError,
 				transaction: m.transaction,
 				id: uuid.v4(),
@@ -64,8 +67,7 @@ export function exportHtmlProject({
 		const firstFileResult = await getFirstFile(htmlExport.fs);
 
 		if (firstFileResult.type === FsResultType.FsError) {
-			sender.send({
-				appId,
+			app.send({
 				type: M.MessageType.ShowError,
 				transaction: m.transaction,
 				id: uuid.v4(),
@@ -86,8 +88,7 @@ export function exportHtmlProject({
 		try {
 			await host.writeFile(`${project.getName()}.html`, firstFileResult.payload.toString());
 		} catch (err) {
-			sender.send({
-				appId,
+			app.send({
 				type: M.MessageType.ShowError,
 				transaction: m.transaction,
 				id: uuid.v4(),

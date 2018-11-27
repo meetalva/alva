@@ -21,7 +21,7 @@ export class ElectronHost implements Types.Host {
 	private process: NodeJS.Process;
 	private sender: Types.Sender;
 	private windows: Map<string | number, Electron.BrowserWindow> = new Map();
-	private app: AlvaApp | undefined;
+	@Mobx.observable private apps: Map<string, AlvaApp> = new Map();
 
 	private constructor(init: ElectronHostInit) {
 		this.process = init.process;
@@ -250,13 +250,14 @@ export class ElectronHost implements Types.Host {
 		return Electron.clipboard.readText();
 	}
 
-	public async getApp(): Promise<AlvaApp | undefined> {
-		return this.app;
+	@Mobx.action
+	public async addApp(app: AlvaApp): Promise<void> {
+		this.apps.set(app.getId(), app);
+		return;
 	}
 
-	@Mobx.action
-	public setApp(app: AlvaApp | undefined): void {
-		this.app = app;
+	public async getApp(id: string): Promise<AlvaApp | undefined> {
+		return this.apps.get(id);
 	}
 
 	public async getSender(): Promise<Types.Sender> {

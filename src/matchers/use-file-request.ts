@@ -6,24 +6,25 @@ import * as Path from 'path';
 import * as Model from '../model';
 
 export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<M.UseFileRequest> {
-	return async message => {
-		const app = await host.getApp();
-		const sender = app || (await host.getSender());
-		const appId = message.appId || (app ? app.getId() : undefined);
+	return async m => {
+		const app = await host.getApp(m.appId || '');
 
-		const projectResult = await Persistence.parse<T.SerializedProject>(message.payload.contents);
+		if (!app) {
+			host.log(`useFileRequest: received message without resolveable app: ${m}`);
+			return;
+		}
 
-		const silent =
-			message.payload && typeof message.payload.silent === 'boolean'
-				? message.payload.silent
-				: false;
+		const projectResult = await Persistence.parse<T.SerializedProject>(m.payload.contents);
+
+		const silent = m.payload && typeof m.payload.silent === 'boolean' ? m.payload.silent : false;
 
 		if (projectResult.state === T.PersistenceState.Error) {
+			host.log(`useFileRequest: ${projectResult.error.message}`);
+
 			if (!silent) {
-				sender.send({
-					appId,
+				app.send({
 					type: M.MessageType.ShowError,
-					id: message.id,
+					id: m.id,
 					payload: {
 						message: [projectResult.error.message].join('\n'),
 						detail: projectResult.error.stack || '',
@@ -41,11 +42,12 @@ export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<
 		const result = Model.Project.toResult(projectResult.contents);
 
 		if (result.status !== T.ProjectStatus.Ok) {
-			sender.send({
-				appId,
+			host.log(`useFileRequest: ${result.error.message}`);
+
+			app.send({
 				type: M.MessageType.ShowError,
-				transaction: message.transaction,
-				id: message.id,
+				transaction: m.transaction,
+				id: m.id,
 				payload: {
 					message: `Sorry, we had trouble reading this project`,
 					detail: `Parsing it failed with: ${result.error.message}`,
@@ -61,14 +63,14 @@ export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<
 
 		const draftProject = result.result;
 
-		if (!message.payload.path) {
+		if (!m.payload.path) {
 			const draftPath = await host.resolveFrom(T.HostBase.AppData, `${uuid.v4()}.alva`);
 			draftProject.setPath(draftPath);
 
 			await host.mkdir(Path.dirname(draftPath));
 			await host.writeFile(draftPath, JSON.stringify(draftProject.toDisk()));
 		} else {
-			draftProject.setPath(message.payload.path);
+			draftProject.setPath(m.payload.path);
 		}
 
 		await dataHost.addProject(draftProject);
@@ -77,19 +79,18 @@ export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<
 			draftProject.sync(await host.getSender());
 		}
 
-		return sender.send({
+		return app.send({
 			type: M.MessageType.UseFileResponse,
-			appId,
-			id: message.id,
-			transaction: message.transaction,
-			sender: message.sender,
+			id: m.id,
+			transaction: m.transaction,
+			sender: m.sender,
 			payload: {
 				project: {
 					path: draftProject.getPath(),
 					contents: draftProject.toJSON(),
 					status: T.ProjectPayloadStatus.Ok
 				},
-				replace: message.payload.replace
+				replace: m.payload.replace
 			}
 		});
 	};

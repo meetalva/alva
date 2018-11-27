@@ -42,7 +42,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 		return (
 			<Chrome
 				onDoubleClick={e => {
-					props.store.getSender().send({
+					props.store.getApp().send({
 						type: MessageType.Maximize,
 						id: uuid.v4(),
 						payload: undefined
@@ -65,7 +65,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 					<ChromeButton
 						title="Help"
 						onClick={() => {
-							props.store.getSender().send({
+							props.store.getApp().send({
 								type: MessageType.OpenExternalURL,
 								id: uuid.v4(),
 								payload: 'https://meetalva.io/doc/docs/start'
@@ -78,7 +78,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 					<ChromeButton
 						title="Found a Bug?"
 						onClick={() => {
-							props.store.getSender().send({
+							props.store.getApp().send({
 								type: MessageType.OpenExternalURL,
 								id: uuid.v4(),
 								payload: AlvaUtil.newIssueUrl({
@@ -100,7 +100,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 							<LogOut size={IconSize.XS} strokeWidth={1.5} style={{ display: 'block' }} />
 						}
 						onClick={() => {
-							props.store.getSender().send({
+							props.store.getApp().send({
 								id: uuid.v4(),
 								type: MessageType.ExportHtmlProject,
 								payload: { path: undefined, projectId: store.getProject().getId() }

@@ -99,9 +99,10 @@ async function main(forced?: ForcedFlags): Promise<void> {
 	process.on('message', onMessage);
 }
 
-process.on('unhandledRejection', (p, error) => {
-	console.trace(error);
-	console.log(JSON.stringify(error));
+process.on('unhandledRejection', (p, err) => {
+	if (err.hasOwnProperty('message')) {
+		console.trace(err);
+	}
 });
 
 main().catch(err => {

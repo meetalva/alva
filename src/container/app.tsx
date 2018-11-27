@@ -40,14 +40,14 @@ export class App extends React.Component {
 					/>
 				)}
 				<ChromeContainer />
-				<Components.MaiArea>
+				<Components.MainArea>
 					<AppView view={Types.AlvaView.SplashScreen}>
 						<ViewSplashscreen />
 					</AppView>
 					<AppView view={Types.AlvaView.PageDetail}>
 						<ViewDetails />
 					</AppView>
-				</Components.MaiArea>
+				</Components.MainArea>
 				<Components.IconRegistry />
 			</Components.Layout>
 		);

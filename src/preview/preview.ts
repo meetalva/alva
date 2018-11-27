@@ -158,7 +158,7 @@ async function main(): Promise<void> {
 		});
 
 		sender.match<Message.ChangeApp>(Message.MessageType.ChangeApp, m => {
-			const app = Model.AlvaApp.from(m.payload.app);
+			const app = Model.AlvaApp.from(m.payload.app, { sender });
 			store.setApp(app);
 		});
 

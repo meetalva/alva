@@ -6,7 +6,7 @@ import { MessageType as MT } from '../../message';
 import * as ContextMenu from '../../context-menu';
 import { ElectronUpdater, UpdateCheckStatus } from './electron-updater';
 import { ElectronMainMenu } from './electron-main-menu';
-import { AlvaApp } from '../../model';
+import { AlvaApp, Project } from '../../model';
 import * as uuid from 'uuid';
 
 export interface ElectronAdapterInit {
@@ -245,6 +245,20 @@ export class ElectronAdapter {
 					}
 				});
 			}
+		});
+
+		server.sender.match<M.UseFileResponse>(MT.UseFileResponse, async m => {
+			if (
+				this.windows.size > 0 ||
+				m.payload.project.status === Types.ProjectPayloadStatus.Error ||
+				!m.payload.replace
+			) {
+				return;
+			}
+
+			const project = Project.from((m.payload.project as Types.ProjectPayloadSuccess).contents);
+			await host.createWindow(`http://localhost:${server.port}/project/${project.getId()}`);
+			this.addWindow(win);
 		});
 
 		const win = await host.createWindow(`http://localhost:${server.port}/`);

@@ -49,7 +49,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 						type: MessageType.OpenFileRequest,
 						id: uuid.v4(),
 						payload: {
-							replace: true
+							replace: app.isActiveView(Types.AlvaView.SplashScreen)
 						}
 					});
 				},
@@ -82,7 +82,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 										id: uuid.v4(),
 										payload: {
 											silent: false,
-											replace: true,
+											replace: props.app.isActiveView(Types.AlvaView.SplashScreen),
 											contents
 										}
 									});

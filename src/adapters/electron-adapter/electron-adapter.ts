@@ -45,6 +45,20 @@ export class ElectronAdapter {
 			}
 		});
 
+		Electron.app.on('open-file', (e, path) => {
+			e.preventDefault();
+
+			sender.send({
+				type: MT.OpenFileRequest,
+				id: uuid.v4(),
+				payload: {
+					path,
+					replace: true,
+					silent: false
+				}
+			});
+		});
+
 		sender.match(MT.ConnectPatternLibraryRequest, Matchers.connectPatternLibrary(context));
 		sender.match(MT.Copy, Matchers.copy(context));
 		sender.match(MT.Cut, Matchers.cut(context));

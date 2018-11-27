@@ -118,8 +118,11 @@ export async function startRenderer(): Promise<void> {
 	console.log('Access ViewStore at .store');
 
 	Mobx.autorun(() => {
+		// We misuse the hash value to let electron resolve windows based on app id found in the url
+		const hash = app.isHostType(Types.HostType.Electron) ? `#${app.getId()}` : '';
+
 		if (app.isActiveView(Types.AlvaView.SplashScreen)) {
-			window.history.pushState(app.toJSON(), document.title, '/');
+			window.history.pushState(app.toJSON(), document.title, `/${hash}`);
 		}
 
 		if (
@@ -129,7 +132,7 @@ export async function startRenderer(): Promise<void> {
 			window.history.pushState(
 				app.toJSON(),
 				document.title,
-				`/project/${store.getProject().getId()}`
+				`/project/${store.getProject().getId()}${hash}`
 			);
 		}
 

@@ -8,6 +8,7 @@ import { ElectronUpdater, UpdateCheckStatus } from './electron-updater';
 import { ElectronMainMenu } from './electron-main-menu';
 import { AlvaApp, Project } from '../../model';
 import * as uuid from 'uuid';
+import * as Url from 'url';
 
 export interface ElectronAdapterInit {
 	server: Types.AlvaServer;
@@ -261,6 +262,14 @@ export class ElectronAdapter {
 			this.addWindow(win);
 		});
 
+		server.sender.match<M.Maximize>(MT.Maximize, async m => {
+			const win = await this.getAppWindow(m.appId || uuid.v4());
+
+			if (win) {
+				win.maximize();
+			}
+		});
+
 		const win = await host.createWindow(`http://localhost:${server.port}/`);
 		this.addWindow(win);
 
@@ -272,6 +281,13 @@ export class ElectronAdapter {
 
 	public async getApp(): Promise<AlvaApp | undefined> {
 		return this.menu.focusedApp;
+	}
+
+	public async getAppWindow(appId: string): Promise<Electron.BrowserWindow | undefined> {
+		return Electron.BrowserWindow.getAllWindows().find(w => {
+			const parsed = Url.parse(w.webContents.getURL());
+			return parsed.hash === `#${appId}`;
+		});
 	}
 
 	public addWindow(win?: Electron.BrowserWindow): void {

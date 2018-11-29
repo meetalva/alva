@@ -20,15 +20,28 @@ export function getExportInfos(
 				continue;
 			}
 
-			const exportName = isDefault ? undefined : declaration.name.getText();
-
 			const type = typechecker.getTypeAtLocation(declaration);
 			const exportType = new TypeScriptType(type, typechecker);
+
+			const jsDocTags = TypeScript.getJSDocTags(statement);
+			const exportIgnore = jsDocTags.some(tag => tag.tagName.escapedText === 'ignore');
+
+			const descriptionTag = jsDocTags.find(tag => tag.tagName.escapedText === 'description');
+			const exportDescription = descriptionTag ? descriptionTag.comment : '';
+
+			const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
+			const exportName = nameTag
+				? nameTag.comment
+				: isDefault
+					? undefined
+					: declaration.name.getText();
 
 			return [
 				{
 					name: exportName,
+					description: exportDescription || '',
 					type: exportType,
+					ignore: exportIgnore,
 					statement
 				}
 			];
@@ -48,7 +61,9 @@ export function getExportInfos(
 		return [
 			{
 				name: exportName,
+				description: '',
 				type: exportType,
+				ignore: false,
 				statement
 			}
 		];
@@ -64,7 +79,9 @@ export function getExportInfos(
 
 			return [
 				{
+					description: '',
 					type: exportType,
+					ignore: false,
 					statement
 				}
 			];
@@ -84,7 +101,9 @@ export function getExportInfos(
 
 			return {
 				name: exportName,
+				description: '',
 				type: exportType,
+				ignore: false,
 				statement
 			};
 		});

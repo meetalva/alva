@@ -163,6 +163,10 @@ function analyzePatternExport(
 	const contextId = `${ctx.candidate.id}:${exportName}`;
 	const id = ctx.options.getGlobalPatternId(contextId);
 
+	if (ex.ignore) {
+		return;
+	}
+
 	const properties = PropertyAnalyzer.analyze(propTypes.type, {
 		program: ctx.program,
 		getPropertyId(propertyContextId: string): string {
@@ -184,7 +188,7 @@ function analyzePatternExport(
 		pattern: {
 			model: Types.ModelName.Pattern,
 			contextId,
-			description: ctx.candidate.description,
+			description: ex.description ? ex.description : ctx.candidate.description,
 			exportName,
 			id,
 			name: exportName !== 'default' ? exportName : ctx.candidate.displayName,

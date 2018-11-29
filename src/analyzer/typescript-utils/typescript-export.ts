@@ -13,6 +13,11 @@ export interface TypescriptExport {
 	name?: string;
 
 	/**
+	 * The description of the export
+	 */
+	description: string;
+
+	/**
 	 * The TypeScript export statement.
 	 */
 	statement: ts.Statement;
@@ -21,4 +26,9 @@ export interface TypescriptExport {
 	 * The type of the object exported.
 	 */
 	type: TypeScriptType;
+
+	/**
+	 * If the export should be ignored
+	 */
+	ignore: boolean;
 }

@@ -244,7 +244,7 @@ export class Project {
 
 		serialized.patternLibraries.forEach(p => project.addPatternLibrary(PatternLibrary.from(p)));
 
-		// Legacy bridge: Use page array order of no pagelist is found
+		// Legacy bridge: Use page array order if no pagelist is found
 		const pageList = serialized.pageList || serialized.pages.map(p => p.id);
 
 		serialized.pages
@@ -781,7 +781,7 @@ export class Project {
 			id: this.id,
 			name: this.name,
 			pages: this.pages.filter(Boolean).map(p => p.toJSON()),
-			pageList: this.pageList,
+			pageList: Array.from(this.pageList),
 			path: this.path,
 			patternLibraries: this.getPatternLibraries().map(p => p.toJSON()),
 			userStore: this.userStore.toJSON()
@@ -976,5 +976,11 @@ export class Project {
 		pageChanges.removed.forEach(change => this.removePage(change.before));
 		pageChanges.added.forEach(change => this.addPage(change.after));
 		pageChanges.changed.forEach(change => change.before.update(change.after));
+
+		this.pageList = b.pageList;
+	}
+
+	public clone(): Project {
+		return Project.from(this.toJSON());
 	}
 }

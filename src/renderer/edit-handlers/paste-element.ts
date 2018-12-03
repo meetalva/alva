@@ -77,7 +77,7 @@ export function pasteElement({
 				});
 		}
 
-		store.commit();
 		project.setSelectedElement(clonedElement);
+		store.commit();
 	};
 }

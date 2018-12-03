@@ -244,8 +244,8 @@ export class ViewStore {
 			return;
 		}
 
-		this.commit();
 		this.setSelectedElement(clone);
+		this.commit();
 		return clone;
 	}
 
@@ -263,8 +263,8 @@ export class ViewStore {
 			return;
 		}
 
-		this.commit();
 		this.setSelectedElement(clone);
+		this.commit();
 		return clone;
 	}
 
@@ -282,8 +282,8 @@ export class ViewStore {
 			return;
 		}
 
-		this.commit();
 		this.project.setActivePage(clone);
+		this.commit();
 		return clone;
 	}
 
@@ -298,8 +298,8 @@ export class ViewStore {
 			return;
 		}
 
-		this.commit();
 		this.setSelectedElement(element);
+		this.commit();
 		return element;
 	}
 
@@ -320,8 +320,8 @@ export class ViewStore {
 
 		if (element) {
 			const selectNext = this.removeElement(element);
-			this.commit();
 			selectNext();
+			this.commit();
 		}
 	}
 
@@ -344,8 +344,8 @@ export class ViewStore {
 		}
 
 		const selectNext = this.removeElement(selectedElement);
-		this.commit();
 		selectNext();
+		this.commit();
 		return selectedElement;
 	}
 
@@ -371,8 +371,8 @@ export class ViewStore {
 		);
 
 		this.project.addPage(page);
-		this.commit();
 		this.project.setActivePage(page);
+		this.commit();
 
 		return page;
 	}
@@ -669,7 +669,7 @@ export class ViewStore {
 		}
 
 		if (elementToSelect) {
-			elementToSelect.setSelected(true);
+			this.setSelectedElement(elementToSelect);
 		}
 	}
 
@@ -910,7 +910,7 @@ export class ViewStore {
 		}
 
 		if (elementToSelect) {
-			elementToSelect.setSelected(true);
+			this.setSelectedElement(elementToSelect);
 		}
 	}
 

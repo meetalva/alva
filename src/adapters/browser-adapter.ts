@@ -27,7 +27,11 @@ export class BrowserAdapter {
 			store: this.store
 		});
 
-		this.sender.setLog(this.host.log);
+		this.sender.setLog((dir: string, m: M.Message) => {
+			console.groupCollapsed(`${dir} ${m.type}`);
+			console.dir(m);
+			console.groupEnd();
+		});
 	}
 
 	public static fromStore(store: Store.ViewStore, ctx: { fs: typeof Fs }): BrowserAdapter {

@@ -10,12 +10,11 @@ import { ViewStore } from '../../store';
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PatternListContainer extends React.Component {
-	private dragImg: HTMLElement | null;
+	private dragImg: React.RefObject<any> = React.createRef();
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
-		if (this.dragImg) {
-			e.dataTransfer.effectAllowed = 'copy';
-			e.dataTransfer.setDragImage(this.dragImg, 75, 15);
+		if (this.dragImg.current) {
+			e.dataTransfer.setDragImage(this.dragImg.current, 75, 15);
 		}
 	}
 
@@ -63,10 +62,7 @@ export class PatternListContainer extends React.Component {
 								searchResult={searchResult}
 							/>
 						))}
-					<ElementDragImage
-						element={store.getDraggedElement()}
-						innerRef={ref => (this.dragImg = ref)}
-					/>
+					<ElementDragImage element={store.getDraggedElement()} dragRef={this.dragImg} />
 				</div>
 			</div>
 		);

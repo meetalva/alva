@@ -1,4 +1,6 @@
 import { ViewStore } from '../store';
+import * as uuid from 'uuid';
+import * as Message from '../message';
 
 export function createListeners({ store }: { store: ViewStore }): void {
 	window.addEventListener('keydown', e => {
@@ -15,18 +17,41 @@ export function createListeners({ store }: { store: ViewStore }): void {
 
 	window.addEventListener(
 		'focus',
-		() =>
+		() => {
+			const project = store.getProject();
+
+			store.getSender().send({
+				id: uuid.v4(),
+				type: Message.MessageType.WindowFocused,
+				payload: {
+					app: store.getApp().toJSON(),
+					projectId: project ? project.getId() : undefined
+				}
+			});
+
 			store
 				.getApp()
 				.setHasFocusedInput(
 					['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())
-				),
+				);
+		},
 		true
 	);
 
 	window.addEventListener(
 		'blur',
 		() => {
+			const project = store.getProject();
+
+			store.getSender().send({
+				id: uuid.v4(),
+				type: Message.MessageType.WindowBlured,
+				payload: {
+					app: store.getApp().toJSON(),
+					projectId: project ? project.getId() : undefined
+				}
+			});
+
 			store.getApp().setHasFocusedInput(false);
 		},
 		true

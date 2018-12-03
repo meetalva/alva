@@ -9,7 +9,7 @@ export enum PersistenceState {
 	Success = 'success'
 }
 
-export type PersistencePersistResult = PersistencePersistError | PersistencePersistSuccess;
+export type PersistenceSerializeResult = PersistencePersistError | PersistencePersistSuccess;
 
 export interface PersistencePersistError {
 	error: Error;
@@ -17,10 +17,11 @@ export interface PersistencePersistError {
 }
 
 export interface PersistencePersistSuccess {
+	contents: string;
 	state: PersistenceState.Success;
 }
 
-export type PersistenceReadResult<T> = PersistenceReadError | PersistenceReadSuccess<T>;
+export type PersistenceParseResult<T> = PersistenceReadError | PersistenceReadSuccess<T>;
 
 export interface PersistenceReadError {
 	error: Error;

@@ -1,8 +1,5 @@
 import * as React from 'react';
 import * as MobxReact from 'mobx-react';
-import * as uuid from 'uuid';
-
-import { MessageType } from '../../message';
 import { PageTileContainer } from './page-tile-container';
 import { Page } from '../../model/page';
 import * as Components from '../../components';
@@ -26,7 +23,8 @@ export class PageListContainer extends React.Component {
 		}
 
 		this.draggedPage = draggedPage;
-		e.dataTransfer.effectAllowed = 'copy';
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('text', JSON.stringify(draggedPage.toJSON()));
 	}
 
 	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
@@ -54,10 +52,10 @@ export class PageListContainer extends React.Component {
 
 		if (this.draggedPage.getIndex() > dropTarget.getIndex()) {
 			dropTarget.setDroppableBackState(true);
-			e.dataTransfer.dropEffect = 'copy';
+			e.dataTransfer.dropEffect = 'move';
 		} else if (this.draggedPage.getIndex() < dropTarget.getIndex()) {
 			dropTarget.setDroppableNextState(true);
-			e.dataTransfer.dropEffect = 'copy';
+			e.dataTransfer.dropEffect = 'move';
 		}
 	}
 
@@ -125,16 +123,7 @@ export class PageListContainer extends React.Component {
 								page={page}
 							/>
 						))}
-					<Components.AddButton
-						margin={true}
-						onClick={() =>
-							store.getSender().send({
-								id: uuid.v4(),
-								payload: undefined,
-								type: MessageType.CreateNewPage
-							})
-						}
-					>
+					<Components.AddButton margin={true} onClick={() => store.executePageAddNew()}>
 						Add Page
 					</Components.AddButton>
 				</Components.Layout>

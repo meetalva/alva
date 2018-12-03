@@ -7,12 +7,10 @@ export function changeUserStore({
 	return m => {
 		const project = store.getProject();
 
-		if (!project) {
+		if (!project || project.getId() !== m.payload.projectId) {
 			return;
 		}
 
-		project.startBatch();
 		project.getUserStore().sync(m, { withEnhancer: false });
-		project.endBatch();
 	};
 }

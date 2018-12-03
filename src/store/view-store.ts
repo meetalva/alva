@@ -1,4 +1,4 @@
-import { Sender } from '../sender/client';
+import { Sender } from '../sender';
 import { isEqual } from 'lodash';
 import { MessageType } from '../message';
 import * as Mobx from 'mobx';
@@ -119,26 +119,38 @@ export class ViewStore {
 	}
 
 	public commit(): void {
+		if (!this.project || !this.app) {
+			return;
+		}
+
+		this.editHistory.push({
+			app: this.app.toJSON(),
+			project: this.project.toJSON()
+		});
+
 		window.requestIdleCallback(() => {
-			if (!this.project || !this.app) {
-				return;
-			}
-
-			this.editHistory.push({
-				app: this.app.toJSON(),
-				project: this.project.toJSON()
-			});
-
 			this.save();
+		});
+	}
+
+	public stage(): void {
+		if (!this.project || !this.app) {
+			return;
+		}
+
+		this.editHistory.replace({
+			app: this.app.toJSON(),
+			project: this.project.toJSON()
 		});
 	}
 
 	@Mobx.action
 	public connectPatternLibrary(library?: Model.PatternLibrary): void {
-		this.sender.send({
+		this.getApp().send({
 			type: MessageType.ConnectPatternLibraryRequest,
 			id: uuid.v4(),
 			payload: {
+				projectId: this.project.getId(),
 				library: library ? library.getId() : undefined
 			}
 		});
@@ -179,24 +191,11 @@ export class ViewStore {
 			.getSlots()
 			.map(slot => Model.ElementContent.fromSlot(slot, { project }));
 
-		const element = new Model.Element(
-			{
-				contentIds: elementContents.map(e => e.getId()),
-				dragged: init.dragged || false,
-				focused: false,
-				highlighted: false,
-				forcedOpen: false,
-				open: false,
-				patternId: init.pattern.getId(),
-				placeholderHighlighted: false,
-				propertyValues: [],
-				setDefaults: true,
-				selected: false
-			},
-			{
-				project
-			}
-		);
+		const element = Model.Element.fromPattern(init.pattern, {
+			dragged: Boolean(init.dragged),
+			contents: elementContents,
+			project
+		});
 
 		ViewStore.EPHEMERAL_CONTENTS.set(element, elementContents);
 		return element;
@@ -245,8 +244,8 @@ export class ViewStore {
 			return;
 		}
 
-		this.commit();
 		this.setSelectedElement(clone);
+		this.commit();
 		return clone;
 	}
 
@@ -264,8 +263,8 @@ export class ViewStore {
 			return;
 		}
 
-		this.commit();
 		this.setSelectedElement(clone);
+		this.commit();
 		return clone;
 	}
 
@@ -283,8 +282,8 @@ export class ViewStore {
 			return;
 		}
 
-		this.commit();
 		this.project.setActivePage(clone);
+		this.commit();
 		return clone;
 	}
 
@@ -299,8 +298,8 @@ export class ViewStore {
 			return;
 		}
 
-		this.commit();
 		this.setSelectedElement(element);
+		this.commit();
 		return element;
 	}
 
@@ -321,8 +320,8 @@ export class ViewStore {
 
 		if (element) {
 			const selectNext = this.removeElement(element);
-			this.commit();
 			selectNext();
+			this.commit();
 		}
 	}
 
@@ -345,8 +344,8 @@ export class ViewStore {
 		}
 
 		const selectNext = this.removeElement(selectedElement);
-		this.commit();
 		selectNext();
+		this.commit();
 		return selectedElement;
 	}
 
@@ -372,8 +371,8 @@ export class ViewStore {
 		);
 
 		this.project.addPage(page);
-		this.commit();
 		this.project.setActivePage(page);
+		this.commit();
 
 		return page;
 	}
@@ -433,6 +432,10 @@ export class ViewStore {
 
 	public getDragging(): boolean {
 		return typeof this.draggedElement !== 'undefined';
+	}
+
+	public getEditHistory(): Model.EditHistory {
+		return this.editHistory;
 	}
 
 	public getElementActions(): Model.ElementAction[] {
@@ -634,7 +637,6 @@ export class ViewStore {
 
 	@Mobx.action
 	public redo(): void {
-		this.getProject().startBatch();
 		const item = this.editHistory.forward();
 
 		if (!item) {
@@ -647,9 +649,28 @@ export class ViewStore {
 			return;
 		}
 
-		this.unsetDraggedElement();
-		this.setApp(Model.AlvaApp.from(item.app));
+		const nowSelected = this.project.getSelectedElement();
+
+		this.setApp(Model.AlvaApp.from(item.app, { sender: this.getSender() }));
 		this.getProject().update(project);
+
+		const previouslySelected = project.getSelectedElement();
+
+		const elementToSelect = previouslySelected
+			? this.project.getElementById(previouslySelected.getId())
+			: undefined;
+
+		const elementToUnselect = nowSelected
+			? this.project.getElementById(nowSelected.getId())
+			: undefined;
+
+		if (elementToUnselect) {
+			elementToUnselect.setSelected(false);
+		}
+
+		if (elementToSelect) {
+			this.setSelectedElement(elementToSelect);
+		}
 	}
 
 	@Mobx.action
@@ -710,7 +731,7 @@ export class ViewStore {
 
 	@Mobx.action
 	public requestContextMenu(payload: Types.ContextMenuRequestPayload): void {
-		this.sender.send({
+		this.getApp().send({
 			id: uuid.v4(),
 			type: MessageType.ContextMenuRequest,
 			payload
@@ -719,9 +740,9 @@ export class ViewStore {
 
 	@Mobx.action
 	public save(): void {
-		this.sender.send({
+		this.getApp().send({
 			id: uuid.v4(),
-			payload: { publish: false },
+			payload: { publish: false, projectId: this.project.getId() },
 			type: MessageType.Save
 		});
 	}
@@ -855,7 +876,6 @@ export class ViewStore {
 
 	@Mobx.action
 	public undo(): void {
-		this.getProject().startBatch();
 		const item = this.editHistory.back();
 
 		if (!item) {
@@ -863,17 +883,35 @@ export class ViewStore {
 		}
 
 		const project = Model.Project.from(item.project);
-		const app = Model.AlvaApp.from(item.app);
+
+		const app = Model.AlvaApp.from(item.app, { sender: this.getSender() });
 
 		if (this.project && isEqual(project.toJSON(), this.project.toJSON())) {
 			return;
 		}
 
-		this.unsetDraggedElement();
-		this.setApp(app);
+		const nowSelected = this.project.getSelectedElement();
 
-		this.getProject().endBatch();
+		this.setApp(app);
 		this.getProject().update(project);
+
+		const previouslySelected = project.getSelectedElement();
+
+		const elementToSelect = previouslySelected
+			? this.project.getElementById(previouslySelected.getId())
+			: undefined;
+
+		const elementToUnselect = nowSelected
+			? this.project.getElementById(nowSelected.getId())
+			: undefined;
+
+		if (elementToUnselect) {
+			elementToUnselect.setSelected(false);
+		}
+
+		if (elementToSelect) {
+			this.setSelectedElement(elementToSelect);
+		}
 	}
 
 	@Mobx.action
@@ -888,7 +926,7 @@ export class ViewStore {
 	}
 
 	public updatePatternLibrary(library: Model.PatternLibrary): void {
-		this.sender.send({
+		this.getApp().send({
 			type: MessageType.UpdatePatternLibraryRequest,
 			payload: {
 				id: library.getId()

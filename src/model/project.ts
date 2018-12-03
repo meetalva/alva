@@ -4,7 +4,6 @@ import { Element, ElementContent, ElementProperty } from './element';
 import { ElementAction } from './element-action';
 import * as Message from '../message';
 import * as Mobx from 'mobx';
-import * as ModelTree from '../model-tree';
 import * as _ from 'lodash';
 import { Page } from './page';
 import { PatternSearch } from './pattern-search';
@@ -15,8 +14,8 @@ import * as Types from '../types';
 import { UserStore } from './user-store';
 import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-enhancer';
 import { UserStoreReference } from './user-store-reference';
-import * as isPlainObject from 'is-plain-object';
 import * as uuid from 'uuid';
+import * as ModelTree from '../model-tree';
 
 export interface ProjectProperties {
 	draft: boolean;
@@ -37,7 +36,7 @@ export interface ProjectCreateInit {
 export class Project {
 	public readonly model = Types.ModelName.Project;
 
-	private batch: number = 1;
+	private syncing: boolean = false;
 
 	@Mobx.observable private draft: boolean;
 
@@ -157,9 +156,9 @@ export class Project {
 
 	@Mobx.computed
 	private get pages(): Page[] {
-		return this.pageList
-			.map(id => this.internalPages.get(id))
-			.filter((page): page is Page => typeof page !== 'undefined');
+		return [...this.internalPages.values()]
+			.filter(p => this.pageList.includes(p.getId()))
+			.sort((a, b) => this.pageList.indexOf(a.getId()) - this.pageList.indexOf(b.getId()));
 	}
 
 	public constructor(init: ProjectProperties) {
@@ -176,8 +175,6 @@ export class Project {
 		init.patternLibraries.forEach(patternLibrary => {
 			this.addPatternLibrary(patternLibrary);
 		});
-
-		this.endBatch();
 	}
 
 	public static createBuiltinPatternLibrary(opts?: PatternLibraryCreateOptions): PatternLibrary {
@@ -187,6 +184,7 @@ export class Project {
 				bundleId: '',
 				description: 'Built-in components for basic layouts and logic',
 				id: uuid.v4(),
+				version: '1.0.0',
 				name: 'Essentials',
 				origin: Types.PatternLibraryOrigin.BuiltIn,
 				patternProperties: [],
@@ -244,11 +242,14 @@ export class Project {
 			userStore
 		});
 
-		project.startBatch();
-
 		serialized.patternLibraries.forEach(p => project.addPatternLibrary(PatternLibrary.from(p)));
 
-		serialized.pages.forEach(page => project.addPage(Page.from(page, { project })));
+		// Legacy bridge: Use page array order of no pagelist is found
+		const pageList = serialized.pageList || serialized.pages.map(p => p.id);
+
+		serialized.pages
+			.sort((a, b) => pageList.indexOf(a.id) - pageList.indexOf(b.id))
+			.forEach(page => project.addPage(Page.from(page, { project })));
 
 		serialized.elements.forEach(element =>
 			project.addElement(Element.from(element, { project }))
@@ -264,9 +265,37 @@ export class Project {
 
 		userStore.getPageProperty().setProject(project);
 
-		project.endBatch();
-
 		return project;
+	}
+
+	public static toResult(
+		serialized: Types.SerializedProject
+	):
+		| { status: Types.ProjectStatus.Ok; result: Project }
+		| { status: Types.ProjectStatus.Error; error: Error } {
+		try {
+			return {
+				status: Types.ProjectStatus.Ok,
+				result: Project.from(serialized)
+			};
+		} catch (error) {
+			return {
+				status: Types.ProjectStatus.Error,
+				error
+			};
+		}
+	}
+
+	public static fromResult(
+		result: Types.PersistenceParseResult<Types.SerializedProject>
+	):
+		| { status: Types.ProjectStatus.Ok; result: Project }
+		| { status: Types.ProjectStatus.Error; error: Error } {
+		if (result.state === Types.PersistenceState.Error) {
+			return { status: Types.ProjectStatus.Error, error: result.error };
+		}
+
+		return Project.toResult(result.contents);
 	}
 
 	public static equals(a: Types.SavedProject, b: Types.SavedProject): boolean;
@@ -310,11 +339,8 @@ export class Project {
 
 	@Mobx.action
 	public addPage(page: Page): void {
-		if (!this.pageList.includes(page.getId())) {
-			this.pageList.push(page.getId());
-		}
-
 		this.internalPages.set(page.getId(), page);
+		this.pageList.push(page.getId());
 		page.setProject(this);
 	}
 
@@ -360,6 +386,22 @@ export class Project {
 		return this.highlightedElementContents;
 	}
 
+	public getItem(
+		id: string,
+		type: Types.ItemType | Types.SerializedItemType
+	): Element | Page | undefined {
+		switch (type) {
+			case Types.ItemType.Page:
+			case 'page':
+				return this.getPageById(id);
+			case Types.ItemType.Element:
+			case 'element':
+				return this.getElementById(id);
+			default:
+				return;
+		}
+	}
+
 	public getFocusedItem(): Element | Page | undefined {
 		return this.focusedItem;
 	}
@@ -369,11 +411,17 @@ export class Project {
 	}
 
 	public getId(): string {
-		return this.id;
+		return this.path
+			? Buffer.from([this.id, this.path].join(':'), 'utf-8').toString('base64')
+			: this.id;
 	}
 
 	public getName(): string {
 		return this.name;
+	}
+
+	public hasFriendlyName(): boolean {
+		return this.name !== this.id;
 	}
 
 	public getNextPage(): Page | undefined {
@@ -480,6 +528,10 @@ export class Project {
 		return this.patternLibraries.get(id);
 	}
 
+	public getPatternLibraryByContextId(contextid: string): PatternLibrary | undefined {
+		return [...this.patternLibraries.values()].find(p => p.contextId === contextid);
+	}
+
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
 		return this.patternProperties.find(p => p.getId() === id);
 	}
@@ -514,8 +566,7 @@ export class Project {
 
 	public getSelectedElement(): Element | undefined {
 		const selected = this.selectedElements[0];
-
-		return selected ? selected : this.activePage.getRoot();
+		return selected ? selected : this.activePage ? this.activePage.getRoot() : undefined;
 	}
 
 	public getUserStore(): UserStore {
@@ -528,6 +579,13 @@ export class Project {
 
 	public setDraft(draft: boolean): void {
 		this.draft = draft;
+	}
+
+	public setId(raw: string): void {
+		const [id] = Buffer.from(raw, 'base64')
+			.toString('utf-8')
+			.split(':');
+		this.id = id;
 	}
 
 	public getElementPropertyById(id: string): ElementProperty | undefined {
@@ -686,11 +744,6 @@ export class Project {
 	}
 
 	@Mobx.action
-	public setId(id: string): void {
-		this.id = name;
-	}
-
-	@Mobx.action
 	public setName(name: string): void {
 		this.name = name;
 	}
@@ -728,136 +781,110 @@ export class Project {
 			id: this.id,
 			name: this.name,
 			pages: this.pages.filter(Boolean).map(p => p.toJSON()),
+			pageList: this.pageList,
 			path: this.path,
 			patternLibraries: this.getPatternLibraries().map(p => p.toJSON()),
 			userStore: this.userStore.toJSON()
 		};
 	}
 
+	public getByPath(path: string): any {
+		function getByPath(fragments: string[], origin: any): any {
+			if (!origin) {
+				return;
+			}
+
+			const fragment = fragments.shift();
+
+			if (!fragment) {
+				return origin;
+			}
+
+			if (Mobx.isObservableMap(origin)) {
+				return getByPath(fragments, origin.get(fragment));
+			}
+
+			return getByPath(fragments, origin[fragment]);
+		}
+
+		return getByPath(path.split('/'), this);
+	}
+
 	public sync(sender: Types.Sender): void {
-		sender.match<Message.MobxUpdateMessage>(Message.MessageType.MobxUpdate, message => {
-			if (
-				message.payload.change.hasOwnProperty('key') &&
-				!message.payload.change.hasOwnProperty('mapKey')
-			) {
-				const change = message.payload.change as Message.MobxObjectUpdatePayload;
-				const object = this.getObject(message.payload.name, message.payload.id);
+		if (this.syncing) {
+			return;
+		}
 
-				if (!object) {
-					return;
-				}
+		this.syncing = true;
 
-				if (!object.hasOwnProperty(change.key)) {
-					return;
-				}
-
-				const ValueModel =
-					typeof change.newValue === 'object'
-						? ModelTree.getModelByName((change.newValue as AnyModel).model)
-						: undefined;
-
-				const value = ValueModel
-					? ValueModel.from(change.newValue, { project: this })
-					: change.newValue;
-
-				if (isPlainObject(value) && !ValueModel) {
-					return;
-				}
-
-				object[change.key] = value;
-			}
-
-			if (message.payload.change.hasOwnProperty('mapKey')) {
-				const change = message.payload.change as Message.MobxMapUpdatePayload;
-				const object = this.getObject(message.payload.name, message.payload.id);
-
-				if (!object) {
-					return;
-				}
-
-				if (!object.hasOwnProperty(change.key)) {
-					return;
-				}
-
-				object[change.key].set(change.mapKey, change.newValue);
-			}
-
-			if (message.payload.change.hasOwnProperty('index')) {
-				console.log('MobxArrayUpdatePayload', message);
-			}
+		sender.match<Message.ProjectUpdate>(Message.MessageType.ProjectUpdate, m => {
+			this.onProjectUpdate(m);
 		});
+	}
 
-		sender.match<Message.MobxAddMessage>(Message.MessageType.MobxAdd, message => {
-			const parent = this.getObject(message.payload.name, message.payload.id);
-			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
+	public unsync(sender: Types.Sender): void {
+		sender.unmatch(Message.MessageType.ProjectUpdate, this.onProjectUpdate);
+	}
 
-			if (!parent) {
-				return;
+	private onProjectUpdate(m: Message.ProjectUpdate) {
+		const { change, path, projectId } = m.payload;
+
+		if (projectId !== this.getId()) {
+			return;
+		}
+
+		const target = this.getByPath(path);
+
+		if (Mobx.isObservableMap(target)) {
+			const c = change as Mobx.IMapDidChange;
+
+			switch (c.type) {
+				case 'add':
+				case 'update': {
+					const ValueModel =
+						typeof c.newValue === 'object'
+							? ModelTree.getModelByName(c.newValue.model as Types.ModelName)
+							: undefined;
+					const value = ValueModel
+						? (ValueModel as any).from(c.newValue, { project: this })
+						: c.newValue;
+					target.set(c.name, value);
+					break;
+				}
+				case 'delete':
+					target.delete(c.name);
 			}
+			return;
+		}
 
-			const mayBeMember = parent[message.payload.memberName];
+		if (Mobx.isObservableObject(target)) {
+			const c = change as Mobx.IObjectDidChange;
 
-			if (!mayBeMember) {
-				return;
+			switch (c.type) {
+				case 'add':
+				case 'update': {
+					const ValueModel =
+						typeof c.newValue === 'object'
+							? ModelTree.getModelByName(c.newValue.model as Types.ModelName)
+							: undefined;
+					const value = ValueModel
+						? (ValueModel as any).from(c.newValue, { project: this })
+						: c.newValue;
+					target[c.name] = value;
+					break;
+				}
+				case 'remove': {
+					delete target[c.name];
+				}
 			}
+			return;
+		}
 
-			const value = ValueModel
-				? ValueModel.from(message.payload.change.newValue, { project: this })
-				: message.payload.change.newValue;
-
-			if (isPlainObject(value) && !ValueModel) {
-				return;
-			}
-
-			const member = mayBeMember as Map<unknown, unknown>;
-			member.set(message.payload.change.key, value);
-		});
-
-		sender.match<Message.MobxDeleteMessage>(Message.MessageType.MobxDelete, message => {
-			const parent = this.getObject(message.payload.name, message.payload.id);
-
-			if (!parent) {
-				return;
-			}
-
-			const mayBeMember = parent[message.payload.memberName];
-
-			if (!mayBeMember) {
-				return;
-			}
-
-			const member = mayBeMember as Map<unknown, unknown>;
-			member.delete(message.payload.change.key);
-		});
-
-		sender.match<Message.MobxSpliceMessage>(Message.MessageType.MobxSplice, message => {
-			const parent = this.getObject(message.payload.name, message.payload.id);
-			const ValueModel = ModelTree.getModelByName(message.payload.valueModel);
-
-			if (!parent) {
-				return;
-			}
-
-			const mayBeMember = parent[message.payload.memberName];
-
-			if (!mayBeMember) {
-				return;
-			}
-
-			const added = message.payload.change.added.map(
-				a => (ValueModel ? ValueModel.from(a, { project: this }) : a)
-			);
-			const removed = message.payload.change.removed;
-			const member = mayBeMember as unknown[];
-
-			if (Array.isArray(member) && removed.length > 0) {
-				member.splice(message.payload.change.index, removed.length);
-			}
-
-			if (Array.isArray(member) && added.length > 0) {
-				member.splice(message.payload.change.index, 0, ...added);
-			}
-		});
+		if (Mobx.isObservableArray(target) && change.type === 'splice') {
+			const c = change as Mobx.IArraySplice;
+			target.splice(c.index, c.removedCount, ...c.added);
+			return;
+		}
 	}
 
 	@Mobx.action
@@ -949,17 +976,5 @@ export class Project {
 		pageChanges.removed.forEach(change => this.removePage(change.before));
 		pageChanges.added.forEach(change => this.addPage(change.after));
 		pageChanges.changed.forEach(change => change.before.update(change.after));
-	}
-
-	public startBatch(): void {
-		++this.batch;
-	}
-
-	public endBatch(): void {
-		this.batch = Math.max(0, --this.batch);
-	}
-
-	public get batching(): boolean {
-		return this.batch > 0;
 	}
 }

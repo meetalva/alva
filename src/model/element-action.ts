@@ -153,7 +153,6 @@ export class ElementAction {
 		// tslint:disable-next-line:no-any
 		event: any;
 	}): string | undefined {
-		console.log(event);
 		switch (this.payloadType) {
 			case Types.ElementActionPayloadType.EventPayload: {
 				switch (this.getPayload()) {

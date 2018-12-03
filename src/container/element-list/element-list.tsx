@@ -15,7 +15,7 @@ import { Images } from '../../components/icons';
 @MobxReact.inject('store')
 @MobxReact.observer
 export class ElementList extends React.Component {
-	private dragImg: HTMLElement | null;
+	private dragImg: React.RefObject<any> = React.createRef();
 	private globalDragEndListener?: (e: DragEvent) => void;
 	private globalDropListener?: (e: DragEvent) => void;
 	private globalKeyDownListener?: (e: KeyboardEvent) => void;
@@ -100,17 +100,25 @@ export class ElementList extends React.Component {
 
 		if (store.getSelectedElement() !== element) {
 			store.setSelectedElement(element);
+			store.stage();
 		}
 	}
 
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
+		e.preventDefault();
+
 		const { store } = this.props as { store: Store.ViewStore };
 		const element = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		if (element) {
 			store.requestContextMenu({
 				menu: Types.ContextMenuType.ElementMenu,
-				data: { element: element.toJSON() }
+				projectId: store.getProject().getId(),
+				data: { element: element.toJSON() },
+				position: {
+					x: e.clientX,
+					y: e.clientY
+				}
 			});
 		}
 	}
@@ -188,7 +196,8 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		e.dataTransfer.dropEffect = 'copy';
+		const dropEffect = draggedElement.getParent() ? 'move' : 'copy';
+		e.dataTransfer.dropEffect = dropEffect;
 	}
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
@@ -210,9 +219,10 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		if (this.dragImg) {
-			e.dataTransfer.effectAllowed = 'copy';
-			e.dataTransfer.setDragImage(this.dragImg, 75, 15);
+		if (this.dragImg.current) {
+			e.dataTransfer.effectAllowed = 'move';
+			e.dataTransfer.setData('text', JSON.stringify(draggedElement.toJSON()));
+			e.dataTransfer.setDragImage(this.dragImg.current, 75, 15);
 		}
 
 		Mobx.transaction(() => {
@@ -403,18 +413,20 @@ export class ElementList extends React.Component {
 			>
 				<Components.Element.ElementChildren>
 					{childContent ? <ElementContentContainer content={childContent} /> : null}
-					{!hasChildren && (
+					<div
+						style={{
+							position: 'absolute',
+							opacity: hasChildren ? 0 : 1
+						}}
+					>
 						<Components.EmptyState
 							headline="Elements"
 							copy="Drop components here from the library below"
 							image={Images.EmptyElements}
 						/>
-					)}
+					</div>
 				</Components.Element.ElementChildren>
-				<ElementDragImage
-					element={store.getDraggedElement()}
-					innerRef={ref => (this.dragImg = ref)}
-				/>
+				<ElementDragImage element={store.getDraggedElement()} dragRef={this.dragImg} />
 			</Components.DragArea>
 		);
 	}

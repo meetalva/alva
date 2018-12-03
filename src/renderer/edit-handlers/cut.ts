@@ -3,7 +3,7 @@ import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 import * as Types from '../../types';
 
 export function cut({ app, store }: MessageHandlerContext): MessageHandler<M.Cut> {
-	return () => {
+	return m => {
 		if (app.getHasFocusedInput()) {
 			return;
 		}

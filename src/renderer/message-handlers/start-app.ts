@@ -9,7 +9,7 @@ export function startApp({ store, app }: MessageHandlerContext): MessageHandler<
 
 		try {
 			if (m.payload.app) {
-				app.update(Model.AlvaApp.from(m.payload.app));
+				app.update(Model.AlvaApp.from(m.payload.app, { sender: store.getSender() }));
 			}
 		} catch (err) {
 			console.error(err);

@@ -35,6 +35,12 @@ export class ViewDetails extends React.Component {
 				.getEnhancer()
 				.getJavaScript() === 'undefined';
 
+		const onlyBuiltin = props.store
+			.getPatternLibraries()
+			.every(lib => lib.getOrigin() === Types.PatternLibraryOrigin.BuiltIn);
+
+		const mayConnect = props.store.getApp().hasFileAccess();
+
 		return (
 			<React.Fragment>
 				<AppPane
@@ -80,11 +86,7 @@ export class ViewDetails extends React.Component {
 					</Components.SideBar>
 				</AppPane>
 				<div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column' }}>
-					<PreviewPaneWrapper
-						isDragging={props.store.getDragging()}
-						key="center"
-						previewFrame={`http://localhost:${props.store.getServerPort()}/preview.html`}
-					/>
+					<PreviewPaneWrapper isDragging={props.store.getDragging()} key="center" />
 					<AppPane
 						pane={Types.AppPane.DevelopmentPane}
 						defaultSize={{ width: '100%', height: 500 }}
@@ -113,20 +115,19 @@ export class ViewDetails extends React.Component {
 						<div style={{ flexShrink: 0, height: 40 }}>
 							<PropertiesSwitch />
 						</div>
-						{props.store
-							.getPatternLibraries()
-							.every(lib => lib.getOrigin() === Types.PatternLibraryOrigin.BuiltIn) && (
-							<ConnectPaneContainer
-								onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
-								onSecondaryButtonClick={() =>
-									props.store.getSender().send({
-										type: MessageType.OpenExternalURL,
-										id: uuid.v4(),
-										payload: 'https://media.meetalva.io/file/Website.alva'
-									})
-								}
-							/>
-						)}
+						{onlyBuiltin &&
+							mayConnect && (
+								<ConnectPaneContainer
+									onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
+									onSecondaryButtonClick={() =>
+										props.store.getApp().send({
+											type: MessageType.OpenExternalURL,
+											id: uuid.v4(),
+											payload: 'https://media.meetalva.io/file/Website.alva'
+										})
+									}
+								/>
+							)}
 						<Components.PropertyPane>
 							{props.store.getApp().getRightSidebarTab() ===
 								Types.RightSidebarTab.Properties && <PropertyListContainer />}

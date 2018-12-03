@@ -12,6 +12,7 @@ export interface ChromeProps {
 const StyledChrome = styled.div`
 	box-sizing: border-box;
 	display: grid;
+	flex: 0 0 40px;
 	grid-template-columns: 33.333% 33.333% 33.333%;
 	align-items: center;
 	width: 100%;

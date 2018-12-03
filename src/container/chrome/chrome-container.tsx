@@ -8,6 +8,7 @@ import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
 import { LogOut } from 'react-feather';
+import * as Types from '../../types';
 
 export interface InjectedChromeContainerProps {
 	page: Page;
@@ -17,9 +18,10 @@ export interface InjectedChromeContainerProps {
 export const ChromeContainer = MobxReact.inject('store')(
 	MobxReact.observer((props): JSX.Element | null => {
 		const { store } = props as InjectedChromeContainerProps;
+		const app = store.getApp();
 		const project = store.getProject();
 
-		if (!project) {
+		if (!project || app.getActiveView() !== Types.AlvaView.PageDetail) {
 			return null;
 		}
 
@@ -39,8 +41,8 @@ export const ChromeContainer = MobxReact.inject('store')(
 
 		return (
 			<Chrome
-				onDoubleClick={e => {
-					props.store.getSender().send({
+				onDoubleClick={() => {
+					props.store.getApp().send({
 						type: MessageType.Maximize,
 						id: uuid.v4(),
 						payload: undefined
@@ -63,7 +65,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 					<ChromeButton
 						title="Help"
 						onClick={() => {
-							props.store.getSender().send({
+							props.store.getApp().send({
 								type: MessageType.OpenExternalURL,
 								id: uuid.v4(),
 								payload: 'https://meetalva.io/doc/docs/start'
@@ -76,10 +78,16 @@ export const ChromeContainer = MobxReact.inject('store')(
 					<ChromeButton
 						title="Found a Bug?"
 						onClick={() => {
-							props.store.getSender().send({
+							props.store.getApp().send({
 								type: MessageType.OpenExternalURL,
 								id: uuid.v4(),
-								payload: 'https://github.com/meetalva/alva/labels/type%3A%20bug'
+								payload: AlvaUtil.newIssueUrl({
+									user: 'meetalva',
+									repo: 'alva',
+									title: 'New bug report',
+									body: `Hey there, I just encountered the following error with Alva:`,
+									labels: ['type: bug']
+								})
 							});
 						}}
 						onDoubleClick={event => {
@@ -92,10 +100,10 @@ export const ChromeContainer = MobxReact.inject('store')(
 							<LogOut size={IconSize.XS} strokeWidth={1.5} style={{ display: 'block' }} />
 						}
 						onClick={() => {
-							props.store.getSender().send({
+							props.store.getApp().send({
 								id: uuid.v4(),
 								type: MessageType.ExportHtmlProject,
-								payload: { path: undefined }
+								payload: { path: undefined, projectId: store.getProject().getId() }
 							});
 						}}
 						onDoubleClick={event => {

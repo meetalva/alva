@@ -11,7 +11,7 @@ export interface PatternItemContainerContainerProps {
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PatternItemContainer extends React.Component<PatternItemContainerContainerProps> {
-	private handleDoubleClick(e: React.MouseEvent<HTMLElement>): void {
+	private handleDoubleClick = (): void => {
 		const { store } = this.props as PatternItemContainerContainerProps & { store: ViewStore };
 		const element = store.createElement({ pattern: this.props.pattern });
 
@@ -37,13 +37,16 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 			store.addElement(element);
 			store.executeElementInsertAfter({ element, targetElement });
 		}
-	}
+	};
 
-	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
+	private handleDragStart = (e: React.DragEvent<HTMLElement>) => {
 		const { store } = this.props as PatternItemContainerContainerProps & { store: ViewStore };
 		const element = store.createElement({ pattern: this.props.pattern, dragged: true });
 		store.addElement(element);
-	}
+
+		e.dataTransfer.effectAllowed = 'copy';
+		e.dataTransfer.setData('text', JSON.stringify(element.toJSON()));
+	};
 
 	public render(): JSX.Element | null {
 		const { props } = this;
@@ -52,8 +55,8 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 			<Components.PatternListItem
 				key={props.pattern.getId()}
 				draggable
-				onDoubleClick={e => this.handleDoubleClick(e)}
-				onDragStart={e => this.handleDragStart(e)}
+				onDoubleClick={this.handleDoubleClick}
+				onDragStart={this.handleDragStart}
 			>
 				<Components.PatternItemLabel>{props.pattern.getName()}</Components.PatternItemLabel>
 				<Components.PatternItemDescription>

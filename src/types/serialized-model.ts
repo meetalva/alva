@@ -84,6 +84,7 @@ export interface SerializedPatternLibrary {
 	description: string;
 	id: string;
 	name: string;
+	version: string;
 	origin: SerializedPatternLibraryOrigin;
 	patternProperties: PatternProperty.SerializedPatternProperty[];
 	patterns: SerializedPattern[];
@@ -98,6 +99,7 @@ export interface SavedProject {
 	id: string;
 	name: string;
 	pages: SerializedPage[];
+	pageList: string[];
 	patternLibraries: SerializedPatternLibrary[];
 	userStore: UserStore.SerializedUserStore;
 }
@@ -168,9 +170,11 @@ export interface LegacySerializedElementProperty {
 }
 
 export interface SerializedAlvaApp {
+	id: string;
 	model: Types.ModelName.AlvaApp;
 	activeView: SerializedAlvaView;
 	hasFocusedInput: boolean;
+	hostType: string;
 	panes: SerializedAppPane[];
 	paneSizes: SerializedPaneSize[];
 	rightSidebarTab: SerializedRightSidebarTab;
@@ -198,4 +202,10 @@ export interface SerializedElementActionPayload {
 
 export enum SerialializationType {
 	Set = 'Set'
+}
+
+export interface ClipboardPayload {
+	type: SerializedItemType;
+	item: SerializedItem;
+	project: SerializedProject;
 }

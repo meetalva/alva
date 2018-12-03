@@ -73,6 +73,10 @@ export function getMessageBody(data: string): string | undefined {
 }
 
 export function getMessageHeader(data: string): MessageHeader {
+	if (typeof data !== 'string') {
+		return { type: TechnicalMessageType.Invalid, status: MessageHeaderStatus.Error };
+	}
+
 	const headerLength = getMessageHeaderLength(data);
 
 	if (typeof headerLength === 'undefined') {

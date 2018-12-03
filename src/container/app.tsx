@@ -4,32 +4,42 @@ import * as Components from '../components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewDetails } from './view-details';
-import { ViewStore } from '../store';
 import { ViewSplashscreen } from './view-splashscreen';
 import * as Types from '../types';
-
-Components.globalStyles();
-
-interface InjectedAppProps {
-	store: ViewStore;
-}
+import * as MenuContainer from './menu';
+import * as Menu from '../menu';
+import { ViewStore } from '../store';
 
 @MobxReact.inject('store')
 @MobxReact.observer
 export class App extends React.Component {
 	public render(): JSX.Element | null {
-		const props = this.props as InjectedAppProps;
-		const app = props.store.getApp();
-
-		if (app.getState() !== Types.AppState.Started) {
-			return null;
-		}
+		const props = this.props as { store: ViewStore };
+		const ctx = { app: props.store.getApp(), project: props.store.getProject() };
 
 		return (
-			<Components.Layout direction={Components.LayoutDirection.Column}>
-				<Components.FixedArea top={0} right={0} left={0} z={10}>
-					<ChromeContainer />
-				</Components.FixedArea>
+			<Components.Layout
+				onContextMenu={e => e.preventDefault()}
+				direction={Components.LayoutDirection.Column}
+				height={Components.LayoutHeight.Full}
+			>
+				<Components.GlobalStyle />
+				{!props.store.getApp().isHostType(Types.HostType.Electron) && (
+					<MenuContainer.Menu
+						variant={MenuContainer.MenuVariant.Horizontal}
+						menus={[
+							// TODO: Connect to store more cleanly
+							Menu.appMenu(ctx),
+							Menu.fileMenu(ctx),
+							Menu.editMenu(ctx),
+							Menu.libraryMenu(ctx),
+							Menu.viewMenu(ctx),
+							Menu.windowMenu(ctx),
+							Menu.helpMenu(ctx)
+						]}
+					/>
+				)}
+				<ChromeContainer />
 				<Components.MainArea>
 					<AppView view={Types.AlvaView.SplashScreen}>
 						<ViewSplashscreen />

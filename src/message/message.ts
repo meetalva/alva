@@ -1,7 +1,14 @@
 import { Envelope, EmptyEnvelope } from './envelope';
 import * as Types from '../types';
+import * as Mobx from 'mobx';
 
 export enum MessageType {
+	UpdateAvailable = 'update-available',
+	UpdateUnavailable = 'update-unavailable',
+	UpdateError = 'update-error',
+	UpdateDownload = 'update-download',
+	UpdateDownloadProgress = 'update-download-progress',
+	UpdateDownloaded = 'update-downloaded',
 	ActivatePage = 'activate-page',
 	AppLoaded = 'app-loaded',
 	AppRequest = 'app-request',
@@ -43,13 +50,12 @@ export enum MessageType {
 	ExportPngPage = 'export-png-page',
 	ExportSketchPage = 'export-sketch-page',
 	ExportHtmlProject = 'export-html-project',
+	ExportHtmlProjectResult = 'export-html-project-result',
 	KeyboardChange = 'keyboard-change',
 	Log = 'log',
 	Maximize = 'maximize',
-	MobxAdd = 'mobx-add',
-	MobxDelete = 'mobx-delete',
-	MobxUpdate = 'mobx-update',
-	MobxSplice = 'mobx-splice',
+	AppUpdate = 'app-update',
+	ProjectUpdate = 'project-update',
 	OpenExternalURL = 'open-external-url',
 	OpenFileRequest = 'open-file-request',
 	OpenFileResponse = 'open-file-response',
@@ -63,20 +69,30 @@ export enum MessageType {
 	Redo = 'redo',
 	Reload = 'reload',
 	Save = 'save',
+	SaveAs = 'save-as',
 	SaveResult = 'save-result',
 	SetPane = 'set-pane',
 	ShowError = 'show-error',
+	ShowMessage = 'show-message',
 	SketchExportRequest = 'sketch-export-request',
 	SketchExportResponse = 'sketch-export-response',
 	StartApp = 'start-app',
 	Undo = 'undo',
+	UseFileRequest = 'use-file',
+	UseFileResponse = 'use-file-response',
 	UpdatePatternLibraryRequest = 'update-pattern-library-request',
 	UpdatePatternLibraryResponse = 'update-pattern-library-response',
 	ChangeUserStore = 'user-store-change',
 	SelectElement = 'select-element',
 	HighlightElement = 'highlight-element',
+	WindowOpen = 'window-open',
 	WindowClose = 'window-close',
+	WindowFocused = 'window-focused',
+	WindowBlured = 'window-blured',
 	ChromeScreenShot = 'chrome-screenshot',
+	ToggleFullScreen = 'toggle-fullscreen',
+	ToggleDevTools = 'toggle-dev-tools',
+	OpenWindow = 'open-window'
 }
 
 export type Message =
@@ -94,8 +110,8 @@ export type Message =
 	| ConnectedPatternLibraryNotification
 	| ContentRequest
 	| ContentResponse
-	| ContextMenuRequst
-	| CopyPageElement
+	| ContextMenuRequest
+	| CopyElement
 	| CreateNewPage
 	| CreateScriptBundleRequest
 	| CreateScriptBundleResponse
@@ -123,10 +139,6 @@ export type Message =
 	| KeyboardChange
 	| Log
 	| Maximize
-	| MobxAddMessage
-	| MobxDeleteMessage
-	| MobxUpdateMessage
-	| MobxSpliceMessage
 	| OpenExternalURL
 	| OpenFileRequest
 	| OpenFileResponse
@@ -140,9 +152,11 @@ export type Message =
 	| Redo
 	| Reload
 	| Save
+	| SaveAs
 	| SaveResult
 	| SetPane
 	| ShowError
+	| ShowMessage
 	| SketchExportRequest
 	| SketchExportResponse
 	| StartAppMessage
@@ -153,8 +167,27 @@ export type Message =
 	| SelectElement
 	| HighlightElement
 	| WindowClose
-	| ChromeScreenShot;
+	| WindowOpen
+	| ChromeScreenShot
+	| UseFileRequest
+	| UseFileResponse
+	| ToggleFullScreen
+	| ProjectUpdate
+	| AppUpdate
+	| WindowBlured
+	| WindowFocused
+	| ToggleDevTools
+	| OpenWindow
+	| CreateNewFileRequest
+	| OpenFileRequest
+	| UpdateAvailable
+	| UpdateError
+	| UpdateDownloadProgress
+	| UpdateDownloaded
+	| UpdateUnavailable
+	| UpdateDownload;
 
+export type CreateNewFileRequest = Envelope<MessageType.CreateNewFileRequest, { replace: boolean }>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
 export type AppLoaded = EmptyEnvelope<MessageType.AppLoaded>;
 export type AppRequest = EmptyEnvelope<MessageType.AppRequest>;
@@ -199,6 +232,7 @@ export type ConnectedPatternLibraryNotification = Envelope<
 export type ConnectPatternLibraryRequest = Envelope<
 	MessageType.ConnectPatternLibraryRequest,
 	{
+		projectId: string;
 		library: string | undefined;
 	}
 >;
@@ -210,17 +244,19 @@ export type ConnectPatternLibraryResponse = Envelope<
 		previousLibraryId: string | undefined;
 	}
 >;
-export type ContextMenuRequst = Envelope<
+export type ContextMenuRequest = Envelope<
 	MessageType.ContextMenuRequest,
 	Types.ContextMenuRequestPayload
 >;
 export type ContentRequest = EmptyEnvelope<MessageType.ContentRequest>;
 export type ContentResponse = Envelope<MessageType.ContentResponse, string>;
-export type Copy = Envelope<
-	MessageType.Copy,
-	{ type: Types.SerializedItemType; id: string } | undefined
->;
-export type CopyPageElement = Envelope<MessageType.CopyElement, string>;
+export interface CopyPayload {
+	itemType: Types.SerializedItemType;
+	projectId: string;
+	itemId: string;
+}
+export type Copy = Envelope<MessageType.Copy, CopyPayload>;
+export type CopyElement = Envelope<MessageType.CopyElement, string>;
 export type CreateNewPage = Envelope<MessageType.CreateNewPage, undefined>;
 export type CreateScriptBundleRequest = Envelope<
 	MessageType.CreateScriptBundleRequest,
@@ -230,7 +266,10 @@ export type CreateScriptBundleResponse = Envelope<
 	MessageType.CreateScriptBundleResponse,
 	Types.FilePayload[]
 >;
-export type Cut = EmptyEnvelope<MessageType.Cut>;
+export type Cut = Envelope<
+	MessageType.Cut,
+	{ projectId: string; item: Types.SerializedItem; itemType: Types.SerializedItemType }
+>;
 export type DeleteSelected = EmptyEnvelope<MessageType.DeleteSelected>;
 export type KeyboardChange = Envelope<MessageType.KeyboardChange, { metaDown: boolean }>;
 export type NewFileRequest = EmptyEnvelope<MessageType.CreateNewFileRequest>;
@@ -245,7 +284,7 @@ export type Maximize = EmptyEnvelope<MessageType.Maximize>;
 export type OpenExternalURL = Envelope<MessageType.OpenExternalURL, string>;
 export type OpenFileRequest = Envelope<
 	MessageType.OpenFileRequest,
-	{ path: string; silent?: boolean } | undefined
+	{ path?: string; silent?: boolean; replace: boolean }
 >;
 export type OpenFileResponse = Envelope<MessageType.OpenFileResponse, Types.ProjectPayload>;
 export type PageChange = Envelope<MessageType.PageChange, Types.PageChangePayload>;
@@ -258,7 +297,7 @@ export type PasteElement = Envelope<
 	MessageType.PasteElement,
 	{
 		element: Types.SerializedElement;
-		project?: Types.SerializedProject;
+		project: Types.SerializedProject;
 		targetType: Types.ElementTargetType;
 		targetId?: string;
 	}
@@ -274,13 +313,17 @@ export type ProjectResponse = Envelope<
 >;
 export type Redo = EmptyEnvelope<MessageType.Redo>;
 export type Reload = Envelope<MessageType.Reload, { forced: boolean } | undefined>;
-export type Save = Envelope<MessageType.Save, { publish: boolean } | undefined>;
+export type Save = Envelope<MessageType.Save, { publish: boolean; projectId: string }>;
+export type SaveAs = Envelope<MessageType.SaveAs, { projectId: string }>;
 export type SaveResult = Envelope<
 	MessageType.SaveResult,
-	{ draft: boolean; result: Types.PersistencePersistResult; name: string }
+	{ project: Types.SerializedProject; previous: string }
 >;
 export type SetPane = Envelope<MessageType.SetPane, { pane: Types.AppPane; visible: boolean }>;
-export type ShowError = Envelope<MessageType.ShowError, { message: string; stack: string }>;
+export type ShowError = Envelope<
+	MessageType.ShowError,
+	{ message: string; detail: string; error?: { message: string; stack: string }; help?: string }
+>;
 export type SketchExportRequest = Envelope<
 	MessageType.SketchExportRequest,
 	Types.SketchExportPayload
@@ -316,7 +359,7 @@ export type UpdatePatternLibraryResponse = Envelope<
 >;
 export type ExportHtmlProject = Envelope<
 	MessageType.ExportHtmlProject,
-	{ path: string | undefined }
+	{ path: string | undefined; projectId: string }
 >;
 export type ExportPngPage = Envelope<MessageType.ExportPngPage, { path: string | undefined }>;
 export type ExportSketchPage = Envelope<MessageType.ExportSketchPage, { path: string | undefined }>;
@@ -328,7 +371,7 @@ export type ChangeProject = Envelope<
 
 export type ChangeUserStore = Envelope<
 	MessageType.ChangeUserStore,
-	{ userStore: Types.SerializedUserStore }
+	{ userStore: Types.SerializedUserStore; projectId: string }
 >;
 
 export type HighlightElement = Envelope<
@@ -338,91 +381,11 @@ export type HighlightElement = Envelope<
 
 export type SelectElement = Envelope<
 	MessageType.SelectElement,
-	{ element: Types.SerializedElement | undefined }
+	{ element: Types.SerializedElement | undefined; projectId: string }
 >;
 
-export type Clipboard = Envelope<
-	MessageType.Clipboard,
-	{
-		type: Types.SerializedItemType;
-		item: Types.SerializedItem;
-		project: Types.SerializedProject;
-	}
->;
+export type Clipboard = Envelope<MessageType.Clipboard, Types.ClipboardPayload>;
 
-export interface MobxUpdatePayload {
-	id: string;
-	name: string;
-	change: MobxUpdateChange;
-}
-
-export interface MobxAddPayload<T = unknown> {
-	id: string;
-	name: string;
-	memberName: string;
-	valueModel: Types.ModelName | undefined;
-	change: MobxAddChange<T>;
-}
-
-export interface MobxDeletePayload {
-	id: string;
-	name: string;
-	memberName: string;
-	change: {
-		type: Types.MobxChangeType.Delete;
-		key: string;
-	};
-}
-
-export interface MobxSplicePayload<T = unknown> {
-	id: string;
-	name: string;
-	memberName: string;
-	valueModel: Types.ModelName | undefined;
-	change: MobxSpliceChange<T>;
-}
-
-export interface MobxAddChange<T> {
-	type: Types.MobxChangeType.Add;
-	key: string;
-	newValue: T;
-}
-
-export interface MobxSpliceChange<T> {
-	type: Types.MobxChangeType.Splice;
-	index: number;
-	added: T[];
-	removed: T[];
-}
-
-export type MobxUpdateChange =
-	| MobxArrayUpdatePayload
-	| MobxMapUpdatePayload
-	| MobxObjectUpdatePayload;
-
-export interface MobxArrayUpdatePayload<T = unknown> {
-	type: Types.MobxChangeType.Update;
-	index: number;
-	newValue: T;
-}
-
-export interface MobxMapUpdatePayload<T = unknown> {
-	type: Types.MobxChangeType.Update;
-	key: string;
-	mapKey: string;
-	newValue: T;
-}
-
-export interface MobxObjectUpdatePayload<T = unknown> {
-	type: Types.MobxChangeType.Update;
-	key: string;
-	newValue: T;
-}
-
-export type MobxUpdateMessage = Envelope<MessageType.MobxUpdate, MobxUpdatePayload>;
-export type MobxAddMessage = Envelope<MessageType.MobxAdd, MobxAddPayload>;
-export type MobxDeleteMessage = Envelope<MessageType.MobxDelete, MobxDeletePayload>;
-export type MobxSpliceMessage = Envelope<MessageType.MobxSplice, MobxSplicePayload>;
 export type WindowClose = EmptyEnvelope<MessageType.WindowClose>;
 export type ChromeScreenShot = Envelope<
 	MessageType.ChromeScreenShot,
@@ -431,3 +394,118 @@ export type ChromeScreenShot = Envelope<
 		height: number;
 	}
 >;
+
+export type WindowOpen = Envelope<
+	MessageType.WindowOpen,
+	{
+		windowId: string;
+		projectId: string;
+		projectPath: string;
+	}
+>;
+
+export type UseFileRequest = Envelope<
+	MessageType.UseFileRequest,
+	{ contents: string; silent: boolean; replace: boolean; path?: string }
+>;
+
+export type UseFileResponse = Envelope<
+	MessageType.UseFileResponse,
+	{
+		project: Types.ProjectPayload;
+		replace: boolean;
+	}
+>;
+
+export type ShowMessage = Envelope<
+	MessageType.ShowMessage,
+	{
+		message: string;
+		detail?: string;
+		buttons: {
+			id?: string;
+			label: string;
+			message?: Message;
+		}[];
+	}
+>;
+
+export type ToggleFullScreen = EmptyEnvelope<MessageType.ToggleFullScreen>;
+
+export type MobxMapChange = Mobx.IMapDidChange;
+export type MobxChange =
+	| Mobx.IObjectDidChange
+	| Mobx.IArrayChange
+	| Mobx.IArraySplice
+	| Mobx.IMapDidChange;
+
+export type ProjectUpdate = Envelope<
+	MessageType.ProjectUpdate,
+	{
+		change: MobxChange;
+		path: string;
+		projectId: string;
+	}
+>;
+
+export type AppUpdate = Envelope<
+	MessageType.AppUpdate,
+	{
+		change: MobxChange;
+		path: string;
+		appId: string;
+	}
+>;
+
+export type WindowFocused = Envelope<
+	MessageType.WindowFocused,
+	{
+		app: Types.SerializedAlvaApp;
+		projectId?: string;
+	}
+>;
+
+export type WindowBlured = Envelope<
+	MessageType.WindowBlured,
+	{
+		app: Types.SerializedAlvaApp;
+		projectId?: string;
+	}
+>;
+
+export type ToggleDevTools = EmptyEnvelope<MessageType.ToggleDevTools>;
+
+export type OpenWindow = Envelope<
+	MessageType.OpenWindow,
+	{
+		view: Types.AlvaView;
+		projectId: string;
+	}
+>;
+
+export type UpdateAvailable = Envelope<
+	MessageType.UpdateAvailable,
+	{
+		readonly version: string;
+		readonly releaseName?: string | null;
+		readonly releaseNotes?: string | null;
+		readonly releaseDate: string;
+	}
+>;
+
+export type UpdateUnavailable = EmptyEnvelope<MessageType.UpdateUnavailable>;
+
+export type UpdateError = Envelope<
+	MessageType.UpdateError,
+	{
+		error: {
+			message: string;
+		};
+	}
+>;
+
+export type UpdateDownloadProgress = Envelope<MessageType.UpdateDownloadProgress, unknown>;
+
+export type UpdateDownloaded = Envelope<MessageType.UpdateDownloaded, unknown>;
+
+export type UpdateDownload = EmptyEnvelope<MessageType.UpdateDownload>;

@@ -1,7 +1,6 @@
 import * as PatternProperty from './pattern-property';
 import * as SerializedModel from './serialized-model';
 import * as UserStore from './user-store';
-import * as Message from '../message';
 
 export enum AppState {
 	Starting = 'starting',
@@ -248,24 +247,23 @@ export enum PreviewDocumentMode {
 }
 
 export enum ContextMenuType {
-	LayoutMenu = 'layout-menu',
 	ElementMenu = 'element-menu'
 }
 
-export type ContextMenuRequestPayload = ElementContextMenuRequest | LayoutContextMenuRequest;
+export type ContextMenuRequestPayload = ElementContextMenuRequest;
 
 export interface ElementContextMenuRequest {
 	menu: ContextMenuType.ElementMenu;
+	projectId: string;
 	data: ElementContextMenuRequestPayload;
+	position: {
+		x: number;
+		y: number;
+	};
 }
 
 export interface ElementContextMenuRequestPayload {
 	element: SerializedModel.SerializedElement;
-}
-
-export interface LayoutContextMenuRequest {
-	menu: ContextMenuType.LayoutMenu;
-	data: LayoutContextMenuRequestPayload;
 }
 
 export interface LayoutContextMenuRequestPayload {
@@ -345,14 +343,44 @@ declare class ModelSurface {
 
 export { ModelSurface };
 
-export interface Sender {
-	match<T extends Message.Message>(
-		type: Message.Message['type'],
-		handler: (message: T) => void
-	): Promise<void>;
-}
-
 export enum ActionName {
 	MatchHighlightedElement = 'MatchHighlightedElement',
 	OpenFile = 'OpenFile'
+}
+
+export interface Dependencies {
+	patterns: PatternDependency[];
+	libraries: LibraryDependency[];
+}
+
+export interface LibraryDependency {
+	id: string;
+	bundleId: string;
+	bundleHash: string;
+	origin: SerializedModel.SerializedPatternLibraryOrigin;
+}
+
+export interface PatternDependency {
+	id: string;
+	contextId: string;
+	libraryId: string;
+	origin: SerializedModel.SerializedPatternOrigin;
+	type: SerializedModel.SerializedPatternType;
+}
+
+export enum PreviewTransferType {
+	Inline = 'inline',
+	Message = 'message'
+}
+
+export interface Location {
+	readonly hash: string;
+	readonly host: string;
+	readonly hostname: string;
+	readonly href: string;
+	readonly origin: string;
+	readonly pathname: string;
+	readonly port: string;
+	readonly protocol: string;
+	readonly search: string;
 }

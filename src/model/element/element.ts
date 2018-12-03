@@ -10,6 +10,7 @@ import { Project } from '../project';
 import * as Types from '../../types';
 import { UserStoreReference } from '../user-store-reference';
 import * as uuid from 'uuid';
+import { PatternLibrary } from '../pattern-library';
 
 export interface ElementInit {
 	containerId?: string;
@@ -170,6 +171,10 @@ export class Element {
 		}
 
 		this.propertyValues = new Map(init.propertyValues);
+
+		this.properties
+			.filter(p => !this.propertyValues.has(p.getPatternPropertyId()))
+			.forEach(p => this.propertyValues.set(p.getPatternPropertyId(), undefined));
 	}
 
 	public static from(serialized: Types.SerializedElement, context: ElementContext): Element {
@@ -207,6 +212,30 @@ export class Element {
 		return element;
 	}
 
+	public static fromPattern(
+		pattern: Pattern,
+		init: { dragged: boolean; contents: ElementContent[]; project: Project }
+	): Element {
+		return new Element(
+			{
+				contentIds: init.contents.map(e => e.getId()),
+				dragged: init.dragged || false,
+				focused: false,
+				highlighted: false,
+				forcedOpen: false,
+				open: false,
+				patternId: pattern.getId(),
+				placeholderHighlighted: false,
+				propertyValues: [],
+				setDefaults: true,
+				selected: false
+			},
+			{
+				project: init.project
+			}
+		);
+	}
+
 	public accepts(child: Element): boolean {
 		const childrenContent = this.getContentBySlotType(Types.SlotType.Children);
 
@@ -236,8 +265,13 @@ export class Element {
 	}
 
 	@Mobx.action
-	public clone(opts?: { withState: boolean }): Element {
+	public clone(opts?: { withState: boolean; target?: Project }): Element {
+		const target = opts && opts.target ? opts.target : this.project;
 		const withState = Boolean(opts && opts.withState);
+		const previousPattern = this.getPattern()!;
+		const previousLibrary = previousPattern.getPatternLibrary();
+		const nextLibrary = target.getPatternLibraryByContextId(previousLibrary.contextId)!;
+		const nextPattern = nextLibrary.getPatternByContextId(previousPattern.getContextId());
 
 		const clonedActions: Map<string, ElementAction> = this.properties
 			.filter(prop => {
@@ -267,18 +301,21 @@ export class Element {
 		const clonedContents = [...this.contentIds]
 			.map(contentId => this.project.getElementContentById(contentId))
 			.filter((content): content is ElementContent => typeof content !== 'undefined')
-			.map(content => content.clone({ withState }));
+			.map(content => content.clone({ withState, target }));
 
 		const propertyValues: [string, Types.ElementPropertyValue][] = [
 			...this.propertyValues.entries()
 		].map(([id, value]) => {
 			const clonedAction = clonedActions.get(id);
+			const previousProperty = previousPattern.getPropertyById(id);
+			const nextProperty = nextPattern!.getPropertyByContextId(previousProperty!.getContextId());
+			const nextId = nextProperty!.getId();
 
 			if (clonedAction) {
-				return [id, clonedAction.getId()] as [string, string];
+				return [nextId, clonedAction.getId()] as [string, string];
 			}
 
-			return [id, value] as [string, Types.ElementPropertyValue];
+			return [nextId, value] as [string, Types.ElementPropertyValue];
 		});
 
 		const clone = new Element(
@@ -292,14 +329,14 @@ export class Element {
 				name: this.name,
 				open: withState ? this.open : false,
 				forcedOpen: withState ? this.forcedOpen : false,
-				patternId: this.patternId,
+				patternId: nextPattern!.getId(),
 				placeholderHighlighted: withState ? this.placeholderHighlighted : false,
 				propertyValues,
 				role: this.role,
 				selected: withState ? this.selected : false
 			},
 			{
-				project: this.project
+				project: target
 			}
 		);
 
@@ -334,19 +371,19 @@ export class Element {
 			.filter((ref): ref is UserStoreReference => typeof ref !== 'undefined');
 
 		clonedReferences.forEach(clonedReference => {
-			this.project.getUserStore().addReference(clonedReference);
+			target.getUserStore().addReference(clonedReference);
 		});
 
 		clonedContents.forEach(clonedContent => {
 			clonedContent.setParentElement(clone);
-			this.project.addElementContent(clonedContent);
+			target.addElementContent(clonedContent);
 		});
 
 		[...clonedActions.values()].forEach(clonedAction => {
-			this.project.addElementAction(clonedAction);
+			target.addElementAction(clonedAction);
 		});
 
-		this.project.addElement(clone);
+		target.addElement(clone);
 		return clone;
 	}
 
@@ -530,6 +567,29 @@ export class Element {
 		return this.project.getPatternById(this.patternId);
 	}
 
+	@Mobx.action
+	public setPattern(pattern: Pattern): void {
+		const previousPattern = this.getPattern();
+		this.patternId = pattern.getId();
+
+		if (previousPattern) {
+			pattern.getProperties().forEach(prop => {
+				const previousProp =
+					pattern.getOrigin() === Types.PatternOrigin.BuiltIn
+						? previousPattern.getPropertyByContextId(prop.getContextId())
+						: previousPattern.getPropertyById(prop.getId());
+
+				if (!previousProp) {
+					return;
+				}
+
+				const previousValue = this.getPropertyValue(previousProp.getId());
+				this.propertyValues.delete(previousProp.getId());
+				this.propertyValues.set(prop.getId(), previousValue);
+			});
+		}
+	}
+
 	public getPlaceholderHighlighted(): boolean {
 		return this.placeholderHighlighted;
 	}
@@ -709,7 +769,7 @@ export class Element {
 			forcedOpen: this.forcedOpen,
 			patternId: this.patternId,
 			placeholderHighlighted: this.placeholderHighlighted,
-			propertyValues: [...this.propertyValues.entries()],
+			propertyValues: Array.from(this.propertyValues.entries()),
 			role: serializeRole(this.role),
 			selected: this.selected
 		};
@@ -722,23 +782,31 @@ export class Element {
 
 	@Mobx.action
 	public update(b: Element): void {
-		if (this.selected) {
-			this.project.unsetSelectedElement();
-		}
-
-		if (this.shouldHighlight) {
-			this.project.unsetHighlightedElement();
-		}
-
-		this.shouldHighlight = b.shouldHighlight;
-		this.dragged = b.dragged;
-		this.shouldFocus = b.focused;
 		this.containerId = b.containerId;
 		this.name = b.name;
-		this.open = b.open;
-		this.forcedOpen = b.forcedOpen;
-		this.shouldPlaceholderHighlight = b.placeholderHighlighted;
-		this.selected = b.selected;
+
+		Array.from(b.propertyValues.entries()).forEach(([key, value]) => {
+			this.propertyValues.set(key, value);
+		});
+	}
+
+	public getLibraryDependencies(): PatternLibrary[] {
+		const patterns = [this.getPattern(), ...this.getDescendants().map(d => d.getPattern())]
+			.filter((p): p is Pattern => typeof p !== 'undefined')
+			.map(p => ({
+				id: p.getId(),
+				contextId: p.getContextId(),
+				libraryId: p.getPatternLibrary().getId(),
+				origin: p.getOrigin(),
+				type: p.getType()
+			}));
+
+		return _.uniqBy(
+			patterns
+				.map(p => this.project.getPatternLibraryById(p.libraryId))
+				.filter((p): p is PatternLibrary => typeof p !== 'undefined'),
+			'id'
+		);
 	}
 }
 

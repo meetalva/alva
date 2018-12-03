@@ -24,3 +24,5 @@ jobs:
       - run: npm test
       - run: npm run lint
       - run: npm run build
+      - run: npm run static
+      - run: npm run deploy

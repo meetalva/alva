@@ -1,4 +1,3 @@
-import { setSearch } from '../alva-util';
 import { PreviewFrame, PreviewPane } from '../components';
 import { Copy, CopySize } from '../components/copy';
 import { IconSize } from '../components/icons';
@@ -8,30 +7,54 @@ import * as React from 'react';
 import { Layout } from 'react-feather';
 import { Space, SpaceSize } from '../components/space';
 import { WithStore } from '../store';
+import * as PreviewDocument from '../preview-document/preview-document';
 import * as Types from '../types';
+import * as _ from 'lodash';
+import * as Model from '../model';
 
 export interface PreviewPaneProps {
 	isDragging: boolean;
-	previewFrame: string;
 }
+
+const getSrcDoc = _.memoize((_, project: Model.Project) =>
+	PreviewDocument.previewDocument({
+		transferType: Types.PreviewTransferType.Inline,
+		data: project.toJSON(),
+		scripts: []
+	})
+);
 
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
-	public render(): JSX.Element {
+	private frame: HTMLIFrameElement | null = null;
+
+	public componentDidMount() {
 		const props = this.props as PreviewPaneProps & WithStore;
-		const app = props.store.getApp();
+		const sender = props.store.getSender();
+
+		if (this.frame && this.frame.contentWindow) {
+			sender.setWindow(this.frame.contentWindow);
+		}
+	}
+
+	public render(): JSX.Element | null {
+		const props = this.props as PreviewPaneProps & WithStore;
+		const project = props.store.getProject();
+
+		if (!project) {
+			return null;
+		}
 
 		return (
 			<PreviewPane>
 				<PreviewFrame
-					src={setSearch(props.previewFrame, { mode: Types.PreviewDocumentMode.Live })}
+					ref={frame => (this.frame = frame)}
+					srcDoc={getSrcDoc(project.getId(), project)}
 					offCanvas={false}
-					onMouseEnter={() => app.setHoverArea(Types.HoverArea.Preview)}
 					onMouseLeave={() => {
 						props.store.getProject().unsetHighlightedElement();
 						props.store.getProject().unsetHighlightedElementContent();
-						app.setHoverArea(Types.HoverArea.Chrome);
 					}}
 				/>
 				<Overlay isVisisble={props.isDragging}>

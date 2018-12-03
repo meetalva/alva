@@ -1,10 +1,11 @@
 import * as Components from '../../components';
-import { MessageType } from '../../message';
+import * as Message from '../../message';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
+import { FileInput, FileFormat } from '../file-input';
 
 export interface PropertyItemAssetProps {
 	property: Model.ElementProperty;
@@ -30,6 +31,9 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 				? Components.PropertyItemAssetInputType.File
 				: Components.PropertyItemAssetInputType.Url;
 
+		const app = props.store.getApp();
+		const needsInput = !app.hasFileAccess();
+
 		return (
 			<Components.PropertyItemAsset
 				description={patternProperty.getDescription()}
@@ -46,25 +50,42 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 				onChooseClick={() => {
 					const transactionId = uuid.v4();
 
-					const sender = props.store.getSender();
+					const app = props.store.getApp();
 
-					sender.receive(message => {
-						if (
-							message.type === MessageType.AssetReadResponse &&
-							message.id === transactionId
-						) {
-							property.setValue(message.payload);
-							props.store.commit();
+					app.match<Message.AssetReadResponse>(
+						Message.MessageType.AssetReadResponse,
+						message => {
+							if (message.id === transactionId) {
+								property.setValue(message.payload);
+								props.store.commit();
+							}
 						}
-					});
+					);
 
-					sender.send({
+					app.send({
 						id: transactionId,
 						payload: undefined,
-						type: MessageType.AssetReadRequest
+						type: Message.MessageType.AssetReadRequest
 					});
 				}}
 				placeholder="Or enter URL"
+				renderChoose={
+					needsInput
+						? () => (
+								<Components.ButtonGroupButton as="label">
+									Choose
+									<FileInput
+										accept="image/*"
+										format={FileFormat.Binary}
+										onChange={(result: string) => {
+											property.setValue(result);
+											props.store.commit();
+										}}
+									/>
+								</Components.ButtonGroupButton>
+						  )
+						: undefined
+				}
 			/>
 		);
 	}

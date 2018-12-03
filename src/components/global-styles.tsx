@@ -1,17 +1,26 @@
 import { Color } from './colors';
 import { fonts } from './fonts';
-import { injectGlobal } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
-export default globalStyles;
+export const GlobalStyle = createGlobalStyle`
+	body,
+	html {
+		height: 100%;
+		width: 100%;
+		margin: 0;
+		background-color: ${Color.Grey97};
+		font-family: ${fonts().NORMAL_FONT};
+		font-size: 12px;
+	}
 
-export function globalStyles(): void {
-	// tslint:disable-next-line
-	return injectGlobal`
-		body {
-			margin: 0;
-			background-color: ${Color.Grey97};
-			font-family: ${fonts().NORMAL_FONT};
-			font-size: 12px;
+	.dnd-poly-drag-image {
+		opacity: .5 !important;
+	}
+
+	@supports (-webkit-overflow-scrolling: touch) {
+		body,
+		html {
+			position: fixed;
 		}
-	`;
-}
+	}
+`;

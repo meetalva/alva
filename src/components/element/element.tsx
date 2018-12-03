@@ -213,7 +213,7 @@ class SeamlessInput extends React.Component<SeamlessInputProps> {
 		return (
 			<StyledSeamlessInput
 				autoFocus={props.autoFocus}
-				innerRef={ref => (this.ref = ref)}
+				ref={ref => (this.ref = ref)}
 				value={props.value}
 				onChange={props.onChange}
 			/>

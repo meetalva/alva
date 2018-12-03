@@ -1,6 +1,5 @@
-import { Message, MessageType } from '../message';
-
-const TYPES = Object.values(MessageType);
+import { Message } from '../message';
+import { isMessageType } from './is-message-type';
 
 // tslint:disable-next-line:no-any
 export function isMessage(input: any): input is Message {
@@ -14,7 +13,7 @@ export function isMessage(input: any): input is Message {
 		return false;
 	}
 
-	if (!TYPES.includes(type)) {
+	if (!isMessageType(type)) {
 		return false;
 	}
 

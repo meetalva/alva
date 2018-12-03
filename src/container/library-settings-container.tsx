@@ -15,8 +15,12 @@ export class LibrarySettingsContainer extends React.Component<LibrarySettingsCon
 	public render(): JSX.Element {
 		const props = this.props as LibrarySettingsContainerProps & WithStore;
 		const capabilities = props.library.getCapabilites();
-		const mayUpdate = capabilities.includes(Types.LibraryCapability.Update);
-		const mayReconnect = capabilities.includes(Types.LibraryCapability.Reconnect);
+		const mayUpdate =
+			capabilities.includes(Types.LibraryCapability.Update) &&
+			props.store.getApp().hasFileAccess();
+		const mayReconnect =
+			capabilities.includes(Types.LibraryCapability.Reconnect) &&
+			props.store.getApp().hasFileAccess();
 
 		return (
 			<Components.PropertyBox

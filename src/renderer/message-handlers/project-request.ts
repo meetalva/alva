@@ -3,13 +3,13 @@ import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 import * as Types from '../../types';
 
 export function projectRequest({ store }: MessageHandlerContext): MessageHandler<M.ProjectRequest> {
-	const sender = store.getSender();
+	const app = store.getApp();
 
 	return m => {
 		const data = store.getProject();
 
 		if (!data) {
-			sender.send({
+			app.send({
 				id: m.id,
 				type: M.MessageType.ProjectResponse,
 				payload: {
@@ -21,9 +21,10 @@ export function projectRequest({ store }: MessageHandlerContext): MessageHandler
 			return;
 		}
 
-		sender.send({
+		app.send({
 			id: m.id,
 			type: M.MessageType.ProjectResponse,
+			transaction: m.transaction,
 			payload: {
 				data: data.toJSON(),
 				status: Types.ProjectStatus.Ok

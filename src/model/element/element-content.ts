@@ -113,13 +113,21 @@ export class ElementContent {
 	}
 
 	@Mobx.action
-	public clone(opts?: { withState: boolean }): ElementContent {
+	public clone(opts: { withState: boolean; target?: Project }): ElementContent {
 		const withState = Boolean(opts && opts.withState);
+		const target = opts && opts.target ? opts.target : this.project;
+		const previousPattern = this.getParentElement()!.getPattern()!;
+		const previousLibrary = previousPattern.getPatternLibrary();
+		const nextLibrary = target.getPatternLibraryByContextId(previousLibrary.contextId)!;
+		const nextPattern = nextLibrary.getPatternByContextId(previousPattern.getContextId());
+
+		const previousSlot = this.getSlot()!;
+		const nextSlot = nextPattern!.getSlotByContextId(previousSlot.getContextId())!;
 
 		const clonedElements = this.elementIds
 			.map(elementId => this.project.getElementById(elementId))
 			.filter((e): e is Element => typeof e !== 'undefined')
-			.map(e => e.clone({ withState }));
+			.map(e => e.clone({ withState, target }));
 
 		const clone = new ElementContent(
 			{
@@ -128,15 +136,15 @@ export class ElementContent {
 				highlighted: withState ? this.highlighted : false,
 				id: uuid.v4(),
 				open: withState ? this.open : false,
-				slotId: this.slotId
+				slotId: nextSlot.getId()
 			},
 			{
-				project: this.project
+				project: target
 			}
 		);
 
 		clonedElements.forEach(clonedElement => {
-			this.project.addElement(clonedElement);
+			target.addElement(clonedElement);
 			clonedElement.setContainer(clone);
 		});
 

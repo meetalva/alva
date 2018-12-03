@@ -17,7 +17,20 @@ const StyledPreviewPane = styled.div`
 	background: ${Color.White};
 `;
 
-const StyledFrame = styled.iframe`
+export interface PreviewFrameProps {
+	offCanvas: boolean;
+	onMouseEnter?: React.MouseEventHandler<HTMLElement>;
+	onMouseLeave?: React.MouseEventHandler<HTMLElement>;
+	src?: string;
+	srcDoc?: string;
+}
+
+export interface PreviewPaneProps {
+	children?: React.ReactNode;
+	id?: string;
+}
+
+const PreviewFrame = styled.iframe`
 	position: ${(props: PreviewFrameProps) => (props.offCanvas ? 'absolute' : 'static')};
 	top: ${(props: PreviewFrameProps) => (props.offCanvas ? '100vh' : 'auto')};
 	width: 100%;
@@ -25,20 +38,6 @@ const StyledFrame = styled.iframe`
 	overflow: hidden;
 	border: none;
 `;
-
-export interface PreviewFrameProps {
-	offCanvas: boolean;
-	onMouseEnter?: React.MouseEventHandler<HTMLElement>;
-	onMouseLeave?: React.MouseEventHandler<HTMLElement>;
-	src: string;
-}
-
-const PreviewFrame: React.SFC<PreviewFrameProps> = props => <StyledFrame {...props} />;
-
-export interface PreviewPaneProps {
-	children?: React.ReactNode;
-	id?: string;
-}
 
 class PreviewPane extends React.Component<PreviewPaneProps> {
 	public render(): JSX.Element {

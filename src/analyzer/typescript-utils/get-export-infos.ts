@@ -84,11 +84,21 @@ export function getExportInfos(
 			const type = typechecker.getTypeAtLocation(declaration);
 			const exportType = new TypeScriptType(type, typechecker);
 
+			const jsDocTags = TypeScript.getJSDocTags(statement);
+			const exportIgnore = jsDocTags.some(tag => tag.tagName.escapedText === 'ignore');
+
+			const descriptionTag = jsDocTags.find(tag => tag.tagName.escapedText === 'description');
+			const exportDescription = descriptionTag ? descriptionTag.comment : '';
+
+			const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
+			const exportName = nameTag ? nameTag.comment : undefined;
+
 			return [
 				{
-					description: '',
+					name: exportName,
+					description: exportDescription || '',
 					type: exportType,
-					ignore: false,
+					ignore: exportIgnore,
 					statement
 				}
 			];

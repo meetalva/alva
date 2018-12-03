@@ -14,6 +14,12 @@ export function getExportInfos(
 		modifiers &&
 		modifiers.some(modifier => modifier.kind === TypeScript.SyntaxKind.DefaultKeyword);
 
+	const jsDocTags = TypeScript.getJSDocTags(statement);
+	const exportIgnore = jsDocTags.some(tag => tag.tagName.escapedText === 'ignore');
+
+	const descriptionTag = jsDocTags.find(tag => tag.tagName.escapedText === 'description');
+	const exportDescription = descriptionTag ? descriptionTag.comment : '';
+
 	if (TypeScript.isVariableStatement(statement)) {
 		for (const declaration of statement.declarationList.declarations) {
 			if (!declaration.type) {
@@ -22,12 +28,6 @@ export function getExportInfos(
 
 			const type = typechecker.getTypeAtLocation(declaration);
 			const exportType = new TypeScriptType(type, typechecker);
-
-			const jsDocTags = TypeScript.getJSDocTags(statement);
-			const exportIgnore = jsDocTags.some(tag => tag.tagName.escapedText === 'ignore');
-
-			const descriptionTag = jsDocTags.find(tag => tag.tagName.escapedText === 'description');
-			const exportDescription = descriptionTag ? descriptionTag.comment : '';
 
 			const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
 			const exportName = nameTag
@@ -56,12 +56,6 @@ export function getExportInfos(
 		const type = typechecker.getTypeAtLocation(statement);
 		const exportType = new TypeScriptType(type, typechecker);
 
-		const jsDocTags = TypeScript.getJSDocTags(statement);
-		const exportIgnore = jsDocTags.some(tag => tag.tagName.escapedText === 'ignore');
-
-		const descriptionTag = jsDocTags.find(tag => tag.tagName.escapedText === 'description');
-		const exportDescription = descriptionTag ? descriptionTag.comment : '';
-
 		const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
 		const exportName = nameTag ? nameTag.comment : isDefault ? undefined : statement.name.text;
 
@@ -84,12 +78,6 @@ export function getExportInfos(
 			const type = typechecker.getTypeAtLocation(declaration);
 			const exportType = new TypeScriptType(type, typechecker);
 
-			const jsDocTags = TypeScript.getJSDocTags(statement);
-			const exportIgnore = jsDocTags.some(tag => tag.tagName.escapedText === 'ignore');
-
-			const descriptionTag = jsDocTags.find(tag => tag.tagName.escapedText === 'description');
-			const exportDescription = descriptionTag ? descriptionTag.comment : '';
-
 			const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
 			const exportName = nameTag ? nameTag.comment : undefined;
 
@@ -111,16 +99,21 @@ export function getExportInfos(
 		}
 
 		return statement.exportClause.elements.map(exportSpecifier => {
-			const exportName = isDefault ? undefined : exportSpecifier.name.getText();
-
 			const type = typechecker.getTypeAtLocation(exportSpecifier);
 			const exportType = new TypeScriptType(type, typechecker);
 
+			const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
+			const exportName = nameTag
+				? nameTag.comment
+				: isDefault
+					? undefined
+					: exportSpecifier.name.getText();
+
 			return {
 				name: exportName,
-				description: '',
+				description: exportDescription || '',
 				type: exportType,
-				ignore: false,
+				ignore: exportIgnore,
 				statement
 			};
 		});

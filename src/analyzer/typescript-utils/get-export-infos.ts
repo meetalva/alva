@@ -53,17 +53,24 @@ export function getExportInfos(
 			return [];
 		}
 
-		const exportName = isDefault ? undefined : statement.name.text;
-
 		const type = typechecker.getTypeAtLocation(statement);
 		const exportType = new TypeScriptType(type, typechecker);
+
+		const jsDocTags = TypeScript.getJSDocTags(statement);
+		const exportIgnore = jsDocTags.some(tag => tag.tagName.escapedText === 'ignore');
+
+		const descriptionTag = jsDocTags.find(tag => tag.tagName.escapedText === 'description');
+		const exportDescription = descriptionTag ? descriptionTag.comment : '';
+
+		const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
+		const exportName = nameTag ? nameTag.comment : isDefault ? undefined : statement.name.text;
 
 		return [
 			{
 				name: exportName,
-				description: '',
+				description: exportDescription || '',
 				type: exportType,
-				ignore: false,
+				ignore: exportIgnore,
 				statement
 			}
 		];

@@ -20,6 +20,9 @@ export function getExportInfos(
 	const descriptionTag = jsDocTags.find(tag => tag.tagName.escapedText === 'description');
 	const exportDescription = descriptionTag ? descriptionTag.comment : '';
 
+	const iconTag = jsDocTags.find(tag => tag.tagName.escapedText === 'icon');
+	const exportIcon = iconTag ? iconTag.comment : '';
+
 	if (TypeScript.isVariableStatement(statement)) {
 		for (const declaration of statement.declarationList.declarations) {
 			if (!declaration.type) {
@@ -40,6 +43,7 @@ export function getExportInfos(
 				{
 					name: exportName,
 					description: exportDescription || '',
+					icon: exportIcon || '',
 					type: exportType,
 					ignore: exportIgnore,
 					statement
@@ -63,6 +67,7 @@ export function getExportInfos(
 			{
 				name: exportName,
 				description: exportDescription || '',
+				icon: exportIcon || '',
 				type: exportType,
 				ignore: exportIgnore,
 				statement
@@ -85,6 +90,7 @@ export function getExportInfos(
 				{
 					name: exportName,
 					description: exportDescription || '',
+					icon: exportIcon || '',
 					type: exportType,
 					ignore: exportIgnore,
 					statement
@@ -112,6 +118,7 @@ export function getExportInfos(
 			return {
 				name: exportName,
 				description: exportDescription || '',
+				icon: exportIcon || '',
 				type: exportType,
 				ignore: exportIgnore,
 				statement

@@ -14,6 +14,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 			contextId: PATTERN_CONTEXT_ID,
 			description: '',
 			exportName: 'default',
+			icon: '',
 			id: patternId,
 			name: 'Page',
 			origin: Types.PatternOrigin.BuiltIn,

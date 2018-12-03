@@ -47,6 +47,7 @@ export const Link = (context: BuiltInContext): BuiltInResult => {
 				contextId: PATTERN_CONTEXT_ID,
 				description: 'for Interaction',
 				exportName: 'default',
+				icon: 'ExternalLink',
 				id: patternId,
 				name: 'Link',
 				origin: Types.PatternOrigin.BuiltIn,

@@ -286,6 +286,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 				contextId: CONTEXT_ID,
 				description: 'for Flexbox Layouts',
 				exportName: 'default',
+				icon: 'Box',
 				id: patternId,
 				name: 'Box',
 				origin: Types.PatternOrigin.BuiltIn,

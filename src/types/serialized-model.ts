@@ -56,6 +56,7 @@ export interface SerializedPattern {
 	contextId: string;
 	description: string;
 	exportName: string;
+	icon: string;
 	id: string;
 	name: string;
 	origin: SerializedPatternOrigin;

@@ -12,6 +12,7 @@ export interface PatternInit {
 	description: string;
 	exportName: string;
 	id?: string;
+	icon: string;
 	name: string;
 	origin: Types.PatternOrigin;
 	propertyIds: string[];
@@ -29,6 +30,7 @@ export class Pattern {
 	@Mobx.observable private contextId: string;
 	@Mobx.observable private description: string;
 	@Mobx.observable private exportName: string;
+	@Mobx.observable private icon: string;
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
 	@Mobx.observable private origin: Types.PatternOrigin;
@@ -41,6 +43,7 @@ export class Pattern {
 		this.contextId = init.contextId;
 		this.description = init.description;
 		this.exportName = init.exportName;
+		this.icon = init.icon;
 		this.id = init.id || uuid.v4();
 		this.name = AlvaUtil.guessName(init.name);
 		this.origin = init.origin;
@@ -57,6 +60,7 @@ export class Pattern {
 				contextId: serialized.contextId,
 				description: serialized.description,
 				exportName: serialized.exportName,
+				icon: serialized.icon,
 				id: serialized.id,
 				name: serialized.name,
 				origin: deserializeOrigin(serialized.origin),
@@ -90,6 +94,10 @@ export class Pattern {
 
 	public getExportName(): string {
 		return this.exportName;
+	}
+
+	public getIcon(): string {
+		return this.icon;
 	}
 
 	public getId(): string {
@@ -158,6 +166,7 @@ export class Pattern {
 			contextId: this.contextId,
 			description: this.description,
 			exportName: this.exportName,
+			icon: this.icon,
 			id: this.id,
 			name: this.name,
 			origin: serializeOrigin(this.origin),

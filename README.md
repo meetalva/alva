@@ -91,6 +91,9 @@ There is no such thing as out-dated and static PNG screens, as the current versi
 ## Pattern Meta Data
 
 ### Pattern
+* **name**: TSDoc `@name [name]` - Used as the pattern name
+* **description**: TSDoc `@description [description]` - Used as subline for the pattern
+* **ignore**: TSDoc `@ignore` - Do not show this pattern
 
 ### Pattern Property
 

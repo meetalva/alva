@@ -132,10 +132,12 @@ export class ReferenceSelect extends React.Component<ReferenceSelectProps> {
 				{showConcreteValue && (
 					<HoverReveal>
 						{this.props.children}
-						<PositionedLinkIcon
-							onClick={e => this.handleConnect(e)}
-							position={props.iconPosition || IconPosition.Default}
-						/>
+						<div title="Connect Variable">
+							<PositionedLinkIcon
+								onClick={e => this.handleConnect(e)}
+								position={props.iconPosition || IconPosition.Default}
+							/>
+						</div>
 					</HoverReveal>
 				)}
 				{showPropertySelect &&

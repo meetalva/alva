@@ -143,12 +143,26 @@ export class ElementProperty {
 			return this.patternProperty.coerceValue(referencedValue);
 		}
 
+		const concreteValue = this.getConcreteValue();
+
+		if (typeof concreteValue !== 'undefined') {
+			return concreteValue;
+		}
+
+		return this.getDefaultValue();
+	}
+
+	public getConcreteValue(): Types.ElementPropertyValue {
 		const concreteValue = this.element.getPropertyValue(this.patternPropertyId);
 
 		if (typeof concreteValue !== 'undefined' && concreteValue !== null) {
 			return concreteValue;
 		}
 
+		return;
+	}
+
+	public getDefaultValue(): Types.ElementPropertyValue {
 		if (this.patternProperty) {
 			return this.patternProperty.getDefaultValue();
 		}

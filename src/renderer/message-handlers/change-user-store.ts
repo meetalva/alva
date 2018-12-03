@@ -11,8 +11,6 @@ export function changeUserStore({
 			return;
 		}
 
-		project.startBatch();
 		project.getUserStore().sync(m, { withEnhancer: false });
-		project.endBatch();
 	};
 }

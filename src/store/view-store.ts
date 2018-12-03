@@ -119,17 +119,28 @@ export class ViewStore {
 	}
 
 	public commit(): void {
+		if (!this.project || !this.app) {
+			return;
+		}
+
+		this.editHistory.push({
+			app: this.app.toJSON(),
+			project: this.project.toJSON()
+		});
+
 		window.requestIdleCallback(() => {
-			if (!this.project || !this.app) {
-				return;
-			}
-
-			this.editHistory.push({
-				app: this.app.toJSON(),
-				project: this.project.toJSON()
-			});
-
 			this.save();
+		});
+	}
+
+	public stage(): void {
+		if (!this.project || !this.app) {
+			return;
+		}
+
+		this.editHistory.replace({
+			app: this.app.toJSON(),
+			project: this.project.toJSON()
 		});
 	}
 
@@ -180,24 +191,11 @@ export class ViewStore {
 			.getSlots()
 			.map(slot => Model.ElementContent.fromSlot(slot, { project }));
 
-		const element = new Model.Element(
-			{
-				contentIds: elementContents.map(e => e.getId()),
-				dragged: init.dragged || false,
-				focused: false,
-				highlighted: false,
-				forcedOpen: false,
-				open: false,
-				patternId: init.pattern.getId(),
-				placeholderHighlighted: false,
-				propertyValues: [],
-				setDefaults: true,
-				selected: false
-			},
-			{
-				project
-			}
-		);
+		const element = Model.Element.fromPattern(init.pattern, {
+			dragged: Boolean(init.dragged),
+			contents: elementContents,
+			project
+		});
 
 		ViewStore.EPHEMERAL_CONTENTS.set(element, elementContents);
 		return element;
@@ -639,7 +637,6 @@ export class ViewStore {
 
 	@Mobx.action
 	public redo(): void {
-		this.getProject().startBatch();
 		const item = this.editHistory.forward();
 
 		if (!item) {
@@ -652,9 +649,28 @@ export class ViewStore {
 			return;
 		}
 
-		this.unsetDraggedElement();
+		const nowSelected = this.project.getSelectedElement();
+
 		this.setApp(Model.AlvaApp.from(item.app, { sender: this.getSender() }));
 		this.getProject().update(project);
+
+		const previouslySelected = project.getSelectedElement();
+
+		const elementToSelect = previouslySelected
+			? this.project.getElementById(previouslySelected.getId())
+			: undefined;
+
+		const elementToUnselect = nowSelected
+			? this.project.getElementById(nowSelected.getId())
+			: undefined;
+
+		if (elementToUnselect) {
+			elementToUnselect.setSelected(false);
+		}
+
+		if (elementToSelect) {
+			elementToSelect.setSelected(true);
+		}
 	}
 
 	@Mobx.action
@@ -860,7 +876,6 @@ export class ViewStore {
 
 	@Mobx.action
 	public undo(): void {
-		this.getProject().startBatch();
 		const item = this.editHistory.back();
 
 		if (!item) {
@@ -868,17 +883,35 @@ export class ViewStore {
 		}
 
 		const project = Model.Project.from(item.project);
+
 		const app = Model.AlvaApp.from(item.app, { sender: this.getSender() });
 
 		if (this.project && isEqual(project.toJSON(), this.project.toJSON())) {
 			return;
 		}
 
-		this.unsetDraggedElement();
-		this.setApp(app);
+		const nowSelected = this.project.getSelectedElement();
 
-		this.getProject().endBatch();
+		this.setApp(app);
 		this.getProject().update(project);
+
+		const previouslySelected = project.getSelectedElement();
+
+		const elementToSelect = previouslySelected
+			? this.project.getElementById(previouslySelected.getId())
+			: undefined;
+
+		const elementToUnselect = nowSelected
+			? this.project.getElementById(nowSelected.getId())
+			: undefined;
+
+		if (elementToUnselect) {
+			elementToUnselect.setSelected(false);
+		}
+
+		if (elementToSelect) {
+			elementToSelect.setSelected(true);
+		}
 	}
 
 	@Mobx.action

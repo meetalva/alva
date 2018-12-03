@@ -46,4 +46,16 @@ export class EditHistory {
 
 		this.pointer = Math.max(this.items.length - 1, 0);
 	}
+
+	public replace(item: Types.EditHistoryItem): void {
+		if (typeof this.pointer === 'undefined') {
+			this.pointer = Math.max(this.items.length - 1, 0);
+		}
+
+		if (typeof this.items[this.pointer] === 'undefined') {
+			return;
+		}
+
+		this.items.splice(this.pointer, 1, item);
+	}
 }

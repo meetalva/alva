@@ -171,6 +171,10 @@ export class Element {
 		}
 
 		this.propertyValues = new Map(init.propertyValues);
+
+		this.properties
+			.filter(p => !this.propertyValues.has(p.getPatternPropertyId()))
+			.forEach(p => this.propertyValues.set(p.getPatternPropertyId(), undefined));
 	}
 
 	public static from(serialized: Types.SerializedElement, context: ElementContext): Element {
@@ -206,6 +210,30 @@ export class Element {
 		}
 
 		return element;
+	}
+
+	public static fromPattern(
+		pattern: Pattern,
+		init: { dragged: boolean; contents: ElementContent[]; project: Project }
+	): Element {
+		return new Element(
+			{
+				contentIds: init.contents.map(e => e.getId()),
+				dragged: init.dragged || false,
+				focused: false,
+				highlighted: false,
+				forcedOpen: false,
+				open: false,
+				patternId: pattern.getId(),
+				placeholderHighlighted: false,
+				propertyValues: [],
+				setDefaults: true,
+				selected: false
+			},
+			{
+				project: init.project
+			}
+		);
 	}
 
 	public accepts(child: Element): boolean {
@@ -741,7 +769,7 @@ export class Element {
 			forcedOpen: this.forcedOpen,
 			patternId: this.patternId,
 			placeholderHighlighted: this.placeholderHighlighted,
-			propertyValues: [...this.propertyValues.entries()],
+			propertyValues: Array.from(this.propertyValues.entries()),
 			role: serializeRole(this.role),
 			selected: this.selected
 		};
@@ -754,27 +782,12 @@ export class Element {
 
 	@Mobx.action
 	public update(b: Element): void {
-		if (this.selected) {
-			this.project.unsetSelectedElement();
-		}
-
-		if (this.shouldHighlight) {
-			this.project.unsetHighlightedElement();
-		}
-
-		this.shouldHighlight = b.shouldHighlight;
-		this.dragged = b.dragged;
-		this.shouldFocus = b.focused;
 		this.containerId = b.containerId;
 		this.name = b.name;
-		this.open = b.open;
-		this.forcedOpen = b.forcedOpen;
-		this.shouldPlaceholderHighlight = b.placeholderHighlighted;
-		this.selected = b.selected;
 
-		Array.from(b.propertyValues.entries()).forEach(([key, value]) =>
-			this.propertyValues.set(key, value)
-		);
+		Array.from(b.propertyValues.entries()).forEach(([key, value]) => {
+			this.propertyValues.set(key, value);
+		});
 	}
 
 	public getLibraryDependencies(): PatternLibrary[] {

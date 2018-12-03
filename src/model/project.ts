@@ -36,8 +36,6 @@ export interface ProjectCreateInit {
 export class Project {
 	public readonly model = Types.ModelName.Project;
 
-	private batch: number = 1;
-
 	private syncing: boolean = false;
 
 	@Mobx.observable private draft: boolean;
@@ -177,8 +175,6 @@ export class Project {
 		init.patternLibraries.forEach(patternLibrary => {
 			this.addPatternLibrary(patternLibrary);
 		});
-
-		this.endBatch();
 	}
 
 	public static createBuiltinPatternLibrary(opts?: PatternLibraryCreateOptions): PatternLibrary {
@@ -980,17 +976,5 @@ export class Project {
 		pageChanges.removed.forEach(change => this.removePage(change.before));
 		pageChanges.added.forEach(change => this.addPage(change.after));
 		pageChanges.changed.forEach(change => change.before.update(change.after));
-	}
-
-	public startBatch(): void {
-		++this.batch;
-	}
-
-	public endBatch(): void {
-		this.batch = Math.max(0, --this.batch);
-	}
-
-	public get batching(): boolean {
-		return this.batch > 0;
 	}
 }

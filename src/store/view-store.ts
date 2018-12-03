@@ -879,6 +879,7 @@ export class ViewStore {
 		const item = this.editHistory.back();
 
 		if (!item) {
+			console.debug(`store.undo: no edit history item`);
 			return;
 		}
 
@@ -887,6 +888,7 @@ export class ViewStore {
 		const app = Model.AlvaApp.from(item.app, { sender: this.getSender() });
 
 		if (this.project && isEqual(project.toJSON(), this.project.toJSON())) {
+			console.debug(`store.undo: versions of project ${project.getName()} are equal`);
 			return;
 		}
 

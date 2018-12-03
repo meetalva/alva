@@ -190,6 +190,7 @@ function analyzePatternExport(
 			contextId,
 			description: ex.description ? ex.description : ctx.candidate.description,
 			exportName,
+			icon: ex.icon,
 			id,
 			name: exportName !== 'default' ? exportName : ctx.candidate.displayName,
 			origin: 'user-provided',

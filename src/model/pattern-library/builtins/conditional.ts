@@ -57,6 +57,7 @@ export const Conditional = (context: BuiltInContext): BuiltInResult => {
 				contextId: PATTERN_CONTEXT_ID,
 				description: 'for Show and Hide Logic',
 				exportName: 'default',
+				icon: 'ToggleRight',
 				id: patternId,
 				name: 'Conditional',
 				origin: Types.PatternOrigin.BuiltIn,

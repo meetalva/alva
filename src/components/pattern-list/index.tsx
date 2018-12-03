@@ -1,18 +1,14 @@
 import { Color } from '../colors';
 import { IconSize } from '../icons';
 import * as React from 'react';
-import { Box } from 'react-feather';
+import * as Icon from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
-
-export const PatternAnchor = {
-	icon: 'data-icon'
-};
 
 export interface PatternListItemProps {
 	children: React.ReactNode;
 	draggable?: boolean;
-	icon?: string;
+	icon: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 	onDragStart?: React.DragEventHandler<HTMLElement>;
@@ -53,7 +49,7 @@ const StyledPatternListItem = styled.div`
 		props.draggable ? 'cursor: move;' : props.onClick ? 'cursor: pointer;' : ''};
 `;
 
-const StyledIcon = styled(Box)`
+const IconWrapper = styled.div`
 	margin-top: ${getSpace(SpaceSize.XS)}px;
 	margin-right: ${getSpace(SpaceSize.XS + SpaceSize.XXS)}px;
 	flex: 0 0 ${IconSize.XS}px;
@@ -94,18 +90,19 @@ export const PatternFolderView: React.SFC<PatternFolderViewProps> = props => (
 
 export const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
 	const { draggable, onDragStart, icon, onClick } = props;
+	const IconImage = Icon.hasOwnProperty(icon) ? Icon[icon] : Icon.Box;
+
 	return (
 		<StyledPatternListItem
 			onDoubleClick={props.onDoubleClick}
 			onDragStart={onDragStart}
 			draggable={draggable}
 			onClick={onClick}
+			icon={props.icon}
 		>
-			{icon ? (
-				<img {...{ [PatternAnchor.icon]: 'true' }} src={icon} />
-			) : (
-				<StyledIcon size={IconSize.XS} color={Color.Grey50} />
-			)}
+			<IconWrapper>
+				<IconImage size={IconSize.XS} color={Color.Grey50} />
+			</IconWrapper>
 			<StyledPatternListItemContainer>{props.children}</StyledPatternListItemContainer>
 		</StyledPatternListItem>
 	);

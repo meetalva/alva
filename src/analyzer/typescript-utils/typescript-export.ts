@@ -23,6 +23,11 @@ export interface TypescriptExport {
 	statement: ts.Statement;
 
 	/**
+	 * Icon to show in pattern list
+	 */
+	icon: string;
+
+	/**
 	 * The type of the object exported.
 	 */
 	type: TypeScriptType;

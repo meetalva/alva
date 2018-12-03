@@ -17,7 +17,7 @@ export const Page = (context: BuiltInContext): BuiltInResult => {
 			id: patternId,
 			name: 'Page',
 			origin: Types.PatternOrigin.BuiltIn,
-			propertyIds: properties,
+			propertyIds: [],
 			slots: [
 				new PatternSlot({
 					contextId: 'children',

@@ -771,6 +771,10 @@ export class Element {
 		this.forcedOpen = b.forcedOpen;
 		this.shouldPlaceholderHighlight = b.placeholderHighlighted;
 		this.selected = b.selected;
+
+		Array.from(b.propertyValues.entries()).forEach(([key, value]) =>
+			this.propertyValues.set(key, value)
+		);
 	}
 
 	public getLibraryDependencies(): PatternLibrary[] {

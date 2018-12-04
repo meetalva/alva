@@ -47,26 +47,21 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 					property.setValue('');
 					props.store.commit();
 				}}
-				onChooseClick={() => {
-					const transactionId = uuid.v4();
-
+				onChooseClick={async () => {
 					const app = props.store.getApp();
 
-					app.match<Message.AssetReadResponse>(
-						Message.MessageType.AssetReadResponse,
-						message => {
-							if (message.id === transactionId) {
-								property.setValue(message.payload);
-								props.store.commit();
-							}
-						}
+					const response = await app.transaction(
+						{
+							type: Message.MessageType.AssetReadRequest,
+							id: uuid.v4(),
+							payload: undefined
+						},
+						{ type: Message.MessageType.AssetReadResponse }
 					);
 
-					app.send({
-						id: transactionId,
-						payload: undefined,
-						type: Message.MessageType.AssetReadRequest
-					});
+					console.log(response.payload);
+					property.setValue(response.payload);
+					props.store.commit();
 				}}
 				placeholder="Or enter URL"
 				renderChoose={

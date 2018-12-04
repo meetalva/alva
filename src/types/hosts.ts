@@ -20,6 +20,7 @@ export interface HostFlags {
 export interface HostFile {
 	path: string;
 	contents: string;
+	buffer: Buffer;
 }
 
 export enum HostBase {

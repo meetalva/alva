@@ -80,10 +80,12 @@ export class NodeHost implements Types.Host {
 
 	public async readFile(path: string): Promise<Types.HostFile> {
 		const readFile = Util.promisify(Fs.readFile);
+		const buffer = await readFile(path);
 
 		return {
 			path,
-			contents: (await readFile(path)).toString()
+			buffer,
+			contents: buffer.toString('utf-8')
 		};
 	}
 

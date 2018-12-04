@@ -17,7 +17,11 @@ const ids = {
 };
 
 export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
-	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.Electron);
+	const isElectron = typeof ctx.app !== 'undefined' && ctx.app.isHostType(Types.HostType.Electron);
+	const hasNextPage =
+		typeof ctx.project !== 'undefined' && typeof ctx.project.getNextPage() !== 'undefined';
+	const hasPreviousPage =
+		typeof ctx.project !== 'undefined' && typeof ctx.project.getPreviousPage() !== 'undefined';
 
 	return {
 		id: ids.view,
@@ -57,7 +61,7 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				id: ids.previousPage,
 				label: 'Previous Page',
 				accelerator: 'CmdOrCtrl+Alt+Left',
-				enabled: ctx.project && typeof ctx.project.getPreviousPage() !== 'undefined',
+				enabled: hasPreviousPage,
 				click: app => {
 					const previousPage = ctx.project && ctx.project.getPreviousPage();
 
@@ -76,7 +80,7 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				id: ids.nextPage,
 				label: 'Next Page',
 				accelerator: 'CmdOrCtrl+Alt+Right',
-				enabled: ctx.project && typeof ctx.project.getNextPage() !== 'undefined',
+				enabled: hasNextPage,
 				click: app => {
 					const nextPage = ctx.project && ctx.project.getNextPage();
 

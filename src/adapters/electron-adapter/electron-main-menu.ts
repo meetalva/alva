@@ -11,7 +11,7 @@ export class ElectronMainMenu {
 
 	@Mobx.observable private apps: Map<string, Model.AlvaApp> = new Map();
 	@Mobx.observable private focusedAppId: string | undefined;
-	@Mobx.observable private focusedProjectId: string | undefined;
+	@Mobx.observable private focusedProject: Model.Project | undefined;
 
 	public constructor(init: { server: Types.AlvaServer }) {
 		this.server = init.server;
@@ -22,20 +22,28 @@ export class ElectronMainMenu {
 		return this.focusedAppId ? this.apps.get(this.focusedAppId) : undefined;
 	}
 
-	@Mobx.computed
-	public get focusedProject(): Promise<Model.Project | undefined> {
-		return this.focusedProjectId
-			? this.server.dataHost.getProject(this.focusedProjectId)
-			: Promise.resolve(undefined);
-	}
-
 	public start(): void {
 		this.server.sender.match<M.WindowFocused>(M.MessageType.WindowFocused, m => {
 			const app = Model.AlvaApp.from(m.payload.app, { sender: this.server.sender });
 			this.apps.set(app.getId(), app);
 			this.focusedAppId = app.getId();
-			this.focusedProjectId = m.payload.projectId;
 			app.setSender(this.server.sender);
+
+			if (m.payload.projectId) {
+				this.server.dataHost.getProject(m.payload.projectId).then(project => {
+					this.focusedProject = project;
+				});
+			}
+		});
+
+		this.server.sender.match<M.WindowBlured>(M.MessageType.WindowBlured, m => {
+			if (this.focusedAppId === m.appId) {
+				this.focusedAppId = undefined;
+			}
+
+			if (this.focusedProject && this.focusedProject.getId() === m.payload.projectId) {
+				this.focusedProject = undefined;
+			}
 		});
 
 		this.server.sender.match<M.ChangeApp>(M.MessageType.ChangeApp, m => {
@@ -47,7 +55,7 @@ export class ElectronMainMenu {
 		Mobx.autorun(async () => {
 			const ctx = {
 				app: this.focusedApp,
-				project: await this.focusedProject
+				project: this.focusedProject
 			};
 
 			if (this.focusedApp) {

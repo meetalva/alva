@@ -93,7 +93,6 @@ const StyledChevron = styled(tag(['visible'])('div'))`
 	padding: ${getSpace(SpaceSize.XXS)}px;
 	border-radius: ${getSpace(SpaceSize.XXS)}px;
 	visibility: ${(props: StyledIconProps) => (props.visible ? 'visible' : 'hidden')};
-	cursor: pointer;
 	pointer-events: auto;
 
 	&:hover {

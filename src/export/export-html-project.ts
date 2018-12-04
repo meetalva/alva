@@ -14,11 +14,17 @@ export async function exportHtmlProject({
 }): Promise<Types.ExportResult> {
 	const fs = new MemoryFileSystem() as typeof Fs;
 
-	const previewProject = Model.Project.from(project.toJSON());
-	const firstPage = project.getPages()[0];
+	const previewProject = project.clone();
+	const firstPage = previewProject.getPages()[0];
 
-	previewProject.getPages().forEach(p => p.setActive(false));
-	firstPage.setActive(true);
+	if (!firstPage) {
+		return {
+			type: Types.ExportResultType.ExportError,
+			error: new Error(`Could not determine leading page for ${previewProject.getName()}`)
+		};
+	}
+
+	previewProject.setActivePage(firstPage);
 
 	fs.writeFileSync(
 		`/${project.getId()}.html`,

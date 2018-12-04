@@ -27,5 +27,5 @@ const StyledLabel = styled.span`
 export const PropertyLabel: React.StatelessComponent<PropertyLabelProps> = props => {
 	const { label } = props;
 
-	return <StyledLabel>{label}</StyledLabel>;
+	return <StyledLabel title={label}>{label}</StyledLabel>;
 };

@@ -13,7 +13,7 @@ export class BrowserAdapter {
 	public readonly host: BrowserHost;
 	public readonly dataHost: Types.DataHost;
 
-	private constructor(init: { sender: Types.Sender; store: Store.ViewStore; fs: typeof Fs }) {
+	private constructor(init: { sender: Types.Sender; store: Store.ViewStore; fs?: typeof Fs }) {
 		this.sender = init.sender;
 		this.store = init.store;
 
@@ -34,8 +34,8 @@ export class BrowserAdapter {
 		});
 	}
 
-	public static fromStore(store: Store.ViewStore, ctx: { fs: typeof Fs }): BrowserAdapter {
-		return new BrowserAdapter({ sender: store.getSender(), store, fs: ctx.fs });
+	public static fromStore(store: Store.ViewStore, { fs }: { fs?: typeof Fs }): BrowserAdapter {
+		return new BrowserAdapter({ sender: store.getSender(), store, fs });
 	}
 
 	public async start() {

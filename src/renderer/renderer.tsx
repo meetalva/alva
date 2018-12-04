@@ -14,7 +14,6 @@ import * as uuid from 'uuid';
 import * as Types from '../types';
 import { BrowserAdapter } from '../adapters/browser-adapter';
 import * as Fs from 'fs';
-import * as BrowserFs from 'browserfs';
 
 let app: Model.AlvaApp;
 let history;
@@ -60,9 +59,9 @@ export async function startRenderer(): Promise<void> {
 		}
 	});
 
-	const fs = await getBrowserFs();
-
-	const adapter = BrowserAdapter.fromStore(store, { fs });
+	const adapter = BrowserAdapter.fromStore(store, {
+		fs: await getBrowserFs()
+	});
 
 	if (!app.isHostType(Types.HostType.Electron)) {
 		adapter.start();
@@ -165,23 +164,25 @@ export async function startRenderer(): Promise<void> {
 }
 
 function getBrowserFs(): Promise<typeof Fs> {
-	return new Promise((resolve, reject) => {
-		const container = {};
-		BrowserFs.install(container);
+	return import('@marionebl/browserfs').then<typeof Fs>(BrowserFs => {
+		return new Promise((resolve, reject) => {
+			const container = {};
+			BrowserFs.install(container);
 
-		BrowserFs.configure(
-			{
-				fs: 'IndexedDB',
-				options: {}
-			},
-			err => {
-				if (err) {
-					return reject(err);
+			BrowserFs.configure(
+				{
+					fs: 'IndexedDB',
+					options: {}
+				},
+				err => {
+					if (err) {
+						return reject(err);
+					}
+
+					resolve((container as any).require('fs'));
 				}
-
-				resolve((container as any).require('fs'));
-			}
-		);
+			);
+		});
 	});
 }
 

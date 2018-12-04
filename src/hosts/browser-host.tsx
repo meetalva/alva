@@ -12,14 +12,14 @@ import * as Fs from 'fs';
 export class BrowserHost implements Types.Host {
 	public type = Types.HostType.Browser;
 
-	private fs: typeof Fs;
+	private fs?: typeof Fs;
 	private container: HTMLElement;
 	private menuStore: Store.MenuStore;
 	private store: Store.ViewStore;
 	@Mobx.observable private apps: Map<string, AlvaApp> = new Map();
 	private sender: Types.Sender;
 
-	constructor(init: { store: Store.ViewStore; fs: typeof Fs }) {
+	constructor(init: { store: Store.ViewStore; fs?: typeof Fs }) {
 		this.container = document.createElement('div');
 		this.container.style.position = 'fixed';
 		this.container.style.top = '100vh';
@@ -66,14 +66,14 @@ export class BrowserHost implements Types.Host {
 
 	public exists(path: string): Promise<boolean> {
 		return new Promise(resolve => {
-			this.fs.exists(path, exists => resolve(exists));
+			this.fs!.exists(path, exists => resolve(exists));
 		});
 	}
 
 	public async mkdir(path: string): Promise<void> {
 		const _mkdir = p =>
 			new Promise((resolve, reject) => {
-				this.fs.mkdir(p, err => {
+				this.fs!.mkdir(p, err => {
 					if (err) {
 						reject(err);
 					}
@@ -97,7 +97,7 @@ export class BrowserHost implements Types.Host {
 
 	public readFile(path: string): Promise<Types.HostFile> {
 		return new Promise((resolve, reject) => {
-			this.fs.readFile(path, (err, contents) => {
+			this.fs!.readFile(path, (err, contents) => {
 				if (err) {
 					return reject(err);
 				}
@@ -113,7 +113,7 @@ export class BrowserHost implements Types.Host {
 
 	public writeFile(path: string, data: unknown): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this.fs.writeFile(path, data, err => {
+			this.fs!.writeFile(path, data, err => {
 				if (err) {
 					return reject(err);
 				}

@@ -75,3 +75,24 @@ export interface ElementMenuContext {
 }
 
 export type ContextMenuItem = ActionableMenuItem | SeperatorMenuItem;
+
+export interface MenuProps {
+	variant: MenuVariant;
+	menus: MenuItem[];
+}
+
+export interface GenericMenuItemProps {
+	variant: MenuVariant;
+	menu: MenuItem;
+}
+
+export interface SubMenuProps {
+	visible: boolean;
+	variant: MenuVariant;
+	menus: MenuItem[];
+}
+
+export enum MenuVariant {
+	Horizontal,
+	Vertical
+}

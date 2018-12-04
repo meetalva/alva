@@ -3,6 +3,7 @@ import * as MobxReact from 'mobx-react';
 import * as Store from '../../store';
 import * as Menu from './menu';
 import * as Components from '../../components';
+import * as Types from '../../types';
 
 @MobxReact.inject('menuStore')
 @MobxReact.observer
@@ -37,7 +38,7 @@ export class ContextMenu extends React.Component {
 				>
 					{menuStore.topLevel.map(menu => (
 						<Menu.GenericMenuItem
-							variant={Menu.MenuVariant.Horizontal}
+							variant={Types.MenuVariant.Horizontal}
 							key={menu.id}
 							menu={menu}
 						/>

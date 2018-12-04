@@ -14,13 +14,19 @@ export const staticDocument = async (config: StaticDocumentConfig): Promise<stri
 		'/scripts/Mobx.js',
 		'/scripts/previewRenderer.js',
 		'/scripts/preview.js'
-	].map(p => `${location.origin}/${p}`);
+	].map(p => [config.location.origin, p].filter(Boolean).join(''));
 
 	// Read preview scripts from disk
 	const scripts = (await Promise.all(
 		SCRIPT_PATHS.map(async scriptPath => ({
 			basename: Path.basename(scriptPath, Path.extname(scriptPath)),
-			content: await fetch(scriptPath).then(r => r.text())
+			content: await fetch(scriptPath).then(r => {
+				if (r.status !== 200) {
+					throw new Error(`Fetching ${scriptPath} failed: ${r.statusText}`);
+				}
+
+				return r.text();
+			})
 		}))
 	)).map(script => `<script data-script="${script.basename}">${script.content}</script>`);
 

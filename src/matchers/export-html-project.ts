@@ -21,6 +21,12 @@ export function exportHtmlProject({
 		const project = await dataHost.getProject(m.payload.projectId);
 
 		if (!project) {
+			host.log(`exportHtmlProject: received message without resolveable project: ${m}`);
+			return;
+		}
+
+		if (!location) {
+			host.log(`exportHtmlProject: received message without location: ${m}`);
 			return;
 		}
 
@@ -39,54 +45,57 @@ export function exportHtmlProject({
 			}));
 
 		if (!targetPath && host.type === T.HostType.Electron) {
+			host.log(`exportHtmlProject: no targetPath for Electro Host`);
 			return;
 		}
-
-		const htmlExport = await Export.exportHtmlProject({
-			project,
-			location
-		});
-
-		if (htmlExport.type === T.ExportResultType.ExportError) {
-			app.send({
-				type: M.MessageType.ShowError,
-				transaction: m.transaction,
-				id: uuid.v4(),
-				payload: {
-					message: `HTML Export for ${project.getName()} failed.`,
-					detail: `It threw the following error: ${htmlExport.error.message}`,
-					error: {
-						message: htmlExport.error.message,
-						stack: htmlExport.error.stack || ''
-					}
-				}
-			});
-			return;
-		}
-
-		const firstFileResult = await getFirstFile(htmlExport.fs);
-
-		if (firstFileResult.type === FsResultType.FsError) {
-			app.send({
-				type: M.MessageType.ShowError,
-				transaction: m.transaction,
-				id: uuid.v4(),
-				payload: {
-					message: `HTML Export for ${project.getName()} failed.`,
-					detail: `It threw the following error: ${firstFileResult.error.message}`,
-					error: {
-						message: firstFileResult.error.message,
-						stack: firstFileResult.error.stack || ''
-					}
-				}
-			});
-			return;
-		}
-
-		await host.saveFile(`${project.getName()}.html`, firstFileResult.payload.toString());
 
 		try {
-			await host.writeFile(`${project.getName()}.html`, firstFileResult.payload.toString());
+			const htmlExport = await Export.exportHtmlProject({
+				project,
+				location
+			});
+
+			if (htmlExport.type === T.ExportResultType.ExportError) {
+				app.send({
+					type: M.MessageType.ShowError,
+					transaction: m.transaction,
+					id: uuid.v4(),
+					payload: {
+						message: `HTML Export for ${project.getName()} failed.`,
+						detail: `It threw the following error: ${htmlExport.error.message}`,
+						error: {
+							message: htmlExport.error.message,
+							stack: htmlExport.error.stack || ''
+						}
+					}
+				});
+				return;
+			}
+
+			const firstFileResult = await getFirstFile(htmlExport.fs);
+
+			if (firstFileResult.type === FsResultType.FsError) {
+				app.send({
+					type: M.MessageType.ShowError,
+					transaction: m.transaction,
+					id: uuid.v4(),
+					payload: {
+						message: `HTML Export for ${project.getName()} failed.`,
+						detail: `It threw the following error: ${firstFileResult.error.message}`,
+						error: {
+							message: firstFileResult.error.message,
+							stack: firstFileResult.error.stack || ''
+						}
+					}
+				});
+				return;
+			}
+
+			await host.saveFile(`${project.getName()}.html`, firstFileResult.payload.toString());
+			await host.writeFile(
+				targetPath ? targetPath : `${project.getName()}.html`,
+				firstFileResult.payload.toString()
+			);
 		} catch (err) {
 			app.send({
 				type: M.MessageType.ShowError,

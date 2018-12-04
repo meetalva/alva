@@ -35,7 +35,7 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 						type: MessageType.CreateNewFileRequest,
 						id: uuid.v4(),
 						payload: {
-							replace: app.isActiveView(Types.AlvaView.SplashScreen)
+							replace: false
 						}
 					});
 				}

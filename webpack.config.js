@@ -1,17 +1,15 @@
 const Path = require('path');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const webpack = require('webpack');
+const yargs = require('yargs-parser');
+const flags = yargs(process.argv.slice(2));
 
 module.exports = {
-	mode: 'development',
+	mode: flags.production ? 'production' : 'development',
+	devtool: flags.production || flags.sourceMaps ? 'source-maps' : 'eval',
 	entry: {
-		exportToSketchData: require.resolve('./src/preview/export-to-sketch-data.ts'),
 		preview: require.resolve('./src/preview/preview.ts'),
 		previewRenderer: require.resolve('./src/preview-renderer/index.ts'),
-		renderer: [
-			require.resolve('./src/renderer/index.tsx'),
-			// 'webpack-hot-middleware/client'
-		],
+		renderer: require.resolve('./src/renderer/index.tsx'),
 		Mobx: require.resolve('mobx')
 	},
 	module: {
@@ -20,7 +18,10 @@ module.exports = {
 				test: /\.tsx?$/,
 				loader: 'ts-loader',
 				options: {
-					transpileOnly: true
+					transpileOnly: true,
+					compilerOptions: {
+						module: 'esnext'
+					}
 				}
 			},
 			{
@@ -33,15 +34,13 @@ module.exports = {
 		extensions: ['.ts', '.tsx', '.js']
 	},
 	plugins: [
-		// new webpack.HotModuleReplacementPlugin(),
 		new MonacoWebpackPlugin({
 			languages: ['typescript'],
 			output: '/scripts/'
 		})
 	],
 	externals: {
-		mobx: 'Mobx',
-		exportToSketchData: 'exportToSketchData'
+		mobx: 'Mobx'
 	},
 	output: {
 		filename: '[name].js',
@@ -49,8 +48,5 @@ module.exports = {
 		libraryTarget: 'window',
 		path: Path.join(__dirname, 'build', 'scripts'),
 		publicPath: '/scripts/'
-	},
-	devServer: {
-		hotOnly: true
 	}
 };

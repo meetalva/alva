@@ -4,7 +4,6 @@ import { ConnectPaneContainer } from './connect-pane-container';
 import { ElementList } from './element-list';
 import { MessageType } from '../message';
 import * as MobxReact from 'mobx-react';
-import { PaneDevelopmentEditor } from './pane-development-editor';
 import { PageListContainer } from './page-list/page-list-container';
 import { PatternListContainer } from './pattern-list';
 import { PreviewPaneWrapper } from './preview-pane-wrapper';
@@ -12,9 +11,15 @@ import { PropertyListContainer } from './property-list';
 import { PropertiesSwitch } from './properties-switch';
 import { ProjectSettingsContainer } from './project-settings-container';
 import * as React from 'react';
+import * as ReactLoadable from 'react-loadable';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 import { ViewStore } from '../store';
+
+const PaneDevelopmentEditor = ReactLoadable({
+	loader: () => import('./pane-development-editor').then(m => m.PaneDevelopmentEditor),
+	loading: () => null
+});
 
 @MobxReact.inject('store')
 @MobxReact.observer

@@ -5,29 +5,8 @@ import * as MobxReact from 'mobx-react';
 import * as Store from '../../store';
 import { AcceleratorIndicator } from './accelerator';
 
-export interface MenuProps {
-	variant: MenuVariant;
-	menus: Types.MenuItem[];
-}
-
-export interface GenericMenuItemProps {
-	variant: MenuVariant;
-	menu: Types.MenuItem;
-}
-
-export interface SubMenuProps {
-	visible: boolean;
-	variant: MenuVariant;
-	menus: Types.MenuItem[];
-}
-
-export enum MenuVariant {
-	Horizontal,
-	Vertical
-}
-
 @MobxReact.observer
-export class Menu extends React.Component<MenuProps> {
+export class Menu extends React.Component<Types.MenuProps> {
 	private menuStore = new Store.MenuStore(this.props.menus);
 
 	public render(): JSX.Element | null {
@@ -47,7 +26,11 @@ export class Menu extends React.Component<MenuProps> {
 					}}
 				>
 					{props.menus.map(menu => (
-						<GenericMenuItem variant={MenuVariant.Horizontal} key={menu.id} menu={menu} />
+						<GenericMenuItem
+							variant={Types.MenuVariant.Horizontal}
+							key={menu.id}
+							menu={menu}
+						/>
 					))}
 					{this.menuStore.activeMenu && (
 						<div
@@ -68,7 +51,7 @@ export class Menu extends React.Component<MenuProps> {
 	}
 }
 
-export class SubMenu extends React.Component<SubMenuProps> {
+export class SubMenu extends React.Component<Types.SubMenuProps> {
 	public render(): JSX.Element | null {
 		const { props } = this;
 		return (
@@ -81,8 +64,8 @@ export class SubMenu extends React.Component<SubMenuProps> {
 					margin: 0,
 					background: Components.Color.White,
 					zIndex: 99,
-					padding: props.variant === MenuVariant.Vertical ? '5px 0' : 0,
-					minWidth: props.variant === MenuVariant.Vertical ? '240px' : 'auto',
+					padding: props.variant === Types.MenuVariant.Vertical ? '5px 0' : 0,
+					minWidth: props.variant === Types.MenuVariant.Vertical ? '240px' : 'auto',
 					borderRadius: '0 0 5px 5px',
 					border: `1px solid ${Components.Color.Grey90}`,
 					boxShadow: `0 5px 10px rgba(0,0,0,.01)`
@@ -91,7 +74,7 @@ export class SubMenu extends React.Component<SubMenuProps> {
 				{props.menus.map(menu => {
 					return (
 						<div style={{ position: 'relative' }} key={menu.id}>
-							<GenericMenuItem variant={MenuVariant.Vertical} menu={menu} />
+							<GenericMenuItem variant={Types.MenuVariant.Vertical} menu={menu} />
 						</div>
 					);
 				})}
@@ -100,7 +83,7 @@ export class SubMenu extends React.Component<SubMenuProps> {
 	}
 }
 
-export class GenericMenuItem extends React.Component<GenericMenuItemProps> {
+export class GenericMenuItem extends React.Component<Types.GenericMenuItemProps> {
 	public render(): JSX.Element | null {
 		const { props } = this;
 
@@ -359,7 +342,7 @@ class SeperatorMenuItem extends React.Component {
 
 interface NestedMenuItemProps {
 	menu: Types.NestedMenuItem;
-	variant: MenuVariant;
+	variant: Types.MenuVariant;
 }
 
 @MobxReact.inject('menuStore')
@@ -428,7 +411,7 @@ class NestedMenuItem extends React.Component<NestedMenuItemProps> {
 			>
 				{props.menu.label.replace(/\&([a-zA-Z].)/, '$1')}
 				<SubMenu
-					variant={MenuVariant.Vertical}
+					variant={Types.MenuVariant.Vertical}
 					menus={props.menu.submenu}
 					visible={menu.active}
 				/>

@@ -15,12 +15,14 @@ export function paste({ host }: T.MatcherContext): T.Matcher<M.Paste> {
 		const contents = await host.readClipboard();
 
 		if (!contents) {
+			host.log(`paste: non contents`);
 			return;
 		}
 
 		const message = Serde.deserialize(contents);
 
 		if (!message || message.type !== M.MessageType.Clipboard) {
+			host.log(`paste: clipboard message is no message`);
 			return;
 		}
 
@@ -42,7 +44,7 @@ export function paste({ host }: T.MatcherContext): T.Matcher<M.Paste> {
 				});
 				break;
 			}
-			case T.ItemType.Page:
+			case T.ItemType.Page: {
 				app.send({
 					id: uuid.v4(),
 					type: M.MessageType.PastePage,
@@ -51,6 +53,10 @@ export function paste({ host }: T.MatcherContext): T.Matcher<M.Paste> {
 						project: message.payload.project
 					}
 				});
+				break;
+			}
+			default:
+				host.log(`paste: unknown item type ${itemType}`);
 		}
 	};
 }

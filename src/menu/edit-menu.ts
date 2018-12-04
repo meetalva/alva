@@ -20,6 +20,12 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 	const hasBrowserClipboard =
 		typeof navigator !== 'undefined' && typeof (navigator as any).clipboard !== 'undefined';
 	const hasClipboard = isElectron || hasBrowserClipboard;
+	const hasFocusedInput = typeof ctx.app !== 'undefined' && ctx.app.getHasFocusedInput();
+	const hasSelectedElement =
+		typeof ctx.project !== 'undefined' && typeof ctx.project.getSelectedElement() !== 'undefined';
+	const selectedElementAccepts = hasSelectedElement
+		? ctx.project!.getSelectedElement()!.acceptsChildren()
+		: false;
 
 	return {
 		label: 'Edit',
@@ -129,11 +135,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				id: ids.pasteInside,
 				label: '&Paste Inside',
 				enabled:
-					hasClipboard &&
-					ctx.app &&
-					!ctx.app.getHasFocusedInput() &&
-					ctx.project &&
-					ctx.project.getSelectedElement(),
+					!hasFocusedInput && hasClipboard && selectedElementAccepts && hasSelectedElement,
 				accelerator: 'CmdOrCtrl+Shift+V',
 				click: app => {
 					const selectedElement = ctx.project && ctx.project.getSelectedElement();

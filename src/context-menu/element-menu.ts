@@ -21,8 +21,8 @@ export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.Context
 			label: 'Paste Below',
 			accelerator: 'CmdOrCtrl+V',
 			enabled: ctx.element.getRole() !== Types.ElementRole.Root,
-			click: sender => {
-				sender.send({
+			click: () => {
+				ctx.app.send({
 					id: uuid.v4(),
 					type: M.Paste,
 					payload: {
@@ -35,9 +35,10 @@ export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.Context
 		{
 			id: ids.pasteInside,
 			label: 'Paste Inside',
+			accelerator: 'CmdOrCtrl+Shift+V',
 			enabled: ctx.element.acceptsChildren(),
-			click: sender => {
-				sender.send({
+			click: () => {
+				ctx.app.send({
 					id: uuid.v4(),
 					type: M.Paste,
 					payload: {
@@ -52,8 +53,8 @@ export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.Context
 			label: 'Duplicate',
 			accelerator: 'CmdOrCtrl+D',
 			enabled: ctx.element.getRole() !== Types.ElementRole.Root,
-			click: sender => {
-				sender.send({
+			click: () => {
+				ctx.app.send({
 					id: uuid.v4(),
 					type: M.DuplicateElement,
 					payload: ctx.element.getId()
@@ -68,8 +69,8 @@ export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.Context
 			label: 'Cut',
 			accelerator: 'CmdOrCtrl+X',
 			enabled: ctx.element.getRole() !== Types.ElementRole.Root,
-			click: sender => {
-				sender.send({
+			click: () => {
+				ctx.app.send({
 					id: uuid.v4(),
 					type: M.CutElement,
 					payload: ctx.element.getId()
@@ -81,8 +82,8 @@ export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.Context
 			label: 'Copy',
 			accelerator: 'CmdOrCtrl+C',
 			enabled: ctx.element.getRole() !== Types.ElementRole.Root,
-			click: sender => {
-				sender.send({
+			click: () => {
+				ctx.app.send({
 					id: uuid.v4(),
 					type: M.CopyElement,
 					payload: ctx.element.getId()
@@ -94,8 +95,8 @@ export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.Context
 			label: 'Delete',
 			accelerator: 'Backspace',
 			enabled: ctx.element.getRole() !== Types.ElementRole.Root,
-			click: sender => {
-				sender.send({
+			click: () => {
+				ctx.app.send({
 					id: uuid.v4(),
 					type: M.DeleteElement,
 					payload: ctx.element.getId()

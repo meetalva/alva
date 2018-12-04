@@ -82,6 +82,7 @@ export class ElectronAdapter {
 		sender.match<M.UseFileRequest>(MT.UseFileRequest, Matchers.useFileRequest(context));
 		sender.match<M.ContextMenuRequest>(MT.ContextMenuRequest, Matchers.showContextMenu(context));
 		sender.match<M.ChangeApp>(MT.ChangeApp, Matchers.addApp(context));
+		sender.match<M.AssetReadRequest>(MT.AssetReadRequest, Matchers.openAsset(context));
 
 		server.sender.match<M.ToggleDevTools>(M.MessageType.ToggleDevTools, async () => {
 			await host.toggleDevTools();

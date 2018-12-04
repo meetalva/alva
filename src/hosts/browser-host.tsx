@@ -104,6 +104,7 @@ export class BrowserHost implements Types.Host {
 
 				resolve({
 					path,
+					buffer: contents,
 					contents: contents.toString()
 				});
 			});

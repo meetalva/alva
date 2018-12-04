@@ -4,6 +4,7 @@ export * from './copy';
 export * from './create-new-file-request';
 export * from './cut';
 export * from './export-html-project';
+export * from './open-asset';
 export * from './open-external-url';
 export * from './open-file-request';
 export * from './open-window';

@@ -113,18 +113,21 @@ export const PatternListItem: React.StatelessComponent<PatternListItemProps> = p
 
 export interface WithChildren {
 	children: React.ReactNode;
+	title?: string;
 }
 
 export const PatternLabel: React.StatelessComponent<WithChildren> = props => (
-	<StyledPatternLabel>{props.children}</StyledPatternLabel>
+	<StyledPatternLabel title={props.title}>{props.children}</StyledPatternLabel>
 );
 
 export const PatternItemLabel: React.StatelessComponent<WithChildren> = props => (
-	<StyledPatternListItemName>{props.children}</StyledPatternListItemName>
+	<StyledPatternListItemName title={props.title}>{props.children}</StyledPatternListItemName>
 );
 
 export const PatternItemDescription: React.StatelessComponent<WithChildren> = props => (
-	<StyledPatternListItemDescription>{props.children}</StyledPatternListItemDescription>
+	<StyledPatternListItemDescription title={props.title}>
+		{props.children}
+	</StyledPatternListItemDescription>
 );
 
 export const PatternList: React.StatelessComponent<WithChildren> = props => (

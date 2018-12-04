@@ -58,8 +58,10 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 				onDoubleClick={this.handleDoubleClick}
 				onDragStart={this.handleDragStart}
 			>
-				<Components.PatternItemLabel>{props.pattern.getName()}</Components.PatternItemLabel>
-				<Components.PatternItemDescription>
+				<Components.PatternItemLabel title={props.pattern.getName()}>
+					{props.pattern.getName()}
+				</Components.PatternItemLabel>
+				<Components.PatternItemDescription title={props.pattern.getDescription()}>
 					{props.pattern.getDescription()}
 				</Components.PatternItemDescription>
 			</Components.PatternListItem>

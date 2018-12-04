@@ -59,8 +59,10 @@ export class PatternItemContainer extends React.Component<PatternItemContainerCo
 				onDragStart={this.handleDragStart}
 				icon={props.pattern.getIcon()}
 			>
-				<Components.PatternItemLabel>{props.pattern.getName()}</Components.PatternItemLabel>
-				<Components.PatternItemDescription>
+				<Components.PatternItemLabel title={props.pattern.getName()}>
+					{props.pattern.getName()}
+				</Components.PatternItemLabel>
+				<Components.PatternItemDescription title={props.pattern.getDescription()}>
 					{props.pattern.getDescription()}
 				</Components.PatternItemDescription>
 			</Components.PatternListItem>

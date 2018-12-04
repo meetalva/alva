@@ -48,6 +48,8 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 					if (!ctx.project) {
 						return;
 					}
+					const projectId = ctx.project.getId() || '';
+					console.log('1. second entry from UI @@@@@@@@@@@@@@');
 
 					ctx.project
 						.getPatternLibraries()
@@ -59,7 +61,8 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 								id: uuid.v4(),
 								type: Message.MessageType.UpdatePatternLibraryRequest,
 								payload: {
-									id: library.getId()
+									libId: library.getId(),
+									projectId
 								}
 							});
 						});

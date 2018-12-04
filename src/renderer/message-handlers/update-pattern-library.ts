@@ -7,7 +7,7 @@ export function updatePatternLibrary({
 }: MessageHandlerContext): MessageHandler<M.UpdatePatternLibraryResponse> {
 	return m => {
 		const project = store.getProject();
-
+		console.log('this handler should be trigger&&&&&&&&&&&&');
 		if (!project) {
 			return;
 		}

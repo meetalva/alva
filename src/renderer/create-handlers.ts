@@ -43,7 +43,6 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 		M.MessageType.UpdatePatternLibraryResponse,
 		Handlers.updatePatternLibrary(ctx)
 	);
-
 	app.match<M.Cut>(M.MessageType.Cut, Edit.cut(ctx));
 	app.match<M.DeleteSelected>(M.MessageType.DeleteSelected, Edit.deleteSelected(ctx));
 	app.match<M.DuplicateElement>(M.MessageType.DuplicateElement, Edit.duplicateElement(ctx));

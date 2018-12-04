@@ -346,7 +346,8 @@ export type Undo = EmptyEnvelope<MessageType.Undo>;
 export type UpdatePatternLibraryRequest = Envelope<
 	MessageType.UpdatePatternLibraryRequest,
 	{
-		id: string;
+		libId: string;
+		projectId: string;
 	}
 >;
 export type UpdatePatternLibraryResponse = Envelope<

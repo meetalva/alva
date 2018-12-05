@@ -1,6 +1,7 @@
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
+import * as ReactLoadable from 'react-loadable';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
 
@@ -21,10 +22,15 @@ export interface StoreInjection {
 	store: ViewStore;
 }
 
+const PropertyUnknownEditor = ReactLoadable({
+	loader: () => import('./property-unknown-editor').then(m => m.PropertyUnknownEditor),
+	loading: () => null
+});
+
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyListItem extends React.Component<PropertyListItemProps> {
-	public render(): React.ReactNode {
+	public render(): React.ReactNode | null {
 		const props = this.props as PropertyListItemProps & StoreInjection;
 		const { property } = props;
 
@@ -67,12 +73,14 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 					</ReferenceSelect>
 				);
 			case Types.PatternPropertyType.String:
-			default: {
 				return (
 					<ReferenceSelect key={id} property={property}>
 						<PropertyItemString property={property} />
 					</ReferenceSelect>
 				);
+			case Types.PatternPropertyType.Unknown:
+			default: {
+				return <PropertyUnknownEditor property={property} />;
 			}
 		}
 	}

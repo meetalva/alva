@@ -115,13 +115,42 @@ function createProperty(
 		return createEventHandlerProperty(init, ctx);
 	}
 
-	return;
+	return createUnknownProperty(init, ctx);
+}
+
+function createUnknownProperty(
+	args: PropertyInit,
+	ctx: PropertyAnalyzeContext
+): Types.SerializedPatternUnknownProperty {
+	const printer = Ts.createPrinter({
+		removeComments: true
+	});
+
+	const print = (node: Ts.Declaration) => {
+		return printer.printNode(Ts.EmitHint.Unspecified, node, node.getSourceFile());
+	};
+
+	return {
+		model: Types.ModelName.PatternProperty,
+		contextId: args.symbol.name,
+		description: '',
+		example: '',
+		hidden: false,
+		id: ctx.getPropertyId(args.symbol.name),
+		inputType: Types.PatternPropertyInputType.Default,
+		label: args.symbol.name,
+		origin: 'user-provided',
+		propertyName: args.symbol.name,
+		required: false,
+		type: Types.PatternPropertyType.Unknown,
+		typeText: print(args.symbol.valueDeclaration)
+	};
 }
 
 function createBooleanProperty(
 	args: PropertyInit,
 	ctx: PropertyAnalyzeContext
-): Types.SerializedPatternBooleanProperty | undefined {
+): Types.SerializedPatternBooleanProperty {
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
@@ -220,8 +249,8 @@ function createStringProperty(
 	ctx: PropertyAnalyzeContext
 ):
 	| Types.SerializedPatternAssetProperty
-	| Types.SerializedHrefProperty
-	| Types.SerializedStringProperty {
+	| Types.SerializedPatternHrefProperty
+	| Types.SerializedPatternStringProperty {
 	if (TypescriptUtils.hasJsDocTagFromSymbol(args.symbol, 'asset')) {
 		return {
 			model: Types.ModelName.PatternProperty,

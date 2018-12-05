@@ -145,11 +145,25 @@ export class ElementProperty {
 
 		const concreteValue = this.getConcreteValue();
 
+		if (typeof concreteValue !== 'undefined' && this.patternProperty) {
+			return this.patternProperty.coerceValue(concreteValue);
+		}
+
+		return this.getDefaultValue();
+	}
+
+	public getRawValue(): string {
+		if (this.referencedUserStoreProperty && this.patternProperty) {
+			return this.referencedUserStoreProperty.getValue();
+		}
+
+		const concreteValue = this.element.getPropertyValue(this.patternPropertyId) as string;
+
 		if (typeof concreteValue !== 'undefined') {
 			return concreteValue;
 		}
 
-		return this.getDefaultValue();
+		return this.getDefaultValue() as string;
 	}
 
 	public getConcreteValue(): Types.ElementPropertyValue {

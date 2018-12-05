@@ -216,7 +216,8 @@ export type ElementPropertyValue =
 	| number[]
 	| object
 	| string
-	| string[];
+	| string[]
+	| unknown;
 
 export enum RightSidebarTab {
 	Properties = 'properties',

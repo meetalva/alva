@@ -10,7 +10,8 @@ export enum PatternPropertyType {
 	NumberArray = 'number[]',
 	Number = 'number',
 	StringArray = 'string[]',
-	String = 'string'
+	String = 'string',
+	Unknown = 'unknown'
 }
 
 export type SerializedPatternPropertyType =
@@ -22,7 +23,8 @@ export type SerializedPatternPropertyType =
 	| 'number[]'
 	| 'number'
 	| 'string[]'
-	| 'string';
+	| 'string'
+	| 'unknown';
 
 export enum PatternPropertyOrigin {
 	BuiltIn = 'built-in',
@@ -47,8 +49,9 @@ export type SerializedPatternProperty =
 	| SerializedPatternNumberArrayProperty
 	| SerializedPatternNumberProperty
 	| SerializedPatternStringArrayProperty
-	| SerializedStringProperty
-	| SerializedHrefProperty;
+	| SerializedPatternUnknownProperty
+	| SerializedPatternStringProperty
+	| SerializedPatternHrefProperty;
 
 export interface SerializedPropertyBase {
 	model: ModelName.PatternProperty;
@@ -73,6 +76,12 @@ export interface SerializedPatternAssetProperty extends SerializedPropertyBase {
 export interface SerializedPatternBooleanProperty extends SerializedPropertyBase {
 	defaultValue?: boolean;
 	type: 'boolean';
+}
+
+export interface SerializedPatternUnknownProperty extends SerializedPropertyBase {
+	defaultValue?: unknown;
+	typeText: string;
+	type: 'unknown';
 }
 
 export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
@@ -147,12 +156,12 @@ export interface SerializedPatternStringArrayProperty extends SerializedProperty
 	type: 'string[]';
 }
 
-export interface SerializedStringProperty extends SerializedPropertyBase {
+export interface SerializedPatternStringProperty extends SerializedPropertyBase {
 	defaultValue?: string;
 	type: 'string';
 }
 
-export interface SerializedHrefProperty extends SerializedPropertyBase {
+export interface SerializedPatternHrefProperty extends SerializedPropertyBase {
 	defaultValue?: string;
 	type: 'href';
 }

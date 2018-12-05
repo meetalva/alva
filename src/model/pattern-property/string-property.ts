@@ -11,7 +11,7 @@ import * as Types from '../../types';
 export class PatternStringProperty extends PatternPropertyBase<string | undefined> {
 	public readonly type = Types.PatternPropertyType.String;
 
-	public static from(serialized: Types.SerializedStringProperty): PatternStringProperty {
+	public static from(serialized: Types.SerializedPatternStringProperty): PatternStringProperty {
 		return new PatternStringProperty({
 			contextId: serialized.contextId,
 			defaultValue: serialized.defaultValue,
@@ -36,7 +36,7 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 		}
 	}
 
-	public toJSON(): Types.SerializedStringProperty {
+	public toJSON(): Types.SerializedPatternStringProperty {
 		return {
 			model: this.model,
 			contextId: this.contextId,

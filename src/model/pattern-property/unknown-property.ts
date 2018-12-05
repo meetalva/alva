@@ -1,11 +1,33 @@
+import * as JSON5 from 'json5';
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../../types';
 
-export class PatternHrefProperty extends PatternPropertyBase<string | undefined> {
-	public readonly type = Types.PatternPropertyType.Href;
+export interface PatternUnknownPropertyInit {
+	contextId: string;
+	defaultValue?: unknown;
+	example?: string;
+	description?: string;
+	hidden: boolean;
+	id: string;
+	inputType: Types.PatternPropertyInputType;
+	label: string;
+	origin: Types.PatternPropertyOrigin;
+	propertyName: string;
+	required: boolean;
+	typeText: string;
+}
 
-	public static from(serialized: Types.SerializedPatternHrefProperty): PatternHrefProperty {
-		return new PatternHrefProperty({
+export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefined> {
+	public readonly typeText: string;
+	public readonly type = Types.PatternPropertyType.Unknown;
+
+	public constructor(init: PatternUnknownPropertyInit) {
+		super(init);
+		this.typeText = init.typeText;
+	}
+
+	public static from(serialized: Types.SerializedPatternUnknownProperty): PatternUnknownProperty {
+		return new PatternUnknownProperty({
 			contextId: serialized.contextId,
 			defaultValue: serialized.defaultValue,
 			description: serialized.description,
@@ -16,20 +38,24 @@ export class PatternHrefProperty extends PatternPropertyBase<string | undefined>
 			label: serialized.label,
 			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
-			required: serialized.required
+			required: serialized.required,
+			typeText: serialized.typeText
 		});
 	}
 
-	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
-		if (value === null || value === undefined || value === '') {
-			return '';
-		} else {
-			return String(value);
+	public coerceValue(value: any): string | undefined {
+		if (typeof value === 'undefined') {
+			return;
+		}
+
+		try {
+			return JSON5.parse(value);
+		} catch (err) {
+			return;
 		}
 	}
 
-	public toJSON(): Types.SerializedPatternHrefProperty {
+	public toJSON(): Types.SerializedPatternUnknownProperty {
 		return {
 			model: this.model,
 			contextId: this.contextId,
@@ -43,11 +69,12 @@ export class PatternHrefProperty extends PatternPropertyBase<string | undefined>
 			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,
 			required: this.required,
-			type: this.type
+			type: this.type,
+			typeText: this.typeText
 		};
 	}
 
-	public update(prop: PatternHrefProperty): void {
+	public update(prop: PatternUnknownProperty): void {
 		this.contextId = prop.getContextId();
 		this.description = prop.getDescription();
 		this.defaultValue = prop.getDefaultValue();

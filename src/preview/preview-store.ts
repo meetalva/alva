@@ -211,7 +211,6 @@ export class PreviewStore<V> {
 			} else {
 				renderProperties[patternProperty.getPropertyName()] = elementProperty.getValue();
 			}
-
 			return renderProperties;
 		}, {});
 	}

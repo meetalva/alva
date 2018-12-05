@@ -169,7 +169,8 @@ export abstract class DataHost {
 
 	public async addConnection(
 		project: Model.Project,
-		library: Model.PatternLibrary
+		library: Model.PatternLibrary,
+		libPath: string
 	): Promise<void> {
 		throw new Error('context.addConnection: not implemented');
 	}

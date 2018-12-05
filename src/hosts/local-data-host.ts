@@ -76,9 +76,11 @@ export class LocalDataHost implements Types.DataHost {
 
 	public async addConnection(
 		project: Model.Project,
-		library: Model.PatternLibrary
+		library: Model.PatternLibrary,
+		libPath: string
 	): Promise<void> {
 		const memory = await this.readMemory();
+		console.log(memory, '*********???????????????');
 		const previous = memory[project.getId()] || [];
 		memory[project.getId()] = [...previous, library.getId()];
 		await this.writeMemory(memory);

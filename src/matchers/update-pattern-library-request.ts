@@ -24,9 +24,10 @@ export function updatePatternLibrary({
 			return;
 		}
 		const library = project.getPatternLibraryById(libId);
-		console.log(library, project, '********* this is the library');
 		if (!library) {
 			return;
 		}
+		// const connections = await dataHost.getConnections(project);
+		// console.log(connections, '********* this is the library');
 	};
 }

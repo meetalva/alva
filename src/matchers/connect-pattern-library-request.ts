@@ -1,4 +1,5 @@
 import * as M from '../message';
+import * as Model from '../model';
 import { MessageType } from '../message';
 import * as T from '../types';
 import * as uuid from 'uuid';
@@ -39,18 +40,17 @@ export function connectPatternLibrary({
 			return;
 		}
 
-		const ids = await dataHost.getConnections(project);
+		const currentLibraries = await dataHost.getConnections(project);
 
 		const previousLibrary = m.payload.library
 			? project.getPatternLibraryById(m.payload.library)
-			: project.getPatternLibraries().find(p => ids.some(id => id === p.getId()));
+			: project.getPatternLibraries().find(p => currentLibraries.some(id => id === p.getId()));
 
 		if (m.payload.library && !previousLibrary) {
 			return;
 		}
 
 		const analysisResult = await performAnalysis(path, { previousLibrary });
-
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			app.send({
 				type: MessageType.ShowError,
@@ -67,24 +67,39 @@ export function connectPatternLibrary({
 			});
 			return;
 		}
+		const analysis = analysisResult.result;
+		const library = Model.PatternLibrary.create({
+			id: uuid.v4(),
+			name: analysis.name,
+			version: analysis.version,
+			origin: T.PatternLibraryOrigin.UserProvided,
+			patternProperties: [],
+			patterns: [],
+			bundle: analysis.bundle,
+			bundleId: analysis.id,
+			description: analysis.description,
+			state: T.PatternLibraryState.Connected
+		});
+		library.import(analysis, { project });
+		project.addPatternLibrary(library);
 
 		if (!previousLibrary) {
 			app.send({
 				type: M.MessageType.ConnectPatternLibraryResponse,
 				id: m.id,
 				payload: {
-					analysis: analysisResult.result,
+					analysis,
+					library,
 					path,
-					previousLibraryId: undefined
+					previousLibraryId: library.getId()
 				}
 			});
 		} else {
-			console.log('&&&**&*&*&**&*&*& request management');
 			app.send({
 				type: M.MessageType.UpdatePatternLibraryResponse,
 				id: m.id,
 				payload: {
-					analysis: analysisResult.result,
+					analysis,
 					path,
 					previousLibraryId: previousLibrary.getId()
 				}

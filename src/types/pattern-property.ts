@@ -165,3 +165,8 @@ export interface SerializedPatternHrefProperty extends SerializedPropertyBase {
 	defaultValue?: string;
 	type: 'href';
 }
+
+export interface PatternLibraryConnections {
+	id: string;
+	path: string;
+}

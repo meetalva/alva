@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 const ChildProcess = require('child_process');
 const Path = require('path');
-const base32 = require('base32');
 const fetch = require('node-fetch');
 
 const SURGE_BIN = Path.resolve(process.cwd(), 'node_modules', '.bin', 'surge');
@@ -18,24 +17,18 @@ const TARGET_PATH = `repos/${USER_NAME}/${REPO_NAME}/${API_TARGET}/comments`;
 async function main() {
 	const args = process.argv.slice(2);
 	const folder = args[0];
-	const d = args[1];
 
-	if (!folder || !d) {
-		console.log(`two arguments are required: [folder] [domain]`);
+	if (!folder) {
+		console.log(`two arguments are required: [folder]`);
 	}
 
-	const fragments = d.split('.');
-	const suffix = fragments[fragments.length - 1];
-	const domain = fragments[fragments.length - 2];
-	const subdomain = fragments.slice(0, fragments.length - 2).join('.');
+	const domain = `alva-${API_TARGET.split('/').join('-')}.surge.sh`;
 
-	const safeDomain = `${base32.encode(subdomain)}.${domain}.${suffix}`;
-
-	ChildProcess.spawnSync(SURGE_BIN, [folder, safeDomain], {
+	ChildProcess.spawnSync(SURGE_BIN, [folder, domain], {
 		stdio: 'inherit'
 	});
 
-	const planned = `Deployed at: https://${safeDomain}`;
+	const planned = `Deployed at: https://${domain}`;
 	const comments = await fetch(`https://${GH_TOKEN}:x-oauth-basic@api.github.com/${TARGET_PATH}`).then(r => r.json());
 	const previous = comments.find(comment => comment.body === planned);
 

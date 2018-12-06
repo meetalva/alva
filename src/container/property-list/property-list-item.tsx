@@ -13,6 +13,7 @@ import { PropertyItemNumber } from './property-item-number';
 import { PropertyItemString } from './property-item-string';
 import { PropertyItemRadioGroup } from './property-item-radio-group';
 import { ReferenceSelect, IconPosition } from './reference-select';
+import { PropertyUnknownEditorSkeleton } from './property-unknown-editor-skeleton';
 
 export interface PropertyListItemProps {
 	property: Model.ElementProperty;
@@ -22,17 +23,20 @@ export interface StoreInjection {
 	store: ViewStore;
 }
 
-const PropertyUnknownEditor = ReactLoadable({
-	loader: () => import('./property-unknown-editor').then(m => m.PropertyUnknownEditor),
-	loading: () => null
-});
-
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyListItem extends React.Component<PropertyListItemProps> {
 	public render(): React.ReactNode | null {
 		const props = this.props as PropertyListItemProps & StoreInjection;
 		const { property } = props;
+
+		// This is probably our ticket to hell,
+		// I haven't found a straightforward way to use
+		// outer props in the .loading component though
+		const PropertyUnknownEditor = ReactLoadable({
+			loader: () => import('./property-unknown-editor').then(m => m.PropertyUnknownEditor),
+			loading: () => <PropertyUnknownEditorSkeleton property={props.property} />
+		}) as any;
 
 		const patternProperty = property.getPatternProperty();
 

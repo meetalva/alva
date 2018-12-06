@@ -26,6 +26,7 @@ export * from './page-tile';
 export * from './panes';
 export * from './pattern-list';
 export * from './property-box';
+export * from './property-details';
 export * from './property-input';
 export * from './property-item';
 export * from './property-item-asset';

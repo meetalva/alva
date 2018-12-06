@@ -110,16 +110,25 @@ export class PropertyUnknownEditor extends React.Component<PropertyUnknownEditor
 			<>
 				<Components.PropertyLabel label={patternProperty.getPropertyName()} />
 				<div
-					ref={node => (this.node = node)}
 					style={{
-						width: '100%',
-						minHeight: '50px',
 						border: `1px solid ${Components.Color.Grey90}`,
 						borderRadius: 4,
-						overflow: 'hidden',
-						marginBottom: `${Components.getSpace(Components.SpaceSize.S)}px`
+						padding: `${Components.getSpace(Components.SpaceSize.XS)}px`,
+						boxSizing: 'border-box',
+						marginBottom: `${Components.getSpace(Components.SpaceSize.S)}px`,
+						width: '100%',
+						background: Components.Color.White
 					}}
-				/>
+				>
+					<div
+						ref={node => (this.node = node)}
+						style={{
+							width: '100%',
+							minHeight: '50px',
+							overflow: 'hidden'
+						}}
+					/>
+				</div>
 			</>
 		);
 	}

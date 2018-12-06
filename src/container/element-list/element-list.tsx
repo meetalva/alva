@@ -134,14 +134,14 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		targetElement.setHighlighted(false);
-
-		if (targetContent) {
-			targetContent.setHighlighted(false);
-		}
-
 		if (isSibling) {
 			targetElement.setPlaceholderHighlighted(false);
+		} else {
+			targetElement.setHighlighted(false);
+
+			if (targetContent) {
+				targetContent.setHighlighted(false);
+			}
 		}
 	}
 

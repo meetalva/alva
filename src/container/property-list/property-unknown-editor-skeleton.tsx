@@ -44,6 +44,8 @@ export class PropertyUnknownEditorSkeleton extends React.Component<
 						height: `${(lines.length + 1) * 20}px`,
 						minHeight: '50px',
 						border: `1px solid ${Components.Color.Grey90}`,
+						boxSizing: 'border-box',
+						padding: `${Components.getSpace(Components.SpaceSize.XS)}px`,
 						borderRadius: 4,
 						overflow: 'hidden',
 						marginTop: 0,

@@ -1,6 +1,7 @@
 import * as MobxReact from 'mobx-react';
 import * as Monaco from 'monaco-editor';
 import * as React from 'react';
+import styled from 'styled-components';
 import * as JSON5 from 'json5';
 import * as Model from '../../model';
 import { WithStore } from '../../store';
@@ -10,6 +11,27 @@ import { PatternUnknownProperty } from '../../model/pattern-property/unknown-pro
 export interface PropertyUnknownEditorProps {
 	property: Model.ElementProperty;
 }
+
+const StyledMonacoContainer = styled.div`
+	border: 1px solid ${Components.Color.Grey90};
+	border-radius: 4px;
+	padding: ${Components.getSpace(Components.SpaceSize.XS)}px;
+	box-sizing: border-box;
+	margin-bottom: ${Components.getSpace(Components.SpaceSize.S)}px;
+	width: 100%;
+	background: ${Components.Color.White};
+
+	/** Force the overview ruler on the right side of Monaco into hiding */
+	.decorationsOverviewRuler {
+		display: none !important;
+	}
+
+	/** Force the indent ruler on the left side of Monaco into hiding */
+	.view-overlays .cigra,
+	.view-overlays .cigr {
+		display: none !important;
+	}
+`;
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -56,6 +78,9 @@ export class PropertyUnknownEditor extends React.Component<PropertyUnknownEditor
 			contextmenu: false,
 			scrollBeyondLastLine: false,
 			folding: false,
+			hideCursorInOverviewRuler: true,
+			overviewRulerBorder: false,
+			overviewRulerLanes: 0,
 			scrollbar: {
 				vertical: 'hidden',
 				horizontal: 'hidden'
@@ -109,17 +134,7 @@ export class PropertyUnknownEditor extends React.Component<PropertyUnknownEditor
 		return (
 			<>
 				<Components.PropertyLabel label={patternProperty.getPropertyName()} />
-				<div
-					style={{
-						border: `1px solid ${Components.Color.Grey90}`,
-						borderRadius: 4,
-						padding: `${Components.getSpace(Components.SpaceSize.XS)}px`,
-						boxSizing: 'border-box',
-						marginBottom: `${Components.getSpace(Components.SpaceSize.S)}px`,
-						width: '100%',
-						background: Components.Color.White
-					}}
-				>
+				<StyledMonacoContainer>
 					<div
 						ref={node => (this.node = node)}
 						style={{
@@ -128,7 +143,7 @@ export class PropertyUnknownEditor extends React.Component<PropertyUnknownEditor
 							overflow: 'hidden'
 						}}
 					/>
-				</div>
+				</StyledMonacoContainer>
 			</>
 		);
 	}

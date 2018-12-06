@@ -41,6 +41,11 @@ export function createListeners({ store }: { store: ViewStore }): void {
 	window.addEventListener(
 		'blur',
 		() => {
+			console.log(document.activeElement.tagName);
+			if (document.activeElement.tagName.toLowerCase() === 'iframe') {
+				return;
+			}
+
 			const project = store.getProject();
 
 			store.getSender().send({

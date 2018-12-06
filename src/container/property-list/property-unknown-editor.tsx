@@ -18,7 +18,7 @@ export class PropertyUnknownEditor extends React.Component<PropertyUnknownEditor
 	private editor: Monaco.editor.IStandaloneCodeEditor;
 	private dispose: () => void | null;
 
-	public componentDidMount(): void {
+	public async componentDidMount(): Promise<void> {
 		const props = this.props as PropertyUnknownEditorProps & WithStore;
 		const patternProperty = this.props.property.getPatternProperty() as PatternUnknownProperty;
 

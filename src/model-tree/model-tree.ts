@@ -19,6 +19,8 @@ export function getModelByName(modelName?: Types.ModelName): Types.ModelSurface 
 			return Model.PatternLibrary;
 		case Types.ModelName.PatternProperty:
 			return Model.PatternProperty;
+		case Types.ModelName.PatternEnumPropertyOption:
+			return Model.PatternEnumPropertyOption;
 		case Types.ModelName.PatternSlot:
 			return Model.PatternSlot;
 		case Types.ModelName.UserStore:

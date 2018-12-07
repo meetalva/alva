@@ -10,7 +10,7 @@ export async function performAnalysis(
 	const getGobalEnumOptionId = previousLibrary
 		? previousLibrary.assignEnumOptionId.bind(previousLibrary)
 		: () => uuid.v4();
-	console.log('... it performs an analysis');
+
 	const getGlobalPatternId = previousLibrary
 		? previousLibrary.assignPatternId.bind(previousLibrary)
 		: () => uuid.v4();

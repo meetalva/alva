@@ -9,6 +9,7 @@ export enum PatternOrigin {
 
 export enum PatternLibraryState {
 	Pristine = 'pristine',
+	Connecting = 'connecting',
 	Connected = 'connected',
 	Disconnected = 'disconnected'
 }

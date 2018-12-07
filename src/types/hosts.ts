@@ -169,13 +169,15 @@ export abstract class DataHost {
 
 	public async addConnection(
 		project: Model.Project,
-		library: Model.PatternLibrary,
-		libPath: string
+		opts: {
+			id: string;
+			path: string;
+		}
 	): Promise<void> {
 		throw new Error('context.addConnection: not implemented');
 	}
 
-	public async getConnections(project: Model.Project): Promise<string[]> {
+	public async getConnections(project: Model.Project): Promise<{ id: string; path: string }[]> {
 		throw new Error('context.getConnections: not implemented');
 	}
 }

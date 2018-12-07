@@ -1,6 +1,5 @@
 import { Envelope, EmptyEnvelope } from './envelope';
 import * as Types from '../types';
-import * as Model from '../model';
 import * as Mobx from 'mobx';
 
 export enum MessageType {
@@ -241,7 +240,6 @@ export type ConnectPatternLibraryResponse = Envelope<
 	MessageType.ConnectPatternLibraryResponse,
 	{
 		analysis: Types.LibraryAnalysis;
-		library: Model.PatternLibrary;
 		path: string;
 		previousLibraryId: string | undefined;
 	}

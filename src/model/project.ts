@@ -845,6 +845,7 @@ export class Project {
 						typeof c.newValue === 'object'
 							? ModelTree.getModelByName(c.newValue.model as Types.ModelName)
 							: undefined;
+
 					const value = ValueModel
 						? (ValueModel as any).from(c.newValue, { project: this })
 						: c.newValue;
@@ -937,8 +938,6 @@ export class Project {
 			after: b.getElements()
 		});
 
-		console.log('@@@@@@@@@@ ');
-
 		elementChanges.removed.forEach(change => this.removeElement(change.before));
 		elementChanges.added.forEach(change => this.addElement(change.after));
 		elementChanges.changed.forEach(change => change.before.update(change.after));
@@ -965,8 +964,6 @@ export class Project {
 			before: this.getPatternLibraries(),
 			after: b.getPatternLibraries()
 		});
-		console.log(patternLibraryChanges, '@@@@@@@@@@@@');
-		console.log('@@@@@@@@@@ this should be working');
 
 		patternLibraryChanges.removed.forEach(change => this.removePatternLibrary(change.before));
 		patternLibraryChanges.added.forEach(change => this.addPatternLibrary(change.after));

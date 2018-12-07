@@ -928,7 +928,6 @@ export class ViewStore {
 	}
 
 	public updatePatternLibrary(library: Model.PatternLibrary): void {
-		console.log('1. first entry from UI @@@@@@@@@@@@@@');
 		this.getApp().send({
 			type: MessageType.UpdatePatternLibraryRequest,
 			payload: {

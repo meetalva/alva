@@ -21,14 +21,14 @@ export type EnumValue = string | number;
 
 export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefined> {
 	@Mobx.observable private defaultOptionId?: string;
-	@Mobx.observable private options: PatternEnumPropertyOption[] = [];
+	@Mobx.observable private options: Map<string, PatternEnumPropertyOption> = new Map();
 
 	public readonly type = Types.PatternPropertyType.Enum;
 
 	public constructor(init: PatternEnumPropertyInit) {
 		super(init);
-		this.options = init.options;
 		this.defaultOptionId = init.defaultOptionId;
+		init.options.forEach(option => this.options.set(option.getId(), option));
 	}
 
 	public static from(serialized: Types.SerializedPatternEnumProperty): PatternEnumProperty {
@@ -67,7 +67,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 	}
 
 	public getDefaultValue(): EnumValue | undefined {
-		const option = this.options.find(o => o.getId() === this.defaultOptionId);
+		const option = this.options.get(this.defaultOptionId || '');
 
 		if (!option) {
 			return;
@@ -77,19 +77,19 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 	}
 
 	public getOptionByContextId(contextId: string): PatternEnumPropertyOption | undefined {
-		return this.options.find(option => option.getContextId() === contextId);
+		return [...this.options.values()].find(option => option.getContextId() === contextId);
 	}
 
 	public getOptionById(id: string): PatternEnumPropertyOption | undefined {
-		return this.options.find(option => option.getId() === id);
+		return this.options.get(id);
 	}
 
 	public getOptionByValue(value: EnumValue): PatternEnumPropertyOption | undefined {
-		return this.options.find(option => option.getValue() === value);
+		return [...this.options.values()].find(option => option.getValue() === value);
 	}
 
 	public getOptions(): PatternEnumPropertyOption[] {
-		return this.options;
+		return [...this.options.values()];
 	}
 
 	public toJSON(): Types.SerializedPatternEnumProperty {
@@ -104,7 +104,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			inputType: this.inputType,
 			label: this.label,
 			propertyName: this.propertyName,
-			options: this.options.map(option => option.toJSON()),
+			options: [...this.options.values()].map(option => option.toJSON()),
 			origin: serializeOrigin(this.origin),
 			required: this.required,
 			type: this.type
@@ -118,8 +118,11 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		this.hidden = prop.getHidden();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();
-		this.options = prop.getOptions();
 		this.required = prop.getRequired();
+
+		prop.getOptions().forEach(option => {
+			this.options.set(option.getId(), option);
+		});
 	}
 }
 
@@ -133,6 +136,8 @@ export interface PatternEnumPropertyOptionInit {
 }
 
 export class PatternEnumPropertyOption {
+	public model = Types.ModelName.PatternEnumPropertyOption;
+
 	@Mobx.observable private contextId: string;
 	@Mobx.observable private icon: IconName | undefined;
 	@Mobx.observable private id: string;
@@ -179,6 +184,7 @@ export class PatternEnumPropertyOption {
 
 	public toJSON(): Types.SerializedEnumOption {
 		return {
+			model: Types.ModelName.PatternEnumPropertyOption,
 			contextId: this.contextId,
 			icon: this.icon,
 			id: this.id,

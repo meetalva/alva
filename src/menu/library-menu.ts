@@ -49,7 +49,6 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 						return;
 					}
 					const projectId = ctx.project.getId() || '';
-					console.log('1. second entry from UI @@@@@@@@@@@@@@');
 
 					ctx.project
 						.getPatternLibraries()

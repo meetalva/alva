@@ -1,5 +1,4 @@
 import * as M from '../message';
-import * as Model from '../model';
 import { MessageType } from '../message';
 import * as T from '../types';
 import * as uuid from 'uuid';
@@ -37,20 +36,28 @@ export function connectPatternLibrary({
 		});
 
 		if (!path) {
+			host.log(`connectPatternLibrary: no path`);
 			return;
 		}
 
-		const currentLibraries = await dataHost.getConnections(project);
+		const connections = await dataHost.getConnections(project);
+		const connection = connections.find(c => c.path === path);
 
-		const previousLibrary = m.payload.library
-			? project.getPatternLibraryById(m.payload.library)
-			: project.getPatternLibraries().find(p => currentLibraries.some(id => id === p.getId()));
+		const previousLibrary = connection
+			? project
+					.getPatternLibraries()
+					.find(p => `${p.getName()}@${p.getVersion()}` === connection.id)
+			: m.payload.library
+				? project.getPatternLibraryById(m.payload.library)
+				: undefined;
 
 		if (m.payload.library && !previousLibrary) {
+			host.log(`connectPatternLibrary: could not determine previous library`);
 			return;
 		}
 
 		const analysisResult = await performAnalysis(path, { previousLibrary });
+
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			app.send({
 				type: MessageType.ShowError,
@@ -67,31 +74,22 @@ export function connectPatternLibrary({
 			});
 			return;
 		}
+
 		const analysis = analysisResult.result;
-		const library = Model.PatternLibrary.create({
-			id: uuid.v4(),
-			name: analysis.name,
-			version: analysis.version,
-			origin: T.PatternLibraryOrigin.UserProvided,
-			patternProperties: [],
-			patterns: [],
-			bundle: analysis.bundle,
-			bundleId: analysis.id,
-			description: analysis.description,
-			state: T.PatternLibraryState.Connected
+
+		dataHost.addConnection(project, {
+			id: `${analysisResult.result.name}@${analysisResult.result.version}`,
+			path: analysis.path
 		});
-		library.import(analysis, { project });
-		project.addPatternLibrary(library);
 
 		if (!previousLibrary) {
 			app.send({
 				type: M.MessageType.ConnectPatternLibraryResponse,
 				id: m.id,
 				payload: {
-					analysis,
-					library,
+					analysis: analysisResult.result,
 					path,
-					previousLibraryId: library.getId()
+					previousLibraryId: undefined
 				}
 			});
 		} else {
@@ -99,7 +97,7 @@ export function connectPatternLibrary({
 				type: M.MessageType.UpdatePatternLibraryResponse,
 				id: m.id,
 				payload: {
-					analysis,
+					analysis: analysisResult.result,
 					path,
 					previousLibraryId: previousLibrary.getId()
 				}

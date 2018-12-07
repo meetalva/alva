@@ -80,6 +80,31 @@ export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<
 			draftProject.sync(await host.getSender());
 		}
 
+		const connections = await dataHost.getConnections(draftProject);
+
+		await Promise.all(
+			draftProject
+				.getPatternLibraries()
+				.filter(l => l.getOrigin() !== T.PatternLibraryOrigin.BuiltIn)
+				.map(async library => {
+					const connection = connections.find(
+						connection => connection.id === `${library.getName()}@${library.getVersion()}`
+					);
+
+					if (!connection) {
+						library.setState(T.PatternLibraryState.Disconnected);
+						return;
+					}
+
+					if (!await host.exists(connection.path)) {
+						library.setState(T.PatternLibraryState.Disconnected);
+						return;
+					}
+
+					library.setState(T.PatternLibraryState.Connected);
+				})
+		);
+
 		return app.send({
 			type: M.MessageType.UseFileResponse,
 			id: m.id,

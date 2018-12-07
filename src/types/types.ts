@@ -327,6 +327,7 @@ export enum ModelName {
 	ElementProperty = 'ElementProperty',
 	Page = 'Page',
 	Pattern = 'Pattern',
+	PatternEnumPropertyOption = 'PatternEnumPropertyOption',
 	PatternLibrary = 'PatternLibrary',
 	PatternProperty = 'PatternProperty',
 	PatternSlot = 'PatternSlot',

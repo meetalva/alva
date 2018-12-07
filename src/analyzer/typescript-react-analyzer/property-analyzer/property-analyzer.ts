@@ -209,7 +209,8 @@ function createEnumProperty(
 			const name =
 				TypescriptUtils.getJsDocValueFromNode(enumMember, 'name') || enumMember.name.getText();
 
-			return {
+			const option: Types.SerializedEnumOption = {
+				model: Types.ModelName.PatternEnumPropertyOption,
 				contextId: init,
 				icon: undefined,
 				id: ctx.getEnumOptionId(enumId, name),
@@ -217,6 +218,8 @@ function createEnumProperty(
 				ordinal: init,
 				value
 			};
+
+			return option;
 		}),
 		propertyName: args.symbol.name,
 		required: false,

@@ -16,7 +16,38 @@ export type Injected = PreviewComponentProps & Injection;
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PreviewComponent extends React.Component<PreviewComponentProps> {
-	private dispose: () => void;
+	@Mobx.observable private el?: Element;
+	@Mobx.observable private previousEl?: Element;
+
+	private dispose = Mobx.autorun(() => {
+		if (typeof this.el !== 'undefined' && this.el !== this.previousEl) {
+			this.el.addEventListener('click', this.handleClick);
+			this.el.addEventListener('mouseover', this.handleMouseOver);
+		}
+
+		if (typeof this.el === 'undefined' && typeof this.previousEl !== 'undefined') {
+			this.previousEl!.removeEventListener('click', this.handleClick);
+			this.previousEl!.removeEventListener('mouseover', this.handleMouseOver);
+			this.dispose();
+		}
+
+		const props = this.props as Injected;
+		const children = props.element.getContentBySlotType(Types.SlotType.Children);
+
+		if (props.element.getHighlighted() || (children && children.getHighlighted())) {
+			props.store.updateHighlightedElement({
+				element: props.element,
+				node: this.getDomElement()
+			});
+		}
+
+		if (props.element.getSelected()) {
+			props.store.updateSelectedElement({
+				element: props.element,
+				node: this.getDomElement()
+			});
+		}
+	});
 
 	private getDomElement(): Element | undefined {
 		const node = ReactDom.findDOMNode(this);
@@ -36,62 +67,31 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 		return node as Element;
 	}
 
-	private handleMouseOver(e: MouseEvent): void {
+	private handleMouseOver = (e: MouseEvent): void => {
 		const props = this.props as Injected;
 		e.stopPropagation();
 		props.store.onElementMouseOver(e, { element: props.element, node: this.getDomElement() });
-	}
+	};
 
-	private handleClick(e: MouseEvent): void {
+	private handleClick = (e: MouseEvent): void => {
 		const props = this.props as Injected;
 		props.store.onElementClick(e, { element: props.element, node: this.getDomElement() });
-	}
+	};
 
 	public componentDidMount(): void {
-		const el = this.getDomElement();
+		this.previousEl = this.el;
+		this.el = this.getDomElement();
+	}
 
-		if (!el) {
-			return;
-		}
-
-		this.handleClick = this.handleClick.bind(this);
-		this.handleMouseOver = this.handleMouseOver.bind(this);
-
-		el.addEventListener('click', this.handleClick);
-		el.addEventListener('mouseover', this.handleMouseOver);
-
-		this.dispose = Mobx.autorun(() => {
-			const props = this.props as Injected;
-			const children = props.element.getContentBySlotType(Types.SlotType.Children);
-
-			if (props.element.getHighlighted() || (children && children.getHighlighted())) {
-				props.store.updateHighlightedElement({
-					element: props.element,
-					node: this.getDomElement()
-				});
-			}
-
-			if (props.element.getSelected()) {
-				props.store.updateSelectedElement({
-					element: props.element,
-					node: this.getDomElement()
-				});
-			}
-		});
+	public componentDidUpdate(): void {
+		this.previousEl = this.el;
+		this.el = this.getDomElement();
 	}
 
 	public componentWillUnmount(): void {
-		const el = this.getDomElement();
-
-		if (!el) {
-			return;
-		}
-
-		el.removeEventListener('click', this.handleClick);
-		el.removeEventListener('mouseover', this.handleMouseOver);
-
-		if (this.dispose) {
-			this.dispose();
+		if (this.el) {
+			this.previousEl = this.el;
+			this.el = undefined;
 		}
 	}
 

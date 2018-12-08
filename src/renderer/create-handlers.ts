@@ -30,6 +30,10 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 		M.MessageType.CheckLibraryResponse,
 		Handlers.checkPatternLibrary(ctx)
 	);
+	app.match<M.ConnectPatternLibraryRequest>(
+		M.MessageType.ConnectPatternLibraryRequest,
+		Handlers.connectPatternLibraryRequest(ctx)
+	);
 	app.match<M.ConnectPatternLibraryResponse>(
 		M.MessageType.ConnectPatternLibraryResponse,
 		Handlers.connectPatternLibrary(ctx)
@@ -39,6 +43,10 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 
 	app.match<M.SetPane>(M.MessageType.SetPane, Handlers.setPane(ctx));
 	app.match<M.StartAppMessage>(M.MessageType.StartApp, Handlers.startApp(ctx));
+	app.match<M.UpdatePatternLibraryRequest>(
+		M.MessageType.UpdatePatternLibraryRequest,
+		Handlers.updatePatternLibraryRequest(ctx)
+	);
 	app.match<M.UpdatePatternLibraryResponse>(
 		M.MessageType.UpdatePatternLibraryResponse,
 		Handlers.updatePatternLibrary(ctx)

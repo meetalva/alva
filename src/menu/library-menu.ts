@@ -48,6 +48,7 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 					if (!ctx.project) {
 						return;
 					}
+
 					const projectId = ctx.project.getId() || '';
 
 					ctx.project

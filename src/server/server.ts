@@ -82,7 +82,7 @@ export class AlvaServer implements Types.AlvaServer {
 		});
 
 		this.ws.on('error', e => {
-			console.log(e);
+			this.host.log(e);
 		});
 
 		/** Splash view, recent project list */

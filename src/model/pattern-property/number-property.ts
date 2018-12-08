@@ -17,6 +17,7 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 			defaultValue: serialized.defaultValue,
 			description: serialized.description,
 			example: serialized.example,
+			group: serialized.group,
 			hidden: serialized.hidden,
 			id: serialized.id,
 			inputType: serialized.inputType,
@@ -40,6 +41,7 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 			defaultValue: this.defaultValue,
 			description: this.description,
 			example: this.example,
+			group: this.group,
 			hidden: this.hidden,
 			id: this.id,
 			inputType: this.inputType,
@@ -56,6 +58,7 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 		this.defaultValue = prop.getDefaultValue();
 		this.description = prop.getDescription();
 		this.example = prop.getExample();
+		this.group = prop.getGroup();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();
 		this.hidden = prop.getHidden();

@@ -7,6 +7,7 @@ export interface PatternEnumPropertyInit {
 	contextId: string;
 	defaultOptionId?: string;
 	description?: string;
+	group: string;
 	hidden: boolean;
 	id: string;
 	inputType: Types.PatternPropertyInputType;
@@ -36,6 +37,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			contextId: serialized.contextId,
 			defaultOptionId: serialized.defaultOptionId,
 			description: serialized.description,
+			group: serialized.group,
 			hidden: serialized.hidden,
 			id: serialized.id,
 			inputType: serialized.inputType,
@@ -99,6 +101,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			defaultOptionId: this.defaultOptionId,
 			example: String(this.example),
 			description: this.description,
+			group: this.group,
 			hidden: this.hidden,
 			id: this.id,
 			inputType: this.inputType,
@@ -115,6 +118,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		this.contextId = prop.getContextId();
 		this.defaultOptionId = prop.getDefaultOptionId();
 		this.example = prop.getExample();
+		this.group = prop.getGroup();
 		this.hidden = prop.getHidden();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();

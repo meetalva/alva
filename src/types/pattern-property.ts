@@ -58,6 +58,7 @@ export interface SerializedPropertyBase {
 	contextId: string;
 	description: string;
 	example: string;
+	group: string;
 	hidden: boolean;
 	id: string;
 	inputType: PatternPropertyInputType;

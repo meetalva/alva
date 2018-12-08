@@ -8,6 +8,7 @@ export interface PatternPropertyInit<T> {
 	defaultValue?: T;
 	description?: string;
 	example?: string;
+	group?: string;
 	hidden?: boolean;
 	id?: string;
 	inputType: Types.PatternPropertyInputType;
@@ -24,6 +25,7 @@ export abstract class PatternPropertyBase<T> {
 	@Mobx.observable protected defaultValue: T;
 	@Mobx.observable protected description: string;
 	@Mobx.observable protected example: string;
+	@Mobx.observable protected group: string;
 	@Mobx.observable protected hidden: boolean = false;
 	@Mobx.observable protected id: string;
 	@Mobx.observable protected inputType: Types.PatternPropertyInputType;
@@ -54,6 +56,7 @@ export abstract class PatternPropertyBase<T> {
 		}
 
 		this.example = init.example || '';
+		this.group = init.group || '';
 		this.defaultValue = this.coerceValue(init.defaultValue);
 	}
 
@@ -82,6 +85,10 @@ export abstract class PatternPropertyBase<T> {
 
 	public getExample(): string {
 		return this.example;
+	}
+
+	public getGroup(): string {
+		return this.group;
 	}
 
 	public getHidden(): boolean {

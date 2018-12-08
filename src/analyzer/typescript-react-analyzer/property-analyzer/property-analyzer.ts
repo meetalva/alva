@@ -135,6 +135,7 @@ function createUnknownProperty(
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
+		group: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
@@ -156,6 +157,7 @@ function createBooleanProperty(
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
+		group: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
@@ -194,6 +196,7 @@ function createEnumProperty(
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
+		group: '',
 		hidden: false,
 		id: enumId,
 		inputType: Types.PatternPropertyInputType.Default,
@@ -233,6 +236,7 @@ function createNumberProperty(
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
+		group: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
@@ -257,6 +261,7 @@ function createStringProperty(
 			contextId: args.symbol.name,
 			description: '',
 			example: '',
+			group: '',
 			hidden: false,
 			id: ctx.getPropertyId(args.symbol.name),
 			inputType: Types.PatternPropertyInputType.Default,
@@ -274,6 +279,7 @@ function createStringProperty(
 			contextId: args.symbol.name,
 			description: '',
 			example: '',
+			group: '',
 			hidden: false,
 			id: ctx.getPropertyId(args.symbol.name),
 			inputType: Types.PatternPropertyInputType.Default,
@@ -290,6 +296,7 @@ function createStringProperty(
 		contextId: args.symbol.name,
 		description: '',
 		example: '',
+		group: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
@@ -314,6 +321,7 @@ function createEventHandlerProperty(
 		example: '',
 		// TODO: Allow TSDoc override
 		event: { type: eventType },
+		group: '',
 		hidden: false,
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
@@ -340,6 +348,7 @@ function setPropertyMetaData(init: {
 	property.label = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'name') || property.label;
 	property.description = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'description') || '';
 	property.hidden = TypescriptUtils.hasJsDocTagFromSymbol(symbol, 'ignore');
+	property.group = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'group') || '';
 
 	switch (property.type) {
 		case 'enum':

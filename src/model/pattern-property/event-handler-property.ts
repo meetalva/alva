@@ -52,6 +52,7 @@ export interface PatternEventHandlerPropertyInit {
 	defaultOptionId?: string;
 	description?: string;
 	event: PatternEvent;
+	group: string;
 	hidden: boolean;
 	id: string;
 	inputType: Types.PatternPropertyInputType;
@@ -77,6 +78,7 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 			contextId: serialized.contextId,
 			description: serialized.description,
 			event: PatternEvent.from(serialized.event),
+			group: serialized.group,
 			hidden: serialized.hidden,
 			id: serialized.id,
 			inputType: serialized.inputType,
@@ -104,6 +106,7 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 			description: this.description,
 			event: this.event.toJSON(),
 			example: this.example,
+			group: this.group,
 			hidden: this.hidden,
 			id: this.id,
 			inputType: this.inputType,
@@ -119,6 +122,7 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 		this.contextId = prop.getContextId();
 		this.description = prop.getDescription();
 		this.event = prop.getEvent();
+		this.group = prop.getGroup();
 		this.hidden = prop.getHidden();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();

@@ -68,6 +68,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			defaultOptionId: defaultDirection,
 			required: false,
+			group: '',
 			hidden: false,
 			options: [
 				new PatternEnumPropertyOption({
@@ -97,6 +98,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			propertyName: 'alignItems',
 			defaultOptionId: defaultAlign,
 			required: false,
+			group: '',
 			hidden: false,
 			options: [
 				new PatternEnumPropertyOption({
@@ -149,6 +151,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'justifyContent',
 			defaultOptionId: defaultJustify,
+			group: '',
 			hidden: false,
 			required: false,
 			options: [

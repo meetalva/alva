@@ -10,6 +10,7 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 			defaultValue: serialized.defaultValue,
 			description: serialized.description,
 			example: serialized.example,
+			group: serialized.group,
 			hidden: serialized.hidden,
 			id: serialized.id,
 			inputType: serialized.inputType,
@@ -36,6 +37,7 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 			defaultValue: this.defaultValue,
 			description: this.description,
 			example: this.example,
+			group: this.group,
 			hidden: this.hidden,
 			id: this.id,
 			inputType: this.inputType,
@@ -51,6 +53,7 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 		this.contextId = prop.getContextId();
 		this.defaultValue = prop.getDefaultValue();
 		this.description = prop.getDescription();
+		this.group = prop.getGroup();
 		this.hidden = prop.getHidden();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();

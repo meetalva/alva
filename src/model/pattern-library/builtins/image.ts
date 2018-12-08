@@ -30,6 +30,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 			id: context.options.getGlobalPropertyId(patternId, WIDTH_CONTEXT_ID),
 			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Width',
+			group: 'Default Size',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'width'
 		}),
@@ -38,6 +39,7 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 			id: context.options.getGlobalPropertyId(patternId, HEIGHT_CONTEXT_ID),
 			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Height',
+			group: 'Default Size',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'height'
 		}),
@@ -45,7 +47,8 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 			contextId: MIN_WIDTH_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, MIN_WIDTH_CONTEXT_ID),
 			inputType: Types.PatternPropertyInputType.Default,
-			label: 'Min Width',
+			label: 'Width',
+			group: 'Minimum Size',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'minWidth'
 		}),
@@ -53,7 +56,8 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 			contextId: MIN_HEIGHT_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, MIN_HEIGHT_CONTEXT_ID),
 			inputType: Types.PatternPropertyInputType.Default,
-			label: 'Min Height',
+			label: 'Height',
+			group: 'Minimum Size',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'minHeight'
 		}),
@@ -61,7 +65,8 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 			contextId: MAX_WIDTH_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, MAX_WIDTH_CONTEXT_ID),
 			inputType: Types.PatternPropertyInputType.Default,
-			label: 'Max Width',
+			label: 'Width',
+			group: 'Maximum Size',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'maxWidth'
 		}),
@@ -69,7 +74,8 @@ export const Image = (context: BuiltInContext): BuiltInResult => {
 			contextId: MAX_HEIGHT_CONTEXT_ID,
 			id: context.options.getGlobalPropertyId(patternId, MAX_HEIGHT_CONTEXT_ID),
 			inputType: Types.PatternPropertyInputType.Default,
-			label: 'Max Height',
+			label: 'Height',
+			group: 'Maximum Size',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'maxHeight'
 		}),

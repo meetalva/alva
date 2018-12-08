@@ -5,20 +5,19 @@ import { getSpace, SpaceSize } from '../space';
 import { ChevronDown, ChevronUp } from 'react-feather';
 
 const StyledWrapper = styled.div`
-	margin: ${getSpace(SpaceSize.M)}px 0;
-`;
-
-const StyledSeparator = styled.div`
-	height: 1px;
-	margin: 0 -${getSpace(SpaceSize.M)}px 0;
+	margin: 0 -${getSpace(SpaceSize.M)}px;
 	border-top: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-top-width: 0.5px;
+		border-bottom-width: 0.5px;
+	}
+	&:last-of-type {
+		border-bottom: 1px solid ${Color.Grey90};
 	}
 `;
 
 const StyledDetails = styled.details`
-	padding: ${getSpace(SpaceSize.XS)}px 0;
+	padding: ${getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.M)}px;
 `;
 
 const StyledSummary = styled.summary`
@@ -52,7 +51,6 @@ export interface DetailsProps {
 export const PropertyDetails: React.StatelessComponent<DetailsProps> = props => {
 	return (
 		<StyledWrapper>
-			<StyledSeparator />
 			<StyledDetails open={props.open}>
 				<StyledSummary onClick={props.onClick}>
 					{props.summary}
@@ -62,7 +60,6 @@ export const PropertyDetails: React.StatelessComponent<DetailsProps> = props => 
 				</StyledSummary>
 				{props.open && props.children}
 			</StyledDetails>
-			<StyledSeparator />
 		</StyledWrapper>
 	);
 };

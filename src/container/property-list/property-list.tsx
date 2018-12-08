@@ -56,9 +56,7 @@ export class PropertyListContainer extends React.Component {
 						onClick={this.toggleOpen}
 						key={groupName}
 						summary={
-							<Components.Headline type="primary" order={4}>
-								{groupName}
-							</Components.Headline>
+							<Components.Copy size={Components.CopySize.S}>{groupName}</Components.Copy>
 						}
 					>
 						{groupedPropsKeys.map((key, propertyIndex) => (

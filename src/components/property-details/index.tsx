@@ -4,6 +4,13 @@ import { Color } from '../colors';
 import { getSpace, SpaceSize } from '../space';
 import { ChevronDown, ChevronUp } from 'react-feather';
 
+export interface DetailsProps {
+	open: boolean;
+	toggleable?: boolean;
+	summary: React.ReactNode;
+	onClick?: React.MouseEventHandler<HTMLElement>;
+}
+
 const StyledWrapper = styled.div`
 	margin: 0 -${getSpace(SpaceSize.M)}px;
 	border-top: 1px solid ${Color.Grey90};
@@ -42,12 +49,6 @@ const StyledIcon = styled.div`
 	flex-shrink: 0;
 `;
 
-export interface DetailsProps {
-	open: boolean;
-	summary: React.ReactNode;
-	onClick?: React.MouseEventHandler<HTMLElement>;
-}
-
 export const PropertyDetails: React.StatelessComponent<DetailsProps> = props => {
 	return (
 		<StyledWrapper>
@@ -55,7 +56,8 @@ export const PropertyDetails: React.StatelessComponent<DetailsProps> = props => 
 				<StyledSummary onClick={props.onClick}>
 					{props.summary}
 					<StyledIcon>
-						{props.open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+						{props.toggleable &&
+							(props.open ? <ChevronUp size={15} /> : <ChevronDown size={15} />)}
 					</StyledIcon>
 				</StyledSummary>
 				{props.open && props.children}

@@ -11,13 +11,12 @@ import * as Components from '../../components';
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyListContainer extends React.Component {
-	@Mobx.observable private detailsOpen = false;
-
+	@Mobx.observable private codeDetails = false;
 	@Mobx.action
-	private toggleOpen = (e: React.MouseEvent<HTMLElement>) => {
+	private toggleCodeDetails(e: React.MouseEvent<HTMLElement>) {
 		e.preventDefault();
-		this.detailsOpen = !this.detailsOpen;
-	};
+		this.codeDetails = !this.codeDetails;
+	}
 
 	public render(): React.ReactNode {
 		const { store } = this.props as { store: ViewStore };
@@ -44,6 +43,7 @@ export class PropertyListContainer extends React.Component {
 		);
 		const groupedPropsKeys = Object.keys(groupedPropsObject);
 		const groupedPropsValues = Object.values(groupedPropsObject);
+		console.log(groupedPropsValues);
 
 		return (
 			<div>
@@ -52,14 +52,16 @@ export class PropertyListContainer extends React.Component {
 				))}
 				{groupedPropsKeys.map((groupName, groupIndex) => (
 					<Components.PropertyDetails
-						open={this.detailsOpen}
-						onClick={this.toggleOpen}
+						open
+						onClick={e => e.preventDefault()}
 						key={groupName}
 						summary={
-							<Components.Copy size={Components.CopySize.S}>{groupName}</Components.Copy>
+							<Components.Headline type="primary" order={4}>
+								{groupName}
+							</Components.Headline>
 						}
 					>
-						{groupedPropsKeys.map((key, propertyIndex) => (
+						{groupedPropsValues[groupIndex].map((key, propertyIndex) => (
 							<PropertyListItem
 								key={groupedPropsValues[groupIndex][propertyIndex].getId()}
 								property={groupedPropsValues[groupIndex][propertyIndex]}
@@ -72,8 +74,9 @@ export class PropertyListContainer extends React.Component {
 				))}
 				{unknownProps.length > 0 && (
 					<Components.PropertyDetails
-						open={this.detailsOpen}
-						onClick={this.toggleOpen}
+						open={this.codeDetails}
+						onClick={this.toggleCodeDetails}
+						toggleable
 						summary={
 							<div>
 								<Components.Headline type="primary" order={4}>

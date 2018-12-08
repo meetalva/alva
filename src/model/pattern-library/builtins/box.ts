@@ -50,11 +50,32 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 	const defaultJustify = context.options.getGlobalEnumOptionId(justifyId, 'center');
 
 	const properties = [
+		new PatternStringProperty({
+			contextId: WIDHT_CONTEXT_ID,
+			id: widthId,
+			inputType: Types.PatternPropertyInputType.Default,
+			label: 'Width',
+			group: 'General',
+			origin: Types.PatternPropertyOrigin.BuiltIn,
+			propertyName: 'width',
+			defaultValue: 'auto'
+		}),
+		new PatternStringProperty({
+			contextId: HEIGHT_CONTEXT_ID,
+			id: heightId,
+			inputType: Types.PatternPropertyInputType.Default,
+			label: 'Height',
+			group: 'General',
+			origin: Types.PatternPropertyOrigin.BuiltIn,
+			propertyName: 'height',
+			defaultValue: 'auto'
+		}),
 		new PatternBooleanProperty({
 			contextId: FLEX_CONTEXT_ID,
 			id: flexId,
 			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Flex',
+			group: 'Flexbox',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'flex',
 			defaultValue: true
@@ -64,11 +85,11 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			id: flexDirectionId,
 			inputType: Types.PatternPropertyInputType.RadioGroup,
 			label: 'Direction',
+			group: 'Flexbox',
 			propertyName: 'flexDirection',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			defaultOptionId: defaultDirection,
 			required: false,
-			group: '',
 			hidden: false,
 			options: [
 				new PatternEnumPropertyOption({
@@ -94,11 +115,11 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			id: alignId,
 			inputType: Types.PatternPropertyInputType.RadioGroup,
 			label: 'Align',
+			group: 'Flexbox',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'alignItems',
 			defaultOptionId: defaultAlign,
 			required: false,
-			group: '',
 			hidden: false,
 			options: [
 				new PatternEnumPropertyOption({
@@ -148,10 +169,10 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			id: justifyId,
 			inputType: Types.PatternPropertyInputType.Select,
 			label: 'Justify',
+			group: 'Flexbox',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'justifyContent',
 			defaultOptionId: defaultJustify,
-			group: '',
 			hidden: false,
 			required: false,
 			options: [
@@ -210,6 +231,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			id: flexWrapId,
 			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Wrap',
+			group: 'Flexbox',
 			propertyName: 'wrap',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			defaultValue: false
@@ -219,6 +241,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			id: growId,
 			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Grow',
+			group: 'Flexbox',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'flexGrow',
 			defaultValue: 0
@@ -228,6 +251,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			id: shrinkId,
 			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Shrink',
+			group: 'Flexbox',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'flexShrink',
 			defaultValue: 1
@@ -237,26 +261,9 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			id: basisId,
 			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Size',
+			group: 'Flexbox',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'flexBasis',
-			defaultValue: 'auto'
-		}),
-		new PatternStringProperty({
-			contextId: WIDHT_CONTEXT_ID,
-			id: widthId,
-			inputType: Types.PatternPropertyInputType.Default,
-			label: 'Width',
-			origin: Types.PatternPropertyOrigin.BuiltIn,
-			propertyName: 'width',
-			defaultValue: 'auto'
-		}),
-		new PatternStringProperty({
-			contextId: HEIGHT_CONTEXT_ID,
-			id: heightId,
-			inputType: Types.PatternPropertyInputType.Default,
-			label: 'Height',
-			origin: Types.PatternPropertyOrigin.BuiltIn,
-			propertyName: 'height',
 			defaultValue: 'auto'
 		}),
 		new PatternStringProperty({
@@ -264,6 +271,7 @@ export const Box = (context: BuiltInContext): BuiltInResult => {
 			id: backgroundColorId,
 			inputType: Types.PatternPropertyInputType.Default,
 			label: 'Background Color',
+			group: 'General',
 			origin: Types.PatternPropertyOrigin.BuiltIn,
 			propertyName: 'backgroundColor'
 		})

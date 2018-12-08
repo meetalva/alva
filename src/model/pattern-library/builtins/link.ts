@@ -17,6 +17,7 @@ export const Link = (context: BuiltInContext): BuiltInResult => {
 			event: new PatternProperty.PatternEvent({
 				type: Types.PatternEventType.MouseEvent
 			}),
+			group: '',
 			hidden: false,
 			id: context.options.getGlobalPropertyId(patternId, ONCLICK_CONTEXT_ID),
 			inputType: Types.PatternPropertyInputType.Default,

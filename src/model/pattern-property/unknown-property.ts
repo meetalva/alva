@@ -7,6 +7,7 @@ export interface PatternUnknownPropertyInit {
 	defaultValue?: unknown;
 	example?: string;
 	description?: string;
+	group: string;
 	hidden: boolean;
 	id: string;
 	inputType: Types.PatternPropertyInputType;
@@ -32,6 +33,7 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 			defaultValue: serialized.defaultValue,
 			description: serialized.description,
 			example: serialized.example,
+			group: serialized.group,
 			hidden: serialized.hidden,
 			id: serialized.id,
 			inputType: serialized.inputType,
@@ -62,6 +64,7 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 			defaultValue: this.defaultValue,
 			description: this.description,
 			example: this.example || '',
+			group: this.group,
 			hidden: this.hidden,
 			id: this.id,
 			inputType: this.inputType,
@@ -79,6 +82,7 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 		this.description = prop.getDescription();
 		this.defaultValue = prop.getDefaultValue();
 		this.example = prop.getExample();
+		this.group = prop.getGroup();
 		this.hidden = prop.getHidden();
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();

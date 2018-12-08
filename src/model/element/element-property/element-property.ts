@@ -121,6 +121,16 @@ export class ElementProperty {
 		return patternProperty.getHidden();
 	}
 
+	public getGroup(): string | undefined {
+		const patternProperty = this.getPatternProperty();
+
+		if (!patternProperty) {
+			return undefined;
+		}
+
+		return patternProperty.getGroup();
+	}
+
 	public getElement(): Element | undefined {
 		return this.element;
 	}

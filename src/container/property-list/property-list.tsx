@@ -1,6 +1,6 @@
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
-import { partition } from 'lodash';
+import { partition, groupBy } from 'lodash';
 import { PropertyListItem } from './property-list-item';
 import * as React from 'react';
 import { ViewStore } from '../../store';
@@ -37,10 +37,35 @@ export class PropertyListContainer extends React.Component {
 			isPropertyType(Types.PatternPropertyType.Unknown)
 		);
 
+		const [groupedProps, ungroupedProps] = partition(regularProps, isGrouped(true));
+
+		const foo = groupBy(groupedProps, elementProperty => elementProperty.getGroup());
+		const keys = Object.keys(foo);
+		const values = Object.values(foo);
+
 		return (
 			<div>
-				{regularProps.map(elementProperty => (
+				{ungroupedProps.map(elementProperty => (
 					<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
+				))}
+				{keys.map((groupName, groupIndex) => (
+					<Components.PropertyDetails
+						open={this.detailsOpen}
+						onClick={this.toggleOpen}
+						key={groupName}
+						summary={
+							<Components.Headline type="primary" order={4}>
+								{groupName}
+							</Components.Headline>
+						}
+					>
+						{keys.map((key, propertyIndex) => (
+							<PropertyListItem
+								key={values[groupIndex][propertyIndex].getId()}
+								property={values[groupIndex][propertyIndex]}
+							/>
+						))}
+					</Components.PropertyDetails>
 				))}
 				{eventHandlerProps.map(elementProperty => (
 					<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
@@ -73,5 +98,13 @@ function isPropertyType(type: Types.PatternPropertyType): (p: Model.ElementPrope
 	return p => {
 		const patternProperty = p.getPatternProperty();
 		return typeof patternProperty !== 'undefined' && patternProperty.getType() === type;
+	};
+}
+
+function isGrouped(grouped: boolean): (p: Model.ElementProperty) => boolean {
+	return p => {
+		const patternProperty = p.getPatternProperty();
+		const hasGroup = typeof patternProperty !== 'undefined' && patternProperty.getGroup() !== '';
+		return typeof patternProperty !== 'undefined' && hasGroup === grouped;
 	};
 }

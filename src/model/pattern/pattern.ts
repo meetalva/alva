@@ -117,6 +117,10 @@ export class Pattern {
 	}
 
 	public getProperties(): PatternProperty.AnyPatternProperty[] {
+		if (!this.patternLibrary) {
+			return [];
+		}
+
 		return this.getPropertyIds()
 			.map(propertyId => this.patternLibrary.getPatternPropertyById(propertyId))
 			.filter((p): p is PatternProperty.AnyPatternProperty => typeof p !== 'undefined');

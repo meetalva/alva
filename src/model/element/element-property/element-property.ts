@@ -125,7 +125,7 @@ export class ElementProperty {
 		const patternProperty = this.getPatternProperty();
 
 		if (!patternProperty) {
-			return undefined;
+			return;
 		}
 
 		return patternProperty.getGroup();

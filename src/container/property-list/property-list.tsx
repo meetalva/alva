@@ -43,7 +43,6 @@ export class PropertyListContainer extends React.Component {
 		);
 		const groupedPropsKeys = Object.keys(groupedPropsObject);
 		const groupedPropsValues = Object.values(groupedPropsObject);
-		console.log(groupedPropsValues);
 
 		return (
 			<div>

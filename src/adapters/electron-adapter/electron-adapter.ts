@@ -7,6 +7,7 @@ import * as ContextMenu from '../../context-menu';
 import { ElectronUpdater, UpdateCheckStatus } from './electron-updater';
 import { ElectronMainMenu } from './electron-main-menu';
 import { AlvaApp, Project } from '../../model';
+import * as Serde from '../../sender/serde';
 import * as uuid from 'uuid';
 import * as Url from 'url';
 
@@ -155,11 +156,34 @@ export class ElectronAdapter {
 			}
 		});
 
-		server.sender.match<M.Paste>(M.MessageType.Paste, async () => {
-			const app = await this.getApp();
+		server.sender.match<M.Paste>(M.MessageType.Paste, async m => {
+			const app = await host.getApp(m.appId || '');
 
-			if (app && app.getHasFocusedInput()) {
+			if (!app) {
+				host.log(`paste: received message without resolveable app: ${m}`);
+				return;
+			}
+
+			const contents = await host.readClipboard();
+
+			if (!contents) {
+				host.log(`paste: no contents`);
+				return;
+			}
+
+			const message = Serde.deserialize(contents);
+
+			// Trigger the default behaviour if the clipboard
+			// has no Alva message and an input is focused
+			if (!message && app.getHasFocusedInput()) {
+				host.log(`paste: redirecting to input`);
 				Electron.Menu.sendActionToFirstResponder('paste:');
+				return;
+			}
+
+			if (!message || message.type !== M.MessageType.Clipboard) {
+				host.log(`paste: clipboard message is no clipboard message`);
+				return;
 			}
 		});
 

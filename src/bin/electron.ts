@@ -23,7 +23,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 
 	// Determine file to open
 	// Use process.argv[1] if passed for win32
-	const filePath = (await getPassedFile()) || (await electronHost.getFlags())._[0];
+	const filePath = (await getPassedFile()) || process.argv[1];
 
 	const localDataHost = await Hosts.LocalDataHost.fromHost(electronHost);
 
@@ -33,6 +33,10 @@ async function main(forced?: ForcedFlags): Promise<void> {
 	});
 
 	const adapter = new ElectronAdapter({ server: alvaServer });
+
+	electronHost.log(
+		`Starting ${filePath ? 'with' : 'without'} file ${filePath ? `at ${filePath}` : ''}`
+	);
 
 	await alvaServer.start();
 	await adapter.start({ filePath });

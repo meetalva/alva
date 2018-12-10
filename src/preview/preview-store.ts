@@ -140,7 +140,6 @@ export class PreviewStore<V> {
 			if (!patternProperty) {
 				return renderProperties;
 			}
-
 			if (patternProperty.getType() === Types.PatternPropertyType.EventHandler) {
 				// Special case:
 				// the link property should render "click" event handlers as href, too
@@ -193,19 +192,23 @@ export class PreviewStore<V> {
 							return;
 						}
 					}
-
-					const elementAction = this.project.getElementActionById(
-						elementProperty.getValue() as string
-					);
-
-					if (!elementAction) {
+					const elementPropertyValues = elementProperty.getValue();
+					if (!elementPropertyValues) {
 						return;
 					}
+					const elementActions = Array.isArray(elementPropertyValues)
+						? elementPropertyValues.map(action => this.project.getElementActionById(action))
+						: new Array(elementPropertyValues);
 
-					elementAction.execute({
-						sender: this.app || this.sender,
-						project: this.getProject(),
-						event: e
+					elementActions.forEach((action: Model.ElementAction) => {
+						if (!action) {
+							return;
+						}
+						action.execute({
+							sender: this.app || this.sender,
+							project: this.getProject(),
+							event: e
+						});
 					});
 				};
 			} else {

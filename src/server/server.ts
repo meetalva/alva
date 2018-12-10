@@ -26,7 +26,7 @@ export class AlvaServer implements Types.AlvaServer {
 	private ws: WS.Server;
 	public readonly dataHost: Types.DataHost;
 	public readonly host: Types.Host;
-	public readonly sender: Sender.Sender;
+	public sender: Sender.Sender;
 	public readonly port: number;
 	public readonly interface?: string;
 

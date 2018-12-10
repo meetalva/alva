@@ -15,14 +15,14 @@ export function paste({ host }: T.MatcherContext): T.Matcher<M.Paste> {
 		const contents = await host.readClipboard();
 
 		if (!contents) {
-			host.log(`paste: non contents`);
+			host.log(`paste: no contents`);
 			return;
 		}
 
 		const message = Serde.deserialize(contents);
 
 		if (!message || message.type !== M.MessageType.Clipboard) {
-			host.log(`paste: clipboard message is no message`);
+			host.log(`paste: clipboard message is no clipboard message`);
 			return;
 		}
 

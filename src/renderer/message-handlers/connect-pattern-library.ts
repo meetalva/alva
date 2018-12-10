@@ -30,8 +30,8 @@ export function connectPatternLibrary({
 		});
 
 		library.import(analysis, { project });
-
 		project.addPatternLibrary(library);
+
 		store.getApp().setRightSidebarTab(Types.RightSidebarTab.ProjectSettings);
 		store.commit();
 

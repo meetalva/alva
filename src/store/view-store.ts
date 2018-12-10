@@ -931,7 +931,8 @@ export class ViewStore {
 		this.getApp().send({
 			type: MessageType.UpdatePatternLibraryRequest,
 			payload: {
-				id: library.getId()
+				libId: library.getId(),
+				projectId: this.project.getId()
 			},
 			id: uuid.v4()
 		});

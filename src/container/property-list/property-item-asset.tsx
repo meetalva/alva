@@ -59,7 +59,6 @@ export class PropertyItemAsset extends React.Component<PropertyItemAssetProps> {
 						{ type: Message.MessageType.AssetReadResponse }
 					);
 
-					console.log(response.payload);
 					property.setValue(response.payload);
 					props.store.commit();
 				}}

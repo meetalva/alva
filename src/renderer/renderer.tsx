@@ -22,7 +22,6 @@ let store: ViewStore;
 window.requestIdleCallback = window.requestIdleCallback || window.requestAnimationFrame;
 
 export async function startRenderer(): Promise<void> {
-	console.log('App starting...');
 	const el = document.getElementById('data') as HTMLElement;
 	const payload = el.textContent === null ? '{}' : el.textContent;
 	const data = JSON.parse(decodeURIComponent(payload));
@@ -62,6 +61,8 @@ export async function startRenderer(): Promise<void> {
 	const adapter = BrowserAdapter.fromStore(store, {
 		fs: await getBrowserFs()
 	});
+
+	adapter.host.log('App starting...');
 
 	if (!app.isHostType(Types.HostType.Electron)) {
 		adapter.start();
@@ -114,7 +115,7 @@ export async function startRenderer(): Promise<void> {
 		});
 	};
 
-	console.log('Access ViewStore at .store');
+	adapter.host.log('Access ViewStore at .store');
 
 	Mobx.autorun(() => {
 		// We misuse the hash value to let electron resolve windows based on app id found in the url

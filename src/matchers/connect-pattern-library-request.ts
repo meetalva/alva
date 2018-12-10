@@ -1,9 +1,8 @@
 import * as M from '../message';
 import { MessageType } from '../message';
 import * as T from '../types';
-import * as Model from '../model';
 import * as uuid from 'uuid';
-import * as Analyzer from '../analyzer';
+import { performAnalysis } from './perform-analysis';
 
 export function connectPatternLibrary({
 	host,
@@ -37,16 +36,23 @@ export function connectPatternLibrary({
 		});
 
 		if (!path) {
+			host.log(`connectPatternLibrary: no path`);
 			return;
 		}
 
-		const ids = await dataHost.getConnections(project);
+		const connections = await dataHost.getConnections(project);
+		const connection = connections.find(c => c.path === path);
 
-		const previousLibrary = m.payload.library
-			? project.getPatternLibraryById(m.payload.library)
-			: project.getPatternLibraries().find(p => ids.some(id => id === p.getId()));
+		const previousLibrary = connection
+			? project
+					.getPatternLibraries()
+					.find(p => `${p.getName()}@${p.getVersion()}` === connection.id)
+			: m.payload.library
+				? project.getPatternLibraryById(m.payload.library)
+				: undefined;
 
 		if (m.payload.library && !previousLibrary) {
+			host.log(`connectPatternLibrary: could not determine previous library`);
 			return;
 		}
 
@@ -68,6 +74,13 @@ export function connectPatternLibrary({
 			});
 			return;
 		}
+
+		const analysis = analysisResult.result;
+
+		dataHost.addConnection(project, {
+			id: `${analysisResult.result.name}@${analysisResult.result.version}`,
+			path: analysis.path
+		});
 
 		if (!previousLibrary) {
 			app.send({
@@ -91,32 +104,4 @@ export function connectPatternLibrary({
 			});
 		}
 	};
-}
-
-async function performAnalysis(
-	path: string,
-	{ previousLibrary }: { previousLibrary: Model.PatternLibrary | undefined }
-): Promise<T.LibraryAnalysisResult> {
-	const getGobalEnumOptionId = previousLibrary
-		? previousLibrary.assignEnumOptionId.bind(previousLibrary)
-		: () => uuid.v4();
-
-	const getGlobalPatternId = previousLibrary
-		? previousLibrary.assignPatternId.bind(previousLibrary)
-		: () => uuid.v4();
-
-	const getGlobalPropertyId = previousLibrary
-		? previousLibrary.assignPropertyId.bind(previousLibrary)
-		: () => uuid.v4();
-
-	const getGlobalSlotId = previousLibrary
-		? previousLibrary.assignSlotId.bind(previousLibrary)
-		: () => uuid.v4();
-
-	return Analyzer.analyze(path, {
-		getGobalEnumOptionId,
-		getGlobalPatternId,
-		getGlobalPropertyId,
-		getGlobalSlotId
-	});
 }

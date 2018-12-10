@@ -15,9 +15,11 @@ export class LibrarySettingsContainer extends React.Component<LibrarySettingsCon
 	public render(): JSX.Element {
 		const props = this.props as LibrarySettingsContainerProps & WithStore;
 		const capabilities = props.library.getCapabilites();
+
 		const mayUpdate =
 			capabilities.includes(Types.LibraryCapability.Update) &&
 			props.store.getApp().hasFileAccess();
+
 		const mayReconnect =
 			capabilities.includes(Types.LibraryCapability.Reconnect) &&
 			props.store.getApp().hasFileAccess();
@@ -37,19 +39,53 @@ export class LibrarySettingsContainer extends React.Component<LibrarySettingsCon
 									<>
 										{mayUpdate && (
 											<Components.ButtonGroupButton
-												onClick={() => props.store.updatePatternLibrary(props.library)}
+												disabled={
+													props.library.getState() ===
+													Types.PatternLibraryState.Connecting
+												}
+												onClick={() => {
+													if (
+														props.library.getState() ===
+														Types.PatternLibraryState.Connecting
+													) {
+														return;
+													}
+
+													props.library.setState(Types.PatternLibraryState.Connecting);
+													props.store.updatePatternLibrary(props.library);
+												}}
 											>
-												Update
+												{props.library.getState() ===
+												Types.PatternLibraryState.Connecting
+													? 'Updating …'
+													: 'Update'}
 											</Components.ButtonGroupButton>
 										)}
 										{!mayUpdate &&
 											mayReconnect && (
 												<Components.ButtonGroupButton
-													onClick={() =>
-														props.store.connectPatternLibrary(props.library)
+													disabled={
+														props.library.getState() ===
+														Types.PatternLibraryState.Connecting
 													}
+													onClick={() => {
+														if (
+															props.library.getState() ===
+															Types.PatternLibraryState.Connecting
+														) {
+															return;
+														}
+
+														props.library.setState(
+															Types.PatternLibraryState.Connecting
+														);
+														props.store.connectPatternLibrary(props.library);
+													}}
 												>
-													Connect
+													{props.library.getState() ===
+													Types.PatternLibraryState.Connecting
+														? 'Connecting …'
+														: 'Connect'}
 												</Components.ButtonGroupButton>
 											)}
 									</>
@@ -77,6 +113,7 @@ const LibraryStateIndicator: React.SFC<LibraryStateIndicatorProps> = props => {
 const getLedColor = (state: Types.PatternLibraryState): Components.LedColor => {
 	switch (state) {
 		case Types.PatternLibraryState.Connected:
+		case Types.PatternLibraryState.Connecting:
 			return Components.LedColor.Green;
 		case Types.PatternLibraryState.Disconnected:
 			return Components.LedColor.Orange;
@@ -88,6 +125,8 @@ const getLedColor = (state: Types.PatternLibraryState): Components.LedColor => {
 
 const getIndicatorLabel = (state: Types.PatternLibraryState): string => {
 	switch (state) {
+		case Types.PatternLibraryState.Connecting:
+			return 'Connecting';
 		case Types.PatternLibraryState.Connected:
 			return 'Connected';
 		case Types.PatternLibraryState.Disconnected:

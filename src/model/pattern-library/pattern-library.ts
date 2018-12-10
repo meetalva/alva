@@ -8,6 +8,7 @@ import { AnyPatternProperty, PatternEnumProperty, PatternProperty } from '../pat
 import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
+
 const md5 = require('md5');
 
 export interface PatternLibraryInit {
@@ -459,11 +460,13 @@ export class PatternLibrary {
 }
 
 function deserializeState(
-	input: 'pristine' | 'connected' | 'disconnected'
+	input: 'pristine' | 'connected' | 'disconnected' | 'connecting'
 ): Types.PatternLibraryState {
 	switch (input) {
 		case 'pristine':
 			return Types.PatternLibraryState.Pristine;
+		case 'connecting':
+			return Types.PatternLibraryState.Connecting;
 		case 'connected':
 			return Types.PatternLibraryState.Connected;
 		case 'disconnected':

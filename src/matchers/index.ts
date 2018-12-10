@@ -1,5 +1,6 @@
 export * from './add-app';
 export * from './connect-pattern-library-request';
+export * from './update-pattern-library-request';
 export * from './copy';
 export * from './create-new-file-request';
 export * from './cut';

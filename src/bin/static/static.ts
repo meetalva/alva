@@ -38,10 +38,10 @@ async function main(forced?: ForcedFlags): Promise<void> {
 			});
 		});
 
-		console.log(`Starting static server for ${path} on port ${port}...`);
+		nodeHost.log(`Starting static server for ${path} on port ${port}...`);
 
 		server.listen(port, () => {
-			console.log(`Running at http://localhost:${port}`);
+			nodeHost.log(`Running at http://localhost:${port}`);
 		});
 	}
 
@@ -58,7 +58,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 
 	if (projectResult) {
 		const p = projectResult.result;
-		console.log(`Embedding ${p.getName()} at http://localhost:${port}/project/${p.getId()}`);
+		nodeHost.log(`Embedding ${p.getName()} at http://localhost:${port}/project/${p.getId()}`);
 	}
 
 	await build({ path, host: nodeHost, project: projectResult ? projectResult.result : undefined });

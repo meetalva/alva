@@ -845,6 +845,7 @@ export class Project {
 						typeof c.newValue === 'object'
 							? ModelTree.getModelByName(c.newValue.model as Types.ModelName)
 							: undefined;
+
 					const value = ValueModel
 						? (ValueModel as any).from(c.newValue, { project: this })
 						: c.newValue;

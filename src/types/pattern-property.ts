@@ -91,6 +91,7 @@ export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
 }
 
 export interface SerializedEnumOption {
+	model: ModelName.PatternEnumPropertyOption;
 	contextId: string;
 	icon: IconName | undefined;
 	id: string;
@@ -164,4 +165,9 @@ export interface SerializedPatternStringProperty extends SerializedPropertyBase 
 export interface SerializedPatternHrefProperty extends SerializedPropertyBase {
 	defaultValue?: string;
 	type: 'href';
+}
+
+export interface PatternLibraryConnections {
+	id: string;
+	path: string;
 }

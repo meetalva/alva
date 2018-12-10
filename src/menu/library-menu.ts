@@ -49,6 +49,8 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 						return;
 					}
 
+					const projectId = ctx.project.getId() || '';
+
 					ctx.project
 						.getPatternLibraries()
 						.filter(library =>
@@ -59,7 +61,8 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 								id: uuid.v4(),
 								type: Message.MessageType.UpdatePatternLibraryRequest,
 								payload: {
-									id: library.getId()
+									libId: library.getId(),
+									projectId
 								}
 							});
 						});

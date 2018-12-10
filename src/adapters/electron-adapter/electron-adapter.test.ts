@@ -10,9 +10,12 @@ jest.mock('./electron-updater');
 jest.mock('../../matchers', () => {
 	const MockMatchers = jest.genMockFromModule('../../matchers') as any;
 	const openAssetHandler = jest.fn();
+	const updatePatternLibraryHandler = jest.fn();
 
 	MockMatchers.openAsset = () => openAssetHandler;
 	MockMatchers.openAsset.handler = openAssetHandler;
+	MockMatchers.updatePatternLibrary = () => updatePatternLibraryHandler;
+	MockMatchers.updatePatternLibrary.handler = updatePatternLibraryHandler;
 
 	return MockMatchers;
 });
@@ -62,4 +65,21 @@ test('reacts to asset read requests', async () => {
 
 	server.sender.send(inMessage);
 	expect((Matchers.openAsset as any).handler).toHaveBeenCalledWith(inMessage);
+});
+
+test('reacts to pattern library update request', async () => {
+	const server = await AlvaServer.fromHosts({} as any);
+	const adapter = new ElectronAdapter({ server });
+	await adapter.start();
+
+	const reqMsg: M.Message = {
+		type: M.MessageType.UpdatePatternLibraryRequest,
+		id: uuid.v4(),
+		payload: {
+			libId: uuid.v4(),
+			projectId: uuid.v4()
+		}
+	};
+	server.sender.send(reqMsg);
+	expect((Matchers.updatePatternLibrary as any).handler).toHaveBeenCalledWith(reqMsg);
 });

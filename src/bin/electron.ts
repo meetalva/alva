@@ -4,9 +4,6 @@ import * as Hosts from '../hosts';
 import * as Types from '../types';
 import * as Serde from '../sender/serde';
 import { ElectronAdapter } from '../adapters/electron-adapter';
-import * as Mobx from 'mobx';
-// import * as uuid from 'uuid';
-// import { MessageType as MT } from '../message';
 
 const importFresh = require('import-fresh');
 const clearModule = require('clear-module');
@@ -16,34 +13,17 @@ export interface ForcedFlags {
 	port?: number;
 }
 
-export interface State {
-	ready: boolean;
-	fileToOpen?: string;
-}
-
-const state: State = Mobx.observable({
-	ready: false,
-	fileToOpen: undefined
-});
-
-const onOpenFile = (e, path) => {
-	e.preventDefault();
-	state.fileToOpen = path;
-};
-
 async function main(forced?: ForcedFlags): Promise<void> {
-	Electron.app.once('open-file', onOpenFile);
-
-	Electron.app.on('ready', () => {
-		state.ready = true;
-	});
-
 	const AlvaServer = importFresh(serverPath).AlvaServer as typeof Server.AlvaServer;
 
 	const electronHost = await Hosts.ElectronHost.from({
 		process,
 		forced
 	});
+
+	// Determine file to open
+	// Use process.argv[1] if passed for win32
+	const filePath = (await getPassedFile()) || process.argv[1];
 
 	const localDataHost = await Hosts.LocalDataHost.fromHost(electronHost);
 
@@ -54,24 +34,12 @@ async function main(forced?: ForcedFlags): Promise<void> {
 
 	const adapter = new ElectronAdapter({ server: alvaServer });
 
+	electronHost.log(
+		`Starting ${filePath ? 'with' : 'without'} file ${filePath ? `at ${filePath}` : ''}`
+	);
+
 	await alvaServer.start();
-	await adapter.start();
-
-	// Use process.argv[1] if passed for win32
-	// await Mobx.when(() => state.ready);
-	// const fileToOpen = state.fileToOpen || (await electronHost.getFlags())._[0];
-
-	// if (fileToOpen) {
-	// 	alvaServer.sender.send({
-	// 		type: MT.OpenFileRequest,
-	// 		id: uuid.v4(),
-	// 		payload: {
-	// 			path: fileToOpen,
-	// 			replace: true,
-	// 			silent: false
-	// 		}
-	// 	});
-	// }
+	await adapter.start({ filePath });
 
 	const onRestart = async () => {
 		const port = alvaServer.port;
@@ -97,6 +65,23 @@ async function main(forced?: ForcedFlags): Promise<void> {
 	};
 
 	process.on('message', onMessage);
+}
+
+function getPassedFile(): Promise<string | undefined> {
+	return new Promise(resolve => {
+		let passedFile: string;
+
+		Electron.app.once('will-finish-launching', () => {
+			Electron.app.on('open-file', (e, path) => {
+				e.preventDefault();
+				passedFile = path;
+			});
+		});
+
+		Electron.app.once('ready', () => {
+			resolve(passedFile);
+		});
+	});
 }
 
 process.on('unhandledRejection', (p, err) => {

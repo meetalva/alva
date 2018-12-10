@@ -215,7 +215,7 @@ export class Sender implements Types.Sender {
 		const matchers = this.matchers.get(message.type);
 
 		if (matchers) {
-			matchers.forEach(matcher => matcher(message));
+			matchers.filter(m => typeof m === 'function').forEach(matcher => matcher(message));
 		}
 
 		const envelope = Serde.serialize(message);

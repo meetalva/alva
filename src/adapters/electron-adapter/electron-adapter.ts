@@ -27,7 +27,7 @@ export class ElectronAdapter {
 		this.updater = new ElectronUpdater({ server });
 	}
 
-	public async start(): Promise<void> {
+	public async start(opts?: { filePath?: string }): Promise<void> {
 		const server = this.server;
 		const sender = this.server.sender;
 		const host = this.server.host;
@@ -46,18 +46,25 @@ export class ElectronAdapter {
 			}
 		});
 
-		Electron.app.on('open-file', (e, path) => {
+		Electron.app.on('open-file', async (e, path) => {
 			e.preventDefault();
 
-			sender.send({
-				type: MT.OpenFileRequest,
-				id: uuid.v4(),
-				payload: {
-					path,
-					replace: true,
-					silent: false
-				}
-			});
+			const projectWindows = await this.getProjectWindows();
+			const projectWindow = projectWindows.find(({ project }) => project.getPath() === path);
+
+			if (projectWindow) {
+				projectWindow.window.show();
+				projectWindow.window.focus();
+			} else {
+				this.server.sender.send({
+					type: MT.OpenFileRequest,
+					id: uuid.v4(),
+					payload: {
+						path,
+						replace: false
+					}
+				});
+			}
 		});
 
 		sender.match<M.ConnectPatternLibraryRequest>(
@@ -265,8 +272,10 @@ export class ElectronAdapter {
 			}
 
 			const project = Project.from((m.payload.project as Types.ProjectPayloadSuccess).contents);
-			await host.createWindow(`${server.location.origin}/project/${project.getId()}`);
-			this.addWindow(win);
+			const newWindow = await host.createWindow(
+				`${server.location.origin}/project/${project.getId()}`
+			);
+			this.addWindow(newWindow);
 		});
 
 		server.sender.match<M.Maximize>(MT.Maximize, async m => {
@@ -277,8 +286,20 @@ export class ElectronAdapter {
 			}
 		});
 
-		const win = await host.createWindow(server.location.origin);
-		this.addWindow(win);
+		// Open the splash screen when starting without file
+		if (!opts || !opts.filePath) {
+			const win = await host.createWindow(server.location.origin);
+			this.addWindow(win);
+		} else {
+			this.server.sender.send({
+				type: MT.OpenFileRequest,
+				id: uuid.v4(),
+				payload: {
+					path: opts.filePath,
+					replace: false
+				}
+			});
+		}
 
 		this.menu.start();
 		this.updater.start();
@@ -290,11 +311,24 @@ export class ElectronAdapter {
 		return this.menu.focusedApp;
 	}
 
+	public async getAppWindows(): Promise<Map<string, Electron.BrowserWindow>> {
+		return new Map(
+			Electron.BrowserWindow.getAllWindows()
+				.map(win => {
+					const parsed = Url.parse(win.webContents.getURL());
+
+					if (!parsed.hash) {
+						return;
+					}
+
+					return [parsed.hash.slice(1), win];
+				})
+				.filter((win): win is [string, Electron.BrowserWindow] => typeof win !== 'undefined')
+		);
+	}
+
 	public async getAppWindow(appId: string): Promise<Electron.BrowserWindow | undefined> {
-		return Electron.BrowserWindow.getAllWindows().find(w => {
-			const parsed = Url.parse(w.webContents.getURL());
-			return parsed.hash === `#${appId}`;
-		});
+		return (await this.getAppWindows()).get(appId);
 	}
 
 	public addWindow(win?: Electron.BrowserWindow): void {
@@ -305,5 +339,29 @@ export class ElectronAdapter {
 				this.windows.delete(win.id);
 			});
 		}
+	}
+
+	public async getProjectWindows(): Promise<
+		{ project: Project; window: Electron.BrowserWindow }[]
+	> {
+		return (await Promise.all(
+			Array.from((await this.getAppWindows()).values()).map(async win => {
+				const parsed = Url.parse(win.webContents.getURL());
+				if (!parsed.pathname || !parsed.pathname.startsWith('/project')) {
+					return;
+				}
+
+				const fragments = parsed.pathname.split('/').filter(Boolean);
+				const id = fragments[fragments.length - 1];
+
+				return {
+					window: win,
+					project: await this.server.dataHost.getProject(id)
+				};
+			})
+		)).filter(
+			(item): item is { window: Electron.BrowserWindow; project: Project } =>
+				typeof item !== 'undefined' && typeof item.project !== 'undefined'
+		);
 	}
 }

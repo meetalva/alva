@@ -8,6 +8,11 @@ import * as Electron from 'electron';
 import { createWindow } from './create-window';
 import { AlvaApp } from '../../model';
 import * as Mobx from 'mobx';
+import * as Message from '../../message';
+import * as ElectronLog from 'electron-log';
+
+ElectronLog.transports.console.level = 'info';
+ElectronLog.transports.file.level = 'silly';
 
 export interface ElectronHostInit {
 	process: NodeJS.Process;
@@ -113,7 +118,7 @@ export class ElectronHost implements Types.Host {
 	}
 
 	public async log(message?: unknown, ...optionalParams: unknown[]): Promise<void> {
-		console.log(message, ...optionalParams);
+		ElectronLog.log(message, ...optionalParams);
 	}
 
 	public async resolveFrom(base: Types.HostBase, ...paths: string[]): Promise<string> {
@@ -268,5 +273,9 @@ export class ElectronHost implements Types.Host {
 
 	public setSender(sender: Types.Sender) {
 		this.sender = sender;
+		this.sender.setLog((m: string, message: Message.Message) => {
+			this.log(m, message.type, message.id);
+			ElectronLog.silly(message);
+		});
 	}
 }

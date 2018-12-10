@@ -284,7 +284,7 @@ export type Maximize = EmptyEnvelope<MessageType.Maximize>;
 export type OpenExternalURL = Envelope<MessageType.OpenExternalURL, string>;
 export type OpenFileRequest = Envelope<
 	MessageType.OpenFileRequest,
-	{ path?: string; silent?: boolean; replace: boolean }
+	{ path?: string; silent?: boolean; replace: boolean; newWindow?: boolean }
 >;
 export type OpenFileResponse = Envelope<MessageType.OpenFileResponse, Types.ProjectPayload>;
 export type PageChange = Envelope<MessageType.PageChange, Types.PageChangePayload>;

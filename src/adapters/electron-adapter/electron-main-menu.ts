@@ -96,4 +96,8 @@ export class ElectronMainMenu {
 			Electron.Menu.setApplicationMenu(menu);
 		});
 	}
+
+	public getApp(id: string): Model.AlvaApp | undefined {
+		return this.apps.get(id);
+	}
 }

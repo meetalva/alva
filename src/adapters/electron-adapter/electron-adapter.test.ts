@@ -83,3 +83,21 @@ test('reacts to pattern library update request', async () => {
 	server.sender.send(reqMsg);
 	expect((Matchers.updatePatternLibrary as any).handler).toHaveBeenCalledWith(reqMsg);
 });
+
+test('creates new splashscreen on start', async () => {
+	const server = await AlvaServer.fromHosts({} as any);
+
+	const adapter = new ElectronAdapter({ server });
+	await adapter.start();
+
+	expect((server as any).host.createWindow).toHaveBeenCalled();
+});
+
+test('create no splashscreen on start with filePath', async () => {
+	const server = await AlvaServer.fromHosts({} as any);
+
+	const adapter = new ElectronAdapter({ server });
+	await adapter.start({ filePath: 'some-file' });
+
+	expect((server as any).host.createWindow).not.toHaveBeenCalled();
+});

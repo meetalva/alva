@@ -62,15 +62,18 @@ async function main(forced?: ForcedFlags): Promise<void> {
 	// Use process.argv[1] if passed for win32
 	await Mobx.when(() => state.ready);
 	const fileToOpen = state.fileToOpen || (await electronHost.getFlags())._[0];
-	alvaServer.sender.send({
-		type: MT.OpenFileRequest,
-		id: uuid.v4(),
-		payload: {
-			path: fileToOpen,
-			replace: false,
-			silent: false
-		}
-	});
+
+	if (fileToOpen) {
+		alvaServer.sender.send({
+			type: MT.OpenFileRequest,
+			id: uuid.v4(),
+			payload: {
+				path: fileToOpen,
+				replace: false,
+				silent: false
+			}
+		});
+	}
 
 	const onRestart = async () => {
 		const port = alvaServer.port;

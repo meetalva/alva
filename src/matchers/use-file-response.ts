@@ -3,19 +3,12 @@ import * as T from '../types';
 import * as uuid from 'uuid';
 import * as Model from '../model';
 
-export function useFileResponse({
-	dataHost,
-	host
-}: T.MatcherContext): T.Matcher<M.UseFileResponse> {
+export function useFileResponse({ host }: T.MatcherContext): T.Matcher<M.UseFileResponse> {
 	return async m => {
-		const app = await host.getApp(m.appId || '');
-
-		if (!app) {
-			host.log(`useFileResponse: received message without resolveable app: ${m}`);
-			return;
-		}
+		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 
 		if (m.payload.project.status === T.ProjectPayloadStatus.Error) {
+			host.log('useFileResponse: Received project payload with error status');
 			return;
 		}
 
@@ -23,7 +16,7 @@ export function useFileResponse({
 		const replacement = Model.Project.from(p.contents);
 
 		if (!m.payload.replace) {
-			app.send({
+			sender.send({
 				id: uuid.v4(),
 				type: M.MessageType.OpenWindow,
 				payload: {
@@ -33,6 +26,10 @@ export function useFileResponse({
 				transaction: m.transaction,
 				sender: m.sender
 			});
+		} else {
+			host.log(
+				'useFileResponse: Received project payload with replace parameter "true", skipping'
+			);
 		}
 	};
 }

@@ -3,12 +3,7 @@ import * as T from '../types';
 
 export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFileRequest> {
 	return async m => {
-		const app = await host.getApp(m.appId || '');
-
-		if (!app) {
-			host.log(`openFileRequest: received message without resolveable app: ${m}`);
-			return;
-		}
+		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 
 		const selectedPath =
 			m.payload.path ||
@@ -32,7 +27,7 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 		try {
 			const { contents } = await host.readFile(selectedPath);
 
-			const response = await app.transaction<M.UseFileRequest, M.UseFileResponse>(
+			const response = await sender.transaction<M.UseFileRequest, M.UseFileResponse>(
 				{
 					type: M.MessageType.UseFileRequest,
 					id: m.id,
@@ -51,7 +46,7 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 			if (response.payload.project.status === T.ProjectPayloadStatus.Error) {
 				const p = response.payload.project as T.ProjectPayloadError;
 
-				app.send({
+				sender.send({
 					type: M.MessageType.ShowError,
 					transaction: m.transaction,
 					id: m.id,
@@ -65,7 +60,7 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 			if (response.payload.project.status === T.ProjectPayloadStatus.Ok) {
 				const p = response.payload.project as T.ProjectPayloadSuccess;
 
-				app.send({
+				sender.send({
 					type: M.MessageType.OpenFileResponse,
 					id: m.id,
 					transaction: m.transaction,
@@ -74,8 +69,11 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 				});
 			}
 		} catch (err) {
+			Electron.dialog.showMessageBox({
+				message: JSON.stringify(err)
+			});
 			if (!silent) {
-				app.send({
+				sender.send({
 					type: M.MessageType.ShowError,
 					transaction: m.transaction,
 					id: m.id,

@@ -7,12 +7,7 @@ import * as Model from '../model';
 
 export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<M.UseFileRequest> {
 	return async m => {
-		const app = await host.getApp(m.appId || '');
-
-		if (!app) {
-			host.log(`useFileRequest: received message without resolveable app: ${m}`);
-			return;
-		}
+		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 
 		const projectResult = await Persistence.parse<T.SerializedProject>(m.payload.contents);
 
@@ -22,7 +17,7 @@ export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<
 			host.log(`useFileRequest: ${projectResult.error.message}`);
 
 			if (!silent) {
-				app.send({
+				sender.send({
 					type: M.MessageType.ShowError,
 					transaction: m.transaction,
 					id: m.id,
@@ -45,7 +40,7 @@ export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<
 		if (result.status !== T.ProjectStatus.Ok) {
 			host.log(`useFileRequest: ${result.error.message}`);
 
-			app.send({
+			sender.send({
 				type: M.MessageType.ShowError,
 				transaction: m.transaction,
 				id: m.id,
@@ -105,7 +100,7 @@ export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<
 				})
 		);
 
-		return app.send({
+		return sender.send({
 			type: M.MessageType.UseFileResponse,
 			id: m.id,
 			transaction: m.transaction,

@@ -193,6 +193,7 @@ export class PreviewStore<V> {
 						}
 					}
 					const elementPropertyValues = elementProperty.getValue();
+
 					if (!elementPropertyValues) {
 						return;
 					}

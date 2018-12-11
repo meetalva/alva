@@ -1,68 +1,56 @@
 import * as Model from '../model';
 import * as Types from '../types';
+import * as uuid from 'uuid';
+import { PreviewStore } from './preview-store';
 import { ElementArea } from './element-area';
-import { getComponents } from './get-components';
-import { ViewStore } from '../store';
-import { Sender } from '../sender';
-import { PreviewStore, SyntheticComponents } from './preview-store';
 
-jest.mock('../sender');
-
-test('get and render element actions', () => {
-	const app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender: {} as any });
-	const history = new Model.EditHistory();
-	const sender = new Sender({
-		endpoint: ''
-	});
-
-	const store = new ViewStore({
-		app,
-		history,
-		sender
-	});
-
+test('get and render element action ids', () => {
 	const project = Model.Project.create({
-		name: '',
-		path: '',
+		name: 'test',
+		path: 'my/path',
 		draft: true
 	});
-	store.setProject(project);
+	const library = project.getBuiltinPatternLibrary();
+	const linkPattern = library.getPatternByType(Types.PatternType.SyntheticLink);
+	const onClickPatternProp = linkPattern.getPropertyByContextId('onClick')!;
+	const element = Model.Element.fromPattern(linkPattern, {
+		dragged: false,
+		contents: [],
+		project
+	});
 
-	const mode = Types.PreviewDocumentMode.Static;
-	const inputMock = Model.Element.from(
+	const onClickElProp = element
+		.getProperties()
+		.find(prop => prop.getPatternProperty() === onClickPatternProp)!;
+
+	const action = Model.ElementAction.from(
 		{
-			model: Types.ModelName.Element,
-			dragged: false,
-			focused: false,
-			highlighted: false,
-			id: 'id',
-			name: 'name',
-			patternId: 'pattern-id',
-			placeholderHighlighted: false,
-			containerId: 'container-id',
-			contentIds: [],
-			open: false,
-			forcedOpen: false,
-			propertyValues: [['property-id', 'b']],
-			role: 'node',
-			selected: false
+			model: Types.ModelName.ElementAction,
+			elementPropertyId: element.getId(),
+			id: uuid.v4(),
+			open: true,
+			payload: '',
+			payloadType: Types.ElementActionPayloadType.EventPayload,
+			storeActionId: uuid.v4(),
+			storePropertyId: uuid.v4()
 		},
-		{ project }
+		{ userStore: project.getUserStore() }
 	);
-	project.addElement(inputMock);
 
-	const components = getComponents(project);
-	// tslint:disable-next-line:no-object-literal-type-assertion
-	const synthetics = {} as SyntheticComponents<{}>;
+	element.setPropertyValue(onClickPatternProp.getId(), [action.getId()]);
+
+	expect(onClickElProp.getValue()).toEqual([action.getId()]);
 
 	const previewStore = new PreviewStore({
-		mode,
-		components,
+		mode: Types.PreviewDocumentMode.Static,
+		components: {},
 		project,
-		synthetics,
+		synthetics: {},
 		selectionArea: new ElementArea(),
 		highlightArea: new ElementArea()
 	});
-
-	console.log(previewStore, '&&&&&&');
+	const clickHandlerProps = previewStore.getProperties(element);
+	// Todo: get properties on click hanedler
+	// execute clickHandler
+	// Test if the correct messages are being send.
 });

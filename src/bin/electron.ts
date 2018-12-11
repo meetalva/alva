@@ -23,7 +23,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 
 	// Determine file to open
 	// Use process.argv[1] if passed for win32
-	const filePath = (await getPassedFile()) || process.argv[1];
+	const filePath = (await getPassedFile()) || getFileFromProcess();
 
 	const localDataHost = await Hosts.LocalDataHost.fromHost(electronHost);
 
@@ -82,6 +82,11 @@ function getPassedFile(): Promise<string | undefined> {
 			resolve(passedFile);
 		});
 	});
+}
+
+function getFileFromProcess(): string | undefined {
+	const lastArgument = process.argv[process.argv.length - 1];
+	return lastArgument !== __filename ? lastArgument : undefined;
 }
 
 process.on('unhandledRejection', (p, err) => {

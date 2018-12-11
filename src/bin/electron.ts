@@ -7,6 +7,7 @@ import { ElectronAdapter } from '../adapters/electron-adapter';
 
 const importFresh = require('import-fresh');
 const clearModule = require('clear-module');
+const yargsParser = require('yargs-parser');
 const serverPath = require.resolve('../server');
 
 export interface ForcedFlags {
@@ -85,7 +86,8 @@ function getPassedFile(): Promise<string | undefined> {
 }
 
 function getFileFromProcess(): string | undefined {
-	const lastArgument = process.argv[process.argv.length - 1];
+	const { _: args } = yargsParser(process.argv);
+	const lastArgument = args[args.length - 1];
 	return lastArgument !== __filename ? lastArgument : undefined;
 }
 

@@ -41,15 +41,13 @@ export class PropertyListContainer extends React.Component {
 		const groupedPropsObject = groupBy(groupedProps, elementProperty =>
 			elementProperty.getGroup()
 		);
-		const groupedPropsKeys = Object.keys(groupedPropsObject);
-		const groupedPropsValues = Object.values(groupedPropsObject);
 
 		return (
 			<div>
 				{ungroupedProps.map(elementProperty => (
 					<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
 				))}
-				{groupedPropsKeys.map((groupName, groupIndex) => (
+				{Object.entries(groupedPropsObject).map(([groupName, group]) => (
 					<Components.PropertyDetails
 						open
 						onClick={e => e.preventDefault()}
@@ -60,11 +58,8 @@ export class PropertyListContainer extends React.Component {
 							</Components.Headline>
 						}
 					>
-						{groupedPropsValues[groupIndex].map((key, propertyIndex) => (
-							<PropertyListItem
-								key={groupedPropsValues[groupIndex][propertyIndex].getId()}
-								property={groupedPropsValues[groupIndex][propertyIndex]}
-							/>
+						{group.map(property => (
+							<PropertyListItem key={property.getId()} property={property} />
 						))}
 					</Components.PropertyDetails>
 				))}

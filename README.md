@@ -4,19 +4,14 @@
 
 # Meet Alva
 
-> Alva is a radically new digital design tool built for cross-functional product teams.
+> Create living prototypes with code components
 >
 > https://meetalva.io
 
 
-Alva works with your production frontend components, adding up-to-date, responsive, and interactive designs to your living styleguide.
+# [Get Started](https://meetalva.io/doc/docs/guides/start?guides-enabled=true) | [Let's chat](https://gitter.im/meetalva/Lobby) | [Website](https://meetalva.io)
 
-You can start with a minimal set of components to sketch concepts and do fast iterations with your development team to create and enrich components, from atoms to modules and entire pages and a full-featured styleguide. But you can also add Alva designs to existing style
-guides.
-
-Alva focuses on the arrangement and content editing of pages, while it leaves the implementation of the components to the developers, providing a single source of truth for both.
-
-There is no such thing as out-dated and static PNG screens, as the current version of both the design models and the component implementation always render to up-to-date web pages instead.
+Start with a minimal set of components to sketch concepts and iterate fast your team to create and enrich components, refine design and implemenation and compose a working, living prototype.
 
 ## Installation
 
@@ -29,6 +24,9 @@ There is no such thing as out-dated and static PNG screens, as the current versi
 * Follow the instructions to install Alva
 
 ## Usage
+
+> **Heads up!** This is the mini-version of basic Alva usage docs. 
+> Don't miss out on our great [Alva guides in our web docs](http://localhost:1337/doc/docs/guides/start?guides-enabled=true).
 
 ### Getting Started with Alva
 

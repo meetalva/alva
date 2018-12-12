@@ -26,7 +26,7 @@ Start with a minimal set of components to sketch concepts and iterate fast your 
 ## Usage
 
 > **Heads up!** This is the mini-version of basic Alva usage docs. 
-> Don't miss out on our great [Alva guides in our web docs](http://localhost:1337/doc/docs/guides/start?guides-enabled=true).
+> Don't miss out on our great [Alva guides in our web docs](https://meetalva.io/doc/docs/start.html?guides-enabled=true).
 
 ### Getting Started with Alva
 

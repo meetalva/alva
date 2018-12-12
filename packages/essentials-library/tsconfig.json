@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+      "outDir": "lib",
+      "sourceMap": true,
+      "module": "commonjs",
+      "target": "es2015",
+      "declaration": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "strict": true,
+      "jsx": "react"
+    },
+    "include": [
+      "src/**/*.tsx",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/**/*.test.ts",
+      "src/test.ts"
+    ]
+  }
+  

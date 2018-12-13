@@ -2,11 +2,6 @@ import * as PatternProperty from './pattern-property';
 import * as Types from './types';
 import * as UserStore from './user-store';
 
-export enum PatternOrigin {
-	BuiltIn = 'built-in',
-	UserProvided = 'user-provided'
-}
-
 export enum PatternLibraryState {
 	Pristine = 'pristine',
 	Connecting = 'connecting',
@@ -22,17 +17,6 @@ export type SerializedAppPane =
 	| 'development-pane';
 
 export type SerializedAlvaView = 'PageDetail' | 'SplashScreen';
-
-export type SerializedPatternOrigin = 'built-in' | 'user-provided';
-
-export type SerializedPatternType =
-	| 'pattern'
-	| 'synthetic:box'
-	| 'synthetic:conditional'
-	| 'synthetic:image'
-	| 'synthetic:link'
-	| 'synthetic:page'
-	| 'synthetic:text';
 
 export type SerializedPatternLibraryOrigin = 'built-in' | 'user-provided';
 
@@ -60,10 +44,8 @@ export interface SerializedPattern {
 	icon: string;
 	id: string;
 	name: string;
-	origin: SerializedPatternOrigin;
 	propertyIds: string[];
 	slots: SerializedPatternSlot[];
-	type: SerializedPatternType;
 }
 
 export interface SerializedPatternSlot {

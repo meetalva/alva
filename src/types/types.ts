@@ -366,8 +366,6 @@ export interface PatternDependency {
 	id: string;
 	contextId: string;
 	libraryId: string;
-	origin: SerializedModel.SerializedPatternOrigin;
-	type: SerializedModel.SerializedPatternType;
 }
 
 export enum PreviewTransferType {

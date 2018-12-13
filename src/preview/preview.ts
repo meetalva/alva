@@ -5,14 +5,13 @@ import { getInitialData } from './get-initial-data';
 import * as Message from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
-import { PreviewStore, SyntheticComponents } from './preview-store';
+import { PreviewStore } from './preview-store';
 import { Sender } from '../sender';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
 export interface Renderer<T> {
 	render(store: PreviewStore<T>, container: HTMLElement): void;
-	getSynthetics(): SyntheticComponents<T>;
 }
 
 declare global {
@@ -114,7 +113,6 @@ async function main(): Promise<void> {
 		mode,
 		components,
 		project,
-		synthetics: window.previewRenderer.getSynthetics(),
 		selectionArea: new ElementArea(),
 		highlightArea: new ElementArea()
 	});

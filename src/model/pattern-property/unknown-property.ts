@@ -1,5 +1,5 @@
 import * as JSON5 from 'json5';
-import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
+import { PatternPropertyBase } from './property-base';
 import * as Types from '../../types';
 
 export interface PatternUnknownPropertyInit {
@@ -12,7 +12,6 @@ export interface PatternUnknownPropertyInit {
 	id: string;
 	inputType: Types.PatternPropertyInputType;
 	label: string;
-	origin: Types.PatternPropertyOrigin;
 	propertyName: string;
 	required: boolean;
 	typeText: string;
@@ -38,7 +37,6 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 			id: serialized.id,
 			inputType: serialized.inputType,
 			label: serialized.label,
-			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
 			required: serialized.required,
 			typeText: serialized.typeText
@@ -69,7 +67,6 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 			id: this.id,
 			inputType: this.inputType,
 			label: this.label,
-			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type,

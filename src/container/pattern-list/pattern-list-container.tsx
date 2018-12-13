@@ -4,7 +4,6 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import { PatternItemContainer } from './pattern-item-container';
 import * as React from 'react';
-import * as Types from '../../types';
 import { ViewStore } from '../../store';
 
 @MobxReact.inject('store')
@@ -77,9 +76,7 @@ export interface PatternLibraryContainerProps {
 class PatternLibraryContainer extends React.Component<PatternLibraryContainerProps> {
 	public render(): JSX.Element | null {
 		const props = this.props;
-		const patterns = props.library
-			.getPatterns(props.searchResult)
-			.filter(pattern => pattern.getType() !== Types.PatternType.SyntheticPage);
+		const patterns = props.library.getPatterns(props.searchResult);
 
 		if (patterns.length === 0) {
 			return null;

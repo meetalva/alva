@@ -33,21 +33,11 @@ export interface PreviewStoreInit<V, T extends Types.PreviewDocumentMode> {
 	mode: T;
 	project: Model.Project;
 	selectionArea: ElementArea;
-	synthetics: SyntheticComponents<V>;
 }
 
 export interface Components {
 	// tslint:disable-next-line:no-any
 	[id: string]: any;
-}
-
-export interface SyntheticComponents<V> {
-	'synthetic:box': V;
-	'synthetic:conditional': V;
-	'synthetic:page': V;
-	'synthetic:image': V;
-	'synthetic:link': V;
-	'synthetic:text': V;
 }
 
 export class PreviewStore<V> {
@@ -58,7 +48,6 @@ export class PreviewStore<V> {
 	@Mobx.observable private mode: Types.PreviewDocumentMode;
 	@Mobx.observable private project: Model.Project;
 	@Mobx.observable private selectionArea: ElementArea;
-	@Mobx.observable private synthetics: SyntheticComponents<V>;
 	@Mobx.observable private scrollPosition: Types.Point;
 	private sender?: Sender;
 
@@ -66,7 +55,6 @@ export class PreviewStore<V> {
 		this.mode = init.mode;
 		this.project = init.project;
 		this.components = init.components;
-		this.synthetics = init.synthetics;
 		this.selectionArea = init.selectionArea;
 		this.highlightArea = init.highlightArea;
 	}
@@ -92,23 +80,16 @@ export class PreviewStore<V> {
 			return;
 		}
 
-		const type = pattern.getType();
+		// tslint:disable-next-line:no-any
+		const component = this.components[pattern.getId()];
 
-		switch (type) {
-			case Types.PatternType.Pattern:
-				// tslint:disable-next-line:no-any
-				const component = this.components[pattern.getId()];
-
-				if (!component) {
-					throw new Error(
-						`Could not find component with id "${pattern.getId()}" for pattern "${pattern.getName()}:${pattern.getExportName()}".`
-					);
-				}
-
-				return component[pattern.getExportName()];
-			default:
-				return this.synthetics[type];
+		if (!component) {
+			throw new Error(
+				`Could not find component with id "${pattern.getId()}" for pattern "${pattern.getName()}:${pattern.getExportName()}".`
+			);
 		}
+
+		return component[pattern.getExportName()];
 	}
 
 	public getElementById(id: string): Model.Element | undefined {
@@ -144,46 +125,7 @@ export class PreviewStore<V> {
 			if (patternProperty.getType() === Types.PatternPropertyType.EventHandler) {
 				// Special case:
 				// the link property should render "click" event handlers as href, too
-				const pattern = element.getPattern();
 
-				if (pattern && pattern.getType() === Types.PatternType.SyntheticLink) {
-					const elementAction = this.project.getElementActionById(
-						elementProperty.getValue() as string
-					);
-
-					const userStoreAction = elementAction
-						? this.project.getUserStore().getActionById(elementAction.getStoreActionId())
-						: undefined;
-
-					const propertyId = elementAction ? elementAction.getStorePropertyId() : undefined;
-
-					const userStoreProperty = propertyId
-						? this.project.getUserStore().getPropertyById(propertyId)
-						: undefined;
-
-					const actionType = userStoreAction ? userStoreAction.getType() : undefined;
-
-					const propertyType = userStoreProperty
-						? userStoreProperty.getValueType()
-						: undefined;
-
-					switch (actionType) {
-						case Types.UserStoreActionType.OpenExternal:
-							if (elementAction) {
-								renderProperties['href'] = elementAction.getPayload();
-								renderProperties['target'] = '_blank';
-								renderProperties['rel'] = 'noopener';
-							}
-							break;
-						case Types.UserStoreActionType.Set:
-							if (
-								userStoreProperty &&
-								propertyType === Types.UserStorePropertyValueType.Page
-							) {
-								renderProperties['href'] = `?page=${userStoreProperty.getValue()}`;
-							}
-					}
-				}
 				const property = patternProperty as Model.PatternEventHandlerProperty;
 				const event = property.getEvent();
 

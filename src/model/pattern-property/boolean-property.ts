@@ -1,4 +1,4 @@
-import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
+import { PatternPropertyBase } from './property-base';
 import * as Types from '../../types';
 
 /**
@@ -21,7 +21,6 @@ export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefi
 			id: serialized.id,
 			inputType: serialized.inputType,
 			label: serialized.label,
-			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
@@ -44,7 +43,6 @@ export class PatternBooleanProperty extends PatternPropertyBase<boolean | undefi
 			id: this.id,
 			inputType: this.inputType,
 			label: this.label,
-			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type

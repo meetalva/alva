@@ -1,5 +1,4 @@
 import { computeDifference } from '../../alva-util';
-import { Box, Conditional, Image, Link, Page, Text } from './builtins';
 import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Pattern, PatternSlot } from '../pattern';
@@ -82,46 +81,7 @@ export class PatternLibrary {
 		init: PatternLibraryInit,
 		opts?: PatternLibraryCreateOptions
 	): PatternLibrary {
-		const options = opts || {
-			getGlobalEnumOptionId: () => uuid.v4(),
-			getGlobalPatternId: () => uuid.v4(),
-			getGlobalPropertyId: () => uuid.v4(),
-			getGlobalSlotId: () => uuid.v4()
-		};
-
 		const patternLibrary = new PatternLibrary(init);
-
-		if (init.origin === Types.PatternLibraryOrigin.BuiltIn) {
-			const link = Link({ options, patternLibrary });
-			const page = Page({ options, patternLibrary });
-			const image = Image({ options, patternLibrary });
-			const text = Text({ options, patternLibrary });
-			const box = Box({ options, patternLibrary });
-			const conditional = Conditional({ options, patternLibrary });
-
-			[
-				page.pattern,
-				text.pattern,
-				box.pattern,
-				conditional.pattern,
-				image.pattern,
-				link.pattern
-			].forEach(pattern => {
-				patternLibrary.addPattern(pattern);
-			});
-
-			[
-				...page.properties,
-				...image.properties,
-				...text.properties,
-				...box.properties,
-				...conditional.properties,
-				...link.properties
-			].forEach(property => {
-				patternLibrary.addProperty(property);
-			});
-		}
-
 		return patternLibrary;
 	}
 
@@ -341,10 +301,6 @@ export class PatternLibrary {
 
 	public getPatternById(id: string): Pattern | undefined {
 		return this.patterns.get(id);
-	}
-
-	public getPatternByType(type: Types.PatternType): Pattern {
-		return this.getPatterns().find(pattern => pattern.getType() === type) as Pattern;
 	}
 
 	public getPatternProperties(): AnyPatternProperty[] {

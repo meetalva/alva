@@ -574,10 +574,7 @@ export class Element {
 
 		if (previousPattern) {
 			pattern.getProperties().forEach(prop => {
-				const previousProp =
-					pattern.getOrigin() === Types.PatternOrigin.BuiltIn
-						? previousPattern.getPropertyByContextId(prop.getContextId())
-						: previousPattern.getPropertyById(prop.getId());
+				const previousProp = previousPattern.getPropertyById(prop.getId());
 
 				if (!previousProp) {
 					return;
@@ -796,9 +793,7 @@ export class Element {
 			.map(p => ({
 				id: p.getId(),
 				contextId: p.getContextId(),
-				libraryId: p.getPatternLibrary().getId(),
-				origin: p.getOrigin(),
-				type: p.getType()
+				libraryId: p.getPatternLibrary().getId()
 			}));
 
 		return _.uniqBy(

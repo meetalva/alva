@@ -260,7 +260,6 @@ export class Project {
 		);
 
 		serialized.elementActions.forEach(elementAction => {
-			console.log(elementAction, '*******');
 			project.addElementAction(ElementAction.from(elementAction, { userStore }));
 		});
 

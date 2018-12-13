@@ -1,56 +1,47 @@
-import * as Model from '../model';
-import * as Types from '../types';
-import * as uuid from 'uuid';
-import { PreviewStore } from './preview-store';
-import { ElementArea } from './element-area';
+import * as Test from './test';
 
-test('get and render element action ids', () => {
-	const project = Model.Project.create({
-		name: 'test',
-		path: 'my/path',
-		draft: true
-	});
-	const library = project.getBuiltinPatternLibrary();
-	const linkPattern = library.getPatternByType(Types.PatternType.SyntheticLink);
-	const onClickPatternProp = linkPattern.getPropertyByContextId('onClick')!;
-	const element = Model.Element.fromPattern(linkPattern, {
-		dragged: false,
-		contents: [],
-		project
-	});
+test('execute single element in string', () => {
+	const { element, project } = Test.createElementWithProject();
+	const { action } = Test.createAction({ element, project });
+	action.execute = jest.fn();
 
-	const onClickElProp = element
-		.getProperties()
-		.find(prop => prop.getPatternProperty() === onClickPatternProp)!;
+	const onClickPatternProp = element.getPattern()!.getPropertyByContextId('onClick')!;
+	element.setPropertyValue(onClickPatternProp.getId(), action.getId());
 
-	const action = Model.ElementAction.from(
-		{
-			model: Types.ModelName.ElementAction,
-			elementPropertyId: element.getId(),
-			id: uuid.v4(),
-			open: true,
-			payload: '',
-			payloadType: Types.ElementActionPayloadType.EventPayload,
-			storeActionId: uuid.v4(),
-			storePropertyId: uuid.v4()
-		},
-		{ userStore: project.getUserStore() }
-	);
+	const props = Test.getRenderProperties({ element, project });
+	props.onClick();
 
+	expect(action.execute).toHaveBeenCalled();
+});
+
+test('execute single element action in array', () => {
+	const { element, project } = Test.createElementWithProject();
+	const { action } = Test.createAction({ element, project });
+	action.execute = jest.fn();
+
+	const onClickPatternProp = element.getPattern()!.getPropertyByContextId('onClick')!;
 	element.setPropertyValue(onClickPatternProp.getId(), [action.getId()]);
 
-	expect(onClickElProp.getValue()).toEqual([action.getId()]);
+	const props = Test.getRenderProperties({ element, project });
+	props.onClick();
 
-	const previewStore = new PreviewStore({
-		mode: Types.PreviewDocumentMode.Static,
-		components: {},
-		project,
-		synthetics: {},
-		selectionArea: new ElementArea(),
-		highlightArea: new ElementArea()
-	});
-	const clickHandlerProps = previewStore.getProperties(element);
-	// Todo: get properties on click hanedler
-	// execute clickHandler
-	// Test if the correct messages are being send.
+	expect(action.execute).toHaveBeenCalled();
+});
+
+test('executes multiple element actions in array', () => {
+	const { element, project } = Test.createElementWithProject();
+	const { action: actionA } = Test.createAction({ element, project });
+	const { action: actionB } = Test.createAction({ element, project });
+
+	actionA.execute = jest.fn();
+	actionB.execute = jest.fn();
+
+	const onClickPatternProp = element.getPattern()!.getPropertyByContextId('onClick')!;
+	element.setPropertyValue(onClickPatternProp.getId(), [actionA.getId(), actionB.getId()]);
+
+	const props = Test.getRenderProperties({ element, project });
+	props.onClick();
+
+	expect(actionA.execute).toHaveBeenCalled();
+	expect(actionB.execute).toHaveBeenCalled();
 });

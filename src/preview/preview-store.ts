@@ -140,49 +140,8 @@ export class PreviewStore<V> {
 			if (!patternProperty) {
 				return renderProperties;
 			}
+
 			if (patternProperty.getType() === Types.PatternPropertyType.EventHandler) {
-				// Special case:
-				// the link property should render "click" event handlers as href, too
-				const pattern = element.getPattern();
-
-				if (pattern && pattern.getType() === Types.PatternType.SyntheticLink) {
-					const elementAction = this.project.getElementActionById(
-						elementProperty.getValue() as string
-					);
-
-					const userStoreAction = elementAction
-						? this.project.getUserStore().getActionById(elementAction.getStoreActionId())
-						: undefined;
-
-					const propertyId = elementAction ? elementAction.getStorePropertyId() : undefined;
-
-					const userStoreProperty = propertyId
-						? this.project.getUserStore().getPropertyById(propertyId)
-						: undefined;
-
-					const actionType = userStoreAction ? userStoreAction.getType() : undefined;
-
-					const propertyType = userStoreProperty
-						? userStoreProperty.getValueType()
-						: undefined;
-
-					switch (actionType) {
-						case Types.UserStoreActionType.OpenExternal:
-							if (elementAction) {
-								renderProperties['href'] = elementAction.getPayload();
-								renderProperties['target'] = '_blank';
-								renderProperties['rel'] = 'noopener';
-							}
-							break;
-						case Types.UserStoreActionType.Set:
-							if (
-								userStoreProperty &&
-								propertyType === Types.UserStorePropertyValueType.Page
-							) {
-								renderProperties['href'] = `?page=${userStoreProperty.getValue()}`;
-							}
-					}
-				}
 				const property = patternProperty as Model.PatternEventHandlerProperty;
 				const event = property.getEvent();
 
@@ -192,14 +151,18 @@ export class PreviewStore<V> {
 							return;
 						}
 					}
-					const elementPropertyValues = elementProperty.getValue();
 
-					if (!elementPropertyValues) {
+					const actionIds = elementProperty.getValue() as unknown;
+
+					if (!actionIds) {
 						return;
 					}
-					const elementActions = Array.isArray(elementPropertyValues)
-						? elementPropertyValues.map(action => this.project.getElementActionById(action))
-						: new Array(elementPropertyValues);
+
+					const elementActions = Array.isArray(actionIds)
+						? actionIds.map(id => this.project.getElementActionById(id)).filter(Boolean)
+						: typeof actionIds === 'string'
+							? [this.project.getElementActionById(actionIds)]
+							: [];
 
 					elementActions.forEach((action: Model.ElementAction) => {
 						if (!action) {
@@ -215,6 +178,7 @@ export class PreviewStore<V> {
 			} else {
 				renderProperties[patternProperty.getPropertyName()] = elementProperty.getValue();
 			}
+
 			return renderProperties;
 		}, {});
 	}

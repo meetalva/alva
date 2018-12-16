@@ -6,7 +6,8 @@ const REACT_COMPONENT_TYPES = [
 	'ComponentClass',
 	'PureComponent',
 	'StatelessComponent',
-	'ComponentType'
+	'ComponentType',
+	'FunctionComponent'
 ];
 
 export function isReactComponentType(

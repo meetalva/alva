@@ -90,7 +90,6 @@ function createProperty(
 	}
 
 	if ((init.type.flags & Ts.TypeFlags.EnumLiteral) === Ts.TypeFlags.EnumLiteral) {
-		console.log('enum', init.symbol.name);
 		return PropertyCreators.createEnumProperty(init, ctx);
 	}
 

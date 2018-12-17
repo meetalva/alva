@@ -8,12 +8,20 @@ import * as Types from '../../types';
 import * as Model from '../../model';
 import * as Components from '../../components';
 
+export interface PropertyListContainerProps {
+	onClick?: React.MouseEventHandler<HTMLElement>;
+}
+
 @MobxReact.inject('store')
 @MobxReact.observer
-export class PropertyListContainer extends React.Component {
+export class PropertyListContainer extends React.Component<PropertyListContainerProps> {
 	@Mobx.observable private codeDetails = false;
 	@Mobx.action
 	private toggleCodeDetails(e: React.MouseEvent<HTMLElement>) {
+		if (this.props.onClick) {
+			this.props.onClick(e);
+		}
+
 		e.preventDefault();
 		this.codeDetails = !this.codeDetails;
 	}
@@ -69,7 +77,7 @@ export class PropertyListContainer extends React.Component {
 				{unknownProps.length > 0 && (
 					<Components.PropertyDetails
 						open={this.codeDetails}
-						onClick={this.toggleCodeDetails}
+						onClick={e => this.toggleCodeDetails(e)}
 						toggleable
 						summary={
 							<div>

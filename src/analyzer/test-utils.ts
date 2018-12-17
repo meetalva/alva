@@ -60,8 +60,13 @@ export const getPropTypes = (
 	}) as TypeScriptUtils.TypeScriptType;
 	const [props] = reactType.getTypeArguments();
 
-	return props.type.getApparentProperties().map(symbol => ({
-		symbol,
-		type: typeChecker.getTypeAtLocation((symbol.declarations as TypeScript.Declaration[])[0])
-	}));
+	return props.type.getApparentProperties().map(symbol => {
+		const declarations = symbol.declarations!;
+		const type = typeChecker.getTypeAtLocation(declarations[declarations.length - 1]);
+
+		return {
+			symbol,
+			type
+		};
+	});
 };

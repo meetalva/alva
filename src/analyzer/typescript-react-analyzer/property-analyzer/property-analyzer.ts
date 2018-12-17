@@ -3,18 +3,8 @@ import * as ReactUtils from '../../react-utils';
 import * as Types from '../../../types';
 import * as Ts from 'typescript';
 import * as TypescriptUtils from '../../typescript-utils';
-
-export interface PropertyAnalyzeContext {
-	program: Ts.Program;
-	getEnumOptionId(enumId: string, contextId: string): string;
-	getPropertyId(contextId: string): string;
-}
-
-export interface PropertyInit {
-	symbol: Ts.Symbol;
-	type: Ts.Type;
-	typechecker: Ts.TypeChecker;
-}
+import { PropertyInit, PropertyAnalyzeContext } from './types';
+import * as PropertyCreators from './property-creators';
 
 /**
  * Analyzes a given Props type and returns all Alva-supported properties found.
@@ -100,7 +90,8 @@ function createProperty(
 	}
 
 	if ((init.type.flags & Ts.TypeFlags.EnumLiteral) === Ts.TypeFlags.EnumLiteral) {
-		return createEnumProperty(init, ctx);
+		console.log('enum', init.symbol.name);
+		return PropertyCreators.createEnumProperty(init, ctx);
 	}
 
 	if ((init.type.flags & Ts.TypeFlags.String) === Ts.TypeFlags.String) {
@@ -112,6 +103,7 @@ function createProperty(
 	}
 
 	if (ReactUtils.isReactEventHandlerType(init.type, { program: ctx.program })) {
+		console.log('event', init.symbol.name);
 		return createEventHandlerProperty(init, ctx);
 	}
 
@@ -166,71 +158,6 @@ function createBooleanProperty(
 		propertyName: args.symbol.name,
 		required: false,
 		type: Types.PatternPropertyType.Boolean
-	};
-}
-
-export function createEnumProperty(
-	args: PropertyInit,
-	ctx: PropertyAnalyzeContext
-): Types.SerializedPatternEnumProperty | undefined {
-	if (!(args.type.symbol && args.type.symbol.flags & Ts.SymbolFlags.EnumMember)) {
-		return;
-	}
-
-	const enumMemberDeclaration = TypescriptUtils.findTypeDeclaration(args.type.symbol, {
-		typechecker: args.typechecker
-	});
-
-	if (!enumMemberDeclaration || !enumMemberDeclaration.parent) {
-		return;
-	}
-
-	const enumDeclaration = enumMemberDeclaration.parent;
-	if (!Ts.isEnumDeclaration(enumDeclaration)) {
-		return;
-	}
-
-	const enumId = ctx.getPropertyId(args.symbol.name);
-
-	return {
-		model: Types.ModelName.PatternProperty,
-		contextId: args.symbol.name,
-		description: '',
-		example: '',
-		group: '',
-		hidden: false,
-		id: enumId,
-		inputType: Types.PatternPropertyInputType.Default,
-		label: args.symbol.name,
-		origin: 'user-provided',
-		options: enumDeclaration.members.map((enumMember, index) => {
-			const optionContextId = enumMember.initializer
-				? String(enumMember.initializer.getText())
-				: String(index);
-
-			const value =
-				optionContextId.charAt(0) === '"'
-					? optionContextId.slice(1, -1)
-					: parseInt(optionContextId, 10);
-
-			const name =
-				TypescriptUtils.getJsDocValueFromNode(enumMember, 'name') || enumMember.name.getText();
-
-			const option: Types.SerializedEnumOption = {
-				model: Types.ModelName.PatternEnumPropertyOption,
-				contextId: name,
-				icon: undefined,
-				id: ctx.getEnumOptionId(enumId, name),
-				name,
-				ordinal: optionContextId,
-				value
-			};
-
-			return option;
-		}),
-		propertyName: args.symbol.name,
-		required: false,
-		type: Types.PatternPropertyType.Enum
 	};
 }
 

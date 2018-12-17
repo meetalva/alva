@@ -169,7 +169,7 @@ function createBooleanProperty(
 	};
 }
 
-function createEnumProperty(
+export function createEnumProperty(
 	args: PropertyInit,
 	ctx: PropertyAnalyzeContext
 ): Types.SerializedPatternEnumProperty | undefined {
@@ -178,8 +178,9 @@ function createEnumProperty(
 	}
 
 	const enumMemberDeclaration = TypescriptUtils.findTypeDeclaration(args.type.symbol, {
-		typechecker: ctx.program.getTypeChecker()
+		typechecker: args.typechecker
 	});
+
 	if (!enumMemberDeclaration || !enumMemberDeclaration.parent) {
 		return;
 	}
@@ -203,22 +204,25 @@ function createEnumProperty(
 		label: args.symbol.name,
 		origin: 'user-provided',
 		options: enumDeclaration.members.map((enumMember, index) => {
-			const init = enumMember.initializer
+			const optionContextId = enumMember.initializer
 				? String(enumMember.initializer.getText())
 				: String(index);
 
-			const value = init.charAt(0) === '"' ? init.slice(1, -1) : parseInt(init, 10);
+			const value =
+				optionContextId.charAt(0) === '"'
+					? optionContextId.slice(1, -1)
+					: parseInt(optionContextId, 10);
 
 			const name =
 				TypescriptUtils.getJsDocValueFromNode(enumMember, 'name') || enumMember.name.getText();
 
 			const option: Types.SerializedEnumOption = {
 				model: Types.ModelName.PatternEnumPropertyOption,
-				contextId: init,
+				contextId: name,
 				icon: undefined,
 				id: ctx.getEnumOptionId(enumId, name),
 				name,
-				ordinal: init,
+				ordinal: optionContextId,
 				value
 			};
 

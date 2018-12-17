@@ -103,7 +103,6 @@ function createProperty(
 	}
 
 	if (ReactUtils.isReactEventHandlerType(init.type, { program: ctx.program })) {
-		console.log('event', init.symbol.name);
 		return createEventHandlerProperty(init, ctx);
 	}
 

@@ -11,3 +11,9 @@ export const OtherProperty: React.SFC<{ other: React.ReactNode }> = props => {
 export function FunctionDeclarationComponent(p) {
 	return <div>{p.children}</div>;
 }
+
+export class BasicClassComponent extends React.Component {
+	public render() {
+		return <div>{this.props.children}</div>;
+	}
+}

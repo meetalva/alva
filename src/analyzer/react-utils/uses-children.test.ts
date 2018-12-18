@@ -28,6 +28,11 @@ test('detects children usage in function declaration', () => {
 	expect(usesChildren(functionDeclaration, { project })).toBe(true);
 });
 
+test('detects children usage in basic class', () => {
+	const classComponent = getNamedExport(sourceFile, 'BasicClassComponent');
+	expect(usesChildren(classComponent, { project })).toBe(true);
+});
+
 function getNamedExport(sourceFile: Tsa.SourceFile, name: string) {
 	const symbols = sourceFile.getExportSymbols();
 	const symbol = symbols.find(s => s.getName() === name);

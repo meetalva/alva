@@ -227,6 +227,7 @@
     "smoothscroll-polyfill": "0.4.3",
     "styled-components": "4.0.3",
     "tag-hoc": "1.0.0",
+    "ts-simple-ast": "20.0.0",
     "tslib": "1.9.0",
     "typescript": "3.0.1",
     "url-search-params": "0.10.0",

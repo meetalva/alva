@@ -1,8 +1,8 @@
 import * as M from '../../message';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 import * as Types from '../../types';
-import * as Model from '../../model';
 import * as uuid from 'uuid';
+import { PatternLibrary } from '../../model';
 
 export function connectPatternLibrary({
 	store
@@ -14,22 +14,7 @@ export function connectPatternLibrary({
 			return;
 		}
 
-		const analysis = m.payload.analysis;
-
-		const library = Model.PatternLibrary.create({
-			id: uuid.v4(),
-			name: analysis.name,
-			version: analysis.version,
-			origin: Types.PatternLibraryOrigin.UserProvided,
-			patternProperties: [],
-			patterns: [],
-			bundle: analysis.bundle,
-			bundleId: analysis.id,
-			description: analysis.description,
-			state: Types.PatternLibraryState.Connected
-		});
-
-		library.import(analysis, { project });
+		const library = PatternLibrary.fromAnalysis(m.payload.analysis, { project });
 		project.addPatternLibrary(library);
 
 		store.getApp().setRightSidebarTab(Types.RightSidebarTab.ProjectSettings);

@@ -125,6 +125,28 @@ export class PatternLibrary {
 		return patternLibrary;
 	}
 
+	public static fromAnalysis(
+		analysis: Types.LibraryAnalysis,
+		{ project }: { project: Project }
+	): PatternLibrary {
+		const library = PatternLibrary.create({
+			id: uuid.v4(),
+			name: analysis.name,
+			version: analysis.version,
+			origin: Types.PatternLibraryOrigin.UserProvided,
+			patternProperties: [],
+			patterns: [],
+			bundle: analysis.bundle,
+			bundleId: analysis.id,
+			description: analysis.description,
+			state: Types.PatternLibraryState.Connected
+		});
+
+		library.import(analysis, { project });
+
+		return library;
+	}
+
 	public static from(serialized: Types.SerializedPatternLibrary): PatternLibrary {
 		const state = deserializeState(serialized.state);
 

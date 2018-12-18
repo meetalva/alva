@@ -22,10 +22,8 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package-lock.json" }}
 
-      - run: cd packages/core
-
-      - run: lerna test
-      - run: lerna run lint
-      - run: lerna run build
-      - run: lerna run static
-      - run: lerna run deploy
+      - run: npm test
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run static
+      - run: npm run deploy

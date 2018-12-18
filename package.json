@@ -7,7 +7,10 @@
     "commit": "commit",
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "build": "lerna run build",
+    "static": "lerna run static",
+    "deploy": "lerna run deploy"
   },
   "repository": {
     "type": "git",

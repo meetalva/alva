@@ -13,7 +13,12 @@ import * as uuid from 'uuid';
 import { Compiler } from 'webpack';
 import * as resolve from 'resolve';
 import { last } from 'lodash';
+<<<<<<< HEAD:packages/core/src/analyzer/typescript-react-analyzer/typescript-react-analyzer.ts
 import { PatternAnalysis } from '../../types';
+=======
+import * as Tsa from 'ts-simple-ast';
+import { usesChildren } from '../react-utils/uses-children';
+>>>>>>> feat: integrate uses-children detection:src/analyzer/typescript-react-analyzer/typescript-react-analyzer.ts
 
 const precinct = require('precinct');
 
@@ -37,6 +42,7 @@ interface AnalyzeContext {
 	candidate: PatternCandidate;
 	options: AnalyzeOptions;
 	program: ts.Program;
+	project: Tsa.Project;
 }
 
 type PatternAnalyzer = (
@@ -103,8 +109,17 @@ async function analyzePatterns(context: {
 
 	const program = ts.createProgram(declarationPaths, options.config, compilerHost);
 
+<<<<<<< HEAD:packages/core/src/analyzer/typescript-react-analyzer/typescript-react-analyzer.ts
 	const analyzePattern = getPatternAnalyzer(program, context.options);
 	return patternCandidates.reduce<PatternAnalysis[]>(
+=======
+	const project = new Tsa.Project({
+		tsConfigFilePath: optionsPath
+	});
+
+	const analyzePattern = getPatternAnalyzer(program, project, context.options);
+	return patternCandidates.reduce(
+>>>>>>> feat: integrate uses-children detection:src/analyzer/typescript-react-analyzer/typescript-react-analyzer.ts
 		(acc, candidate) => [...acc, ...analyzePattern(candidate, analyzePatternExport)],
 		[]
 	);
@@ -126,7 +141,11 @@ async function createPatternCompiler(
 	});
 }
 
-function getPatternAnalyzer(program: ts.Program, options: AnalyzeOptions): PatternAnalyzer {
+function getPatternAnalyzer(
+	program: ts.Program,
+	project: Tsa.Project,
+	options: AnalyzeOptions
+): PatternAnalyzer {
 	return (
 		candidate: PatternCandidate,
 		predicate: PatternAnalyzerPredicate
@@ -138,7 +157,7 @@ function getPatternAnalyzer(program: ts.Program, options: AnalyzeOptions): Patte
 		}
 
 		return TypeScriptUtils.getExports(sourceFile, program)
-			.map(ex => predicate(ex, { program, candidate, options }))
+			.map(ex => predicate(ex, { program, project, candidate, options }))
 			.filter((p): p is Types.PatternAnalysis => typeof p !== 'undefined');
 	};
 }
@@ -183,6 +202,57 @@ function analyzePatternExport(
 			return ctx.options.getGlobalSlotId(id, slotContextId);
 		}
 	});
+
+	// Try to find out if children are used if
+	// they are not typed explicitly
+	if (!slots.some(slot => slot.type === 'children')) {
+		const declPath = (ex.statement.getSourceFile() as any).path;
+		const sourcePath = setExtname(declPath, '.ts');
+		const sourcePathTSX = setExtname(declPath, '.tsx');
+
+		const compilerOptions = ctx.project.getCompilerOptions();
+		const relSourcePath = Path.relative((compilerOptions.outDir || '').toLowerCase(), sourcePath);
+		const relSourcePathTSX = Path.relative(
+			(compilerOptions.outDir || '').toLowerCase(),
+			sourcePathTSX
+		);
+
+		const sourceFile = ctx.project
+			.getSourceFiles()
+			.find(
+				f =>
+					f.getFilePath().endsWith(relSourcePath) || f.getFilePath().endsWith(relSourcePathTSX)
+			);
+
+		const exp = sourceFile
+			? sourceFile.getExportSymbols().find(s => s.getName() === (ex.name || 'default'))
+			: undefined;
+
+		const expNode = exp ? exp.getDeclarations()[0] : undefined;
+
+		if (expNode && Tsa.TypeGuards.isExportAssignment(expNode)) {
+			const expr = expNode.getExpression();
+
+			const node = Tsa.TypeGuards.isIdentifier(expr)
+				? expr.getDefinitionNodes()[0]
+				: exp && exp.getValueDeclaration();
+
+			if (node && usesChildren(node, { project: ctx.project })) {
+				slots.push({
+					model: Types.ModelName.PatternSlot,
+					contextId: 'children',
+					description: 'Element that render inside this element',
+					example: '',
+					hidden: false,
+					id: ctx.options.getGlobalSlotId(id, 'children'),
+					label: 'children',
+					propertyName: 'children',
+					required: false,
+					type: 'children'
+				});
+			}
+		}
+	}
 
 	return {
 		path: ctx.candidate.artifactPath,

@@ -38,4 +38,6 @@ function getChildrenProp(node: Tsa.Node): Tsa.Symbol | undefined {
 		const propType = param.getType();
 		return propType.getProperty('children');
 	}
+
+	return;
 }

@@ -44,3 +44,9 @@ export class AliasingClassComponent extends React.Component {
 		return <div>{a}</div>;
 	}
 }
+
+const BasicReferencedComponent: React.SFC = props => {
+	return <div>{props.children}</div>;
+};
+
+export { BasicReferencedComponent };

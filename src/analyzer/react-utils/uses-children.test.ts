@@ -39,8 +39,18 @@ test('detects children usage in SFC with destructuring parameter', () => {
 });
 
 test('detects children usage in SFC with aliasing', () => {
-	const destructuringComponent = getNamedExport(sourceFile, 'AliasingSFC');
+	const aliasingComponent = getNamedExport(sourceFile, 'AliasingSFC');
+	expect(usesChildren(aliasingComponent, { project })).toBe(true);
+});
+
+test('detects children usage in Class with destructuring parameter', () => {
+	const destructuringComponent = getNamedExport(sourceFile, 'DestrucutingClassComponent');
 	expect(usesChildren(destructuringComponent, { project })).toBe(true);
+});
+
+test('detects children usage in Class with aliasing', () => {
+	const aliasingComponent = getNamedExport(sourceFile, 'AliasingClassComponent');
+	expect(usesChildren(aliasingComponent, { project })).toBe(true);
 });
 
 function getNamedExport(sourceFile: Tsa.SourceFile, name: string) {

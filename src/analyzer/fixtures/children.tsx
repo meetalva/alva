@@ -27,3 +27,20 @@ export const AliasingSFC: React.SFC = props => {
 	const c = p.children;
 	return <div>{c}</div>;
 };
+
+export class DestrucutingClassComponent extends React.Component {
+	public render() {
+		const { props } = this;
+		const { children } = props;
+		return <div>{children}</div>;
+	}
+}
+
+export class AliasingClassComponent extends React.Component {
+	public render() {
+		const p = this.props;
+		const c = p.children;
+		const a = c;
+		return <div>{a}</div>;
+	}
+}

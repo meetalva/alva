@@ -33,13 +33,25 @@ test('detects children usage in basic class', () => {
 	expect(usesChildren(classComponent, { project })).toBe(true);
 });
 
+test('detects children usage in SFC with destructuring parameter', () => {
+	const destructuringComponent = getNamedExport(sourceFile, 'DestructuringSFC');
+	expect(usesChildren(destructuringComponent, { project })).toBe(true);
+});
+
+test('detects children usage in SFC with aliasing', () => {
+	const destructuringComponent = getNamedExport(sourceFile, 'AliasingSFC');
+	expect(usesChildren(destructuringComponent, { project })).toBe(true);
+});
+
 function getNamedExport(sourceFile: Tsa.SourceFile, name: string) {
 	const symbols = sourceFile.getExportSymbols();
 	const symbol = symbols.find(s => s.getName() === name);
 
 	if (!symbol) {
 		throw new Error(
-			`No symbol with name ${name} found. Available symbols: ${symbols.map(s => s.getName())}`
+			`No symbol with name ${name} found. Available symbols: ${symbols
+				.map(s => s.getName())
+				.join(', ')}`
 		);
 	}
 

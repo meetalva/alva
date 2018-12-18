@@ -5,60 +5,37 @@ export function usesChildren(node: Tsa.Node, { project }: { project: Tsa.Project
 		return usesChildren(node.getInitializer()!, { project });
 	}
 
-	if (Tsa.TypeGuards.isFunctionLikeDeclaration(node)) {
-		const propsParamDeclaration = node.getParameters()[0];
+	const childrenProp = getChildrenProp(node);
 
-		if (!propsParamDeclaration) {
-			return false;
-		}
-
-		return propsParamDeclaration
-			.findReferencesAsNodes()
-			.map(ref => ref.getParent()!) // TODO: traverse upwards
-			.some(ref => {
-				if (Tsa.TypeGuards.isPropertyAccessExpression(ref)) {
-					return ref.getName() === 'children';
-				}
-				return false;
-			});
+	if (typeof childrenProp === 'undefined') {
+		return false;
 	}
 
+	const childrenDecl = childrenProp.getDeclarations()[0] as Tsa.PropertyDeclaration;
+
+	if (!childrenDecl) {
+		return false;
+	}
+
+	return childrenDecl.findReferencesAsNodes().some(ref => ref.getAncestors().includes(node));
+}
+
+function getChildrenProp(node: Tsa.Node): Tsa.Symbol | undefined {
 	if (Tsa.TypeGuards.isClassDeclaration(node)) {
-		const props = node
+		return node
 			.getType()
 			.getProperties()
 			.find(s => s.getName() === 'props');
-
-		if (!props) {
-			return false;
-		}
-
-		const decl = props.getDeclarations()[0] as Tsa.PropertyDeclaration;
-		const refs = decl.findReferencesAsNodes();
-
-		return refs
-			.filter(ref => isInside(ref, node))
-			.map(ref => ref.getParent()!.getParent()!)
-			.some(ref => {
-				if (Tsa.TypeGuards.isPropertyAccessExpression(ref)) {
-					return ref.getName() === 'children';
-				}
-				return false;
-			});
 	}
 
-	return false;
-}
+	if (Tsa.TypeGuards.isFunctionLikeDeclaration(node)) {
+		const param = node.getParameters()[0];
 
-function isInside(a: Tsa.Node, b: Tsa.Node): boolean {
-	let current: Tsa.Node = a;
-
-	// tslint:disable-next-line:no-conditional-assignment
-	while ((current = current.getParent())) {
-		if (current === b) {
-			return true;
+		if (!param) {
+			return;
 		}
-	}
 
-	return false;
+		const propType = param.getType();
+		return propType.getProperty('children');
+	}
 }

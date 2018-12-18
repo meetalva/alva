@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: circleci/node:8
 
-    working_directory: ~/repo/packages/core
+    working_directory: ~/repo
 
     steps:
       - checkout
@@ -15,11 +15,14 @@ jobs:
           - v1-dependencies-
 
       - run: npm install
+      - run: npm run bootstrap
 
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package-lock.json" }}
+
+      - run: cd packages/core
 
       - run: npm test
       - run: npm run lint

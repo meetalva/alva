@@ -8,6 +8,7 @@
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
     "precommit": "lint-staged",
+    "test": "lerna run test",
     "build": "lerna run build",
     "static": "lerna run static",
     "deploy": "lerna run deploy"

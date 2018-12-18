@@ -8,9 +8,9 @@ import { WithStore } from '../store';
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PaneDevelopmentEditor extends React.Component {
-	private node: HTMLElement | null;
-	private editor: Monaco.editor.IStandaloneCodeEditor;
-	private dispose: () => void | null;
+	private node?: HTMLElement | null;
+	private editor?: Monaco.editor.IStandaloneCodeEditor;
+	private dispose?: () => void | null;
 
 	public componentDidMount(): void {
 		const props = this.props as WithStore;
@@ -55,16 +55,16 @@ export class PaneDevelopmentEditor extends React.Component {
 		});
 
 		this.editor.onDidChangeModelContent(async () => {
-			const value = this.editor.getValue();
+			const value = this.editor!.getValue();
 			storeEnhancer.setTypeScript(value);
 
-			const model = this.editor.getModel();
+			const model = this.editor!.getModel();
 			const getClient = await Monaco.languages.typescript.getTypeScriptWorker();
 			const client = await getClient(model.uri);
 			const emitOutput = await client.getEmitOutput(model.uri.toString());
 
 			const outputFile = emitOutput.outputFiles.find(
-				file => file.name === `${model.uri.toString()}.js`
+				(file: any) => file.name === `${model.uri.toString()}.js`
 			);
 
 			if (outputFile) {
@@ -73,14 +73,14 @@ export class PaneDevelopmentEditor extends React.Component {
 		});
 
 		this.editor.onDidBlurEditor(async () => {
-			storeEnhancer.setTypeScript(this.editor.getValue());
+			storeEnhancer.setTypeScript(this.editor!.getValue());
 
-			const model = this.editor.getModel();
+			const model = this.editor!.getModel();
 			const getClient = await Monaco.languages.typescript.getTypeScriptWorker();
 			const client = await getClient(model.uri);
 			const emitOutput = await client.getEmitOutput(model.uri.toString());
 			const outputFile = emitOutput.outputFiles.find(
-				file => file.name === `${model.uri.toString()}.js`
+				(file: any) => file.name === `${model.uri.toString()}.js`
 			);
 
 			if (outputFile) {
@@ -110,11 +110,11 @@ export class PaneDevelopmentEditor extends React.Component {
 		Mobx.autorun(() => {
 			const value = storeEnhancer.getTypeScript();
 
-			if (value === this.editor.getValue() && storeEnhancer.getJavaScript() !== 'undefined') {
+			if (value === this.editor!.getValue() && storeEnhancer.getJavaScript() !== 'undefined') {
 				return;
 			}
 
-			this.editor.setValue(value);
+			this.editor!.setValue(value);
 		});
 	}
 

@@ -1,5 +1,4 @@
 import { ElementArea } from './element-area';
-import exportToSketchData from './export-to-sketch-data';
 import { getComponents } from './get-components';
 import { getInitialData } from './get-initial-data';
 import * as Message from '../message';
@@ -165,8 +164,8 @@ async function main(): Promise<void> {
 		Mobx.autorun(() => {
 			Array.prototype.slice
 				.call(document.querySelectorAll('script[data-bundle]'), 0)
-				.filter(script => script.parentElement)
-				.forEach(script => script.parentElement.removeChild(script));
+				.filter((script: Node) => script.parentElement)
+				.forEach((script: Node) => script.parentElement!.removeChild(script));
 
 			store
 				.getProject()
@@ -247,17 +246,9 @@ async function main(): Promise<void> {
 	}
 }
 
-main();
-
-window.rpc = {
-	exportToSketchData,
-	async getDocumentSize(): Promise<{ width: number; height: number }> {
-		return {
-			width: (document.scrollingElement || document.documentElement).scrollWidth,
-			height: (document.scrollingElement || document.documentElement).scrollHeight
-		};
-	}
-};
+main().catch(err => {
+	throw err;
+});
 
 function framed(): boolean {
 	try {

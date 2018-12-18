@@ -96,7 +96,7 @@ export class UserStoreEnhancer {
 		return context.exports as UserStoreEnhancerModule;
 	}
 
-	private usetStore: UserStore;
+	private userStore?: UserStore;
 
 	public constructor(init: UserStoreEnhancerInit) {
 		this.id = init.id;
@@ -119,7 +119,11 @@ export class UserStoreEnhancer {
 	}
 
 	public getApi(): string {
-		return userStoreApi(this.usetStore.getProperties().map(p => JSON.stringify(p.getName())));
+		if (!this.userStore) {
+			return '';
+		}
+
+		return userStoreApi(this.userStore.getProperties().map(p => JSON.stringify(p.getName())));
 	}
 
 	public getId(): string {
@@ -149,7 +153,7 @@ export class UserStoreEnhancer {
 	}
 
 	public setUserStore(userStore: UserStore): void {
-		this.usetStore = userStore;
+		this.userStore = userStore;
 	}
 
 	public toJSON(): Types.SerializedUserStoreEnhancer {

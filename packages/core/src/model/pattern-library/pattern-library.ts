@@ -57,7 +57,10 @@ export class PatternLibrary {
 
 	@Mobx.computed
 	private get slots(): PatternSlot[] {
-		return this.getPatterns().reduce((acc, pattern) => [...acc, ...pattern.getSlots()], []);
+		return this.getPatterns().reduce<PatternSlot[]>(
+			(acc, pattern) => [...acc, ...pattern.getSlots()],
+			[]
+		);
 	}
 
 	@Mobx.computed

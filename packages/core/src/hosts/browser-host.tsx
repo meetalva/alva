@@ -17,7 +17,7 @@ export class BrowserHost implements Types.Host {
 	private menuStore: Store.MenuStore;
 	private store: Store.ViewStore;
 	@Mobx.observable private apps: Map<string, AlvaApp> = new Map();
-	private sender: Types.Sender;
+	private sender?: Types.Sender;
 
 	constructor(init: { store: Store.ViewStore; fs?: typeof Fs }) {
 		this.container = document.createElement('div');
@@ -71,7 +71,7 @@ export class BrowserHost implements Types.Host {
 	}
 
 	public async mkdir(path: string): Promise<void> {
-		const _mkdir = p =>
+		const _mkdir = (p: string) =>
 			new Promise((resolve, reject) => {
 				this.fs!.mkdir(p, err => {
 					if (err) {
@@ -222,7 +222,7 @@ export class BrowserHost implements Types.Host {
 	}
 
 	public async getSender(): Promise<Types.Sender> {
-		return this.sender;
+		return this.sender!;
 	}
 
 	public setSender(sender: Types.Sender) {

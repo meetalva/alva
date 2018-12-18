@@ -4,13 +4,14 @@ import { IconSize } from '../components/icons';
 import { Overlay } from '../components/overlay';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
-import { Layout } from 'react-feather';
 import { Space, SpaceSize } from '../components/space';
 import { WithStore } from '../store';
 import * as PreviewDocument from '../preview-document/preview-document';
 import * as Types from '../types';
 import * as _ from 'lodash';
 import * as Model from '../model';
+
+const { Layout } = require('react-feather');
 
 export interface PreviewPaneProps {
 	isDragging: boolean;
@@ -49,7 +50,7 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 		return (
 			<PreviewPane>
 				<PreviewFrame
-					ref={frame => (this.frame = frame)}
+					ref={(frame: any) => (this.frame = frame)}
 					srcDoc={getSrcDoc(project.getId(), project)}
 					offCanvas={false}
 					onMouseLeave={() => {

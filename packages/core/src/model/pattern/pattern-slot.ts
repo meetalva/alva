@@ -54,7 +54,7 @@ export class PatternSlot {
 		});
 	}
 
-	public clone(_): PatternSlot {
+	public clone(): PatternSlot {
 		return new PatternSlot({
 			contextId: this.contextId,
 			description: this.description,

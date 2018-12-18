@@ -1,7 +1,7 @@
 import { compilerSafeName } from './compiler-safe-name';
 import * as Fs from 'fs';
 import * as Path from 'path';
-import * as QueryString from 'query-string';
+import * as QueryString from 'querystring';
 import * as webpack from 'webpack';
 
 const LOADER_PATH = require.resolve('../preview/preview-loader');
@@ -21,7 +21,7 @@ export function createCompiler(
 	const entry: { [name: string]: string } = {};
 
 	const components = patterns.reduce((acc, pattern) => {
-		acc[compilerSafeName(pattern.id)] = `./${Path.relative(options.cwd, pattern.path)
+		(acc as any)[compilerSafeName(pattern.id)] = `./${Path.relative(options.cwd, pattern.path)
 			.split(Path.sep)
 			.join('/')}`;
 		return acc;

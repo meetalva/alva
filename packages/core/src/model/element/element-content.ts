@@ -42,7 +42,7 @@ export class ElementContent {
 
 	@Mobx.computed
 	private get descendants(): Element[] {
-		return this.getElements().reduce(
+		return this.getElements().reduce<Element[]>(
 			(acc, element) => [...acc, element, ...element.getDescendants()],
 			[]
 		);

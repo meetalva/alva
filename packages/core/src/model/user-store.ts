@@ -27,7 +27,7 @@ export class UserStore {
 	public readonly model = Types.ModelName.UserStore;
 
 	private id: string;
-	private previousDesignTimeStore: DesignTime.DesignTimeUserStore;
+	private previousDesignTimeStore?: DesignTime.DesignTimeUserStore;
 
 	@Mobx.observable private actions: Map<string, UserStoreAction> = new Map();
 	@Mobx.observable private currentPageProperty: UserStoreProperty;

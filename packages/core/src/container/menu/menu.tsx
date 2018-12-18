@@ -228,7 +228,7 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 @MobxReact.inject('menuStore', 'store')
 @MobxReact.observer
 class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }> {
-	private handleAction = e => {
+	private handleAction = (e: any) => {
 		e.preventDefault();
 
 		const props = this.props as { menu: Types.CheckboxMenuItem } & {

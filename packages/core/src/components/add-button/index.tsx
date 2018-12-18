@@ -2,7 +2,7 @@ import { Color } from '../colors';
 import { Copy } from '../copy';
 import { IconSize } from '../icons';
 import * as React from 'react';
-import { Plus } from 'react-feather';
+const { Plus } = require('react-feather');
 import { Space, getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 

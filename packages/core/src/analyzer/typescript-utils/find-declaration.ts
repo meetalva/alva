@@ -11,12 +11,12 @@ export function findDeclaration(
 
 	return sourceFile.statements
 		.filter(statement => TypeScript.isVariableStatement(statement))
-		.reduce(
-			(result, statement: TypeScript.VariableStatement) => [
-				...result,
-				...statement.declarationList.declarations
-			],
+		.reduce<any[]>(
+			(result, statement: any) => [...result, ...statement.declarationList.declarations],
 			[]
 		)
-		.find(declaration => declaration.name.getText() === expression.getText());
+		.find(
+			(declaration: TypeScript.Declaration) =>
+				(declaration as any).name.getText() === expression.getText()
+		);
 }

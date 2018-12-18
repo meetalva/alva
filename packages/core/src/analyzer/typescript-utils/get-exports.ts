@@ -9,5 +9,8 @@ export function getExports(
 ): TypescriptExport[] {
 	return sourceFile.statements
 		.filter(isExport)
-		.reduce((acc, exportStatement) => [...acc, ...getExportInfos(program, exportStatement)], []);
+		.reduce<TypescriptExport[]>(
+			(acc, exportStatement) => [...acc, ...getExportInfos(program, exportStatement)],
+			[]
+		);
 }

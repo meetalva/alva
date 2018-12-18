@@ -1,9 +1,9 @@
 import { Color } from '../colors';
 import { IconSize } from '../icons';
 import * as React from 'react';
-import * as Icon from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
+const Icon = require('react-feather');
 
 export interface PatternListItemProps {
 	children: React.ReactNode;

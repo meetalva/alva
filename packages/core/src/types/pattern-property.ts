@@ -56,7 +56,7 @@ export type SerializedPatternProperty =
 export interface SerializedPropertyBase {
 	model: ModelName.PatternProperty;
 	contextId: string;
-	description: string;
+	description: string | undefined;
 	example: string;
 	group: string;
 	hidden: boolean;

@@ -60,7 +60,7 @@ export class BrowserDataHost implements Types.DataHost {
 		return Model.Project.from(parsed.contents);
 	}
 
-	public async addConnection(_, __): Promise<void> {
+	public async addConnection(): Promise<void> {
 		return;
 	}
 

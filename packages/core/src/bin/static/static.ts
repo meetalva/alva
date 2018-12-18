@@ -71,7 +71,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 		await freshBuild({ path, host: nodeHost });
 	};
 
-	const onMessage = envelope => {
+	const onMessage = (envelope: string) => {
 		const message = Serde.deserialize(envelope);
 
 		if (!message) {

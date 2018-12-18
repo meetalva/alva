@@ -63,7 +63,7 @@ function simplifyAccelerator(accelerator: string): string {
 		})
 		.join('+');
 
-	return collisions[acc] ? collisions[acc]() : acc;
+	return (collisions as any)[acc] ? (collisions as any)[acc]() : acc;
 }
 
 function parseAccelerator(accelerator: string): string {

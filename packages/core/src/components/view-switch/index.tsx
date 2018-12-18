@@ -3,10 +3,10 @@ import { CopySize } from '../copy';
 import { IconProps, IconSize } from '../icons';
 import * as React from 'react';
 import { EditableTitleState } from '../../types';
-import { ChevronLeft, ChevronRight } from 'react-feather';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
+const { ChevronLeft, ChevronRight } = require('react-feather');
 const tag = require('tag-hoc').default;
 
 export type JustifyType = 'start' | 'center' | 'end' | 'stretch';
@@ -141,7 +141,7 @@ export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 			color={Color.Grey60}
 			is={ChevronLeft}
 			onClick={props.onLeftClick}
-			onDoubleClick={event => {
+			onDoubleClick={(event: Event) => {
 				event.stopPropagation();
 			}}
 			size={IconSize.XS}
@@ -152,7 +152,7 @@ export const ViewSwitch: React.SFC<ViewSwitchProps> = (props): JSX.Element => (
 			color={Color.Grey60}
 			is={ChevronRight}
 			onClick={props.onRightClick}
-			onDoubleClick={event => {
+			onDoubleClick={(event: Event) => {
 				event.stopPropagation();
 			}}
 			size={IconSize.XS}

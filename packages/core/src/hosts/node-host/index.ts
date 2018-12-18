@@ -10,8 +10,8 @@ export class NodeHost implements Types.Host {
 	public type = Types.HostType.Node;
 
 	private forced?: Partial<Types.HostFlags>;
-	private process: NodeJS.Process;
-	private sender: Types.Sender;
+	private process?: NodeJS.Process;
+	private sender?: Types.Sender;
 	private apps: Map<string, Model.AlvaApp> = new Map();
 
 	public static async fromProcess(
@@ -27,7 +27,7 @@ export class NodeHost implements Types.Host {
 	public async getFlags(): Promise<Types.HostFlags> {
 		const yargsParser = require('yargs-parser');
 		return {
-			...yargsParser(this.process.argv.slice(2), {
+			...yargsParser(this.process!.argv.slice(2), {
 				number: ['port'],
 				boolean: ['localhost']
 			}),
@@ -99,7 +99,7 @@ export class NodeHost implements Types.Host {
 	}
 
 	public async getSender(): Promise<Types.Sender> {
-		return this.sender;
+		return this.sender!;
 	}
 
 	public setSender(sender: Types.Sender) {

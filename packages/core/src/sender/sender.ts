@@ -34,9 +34,9 @@ export type Matcher = (message: Message.Message) => void;
 export class Sender implements Types.Sender {
 	public readonly id: string;
 
-	private endpoint: string;
-	private window: Window;
-	private connection: WebSocket;
+	private endpoint?: string;
+	private window?: Window;
+	private connection?: WebSocket;
 	private queue: Set<string> = new Set();
 	private matchers: Map<Message.MessageType, Matcher[]> = new Map();
 	private retry: number = 0;
@@ -237,7 +237,7 @@ export class Sender implements Types.Sender {
 	): Promise<void> {
 		const base = this.matchers.has(type) ? this.matchers.get(type)! : [];
 
-		this.matchers.set(type, [...base, handler]);
+		this.matchers.set(type, [...base, handler as Matcher]);
 	}
 
 	public async unmatch<T extends Message.Message>(

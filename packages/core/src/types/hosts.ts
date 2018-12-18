@@ -2,6 +2,7 @@ import * as Model from '../model';
 import * as Message from '../message';
 
 export enum HostType {
+	Unknown = 'unknown',
 	Browser = 'browser',
 	Node = 'node',
 	Electron = 'electron'
@@ -64,7 +65,7 @@ export interface HostMessageOptions {
 }
 
 export abstract class Host {
-	public type: Types.HostType;
+	public type: Types.HostType = Types.HostType.Unknown;
 
 	public async getFlags(): Promise<HostFlags> {
 		throw new Error('host.getFlags: not implemented');
@@ -133,7 +134,7 @@ export abstract class Host {
 		throw new Error('host.readClipboard: not implemented');
 	}
 
-	public async createWindow(_): Promise<Electron.BrowserWindow | undefined> {
+	public async createWindow(url: string): Promise<Electron.BrowserWindow | undefined> {
 		throw new Error('host.createWindow: not implemented');
 	}
 

@@ -1,13 +1,14 @@
 import { Pattern, PatternSlot } from '../../pattern';
 import { BuiltInContext, BuiltInResult } from '../pattern-library';
 import * as Types from '../../../types';
+import { AnyPatternProperty } from '../../pattern-property';
 
 const PATTERN_CONTEXT_ID = 'synthetic:page';
 const SLOT_CONTEXT_ID = 'children';
 
 export const Page = (context: BuiltInContext): BuiltInResult => {
 	const patternId = context.options.getGlobalPatternId(PATTERN_CONTEXT_ID);
-	const properties = [];
+	const properties: AnyPatternProperty[] = [];
 
 	const pattern = new Pattern(
 		{

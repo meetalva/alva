@@ -43,7 +43,7 @@ export class Element {
 
 	@Mobx.observable private dragged: boolean;
 
-	@Mobx.observable private editedName: string;
+	@Mobx.observable private editedName?: string;
 
 	@Mobx.observable private shouldFocus: boolean;
 
@@ -53,13 +53,13 @@ export class Element {
 
 	@Mobx.observable private id: string;
 
-	@Mobx.observable private name: string;
+	@Mobx.observable private name: string = 'New Element';
 
 	@Mobx.observable private nameEditable: boolean = false;
 
 	@Mobx.observable private open: boolean;
 
-	@Mobx.observable private parent: Element;
+	@Mobx.observable private parent?: Element;
 
 	@Mobx.observable private patternId: string;
 
@@ -466,7 +466,10 @@ export class Element {
 	}
 
 	public getDescendants(): Element[] {
-		return this.getContents().reduce((acc, content) => [...acc, ...content.getDescendants()], []);
+		return this.getContents().reduce<Element[]>(
+			(acc, content) => [...acc, ...content.getDescendants()],
+			[]
+		);
 	}
 
 	public getDragged(): boolean {
@@ -524,7 +527,7 @@ export class Element {
 	}
 
 	public getName(opts?: { unedited: boolean }): string {
-		if ((!opts || !opts.unedited) && this.nameEditable) {
+		if ((!opts || !opts.unedited) && this.nameEditable && this.editedName) {
 			return this.editedName;
 		}
 
@@ -663,6 +666,10 @@ export class Element {
 		const container = this.getContainer();
 
 		if (!container) {
+			return;
+		}
+
+		if (!this.parent) {
 			return;
 		}
 

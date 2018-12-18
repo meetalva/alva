@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { Color } from '../colors';
 import { getSpace, SpaceSize } from '../space';
-import { ChevronDown, ChevronUp } from 'react-feather';
+const { ChevronDown, ChevronUp } = require('react-feather');
 
 export interface DetailsProps {
 	open: boolean;

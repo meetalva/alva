@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { PropertyInputStyles } from '../property-input';
 import { PropertyItem } from '../property-item';
-import { Link2 } from 'react-feather';
+const { Link2 } = require('react-feather');
 import styled, { StyledComponentClass } from 'styled-components';
 import { Color } from '../colors';
 import * as TextareaAutosize from 'react-textarea-autosize';

@@ -21,13 +21,13 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 	private dispose = Mobx.autorun(() => {
 		if (typeof this.el !== 'undefined' && this.el !== this.previousEl) {
-			this.el.addEventListener('click', this.handleClick);
-			this.el.addEventListener('mouseover', this.handleMouseOver);
+			this.el.addEventListener('click', this.handleClick as any);
+			this.el.addEventListener('mouseover', this.handleMouseOver as any);
 		}
 
 		if (typeof this.el === 'undefined' && typeof this.previousEl !== 'undefined') {
-			this.previousEl!.removeEventListener('click', this.handleClick);
-			this.previousEl!.removeEventListener('mouseover', this.handleMouseOver);
+			this.previousEl!.removeEventListener('click', this.handleClick as any);
+			this.previousEl!.removeEventListener('mouseover', this.handleMouseOver as any);
 			this.dispose();
 		}
 

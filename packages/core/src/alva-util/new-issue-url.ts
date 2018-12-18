@@ -21,7 +21,7 @@ export interface NewGithubIssueOptionsLongHand extends NewGithubIssuePayload {
 
 const URLSearchParams = require('url-search-params');
 
-export function newIssueUrl(options): string {
+export function newIssueUrl(options: any): string {
 	let repoUrl;
 
 	if (options.repoUrl) {

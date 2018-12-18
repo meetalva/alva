@@ -13,6 +13,7 @@ import * as uuid from 'uuid';
 import { Compiler } from 'webpack';
 import * as resolve from 'resolve';
 import { last } from 'lodash';
+import { PatternAnalysis } from '../../types';
 
 const precinct = require('precinct');
 
@@ -103,7 +104,7 @@ async function analyzePatterns(context: {
 	const program = ts.createProgram(declarationPaths, options.config, compilerHost);
 
 	const analyzePattern = getPatternAnalyzer(program, context.options);
-	return patternCandidates.reduce(
+	return patternCandidates.reduce<PatternAnalysis[]>(
 		(acc, candidate) => [...acc, ...analyzePattern(candidate, analyzePatternExport)],
 		[]
 	);

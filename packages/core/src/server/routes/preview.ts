@@ -1,6 +1,7 @@
 import * as Express from 'express';
 import * as PreviewDocument from '../../preview-document';
 import * as Types from '../../types';
+import { PatternLibrary } from '../../model';
 
 export function previewRouteFactory(server: Types.AlvaServer): Express.RequestHandler {
 	return async function previewRoute(req: Express.Request, res: Express.Response): Promise<void> {
@@ -27,7 +28,7 @@ export function previewRouteFactory(server: Types.AlvaServer): Express.RequestHa
 			.getPatternLibraries()
 			.filter(lib => lib.getOrigin() === Types.PatternLibraryOrigin.UserProvided);
 
-		const script = lib =>
+		const script = (lib: PatternLibrary) =>
 			`<script src="/project/${project.getId()}/library/${lib.getId()}" data-bundle="${lib.getBundleId()}"></script>`;
 
 		res.send(

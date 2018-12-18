@@ -7,8 +7,9 @@ import { Page } from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
-import { LogOut } from 'react-feather';
 import * as Types from '../../types';
+
+const { LogOut } = require('react-feather');
 
 export interface InjectedChromeContainerProps {
 	page: Page;

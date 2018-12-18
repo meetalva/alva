@@ -3,7 +3,7 @@ import { Color } from '../colors';
 import { fonts } from '../fonts';
 import { getSpace, SpaceSize } from '../space';
 import styled, { StyledComponentClass } from 'styled-components';
-import { Link2 } from 'react-feather';
+const { Link2 } = require('react-feather');
 
 const StyledReference = styled.div`
 	display: inline-block;

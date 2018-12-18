@@ -1,7 +1,7 @@
 import { Color } from '../colors';
 import { IconSize } from '../icons';
 import * as React from 'react';
-import { Layout } from 'react-feather';
+const { Layout } = require('react-feather');
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 

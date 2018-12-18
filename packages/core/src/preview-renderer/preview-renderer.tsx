@@ -25,7 +25,7 @@ export function render(store: PreviewStore<React.SFC>, container: HTMLElement): 
 
 export function getSynthetics(): SyntheticComponents<React.SFC> {
 	return {
-		'synthetic:box': SyntheticBox,
+		'synthetic:box': SyntheticBox as any,
 		'synthetic:conditional': SyntheticConditional,
 		'synthetic:image': SyntheticImage,
 		'synthetic:link': SyntheticLink,

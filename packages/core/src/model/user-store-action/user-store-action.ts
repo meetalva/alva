@@ -19,7 +19,7 @@ export class UserStoreAction {
 	private acceptsProperty: boolean;
 	private id: string;
 	@Mobx.observable private name: string;
-	private userStore: UserStore;
+	private userStore?: UserStore;
 	@Mobx.observable private userStorePropertyId?: string;
 	private type: Types.UserStoreActionType;
 

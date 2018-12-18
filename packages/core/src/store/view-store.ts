@@ -7,7 +7,7 @@ import * as Types from '../types';
 
 import * as uuid from 'uuid';
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: never[] = [];
 
 export interface ViewStoreInit {
 	app: Model.AlvaApp;
@@ -55,9 +55,9 @@ export class ViewStore {
 
 	@Mobx.observable private metaDown: boolean = false;
 
-	@Mobx.observable private project: Model.Project;
+	@Mobx.observable private project?: Model.Project;
 
-	@Mobx.observable private serverPort: number;
+	@Mobx.observable private serverPort?: number;
 
 	@Mobx.observable private sender: Sender;
 
@@ -107,14 +107,20 @@ export class ViewStore {
 
 	@Mobx.action
 	public addElement(element: Model.Element): void {
+		const project = this.project;
+
+		if (!project) {
+			return;
+		}
+
 		const contents = ViewStore.EPHEMERAL_CONTENTS.get(element) || [];
 
 		contents.forEach(elementContent => {
 			elementContent.setParentElement(element);
-			this.project.addElementContent(elementContent);
+			project.addElementContent(elementContent);
 		});
 
-		this.project.addElement(element);
+		project.addElement(element);
 		ViewStore.EPHEMERAL_CONTENTS.delete(element);
 	}
 
@@ -146,11 +152,17 @@ export class ViewStore {
 
 	@Mobx.action
 	public connectPatternLibrary(library?: Model.PatternLibrary): void {
+		const project = this.project;
+
+		if (!project) {
+			return;
+		}
+
 		this.getApp().send({
 			type: MessageType.ConnectPatternLibraryRequest,
 			id: uuid.v4(),
 			payload: {
-				projectId: this.project.getId(),
+				projectId: project.getId(),
 				library: library ? library.getId() : undefined
 			}
 		});
@@ -214,11 +226,17 @@ export class ViewStore {
 
 	@Mobx.action
 	public duplicatePage(page: Model.Page): Model.Page | undefined {
+		const project = this.project;
+
+		if (!project) {
+			return;
+		}
+
 		const clone = page.clone();
 
-		this.project.addPage(clone);
+		project.addPage(clone);
 
-		this.project.movePageAfter({
+		project.movePageAfter({
 			page: clone,
 			targetPage: page
 		});
@@ -270,6 +288,12 @@ export class ViewStore {
 
 	@Mobx.action
 	public duplicateActivePage(): Model.Page | undefined {
+		const project = this.project;
+
+		if (!project) {
+			return;
+		}
+
 		const activePage = this.getActivePage();
 
 		if (!activePage) {
@@ -282,7 +306,7 @@ export class ViewStore {
 			return;
 		}
 
-		this.project.setActivePage(clone);
+		project.setActivePage(clone);
 		this.commit();
 		return clone;
 	}
@@ -309,8 +333,14 @@ export class ViewStore {
 		element: Model.Element;
 		index: number;
 	}): void {
+		const project = this.project;
+
+		if (!project) {
+			return;
+		}
+
 		this.moveElement(init);
-		this.project.unsetPlaceholderHighlightedElement();
+		project.unsetPlaceholderHighlightedElement();
 		this.commit();
 	}
 
@@ -359,7 +389,13 @@ export class ViewStore {
 	public executePageAddNew(): Model.Page | undefined {
 		const name = 'Page';
 
-		const count = this.project.getPages().filter(p => p.getName().startsWith(name)).length;
+		const project = this.project;
+
+		if (!project) {
+			return;
+		}
+
+		const count = project.getPages().filter(p => p.getName().startsWith(name)).length;
 
 		const page = Model.Page.create(
 			{
@@ -367,11 +403,11 @@ export class ViewStore {
 				id: uuid.v4(),
 				name: `${name} ${count + 1}`
 			},
-			{ project: this.project }
+			{ project }
 		);
 
-		this.project.addPage(page);
-		this.project.setActivePage(page);
+		project.addPage(page);
+		project.setActivePage(page);
 		this.commit();
 
 		return page;
@@ -416,11 +452,11 @@ export class ViewStore {
 	public getContentById(id: string): Model.ElementContent | undefined {
 		const project = this.getProject();
 
-		let result;
+		let result: Model.ElementContent | undefined;
 
 		project.getPages().some(page => {
 			result = page.getContentById(id);
-			return result;
+			return typeof result !== 'undefined';
 		});
 
 		return result;
@@ -463,7 +499,13 @@ export class ViewStore {
 	}
 
 	public getElementById(id: string): Model.Element | undefined {
-		return this.project.getElementById(id);
+		const project = this.project;
+
+		if (!project) {
+			return;
+		}
+
+		return project.getElementById(id);
 	}
 
 	public getPlaceHolderHighhlightedElement(): Model.Element | undefined {
@@ -483,7 +525,13 @@ export class ViewStore {
 	}
 
 	public getNameEditableElement(): Model.Element | undefined {
-		return this.project.getElements().find(e => e.getNameEditable());
+		const project = this.project;
+
+		if (!project) {
+			return;
+		}
+
+		return project.getElements().find(e => e.getNameEditable());
 	}
 
 	public getPageById(id: string): Model.Page | undefined {
@@ -531,7 +579,7 @@ export class ViewStore {
 	}
 
 	public getProject(): Model.Project {
-		return this.project;
+		return this.project!;
 	}
 
 	public getSelectedElement(): Model.Element | undefined {
@@ -547,7 +595,7 @@ export class ViewStore {
 	}
 
 	public getServerPort(): number {
-		return this.serverPort;
+		return this.serverPort!;
 	}
 
 	public hasApplicableClipboardItem(): boolean {
@@ -637,6 +685,12 @@ export class ViewStore {
 
 	@Mobx.action
 	public redo(): void {
+		const p = this.project;
+
+		if (!p) {
+			return;
+		}
+
 		const item = this.editHistory.forward();
 
 		if (!item) {
@@ -649,7 +703,7 @@ export class ViewStore {
 			return;
 		}
 
-		const nowSelected = this.project.getSelectedElement();
+		const nowSelected = p.getSelectedElement();
 
 		this.setApp(Model.AlvaApp.from(item.app, { sender: this.getSender() }));
 		this.getProject().update(project);
@@ -657,12 +711,10 @@ export class ViewStore {
 		const previouslySelected = project.getSelectedElement();
 
 		const elementToSelect = previouslySelected
-			? this.project.getElementById(previouslySelected.getId())
+			? p.getElementById(previouslySelected.getId())
 			: undefined;
 
-		const elementToUnselect = nowSelected
-			? this.project.getElementById(nowSelected.getId())
-			: undefined;
+		const elementToUnselect = nowSelected ? p.getElementById(nowSelected.getId()) : undefined;
 
 		if (elementToUnselect) {
 			elementToUnselect.setSelected(false);
@@ -675,6 +727,13 @@ export class ViewStore {
 
 	@Mobx.action
 	public removeElement(element: Model.Element): () => void {
+		const project = this.project;
+
+		if (typeof project === 'undefined') {
+			// tslint:disable-next-line:no-empty
+			return () => {};
+		}
+
 		if (element.getRole() === Types.ElementRole.Root) {
 			return () => undefined;
 		}
@@ -689,6 +748,12 @@ export class ViewStore {
 		const container = element.getContainer();
 
 		const selectNext = () => {
+			const project = this.project;
+
+			if (typeof project === 'undefined') {
+				return;
+			}
+
 			if (typeof index !== 'number') {
 				return;
 			}
@@ -704,11 +769,11 @@ export class ViewStore {
 			if (elementBefore) {
 				this.setSelectedElement(elementBefore);
 			} else {
-				this.project.unsetSelectedElement();
+				project.unsetSelectedElement();
 			}
 		};
 
-		this.project.removeElement(element);
+		project.removeElement(element);
 		elementContainer.remove({ element });
 
 		return selectNext;
@@ -718,14 +783,20 @@ export class ViewStore {
 	public removePage(page: Model.Page): void {
 		const index = page.getIndex();
 
-		if (this.project.getPages().length > 1) {
+		const project = this.project;
+
+		if (typeof project === 'undefined') {
+			return;
+		}
+
+		if (project.getPages().length > 1) {
 			if (index !== 0) {
-				this.project.setActivePageByIndex(index - 1);
+				project.setActivePageByIndex(index - 1);
 			} else {
-				this.project.setActivePageByIndex(index + 1);
+				project.setActivePageByIndex(index + 1);
 			}
 
-			this.project.removePage(page);
+			project.removePage(page);
 		}
 	}
 
@@ -740,9 +811,15 @@ export class ViewStore {
 
 	@Mobx.action
 	public save(): void {
+		const project = this.project;
+
+		if (typeof project === 'undefined') {
+			return;
+		}
+
 		this.getApp().send({
 			id: uuid.v4(),
-			payload: { publish: false, projectId: this.project.getId() },
+			payload: { publish: false, projectId: project.getId() },
 			type: MessageType.Save
 		});
 	}
@@ -817,7 +894,13 @@ export class ViewStore {
 
 	@Mobx.action
 	public setNameEditableElement(editableElement?: Model.Element): void {
-		const previousElement = this.project.getElements().find(element => element.getNameEditable());
+		const project = this.project;
+
+		if (typeof project === 'undefined') {
+			return;
+		}
+
+		const previousElement = project.getElements().find(element => element.getNameEditable());
 
 		if (previousElement && previousElement !== editableElement) {
 			previousElement.setNameEditable(false);
@@ -842,6 +925,12 @@ export class ViewStore {
 
 	@Mobx.action
 	public setSelectedElement(selectedElement: Model.Element): void {
+		const project = this.project;
+
+		if (typeof project === 'undefined') {
+			return;
+		}
+
 		const previousSelectedElement = this.getSelectedElement();
 
 		if (previousSelectedElement && previousSelectedElement !== selectedElement) {
@@ -862,7 +951,7 @@ export class ViewStore {
 		selectedElement.setSelected(true);
 
 		this.app.setRightSidebarTab(Types.RightSidebarTab.Properties);
-		this.project.setFocusedItem(selectedElement);
+		project.setFocusedItem(selectedElement);
 
 		selectedElement.getAncestors().forEach(ancestor => {
 			ancestor.setForcedOpen(true);
@@ -876,6 +965,12 @@ export class ViewStore {
 
 	@Mobx.action
 	public undo(): void {
+		const p = this.project;
+
+		if (typeof p === 'undefined') {
+			return;
+		}
+
 		const item = this.editHistory.back();
 
 		if (!item) {
@@ -892,7 +987,7 @@ export class ViewStore {
 			return;
 		}
 
-		const nowSelected = this.project.getSelectedElement();
+		const nowSelected = p.getSelectedElement();
 
 		this.setApp(app);
 		this.getProject().update(project);
@@ -900,12 +995,10 @@ export class ViewStore {
 		const previouslySelected = project.getSelectedElement();
 
 		const elementToSelect = previouslySelected
-			? this.project.getElementById(previouslySelected.getId())
+			? p.getElementById(previouslySelected.getId())
 			: undefined;
 
-		const elementToUnselect = nowSelected
-			? this.project.getElementById(nowSelected.getId())
-			: undefined;
+		const elementToUnselect = nowSelected ? p.getElementById(nowSelected.getId()) : undefined;
 
 		if (elementToUnselect) {
 			elementToUnselect.setSelected(false);
@@ -923,16 +1016,28 @@ export class ViewStore {
 
 	@Mobx.action
 	public unsetDraggedElement(): void {
-		this.project.unsetHighlightedElement();
-		this.project.unsetDraggedElements();
+		const project = this.project;
+
+		if (typeof project === 'undefined') {
+			return;
+		}
+
+		project.unsetHighlightedElement();
+		project.unsetDraggedElements();
 	}
 
 	public updatePatternLibrary(library: Model.PatternLibrary): void {
+		const project = this.project;
+
+		if (typeof project === 'undefined') {
+			return;
+		}
+
 		this.getApp().send({
 			type: MessageType.UpdatePatternLibraryRequest,
 			payload: {
 				libId: library.getId(),
-				projectId: this.project.getId()
+				projectId: project.getId()
 			},
 			id: uuid.v4()
 		});

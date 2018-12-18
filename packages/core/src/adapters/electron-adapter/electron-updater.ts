@@ -47,12 +47,12 @@ export class ElectronUpdater {
 
 	public constructor({ server }: ElectronAdapterInit) {
 		this.server = server;
+
+		this.updater = require('electron-updater').autoUpdater;
+		this.updater.autoDownload = false;
 	}
 
 	public start() {
-		this.updater = require('electron-updater').autoUpdater;
-		this.updater.autoDownload = false;
-
 		this.updater.on('update-available', (info: AU.UpdateInfo) => {
 			const releaseNotes = Array.isArray(info.releaseNotes)
 				? info.releaseNotes.map(n => n.note).join('\n')

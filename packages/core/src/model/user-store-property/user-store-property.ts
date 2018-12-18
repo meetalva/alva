@@ -19,7 +19,7 @@ export class UserStoreProperty {
 	public readonly model = Types.ModelName.UserStoreProperty;
 
 	private id: string;
-	private project: Project;
+	private project?: Project;
 
 	@Mobx.observable private concreteValue: string | undefined;
 	@Mobx.observable private initialValue: string;

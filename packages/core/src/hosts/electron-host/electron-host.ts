@@ -24,7 +24,7 @@ export class ElectronHost implements Types.Host {
 
 	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
-	private sender: Types.Sender;
+	private sender?: Types.Sender;
 	private windows: Map<string | number, Electron.BrowserWindow> = new Map();
 	@Mobx.observable private apps: Map<string, AlvaApp> = new Map();
 
@@ -173,9 +173,9 @@ export class ElectronHost implements Types.Host {
 		return;
 	}
 
-	public selectFile(opts): Promise<void | string> {
+	public selectFile(opts: Electron.OpenDialogOptions): Promise<void | string> {
 		return new Promise(resolve => {
-			Electron.dialog.showOpenDialog(opts, paths => {
+			Electron.dialog.showOpenDialog(opts, (paths: string[]) => {
 				if (!paths) {
 					return resolve();
 				}
@@ -185,9 +185,9 @@ export class ElectronHost implements Types.Host {
 		});
 	}
 
-	public selectSaveFile(opts): Promise<void | string> {
+	public selectSaveFile(opts: Electron.SaveDialogOptions): Promise<void | string> {
 		return new Promise(resolve => {
-			Electron.dialog.showSaveDialog(opts, path => {
+			Electron.dialog.showSaveDialog(opts, (path: string | null) => {
 				if (!path) {
 					return resolve();
 				}
@@ -217,7 +217,7 @@ export class ElectronHost implements Types.Host {
 			return;
 		}
 
-		if (button.message && button) {
+		if (button.message && button && this.sender) {
 			this.sender.send(button.message);
 		}
 
@@ -268,7 +268,7 @@ export class ElectronHost implements Types.Host {
 	}
 
 	public async getSender(): Promise<Types.Sender> {
-		return this.sender;
+		return this.sender!;
 	}
 
 	public setSender(sender: Types.Sender) {

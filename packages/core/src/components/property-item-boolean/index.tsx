@@ -2,7 +2,7 @@ import { Color } from '../colors';
 import { IconSize } from '../icons';
 import { PropertyItem } from '../property-item';
 import * as React from 'react';
-import { Check, X } from 'react-feather';
+const { Check, X } = require('react-feather');
 import styled from 'styled-components';
 
 export interface PropertyItemBooleanProps {

@@ -1,69 +1,18 @@
 {
 	"compilerOptions": {
 		"skipLibCheck": true,
-		"allowJs": false,
 		"allowSyntheticDefaultImports": false,
-		"alwaysStrict": true,
-		"checkJs": false,
+		"strict": true,
 		"declaration": true,
 		"downlevelIteration": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
-		"importHelpers": false,
-		"inlineSourceMap": true,
-		"inlineSources": true,
-		"isolatedModules": false,
 		"jsx": "react",
 		"module": "commonjs",
 		"moduleResolution": "node",
-		"lib": [
-			"es2017",
-			"dom"
-		],
-		"plugins": [
-			{
-				"name": "typescript-styled-plugin",
-				"lint": {
-					"unknownProperties": "ignore"
-				}
-			}
-		],
+		"lib": ["es2017", "dom"],
 		"outDir": "build",
-		"noEmit": false,
-		"noEmitOnError": false,
-		"noFallthroughCasesInSwitch": true,
-		"noImplicitAny": false,
-		"noImplicitReturns": true,
-		"noImplicitThis": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": false,
-		"pretty": true,
-		"removeComments": false,
 		"rootDir": "src",
-		"strictNullChecks": true,
 		"target": "es2017"
-	},
-	"typedocOptions": {
-		"mode": "file",
-		"out": "build/docs",
-		"ignoreCompilerErrors": true,
-		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true,
-		"target": "ES5",
-		"moduleResolution": "node",
-		"preserveConstEnums": true,
-		"stripInternal": true,
-		"suppressExcessPropertyErrors": true,
-		"suppressImplicitAnyIndexErrors": true,
-		"excludeNotExported": true,
-		"excludePrivate": true,
-		"excludeExternal": true
-	},
-	"include": [
-		"src/**/*.ts",
-		"src/**/*.tsx"
-	],
-	"exclude": [
-		"src/test/**"
-	]
+	}
 }

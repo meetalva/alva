@@ -134,7 +134,7 @@ export class ReferenceSelect extends React.Component<ReferenceSelectProps> {
 						{this.props.children}
 						<div title="Connect Variable">
 							<PositionedLinkIcon
-								onClick={e => this.handleConnect(e)}
+								onClick={(e: React.MouseEvent<HTMLElement>) => this.handleConnect(e)}
 								position={props.iconPosition || IconPosition.Default}
 							/>
 						</div>

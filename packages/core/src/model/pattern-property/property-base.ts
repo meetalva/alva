@@ -23,7 +23,7 @@ export abstract class PatternPropertyBase<T> {
 
 	@Mobx.observable protected contextId: string;
 	@Mobx.observable protected defaultValue: T;
-	@Mobx.observable protected description: string;
+	@Mobx.observable protected description?: string;
 	@Mobx.observable protected example: string;
 	@Mobx.observable protected group: string;
 	@Mobx.observable protected hidden: boolean = false;
@@ -33,7 +33,7 @@ export abstract class PatternPropertyBase<T> {
 	@Mobx.observable protected origin: Types.PatternPropertyOrigin;
 	@Mobx.observable protected propertyName: string;
 	@Mobx.observable protected required: boolean = false;
-	@Mobx.observable public type: Types.PatternPropertyType;
+	@Mobx.observable public type: Types.PatternPropertyType = Types.PatternPropertyType.Unknown;
 
 	public constructor(init: PatternPropertyInit<T>) {
 		this.contextId = init.contextId;
@@ -79,7 +79,7 @@ export abstract class PatternPropertyBase<T> {
 		return this.defaultValue;
 	}
 
-	public getDescription(): string {
+	public getDescription(): string | undefined {
 		return this.description;
 	}
 

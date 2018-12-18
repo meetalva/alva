@@ -36,9 +36,9 @@ const StyledMonacoContainer = styled.div`
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyUnknownEditor extends React.Component<PropertyUnknownEditorProps> {
-	private node: HTMLElement | null;
-	private editor: Monaco.editor.IStandaloneCodeEditor;
-	private dispose: () => void | null;
+	private node?: HTMLElement | null;
+	private editor?: Monaco.editor.IStandaloneCodeEditor;
+	private dispose?: () => void | null;
 
 	public async componentDidMount(): Promise<void> {
 		const props = this.props as PropertyUnknownEditorProps & WithStore;
@@ -94,8 +94,7 @@ export class PropertyUnknownEditor extends React.Component<PropertyUnknownEditor
 		this.editor.layout();
 
 		this.editor.onDidChangeModelContent(async () => {
-			const value = this.editor
-				.getValue()
+			const value = this.editor!.getValue()
 				.split(comment)
 				.join('');
 
@@ -108,8 +107,8 @@ export class PropertyUnknownEditor extends React.Component<PropertyUnknownEditor
 			}
 
 			if (this.node) {
-				this.node.style.height = `${this.editor.getModel().getLineCount() * 20}px`;
-				this.editor.layout();
+				this.node.style.height = `${this.editor!.getModel().getLineCount() * 20}px`;
+				this.editor!.layout();
 			}
 		});
 

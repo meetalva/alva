@@ -11,7 +11,8 @@ const readline = Readline.createInterface({
 
 export class RestartListener {
 	private readline: Readline.ReadLine;
-	private listener: () => void;
+	// tslint:disable-next-line:no-empty
+	private listener: () => void = () => {};
 
 	private constructor(init: RestartListenerInit) {
 		this.readline = init.readline;

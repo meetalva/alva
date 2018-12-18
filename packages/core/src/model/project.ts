@@ -9,13 +9,14 @@ import { Page } from './page';
 import { PatternSearch } from './pattern-search';
 import { Pattern, PatternSlot } from './pattern';
 import { PatternLibrary, PatternLibraryCreateOptions } from './pattern-library';
-import { AnyPatternProperty } from './pattern-property';
+import { AnyPatternProperty, PatternProperty } from './pattern-property';
 import * as Types from '../types';
 import { UserStore } from './user-store';
 import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-enhancer';
 import { UserStoreReference } from './user-store-reference';
 import * as uuid from 'uuid';
 import * as ModelTree from '../model-tree';
+import { ModelName } from '../types';
 
 export interface ProjectProperties {
 	draft: boolean;
@@ -54,7 +55,7 @@ export class Project {
 
 	@Mobx.observable private pageList: string[] = [];
 
-	@Mobx.observable private path;
+	@Mobx.observable private path: string;
 
 	@Mobx.observable private patternLibraries: Map<string, PatternLibrary> = new Map();
 
@@ -67,12 +68,15 @@ export class Project {
 
 	@Mobx.computed
 	private get patterns(): Pattern[] {
-		return this.getPatternLibraries().reduce((ps, lib) => [...ps, ...lib.getPatterns()], []);
+		return this.getPatternLibraries().reduce<Pattern[]>(
+			(ps, lib) => [...ps, ...lib.getPatterns()],
+			[]
+		);
 	}
 
 	@Mobx.computed
 	private get patternProperties(): AnyPatternProperty[] {
-		return this.getPatternLibraries().reduce(
+		return this.getPatternLibraries().reduce<AnyPatternProperty[]>(
 			(ps, lib) => [...ps, ...lib.getPatternProperties()],
 			[]
 		);
@@ -80,7 +84,10 @@ export class Project {
 
 	@Mobx.computed
 	private get patternSlots(): PatternSlot[] {
-		return this.getPatternLibraries().reduce((ps, lib) => [...ps, ...lib.getSlots()], []);
+		return this.getPatternLibraries().reduce<PatternSlot[]>(
+			(ps, lib) => [...ps, ...lib.getSlots()],
+			[]
+		);
 	}
 
 	@Mobx.computed
@@ -300,7 +307,8 @@ export class Project {
 
 	public static equals(a: Types.SavedProject, b: Types.SavedProject): boolean;
 	public static equals(a: Types.SavedProject | Project, b: Types.SavedProject | Project): boolean {
-		const toData = input => (input instanceof Project ? input.toDisk() : input);
+		const toData = (input: Types.SavedProject | Project) =>
+			input instanceof Project ? input.toDisk() : input;
 		return _.isEqual(toData(a), toData(b));
 	}
 
@@ -871,11 +879,11 @@ export class Project {
 					const value = ValueModel
 						? (ValueModel as any).from(c.newValue, { project: this })
 						: c.newValue;
-					target[c.name] = value;
+					(target as any)[c.name] = value;
 					break;
 				}
 				case 'remove': {
-					delete target[c.name];
+					delete (target as any)[c.name];
 				}
 			}
 			return;

@@ -1,8 +1,11 @@
 {
-  "name": "meetalva",
+  "name": "@meetalva/core",
   "version": "0.8.1",
-  "description": "Alva is a radically new design tool that enables cross-functional teams to design digital products.",
+  "description": "Create living prototypes with code components",
   "main": "./build/bin/electron.js",
+  "bin": {
+    "alva": "./bin/alva.js"
+  },
   "scripts": {
     "build": "tsc --project . && webpack --production",
     "build:clean": "npm run clean && npm run build",
@@ -10,13 +13,9 @@
     "clean": "rm -rf build && rm -rf dist",
     "deploy": "node ./scripts/deploy.js .static \"alva-branch-$CIRCLE_BRANCH.surge.sh\"",
     "dist": "node ./scripts/dist-preprocess.js",
-    "docs": "typedoc src",
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
-    "start": "npm run build && node build/bin/alva --host=electron",
-    "start:clean": "npm run clean && npm run start",
     "static": "node build/bin/alva --out=.static --host=static",
-    "watch": "concurrently \"node build/bin/alva --host=electron\" \"tsc --project . --watch\" \"webpack -w\" \"webpack-dev-server --config webpack.renderer.js\"",
-    "watch:clean": "npm run clean && npm run watch",
+    "watch": "concurrently \"tsc --project . --watch\" \"webpack -w\"",
     "watch:tests": "jest --watch",
     "test": "jest"
   },
@@ -134,10 +133,8 @@
     "ts-loader": "4.4.1",
     "tslint": "5.11.0",
     "tslint-config-prettier": "1.15.0",
-    "typedoc": "0.11.1",
     "typescript-styled-plugin": "0.10.0",
-    "webpack-cli": "3.1.0",
-    "webpack-dev-server": "3.1.8"
+    "webpack-cli": "3.1.0"
   },
   "dependencies": {
     "@brainly/html-sketchapp": "3.3.1",

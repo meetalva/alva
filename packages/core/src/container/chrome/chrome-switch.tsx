@@ -3,8 +3,8 @@ import * as React from 'react';
 import * as Components from '../../components';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
-import { Check, ChevronDown } from 'react-feather';
 
+const { Check, ChevronDown } = require('react-feather');
 const ReactSelectComponents = require('react-select').components;
 const OutsideClickHandler = require('react-outside-click-handler').default;
 
@@ -86,18 +86,18 @@ export class ChromeSwitch extends React.Component {
 								});
 							}}
 							styles={{
-								container: base => ({
+								container: (base: any) => ({
 									...base,
 									display: 'flex'
 								}),
-								menu: base => ({
+								menu: (base: any) => ({
 									...base,
 									width: 125,
 									left: -38,
 									overflow: 'hidden',
 									zIndex: 2
 								}),
-								option: base => ({
+								option: () => ({
 									padding: '3px 6px'
 								})
 							}}

@@ -43,9 +43,9 @@ export const ButtonGroupButton: React.SFC<Button.ButtonProps> = props => (
 );
 
 export class ButtonGroup extends React.Component {
-	public static ButtonLeft = props => React.Children.only(props.children);
-	public static ButtonRight = props => React.Children.only(props.children);
-	public static Placeholder = props => <div />;
+	public static ButtonLeft: React.SFC = props => React.Children.only(props.children);
+	public static ButtonRight: React.SFC = props => React.Children.only(props.children);
+	public static Placeholder: React.SFC = () => <div />;
 
 	public render(): JSX.Element {
 		const { props } = this;

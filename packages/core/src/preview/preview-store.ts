@@ -51,7 +51,7 @@ export interface SyntheticComponents<V> {
 }
 
 export class PreviewStore<V> {
-	@Mobx.observable private app: Model.AlvaApp;
+	@Mobx.observable private app?: Model.AlvaApp;
 	@Mobx.observable private components: Components;
 	@Mobx.observable private highlightArea: ElementArea;
 	@Mobx.observable private metaDown: boolean = false;
@@ -59,7 +59,7 @@ export class PreviewStore<V> {
 	@Mobx.observable private project: Model.Project;
 	@Mobx.observable private selectionArea: ElementArea;
 	@Mobx.observable private synthetics: SyntheticComponents<V>;
-	@Mobx.observable private scrollPosition: Types.Point;
+	@Mobx.observable private scrollPosition?: Types.Point;
 	private sender?: Sender;
 
 	public constructor(init: PreviewStoreInit<V, Types.PreviewDocumentMode>) {
@@ -134,53 +134,55 @@ export class PreviewStore<V> {
 	public getProperties<T>(
 		element: Model.Element
 	): { [propName: string]: Types.ElementPropertyValue } {
-		return element.getProperties().reduce((renderProperties, elementProperty) => {
-			const patternProperty = elementProperty.getPatternProperty();
+		return element
+			.getProperties()
+			.reduce<{ [key: string]: any }>((renderProperties, elementProperty) => {
+				const patternProperty = elementProperty.getPatternProperty();
 
-			if (!patternProperty) {
-				return renderProperties;
-			}
+				if (!patternProperty) {
+					return renderProperties;
+				}
 
-			if (patternProperty.getType() === Types.PatternPropertyType.EventHandler) {
-				const property = patternProperty as Model.PatternEventHandlerProperty;
-				const event = property.getEvent();
+				if (patternProperty.getType() === Types.PatternPropertyType.EventHandler) {
+					const property = patternProperty as Model.PatternEventHandlerProperty;
+					const event = property.getEvent();
 
-				renderProperties[patternProperty.getPropertyName()] = e => {
-					if (event.getType() === Types.PatternEventType.MouseEvent) {
-						if (this.mode !== Types.PreviewDocumentMode.Static && !this.getMetaDown()) {
+					renderProperties[patternProperty.getPropertyName()] = (e: Event) => {
+						if (event.getType() === Types.PatternEventType.MouseEvent) {
+							if (this.mode !== Types.PreviewDocumentMode.Static && !this.getMetaDown()) {
+								return;
+							}
+						}
+
+						const actionIds = elementProperty.getValue() as unknown;
+
+						if (!actionIds) {
 							return;
 						}
-					}
 
-					const actionIds = elementProperty.getValue() as unknown;
+						const elementActions = Array.isArray(actionIds)
+							? actionIds.map(id => this.project.getElementActionById(id)).filter(Boolean)
+							: typeof actionIds === 'string'
+								? [this.project.getElementActionById(actionIds)]
+								: [];
 
-					if (!actionIds) {
-						return;
-					}
-
-					const elementActions = Array.isArray(actionIds)
-						? actionIds.map(id => this.project.getElementActionById(id)).filter(Boolean)
-						: typeof actionIds === 'string'
-							? [this.project.getElementActionById(actionIds)]
-							: [];
-
-					elementActions.forEach((action: Model.ElementAction) => {
-						if (!action) {
-							return;
-						}
-						action.execute({
-							sender: this.app || this.sender,
-							project: this.getProject(),
-							event: e
+						elementActions.forEach(action => {
+							if (!action) {
+								return;
+							}
+							action.execute({
+								sender: this.app || this.sender,
+								project: this.getProject(),
+								event: e
+							});
 						});
-					});
-				};
-			} else {
-				renderProperties[patternProperty.getPropertyName()] = elementProperty.getValue();
-			}
+					};
+				} else {
+					renderProperties[patternProperty.getPropertyName()] = elementProperty.getValue();
+				}
 
-			return renderProperties;
-		}, {});
+				return renderProperties;
+			}, {});
 	}
 
 	public getProject(): Model.Project {
@@ -202,7 +204,7 @@ export class PreviewStore<V> {
 		return element
 			.getContents()
 			.filter(content => content.getSlotType() !== Types.SlotType.Children)
-			.reduce((renderProperties, content) => {
+			.reduce<{ [key: string]: T[] }>((renderProperties, content) => {
 				const slot = content.getSlot();
 
 				if (slot) {
@@ -214,7 +216,7 @@ export class PreviewStore<V> {
 	}
 
 	public getScrollPosition(): Types.Point {
-		return this.scrollPosition;
+		return this.scrollPosition || { x: 0, y: 0 };
 	}
 
 	public getSender(): Sender | undefined {

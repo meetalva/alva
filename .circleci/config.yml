@@ -24,8 +24,8 @@ jobs:
 
       - run: cd packages/core
 
-      - run: npm test
-      - run: npm run lint
-      - run: npm run build
-      - run: npm run static
-      - run: npm run deploy
+      - run: lerna test
+      - run: lerna run lint
+      - run: lerna run build
+      - run: lerna run static
+      - run: lerna run deploy

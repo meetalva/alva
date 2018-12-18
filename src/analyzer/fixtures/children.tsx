@@ -7,3 +7,7 @@ export const BasicComponent: React.SFC = props => {
 export const OtherProperty: React.SFC<{ other: React.ReactNode }> = props => {
 	return <div>{props.other}</div>;
 };
+
+export function FunctionDeclarationComponent(p) {
+	return <div>{p.children}</div>;
+}

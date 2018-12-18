@@ -1,24 +1,42 @@
 import { usesChildren } from './uses-children';
-import Project from 'ts-simple-ast';
+import * as Tsa from 'ts-simple-ast';
 
 const fixtures = require('fixturez')(__dirname);
 
-let project;
-let sourceFile;
+let project: Tsa.Project;
+let sourceFile: Tsa.SourceFile;
 
 beforeAll(() => {
 	const fixturePath = fixtures.find('children.tsx');
-	project = new Project();
+	project = new Tsa.Project();
 	project.addExistingSourceFile(fixturePath);
 	sourceFile = project.getSourceFileOrThrow('children.tsx');
 });
 
 test('detects basic props.children usage', () => {
-	const basicComponent = sourceFile.getExportedDeclarations()[0];
-	expect(usesChildren(basicComponent, { project })).toBe(true);
+	const basic = getNamedExport(sourceFile, 'BasicComponent');
+	expect(usesChildren(basic, { project })).toBe(true);
 });
 
-test('does not consider props.other as children usage', () => {
-	const otherProps = sourceFile.getExportedDeclarations()[1];
-	expect(usesChildren(otherProps, { project })).toBe(false);
+test('considers props.other not as children usage', () => {
+	const other = getNamedExport(sourceFile, 'OtherProperty');
+	expect(usesChildren(other, { project })).toBe(false);
 });
+
+test('detects children usage in function declaration', () => {
+	const functionDeclaration = getNamedExport(sourceFile, 'FunctionDeclarationComponent');
+	expect(usesChildren(functionDeclaration, { project })).toBe(true);
+});
+
+function getNamedExport(sourceFile: Tsa.SourceFile, name: string) {
+	const symbols = sourceFile.getExportSymbols();
+	const symbol = symbols.find(s => s.getName() === name);
+
+	if (!symbol) {
+		throw new Error(
+			`No symbol with name ${name} found. Available symbols: ${symbols.map(s => s.getName())}`
+		);
+	}
+
+	return symbol.getValueDeclarationOrThrow();
+}

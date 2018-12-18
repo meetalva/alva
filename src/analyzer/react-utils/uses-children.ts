@@ -12,8 +12,8 @@ export function usesChildren(node: Tsa.Node, { project }: { project: Tsa.Project
 			return false;
 		}
 
-		const refs = propsParamDeclaration.findReferencesAsNodes();
-		return refs
+		return propsParamDeclaration
+			.findReferencesAsNodes()
 			.map(ref => ref.getParent()!) // TODO: traverse upwards
 			.some(ref => {
 				if (Tsa.TypeGuards.isPropertyAccessExpression(ref)) {

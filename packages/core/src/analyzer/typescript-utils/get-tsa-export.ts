@@ -18,9 +18,6 @@ export function getTsaExport(
 		sourcePathTSX
 	);
 
-	project.addExistingSourceFileIfExists(relSourcePath);
-	project.addExistingSourceFileIfExists(relSourcePathTSX);
-
 	const sourceFile = project
 		.getSourceFiles()
 		.find(

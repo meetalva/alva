@@ -50,3 +50,15 @@ const BasicReferencedComponent: React.SFC = props => {
 };
 
 export { BasicReferencedComponent };
+
+const wrap = <T extends {}>(A: React.ComponentType<T>): React.SFC<T> => (props: T) => (
+	<A {...props} />
+);
+
+class ComponentToDecorate extends React.Component {
+	public render() {
+		return <div>{this.props.children}</div>;
+	}
+}
+
+export const DecoratedComponent = wrap(wrap(ComponentToDecorate));

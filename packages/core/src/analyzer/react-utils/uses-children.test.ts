@@ -44,7 +44,7 @@ test('detects children usage in SFC with aliasing', () => {
 });
 
 test('detects children usage in Class with destructuring parameter', () => {
-	const destructuringComponent = getNamedExport(sourceFile, 'DestrucutingClassComponent');
+	const destructuringComponent = getNamedExport(sourceFile, 'DestructuringClassComponent');
 	expect(usesChildren(destructuringComponent, { project })).toBe(true);
 });
 

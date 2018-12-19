@@ -28,7 +28,7 @@ export const AliasingSFC: React.SFC = props => {
 	return <div>{c}</div>;
 };
 
-export class DestrucutingClassComponent extends React.Component {
+export class DestructuringClassComponent extends React.Component {
 	public render() {
 		const { props } = this;
 		const { children } = props;

@@ -7,12 +7,6 @@ export async function performAnalysis(
 	path: string,
 	{ previousLibrary }: { previousLibrary: Model.PatternLibrary | undefined }
 ): Promise<T.LibraryAnalysisResult> {
-	if (previousLibrary) {
-		console.log(previousLibrary!.assignEnumOptionId);
-	} else {
-		console.log('no previous library!');
-	}
-
 	const getGobalEnumOptionId = previousLibrary
 		? previousLibrary.assignEnumOptionId.bind(previousLibrary)
 		: () => uuid.v4();

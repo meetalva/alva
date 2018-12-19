@@ -11,6 +11,11 @@ export interface Prop {
 	type: TypeScript.Type;
 }
 
+export interface Export {
+	symbol: TypeScript.Symbol;
+	type: TypeScript.Type;
+}
+
 export const getFixtureSourceFile = (
 	name: string,
 	ctx: { fixtures: Fixtures }

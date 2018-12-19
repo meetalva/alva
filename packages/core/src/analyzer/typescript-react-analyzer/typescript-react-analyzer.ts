@@ -14,6 +14,11 @@ import { Compiler } from 'webpack';
 import * as resolve from 'resolve';
 import { last } from 'lodash';
 import { PatternAnalysis } from '../../types';
+import * as Tsa from 'ts-simple-ast';
+import { usesChildren } from '../react-utils/uses-children';
+import { getTsaExport } from '../typescript-utils/get-tsa-export';
+import { setExtname } from '../typescript-utils/set-extname';
+import { getExportedNode } from '../typescript-utils/get-exported-node';
 
 const precinct = require('precinct');
 
@@ -37,6 +42,7 @@ interface AnalyzeContext {
 	candidate: PatternCandidate;
 	options: AnalyzeOptions;
 	program: ts.Program;
+	project: Tsa.Project;
 }
 
 type PatternAnalyzer = (
@@ -103,7 +109,11 @@ async function analyzePatterns(context: {
 
 	const program = ts.createProgram(declarationPaths, options.config, compilerHost);
 
-	const analyzePattern = getPatternAnalyzer(program, context.options);
+	const project = new Tsa.Project({
+		tsConfigFilePath: optionsPath
+	});
+
+	const analyzePattern = getPatternAnalyzer(program, project, context.options);
 	return patternCandidates.reduce<PatternAnalysis[]>(
 		(acc, candidate) => [...acc, ...analyzePattern(candidate, analyzePatternExport)],
 		[]
@@ -126,7 +136,11 @@ async function createPatternCompiler(
 	});
 }
 
-function getPatternAnalyzer(program: ts.Program, options: AnalyzeOptions): PatternAnalyzer {
+function getPatternAnalyzer(
+	program: ts.Program,
+	project: Tsa.Project,
+	options: AnalyzeOptions
+): PatternAnalyzer {
 	return (
 		candidate: PatternCandidate,
 		predicate: PatternAnalyzerPredicate
@@ -138,7 +152,7 @@ function getPatternAnalyzer(program: ts.Program, options: AnalyzeOptions): Patte
 		}
 
 		return TypeScriptUtils.getExports(sourceFile, program)
-			.map(ex => predicate(ex, { program, candidate, options }))
+			.map(ex => predicate(ex, { program, project, candidate, options }))
 			.filter((p): p is Types.PatternAnalysis => typeof p !== 'undefined');
 	};
 }
@@ -183,6 +197,27 @@ function analyzePatternExport(
 			return ctx.options.getGlobalSlotId(id, slotContextId);
 		}
 	});
+
+	// Try to find out if children are used if they are not typed explicitly
+	if (!slots.some(slot => slot.type === 'children')) {
+		const exp = getTsaExport(ex, { project: ctx.project });
+		const expNode = getExportedNode(exp);
+
+		if (expNode && usesChildren(expNode, { project: ctx.project })) {
+			slots.push({
+				model: Types.ModelName.PatternSlot,
+				contextId: 'children',
+				description: 'Element that render inside this element',
+				example: '',
+				hidden: false,
+				id: ctx.options.getGlobalSlotId(id, 'children'),
+				label: 'children',
+				propertyName: 'children',
+				required: false,
+				type: 'children'
+			});
+		}
+	}
 
 	return {
 		path: ctx.candidate.artifactPath,
@@ -299,15 +334,4 @@ function getTypingsEntry(pkg: { [key: string]: unknown }): string {
 	}
 
 	return './index.d.ts';
-}
-
-function setExtname(input: string, ext: string): string {
-	const candidate = Path.basename(input, Path.extname(input));
-
-	const basename =
-		Path.extname(candidate) === '.d'
-			? Path.basename(candidate, Path.extname(candidate))
-			: candidate;
-
-	return Path.join(Path.dirname(input), `${basename}${ext}`);
 }

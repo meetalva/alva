@@ -53,7 +53,7 @@ export class Element {
 
 	@Mobx.observable private id: string;
 
-	@Mobx.observable private name: string = 'New Element';
+	@Mobx.observable private name: string;
 
 	@Mobx.observable private nameEditable: boolean = false;
 
@@ -162,13 +162,8 @@ export class Element {
 
 		this.contentIds = init.contentIds;
 
-		if (typeof init.name !== 'undefined') {
-			this.name = init.name;
-		}
-
-		if (this.name === undefined && pattern) {
-			this.name = pattern.getName();
-		}
+		this.name =
+			typeof init.name !== 'undefined' ? init.name : pattern ? pattern.getName() : 'New Element';
 
 		this.propertyValues = new Map(init.propertyValues);
 

@@ -1,0 +1,20 @@
+{
+	"extends": ["tslint:latest", "tslint-config-prettier"],
+	"rules": {
+		"array-type": false,
+		"interface-name": false,
+		"ordered-imports": false,
+		"member-ordering": false,
+		"jsdoc-format": false,
+		"max-classes-per-file": false,
+		"object-literal-sort-keys": false,
+		"no-string-literal": false,
+		"no-console": false,
+		"variable-name": false,
+		"no-var-requires": false,
+		"no-implicit-dependencies": false,
+		"no-this-assignment": false,
+		"no-duplicate-imports": false,
+		"no-shadowed-variable": false
+	}
+}

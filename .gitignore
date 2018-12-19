@@ -1,6 +1,5 @@
 build
 dist
-designkit
 node_modules
 *.log
 .DS_Store

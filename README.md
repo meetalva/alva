@@ -36,9 +36,11 @@ yarn alva
 
 Execute commands in all applicable packages via `yarn lerna run [cmd]`:
 
-| test   | Run unit tests |
-| watch  | Rebuild on file changes |
-| build  | Build once |
+| Command | Description |
+|---------|-------------|
+| test    | Run unit tests |
+| watch   | Rebuild on file changes |
+| build   | Build once |
 
 ## Contribute
 

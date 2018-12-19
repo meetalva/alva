@@ -13,12 +13,12 @@ import * as uuid from 'uuid';
 import { Compiler } from 'webpack';
 import * as resolve from 'resolve';
 import { last } from 'lodash';
-<<<<<<< HEAD:packages/core/src/analyzer/typescript-react-analyzer/typescript-react-analyzer.ts
 import { PatternAnalysis } from '../../types';
-=======
 import * as Tsa from 'ts-simple-ast';
 import { usesChildren } from '../react-utils/uses-children';
->>>>>>> feat: integrate uses-children detection:src/analyzer/typescript-react-analyzer/typescript-react-analyzer.ts
+import { getTsaExport } from '../typescript-utils/get-tsa-export';
+import { setExtname } from '../typescript-utils/set-extname';
+import { getExportedNode } from '../typescript-utils/get-exported-node';
 
 const precinct = require('precinct');
 
@@ -109,17 +109,12 @@ async function analyzePatterns(context: {
 
 	const program = ts.createProgram(declarationPaths, options.config, compilerHost);
 
-<<<<<<< HEAD:packages/core/src/analyzer/typescript-react-analyzer/typescript-react-analyzer.ts
-	const analyzePattern = getPatternAnalyzer(program, context.options);
-	return patternCandidates.reduce<PatternAnalysis[]>(
-=======
 	const project = new Tsa.Project({
 		tsConfigFilePath: optionsPath
 	});
 
 	const analyzePattern = getPatternAnalyzer(program, project, context.options);
-	return patternCandidates.reduce(
->>>>>>> feat: integrate uses-children detection:src/analyzer/typescript-react-analyzer/typescript-react-analyzer.ts
+	return patternCandidates.reduce<PatternAnalysis[]>(
 		(acc, candidate) => [...acc, ...analyzePattern(candidate, analyzePatternExport)],
 		[]
 	);
@@ -203,54 +198,24 @@ function analyzePatternExport(
 		}
 	});
 
-	// Try to find out if children are used if
-	// they are not typed explicitly
+	// Try to find out if children are used if they are not typed explicitly
 	if (!slots.some(slot => slot.type === 'children')) {
-		const declPath = (ex.statement.getSourceFile() as any).path;
-		const sourcePath = setExtname(declPath, '.ts');
-		const sourcePathTSX = setExtname(declPath, '.tsx');
+		const exp = getTsaExport(ex, { project: ctx.project });
+		const expNode = getExportedNode(exp);
 
-		const compilerOptions = ctx.project.getCompilerOptions();
-		const relSourcePath = Path.relative((compilerOptions.outDir || '').toLowerCase(), sourcePath);
-		const relSourcePathTSX = Path.relative(
-			(compilerOptions.outDir || '').toLowerCase(),
-			sourcePathTSX
-		);
-
-		const sourceFile = ctx.project
-			.getSourceFiles()
-			.find(
-				f =>
-					f.getFilePath().endsWith(relSourcePath) || f.getFilePath().endsWith(relSourcePathTSX)
-			);
-
-		const exp = sourceFile
-			? sourceFile.getExportSymbols().find(s => s.getName() === (ex.name || 'default'))
-			: undefined;
-
-		const expNode = exp ? exp.getDeclarations()[0] : undefined;
-
-		if (expNode && Tsa.TypeGuards.isExportAssignment(expNode)) {
-			const expr = expNode.getExpression();
-
-			const node = Tsa.TypeGuards.isIdentifier(expr)
-				? expr.getDefinitionNodes()[0]
-				: exp && exp.getValueDeclaration();
-
-			if (node && usesChildren(node, { project: ctx.project })) {
-				slots.push({
-					model: Types.ModelName.PatternSlot,
-					contextId: 'children',
-					description: 'Element that render inside this element',
-					example: '',
-					hidden: false,
-					id: ctx.options.getGlobalSlotId(id, 'children'),
-					label: 'children',
-					propertyName: 'children',
-					required: false,
-					type: 'children'
-				});
-			}
+		if (expNode && usesChildren(expNode, { project: ctx.project })) {
+			slots.push({
+				model: Types.ModelName.PatternSlot,
+				contextId: 'children',
+				description: 'Element that render inside this element',
+				example: '',
+				hidden: false,
+				id: ctx.options.getGlobalSlotId(id, 'children'),
+				label: 'children',
+				propertyName: 'children',
+				required: false,
+				type: 'children'
+			});
 		}
 	}
 
@@ -369,15 +334,4 @@ function getTypingsEntry(pkg: { [key: string]: unknown }): string {
 	}
 
 	return './index.d.ts';
-}
-
-function setExtname(input: string, ext: string): string {
-	const candidate = Path.basename(input, Path.extname(input));
-
-	const basename =
-		Path.extname(candidate) === '.d'
-			? Path.basename(candidate, Path.extname(candidate))
-			: candidate;
-
-	return Path.join(Path.dirname(input), `${basename}${ext}`);
 }

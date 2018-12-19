@@ -110,7 +110,8 @@ async function analyzePatterns(context: {
 	const program = ts.createProgram(declarationPaths, options.config, compilerHost);
 
 	const project = new Tsa.Project({
-		tsConfigFilePath: optionsPath
+		tsConfigFilePath: optionsPath,
+		addFilesFromTsConfig: false
 	});
 
 	const analyzePattern = getPatternAnalyzer(program, project, context.options);

@@ -53,6 +53,11 @@ test('detects children usage in Class with aliasing', () => {
 	expect(usesChildren(aliasingComponent, { project })).toBe(true);
 });
 
+test('detects children usage in decorated component', () => {
+	const decoratedComponent = getNamedExport(sourceFile, 'DecoratedComponent');
+	expect(usesChildren(decoratedComponent, { project })).toBe(true);
+});
+
 function getNamedExport(sourceFile: Tsa.SourceFile, name: string) {
 	const symbols = sourceFile.getExportSymbols();
 	const symbol = symbols.find(s => s.getName() === name);

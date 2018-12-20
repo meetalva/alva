@@ -1,8 +1,20 @@
 import * as Tsa from 'ts-simple-ast';
 
 export function usesChildren(node: Tsa.Node, { project }: { project: Tsa.Project }): boolean {
+	if (Tsa.TypeGuards.isExportAssignment(node)) {
+		return usesChildren(node.getExpression(), { project });
+	}
+
 	if (Tsa.TypeGuards.isVariableDeclaration(node)) {
 		return usesChildren(node.getInitializer()!, { project });
+	}
+
+	if (Tsa.TypeGuards.isCallExpression(node)) {
+		return node.getArguments().some(arg => usesChildren(arg, { project }));
+	}
+
+	if (Tsa.TypeGuards.isIdentifier(node)) {
+		return node.getDefinitionNodes().some(definiton => usesChildren(definiton, { project }));
 	}
 
 	const childrenProp = getChildrenProp(node);

@@ -34,7 +34,7 @@ async function main(): Promise<void> {
 	cp.stdout.pipe(process.stdout);
 	cp.stderr.pipe(process.stderr);
 
-	cp.on('exit', code => process.exit(code));
+	cp.on('exit', (code: number) => process.exit(code));
 	cp.on('error', () => process.exit(1));
 
 	process.on('exit', () => cp.kill());

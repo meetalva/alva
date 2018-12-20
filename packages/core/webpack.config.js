@@ -2,6 +2,7 @@ const Path = require('path');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const yargs = require('yargs-parser');
 const flags = yargs(process.argv.slice(2));
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 module.exports = {
 	mode: flags.production ? 'production' : 'development',
@@ -37,6 +38,13 @@ module.exports = {
 		new MonacoWebpackPlugin({
 			languages: ['typescript', 'json'],
 			output: '/scripts/'
+		}),
+		new HardSourceWebpackPlugin({
+			environmentHash: {
+				root: Path.join(process.cwd(), '..', '..'),
+				directories: ['packages/core/src'],
+				files: ['yarn.lock', 'packages/core/tsconfig.json'],
+			},
 		})
 	],
 	externals: {

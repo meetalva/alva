@@ -67,7 +67,7 @@ export async function analyze(
 		const getBundle = async () => {
 			const compiler = await createPatternCompiler(patterns, { cwd, id });
 			await Util.promisify(compiler.run).bind(compiler)();
-			return (compiler.outputFileSystem as typeof Fs).readFileSync(`/${id}.js`).toString();
+			return (compiler.outputFileSystem as any).readFileSync(`/${id}.js`).toString();
 		};
 
 		return {

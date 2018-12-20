@@ -44,6 +44,6 @@ export function createCompiler(
 		}
 	});
 
-	compiler.outputFileSystem = new MemoryFs() as typeof Fs;
+	compiler.outputFileSystem = new MemoryFs() as any;
 	return compiler;
 }

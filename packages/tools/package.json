@@ -1,0 +1,25 @@
+{
+  "name": "@meetalva/tools",
+  "version": "0.8.1",
+  "private": true,
+  "bin": {
+    "alva-deploy": "./alva-deploy.js",
+    "alva-trigger": "./alva-trigger.js",
+    "alva-version": "./alva-version.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetalva/alva.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meetalva/alva/issues"
+  },
+  "dependencies": {
+    "execa": "^1.0.0",
+    "node-fetch": "2.1.2",
+    "surge": "0.20.1",
+    "yargs-parser": "10.1.0"
+  }
+}

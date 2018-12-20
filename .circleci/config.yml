@@ -1,28 +1,238 @@
-version: 2
+version: 2.1
+
+commands:
+  setup:
+    description: "Set up the repo to work on"
+    parameters:
+      key:
+        type: string
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v2-dependencies-<< parameters.key >>-{{ checksum "yarn.lock" }}
+          - v2-dependencies-<< parameters.key >>-
+
+      - run:
+          name: Install dependencies
+          command: yarn
+
+      - save_cache:
+          paths:
+            - node_modules
+            - packages/core/node_modules
+            - packages/tools/node_modules
+          key: v2-dependencies-<< parameters.key >>-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Add npm bin to path
+          command: echo 'export PATH="$(npm bin):$PATH"' >> $BASH_ENV
+
+  trigger:
+    description: "Trigger an appropriate release"
+
+    steps:
+      - run:
+          name: Trigger Release
+          command: alva-trigger --project packages/core
+
 jobs:
-  build:
+  install_macos:
+    macos:
+      xcode: "9.0"
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: macos
+
+  install_windows:
+    macos:
+      xcode: "9.0"
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: windows
+
+  test:
     docker:
       - image: circleci/node:8
 
     working_directory: ~/repo
 
     steps:
-      - checkout
+      - setup:
+          key: linux
+
+      - run: lerna run test --stream
+
+  lint:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: linux
+
+      - run:
+          lint: Lint code
+          command: lerna run lint --stream
+
+  compile:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: linux
+
+      - run: lerna run compile --stream
+
+      - persist_to_workspace:
+          root: packages/core
+          paths:
+              - build
+
+  bundle:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: linux
 
       - restore_cache:
           keys:
-          - v2-dependencies-{{ checksum "yarn.lock" }}
-          - v2-dependencies-
+          - v2-bundle-
 
-      - run: yarn
+      - run: lerna run bundle --stream
 
       - save_cache:
           paths:
-            - node_modules
-          key: v2-dependencies-{{ checksum "yarn.lock" }}
+            - packages/core/node_modules/.cache
+          key: v2-bundle-
 
-      - run: yarn lerna run test --stream
-      - run: yarn lerna run lint
-      - run: yarn lerna run build
-      - run: yarn lerna run static
-      - run: yarn lerna run deploy
+      - persist_to_workspace:
+          root: packages/core
+          paths:
+              - build
+
+  static:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: linux
+
+      - attach_workspace:
+          at: packages/core
+
+      - run: lerna run static --stream
+      - run: alva-deploy --project packages/core/.static
+
+  macos:
+    macos:
+      xcode: "9.0"
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: macos
+
+      - attach_workspace:
+          at: packages/core
+
+      - trigger
+
+      - run:
+          name: Publish Release
+          command: lerna run release --stream
+
+  linux:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: linux
+
+      - attach_workspace:
+          at: packages/core
+
+      - trigger
+
+      - run:
+          name: Publish Release
+          command: lerna run release --stream
+
+  windows:
+    docker:
+      - image: electronuserland/builder:wine
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: windows
+
+      - attach_workspace:
+          at: packages/core
+
+      - trigger
+
+      - run:
+          name: Publish Release
+          command: lerna run release --stream -- --win
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - install_macos
+      - install_windows
+      - test
+      - lint
+      - bundle
+      - compile
+      - static:
+          requires:
+              - test
+              - lint
+              - compile
+              - bundle
+      - macos:
+          requires:
+              - install_macos
+              - test
+              - lint
+              - compile
+              - bundle
+      - linux:
+          requires:
+              - test
+              - lint
+              - compile
+              - bundle
+      - windows:
+          requires:
+              - install_windows
+              - test
+              - lint
+              - compile
+              - bundle

@@ -97,6 +97,7 @@ async function analyzePatterns(context: {
 	pkg: unknown;
 }): Promise<Types.PatternAnalysis[]> {
 	const patternCandidates = await findPatternCandidates({ cwd: context.cwd, pkg: context.pkg });
+
 	const declarationPaths = patternCandidates.map(p => p.declarationPath);
 
 	const optionsPath = ts.findConfigFile(context.cwd, Fs.existsSync);
@@ -151,9 +152,11 @@ function getPatternAnalyzer(
 			return [];
 		}
 
-		return TypeScriptUtils.getExports(sourceFile, program)
+		const result = TypeScriptUtils.getExports(sourceFile, program)
 			.map(ex => predicate(ex, { program, project, candidate, options }))
 			.filter((p): p is Types.PatternAnalysis => typeof p !== 'undefined');
+
+		return result;
 	};
 }
 

@@ -117,6 +117,10 @@ function createUnknownProperty(
 	});
 
 	const print = (node: Ts.Declaration) => {
+		if (!node) {
+			return '';
+		}
+
 		return printer.printNode(Ts.EmitHint.Unspecified, node, node.getSourceFile());
 	};
 

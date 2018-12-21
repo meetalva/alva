@@ -83,18 +83,31 @@ export class TypeScriptType {
 	 * @return The type arguments.
 	 */
 	public getTypeArguments(): TypeScriptType[] {
-		if (!(this.type.flags & ts.TypeFlags.Object)) {
-			return [];
+		if (this.type.flags & ts.TypeFlags.Object) {
+			const typeReferenceType = this.type as ts.TypeReference;
+			if (!typeReferenceType.typeArguments) {
+				return [];
+			}
+
+			return typeReferenceType.typeArguments.map(
+				typeArg => new TypeScriptType(typeArg, this.typeChecker)
+			);
 		}
 
-		const typeReferenceType = this.type as ts.TypeReference;
-		if (!typeReferenceType.typeArguments) {
-			return [];
+		if (this.type.flags & ts.TypeFlags.Union) {
+			const unionType = this.type as ts.UnionType;
+			const typeReferenceType = unionType.types[0] as ts.TypeReference;
+
+			if (!typeReferenceType.typeArguments) {
+				return [];
+			}
+
+			return typeReferenceType.typeArguments.map(
+				typeArg => new TypeScriptType(typeArg, this.typeChecker)
+			);
 		}
 
-		return typeReferenceType.typeArguments.map(
-			typeArg => new TypeScriptType(typeArg, this.typeChecker)
-		);
+		return [];
 	}
 
 	/**

@@ -92,6 +92,22 @@ export class AlvaApp {
 		);
 	}
 
+	public static fromSender(sender: Types.Sender): AlvaApp {
+		return new AlvaApp(
+			{
+				activeView: Types.AlvaView.SplashScreen,
+				hasFocusedInput: false,
+				hostType: Types.HostType.Electron,
+				panes: new Set(),
+				paneSizes: [],
+				rightSidebarTab: Types.RightSidebarTab.Properties,
+				searchTerm: '',
+				state: Types.AppState.Started
+			},
+			{ sender }
+		);
+	}
+
 	public hasFileAccess(): boolean {
 		return [Types.HostType.Electron].includes(this.hostType);
 	}

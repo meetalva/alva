@@ -85,8 +85,20 @@ export class AlvaServer implements Types.AlvaServer {
 			this.host.log(e);
 		});
 
+		this.app.use((req, res, next) => {
+			this.host.log('↥', req.method, req.url);
+
+			res.on('finish', () => {
+				this.host.log('↧', res.statusCode, req.url);
+			});
+			next();
+		});
+
 		/** Splash view, recent project list */
 		this.app.get('/', Routes.mainRouteFactory(this));
+
+		/** For debugging */
+		this.app.get('/echo/:message', (req, res) => res.send(req.params.message));
 
 		/** Project edit view */
 		this.app.get('/project/:id', Routes.projectRouteFactory(this));
@@ -101,7 +113,7 @@ export class AlvaServer implements Types.AlvaServer {
 		this.app.get('/project/export/:id', Routes.exportRouteFactory(this));
 
 		/** Scripts required for client side application */
-		this.app.get('/scripts/*', Routes.scriptsRouteFactory(this));
+		this.app.get('/scripts/:path', Routes.scriptsRouteFactory(this));
 	}
 
 	public static async fromHosts({
@@ -136,7 +148,7 @@ export class AlvaServer implements Types.AlvaServer {
 		const interfaces = this.interface ? `${this.interface} interface` : 'all interfaces';
 
 		this.host.log(`Starting Alva server on port ${this.port} and ${interfaces}...`);
-		await listen(this.port, this.interface);
+		await listen(this.port);
 
 		await this.sender.start();
 		this.host.log(`Started Alva server on ${this.address}.`);

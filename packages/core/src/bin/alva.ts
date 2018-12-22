@@ -23,9 +23,9 @@ async function main(): Promise<void> {
 
 	const spawn =
 		host !== 'electron'
-			? ChildProcess.fork
-			: (entry: string, args?: string[], opts?: any) =>
-					ChildProcess.spawn(electron, [entry, ...(args || [])], opts);
+			? (e: string, a?: string[], o?: any) => ChildProcess.fork(entry, a, o)
+			: (e: string, a?: string[], o?: any) =>
+					ChildProcess.spawn(electron, [entry, ...(a || [])], o);
 
 	const entry = getEntry(host);
 	const cp = spawn(entry, process.argv.slice(2), { stdio: ['pipe', 'pipe', 'pipe', 'ipc'] });

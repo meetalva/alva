@@ -51,5 +51,8 @@
   "homepage": "https://meetalva.github.io/",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "resolutions": {
+    "**/acorn": "5.7.3"
+  }
 }

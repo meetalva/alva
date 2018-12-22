@@ -88,7 +88,7 @@ function getPassedFile(): Promise<string | undefined> {
 function getFileFromProcess(): string | undefined {
 	const { _: args } = yargsParser(process.argv);
 	const lastArgument = args[args.length - 1];
-	return lastArgument !== __filename ? lastArgument : undefined;
+	return args.length > 1 && lastArgument !== __filename ? lastArgument : undefined;
 }
 
 process.on('unhandledRejection', (p, err) => {

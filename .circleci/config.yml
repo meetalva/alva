@@ -111,16 +111,7 @@ jobs:
       - setup:
           key: linux
 
-      - restore_cache:
-          keys:
-          - v2-bundle-
-
       - run: lerna run bundle --stream
-
-      - save_cache:
-          paths:
-            - packages/core/node_modules/.cache
-          key: v2-bundle-
 
       - persist_to_workspace:
           root: packages/core

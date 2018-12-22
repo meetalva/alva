@@ -11,8 +11,8 @@ commands:
 
       - restore_cache:
           keys:
-          - v2-dependencies-<< parameters.key >>-{{ checksum "yarn.lock" }}
-          - v2-dependencies-<< parameters.key >>-
+          - v3-dependencies-<< parameters.key >>-{{ checksum "yarn.lock" }}
+          - v3-dependencies-<< parameters.key >>-
 
       - run:
           name: Install dependencies
@@ -23,7 +23,7 @@ commands:
             - node_modules
             - packages/core/node_modules
             - packages/tools/node_modules
-          key: v2-dependencies-<< parameters.key >>-{{ checksum "yarn.lock" }}
+          key: v3-dependencies-<< parameters.key >>-{{ checksum "yarn.lock" }}
 
       - run:
           name: Add npm bin to path

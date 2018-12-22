@@ -48,16 +48,6 @@ jobs:
       - setup:
           key: macos
 
-  install_windows:
-    macos:
-      xcode: "9.0"
-
-    working_directory: ~/repo
-
-    steps:
-      - setup:
-          key: windows
-
   test:
     docker:
       - image: circleci/node:8
@@ -196,7 +186,6 @@ workflows:
   build:
     jobs:
       - install_macos
-      - install_windows
       - test
       - lint
       - bundle
@@ -222,7 +211,6 @@ workflows:
               - bundle
       - windows:
           requires:
-              - install_windows
               - test
               - lint
               - compile

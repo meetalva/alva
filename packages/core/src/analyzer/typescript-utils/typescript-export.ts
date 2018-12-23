@@ -4,13 +4,18 @@ import * as ts from 'typescript';
 import { TypeScriptType } from './typescript-type';
 
 /**
- * A JavaScript export declaration.
+ * A JavaScript export declaration
  */
 export interface TypescriptExport {
 	/**
-	 * The name of the export, or undefined if this is the default export.
+	 * The name of the export, or undefined if this is the default export
 	 */
-	name?: string;
+	exportName?: string;
+
+	/**
+	 * The name of the component set via JSDoc or exportName if no name is set
+	 */
+	displayName?: string;
 
 	/**
 	 * The description of the export
@@ -18,7 +23,7 @@ export interface TypescriptExport {
 	description: string;
 
 	/**
-	 * The TypeScript export statement.
+	 * The TypeScript export statement
 	 */
 	statement: ts.Statement;
 
@@ -28,7 +33,7 @@ export interface TypescriptExport {
 	icon: string;
 
 	/**
-	 * The type of the object exported.
+	 * The type of the object exported
 	 */
 	type: TypeScriptType;
 

@@ -25,6 +25,6 @@ export function getTsaExport(
 		);
 
 	return sourceFile
-		? sourceFile.getExportSymbols().find(s => s.getName() === (ex.name || 'default'))
+		? sourceFile.getExportSymbols().find(s => s.getName() === (ex.exportName || 'default'))
 		: undefined;
 }

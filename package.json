@@ -59,7 +59,7 @@
   ],
   "resolutions": {
     "**/acorn": "5.7.3",
-    "**/typescript": "3.2.2",
-    "**/source-map-support": "npm:@marionebl/source-map-support"
+    "**/source-map-support": "npm:@marionebl/source-map-support",
+    "**/typescript": "3.2.2"
   }
 }

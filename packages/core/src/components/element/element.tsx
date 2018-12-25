@@ -3,7 +3,6 @@ import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
-import { tag } from '../tag';
 import { TargetSignal } from '../drag-area';
 
 export const ElementAnchors = {
@@ -67,8 +66,6 @@ const StyledElement = styled.div`
 	z-index: 1;
 `;
 
-const div = tag('div').omit(['active', 'highlight']);
-
 const LABEL_COLOR = (props: StyledElementLabelProps): string => {
 	switch (props.state) {
 		case ElementState.Active:
@@ -93,7 +90,7 @@ const LABEL_BACKGROUND = (props: StyledElementLabelProps): string => {
 	}
 };
 
-const StyledElementLabel = styled(div)`
+const StyledElementLabel = styled.div`
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -115,9 +112,7 @@ const StyledElementLabel = styled(div)`
 	}
 `;
 
-const elementDiv = tag('div').omit(['open']);
-
-const StyledElementChildren = styled(elementDiv)`
+const StyledElementChildren = styled.div`
 	flex-basis: 100%;
 	padding-left: ${getSpace(SpaceSize.L)}px;
 `;

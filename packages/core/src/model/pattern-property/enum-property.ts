@@ -2,6 +2,9 @@ import * as Mobx from 'mobx';
 import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
 import * as Types from '../../types';
 import { IconName } from '../../components';
+import * as uuid from 'uuid';
+import * as _ from 'lodash';
+import { computeDifference } from '../../alva-util';
 
 export interface PatternEnumPropertyInit {
 	contextId: string;
@@ -32,6 +35,24 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		init.options.forEach(option => this.options.set(option.getId(), option));
 	}
 
+	public static Defaults(mixin?: Partial<PatternEnumPropertyInit>): PatternEnumPropertyInit {
+		return {
+			defaultOptionId: undefined,
+			description: '',
+			group: '',
+			hidden: false,
+			id: uuid.v4(),
+			inputType: Types.PatternPropertyInputType.Select,
+			options: [],
+			origin: Types.PatternPropertyOrigin.UserProvided,
+			propertyName: 'a',
+			required: false,
+			label: 'Enum Property',
+			contextId: 'a',
+			...mixin
+		};
+	}
+
 	public static from(serialized: Types.SerializedPatternEnumProperty): PatternEnumProperty {
 		return new PatternEnumProperty({
 			contextId: serialized.contextId,
@@ -49,6 +70,10 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
+	}
+
+	public static fromDefaults(mixin?: Partial<PatternEnumPropertyInit>): PatternEnumProperty {
+		return new PatternEnumProperty(PatternEnumProperty.Defaults(mixin));
 	}
 
 	// tslint:disable-next-line:no-any
@@ -124,8 +149,19 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 		this.propertyName = prop.getPropertyName();
 		this.required = prop.getRequired();
 
-		prop.getOptions().forEach(option => {
-			this.options.set(option.getId(), option);
+		const diff = computeDifference({
+			before: this.getOptions(),
+			after: prop.getOptions()
+		});
+
+		diff.added.forEach(o => {
+			this.options.set(o.after.getId(), o.after);
+		});
+
+		diff.changed.forEach(o => o.before.update(o.after));
+
+		diff.removed.forEach(o => {
+			this.options.delete(o.before.getId());
 		});
 	}
 }
@@ -149,6 +185,20 @@ export class PatternEnumPropertyOption {
 	@Mobx.observable private ordinal: string;
 	@Mobx.observable private value: string | number;
 
+	public static Defaults(
+		mixin?: Partial<PatternEnumPropertyOptionInit>
+	): PatternEnumPropertyOptionInit {
+		return {
+			id: uuid.v4(),
+			name: 'Enum Option',
+			ordinal: '0',
+			value: '0',
+			contextId: '0',
+			icon: undefined,
+			...mixin
+		};
+	}
+
 	public constructor(init: PatternEnumPropertyOptionInit) {
 		this.id = init.id;
 		this.name = init.name;
@@ -160,6 +210,16 @@ export class PatternEnumPropertyOption {
 
 	public static from(serialized: Types.SerializedEnumOption): PatternEnumPropertyOption {
 		return new PatternEnumPropertyOption(serialized);
+	}
+
+	public static fromDefaults(
+		mixin?: Partial<PatternEnumPropertyOptionInit>
+	): PatternEnumPropertyOption {
+		return new PatternEnumPropertyOption(PatternEnumPropertyOption.Defaults(mixin));
+	}
+
+	public equals(b: PatternEnumPropertyOption): boolean {
+		return _.isEqual(this.toJSON(), b.toJSON());
 	}
 
 	public getContextId(): string {
@@ -186,6 +246,10 @@ export class PatternEnumPropertyOption {
 		return this.value;
 	}
 
+	public setValue(value: string | number): void {
+		this.value = value;
+	}
+
 	public toJSON(): Types.SerializedEnumOption {
 		return {
 			model: Types.ModelName.PatternEnumPropertyOption,
@@ -196,5 +260,14 @@ export class PatternEnumPropertyOption {
 			ordinal: this.ordinal,
 			value: this.value
 		};
+	}
+
+	@Mobx.action
+	public update(b: PatternEnumPropertyOption): void {
+		this.contextId = b.contextId;
+		this.icon = b.icon;
+		this.name = b.name;
+		this.ordinal = b.ordinal;
+		this.value = b.value;
 	}
 }

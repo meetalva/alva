@@ -24,7 +24,11 @@
     "type": "git",
     "url": "git+https://github.com/meetalva/alva.git"
   },
-  "author": "",
+  "author": {
+    "email": "hey@meetalva.io",
+    "name": "Meet Alva Team",
+    "url": "https://meetalva.io/"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/meetalva/alva/issues"

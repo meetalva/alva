@@ -81,6 +81,21 @@ export class PatternLibrary {
 		this.state = init.state;
 	}
 
+	public static Defaults() {
+		return {
+			bundleId: uuid.v4(),
+			bundle: '',
+			description: '',
+			id: uuid.v4(),
+			name: 'Library',
+			version: '1.0.0',
+			origin: Types.PatternLibraryOrigin.UserProvided,
+			patterns: [],
+			patternProperties: [],
+			state: Types.PatternLibraryState.Connected
+		};
+	}
+
 	public static create(
 		init: PatternLibraryInit,
 		opts?: PatternLibraryCreateOptions
@@ -171,6 +186,10 @@ export class PatternLibrary {
 		});
 
 		return patternLibrary;
+	}
+
+	public static fromDefaults(): PatternLibrary {
+		return new PatternLibrary(PatternLibrary.Defaults());
 	}
 
 	@Mobx.action

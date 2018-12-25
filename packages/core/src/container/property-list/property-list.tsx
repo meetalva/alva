@@ -34,8 +34,10 @@ export class PropertyListContainer extends React.Component<PropertyListContainer
 			return null;
 		}
 
+		const relevantProps = selectedElement.getProperties().filter(p => !p.getHidden());
+
 		const [eventHandlerProps, props] = partition(
-			selectedElement.getProperties(),
+			relevantProps,
 			isPropertyType(Types.PatternPropertyType.EventHandler)
 		);
 
@@ -55,22 +57,28 @@ export class PropertyListContainer extends React.Component<PropertyListContainer
 				{ungroupedProps.map(elementProperty => (
 					<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
 				))}
-				{Object.entries(groupedPropsObject).map(([groupName, group]) => (
-					<Components.PropertyDetails
-						open
-						onClick={e => e.preventDefault()}
-						key={groupName}
-						summary={
-							<Components.Headline type="primary" order={4}>
-								{groupName}
-							</Components.Headline>
-						}
-					>
-						{group.map(property => (
-							<PropertyListItem key={property.getId()} property={property} />
-						))}
-					</Components.PropertyDetails>
-				))}
+				{Object.entries(groupedPropsObject).map(([groupName, group]) => {
+					if (group.length === 0) {
+						return null;
+					}
+
+					return (
+						<Components.PropertyDetails
+							open
+							onClick={e => e.preventDefault()}
+							key={groupName}
+							summary={
+								<Components.Headline type="primary" order={4}>
+									{groupName}
+								</Components.Headline>
+							}
+						>
+							{group.map(property => (
+								<PropertyListItem key={property.getId()} property={property} />
+							))}
+						</Components.PropertyDetails>
+					);
+				})}
 				{eventHandlerProps.map(elementProperty => (
 					<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
 				))}

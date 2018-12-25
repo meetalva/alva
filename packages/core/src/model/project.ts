@@ -9,14 +9,13 @@ import { Page } from './page';
 import { PatternSearch } from './pattern-search';
 import { Pattern, PatternSlot } from './pattern';
 import { PatternLibrary, PatternLibraryCreateOptions } from './pattern-library';
-import { AnyPatternProperty, PatternProperty } from './pattern-property';
+import { AnyPatternProperty } from './pattern-property';
 import * as Types from '../types';
 import { UserStore } from './user-store';
 import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-enhancer';
 import { UserStoreReference } from './user-store-reference';
 import * as uuid from 'uuid';
 import * as ModelTree from '../model-tree';
-import { ModelName } from '../types';
 
 export interface ProjectProperties {
 	draft: boolean;

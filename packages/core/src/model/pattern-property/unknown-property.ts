@@ -27,6 +27,22 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 		this.typeText = init.typeText;
 	}
 
+	public static Defaults(mixin: Partial<PatternUnknownPropertyInit>): PatternUnknownPropertyInit {
+		return {
+			contextId: 'unknown',
+			group: '',
+			hidden: false,
+			id: 'unknown',
+			inputType: Types.PatternPropertyInputType.Default,
+			label: 'unknown',
+			origin: Types.PatternPropertyOrigin.UserProvided,
+			propertyName: 'unknown',
+			required: false,
+			typeText: '',
+			...mixin
+		};
+	}
+
 	public static from(serialized: Types.SerializedPatternUnknownProperty): PatternUnknownProperty {
 		return new PatternUnknownProperty({
 			contextId: serialized.contextId,
@@ -43,6 +59,10 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 			required: serialized.required,
 			typeText: serialized.typeText
 		});
+	}
+
+	public static fromDefaults(mixin: Partial<PatternUnknownPropertyInit>): PatternUnknownProperty {
+		return new PatternUnknownProperty(PatternUnknownProperty.Defaults(mixin));
 	}
 
 	public coerceValue(value: any): string | undefined {

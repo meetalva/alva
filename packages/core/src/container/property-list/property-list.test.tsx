@@ -3,9 +3,12 @@ import * as RTL from 'react-testing-library';
 import { PropertyListContainer } from './property-list';
 import * as MobxReact from 'mobx-react';
 import { ViewStore } from '../../store';
-import { Project, Element, Pattern } from '../../model';
+import { Project, Element, Pattern, PatternLibrary } from '../../model';
 import * as T from '../../types';
-import { PatternUnknownProperty } from '../../model/pattern-property/unknown-property';
+import {
+	PatternUnknownProperty,
+	PatternUnknownPropertyInit
+} from '../../model/pattern-property/unknown-property';
 
 // tslint:disable-next-line:no-submodule-imports
 require('jest-dom/extend-expect');
@@ -40,25 +43,47 @@ test('executes toggleCodeDetails on click', async () => {
 	expect(onClick).toHaveBeenCalled();
 });
 
-function createUnknownPropElement(project: Project): Element {
-	const library = project.getBuiltinPatternLibrary();
-
-	const property = new PatternUnknownProperty({
-		contextId: 'unknown',
-		group: '',
-		hidden: false,
-		id: 'unknown',
-		inputType: T.PatternPropertyInputType.Default,
-		label: 'unknown',
-		origin: T.PatternPropertyOrigin.UserProvided,
-		propertyName: 'unknown',
-		required: false,
-		typeText: ''
+// TODO: Find out how previous test may leak
+test.skip('does not render code details for hidden props', () => {
+	const project = Project.create({
+		name: 'Project',
+		draft: true,
+		path: ''
 	});
 
-	library.addProperty(property);
+	const element = createUnknownPropElement(project, {
+		property: {
+			hidden: true
+		}
+	});
 
-	const propertyIds = [property.getId()];
+	const store = new ViewStore({} as any);
+	store.getSelectedElement = () => element;
+
+	const rendered = RTL.render(
+		<MobxReact.Provider store={store}>
+			<PropertyListContainer />
+		</MobxReact.Provider>
+	);
+
+	const details = rendered.queryByText('Code Properties');
+
+	expect(details).toBeNull();
+});
+
+interface Mixins {
+	property?: Partial<PatternUnknownPropertyInit>;
+}
+
+function createUnknownPropElement(project: Project, mixins?: Mixins): Element {
+	const library = PatternLibrary.fromDefaults();
+
+	project.addPatternLibrary(library);
+
+	const propMix = mixins && mixins.property ? mixins.property : {};
+	const property = PatternUnknownProperty.fromDefaults(propMix);
+
+	library.addProperty(property);
 
 	const pattern = new Pattern(
 		{
@@ -68,11 +93,11 @@ function createUnknownPropElement(project: Project): Element {
 			icon: '',
 			name: 'Pattern',
 			origin: T.PatternOrigin.UserProvided,
-			propertyIds,
+			propertyIds: [property.getId()],
 			slots: [],
 			type: T.PatternType.Pattern
 		},
-		{ patternLibrary: project.getBuiltinPatternLibrary() }
+		{ patternLibrary: library }
 	);
 
 	library.addPattern(pattern);

@@ -4,7 +4,6 @@ import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
-import { tag } from '../tag';
 
 export enum ElementSlotState {
 	Default = 'default',
@@ -34,8 +33,6 @@ const StyledElementSlot = styled.div`
 	z-index: 1;
 `;
 
-const div = tag('div').omit(['active', 'highlight']);
-
 const LABEL_COLOR = (props: StyledElementSlotLabelProps): string => {
 	switch (props.state) {
 		case ElementSlotState.Disabled:
@@ -56,7 +53,7 @@ const LABEL_BACKGROUND = (props: StyledElementSlotLabelProps): string => {
 	}
 };
 
-const StyledElementSlotLabel = styled(div)`
+const StyledElementSlotLabel = styled.div`
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -67,9 +64,7 @@ const StyledElementSlotLabel = styled(div)`
 	background: ${LABEL_BACKGROUND};
 `;
 
-const elementDiv = tag('div').omit(['open']);
-
-const StyledElementChildren = styled(elementDiv)`
+const StyledElementChildren = styled.div`
 	flex-basis: 100%;
 	padding-left: ${getSpace(SpaceSize.L)}px;
 `;

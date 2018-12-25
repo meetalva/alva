@@ -32,7 +32,8 @@ export function createListeners({ store }: { store: ViewStore }): void {
 			store
 				.getApp()
 				.setHasFocusedInput(
-					['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())
+					document.activeElement !== null &&
+						['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())
 				);
 		},
 		true
@@ -41,7 +42,10 @@ export function createListeners({ store }: { store: ViewStore }): void {
 	window.addEventListener(
 		'blur',
 		() => {
-			if (document.activeElement.tagName.toLowerCase() === 'iframe') {
+			if (
+				document.activeElement === null ||
+				document.activeElement.tagName.toLowerCase() === 'iframe'
+			) {
 				return;
 			}
 
@@ -73,7 +77,10 @@ export function createListeners({ store }: { store: ViewStore }): void {
 	document.addEventListener(
 		'dragover',
 		event => {
-			event.dataTransfer.dropEffect = 'none';
+			if (event.dataTransfer) {
+				event.dataTransfer.dropEffect = 'none';
+			}
+
 			event.preventDefault();
 		},
 		false

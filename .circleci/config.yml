@@ -7,6 +7,11 @@ commands:
       key:
         type: string
     steps:
+
+      - run:
+          name: Install yarn
+          command: yarn global add yarn@1.12.3
+
       - checkout
 
       - restore_cache:

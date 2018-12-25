@@ -17,6 +17,9 @@ export function getExportInfos(
 	const jsDocTags = TypeScript.getJSDocTags(statement);
 	const exportIgnore = jsDocTags.some(tag => tag.tagName.escapedText === 'ignore');
 
+	const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
+	const exportDisplayName = nameTag ? nameTag.comment : undefined;
+
 	const descriptionTag = jsDocTags.find(tag => tag.tagName.escapedText === 'description');
 	const exportDescription = descriptionTag ? descriptionTag.comment : '';
 
@@ -31,17 +34,12 @@ export function getExportInfos(
 
 			const type = typechecker.getTypeAtLocation(declaration);
 			const exportType = new TypeScriptType(type, typechecker);
-
-			const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
-			const exportName = nameTag
-				? nameTag.comment
-				: isDefault
-					? undefined
-					: declaration.name.getText();
+			const exportName = isDefault ? undefined : declaration.name.getText();
 
 			return [
 				{
-					name: exportName,
+					exportName,
+					displayName: exportDisplayName,
 					description: exportDescription || '',
 					icon: exportIcon || '',
 					type: exportType,
@@ -59,13 +57,12 @@ export function getExportInfos(
 
 		const type = typechecker.getTypeAtLocation(statement);
 		const exportType = new TypeScriptType(type, typechecker);
-
-		const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
-		const exportName = nameTag ? nameTag.comment : isDefault ? undefined : statement.name.text;
+		const exportName = isDefault ? undefined : statement.name.getText();
 
 		return [
 			{
-				name: exportName,
+				exportName,
+				displayName: exportDisplayName,
 				description: exportDescription || '',
 				icon: exportIcon || '',
 				type: exportType,
@@ -83,12 +80,10 @@ export function getExportInfos(
 			const type = typechecker.getTypeAtLocation(declaration);
 			const exportType = new TypeScriptType(type, typechecker);
 
-			const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
-			const exportName = nameTag ? nameTag.comment : undefined;
-
 			return [
 				{
-					name: exportName,
+					exportName: undefined,
+					displayName: exportDisplayName,
 					description: exportDescription || '',
 					icon: exportIcon || '',
 					type: exportType,
@@ -107,16 +102,11 @@ export function getExportInfos(
 		return statement.exportClause.elements.map(exportSpecifier => {
 			const type = typechecker.getTypeAtLocation(exportSpecifier);
 			const exportType = new TypeScriptType(type, typechecker);
-
-			const nameTag = jsDocTags.find(tag => tag.tagName.escapedText === 'name');
-			const exportName = nameTag
-				? nameTag.comment
-				: isDefault
-					? undefined
-					: exportSpecifier.name.getText();
+			const exportName = isDefault ? undefined : exportSpecifier.name.getText();
 
 			return {
-				name: exportName,
+				exportName,
+				displayName: exportDisplayName,
 				description: exportDescription || '',
 				icon: exportIcon || '',
 				type: exportType,

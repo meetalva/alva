@@ -45,12 +45,17 @@
     "tslint": "5.11.0",
     "tslint-config-prettier": "1.15.0"
   },
+  "dependencies": {
+    "source-map-support": "npm:@marionebl/source-map-support",
+    "typescript": "3.0.1"
+  },
   "homepage": "https://meetalva.github.io/",
   "workspaces": [
     "packages/*"
   ],
   "resolutions": {
     "**/acorn": "5.7.3",
-    "**/typescript": "3.2.2"
+    "**/typescript": "3.2.2",
+    "**/source-map-support": "npm:@marionebl/source-map-support"
   }
 }

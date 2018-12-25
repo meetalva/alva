@@ -64,7 +64,7 @@ export class App extends React.Component {
 						]}
 					/>
 				)}
-				{showChrome && <ChromeContainer />}
+				<ChromeContainer />
 				<Components.MainArea>
 					<AppView view={Types.AlvaView.SplashScreen}>
 						<ViewSplashscreen />

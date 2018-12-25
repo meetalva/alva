@@ -40,6 +40,10 @@ export async function startRenderer(): Promise<void> {
 		app.setActiveView(data.view);
 	}
 
+	if (data.update) {
+		app.addNotification(data.update);
+	}
+
 	app.setSender(sender);
 
 	history = new Model.EditHistory();
@@ -160,7 +164,15 @@ export async function startRenderer(): Promise<void> {
 		<MobxReact.Provider app={app} store={store}>
 			<App />
 		</MobxReact.Provider>,
-		document.getElementById('app')
+		document.getElementById('app'),
+		() => {
+			// Start the autoupdater when we are done rendering
+			app.send({
+				type: MessageType.CheckForUpdatesRequest,
+				id: uuid.v4(),
+				payload: undefined
+			});
+		}
 	);
 }
 

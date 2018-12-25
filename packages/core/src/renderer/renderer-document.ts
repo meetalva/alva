@@ -6,6 +6,7 @@ export interface RenderDocumentData {
 		host: Types.HostType;
 		view: Types.AlvaView;
 		project?: Model.Project;
+		update?: Types.UpdateInfo;
 	};
 }
 

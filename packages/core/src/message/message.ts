@@ -92,7 +92,9 @@ export enum MessageType {
 	ChromeScreenShot = 'chrome-screenshot',
 	ToggleFullScreen = 'toggle-fullscreen',
 	ToggleDevTools = 'toggle-dev-tools',
-	OpenWindow = 'open-window'
+	OpenWindow = 'open-window',
+	ShowUpdateDetails = 'show-update-details',
+	InstallUpdate = 'install-update'
 }
 
 export type Message =
@@ -185,7 +187,9 @@ export type Message =
 	| UpdateDownloadProgress
 	| UpdateDownloaded
 	| UpdateUnavailable
-	| UpdateDownload;
+	| UpdateDownload
+	| ShowUpdateDetails
+	| InstallUpdate;
 
 export type CreateNewFileRequest = Envelope<MessageType.CreateNewFileRequest, { replace: boolean }>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -484,15 +488,7 @@ export type OpenWindow = Envelope<
 	}
 >;
 
-export type UpdateAvailable = Envelope<
-	MessageType.UpdateAvailable,
-	{
-		readonly version: string;
-		readonly releaseName?: string | null;
-		readonly releaseNotes?: string | null;
-		readonly releaseDate: string;
-	}
->;
+export type UpdateAvailable = Envelope<MessageType.UpdateAvailable, Types.UpdateInfo>;
 
 export type UpdateUnavailable = EmptyEnvelope<MessageType.UpdateUnavailable>;
 
@@ -505,8 +501,15 @@ export type UpdateError = Envelope<
 	}
 >;
 
-export type UpdateDownloadProgress = Envelope<MessageType.UpdateDownloadProgress, unknown>;
+export type UpdateDownloadProgress = Envelope<
+	MessageType.UpdateDownloadProgress,
+	Types.UpdateDownloadProgress
+>;
 
-export type UpdateDownloaded = Envelope<MessageType.UpdateDownloaded, unknown>;
+export type UpdateDownloaded = Envelope<MessageType.UpdateDownloaded, Types.UpdateInfo>;
 
-export type UpdateDownload = EmptyEnvelope<MessageType.UpdateDownload>;
+export type UpdateDownload = Envelope<MessageType.UpdateDownload, Types.UpdateInfo>;
+
+export type ShowUpdateDetails = Envelope<MessageType.ShowUpdateDetails, Types.UpdateInfo>;
+
+export type InstallUpdate = EmptyEnvelope<MessageType.InstallUpdate>;

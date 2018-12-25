@@ -18,6 +18,7 @@ export class LocalDataHost implements Types.DataHost {
 	private async readMemory(): Promise<{
 		projects: { [id: string]: string };
 		connections: { [id: string]: { id: string; path: string }[] };
+		update?: Types.UpdateInfo;
 	}> {
 		const path = await this.host.resolveFrom(Types.HostBase.UserData, 'projects.json');
 		const file = await this.host.readFile(path).catch(() => undefined);
@@ -29,6 +30,7 @@ export class LocalDataHost implements Types.DataHost {
 	private async writeMemory(memory: {
 		projects: { [id: string]: string };
 		connections: { [id: string]: { id: string; path: string }[] };
+		update?: Types.UpdateInfo;
 	}): Promise<void> {
 		const path = await this.host.resolveFrom(Types.HostBase.UserData, 'projects.json');
 		const parent = Path.dirname(path);
@@ -38,6 +40,23 @@ export class LocalDataHost implements Types.DataHost {
 		}
 
 		return this.host.writeFile(path, JSON.stringify(memory));
+	}
+
+	public async setUpdate(update: Types.UpdateInfo): Promise<void> {
+		const memory = await this.readMemory();
+		memory.update = update;
+		await this.writeMemory(memory);
+	}
+
+	public async removeUpdate(): Promise<void> {
+		const memory = await this.readMemory();
+		memory.update = undefined;
+		await this.writeMemory(memory);
+	}
+
+	public async getUpdate(): Promise<Types.UpdateInfo | undefined> {
+		const memory = await this.readMemory();
+		return memory.update;
 	}
 
 	public async addProject(project: Model.Project): Promise<void> {

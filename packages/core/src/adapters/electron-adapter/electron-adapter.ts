@@ -4,12 +4,14 @@ import * as M from '../../message';
 import * as Matchers from '../../matchers';
 import { MessageType as MT } from '../../message';
 import * as ContextMenu from '../../context-menu';
-import { ElectronUpdater, UpdateCheckStatus } from './electron-updater';
+import { ElectronUpdater } from './electron-updater';
 import { ElectronMainMenu } from './electron-main-menu';
 import { AlvaApp, Project } from '../../model';
 import * as Serde from '../../sender/serde';
 import * as uuid from 'uuid';
 import * as Url from 'url';
+
+const throat = require('throat');
 
 export interface ElectronAdapterInit {
 	server: Types.AlvaServer;
@@ -32,7 +34,8 @@ export class ElectronAdapter {
 		const server = this.server;
 		const sender = this.server.sender;
 		const host = this.server.host;
-		const context = { dataHost: server.dataHost, host, location: server.location };
+		const dataHost = this.server.dataHost;
+		const context = { dataHost, host, location: server.location };
 
 		Electron.app.on('window-all-closed', () => {
 			if (process.platform !== 'darwin') {
@@ -95,6 +98,41 @@ export class ElectronAdapter {
 		sender.match<M.ContextMenuRequest>(MT.ContextMenuRequest, Matchers.showContextMenu(context));
 		sender.match<M.ChangeApp>(MT.ChangeApp, Matchers.addApp(context));
 		sender.match<M.AssetReadRequest>(MT.AssetReadRequest, Matchers.openAsset(context));
+		sender.match<M.ShowUpdateDetails>(MT.ShowUpdateDetails, Matchers.showUpdateDetails(context));
+
+		server.sender.match<M.CheckForUpdatesRequest>(
+			M.MessageType.CheckForUpdatesRequest,
+			throat(1, async () => {
+				const check = await this.updater.check({ eager: false });
+
+				if (check.status === Types.UpdateCheckStatus.Available) {
+					const result = await this.updater.download();
+
+					if (result.status === 'error') {
+						host.log(
+							`Error while downloading update ${check.info.version}: ${result.error.message}`
+						);
+						host.log(result.error);
+						return;
+					}
+
+					this.server.sender.send({
+						id: uuid.v4(),
+						type: M.MessageType.UpdateDownloaded,
+						payload: check.info
+					});
+				}
+			})
+		);
+
+		server.sender.match<M.UpdateDownloaded>(M.MessageType.UpdateDownloaded, async m => {
+			await dataHost.setUpdate(m.payload);
+		});
+
+		server.sender.match<M.InstallUpdate>(M.MessageType.InstallUpdate, async m => {
+			await dataHost.removeUpdate();
+			this.updater.install();
+		});
 
 		server.sender.match<M.ToggleDevTools>(M.MessageType.ToggleDevTools, async () => {
 			await host.toggleDevTools();
@@ -202,88 +240,6 @@ export class ElectronAdapter {
 			}
 		});
 
-		server.sender.match<M.CheckForUpdatesRequest>(
-			M.MessageType.CheckForUpdatesRequest,
-			async () => {
-				const result = await this.updater.check({ eager: true });
-
-				if (result.status === UpdateCheckStatus.Error) {
-					this.server.sender.send({
-						id: uuid.v4(),
-						type: M.MessageType.ShowError,
-						payload: {
-							message: `Could not check for updates`,
-							detail: result.error.message,
-							error: {
-								message: result.error.message,
-								stack: result.error.stack || ''
-							}
-						}
-					});
-					return;
-				}
-
-				if (result.status === UpdateCheckStatus.Available) {
-					this.server.sender.send({
-						id: uuid.v4(),
-						type: M.MessageType.ShowMessage,
-						payload: {
-							message: `A new Alva version is available: ${result.info.versionInfo.version}`,
-							detail: 'Do you want to download the update?',
-							buttons: [
-								{
-									label: 'Yes',
-									id: uuid.v4(),
-									message: {
-										id: uuid.v4(),
-										type: M.MessageType.UpdateDownload,
-										payload: undefined
-									}
-								},
-								{
-									label: 'No',
-									id: uuid.v4()
-								}
-							]
-						}
-					});
-					return;
-				}
-
-				if (result.status === UpdateCheckStatus.Unavailable) {
-					this.server.sender.send({
-						id: uuid.v4(),
-						type: M.MessageType.ShowMessage,
-						payload: {
-							message: `Alva is up to date at version ${result.currentVersion.version}`,
-							detail: `You may try again later. Alva also checks for updates automatically when starting.`,
-							buttons: []
-						}
-					});
-					return;
-				}
-			}
-		);
-
-		server.sender.match<M.UpdateDownload>(M.MessageType.UpdateDownload, async () => {
-			const result = await this.updater.download();
-
-			if (result.status === 'error') {
-				this.server.sender.send({
-					id: uuid.v4(),
-					type: M.MessageType.ShowError,
-					payload: {
-						message: `Error while downloading update`,
-						detail: result.error.message,
-						error: {
-							message: result.error.message,
-							stack: result.error.stack || ''
-						}
-					}
-				});
-			}
-		});
-
 		const useFileResponse = Matchers.useFileResponse(context);
 
 		server.sender.match<M.UseFileResponse>(MT.UseFileResponse, async m => {
@@ -327,8 +283,6 @@ export class ElectronAdapter {
 
 		this.menu.start();
 		this.updater.start();
-
-		this.updater.check({ eager: false });
 	}
 
 	public async getApp(): Promise<AlvaApp | undefined> {

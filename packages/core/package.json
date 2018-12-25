@@ -7,6 +7,7 @@
     "alva": "./bin/alva.js"
   },
   "scripts": {
+    "alva": "node bin/alva",
     "compile": "tsc --project .",
     "bundle": "webpack --production",
     "build:clean": "npm run clean && npm run build",
@@ -29,6 +30,7 @@
     "url": "https://github.com/meetalva/alva/issues"
   },
   "build": {
+    "compression": "store",
     "appId": "io.github.meetalva",
     "npmRebuild": false,
     "productName": "Alva",
@@ -44,7 +46,8 @@
     "mac": {
       "category": "public.app-category.graphics-design",
       "target": [
-        "dmg"
+        "dmg",
+        "zip"
       ]
     },
     "nsis": {
@@ -56,7 +59,12 @@
     },
     "linux": {
       "artifactName": "${productName}-${version}.${ext}",
-      "executableName": "Alva"
+      "executableName": "Alva",
+      "target": [
+        "appimage",
+        "snap",
+        "deb"
+      ]
     },
     "fileAssociations": {
       "ext": "alva",
@@ -77,7 +85,7 @@
     "@types/jest": "22.2.2",
     "concurrently": "3.5.1",
     "css-loader": "1.0.0",
-    "electron": "2.0.10",
+    "electron": "^4.0.0",
     "electron-builder": "^20.38.4",
     "fixturez": "1.1.0",
     "jest": "^23.6.0",
@@ -142,6 +150,7 @@
     "electron-devtools-installer": "2.2.4",
     "electron-is-dev": "0.3.0",
     "electron-log": "2.2.17",
+    "electron-progressbar": "^1.1.0",
     "electron-store": "2.0.0",
     "electron-updater": "^4.0.6",
     "execa": "1.0.0",
@@ -169,7 +178,7 @@
     "re-resizable": "4.4.8",
     "react": "16.4.2",
     "react-dom": "16.4.2",
-    "react-feather": "1.1.0",
+    "react-feather": "^1.1.5",
     "react-helmet": "5.2.0",
     "react-loadable": "5.5.0",
     "react-monaco-editor": "0.22.0",
@@ -182,6 +191,7 @@
     "serve-handler": "5.0.7",
     "styled-components": "4.0.3",
     "tag-hoc": "1.0.0",
+    "throat": "^4.1.0",
     "ts-simple-ast": "20.0.0",
     "tslib": "1.9.0",
     "typescript": "3.2.2",

@@ -1,15 +1,13 @@
 import * as AlvaUtil from '../../alva-util';
 import { ChromeSwitch } from './chrome-switch';
-import { ChromeButton, Chrome, CopySize, IconSize, ViewSwitch } from '../../components';
+import * as C from '../../components';
 import { MessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
-import * as Types from '../../types';
-
-const { LogOut } = require('react-feather');
+import { LogOut, ArrowUp } from 'react-feather';
 
 export interface InjectedChromeContainerProps {
 	page: Page;
@@ -21,27 +19,24 @@ export const ChromeContainer = MobxReact.inject('store')(
 		const { store } = props as InjectedChromeContainerProps;
 		const app = store.getApp();
 		const project = store.getProject();
-
-		if (!project || app.getActiveView() !== Types.AlvaView.PageDetail) {
-			return null;
-		}
-
 		const page = store.getActivePage();
+		const hasProject = typeof project !== 'undefined';
 
-		if (!page) {
-			return null;
-		}
-
-		const nextPage = project.getNextPage();
-		const previousPage = project.getPreviousPage();
+		const nextPage = hasProject ? project.getNextPage() : undefined;
+		const previousPage = hasProject ? project.getPreviousPage() : undefined;
 
 		const toPreviousPage = previousPage
-			? () => project.setActivePage(previousPage)
+			? () => (hasProject ? project.setActivePage(previousPage) : undefined)
 			: AlvaUtil.noop;
+
 		const toNextPage = nextPage ? () => project.setActivePage(nextPage) : AlvaUtil.noop;
 
+		const notifications = app.getNotifications();
+		const notification =
+			notifications.length > 0 ? notifications[notifications.length - 1] : undefined;
+
 		return (
-			<Chrome
+			<C.Chrome
 				onDoubleClick={() => {
 					props.store.getApp().send({
 						type: MessageType.Maximize,
@@ -50,20 +45,47 @@ export const ChromeContainer = MobxReact.inject('store')(
 					});
 				}}
 			>
-				<ChromeSwitch />
-				<ViewSwitch
-					fontSize={CopySize.M}
+				{hasProject && <ChromeSwitch />}
+				<C.ViewSwitch
+					fontSize={C.CopySize.M}
 					justify="center"
 					leftVisible={typeof previousPage !== 'undefined'}
 					rightVisible={typeof nextPage !== 'undefined'}
 					onLeftClick={toPreviousPage}
 					onRightClick={toNextPage}
 				>
-					<ProjectName name={project.getName()} draft={project.getDraft()} /> —{' '}
-					{page.getName()}
-				</ViewSwitch>
-				<div style={{ display: 'flex', justifySelf: 'right', alignItems: 'center' }}>
-					<ChromeButton
+					{hasProject &&
+						typeof page !== 'undefined' && (
+							<>
+								<ProjectName name={project.getName()} draft={project.getDraft()} /> —{' '}
+								{page.getName()}
+							</>
+						)}
+				</C.ViewSwitch>
+				<div
+					style={{
+						display: 'flex',
+						justifySelf: 'right',
+						alignItems: 'center',
+						marginLeft: 'auto',
+						gridColumn: 3
+					}}
+				>
+					{notification && (
+						<C.UpdateBadge
+							title={`Update to version ${notification.version}`}
+							onClick={() => {
+								app.send({
+									type: MessageType.ShowUpdateDetails,
+									id: uuid.v4(),
+									payload: notification
+								});
+							}}
+						>
+							{notification.version}
+						</C.UpdateBadge>
+					)}
+					<C.ChromeButton
 						title="Help"
 						onClick={() => {
 							props.store.getApp().send({
@@ -76,7 +98,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 							event.stopPropagation();
 						}}
 					/>
-					<ChromeButton
+					<C.ChromeButton
 						title="Found a Bug?"
 						onClick={() => {
 							props.store.getApp().send({
@@ -95,12 +117,17 @@ export const ChromeContainer = MobxReact.inject('store')(
 							event.stopPropagation();
 						}}
 					/>
-					<ChromeButton
+					<C.ChromeButton
 						title="Export"
+						disabled={!hasProject}
 						icon={
-							<LogOut size={IconSize.XS} strokeWidth={1.5} style={{ display: 'block' }} />
+							<LogOut size={C.IconSize.XS} strokeWidth={1.5} style={{ display: 'block' }} />
 						}
 						onClick={() => {
+							if (!hasProject) {
+								return;
+							}
+
 							props.store.getApp().send({
 								id: uuid.v4(),
 								type: MessageType.ExportHtmlProject,
@@ -113,7 +140,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 					/>
 				</div>
 				{props.children}
-			</Chrome>
+			</C.Chrome>
 		);
 	})
 );

@@ -2,12 +2,14 @@ import * as Mobx from 'mobx';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 import * as M from '../message';
+import { sortBy } from 'lodash';
 
 export interface AlvaAppInit {
 	id?: string;
 	activeView: Types.AlvaView;
 	hasFocusedInput: boolean;
 	hostType: Types.HostType;
+	notifications: Set<Types.UpdateInfo>;
 	panes: Set<Types.AppPane>;
 	paneSizes: Types.PaneSize[];
 	rightSidebarTab: Types.RightSidebarTab;
@@ -20,6 +22,7 @@ export class AlvaApp {
 		activeView: Types.AlvaView.SplashScreen,
 		hasFocusedInput: false,
 		hostType: Types.HostType.Electron,
+		notifications: new Set([]),
 		panes: new Set([
 			Types.AppPane.PagesPane,
 			Types.AppPane.ElementsPane,
@@ -57,6 +60,8 @@ export class AlvaApp {
 
 	@Mobx.observable private hasFocusedInput: boolean = false;
 
+	@Mobx.observable private notifications: Set<Types.UpdateInfo> = new Set();
+
 	private sender: Types.Sender;
 
 	public constructor(init: AlvaAppInit, ctx: { sender: Types.Sender }) {
@@ -78,6 +83,7 @@ export class AlvaApp {
 				activeView: deserializeView(serialized.activeView),
 				hasFocusedInput: serialized.hasFocusedInput,
 				hostType: serialized.hostType as Types.HostType,
+				notifications: new Set(serialized.notifications),
 				panes: new Set(serialized.panes.map(deserializePane)),
 				paneSizes: serialized.paneSizes.map(p => ({
 					width: p.width,
@@ -93,19 +99,7 @@ export class AlvaApp {
 	}
 
 	public static fromSender(sender: Types.Sender): AlvaApp {
-		return new AlvaApp(
-			{
-				activeView: Types.AlvaView.SplashScreen,
-				hasFocusedInput: false,
-				hostType: Types.HostType.Electron,
-				panes: new Set(),
-				paneSizes: [],
-				rightSidebarTab: Types.RightSidebarTab.Properties,
-				searchTerm: '',
-				state: Types.AppState.Started
-			},
-			{ sender }
-		);
+		return new AlvaApp(AlvaApp.Defaults, { sender });
 	}
 
 	public hasFileAccess(): boolean {
@@ -221,6 +215,17 @@ export class AlvaApp {
 		this.state = state;
 	}
 
+	@Mobx.action
+	public addNotification(message: Types.UpdateInfo): void {
+		console.log(message);
+		this.notifications.add(message);
+	}
+
+	@Mobx.action
+	public getNotifications(): Types.UpdateInfo[] {
+		return sortBy([...this.notifications.values()], 'releaseData');
+	}
+
 	public setSender(sender: Types.Sender): void {
 		this.sender = sender;
 	}
@@ -232,6 +237,7 @@ export class AlvaApp {
 			activeView: serializeView(this.activeView),
 			hasFocusedInput: this.hasFocusedInput,
 			hostType: this.hostType,
+			notifications: [...this.notifications.values()],
 			panes: [...this.panes.values()].map(serializePane),
 			paneSizes: [...this.paneSizes.values()].map(paneSize => ({
 				width: paneSize.width,

@@ -28,7 +28,8 @@ export function projectRouteFactory(server: Types.AlvaServer): Express.RequestHa
 				payload: {
 					host: server.host.type,
 					view: Types.AlvaView.PageDetail,
-					project
+					project,
+					update: await server.dataHost.getUpdate()
 				}
 			})
 		);

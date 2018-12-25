@@ -200,10 +200,17 @@ export class ElectronHost implements Types.Host {
 	public async showMessage(
 		opts: Types.HostMessageOptions
 	): Promise<undefined | Types.HostMessageButton> {
+		const cancelId = opts.buttons.findIndex(b => typeof b.cancel !== 'undefined' && b.cancel);
+		const defaultId = opts.buttons.findIndex(
+			b => typeof b.selected !== 'undefined' && b.selected
+		);
+
 		const result = Electron.dialog.showMessageBox({
 			type: opts.type,
 			message: opts.message,
 			detail: opts.detail,
+			cancelId,
+			defaultId,
 			buttons: opts.buttons.map(button => button.label)
 		});
 

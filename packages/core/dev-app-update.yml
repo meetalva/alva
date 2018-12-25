@@ -1,0 +1,3 @@
+bucket: electron-builder
+provider: s3
+endpoint: http://localhost:9000

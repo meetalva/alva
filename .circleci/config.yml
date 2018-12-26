@@ -44,6 +44,7 @@ jobs:
 
     working_directory: ~/repo
 
+    # Work around https://github.com/yarnpkg/yarn/issues/2423
     steps:
       - checkout
 

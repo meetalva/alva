@@ -1,3 +1,9 @@
+import * as Sentry from '@sentry/node';
+
+Sentry.init({
+	dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
+});
+
 import * as Server from '../server';
 import * as Hosts from '../hosts';
 import * as Types from '../types';

@@ -1,3 +1,9 @@
+import * as Sentry from '@sentry/electron';
+
+Sentry.init({
+	dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
+});
+
 import * as Electron from 'electron';
 import * as Hosts from '../hosts';
 import { ElectronAdapter } from '../adapters/electron-adapter';

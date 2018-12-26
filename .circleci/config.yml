@@ -15,10 +15,6 @@ commands:
           - v4-dependencies-<< parameters.key >>-
 
       - run:
-          name: Remove Electron symlink
-          command: unlink "node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron\ Framework.framework/Electron\ Framework" && "Unlinked Electron Framework" || echo "Unlinking Electron Framework failed"
-
-      - run:
           name: Install dependencies
           command: yarn
 
@@ -49,8 +45,27 @@ jobs:
     working_directory: ~/repo
 
     steps:
-      - setup:
-          key: macos
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v4-dependencies-macos-{{ checksum "yarn.lock" }}
+          - v4-dependencies-macos-
+
+      - run:
+          name: Install dependencies
+          command: yarn || yarn
+
+      - save_cache:
+          paths:
+            - node_modules
+            - packages/core/node_modules
+            - packages/tools/node_modules
+          key: v4-dependencies-macos-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Add npm bin to path
+          command: echo 'export PATH="$(npm bin):$PATH"' >> $BASH_ENV
 
   test:
     docker:

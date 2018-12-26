@@ -1,4 +1,4 @@
-import { PropertyItemNumber } from './index';
+import { PropertyItemNumber } from './property-item-number';
 import * as React from 'react';
 import DemoContainer from '../demo-container';
 
@@ -10,7 +10,7 @@ const StringItemDemo: React.StatelessComponent<void> = (): JSX.Element => (
 		<PropertyItemNumber
 			onChange={NOOP}
 			label="Text"
-			value="this is a very long example text to test text overflow and stuff"
+			value={0}
 			description="Lorem ipsum doloret"
 		/>
 	</DemoContainer>

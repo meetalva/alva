@@ -16,7 +16,7 @@ commands:
 
       - run:
           name: Remove Electron symlink
-          command: unlink node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Electron Framework && "Unlinked Electron Framework" || echo "Unlinking Electron Framework failed"
+          command: unlink "node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron\ Framework.framework/Electron\ Framework" && "Unlinked Electron Framework" || echo "Unlinking Electron Framework failed"
 
       - run:
           name: Install dependencies

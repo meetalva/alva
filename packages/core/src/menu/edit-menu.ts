@@ -21,11 +21,11 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 		typeof navigator !== 'undefined' && typeof (navigator as any).clipboard !== 'undefined';
 	const hasClipboard = isElectron || hasBrowserClipboard;
 	const hasFocusedInput = typeof ctx.app !== 'undefined' && ctx.app.getHasFocusedInput();
-	const hasSelectedElement =
-		typeof ctx.project !== 'undefined' && typeof ctx.project.getSelectedElement() !== 'undefined';
-	const selectedElementAccepts = hasSelectedElement
-		? ctx.project!.getSelectedElement()!.acceptsChildren()
-		: false;
+	const hasProject = typeof ctx.project !== 'undefined';
+	const hasElement = hasProject && typeof ctx.project!.getSelectedElement() !== 'undefined';
+	const elementAccepts = hasElement ? ctx.project!.getSelectedElement()!.acceptsChildren() : false;
+	const hasPage = hasProject && ctx.project!.getSelectedPage();
+	const hasItem = hasProject || hasPage;
 
 	return {
 		label: 'Edit',
@@ -65,7 +65,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.cut,
 				label: '&Cut',
-				enabled: typeof ctx.project !== 'undefined' && hasClipboard,
+				enabled: (hasFocusedInput || hasItem) && hasClipboard,
 				accelerator: 'CmdOrCtrl+X',
 				click: app => {
 					if (!ctx.project) {
@@ -93,7 +93,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.copy,
 				label: 'C&opy',
-				enabled: typeof ctx.project !== 'undefined' && hasClipboard,
+				enabled: (hasFocusedInput || hasItem) && hasClipboard,
 				accelerator: 'CmdOrCtrl+C',
 				click: app => {
 					if (!ctx.project) {
@@ -121,7 +121,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.paste,
 				label: '&Paste',
-				enabled: typeof ctx.project !== 'undefined' && hasClipboard,
+				enabled: (hasFocusedInput || hasItem) && hasClipboard,
 				accelerator: 'CmdOrCtrl+V',
 				click: app => {
 					app.send({
@@ -134,8 +134,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.pasteInside,
 				label: '&Paste Inside',
-				enabled:
-					!hasFocusedInput && hasClipboard && selectedElementAccepts && hasSelectedElement,
+				enabled: !hasFocusedInput && hasClipboard && elementAccepts && hasElement,
 				accelerator: 'CmdOrCtrl+Shift+V',
 				click: app => {
 					const selectedElement = ctx.project && ctx.project.getSelectedElement();
@@ -161,9 +160,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.duplicate,
 				label: '&Duplicate',
-				// 				enabled:
-				// 					typeof selectedElement !== 'undefined' ||
-				// 					(typeof activePage !== 'undefined' && !app.getHasFocusedInput()),
+				enabled: hasItem && !hasFocusedInput,
 				accelerator: 'CmdOrCtrl+D',
 				click: app => {
 					app.send({
@@ -180,6 +177,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.selectAll,
 				label: '&Select All',
+				enabled: hasFocusedInput || hasItem,
 				accelerator: 'CmdOrCtrl+A',
 				role: 'selectall'
 			},
@@ -190,7 +188,7 @@ export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			{
 				id: ids.delete,
 				label: '&Delete',
-				enabled: typeof ctx.project !== 'undefined',
+				enabled: hasFocusedInput || hasItem,
 				accelerator: process.platform === 'darwin' ? 'Backspace' : 'Delete',
 				click: app => {
 					app.send({

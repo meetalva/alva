@@ -17,10 +17,12 @@ export interface ElectronAdapterInit {
 
 export class ElectronAdapter {
 	private server: Types.AlvaServer;
-
 	private menu: ElectronMainMenu;
 	private updater: ElectronUpdater;
-	private windows: Map<string | number, Electron.BrowserWindow> = new Map();
+
+	private get windows(): Set<Electron.BrowserWindow> {
+		return new Set(Electron.BrowserWindow.getAllWindows());
+	}
 
 	public constructor({ server }: ElectronAdapterInit) {
 		this.server = server;
@@ -42,8 +44,7 @@ export class ElectronAdapter {
 
 		Electron.app.on('activate', async () => {
 			if (process.platform === 'darwin' && this.windows.size === 0) {
-				const win = await host.createWindow(server.location.origin);
-				this.addWindow(win);
+				await host.createWindow(server.location.origin);
 			}
 		});
 
@@ -296,10 +297,7 @@ export class ElectronAdapter {
 			}
 
 			const project = Project.from((m.payload.project as Types.ProjectPayloadSuccess).contents);
-			const newWindow = await host.createWindow(
-				`${server.location.origin}/project/${project.getId()}`
-			);
-			this.addWindow(newWindow);
+			await host.createWindow(`${server.location.origin}/project/${project.getId()}`);
 		});
 
 		server.sender.match<M.Maximize>(MT.Maximize, async m => {
@@ -312,8 +310,7 @@ export class ElectronAdapter {
 
 		// Open the splash screen when starting without file
 		if (!opts || !opts.filePath) {
-			const win = await host.createWindow(server.location.origin);
-			this.addWindow(win);
+			await host.createWindow(server.location.origin);
 		} else {
 			this.server.sender.send({
 				type: MT.OpenFileRequest,
@@ -331,11 +328,11 @@ export class ElectronAdapter {
 		this.updater.check({ eager: false });
 	}
 
-	public async getApp(): Promise<AlvaApp | undefined> {
-		return this.menu.focusedApp;
+	private async getApp(): Promise<AlvaApp | undefined> {
+		return this.menu.getApp();
 	}
 
-	public async getAppWindows(): Promise<Map<string, Electron.BrowserWindow>> {
+	private async getAppWindows(): Promise<Map<string, Electron.BrowserWindow>> {
 		return new Map(
 			Electron.BrowserWindow.getAllWindows()
 				.map(win => {
@@ -351,21 +348,11 @@ export class ElectronAdapter {
 		);
 	}
 
-	public async getAppWindow(appId: string): Promise<Electron.BrowserWindow | undefined> {
+	private async getAppWindow(appId: string): Promise<Electron.BrowserWindow | undefined> {
 		return (await this.getAppWindows()).get(appId);
 	}
 
-	public addWindow(win?: Electron.BrowserWindow): void {
-		if (win) {
-			this.windows.set(win.id, win);
-
-			win.on('close', () => {
-				this.windows.delete(win.id);
-			});
-		}
-	}
-
-	public async getProjectWindows(): Promise<
+	private async getProjectWindows(): Promise<
 		{ project: Project; window: Electron.BrowserWindow }[]
 	> {
 		return (await Promise.all(

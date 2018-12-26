@@ -1,11 +1,12 @@
 import * as M from '../../message';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 
-export function appRequest({ store, app }: MessageHandlerContext): MessageHandler<M.AppRequest> {
+export function appRequest({ app }: MessageHandlerContext): MessageHandler<M.AppRequest> {
 	return m => {
-		store.getSender().send({
+		app.send({
 			id: m.id,
 			type: M.MessageType.AppResponse,
+			transaction: m.transaction,
 			payload: {
 				app: app.toJSON()
 			}

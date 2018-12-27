@@ -4,6 +4,7 @@ import * as React from 'react';
 import { SplashScreenContainer } from './splash-screen-container';
 import * as uuid from 'uuid';
 import { ViewStore } from '../store';
+import * as T from '../types';
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -16,6 +17,20 @@ export class ViewSplashscreen extends React.Component {
 
 		return (
 			<SplashScreenContainer
+				transaction={transaction}
+				onSubmit={e => {
+					if (app.isHostType(T.HostType.Electron)) {
+						e.preventDefault();
+					}
+					app.send({
+						type: MessageType.CreateNewFileRequest,
+						transaction,
+						id: uuid.v4(),
+						payload: {
+							replace: false
+						}
+					});
+				}}
 				onCreateClick={() => {
 					app.send({
 						type: MessageType.CreateNewFileRequest,
@@ -36,13 +51,6 @@ export class ViewSplashscreen extends React.Component {
 						}
 					});
 				}}
-				onGuideClick={() => {
-					app.send({
-						type: MessageType.OpenExternalURL,
-						id: uuid.v4(),
-						payload: 'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
-					});
-				}}
 				onOpenFile={contents => {
 					app.send({
 						type: MessageType.UseFileRequest,
@@ -53,6 +61,13 @@ export class ViewSplashscreen extends React.Component {
 							replace: false,
 							contents
 						}
+					});
+				}}
+				onGuideClick={() => {
+					app.send({
+						type: MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: 'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
 					});
 				}}
 			/>

@@ -194,8 +194,7 @@ export class BrowserHost implements Types.Host {
 		return clipboard.readText();
 	}
 
-	public async createWindow(address: string): Promise<undefined> {
-		window.open(address, '_blank');
+	public async createWindow(): Promise<undefined> {
 		return;
 	}
 

@@ -5,6 +5,7 @@ import * as Util from 'util';
 import * as Types from '../../types';
 import * as getPort from 'get-port';
 import * as Model from '../../model';
+import * as M from '../../message';
 
 export class NodeHost implements Types.Host {
 	public type = Types.HostType.Node;
@@ -104,6 +105,9 @@ export class NodeHost implements Types.Host {
 
 	public setSender(sender: Types.Sender) {
 		this.sender = sender;
+		this.sender.setLog((m: string, message: M.Message) => {
+			this.log(m, message.type, message.id);
+		});
 	}
 
 	public async open(uri: string): Promise<void> {

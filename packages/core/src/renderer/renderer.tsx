@@ -3,7 +3,8 @@ import { createListeners } from './create-listeners';
 import { createNotifiers } from './create-notifiers';
 import { createHandlers } from './create-handlers';
 import { Sender } from '../sender';
-import { MessageType } from '../message';
+import * as M from '../message';
+import { MessageType as MT } from '../message';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
@@ -14,6 +15,9 @@ import * as uuid from 'uuid';
 import * as Types from '../types';
 import { BrowserAdapter } from '../adapters/browser-adapter';
 import * as Fs from 'fs';
+import * as Querystring from 'querystring';
+import { rejects } from 'assert';
+import { ProjectPayloadError, ProjectPayloadSuccess } from '../types';
 
 let app: Model.AlvaApp;
 let history;
@@ -40,6 +44,14 @@ export async function startRenderer(): Promise<void> {
 		app.setActiveView(data.view);
 	}
 
+	const query = Querystring.parse(window.location.search ? window.location.search.slice(1) : '');
+
+	if (typeof query.t === 'string') {
+		const p = await getProjectResponse(sender, query.t);
+		console.log(p);
+		return;
+	}
+
 	app.setSender(sender);
 
 	history = new Model.EditHistory();
@@ -51,7 +63,7 @@ export async function startRenderer(): Promise<void> {
 
 	app.send({
 		id: uuid.v4(),
-		type: MessageType.WindowFocused,
+		type: MT.WindowFocused,
 		payload: {
 			app: app.toJSON(),
 			projectId: project ? project.getId() : undefined
@@ -107,7 +119,7 @@ export async function startRenderer(): Promise<void> {
 	(window as any).screenshot = () => {
 		app.send({
 			id: uuid.v4(),
-			type: MessageType.ChromeScreenShot,
+			type: MT.ChromeScreenShot,
 			payload: {
 				width: window.innerWidth,
 				height: window.innerHeight
@@ -139,7 +151,7 @@ export async function startRenderer(): Promise<void> {
 		const project = store.getProject();
 
 		app.send({
-			type: MessageType.WindowFocused,
+			type: MT.WindowFocused,
 			id: uuid.v4(),
 			payload: {
 				projectId: project ? project.getId() : undefined,
@@ -184,5 +196,29 @@ function getBrowserFs(): Promise<typeof Fs> {
 				}
 			);
 		});
+	});
+}
+
+function getProjectResponse(sender: Types.Sender, tid: string): Promise<Model.Project> {
+	return new Promise((resolve, reject) => {
+		const onMatch = (m: M.UseFileResponse) => {
+			console.log(m);
+			if (m.transaction === tid) {
+				sender.unmatch(MT.UseFileResponse, onMatch);
+				const projectResult = m.payload.project;
+
+				if (projectResult.status === Types.ProjectPayloadStatus.Error) {
+					const p = projectResult as ProjectPayloadError;
+					return reject(p.error);
+				}
+
+				if (projectResult.status === Types.ProjectPayloadStatus.Ok) {
+					const p = projectResult as ProjectPayloadSuccess;
+					return resolve(Model.Project.from(p.contents));
+				}
+			}
+		};
+
+		sender.match(MT.UseFileResponse, onMatch);
 	});
 }

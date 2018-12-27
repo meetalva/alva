@@ -3,12 +3,15 @@ import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewStore } from '../store';
 import { FileInput } from './file-input';
+import { transaction } from 'mobx';
 
 export interface SplashScreenProps {
+	transaction: string;
 	onCreateClick?: React.MouseEventHandler<HTMLElement>;
 	onOpenClick?: React.MouseEventHandler<HTMLElement>;
 	onOpenFile?(result: string): void;
 	onGuideClick?: React.MouseEventHandler<HTMLElement>;
+	onSubmit?: React.FormEventHandler<HTMLElement>;
 }
 
 @MobxReact.inject('store')
@@ -56,24 +59,27 @@ export class SplashScreenContainer extends React.Component<SplashScreenProps> {
 							Start using an existing Alva file with an included library or create a new one.
 						</Components.Copy>
 					</Components.Space>
-					<Components.Space sizeBottom={Components.SpaceSize.S}>
-						<Components.Button
-							onClick={props.onCreateClick}
-							order={Components.ButtonOrder.Secondary}
-						>
-							Create New Alva File
-						</Components.Button>
-					</Components.Space>
-					<Components.Link color={Components.Color.Grey50} onClick={props.onOpenClick}>
-						<label>
-							<Components.Copy size={Components.CopySize.S}>
-								Open Existing Alva File
-								{!app.hasFileAccess() && (
-									<FileInput accept=".alva" onChange={props.onOpenFile} />
-								)}
-							</Components.Copy>
-						</label>
-					</Components.Link>
+					<form method="GET" target="_blank" noValidate={true} onSubmit={props.onSubmit}>
+						<input type="hidden" name="t" value={props.transaction} />
+						<Components.Space sizeBottom={Components.SpaceSize.S}>
+							<Components.Button
+								onClick={props.onCreateClick}
+								order={Components.ButtonOrder.Secondary}
+							>
+								Create New Alva File
+							</Components.Button>
+						</Components.Space>
+						<Components.Link color={Components.Color.Grey50} onClick={props.onOpenClick}>
+							<label>
+								<Components.Copy size={Components.CopySize.S}>
+									Open Existing Alva File
+									{!app.hasFileAccess() && (
+										<FileInput accept=".alva" onChange={props.onOpenFile} />
+									)}
+								</Components.Copy>
+							</label>
+						</Components.Link>
+					</form>
 				</Components.SplashScreenSection>
 			</Components.SplashScreen>
 		);

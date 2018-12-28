@@ -6,22 +6,24 @@ import { ViewStore } from '../../store';
 import * as Model from '../../model';
 import * as Type from '../../types';
 import { Sender } from '../../sender';
-import * as uuid from 'uuid';
 
 jest.mock('../../sender');
 
+/**
+ * TODO: Initializing a project fragment should be as easy as
+ *
+ * const project = Project.fromFragment(
+ *   <Builtin.Page>
+ *     <Builtin.Conditional ifTrue={<Builtin.Text></Builtin.Text>}/>
+ *   </Builtin.Page>
+ * );
+ */
 test('un-highlight highlighted element content onDragLeave', () => {
-	const app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender: {} as any });
+	const sender = new Sender({ endpoint: '' });
+	const app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender });
 	const history = new Model.EditHistory();
-	const sender = new Sender({
-		endpoint: ''
-	});
 
-	const store = new ViewStore({
-		app,
-		history,
-		sender
-	});
+	const store = new ViewStore({ app, history, sender });
 
 	const project = Model.Project.create({
 		name: '',
@@ -31,86 +33,44 @@ test('un-highlight highlighted element content onDragLeave', () => {
 
 	store.setProject(project);
 
-	// tslint:disable-next-line:no-non-null-assertion
-	const rootElement = store.getActivePage()!.getRoot()!;
-	// tslint:disable-next-line:no-non-null-assertion
-	const rootElementChildrenContent = rootElement.getContentBySlotType(Type.SlotType.Children)!;
+	const page = store.getActivePage()!.getRoot()!;
+	const content = page.getContentBySlotType(Type.SlotType.Children)!;
 
-	const conditionalPattern = project
+	const pattern = project
 		.getBuiltinPatternLibrary()
 		.getPatternByType(Type.PatternType.SyntheticConditional);
-	const conditionalElement = new Model.Element(
-		{
-			patternId: conditionalPattern.getId(),
-			containerId: rootElementChildrenContent.getId(),
-			focused: false,
-			dragged: false,
-			contentIds: [],
-			selected: true,
-			open: true,
-			highlighted: false,
-			propertyValues: [],
-			forcedOpen: false,
-			placeholderHighlighted: false
-		},
-		{
-			project
-		}
-	);
 
-	rootElementChildrenContent.insert({
-		at: 0,
-		element: conditionalElement
+	const element = Model.Element.fromPattern(pattern, {
+		dragged: false,
+		project,
+		contents: []
 	});
 
-	project.addElement(conditionalElement);
+	element.setOpen(true);
+	element.setContainer(content);
+	content.insert({ at: 0, element });
+	project.addElement(element);
 
-	// tslint:disable-next-line:no-non-null-assertion
-	const conditionalIfTrueSlot = conditionalPattern
-		.getSlots()
-		.find(slot => slot.getPropertyName() === 'ifTrue')!;
-	// tslint:disable-next-line:no-non-null-assertion
-	const conditionalIfTrueContent = new Model.ElementContent(
-		{
-			elementIds: [],
-			forcedOpen: false,
-			highlighted: true,
-			id: uuid.v4(),
-			open: true,
-			parentElementId: conditionalElement.getId(),
-			slotId: conditionalIfTrueSlot.getId()
-		},
-		{
-			project
-		}
-	);
+	const truthySlot = pattern.getSlots().find(slot => slot.getPropertyName() === 'ifTrue')!;
 
-	conditionalElement.addContent(conditionalIfTrueContent);
-	project.addElementContent(conditionalIfTrueContent);
+	const truthyContent = Model.ElementContent.fromSlot(truthySlot, { project });
+	truthyContent.setOpen(true);
+	truthyContent.setHighlighted(true);
+
+	element.addContent(truthyContent);
+	project.addElementContent(truthyContent);
 
 	const textPattern = project
 		.getBuiltinPatternLibrary()
 		.getPatternByType(Type.PatternType.SyntheticText);
-	const slottedElement = new Model.Element(
-		{
-			patternId: textPattern.getId(),
-			containerId: conditionalIfTrueContent.getId(),
-			focused: false,
-			dragged: true,
-			contentIds: [],
-			selected: true,
-			open: false,
-			highlighted: true,
-			propertyValues: [],
-			forcedOpen: false,
-			placeholderHighlighted: false
-		},
-		{
-			project
-		}
-	);
 
-	conditionalIfTrueContent.insert({
+	const slottedElement = Model.Element.fromPattern(textPattern, {
+		project,
+		dragged: false,
+		contents: []
+	});
+
+	truthyContent.insert({
 		at: 0,
 		element: slottedElement
 	});
@@ -128,14 +88,10 @@ test('un-highlight highlighted element content onDragLeave', () => {
 	const result = ReactTest.render(input);
 	const document = result.container;
 
-	const slotContentId = conditionalIfTrueContent.getId();
-	const slotDomElement = document.querySelector(
-		`[data-content-id="${slotContentId}"]`
-	) as HTMLElement;
+	const slotContentId = truthyContent.getId();
+	const slotDomElement = document.querySelector(`[data-content-id="${slotContentId}"]`)!;
 
-	expect(conditionalIfTrueContent.getHighlighted()).toEqual(true);
-
+	expect(truthyContent.getHighlighted()).toEqual(true);
 	ReactTest.fireEvent.dragLeave(slotDomElement);
-
-	expect(conditionalIfTrueContent.getHighlighted()).toEqual(false);
+	expect(truthyContent.getHighlighted()).toEqual(false);
 });

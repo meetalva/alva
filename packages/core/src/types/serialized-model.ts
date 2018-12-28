@@ -132,7 +132,7 @@ export interface SerializedElement {
 	name: string;
 	open: boolean;
 	patternId: string;
-	placeholderHighlighted: boolean;
+	placeholderHighlighted: 'before' | 'after' | 'none';
 	propertyValues: [string, Types.ElementPropertyValue][];
 	/** @deprecated
 	 * Formerly direct serialization of ElementProperty,

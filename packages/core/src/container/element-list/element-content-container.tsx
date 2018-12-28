@@ -12,7 +12,7 @@ export class ElementContentContainer extends React.Component<ElementContentConta
 	public render(): JSX.Element | null {
 		const { props } = this;
 		return (
-			<div>
+			<div style={{ paddingBottom: 2 }}>
 				{props.content
 					.getElements()
 					.map(element => <ElementContainer key={element.getId()} element={element} />)}

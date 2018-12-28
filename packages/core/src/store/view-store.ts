@@ -6,6 +6,7 @@ import * as Model from '../model';
 import * as Types from '../types';
 
 import * as uuid from 'uuid';
+import { PlaceholderPosition } from '../components';
 
 const EMPTY_ARRAY: never[] = [];
 
@@ -96,7 +97,9 @@ export class ViewStore {
 
 	@Mobx.computed
 	private get placeholderHighlightedElement(): Model.Element | undefined {
-		return this.elements.find(element => element.getPlaceholderHighlighted());
+		return this.elements.find(
+			element => element.getPlaceholderHighlighted() !== PlaceholderPosition.None
+		);
 	}
 
 	public constructor(init: ViewStoreInit) {

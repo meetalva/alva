@@ -16,6 +16,7 @@ import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-
 import { UserStoreReference } from './user-store-reference';
 import * as uuid from 'uuid';
 import * as ModelTree from '../model-tree';
+import { PlaceholderPosition } from '../components';
 
 export interface ProjectProperties {
 	draft: boolean;
@@ -942,7 +943,7 @@ export class Project {
 	public unsetPlaceholderHighlightedElement(options?: { ignore: Element }): void {
 		this.placeholderHighlightedElements
 			.filter(element => !options || options.ignore.getId() !== element.getId())
-			.forEach(element => element.setPlaceholderHighlighted(false));
+			.forEach(element => element.setPlaceholderHighlighted(PlaceholderPosition.None));
 	}
 
 	public update(b: this): void {

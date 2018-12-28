@@ -11,6 +11,7 @@ import * as Types from '../../types';
 import { UserStoreReference } from '../user-store-reference';
 import * as uuid from 'uuid';
 import { PatternLibrary } from '../pattern-library';
+import { PlaceholderPosition } from '../../components';
 
 export interface ElementInit {
 	containerId?: string;
@@ -23,7 +24,7 @@ export interface ElementInit {
 	name?: string;
 	open: boolean;
 	patternId: string;
-	placeholderHighlighted: boolean;
+	placeholderHighlighted: PlaceholderPosition;
 	propertyValues: [string, Types.ElementPropertyValue][];
 	role?: Types.ElementRole;
 	selected: boolean;
@@ -63,7 +64,7 @@ export class Element {
 
 	@Mobx.observable private patternId: string;
 
-	@Mobx.observable private shouldPlaceholderHighlight: boolean;
+	@Mobx.observable private shouldPlaceholderHighlight: PlaceholderPosition;
 
 	private project: Project;
 
@@ -98,12 +99,12 @@ export class Element {
 	}
 
 	@Mobx.computed
-	private get placeholderHighlighted(): boolean {
+	private get placeholderHighlighted(): PlaceholderPosition {
 		if (!this.shouldPlaceholderHighlight) {
-			return false;
+			return PlaceholderPosition.None;
 		}
 
-		return this.mayHighiglight;
+		return this.mayHighiglight ? this.shouldPlaceholderHighlight : PlaceholderPosition.None;
 	}
 
 	@Mobx.computed
@@ -181,7 +182,7 @@ export class Element {
 				id: serialized.id,
 				name: serialized.name,
 				patternId: serialized.patternId,
-				placeholderHighlighted: serialized.placeholderHighlighted,
+				placeholderHighlighted: serialized.placeholderHighlighted as PlaceholderPosition,
 				containerId: serialized.containerId,
 				contentIds: serialized.contentIds,
 				open: serialized.open,
@@ -220,7 +221,7 @@ export class Element {
 				forcedOpen: false,
 				open: false,
 				patternId: pattern.getId(),
-				placeholderHighlighted: false,
+				placeholderHighlighted: PlaceholderPosition.None,
 				propertyValues: [],
 				setDefaults: true,
 				selected: false
@@ -325,7 +326,9 @@ export class Element {
 				open: withState ? this.open : false,
 				forcedOpen: withState ? this.forcedOpen : false,
 				patternId: nextPattern!.getId(),
-				placeholderHighlighted: withState ? this.placeholderHighlighted : false,
+				placeholderHighlighted: withState
+					? this.placeholderHighlighted
+					: PlaceholderPosition.None,
 				propertyValues,
 				role: this.role,
 				selected: withState ? this.selected : false
@@ -588,7 +591,7 @@ export class Element {
 		}
 	}
 
-	public getPlaceholderHighlighted(): boolean {
+	public getPlaceholderHighlighted(): boolean | PlaceholderPosition {
 		return this.placeholderHighlighted;
 	}
 
@@ -717,7 +720,7 @@ export class Element {
 	}
 
 	@Mobx.action
-	public setPlaceholderHighlighted(placeholderHighlighted: boolean): void {
+	public setPlaceholderHighlighted(placeholderHighlighted: PlaceholderPosition): void {
 		this.shouldPlaceholderHighlight = placeholderHighlighted;
 	}
 
@@ -734,7 +737,7 @@ export class Element {
 		const serialized = this.toJSON();
 		serialized.dragged = false;
 		serialized.highlighted = false;
-		serialized.placeholderHighlighted = false;
+		serialized.placeholderHighlighted = PlaceholderPosition.None;
 		serialized.selected = false;
 		serialized.forcedOpen = false;
 		serialized.focused = false;

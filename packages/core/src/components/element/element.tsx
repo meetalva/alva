@@ -28,6 +28,12 @@ export enum ElementCapability {
 	Openable = 'openable'
 }
 
+export enum PlaceholderPosition {
+	None = 'none',
+	Before = 'before',
+	After = 'after'
+}
+
 export interface ElementProps {
 	capabilities: ElementCapability[];
 	children?: React.ReactNode;
@@ -37,7 +43,7 @@ export interface ElementProps {
 	onChange: React.FormEventHandler<HTMLInputElement>;
 	open: boolean;
 	placeholder: boolean;
-	placeholderHighlighted?: boolean;
+	placeholderHighlighted?: boolean | PlaceholderPosition;
 	state: ElementState;
 	title: string;
 	description?: string;
@@ -233,13 +239,10 @@ export class Element extends React.Component<ElementProps> {
 				{...anchors}
 				draggable={props.capabilities.includes(ElementCapability.Draggable)}
 			>
-				{props.placeholder &&
-					props.dragging && (
-						<TargetSignal
-							{...{ [ElementAnchors.placeholder]: true }}
-							visible={Boolean(props.placeholderHighlighted)}
-						/>
-					)}
+				<TargetSignal
+					{...{ [ElementAnchors.placeholder]: PlaceholderPosition.Before }}
+					visible={props.placeholderHighlighted === PlaceholderPosition.Before}
+				/>
 				<StyledElementLabel state={props.state}>
 					{props.capabilities.includes(ElementCapability.Openable) && (
 						<StyledIcon
@@ -279,6 +282,10 @@ export class Element extends React.Component<ElementProps> {
 					{props.open && containered(props.children, Element.ElementSlots)}
 					{props.open && containered(props.children, Element.ElementChildren)}
 				</StyledElementChildren>
+				<TargetSignal
+					{...{ [ElementAnchors.placeholder]: PlaceholderPosition.After }}
+					visible={props.placeholderHighlighted === PlaceholderPosition.After}
+				/>
 			</StyledElement>
 		);
 	}

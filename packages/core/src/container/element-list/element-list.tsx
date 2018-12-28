@@ -11,6 +11,7 @@ import * as Types from '../../types';
 import * as utils from '../../alva-util';
 
 import { Images } from '../../components/icons';
+import { PlaceholderPosition } from '../../components';
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -43,6 +44,7 @@ export class ElementList extends React.Component {
 		}
 	}
 
+	@Mobx.action
 	private handleBlur(e: React.FormEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const editableElement = store.getNameEditableElement();
@@ -53,6 +55,7 @@ export class ElementList extends React.Component {
 		}
 	}
 
+	@Mobx.action
 	private handleChange(e: React.FormEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLInputElement;
@@ -63,6 +66,7 @@ export class ElementList extends React.Component {
 		}
 	}
 
+	@Mobx.action
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
@@ -104,6 +108,7 @@ export class ElementList extends React.Component {
 		}
 	}
 
+	@Mobx.action
 	private handleContextMenu(e: React.MouseEvent<HTMLElement>): void {
 		e.preventDefault();
 
@@ -123,10 +128,14 @@ export class ElementList extends React.Component {
 		}
 	}
 
+	@Mobx.action
 	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
-		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
+		const position = getPlaceholderPosition(
+			target.getAttribute(Components.ElementAnchors.placeholder)
+		);
+
 		const targetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 		const targetContent = utils.elementContentFromTarget(e.target, { store });
 
@@ -134,8 +143,8 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		if (isSibling) {
-			targetElement.setPlaceholderHighlighted(false);
+		if (position !== PlaceholderPosition.None) {
+			targetElement.setPlaceholderHighlighted(PlaceholderPosition.None);
 		} else {
 			targetElement.setHighlighted(false);
 
@@ -145,16 +154,21 @@ export class ElementList extends React.Component {
 		}
 	}
 
+	@Mobx.action
 	private handleDragEnter(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 
 		const target = e.target as HTMLElement;
-		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
+		const position = getPlaceholderPosition(
+			target.getAttribute(Components.ElementAnchors.placeholder)
+		);
+
 		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
-		const targetContent = isSibling
-			? visualTargetElement && visualTargetElement.getContainer()
-			: utils.elementContentFromTarget(e.target, { store });
+		const targetContent =
+			position !== PlaceholderPosition.None
+				? visualTargetElement && visualTargetElement.getContainer()
+				: utils.elementContentFromTarget(e.target, { store });
 
 		const draggedElement = store.getDraggedElement();
 
@@ -168,21 +182,25 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		targetContent.setHighlighted(!isSibling);
-		visualTargetElement.setHighlighted(!isSibling);
-		visualTargetElement.setPlaceholderHighlighted(isSibling);
+		targetContent.setHighlighted(position === PlaceholderPosition.None);
+		visualTargetElement.setHighlighted(position === PlaceholderPosition.None);
+		visualTargetElement.setPlaceholderHighlighted(position);
 	}
 
+	@Mobx.action
 	private handleDragOver(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 
 		const target = e.target as HTMLElement;
-		const isSibling = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
+		const position = getPlaceholderPosition(
+			target.getAttribute(Components.ElementAnchors.placeholder)
+		);
 		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
-		const targetContent = isSibling
-			? visualTargetElement && visualTargetElement.getContainer()
-			: utils.elementContentFromTarget(e.target, { store });
+		const targetContent =
+			position !== PlaceholderPosition.None
+				? visualTargetElement && visualTargetElement.getContainer()
+				: utils.elementContentFromTarget(e.target, { store });
 
 		const draggedElement = store.getDraggedElement();
 
@@ -200,6 +218,7 @@ export class ElementList extends React.Component {
 		e.dataTransfer.dropEffect = dropEffect;
 	}
 
+	@Mobx.action
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const draggedElement = utils.elementFromTarget(e.target, { sibling: false, store });
@@ -231,29 +250,35 @@ export class ElementList extends React.Component {
 		});
 	}
 
+	@Mobx.action
 	private handleDrop(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
-		const isSiblingDrop = target.getAttribute(Components.ElementAnchors.placeholder) === 'true';
 
+		const position = getPlaceholderPosition(
+			target.getAttribute(Components.ElementAnchors.placeholder)
+		);
 		const draggedElement = store.getDraggedElement();
 		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
+
 		if (!draggedElement || !visualTargetElement) {
 			return;
 		}
 
-		const targetContent = isSiblingDrop
-			? visualTargetElement.getContainer()
-			: utils.elementContentFromTarget(e.target, { store });
+		const targetContent =
+			position !== PlaceholderPosition.None
+				? visualTargetElement.getContainer()
+				: utils.elementContentFromTarget(e.target, { store });
 
 		if (!targetContent) {
 			return;
 		}
 
 		const getDropIndex = () => {
-			if (!isSiblingDrop) {
+			if (position === PlaceholderPosition.None) {
 				return targetContent.getElements().length;
 			}
+
 			return utils.calculateDropIndex({
 				target: visualTargetElement,
 				dragged: draggedElement
@@ -261,6 +286,8 @@ export class ElementList extends React.Component {
 		};
 
 		const index = getDropIndex();
+		const offset = position === PlaceholderPosition.After ? 1 : 0;
+
 		if (index === -1) {
 			return;
 		}
@@ -277,10 +304,11 @@ export class ElementList extends React.Component {
 		store.executeElementMove({
 			element: draggedElement,
 			content: targetContent,
-			index
+			index: index + offset
 		});
 	}
 
+	@Mobx.action
 	private handleKeyDown(e: KeyboardEvent): void {
 		const { store } = this.props as { store: Store.ViewStore };
 
@@ -319,6 +347,7 @@ export class ElementList extends React.Component {
 		}
 	}
 
+	@Mobx.action
 	private handleMouseLeave(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const element = utils.elementFromTarget(e.target as HTMLElement, { sibling: false, store });
@@ -333,6 +362,7 @@ export class ElementList extends React.Component {
 		}
 	}
 
+	@Mobx.action
 	private handleMouseOver(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const targetElement = utils.elementFromTarget(e.target as HTMLElement, {
@@ -429,5 +459,17 @@ export class ElementList extends React.Component {
 				<ElementDragImage element={store.getDraggedElement()} dragRef={this.dragImg} />
 			</Components.DragArea>
 		);
+	}
+}
+
+function getPlaceholderPosition(value: string | null): PlaceholderPosition {
+	switch (value) {
+		case 'before':
+			return PlaceholderPosition.Before;
+		case 'after':
+			return PlaceholderPosition.After;
+		case 'none':
+		default:
+			return PlaceholderPosition.None;
 	}
 }

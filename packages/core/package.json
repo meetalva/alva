@@ -72,7 +72,7 @@
     }
   },
   "devDependencies": {
-    "@patternplate/cli": "2.5.25",
+    "@patternplate/cli": "^3.2.4",
     "@patternplate/render-styled-components": "2.5.18",
     "@types/jest": "22.2.2",
     "concurrently": "3.5.1",

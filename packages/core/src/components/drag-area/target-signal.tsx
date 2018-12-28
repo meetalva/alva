@@ -14,7 +14,7 @@ interface StyledTargetSignalProps {
 const TARGET_SIGNAL_SCALE = (props: StyledTargetSignalProps): number => (props.visible ? 1 : 0);
 
 const StyledTargetSignal = styled.div`
-	position: relative;
+	position: absolute;
 	height: ${getSpace(SpaceSize.S)}px;
 	width: 100%;
 	margin-top: -${getSpace(SpaceSize.XS)}px;

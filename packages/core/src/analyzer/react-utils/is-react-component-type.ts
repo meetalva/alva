@@ -14,7 +14,7 @@ export function isReactComponentType(
 	type: TypeScript.Type,
 	ctx: { program: TypeScript.Program }
 ): boolean {
-	const symbol = type.getSymbol();
+	const symbol = type.getSymbol() || type.aliasSymbol;
 
 	if (!symbol) {
 		return false;

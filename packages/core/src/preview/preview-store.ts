@@ -52,7 +52,6 @@ export interface SyntheticComponents<V> {
 
 export class PreviewStore<V> {
 	@Mobx.observable private app?: Model.AlvaApp;
-	@Mobx.observable private components: Components;
 	@Mobx.observable private highlightArea: ElementArea;
 	@Mobx.observable private metaDown: boolean = false;
 	@Mobx.observable private mode: Types.PreviewDocumentMode;
@@ -60,7 +59,9 @@ export class PreviewStore<V> {
 	@Mobx.observable private selectionArea: ElementArea;
 	@Mobx.observable private synthetics: SyntheticComponents<V>;
 	@Mobx.observable private scrollPosition?: Types.Point;
+
 	private sender?: Sender;
+	private components: Components;
 
 	public constructor(init: PreviewStoreInit<V, Types.PreviewDocumentMode>) {
 		this.mode = init.mode;
@@ -96,16 +97,26 @@ export class PreviewStore<V> {
 
 		switch (type) {
 			case Types.PatternType.Pattern:
-				// tslint:disable-next-line:no-any
-				const component = this.components[pattern.getId()];
+				const component: unknown = this.components[pattern.getId()];
 
-				if (!component) {
+				if (typeof component !== 'object' || component === null) {
 					throw new Error(
 						`Could not find component with id "${pattern.getId()}" for pattern "${pattern.getName()}:${pattern.getExportName()}".`
 					);
 				}
 
-				return component[pattern.getExportName()];
+				const exportName = pattern.getExportName();
+
+				if (!component.hasOwnProperty(exportName)) {
+					if (typeof component !== 'object') {
+						throw new Error(
+							`Could not find export ${exportName} on pattern "${pattern.getName()}:${pattern.getExportName()}".`
+						);
+					}
+				}
+
+				const c = component as { [key: string]: unknown };
+				return c[exportName] as V | undefined;
 			default:
 				return this.synthetics[type];
 		}

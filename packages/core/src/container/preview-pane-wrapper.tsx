@@ -1,4 +1,4 @@
-import { PreviewFrame, PreviewPane } from '../components';
+import { PreviewFrame, PreviewPane, PreviewFrameProps } from '../components';
 import { Copy, CopySize } from '../components/copy';
 import { IconSize } from '../components/icons';
 import { Overlay } from '../components/overlay';
@@ -49,8 +49,8 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 
 		return (
 			<PreviewPane>
-				<PreviewFrame
-					ref={(frame: any) => (this.frame = frame)}
+				<OptimizedPreviewFrame
+					frameRef={(frame: any) => (this.frame = frame)}
 					srcDoc={getSrcDoc(project.getId(), project)}
 					offCanvas={false}
 					onMouseLeave={() => {
@@ -65,6 +65,28 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 					<Copy size={CopySize.M}>Drop the component on the left element list</Copy>
 				</Overlay>
 			</PreviewPane>
+		);
+	}
+}
+
+interface OptimizedPreviewFrameProps extends PreviewFrameProps {
+	frameRef: any;
+}
+
+class OptimizedPreviewFrame extends React.Component<OptimizedPreviewFrameProps> {
+	// All state changes  should be performed
+	public shouldComponentUpdate(): boolean {
+		return false;
+	}
+
+	public render(): JSX.Element {
+		return (
+			<PreviewFrame
+				ref={this.props.frameRef}
+				srcDoc={this.props.srcDoc}
+				offCanvas={false}
+				onMouseLeave={this.props.onMouseLeave}
+			/>
 		);
 	}
 }

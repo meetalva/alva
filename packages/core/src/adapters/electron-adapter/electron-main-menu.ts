@@ -19,19 +19,13 @@ export class ElectronMainMenu {
 	}
 
 	public start(): void {
-		Electron.app.on('browser-window-focus', (_: unknown, win: Electron.BrowserWindow) => {
-			this.onWindowFocus(win);
-		});
-
 		Electron.app.on('browser-window-created', (_: unknown, win: Electron.BrowserWindow) => {
-			console.log(win.isFocused());
-			if (win.isFocused()) {
-				this.onWindowFocus(win);
-			}
+			win.webContents.addListener('did-navigate', () => this.onHashChange(win));
+			win.webContents.addListener('did-navigate-in-page', () => this.onHashChange(win));
 		});
 
-		Electron.app.on('browser-window-blur', (_: unknown, win: Electron.BrowserWindow) => {
-			this.onWindowBlur(win);
+		Electron.app.on('browser-window-focus', (_: unknown, win: Electron.BrowserWindow) => {
+			this.onHashChange(win);
 		});
 
 		this.server.sender.match<M.ChangeApp>(M.MessageType.ChangeApp, m => {
@@ -46,47 +40,37 @@ export class ElectronMainMenu {
 		});
 	}
 
-	private async onWindowFocus(win: Electron.BrowserWindow): Promise<void> {
+	private async onHashChange(win: Electron.BrowserWindow) {
 		const parsed = Url.parse(win.webContents.getURL());
 
 		if (!parsed.hash) {
 			return;
 		}
 
-		const response = await this.server.sender.transaction<M.AppRequest, M.AppResponse>(
-			{
-				id: uuid.v4(),
-				appId: parsed.hash.slice(1),
-				type: MT.AppRequest,
-				payload: undefined
-			},
-			{ type: MT.AppResponse }
-		);
-
-		this.focusedApp = Model.AlvaApp.from(response.payload.app, { sender: this.server.sender });
-
 		if (!parsed.pathname || !parsed.pathname.startsWith('/project')) {
 			this.focusedProject = undefined;
 			return;
 		}
 
+		const appId = parsed.hash.slice(1);
+
+		if (!this.focusedApp || this.focusedApp.getId() !== appId) {
+			const response = await this.server.sender.transaction<M.AppRequest, M.AppResponse>(
+				{
+					id: uuid.v4(),
+					appId,
+					type: MT.AppRequest,
+					payload: undefined
+				},
+				{ type: MT.AppResponse }
+			);
+
+			this.focusedApp = Model.AlvaApp.from(response.payload.app, { sender: this.server.sender });
+		}
+
 		const fragments = parsed.pathname.split('/').filter(Boolean);
 		const id = fragments[fragments.length - 1];
 		this.focusedProject = await this.server.dataHost.getProject(id);
-	}
-
-	private async onWindowBlur(win: Electron.BrowserWindow): Promise<void> {
-		const parsed = Url.parse(win.webContents.getURL());
-		const current = this.focusedApp ? this.focusedApp.getId() : undefined;
-
-		if (!parsed.hash || !current) {
-			return;
-		}
-
-		if (parsed.hash.slice(1) === current) {
-			this.focusedApp = undefined;
-			this.focusedProject = undefined;
-		}
 	}
 
 	private render(ctx: {

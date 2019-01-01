@@ -31,9 +31,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 
 		const toNextPage = nextPage ? () => project.setActivePage(nextPage) : AlvaUtil.noop;
 
-		const notifications = app.getNotifications();
-		const notification =
-			notifications.length > 0 ? notifications[notifications.length - 1] : undefined;
+		const update = app.getUpdate();
 
 		return (
 			<C.Chrome
@@ -71,18 +69,18 @@ export const ChromeContainer = MobxReact.inject('store')(
 						gridColumn: 3
 					}}
 				>
-					{notification && (
+					{update && (
 						<C.UpdateBadge
-							title={`Update to version ${notification.version}`}
+							title={`Update to version ${update.version}`}
 							onClick={() => {
 								app.send({
 									type: MessageType.ShowUpdateDetails,
 									id: uuid.v4(),
-									payload: notification
+									payload: update
 								});
 							}}
 						>
-							{notification.version}
+							{update.version}
 						</C.UpdateBadge>
 					)}
 					<C.ChromeButton

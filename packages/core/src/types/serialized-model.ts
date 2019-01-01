@@ -178,7 +178,6 @@ export interface SerializedAlvaApp {
 	activeView: SerializedAlvaView;
 	hasFocusedInput: boolean;
 	hostType: string;
-	notifications: UpdateInfo[];
 	panes: SerializedAppPane[];
 	paneSizes: SerializedPaneSize[];
 	rightSidebarTab: SerializedRightSidebarTab;

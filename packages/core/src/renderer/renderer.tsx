@@ -41,7 +41,7 @@ export async function startRenderer(): Promise<void> {
 	}
 
 	if (data.update) {
-		app.addNotification(data.update);
+		app.setUpdate(data.update);
 	}
 
 	app.setSender(sender);

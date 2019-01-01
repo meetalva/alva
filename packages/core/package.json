@@ -76,6 +76,11 @@
       "icon": "document.icns",
       "role": "Editor",
       "isPackage": true
+    },
+    "publish": {
+      "provider": "s3",
+      "bucket": "electron-builder",
+      "endpoint": "http://localhost:9000"
     }
   },
   "standard-version": {
@@ -196,6 +201,7 @@
     "styled-components": "4.0.3",
     "tag-hoc": "1.0.0",
     "throat": "^4.1.0",
+    "timeago.js": "^4.0.0-beta.2",
     "ts-simple-ast": "20.0.0",
     "tslib": "1.9.0",
     "typescript": "3.2.2",

@@ -9,7 +9,6 @@ export interface AlvaAppInit {
 	activeView: Types.AlvaView;
 	hasFocusedInput: boolean;
 	hostType: Types.HostType;
-	notifications: Set<Types.UpdateInfo>;
 	panes: Set<Types.AppPane>;
 	paneSizes: Types.PaneSize[];
 	rightSidebarTab: Types.RightSidebarTab;
@@ -22,7 +21,6 @@ export class AlvaApp {
 		activeView: Types.AlvaView.SplashScreen,
 		hasFocusedInput: false,
 		hostType: Types.HostType.Electron,
-		notifications: new Set([]),
 		panes: new Set([
 			Types.AppPane.PagesPane,
 			Types.AppPane.ElementsPane,
@@ -60,7 +58,7 @@ export class AlvaApp {
 
 	@Mobx.observable private hasFocusedInput: boolean = false;
 
-	@Mobx.observable private notifications: Set<Types.UpdateInfo> = new Set();
+	@Mobx.observable private udpate: Types.UpdateInfo | undefined;
 
 	private sender: Types.Sender;
 
@@ -83,7 +81,6 @@ export class AlvaApp {
 				activeView: deserializeView(serialized.activeView),
 				hasFocusedInput: serialized.hasFocusedInput,
 				hostType: serialized.hostType as Types.HostType,
-				notifications: new Set(serialized.notifications),
 				panes: new Set(serialized.panes.map(deserializePane)),
 				paneSizes: serialized.paneSizes.map(p => ({
 					width: p.width,
@@ -216,14 +213,12 @@ export class AlvaApp {
 	}
 
 	@Mobx.action
-	public addNotification(message: Types.UpdateInfo): void {
-		console.log(message);
-		this.notifications.add(message);
+	public setUpdate(update: Types.UpdateInfo): void {
+		this.udpate = update;
 	}
 
-	@Mobx.action
-	public getNotifications(): Types.UpdateInfo[] {
-		return sortBy([...this.notifications.values()], 'releaseData');
+	public getUpdate(): Types.UpdateInfo | undefined {
+		return this.udpate;
 	}
 
 	public setSender(sender: Types.Sender): void {
@@ -237,7 +232,6 @@ export class AlvaApp {
 			activeView: serializeView(this.activeView),
 			hasFocusedInput: this.hasFocusedInput,
 			hostType: this.hostType,
-			notifications: [...this.notifications.values()],
 			panes: [...this.panes.values()].map(serializePane),
 			paneSizes: [...this.paneSizes.values()].map(paneSize => ({
 				width: paneSize.width,

@@ -60,7 +60,7 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: yarn install --frozen-lockfile || yarn install --frozen-lockfile
+          command: yarn install --frozen-lockfile || yarn
 
       - save_cache:
           paths:

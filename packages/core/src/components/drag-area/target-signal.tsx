@@ -25,10 +25,10 @@ const StyledTargetSignal = styled.div`
 		content: '';
 		display: block;
 		position: absolute;
+		top: 3px;
 		height: 6px;
 		width: 6px;
 		left: 0;
-		top: 3px;
 		border-radius: 3px;
 		background: ${Color.Blue40};
 		transform: scale(${TARGET_SIGNAL_SCALE});
@@ -40,9 +40,10 @@ const StyledTargetSignal = styled.div`
 		content: '';
 		display: block;
 		position: absolute;
+		right: 0;
+		left: ${getSpace(SpaceSize.XS)};
 		height: 2px;
 		width: calc(100% - 6px);
-		left: ${getSpace(SpaceSize.XS)};
 		top: 5px;
 		background: ${Color.Blue40};
 		transform: scaleY(${TARGET_SIGNAL_SCALE});

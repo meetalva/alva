@@ -73,7 +73,7 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				open={false}
 				onChange={NOOP}
 				placeholder={true}
-				placeholderHighlighted={true}
+				placeholderHighlighted={PlaceholderPosition.Before}
 				state={ElementState.Default}
 				title="Element"
 				dragging={true}

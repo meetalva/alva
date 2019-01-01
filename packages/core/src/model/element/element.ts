@@ -591,7 +591,7 @@ export class Element {
 		}
 	}
 
-	public getPlaceholderHighlighted(): boolean | PlaceholderPosition {
+	public getPlaceholderHighlighted(): PlaceholderPosition {
 		return this.placeholderHighlighted;
 	}
 

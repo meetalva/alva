@@ -369,28 +369,30 @@ export class ElementList extends React.Component {
 			sibling: false,
 			store
 		});
+
 		const targetContent = utils.elementContentFromTarget(e.target, { store });
-		const label = utils.above(e.target, `[${Components.ElementAnchors.label}]`);
+		const item = utils.above(e.target, `[${Components.ElementAnchors.item}]`);
+
+		const isElementMouseOver = item && targetElement;
+		const isContentMouseOver = item && targetContent;
+		const isRootMouseOver =
+			!item && targetElement && targetElement.getRole() === Types.ElementRole.Root;
 
 		Mobx.transaction(() => {
-			if (
-				(label && targetElement) ||
-				(label && targetContent) ||
-				(!label && targetElement && targetElement.getRole() === Types.ElementRole.Root)
-			) {
+			if (isElementMouseOver || isContentMouseOver || isRootMouseOver) {
 				store.getProject().unsetHighlightedElement();
 				store.getProject().unsetHighlightedElementContent();
 			}
 
 			if (
-				label &&
+				item &&
 				targetElement &&
 				targetContent === targetElement.getContentBySlotId(Types.SlotType.Children)
 			) {
 				targetElement.setHighlighted(true);
 			}
 
-			if (label && targetContent && targetContent.getSlotType() === Types.SlotType.Children) {
+			if (item && targetContent && targetContent.getSlotType() === Types.SlotType.Children) {
 				targetContent.setHighlighted(true);
 			}
 		});

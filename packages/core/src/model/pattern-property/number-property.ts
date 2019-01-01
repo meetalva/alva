@@ -28,10 +28,14 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 		});
 	}
 
-	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
-		const result: number = parseFloat(value);
-		return isNaN(result) ? undefined : result;
+	public coerceValue(value: unknown): number | undefined {
+		const result = typeof value === 'string' ? parseFloat(value) : undefined;
+
+		if (typeof result === 'number' && !Number.isNaN(result)) {
+			return result;
+		}
+
+		return this.required ? 0 : undefined;
 	}
 
 	public toJSON(): Types.SerializedPatternNumberProperty {

@@ -11,7 +11,10 @@ import {
 } from '../../model/pattern-property/unknown-property';
 
 // tslint:disable-next-line:no-submodule-imports
-require('jest-dom/extend-expect');
+import 'jest-dom/extend-expect';
+
+// tslint:disable-next-line:no-submodule-imports
+import 'react-testing-library/cleanup-after-each';
 
 jest.mock('../../store');
 
@@ -43,8 +46,7 @@ test('executes toggleCodeDetails on click', async () => {
 	expect(onClick).toHaveBeenCalled();
 });
 
-// TODO: Find out how previous test may leak
-test.skip('does not render code details for hidden props', () => {
+test('does not render code details for hidden props', () => {
 	const project = Project.create({
 		name: 'Project',
 		draft: true,

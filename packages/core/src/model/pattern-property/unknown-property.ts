@@ -27,7 +27,7 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 		this.typeText = init.typeText;
 	}
 
-	public static Defaults(mixin: Partial<PatternUnknownPropertyInit>): PatternUnknownPropertyInit {
+	public static Defaults(mixin?: Partial<PatternUnknownPropertyInit>): PatternUnknownPropertyInit {
 		return {
 			contextId: 'unknown',
 			group: '',
@@ -61,19 +61,21 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 		});
 	}
 
-	public static fromDefaults(mixin: Partial<PatternUnknownPropertyInit>): PatternUnknownProperty {
+	public static fromDefaults(mixin?: Partial<PatternUnknownPropertyInit>): PatternUnknownProperty {
 		return new PatternUnknownProperty(PatternUnknownProperty.Defaults(mixin));
 	}
 
-	public coerceValue(value: any): string | undefined {
-		if (typeof value === 'undefined') {
-			return;
+	public coerceValue(value: unknown): unknown | undefined {
+		const empty = this.required ? '' : undefined;
+
+		if (typeof value !== 'string') {
+			return empty;
 		}
 
 		try {
 			return JSON5.parse(value);
 		} catch (err) {
-			return;
+			return empty;
 		}
 	}
 

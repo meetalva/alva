@@ -1,5 +1,11 @@
-import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
+import {
+	deserializeOrigin,
+	PatternPropertyBase,
+	serializeOrigin,
+	PatternPropertyInit
+} from './property-base';
 import * as Types from '../../types';
+import uuid = require('uuid');
 
 /**
  * A string property is a property that supports text only.
@@ -10,6 +16,26 @@ import * as Types from '../../types';
  */
 export class PatternStringProperty extends PatternPropertyBase<string | undefined> {
 	public readonly type = Types.PatternPropertyType.String;
+
+	public static Defaults(
+		mixins?: Partial<PatternPropertyInit<string>>
+	): PatternPropertyInit<string> {
+		return {
+			contextId: 'stringProperty',
+			defaultValue: 'Text',
+			description: 'A string property',
+			example: '',
+			group: '',
+			hidden: false,
+			id: uuid.v4(),
+			inputType: Types.PatternPropertyInputType.Default,
+			label: 'String Property',
+			origin: Types.PatternPropertyOrigin.UserProvided,
+			propertyName: 'stringProperty',
+			required: false,
+			...mixins
+		};
+	}
 
 	public static from(serialized: Types.SerializedPatternStringProperty): PatternStringProperty {
 		return new PatternStringProperty({
@@ -28,13 +54,32 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 		});
 	}
 
-	// tslint:disable-next-line:no-any
-	public coerceValue(value: any): any {
-		if (value === null || value === undefined || value === '') {
-			return '';
-		} else {
+	public static fromDefaults(
+		mixins?: Partial<PatternPropertyInit<string>>
+	): PatternStringProperty {
+		return new PatternStringProperty(PatternStringProperty.Defaults(mixins));
+	}
+
+	public coerceValue(value: unknown): string | undefined {
+		if (typeof value === 'string') {
+			return value;
+		}
+
+		const empty = this.required ? '' : undefined;
+
+		if (typeof value === 'undefined' || value === null) {
+			return empty;
+		}
+
+		if (typeof value === 'number' && !Number.isNaN(value)) {
 			return String(value);
 		}
+
+		if (typeof value === 'boolean') {
+			return value ? 'true' : 'false';
+		}
+
+		return empty;
 	}
 
 	public toJSON(): Types.SerializedPatternStringProperty {

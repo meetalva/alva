@@ -55,8 +55,8 @@ jobs:
 
       - restore_cache:
           keys:
-          - v4-dependencies-macos-{{ checksum "yarn.lock" }}
-          - v4-dependencies-macos-
+          - v5-dependencies-macos-{{ checksum "yarn.lock" }}
+          - v5-dependencies-macos-
 
       - run:
           name: Install dependencies
@@ -67,7 +67,7 @@ jobs:
             - node_modules
             - packages/core/node_modules
             - packages/tools/node_modules
-          key: v4-dependencies-macos-{{ checksum "yarn.lock" }}
+          key: v5-dependencies-macos-{{ checksum "yarn.lock" }}
 
       - run:
           name: Add npm bin to path

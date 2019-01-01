@@ -351,6 +351,16 @@ export class Project {
 		page.setProject(this);
 	}
 
+	public getSelectedPage(): Page | undefined {
+		return this.pages.find(
+			p =>
+				p.getId() ===
+				this.getUserStore()
+					.getPageProperty()
+					.getValue()
+		);
+	}
+
 	public getBuiltinPatternLibrary(): PatternLibrary {
 		return this.getPatternLibraries().find(
 			p => p.getOrigin() === Types.PatternLibraryOrigin.BuiltIn

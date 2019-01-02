@@ -16,6 +16,7 @@ import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-
 import { UserStoreReference } from './user-store-reference';
 import * as uuid from 'uuid';
 import * as ModelTree from '../model-tree';
+import { PlaceholderPosition } from '../components';
 
 export interface ProjectProperties {
 	draft: boolean;
@@ -349,6 +350,16 @@ export class Project {
 		this.internalPages.set(page.getId(), page);
 		this.pageList.push(page.getId());
 		page.setProject(this);
+	}
+
+	public getSelectedPage(): Page | undefined {
+		return this.pages.find(
+			p =>
+				p.getId() ===
+				this.getUserStore()
+					.getPageProperty()
+					.getValue()
+		);
 	}
 
 	public getBuiltinPatternLibrary(): PatternLibrary {
@@ -932,7 +943,7 @@ export class Project {
 	public unsetPlaceholderHighlightedElement(options?: { ignore: Element }): void {
 		this.placeholderHighlightedElements
 			.filter(element => !options || options.ignore.getId() !== element.getId())
-			.forEach(element => element.setPlaceholderHighlighted(false));
+			.forEach(element => element.setPlaceholderHighlighted(PlaceholderPosition.None));
 	}
 
 	public update(b: this): void {

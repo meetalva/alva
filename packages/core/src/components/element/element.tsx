@@ -9,6 +9,7 @@ export const ElementAnchors = {
 	element: 'data-id',
 	content: 'data-content-id',
 	icon: 'data-icon',
+	item: 'data-element-item',
 	label: 'data-element-label',
 	placeholder: 'data-element-placeholder'
 };
@@ -28,6 +29,12 @@ export enum ElementCapability {
 	Openable = 'openable'
 }
 
+export enum PlaceholderPosition {
+	None = 'none',
+	Before = 'before',
+	After = 'after'
+}
+
 export interface ElementProps {
 	capabilities: ElementCapability[];
 	children?: React.ReactNode;
@@ -37,7 +44,7 @@ export interface ElementProps {
 	onChange: React.FormEventHandler<HTMLInputElement>;
 	open: boolean;
 	placeholder: boolean;
-	placeholderHighlighted?: boolean;
+	placeholderHighlighted?: PlaceholderPosition;
 	state: ElementState;
 	title: string;
 	description?: string;
@@ -233,14 +240,14 @@ export class Element extends React.Component<ElementProps> {
 				{...anchors}
 				draggable={props.capabilities.includes(ElementCapability.Draggable)}
 			>
-				{props.placeholder &&
-					props.dragging && (
+				{props.dragging &&
+					props.placeholder && (
 						<TargetSignal
-							{...{ [ElementAnchors.placeholder]: true }}
-							visible={Boolean(props.placeholderHighlighted)}
+							{...{ [ElementAnchors.placeholder]: PlaceholderPosition.Before }}
+							visible={props.placeholderHighlighted === PlaceholderPosition.Before}
 						/>
 					)}
-				<StyledElementLabel state={props.state}>
+				<StyledElementLabel state={props.state} {...{ [ElementAnchors.item]: true }}>
 					{props.capabilities.includes(ElementCapability.Openable) && (
 						<StyledIcon
 							dataIcon={props.id}
@@ -279,6 +286,13 @@ export class Element extends React.Component<ElementProps> {
 					{props.open && containered(props.children, Element.ElementSlots)}
 					{props.open && containered(props.children, Element.ElementChildren)}
 				</StyledElementChildren>
+				{props.dragging &&
+					props.placeholder && (
+						<TargetSignal
+							{...{ [ElementAnchors.placeholder]: PlaceholderPosition.After }}
+							visible={props.placeholderHighlighted === PlaceholderPosition.After}
+						/>
+					)}
 			</StyledElement>
 		);
 	}

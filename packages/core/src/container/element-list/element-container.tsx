@@ -8,6 +8,7 @@ import * as Model from '../../model';
 import * as React from 'react';
 import * as Types from '../../types';
 import { ViewStore } from '../../store';
+import { PlaceholderPosition } from '../../components';
 
 export interface ElementContainerProps {
 	element: Model.Element;
@@ -45,7 +46,9 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 				open={open}
 				onChange={AlvaUtil.noop}
 				placeholder={props.element.getRole() !== Types.ElementRole.Root}
-				placeholderHighlighted={props.element.getPlaceholderHighlighted()}
+				placeholderHighlighted={
+					props.element.getPlaceholderHighlighted() || PlaceholderPosition.None
+				}
 				state={getElementState(props.element, store)}
 				title={
 					props.element.getRole() === Types.ElementRole.Root ? 'Page' : props.element.getName()

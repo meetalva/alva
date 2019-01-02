@@ -13,6 +13,7 @@
 		"lib": ["es2017", "dom"],
 		"outDir": "build",
 		"rootDir": "src",
-		"target": "es2017"
+		"target": "es2017",
+		"sourceMap": true
 	}
 }

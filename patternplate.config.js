@@ -14,9 +14,9 @@ module.exports = {
 		'*.md',
 		'docs/*.md'
 	],
-	entry: ['build/components/**/demo.js'],
-	render: '@patternplate/render-styled-components/render',
-	mount: '@patternplate/render-styled-components/mount',
+	entry: ['packages/core/build/components/**/demo.js'],
+	render: '@patternplate/render-react/render',
+	mount: '@patternplate/render-react/mount',
 	ui: {
 		logo: logo,
 		colorBackgroundDark: "rgb(15, 15, 50)",

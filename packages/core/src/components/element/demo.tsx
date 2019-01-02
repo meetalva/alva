@@ -1,6 +1,7 @@
 import DemoContainer from '../demo-container';
 import { Element, ElementCapability, ElementState } from './index';
 import * as React from 'react';
+import { PlaceholderPosition } from './element';
 
 // tslint:disable-next-line:no-empty
 const NOOP = () => {};
@@ -72,7 +73,22 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				open={false}
 				onChange={NOOP}
 				placeholder={true}
-				placeholderHighlighted={true}
+				placeholderHighlighted={PlaceholderPosition.Before}
+				state={ElementState.Default}
+				title="Element"
+				dragging={true}
+			/>
+		</>
+		<>
+			Placeholder Highlighted after
+			<Element
+				id="2"
+				contentId="2"
+				capabilities={[ElementCapability.Editable]}
+				open={false}
+				onChange={NOOP}
+				placeholder={true}
+				placeholderHighlighted={PlaceholderPosition.After}
 				state={ElementState.Default}
 				title="Element"
 				dragging={true}

@@ -1,3 +1,4 @@
+import * as Fs from 'fs';
 import * as Model from '../model';
 import * as Message from '../message';
 
@@ -76,6 +77,16 @@ export interface HostWindowOptions {
 	variant: HostWindowVariant;
 }
 
+export interface ProjectRecord {
+	id: string;
+	draft: boolean;
+	name: string;
+	path: string;
+	displayPath: string;
+	valid: boolean;
+	editDate: number | undefined;
+}
+
 export abstract class Host {
 	public type: Types.HostType = Types.HostType.Unknown;
 
@@ -95,12 +106,20 @@ export abstract class Host {
 		throw new Error('host.resolveFrom: not implemented');
 	}
 
+	public async access(path: string, mode?: number): Promise<boolean> {
+		throw new Error('host.access: not implemented');
+	}
+
 	public async exists(path: string): Promise<boolean> {
 		throw new Error('host.exists: not implemented');
 	}
 
 	public async mkdir(path: string): Promise<void> {
 		throw new Error('host.mkdir: not implemented');
+	}
+
+	public async stat(path: string): Promise<Fs.Stats> {
+		throw new Error('host.stat: not implemented');
 	}
 
 	public async readFile(path: string): Promise<HostFile> {
@@ -178,6 +197,10 @@ export abstract class DataHost {
 
 	public async getProject(id: string): Promise<Model.Project | undefined> {
 		throw new Error('DataHost.getProject: not implemented');
+	}
+
+	public async getProjects(): Promise<ProjectRecord[]> {
+		throw new Error('context.getProjects: not implemented');
 	}
 
 	public async addConnection(

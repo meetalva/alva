@@ -2,6 +2,8 @@ import * as Types from '../types';
 import * as Model from '../model';
 import * as Path from 'path';
 import { Persistence } from '../persistence';
+import * as Fs from 'fs';
+import { sortBy } from 'lodash';
 
 export class LocalDataHost implements Types.DataHost {
 	private host: Types.Host;
@@ -91,6 +93,32 @@ export class LocalDataHost implements Types.DataHost {
 		this.cache.set(project.getId(), project);
 
 		return project;
+	}
+
+	public async getProjects(): Promise<Types.ProjectRecord[]> {
+		const memory = await this.readMemory();
+		const tempPath = await this.host.resolveFrom(Types.HostBase.AppData, '.');
+		const userPath = Path.dirname(await this.host.resolveFrom(Types.HostBase.UserData, '.'));
+
+		const projects = await Promise.all(
+			Object.entries(memory.projects).map(async ([id, path]) => {
+				const valid = await this.host.access(path, Fs.constants.R_OK);
+				const editDate = valid ? (await this.host.stat(path)).mtimeMs : undefined;
+				const draft = !Path.relative(tempPath, path).startsWith('../');
+
+				return {
+					draft,
+					editDate,
+					id,
+					path,
+					displayPath: path.replace(new RegExp(`^(${userPath}|${tempPath})`), '~'),
+					name: draft ? 'Draft' : Path.basename(path, Path.extname(path)),
+					valid
+				};
+			})
+		);
+
+		return sortBy(projects, ['editDate', 'name']).reverse();
 	}
 
 	public async addConnection(

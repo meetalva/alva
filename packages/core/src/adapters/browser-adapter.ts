@@ -6,6 +6,7 @@ import { BrowserHost } from '../hosts/browser-host';
 import { BrowserDataHost } from '../hosts/browser-data-host';
 import * as Matchers from '../matchers/browser';
 import * as Fs from 'fs';
+import * as uuid from 'uuid';
 
 export class BrowserAdapter {
 	public readonly sender: Types.Sender;
@@ -48,6 +49,14 @@ export class BrowserAdapter {
 		};
 
 		if (app.isHostType(Types.HostType.Browser)) {
+			app.send({
+				type: M.MessageType.ProjectRecordsChanged,
+				id: uuid.v4(),
+				payload: {
+					projects: await this.dataHost.getProjects()
+				}
+			});
+
 			app.match<M.UseFileRequest>(MT.UseFileRequest, Matchers.useFileRequest(context));
 			app.match<M.UseFileResponse>(MT.UseFileResponse, Matchers.useFileResponse(context));
 			app.match<M.CreateNewFileRequest>(

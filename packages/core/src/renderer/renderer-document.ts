@@ -9,6 +9,7 @@ export interface RenderDocumentData {
 		view: Types.AlvaView;
 		project?: Model.Project;
 		update?: Types.UpdateInfo;
+		projects?: { path: string; name: string; valid: boolean }[];
 	};
 }
 

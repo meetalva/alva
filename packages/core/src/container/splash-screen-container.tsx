@@ -19,23 +19,22 @@ export class SplashScreenContainer extends React.Component {
 		return (
 			<SplashScreenView
 				openFileSlot={
-					app.hasFileAccess() ? (
-						<C.ButtonGroupButton
-							onClick={() => {
-								app.send({
-									type: MessageType.OpenFileRequest,
-									transaction,
-									id: openFileRequestId,
-									payload: {
-										replace: false
-									}
-								});
-							}}
-							style={{ width: '50%', height: 42 }}
-						/>
-					) : (
-						<C.ButtonGroupButton as="label" style={{ width: '50%', height: 42 }}>
-							Open File
+					<C.ButtonGroupButton
+						as={app.hasFileAccess() ? 'button' : 'label'}
+						onClick={() => {
+							app.send({
+								type: MessageType.OpenFileRequest,
+								transaction,
+								id: openFileRequestId,
+								payload: {
+									replace: false
+								}
+							});
+						}}
+						style={{ width: '50%', height: 42 }}
+					>
+						Open File
+						{!app.hasFileAccess() && (
 							<FileInput
 								accept=".alva"
 								onChange={contents => {
@@ -51,8 +50,8 @@ export class SplashScreenContainer extends React.Component {
 									});
 								}}
 							/>
-						</C.ButtonGroupButton>
-					)
+						)}
+					</C.ButtonGroupButton>
 				}
 				onCreateClick={() => {
 					app.send({

@@ -140,6 +140,30 @@ export class ElectronHost implements Types.Host {
 		return Fs.existsSync(path);
 	}
 
+	public access(path: string, mode: number | undefined): Promise<boolean> {
+		return new Promise(resolve => {
+			Fs.access(path, mode, err => {
+				if (err) {
+					return resolve(false);
+				}
+
+				resolve(true);
+			});
+		});
+	}
+
+	public async stat(path: string): Promise<Fs.Stats> {
+		return new Promise((resolve, reject) => {
+			Fs.stat(path, (err, stats) => {
+				if (err) {
+					return reject(err);
+				}
+
+				resolve(stats);
+			});
+		});
+	}
+
 	public async mkdir(path: string): Promise<void> {
 		const mkdir = Util.promisify(Fs.mkdir);
 

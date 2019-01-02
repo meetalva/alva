@@ -5,13 +5,6 @@ export const Item = styled.div`
 	display: flex;
 	justify-content: center;
 	padding: ${Space.getSpace(Space.SpaceSize.S)}px ${Space.getSpace(Space.SpaceSize.S) * 2}px;
-
-	&:first-child {
-		padding-top: ${Space.getSpace(Space.SpaceSize.S) * 2}px;
-	}
-	&:last-child {
-		padding-bottom: ${Space.getSpace(Space.SpaceSize.S) * 2}px;
-	}
 `;
 
 export const ItemSymbol = styled.div`

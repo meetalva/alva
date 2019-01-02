@@ -51,6 +51,10 @@ export async function startRenderer(): Promise<void> {
 
 	store.setServerPort(parseInt(window.location.port, 10));
 
+	if (data.projects) {
+		store.setProjects(data.projects);
+	}
+
 	const project = store.getProject();
 
 	app.send({

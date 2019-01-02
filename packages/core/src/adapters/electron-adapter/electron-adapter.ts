@@ -92,7 +92,22 @@ export class ElectronAdapter {
 		);
 		sender.match<M.ExportHtmlProject>(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
 		sender.match<M.OpenExternalURL>(MT.OpenExternalURL, Matchers.openExternalUrl(context));
-		sender.match<M.OpenFileRequest>(MT.OpenFileRequest, Matchers.openFileRequest(context));
+
+		sender.match<M.OpenFileRequest>(
+			MT.OpenFileRequest,
+			Matchers.openFileRequest(context, async (path: string) => {
+				const projectWindow = await this.getProjectWindowByPath(path);
+
+				if (projectWindow) {
+					projectWindow.window.show();
+					projectWindow.window.focus();
+					return true;
+				}
+
+				return false;
+			})
+		);
+
 		sender.match<M.OpenWindow>(MT.OpenWindow, Matchers.openWindow(context));
 		sender.match<M.Paste>(MT.Paste, Matchers.paste(context));
 		sender.match<M.Save>(MT.Save, Matchers.save(context, { passive: false }));
@@ -337,6 +352,14 @@ export class ElectronAdapter {
 		)).filter(
 			(item): item is { window: Electron.BrowserWindow; project: Project } =>
 				typeof item !== 'undefined' && typeof item.project !== 'undefined'
+		);
+	}
+
+	private async getProjectWindowByPath(
+		path: string
+	): Promise<{ project: Project; window: Electron.BrowserWindow } | undefined> {
+		return (await this.getProjectWindows()).find(
+			projectWindow => projectWindow.project.getPath() === path
 		);
 	}
 }

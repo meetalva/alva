@@ -76,11 +76,6 @@
       "icon": "document.icns",
       "role": "Editor",
       "isPackage": true
-    },
-    "publish": {
-      "provider": "s3",
-      "bucket": "electron-builder",
-      "endpoint": "http://localhost:9000"
     }
   },
   "standard-version": {

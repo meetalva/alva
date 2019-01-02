@@ -15,5 +15,6 @@ export * from './save-as';
 export * from './show-context-menu';
 export * from './show-error';
 export * from './show-message';
+export * from './show-update-details';
 export * from './use-file-request';
 export * from './use-file-response';

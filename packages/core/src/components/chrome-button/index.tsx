@@ -8,9 +8,19 @@ export interface ChromeButtonProps {
 	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
 	title: string;
 	icon?: React.ReactNode;
+	disabled?: boolean;
 }
 
-const StyledChromeButton = styled.div`
+interface StyledChromeButtonPRops {
+	onClick?: React.MouseEventHandler<HTMLElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
+	disabled?: boolean;
+}
+
+const StyledChromeButton =
+	styled.div <
+	StyledChromeButtonPRops >
+	`
 	display: flex;
 	padding: 0 ${getSpace(SpaceSize.S)}px;
 	align-items: center;
@@ -23,6 +33,7 @@ const StyledChromeButton = styled.div`
 	box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 0.5px 2px 0 rgba(0, 0, 0, 0.3);
 	color: ${Color.Grey50};
 	white-space: nowrap;
+	opacity: ${props => (props.disabled ? 0.5 : 1)};
 
 	&:active {
 		background: ${Color.Grey90};
@@ -34,7 +45,11 @@ const StyledIcon = styled.div`
 `;
 
 export const ChromeButton: React.StatelessComponent<ChromeButtonProps> = props => (
-	<StyledChromeButton {...props}>
+	<StyledChromeButton
+		onClick={props.onClick}
+		onDoubleClick={props.onDoubleClick}
+		disabled={props.disabled}
+	>
 		{props.icon && <StyledIcon>{props.icon}</StyledIcon>}
 		<div>{props.title}</div>
 	</StyledChromeButton>

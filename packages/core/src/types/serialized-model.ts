@@ -1,6 +1,7 @@
 import * as PatternProperty from './pattern-property';
 import * as Types from './types';
 import * as UserStore from './user-store';
+import { UpdateInfo } from './updater';
 
 export enum PatternOrigin {
 	BuiltIn = 'built-in',

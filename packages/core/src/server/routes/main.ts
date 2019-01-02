@@ -9,7 +9,8 @@ export function mainRouteFactory(server: Types.AlvaServer): Express.RequestHandl
 			RendererDocument.rendererDocument({
 				payload: {
 					host: server.host.type,
-					view: Types.AlvaView.SplashScreen
+					view: Types.AlvaView.SplashScreen,
+					update: await server.dataHost.getUpdate()
 				}
 			})
 		);

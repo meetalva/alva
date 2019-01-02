@@ -67,4 +67,16 @@ export class BrowserDataHost implements Types.DataHost {
 	public async getConnections(project: Model.Project): Promise<{ id: string; path: string }[]> {
 		return [];
 	}
+
+	public async setUpdate(update: Types.UpdateInfo): Promise<void> {
+		/** */
+	}
+
+	public async removeUpdate(): Promise<void> {
+		/** */
+	}
+
+	public async getUpdate(): Promise<Types.UpdateInfo | undefined> {
+		return undefined;
+	}
 }

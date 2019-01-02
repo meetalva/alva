@@ -2,6 +2,7 @@ import * as Mobx from 'mobx';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 import * as M from '../message';
+import { sortBy } from 'lodash';
 
 export interface AlvaAppInit {
 	id?: string;
@@ -57,6 +58,8 @@ export class AlvaApp {
 
 	@Mobx.observable private hasFocusedInput: boolean = false;
 
+	@Mobx.observable private udpate: Types.UpdateInfo | undefined;
+
 	private sender: Types.Sender;
 
 	public constructor(init: AlvaAppInit, ctx: { sender: Types.Sender }) {
@@ -90,6 +93,10 @@ export class AlvaApp {
 			},
 			ctx
 		);
+	}
+
+	public static fromSender(sender: Types.Sender): AlvaApp {
+		return new AlvaApp(AlvaApp.Defaults, { sender });
 	}
 
 	public hasFileAccess(): boolean {
@@ -203,6 +210,15 @@ export class AlvaApp {
 	@Mobx.action
 	public setState(state: Types.AppState): void {
 		this.state = state;
+	}
+
+	@Mobx.action
+	public setUpdate(update: Types.UpdateInfo): void {
+		this.udpate = update;
+	}
+
+	public getUpdate(): Types.UpdateInfo | undefined {
+		return this.udpate;
 	}
 
 	public setSender(sender: Types.Sender): void {

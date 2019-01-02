@@ -21,6 +21,7 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 	sender.match<M.KeyboardChange>(M.MessageType.KeyboardChange, Handlers.keyboardChange(ctx));
 	sender.match<M.ProjectRequest>(M.MessageType.ProjectRequest, Handlers.projectRequest(ctx));
 	sender.match<M.ChangeUserStore>(M.MessageType.ChangeUserStore, Handlers.changeUserStore(ctx));
+	sender.match<M.UpdateDownloaded>(M.MessageType.UpdateDownloaded, Handlers.updateDownloaded(ctx));
 
 	app.match<M.SaveResult>(M.MessageType.SaveResult, Handlers.save(ctx));
 

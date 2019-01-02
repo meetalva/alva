@@ -52,6 +52,8 @@ export interface HostSelectSaveFileOptions {
 }
 
 export interface HostMessageButton {
+	selected?: boolean;
+	cancel?: boolean;
 	id?: string;
 	label: string;
 	message?: Message.Message;
@@ -161,11 +163,11 @@ export abstract class Host {
 
 export abstract class DataHost {
 	public async addProject(project: Model.Project): Promise<void> {
-		throw new Error('context.addProject: not implemented');
+		throw new Error('DataHost.addProject: not implemented');
 	}
 
 	public async getProject(id: string): Promise<Model.Project | undefined> {
-		throw new Error('context.getProject: not implemented');
+		throw new Error('DataHost.getProject: not implemented');
 	}
 
 	public async addConnection(
@@ -175,11 +177,23 @@ export abstract class DataHost {
 			path: string;
 		}
 	): Promise<void> {
-		throw new Error('context.addConnection: not implemented');
+		throw new Error('DataHost.addConnection: not implemented');
 	}
 
 	public async getConnections(project: Model.Project): Promise<{ id: string; path: string }[]> {
-		throw new Error('context.getConnections: not implemented');
+		throw new Error('DataHost.getConnections: not implemented');
+	}
+
+	public async setUpdate(update: Types.UpdateInfo): Promise<void> {
+		throw new Error('DataHost.getConnections: not implemented');
+	}
+
+	public async removeUpdate(): Promise<void> {
+		throw new Error('DataHost.getConnections: not implemented');
+	}
+
+	public async getUpdate(): Promise<Types.UpdateInfo | undefined> {
+		throw new Error('DataHost.getConnections: not implemented');
 	}
 }
 

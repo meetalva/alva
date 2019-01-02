@@ -11,6 +11,7 @@ export const GlobalStyle = createGlobalStyle`
 		background-color: ${Color.Grey97};
 		font-family: ${fonts().NORMAL_FONT};
 		font-size: 12px;
+		min-width: 720px;
 	}
 
 	.dnd-poly-drag-image {

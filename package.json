@@ -14,7 +14,11 @@
     "type": "git",
     "url": "git+https://github.com/meetalva/alva.git"
   },
-  "author": "",
+  "author": {
+    "email": "hey@meetalva.io",
+    "name": "Meet Alva Team",
+    "url": "https://meetalva.io/"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/meetalva/alva/issues"
@@ -51,6 +55,7 @@
   ],
   "resolutions": {
     "**/acorn": "5.7.3",
+    "**/source-map-support": "npm:@marionebl/source-map-support",
     "**/typescript": "3.2.2"
   }
 }

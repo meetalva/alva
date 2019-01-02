@@ -9,3 +9,4 @@ export * from './hosts';
 export * from './server';
 export * from './sender';
 export * from './menu';
+export * from './updater';

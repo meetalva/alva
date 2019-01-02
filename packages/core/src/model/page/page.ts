@@ -5,6 +5,7 @@ import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 import { PatternLibrary } from '../pattern-library';
+import { PlaceholderPosition } from '../../components';
 
 export interface PageInit {
 	active: boolean;
@@ -117,7 +118,7 @@ export class Page {
 				forcedOpen: false,
 				focused: false,
 				patternId: rootPattern.getId(),
-				placeholderHighlighted: false,
+				placeholderHighlighted: PlaceholderPosition.None,
 				propertyValues: [],
 				role: Types.ElementRole.Root,
 				setDefaults: true,

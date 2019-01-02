@@ -14,21 +14,22 @@ interface StyledTargetSignalProps {
 const TARGET_SIGNAL_SCALE = (props: StyledTargetSignalProps): number => (props.visible ? 1 : 0);
 
 const StyledTargetSignal = styled.div`
-	position: relative;
+	position: absolute;
 	height: ${getSpace(SpaceSize.S)}px;
-	width: 100%;
+	width: calc(100% - ${getSpace(SpaceSize.L)}px);
 	margin-top: -${getSpace(SpaceSize.XS)}px;
 	margin-bottom: -${getSpace(SpaceSize.XS)}px;
+	left: ${getSpace(SpaceSize.L)}px;
 	z-index: 10;
 
 	&::before {
 		content: '';
 		display: block;
 		position: absolute;
+		top: 3px;
 		height: 6px;
 		width: 6px;
 		left: 0;
-		top: 3px;
 		border-radius: 3px;
 		background: ${Color.Blue40};
 		transform: scale(${TARGET_SIGNAL_SCALE});
@@ -40,9 +41,10 @@ const StyledTargetSignal = styled.div`
 		content: '';
 		display: block;
 		position: absolute;
+		right: 0;
+		left: ${getSpace(SpaceSize.XS)};
 		height: 2px;
 		width: calc(100% - 6px);
-		left: ${getSpace(SpaceSize.XS)};
 		top: 5px;
 		background: ${Color.Blue40};
 		transform: scaleY(${TARGET_SIGNAL_SCALE});

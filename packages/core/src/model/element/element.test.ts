@@ -1,6 +1,7 @@
 import { Element } from './element';
 import { Project } from '../project';
 import { ModelName } from '../../types';
+import { PlaceholderPosition } from '../../components';
 
 jest.mock('../project', () => {
 	class MockProject {
@@ -24,7 +25,7 @@ test('getPropertyValue should reflect initialized propertyValues', () => {
 			id: 'id',
 			name: 'name',
 			patternId: 'pattern-id',
-			placeholderHighlighted: false,
+			placeholderHighlighted: PlaceholderPosition.None,
 			containerId: 'container-id',
 			contentIds: [],
 			open: false,
@@ -51,7 +52,7 @@ test('getPropertyValue should reflect initialized propertyValues', () => {
 			id: 'id',
 			name: 'name',
 			patternId: 'pattern-id',
-			placeholderHighlighted: false,
+			placeholderHighlighted: PlaceholderPosition.None,
 			containerId: 'container-id',
 			contentIds: [],
 			open: false,
@@ -72,7 +73,7 @@ test('getPropertyValue should reflect initialized propertyValues', () => {
 			id: 'id',
 			name: 'name',
 			patternId: 'pattern-id',
-			placeholderHighlighted: false,
+			placeholderHighlighted: PlaceholderPosition.None,
 			containerId: 'container-id',
 			contentIds: [],
 			open: false,

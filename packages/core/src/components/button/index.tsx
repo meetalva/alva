@@ -17,6 +17,7 @@ export interface ButtonProps {
 	size?: ButtonSize;
 	textColor?: Color;
 	as?: keyof JSX.IntrinsicElements;
+	style?: React.CSSProperties;
 }
 
 export enum ButtonOrder {
@@ -94,6 +95,11 @@ const SizedBaseButton = styled(DecoratedBaseButton)`
 `;
 
 const StyledPrimaryButton = styled(SizedBaseButton)`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+	text-align: center;
 	background: ${props => (props.inverted ? Color.White : Color.Blue20)};
 	border-color: ${props => (props.inverted ? Color.White : Color.Blue20)};
 	color: ${props => (props.inverted ? Color.Blue20 : Color.White)};
@@ -106,6 +112,11 @@ const StyledPrimaryButton = styled(SizedBaseButton)`
 `;
 
 const StyledSecondaryButton = styled(SizedBaseButton)`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+	text-align: center;
 	background: transparent;
 	border-color: ${Color.Grey50};
 	color: ${Color.Grey50};
@@ -117,6 +128,11 @@ const StyledSecondaryButton = styled(SizedBaseButton)`
 `;
 
 const StyledTertiaryButton = styled(SizedBaseButton)`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+	text-align: center;
 	background: transparent;
 	border-color: ${Color.Grey90};
 	color: ${Color.Grey36};
@@ -151,7 +167,7 @@ export const Button: React.StatelessComponent<ButtonProps> = props => {
 			buttonRole={props.buttonRole}
 			size={props.size}
 			inverted={props.inverted}
-			style={{ color: props.textColor }}
+			style={{ color: props.textColor, ...props.style }}
 			disabled={props.disabled}
 			as={props.as}
 		>

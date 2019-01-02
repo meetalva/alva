@@ -2,28 +2,19 @@ import * as ConvertColor from 'color';
 import { Color } from '../../components/colors';
 import * as Electron from 'electron';
 import * as electronIsDev from 'electron-is-dev';
+import { HostWindowOptions, HostWindowVariant } from '../../types';
 
-export async function createWindow(address: string): Promise<Electron.BrowserWindow> {
-	const win = new Electron.BrowserWindow({
-		minWidth: 780,
-		minHeight: 380,
-		titleBarStyle: 'hiddenInset',
-		backgroundColor: ConvertColor(Color.Grey97)
-			.hex()
-			.toString(),
-		title: 'Alva',
-		webPreferences: {
-			nodeIntegration: false,
-			preload: require.resolve('./create-window-preload')
-		}
-	});
+export async function createWindow(options: HostWindowOptions): Promise<Electron.BrowserWindow> {
+	const windowOptions = getWindowVariant(options.variant);
+	const win = new Electron.BrowserWindow(windowOptions);
 
-	win.maximize();
-	win.loadURL(address);
+	if (options.variant === HostWindowVariant.Normal) {
+		win.maximize();
+	}
 
-	win.webContents.on('new-window', e => {
-		e.preventDefault();
-	});
+	win.loadURL(options.address);
+
+	win.webContents.on('new-window', e => e.preventDefault());
 
 	// Install development tools in dev mode
 	if (electronIsDev) {
@@ -42,4 +33,42 @@ export async function createWindow(address: string): Promise<Electron.BrowserWin
 	}
 
 	return win;
+}
+
+function getWindowVariant(variant: HostWindowVariant): Electron.BrowserWindowConstructorOptions {
+	const shared: Partial<Electron.BrowserWindowConstructorOptions> = {
+		titleBarStyle: 'hiddenInset',
+		title: 'Alva',
+		webPreferences: {
+			nodeIntegration: false,
+			preload: require.resolve('./create-window-preload')
+		}
+	};
+
+	switch (variant) {
+		case HostWindowVariant.Splashscreen:
+			return {
+				height: 520,
+				width: 980,
+				backgroundColor: ConvertColor(Color.White)
+					.hex()
+					.toString(),
+				resizable: false,
+				minimizable: false,
+				maximizable: false,
+				fullscreenable: false,
+				center: true,
+				...shared
+			};
+		case HostWindowVariant.Normal:
+		default:
+			return {
+				minWidth: 780,
+				minHeight: 380,
+				backgroundColor: ConvertColor(Color.Grey97)
+					.hex()
+					.toString(),
+				...shared
+			};
+	}
 }

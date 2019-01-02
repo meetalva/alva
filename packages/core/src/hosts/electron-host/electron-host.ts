@@ -37,8 +37,8 @@ export class ElectronHost implements Types.Host {
 		return new ElectronHost(init);
 	}
 
-	public async createWindow(address: string): Promise<Electron.BrowserWindow> {
-		const win = await createWindow(address);
+	public async createWindow(options: Types.HostWindowOptions): Promise<Electron.BrowserWindow> {
+		const win = await createWindow(options);
 		this.windows.set(win.id, win);
 
 		/* win.on('close', async e => {

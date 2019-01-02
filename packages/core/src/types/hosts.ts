@@ -66,6 +66,16 @@ export interface HostMessageOptions {
 	buttons: HostMessageButton[];
 }
 
+export enum HostWindowVariant {
+	Splashscreen,
+	Normal
+}
+
+export interface HostWindowOptions {
+	address: string;
+	variant: HostWindowVariant;
+}
+
 export abstract class Host {
 	public type: Types.HostType = Types.HostType.Unknown;
 
@@ -136,7 +146,7 @@ export abstract class Host {
 		throw new Error('host.readClipboard: not implemented');
 	}
 
-	public async createWindow(url: string): Promise<Electron.BrowserWindow | undefined> {
+	public async createWindow(opts: HostWindowOptions): Promise<Electron.BrowserWindow | undefined> {
 		throw new Error('host.createWindow: not implemented');
 	}
 

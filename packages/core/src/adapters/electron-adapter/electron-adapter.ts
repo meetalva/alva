@@ -10,6 +10,7 @@ import { AlvaApp, Project } from '../../model';
 import * as Serde from '../../sender/serde';
 import * as uuid from 'uuid';
 import * as Url from 'url';
+import { HostWindowVariant } from '../../types';
 
 const throat = require('throat');
 
@@ -47,7 +48,10 @@ export class ElectronAdapter {
 
 		Electron.app.on('activate', async () => {
 			if (process.platform === 'darwin' && this.windows.size === 0) {
-				await host.createWindow(server.location.origin);
+				await host.createWindow({
+					address: server.location.origin,
+					variant: HostWindowVariant.Splashscreen
+				});
 			}
 		});
 
@@ -253,7 +257,10 @@ export class ElectronAdapter {
 			}
 
 			const project = Project.from((m.payload.project as Types.ProjectPayloadSuccess).contents);
-			await host.createWindow(`${server.location.origin}/project/${project.getId()}`);
+			await host.createWindow({
+				address: `${server.location.origin}/project/${project.getId()}`,
+				variant: HostWindowVariant.Normal
+			});
 		});
 
 		server.sender.match<M.Maximize>(MT.Maximize, async m => {
@@ -266,7 +273,10 @@ export class ElectronAdapter {
 
 		// Open the splash screen when starting without file
 		if (!opts || !opts.filePath) {
-			await host.createWindow(server.location.origin);
+			await host.createWindow({
+				address: server.location.origin,
+				variant: HostWindowVariant.Splashscreen
+			});
 		} else {
 			this.server.sender.send({
 				type: MT.OpenFileRequest,

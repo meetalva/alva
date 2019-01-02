@@ -16,9 +16,10 @@ const TARGET_SIGNAL_SCALE = (props: StyledTargetSignalProps): number => (props.v
 const StyledTargetSignal = styled.div`
 	position: absolute;
 	height: ${getSpace(SpaceSize.S)}px;
-	width: 100%;
+	width: calc(100% - ${getSpace(SpaceSize.L)}px);
 	margin-top: -${getSpace(SpaceSize.XS)}px;
 	margin-bottom: -${getSpace(SpaceSize.XS)}px;
+	left: ${getSpace(SpaceSize.L)}px;
 	z-index: 10;
 
 	&::before {

@@ -53,6 +53,10 @@ jobs:
     steps:
       - checkout
 
+      - run:
+          name: Install yarn
+          command: yarn global add yarn@1.12.3
+
       - restore_cache:
           keys:
           - v5-dependencies-macos-{{ checksum "yarn.lock" }}

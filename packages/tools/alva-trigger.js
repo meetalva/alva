@@ -6,7 +6,7 @@ const yargs = require('yargs-parser');
 const SHA1 = process.env.CIRCLE_SHA1;
 const TAG = process.env.CIRCLE_TAG;
 const PR_NUMBER = process.env.CI_PULL_REQUEST ? Path.basename(process.env.CI_PULL_REQUEST) : '';
-const CHANNEL = PR_NUMBER ? `issue${PR_NUMBER}` : `branch${process.env.CIRCLE_BRANCH}`;
+const CHANNEL = PR_NUMBER ? `issue-${PR_NUMBER}` : `branch-${process.env.CIRCLE_BRANCH}`;
 
 async function main(cli) {
 	if (!cli.project) {

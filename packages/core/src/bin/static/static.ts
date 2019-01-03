@@ -41,7 +41,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 		nodeHost.log(`Starting static server for ${path} on port ${port}...`);
 
 		server.listen(port, () => {
-			nodeHost.log(`Running at http://127.0.01:${port}`);
+			nodeHost.log(`Running at http://127.0.0.1:${port}`);
 		});
 	}
 
@@ -58,7 +58,7 @@ async function main(forced?: ForcedFlags): Promise<void> {
 
 	if (projectResult) {
 		const p = projectResult.result;
-		nodeHost.log(`Embedding ${p.getName()} at http://127.0.01:${port}/project/${p.getId()}`);
+		nodeHost.log(`Embedding ${p.getName()} at http://127.0.0.1:${port}/project/${p.getId()}`);
 	}
 
 	await build({ path, host: nodeHost, project: projectResult ? projectResult.result : undefined });

@@ -31,11 +31,11 @@ export class AlvaServer implements Types.AlvaServer {
 	public readonly interface?: string;
 
 	public get address(): string {
-		return `http://127.0.01:${this.port}/`;
+		return `http://127.0.0.1:${this.port}/`;
 	}
 
 	public get endpoint(): string {
-		return `ws://127.0.01:${this.port}/`;
+		return `ws://127.0.0.1:${this.port}/`;
 	}
 
 	public get location(): Types.Location {
@@ -44,10 +44,10 @@ export class AlvaServer implements Types.AlvaServer {
 
 		return {
 			hash: '',
-			host: `127.0.01${port}`,
-			hostname: '127.0.01',
-			href: `http://127.0.01${port}`,
-			origin: `http://127.0.01${port}`,
+			host: `127.0.0.1${port}`,
+			hostname: '127.0.0.1',
+			href: `http://127.0.0.1${port}`,
+			origin: `http://127.0.0.1${port}`,
 			pathname: '/',
 			port: stringPort,
 			protocol: 'http:',
@@ -130,7 +130,7 @@ export class AlvaServer implements Types.AlvaServer {
 		const http = Http.createServer(app);
 		const ws = new WS.Server({ server: http });
 
-		const serverInterface = flags.localhost !== false ? '127.0.01' : undefined;
+		const serverInterface = flags.localhost !== false ? '127.0.0.1' : undefined;
 
 		return new AlvaServer({
 			app,

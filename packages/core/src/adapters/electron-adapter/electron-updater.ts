@@ -4,6 +4,7 @@ import * as AU from 'electron-updater';
 import * as uuid from 'uuid';
 import * as isDev from 'electron-is-dev';
 import * as Path from 'path';
+import * as semver from 'semver';
 
 export class ElectronUpdater {
 	private readonly server: Types.AlvaServer;
@@ -85,7 +86,10 @@ export class ElectronUpdater {
 		try {
 			const updateInfo = await this.updater.checkForUpdates();
 
-			if (updateInfo !== null) {
+			if (
+				updateInfo !== null &&
+				semver.gt(updateInfo.versionInfo.version, this.updater.currentVersion)
+			) {
 				return { status: Types.UpdateCheckStatus.Available, info: updateInfo.updateInfo };
 			}
 

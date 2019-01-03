@@ -11,6 +11,7 @@ import * as Serde from '../../sender/serde';
 import * as uuid from 'uuid';
 import * as Url from 'url';
 import { HostWindowVariant } from '../../types';
+import * as Mobx from 'mobx';
 
 const throat = require('throat');
 
@@ -284,6 +285,21 @@ export class ElectronAdapter {
 			if (win) {
 				win.maximize();
 			}
+		});
+
+		server.sender.match<M.SaveResult>(MT.SaveResult, () => this.server.dataHost.checkProjects());
+		server.sender.match<M.UseFileResponse>(MT.UseFileResponse, () =>
+			this.server.dataHost.checkProjects()
+		);
+
+		Mobx.autorun(async () => {
+			server.sender.send({
+				type: MT.ProjectRecordsChanged,
+				id: uuid.v4(),
+				payload: {
+					projects: await this.server.dataHost.getProjects()
+				}
+			});
 		});
 
 		// Open the splash screen when starting without file

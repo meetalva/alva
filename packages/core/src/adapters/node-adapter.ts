@@ -2,6 +2,8 @@ import * as Types from '../types';
 import * as Matchers from '../matchers';
 import * as M from '../message';
 import { MessageType as MT } from '../message';
+import * as Mobx from 'mobx';
+import * as uuid from 'uuid';
 
 export class NodeAdapter {
 	private host: Types.Host;
@@ -49,5 +51,18 @@ export class NodeAdapter {
 		sender.match<M.UseFileResponse>(MT.UseFileResponse, Matchers.useFileResponse(context));
 		sender.match<M.ContextMenuRequest>(MT.ContextMenuRequest, Matchers.showContextMenu(context));
 		sender.match<M.ChangeApp>(MT.ChangeApp, Matchers.addApp(context));
+
+		sender.match<M.SaveResult>(MT.SaveResult, () => this.dataHost.checkProjects());
+		sender.match<M.UseFileResponse>(MT.UseFileResponse, () => this.dataHost.checkProjects());
+
+		Mobx.autorun(async () => {
+			sender.send({
+				type: MT.ProjectRecordsChanged,
+				id: uuid.v4(),
+				payload: {
+					projects: await this.dataHost.getProjects()
+				}
+			});
+		});
 	}
 }

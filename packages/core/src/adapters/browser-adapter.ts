@@ -7,6 +7,7 @@ import { BrowserDataHost } from '../hosts/browser-data-host';
 import * as Matchers from '../matchers/browser';
 import * as Fs from 'fs';
 import * as uuid from 'uuid';
+import * as Mobx from 'mobx';
 
 export class BrowserAdapter {
 	public readonly sender: Types.Sender;
@@ -88,6 +89,19 @@ export class BrowserAdapter {
 			if (senders.includes(this.sender.id)) {
 				this.host.reload();
 			}
+		});
+
+		this.sender.match<M.SaveResult>(MT.SaveResult, () => this.dataHost.checkProjects());
+		this.sender.match<M.UseFileResponse>(MT.UseFileResponse, () => this.dataHost.checkProjects());
+
+		Mobx.autorun(async () => {
+			this.sender.send({
+				type: MT.ProjectRecordsChanged,
+				id: uuid.v4(),
+				payload: {
+					projects: await this.dataHost.getProjects()
+				}
+			});
 		});
 	}
 }

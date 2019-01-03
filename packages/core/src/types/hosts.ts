@@ -203,6 +203,10 @@ export abstract class DataHost {
 		throw new Error('context.getProjects: not implemented');
 	}
 
+	public async checkProjects(): Promise<ProjectRecord[]> {
+		throw new Error('context.checkProjects: not implemented');
+	}
+
 	public async addConnection(
 		project: Model.Project,
 		opts: {

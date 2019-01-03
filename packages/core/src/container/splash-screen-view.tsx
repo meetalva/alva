@@ -33,15 +33,15 @@ export class SplashScreenView extends React.Component<SplashScreenProps> {
 				</C.SplashScreenSlotRight>
 				<C.SplashScreenSlotBottom>
 					<C.ButtonGroup>
-						<C.ButtonGroup.ButtonLeft>
+						<C.ButtonGroup.ButtonLeft>{props.openFileSlot}</C.ButtonGroup.ButtonLeft>
+						<C.ButtonGroup.ButtonRight>
 							<C.ButtonGroupButton
 								onClick={props.onCreateClick}
 								style={{ width: '50%', height: 42 }}
 							>
 								Create File
 							</C.ButtonGroupButton>
-						</C.ButtonGroup.ButtonLeft>
-						<C.ButtonGroup.ButtonRight>{props.openFileSlot}</C.ButtonGroup.ButtonRight>
+						</C.ButtonGroup.ButtonRight>
 					</C.ButtonGroup>
 				</C.SplashScreenSlotBottom>
 			</C.SplashScreen>

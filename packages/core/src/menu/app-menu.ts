@@ -52,18 +52,6 @@ export const appMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				}
 			},
 			{
-				id: ids.updates,
-				label: 'Check for Updates',
-				visible: isElectron,
-				click: sender => {
-					sender.send({
-						id: uuid.v4(),
-						payload: undefined,
-						type: MessageType.CheckForUpdatesRequest
-					});
-				}
-			},
-			{
 				id: uuid.v4(),
 				type: 'separator',
 				visible: isElectron

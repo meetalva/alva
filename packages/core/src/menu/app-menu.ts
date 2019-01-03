@@ -25,30 +25,27 @@ export const appMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 		submenu: [
 			{
 				label: 'About Alva',
-				role: 'about',
 				id: ids.about,
 				click: sender => {
-					setTimeout(() => {
-						if (isElectron || !ctx.app) {
-							return;
-						}
+					if (!ctx.app) {
+						return;
+					}
 
-						sender.send({
-							id: uuid.v4(),
-							payload: {
-								message: `Alva – v${pkg.version}`,
-								detail: [
-									'',
-									pkg.description,
-									'',
-									`Host: ${ctx.app.getHostType()}`,
-									`License: ${pkg.license}`
-								].join('\n'),
-								buttons: []
-							},
-							type: MessageType.ShowMessage
-						});
-					}, 100);
+					sender.send({
+						id: uuid.v4(),
+						payload: {
+							message: `Alva – v${pkg.version}`,
+							detail: [
+								'',
+								pkg.description,
+								'',
+								`Host: ${ctx.app.getHostType()}`,
+								`License: ${pkg.license}`
+							].join('\n'),
+							buttons: []
+						},
+						type: MessageType.ShowMessage
+					});
 				}
 			},
 			{

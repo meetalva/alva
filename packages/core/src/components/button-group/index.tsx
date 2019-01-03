@@ -9,10 +9,6 @@ const StyledButtonGroup = styled.div`
 	width: 100%;
 	border-top: 1px solid ${Color.Grey90};
 
-	&:active {
-		background: ${Color.Grey97};
-	}
-
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-top-width: 0.5px;
 	}

@@ -18,7 +18,6 @@ export const StyledContainer = styled.div`
 	grid-template-columns: 1.75fr 1fr;
 	grid-template-rows: auto 44px;
 	align-items: stretch;
-	-webkit-app-region: drag;
 `;
 
 export const StyledSection =

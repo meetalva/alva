@@ -5,6 +5,7 @@ import { Persistence } from '../persistence';
 import * as Fs from 'fs';
 import { sortBy } from 'lodash';
 import * as Mobx from 'mobx';
+import { pathExists } from 'fs-extra';
 
 export class LocalDataHost implements Types.DataHost {
 	private host: Types.Host;
@@ -112,13 +113,16 @@ export class LocalDataHost implements Types.DataHost {
 					this.host.type === Types.HostType.Electron
 						? !Path.relative(tempPath, path).startsWith('../')
 						: true;
+				const displayPath = Path.dirname(
+					path.replace(new RegExp(`^(${tempPath}|${userPath})`), '~')
+				);
 
 				return {
 					draft,
 					editDate,
 					id,
 					path,
-					displayPath: path.replace(new RegExp(`^(${tempPath}|${userPath})`), '~'),
+					displayPath,
 					name: draft ? 'Draft' : Path.basename(path, Path.extname(path)),
 					valid
 				};

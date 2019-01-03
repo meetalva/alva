@@ -60,6 +60,9 @@
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true
     },
+    "portable": {
+      "artifactName": "${productName}-portable-${version}.${ext}"
+    },
     "linux": {
       "artifactName": "${productName}-${version}.${ext}",
       "executableName": "Alva",
@@ -67,6 +70,12 @@
         "appimage",
         "snap",
         "deb"
+      ]
+    },
+    "win": {
+      "target": [
+        "portable",
+        "nsis"
       ]
     },
     "fileAssociations": {

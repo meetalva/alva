@@ -186,6 +186,7 @@
     "mobx-utils": "5.1.0",
     "mock-fs": "4.4.2",
     "monaco-editor": "0.13.1",
+    "path-is-inside": "^1.0.2",
     "pkg-dir": "3.0.0",
     "precinct": "5.0.1",
     "re-resizable": "4.4.8",

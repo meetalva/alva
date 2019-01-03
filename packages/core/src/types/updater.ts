@@ -1,7 +1,8 @@
 import { AlvaServer } from './server';
 
-export interface ElectronAdapterInit {
+export interface ElectronUpdaterInit {
 	server: AlvaServer;
+	force: boolean;
 }
 
 export enum UpdateCheckStatus {

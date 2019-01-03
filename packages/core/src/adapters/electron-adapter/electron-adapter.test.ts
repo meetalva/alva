@@ -54,7 +54,7 @@ jest.mock('electron', () => {
 test('reacts to asset read requests', async () => {
 	const server = await AlvaServer.fromHosts({} as any);
 
-	const adapter = new ElectronAdapter({ server });
+	const adapter = new ElectronAdapter({ server, forceUpdates: false });
 	await adapter.start();
 
 	const inMessage: M.Message = {
@@ -69,7 +69,7 @@ test('reacts to asset read requests', async () => {
 
 test('reacts to pattern library update request', async () => {
 	const server = await AlvaServer.fromHosts({} as any);
-	const adapter = new ElectronAdapter({ server });
+	const adapter = new ElectronAdapter({ server, forceUpdates: false });
 	await adapter.start();
 
 	const reqMsg: M.Message = {
@@ -87,7 +87,7 @@ test('reacts to pattern library update request', async () => {
 test('creates new splashscreen on start', async () => {
 	const server = await AlvaServer.fromHosts({} as any);
 
-	const adapter = new ElectronAdapter({ server });
+	const adapter = new ElectronAdapter({ server, forceUpdates: false });
 	await adapter.start();
 
 	expect((server as any).host.createWindow).toHaveBeenCalled();
@@ -96,7 +96,7 @@ test('creates new splashscreen on start', async () => {
 test('create no splashscreen on start with filePath', async () => {
 	const server = await AlvaServer.fromHosts({} as any);
 
-	const adapter = new ElectronAdapter({ server });
+	const adapter = new ElectronAdapter({ server, forceUpdates: false });
 	await adapter.start({ filePath: 'some-file' });
 
 	expect((server as any).host.createWindow).not.toHaveBeenCalled();

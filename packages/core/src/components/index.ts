@@ -15,6 +15,7 @@ export * from './fonts';
 export * from './global-styles';
 export * from './headline';
 export * from './icons';
+export * from './item';
 export * from './image';
 export * from './layout';
 export * from './layout-switch';

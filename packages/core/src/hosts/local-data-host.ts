@@ -2,10 +2,14 @@ import * as Types from '../types';
 import * as Model from '../model';
 import * as Path from 'path';
 import { Persistence } from '../persistence';
+import * as Fs from 'fs';
+import { sortBy } from 'lodash';
+import * as Mobx from 'mobx';
 
 export class LocalDataHost implements Types.DataHost {
 	private host: Types.Host;
 	private cache: Map<string, Model.Project> = new Map();
+	@Mobx.observable private projects: Types.ProjectRecord[] | undefined;
 
 	private constructor({ host }: { host: Types.Host }) {
 		this.host = host;
@@ -91,6 +95,47 @@ export class LocalDataHost implements Types.DataHost {
 		this.cache.set(project.getId(), project);
 
 		return project;
+	}
+
+	@Mobx.action
+	public async checkProjects(): Promise<Types.ProjectRecord[]> {
+		const memory = await this.readMemory();
+		const tempPath = await this.host.resolveFrom(Types.HostBase.AppData, '.');
+		const userPath = Path.dirname(await this.host.resolveFrom(Types.HostBase.UserData, '.'));
+
+		const projects = await Promise.all(
+			Object.entries(memory.projects).map(async ([id, path]) => {
+				const valid = await this.host.access(path, Fs.constants.R_OK);
+				const editDate = valid ? (await this.host.stat(path)).mtimeMs : undefined;
+
+				const draft =
+					this.host.type === Types.HostType.Electron
+						? !Path.relative(tempPath, path).startsWith('../')
+						: true;
+
+				return {
+					draft,
+					editDate,
+					id,
+					path,
+					displayPath: path.replace(new RegExp(`^(${tempPath}|${userPath})`), '~'),
+					name: draft ? 'Draft' : Path.basename(path, Path.extname(path)),
+					valid
+				};
+			})
+		);
+
+		const sortedProjects = sortBy(projects, ['editDate', 'name']).reverse();
+		this.projects = sortedProjects;
+		return sortedProjects;
+	}
+
+	public async getProjects(): Promise<Types.ProjectRecord[]> {
+		if (!this.projects) {
+			return this.checkProjects();
+		}
+
+		return this.projects;
 	}
 
 	public async addConnection(

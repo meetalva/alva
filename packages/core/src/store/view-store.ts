@@ -58,6 +58,8 @@ export class ViewStore {
 
 	@Mobx.observable private project?: Model.Project;
 
+	@Mobx.observable private projects: Types.ProjectRecord[] = [];
+
 	@Mobx.observable private serverPort?: number;
 
 	@Mobx.observable private sender: Sender;
@@ -585,6 +587,10 @@ export class ViewStore {
 		return this.project!;
 	}
 
+	public getProjects(): Types.ProjectRecord[] {
+		return this.projects;
+	}
+
 	public getSelectedElement(): Model.Element | undefined {
 		if (!this.project) {
 			return;
@@ -924,6 +930,11 @@ export class ViewStore {
 		this.project = project;
 		this.project.unsetHighlightedElement();
 		this.project.unsetSelectedElement();
+	}
+
+	@Mobx.action
+	public setProjects(projects: Types.ProjectRecord[]): void {
+		this.projects = projects;
 	}
 
 	@Mobx.action

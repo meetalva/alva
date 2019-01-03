@@ -8,6 +8,7 @@ export * from './create-new-page';
 export * from './highlight-element';
 export * from './keyboard-change';
 export * from './log';
+export * from './project-records-changed';
 export * from './project-request';
 export * from './save';
 export * from './select-element';

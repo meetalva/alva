@@ -3,20 +3,53 @@ import * as Model from '../model';
 import { Persistence } from '../persistence';
 import * as Path from 'path';
 import * as Store from '../store';
+import { sortBy } from 'lodash';
+import * as Mobx from 'mobx';
 
 export class BrowserDataHost implements Types.DataHost {
 	private host: Types.Host;
 	private store: Store.ViewStore;
+	@Mobx.observable private projects: Types.ProjectRecord[] | undefined;
 
 	public constructor({ host, store }: { host: Types.Host; store: Store.ViewStore }) {
 		this.host = host;
 		this.store = store;
 	}
 
+	private async readMemory(): Promise<{
+		projects: { [id: string]: string };
+		connections: { [id: string]: { id: string; path: string }[] };
+	}> {
+		const path = await this.host.resolveFrom(Types.HostBase.UserData, 'projects.json');
+		const file = await this.host.readFile(path).catch(() => undefined);
+		return Promise.resolve()
+			.then(() => (file ? JSON.parse(file.contents) : { projects: {}, connections: {} }))
+			.catch(() => ({ projects: {}, connections: {} }));
+	}
+
+	private async writeMemory(memory: {
+		projects: { [id: string]: string };
+		connections: { [id: string]: { id: string; path: string }[] };
+	}): Promise<void> {
+		const path = await this.host.resolveFrom(Types.HostBase.UserData, 'projects.json');
+		const parent = Path.dirname(path);
+
+		if (!await this.host.exists(parent)) {
+			await this.host.mkdir(parent);
+		}
+
+		return this.host.writeFile(path, JSON.stringify(memory));
+	}
+
 	public async addProject(project: Model.Project): Promise<void> {
+		const memory = await this.readMemory();
+		memory.projects[project.getId()] = project.getPath();
+		await this.writeMemory(memory);
+
 		const [, projectPath] = Buffer.from(project.getId(), 'base64')
 			.toString('utf-8')
 			.split(':');
+
 		const serialized = await Persistence.serialize(project);
 
 		if (serialized.state === Types.PersistenceState.Error) {
@@ -58,6 +91,40 @@ export class BrowserDataHost implements Types.DataHost {
 		}
 
 		return Model.Project.from(parsed.contents);
+	}
+
+	@Mobx.action
+	public async checkProjects(): Promise<Types.ProjectRecord[]> {
+		const memory = await this.readMemory();
+
+		const projects = await Promise.all(
+			Object.entries(memory.projects).map(async ([id, path]) => {
+				const valid = await this.host.exists(path);
+				const editDate = valid ? (await this.host.stat(path)).mtimeMs : undefined;
+
+				return {
+					draft: true,
+					editDate,
+					id,
+					path,
+					displayPath: '',
+					name: 'Draft',
+					valid
+				};
+			})
+		);
+
+		const sortedProjects = sortBy(projects, ['editDate', 'name']).reverse();
+		this.projects = sortedProjects;
+		return sortedProjects;
+	}
+
+	public async getProjects(): Promise<Types.ProjectRecord[]> {
+		if (!this.projects) {
+			return this.checkProjects();
+		}
+
+		return this.projects;
 	}
 
 	public async addConnection(): Promise<void> {

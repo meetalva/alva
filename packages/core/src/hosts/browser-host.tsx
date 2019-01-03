@@ -70,6 +70,22 @@ export class BrowserHost implements Types.Host {
 		});
 	}
 
+	public access(path: string, mode: number | undefined): Promise<boolean> {
+		return this.exists(path);
+	}
+
+	public async stat(path: string): Promise<Fs.Stats> {
+		return new Promise((resolve, reject) => {
+			this.fs!.stat(path, (err, stats) => {
+				if (err) {
+					return reject(err);
+				}
+
+				resolve(stats);
+			});
+		});
+	}
+
 	public async mkdir(path: string): Promise<void> {
 		const _mkdir = (p: string) =>
 			new Promise((resolve, reject) => {
@@ -194,8 +210,8 @@ export class BrowserHost implements Types.Host {
 		return clipboard.readText();
 	}
 
-	public async createWindow(address: string): Promise<undefined> {
-		window.open(address, '_blank');
+	public async createWindow(options: Types.HostWindowOptions): Promise<undefined> {
+		window.open(options.address, '_blank');
 		return;
 	}
 

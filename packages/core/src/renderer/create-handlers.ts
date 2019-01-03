@@ -20,6 +20,10 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 	sender.match<M.SelectElement>(M.MessageType.SelectElement, Handlers.selectElement(ctx));
 	sender.match<M.KeyboardChange>(M.MessageType.KeyboardChange, Handlers.keyboardChange(ctx));
 	sender.match<M.ProjectRequest>(M.MessageType.ProjectRequest, Handlers.projectRequest(ctx));
+	sender.match<M.ProjectRecordsChanged>(
+		M.MessageType.ProjectRecordsChanged,
+		Handlers.projectRecordsChanged(ctx)
+	);
 	sender.match<M.ChangeUserStore>(M.MessageType.ChangeUserStore, Handlers.changeUserStore(ctx));
 	sender.match<M.UpdateDownloaded>(M.MessageType.UpdateDownloaded, Handlers.updateDownloaded(ctx));
 

@@ -7,7 +7,6 @@ import styled from 'styled-components';
 const StyledButtonGroup = styled.div`
 	display: flex;
 	width: 100%;
-	margin-top: ${getSpace(SpaceSize.XS)}px;
 	border-top: 1px solid ${Color.Grey90};
 
 	&:active {

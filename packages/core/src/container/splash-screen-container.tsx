@@ -1,81 +1,76 @@
-import * as Components from '../components';
+import { MessageType } from '../message';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
+import { SplashScreenView } from './splash-screen-view';
+import * as uuid from 'uuid';
 import { ViewStore } from '../store';
 import { FileInput } from './file-input';
-
-export interface SplashScreenProps {
-	onCreateClick?: React.MouseEventHandler<HTMLElement>;
-	onOpenClick?: React.MouseEventHandler<HTMLElement>;
-	onOpenFile?(result: string): void;
-	onGuideClick?: React.MouseEventHandler<HTMLElement>;
-}
+import * as C from '../components';
 
 @MobxReact.inject('store')
 @MobxReact.observer
-export class SplashScreenContainer extends React.Component<SplashScreenProps> {
-	public render(): JSX.Element | null {
-		const { props } = this;
-		const { store } = this.props as SplashScreenProps & { store: ViewStore };
-		const app = store.getApp();
+export class SplashScreenContainer extends React.Component {
+	public render(): JSX.Element {
+		const props = this.props as { store: ViewStore };
+		const app = props.store.getApp();
+		const transaction = uuid.v4();
+		const openFileRequestId = uuid.v4();
 
 		return (
-			<Components.SplashScreen>
-				<Components.SplashScreenSection type="primary">
-					<Components.Space sizeBottom={Components.SpaceSize.XXL}>
-						<Components.Headline
-							tagName="h1"
-							type="secondary"
-							textColor={Components.Color.Grey20}
-							order={2}
-						>
-							You’re new here?
-						</Components.Headline>
-						<Components.Headline type="primary" tagName="div" order={2}>
-							Get started with our easy-to-learn guides.
-						</Components.Headline>
-					</Components.Space>
-					<Components.Button
-						onClick={props.onGuideClick}
-						order={Components.ButtonOrder.Primary}
+			<SplashScreenView
+				openFileSlot={
+					<C.ButtonGroupButton
+						as={app.hasFileAccess() ? 'button' : 'label'}
+						onClick={() => {
+							app.send({
+								type: MessageType.OpenFileRequest,
+								transaction,
+								id: openFileRequestId,
+								payload: {
+									replace: false
+								}
+							});
+						}}
+						style={{ width: '50%', height: 42 }}
 					>
-						See Guides
-					</Components.Button>
-				</Components.SplashScreenSection>
-				<Components.SplashScreenSection type="secondary">
-					<Components.Headline
-						type="secondary"
-						tagName="h2"
-						textColor={Components.Color.Grey20}
-						order={3}
-					>
-						Create or Open
-					</Components.Headline>
-					<Components.Space sizeBottom={Components.SpaceSize.XXXL}>
-						<Components.Copy size={Components.CopySize.M} textColor={Components.Color.Grey20}>
-							Start using an existing Alva file with an included library or create a new one.
-						</Components.Copy>
-					</Components.Space>
-					<Components.Space sizeBottom={Components.SpaceSize.S}>
-						<Components.Button
-							onClick={props.onCreateClick}
-							order={Components.ButtonOrder.Secondary}
-						>
-							Create New Alva File
-						</Components.Button>
-					</Components.Space>
-					<Components.Link color={Components.Color.Grey50} onClick={props.onOpenClick}>
-						<label>
-							<Components.Copy size={Components.CopySize.S}>
-								Open Existing Alva File
-								{!app.hasFileAccess() && (
-									<FileInput accept=".alva" onChange={props.onOpenFile} />
-								)}
-							</Components.Copy>
-						</label>
-					</Components.Link>
-				</Components.SplashScreenSection>
-			</Components.SplashScreen>
+						Open File
+						{!app.hasFileAccess() && (
+							<FileInput
+								accept=".alva"
+								onChange={contents => {
+									app.send({
+										type: MessageType.UseFileRequest,
+										transaction,
+										id: openFileRequestId,
+										payload: {
+											silent: false,
+											replace: false,
+											contents
+										}
+									});
+								}}
+							/>
+						)}
+					</C.ButtonGroupButton>
+				}
+				onCreateClick={() => {
+					app.send({
+						type: MessageType.CreateNewFileRequest,
+						transaction,
+						id: uuid.v4(),
+						payload: {
+							replace: false
+						}
+					});
+				}}
+				onGuideClick={() => {
+					app.send({
+						type: MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: 'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
+					});
+				}}
+			/>
 		);
 	}
 }

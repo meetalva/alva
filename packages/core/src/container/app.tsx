@@ -7,11 +7,7 @@ import * as Types from '../types';
 import * as Menu from '../menu';
 import { ViewStore } from '../store';
 import * as ReactLoadable from 'react-loadable';
-
-const MenuContainer = ReactLoadable({
-	loader: () => import(/** webpackChunkName "menu" */ './menu').then(m => m.Menu),
-	loading: () => null
-});
+import { Menu as MenuContainer } from './menu';
 
 const ViewDetails = ReactLoadable({
 	loader: () =>
@@ -21,10 +17,10 @@ const ViewDetails = ReactLoadable({
 	loading: () => null
 });
 
-const ViewSplashscreen = ReactLoadable({
+const SplashScreenContainer = ReactLoadable({
 	loader: () =>
-		import(/** webpackChunkName "splash", webpackMode "eager" */ './view-splashscreen').then(
-			m => m.ViewSplashscreen
+		import(/** webpackChunkName "splash", webpackMode "eager" */ './splash-screen-container').then(
+			m => m.SplashScreenContainer
 		),
 	loading: () => null
 });
@@ -67,7 +63,7 @@ export class App extends React.Component {
 				<ChromeContainer />
 				<Components.MainArea>
 					<AppView view={Types.AlvaView.SplashScreen}>
-						<ViewSplashscreen />
+						<SplashScreenContainer />
 					</AppView>
 					<AppView view={Types.AlvaView.PageDetail}>
 						<ViewDetails />

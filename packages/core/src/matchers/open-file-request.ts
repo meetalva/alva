@@ -1,7 +1,10 @@
 import * as M from '../message';
 import * as T from '../types';
 
-export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFileRequest> {
+export function openFileRequest(
+	{ host }: T.MatcherContext,
+	intercept?: (path: string) => Promise<boolean>
+): T.Matcher<M.OpenFileRequest> {
 	return async m => {
 		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 
@@ -21,6 +24,10 @@ export function openFileRequest({ host }: T.MatcherContext): T.Matcher<M.OpenFil
 		const silent = m.payload && typeof m.payload.silent === 'boolean' ? m.payload.silent : false;
 
 		if (!selectedPath) {
+			return;
+		}
+
+		if (typeof intercept === 'function' && (await intercept(selectedPath))) {
 			return;
 		}
 

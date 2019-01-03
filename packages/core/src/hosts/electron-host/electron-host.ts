@@ -37,8 +37,8 @@ export class ElectronHost implements Types.Host {
 		return new ElectronHost(init);
 	}
 
-	public async createWindow(address: string): Promise<Electron.BrowserWindow> {
-		const win = await createWindow(address);
+	public async createWindow(options: Types.HostWindowOptions): Promise<Electron.BrowserWindow> {
+		const win = await createWindow(options);
 		this.windows.set(win.id, win);
 
 		/* win.on('close', async e => {
@@ -138,6 +138,30 @@ export class ElectronHost implements Types.Host {
 
 	public async exists(path: string): Promise<boolean> {
 		return Fs.existsSync(path);
+	}
+
+	public access(path: string, mode: number | undefined): Promise<boolean> {
+		return new Promise(resolve => {
+			Fs.access(path, mode, err => {
+				if (err) {
+					return resolve(false);
+				}
+
+				resolve(true);
+			});
+		});
+	}
+
+	public async stat(path: string): Promise<Fs.Stats> {
+		return new Promise((resolve, reject) => {
+			Fs.stat(path, (err, stats) => {
+				if (err) {
+					return reject(err);
+				}
+
+				resolve(stats);
+			});
+		});
 	}
 
 	public async mkdir(path: string): Promise<void> {

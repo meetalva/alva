@@ -5,10 +5,16 @@ export function openWindow({ host, location }: T.MatcherContext): T.Matcher<M.Op
 	return async message => {
 		switch (message.payload.view) {
 			case T.AlvaView.PageDetail:
-				await host.createWindow(`${location.origin}/project/${message.payload.projectId}`);
+				await host.createWindow({
+					address: `${location.origin}/project/${message.payload.projectId}`,
+					variant: T.HostWindowVariant.Normal
+				});
 				return;
 			case T.AlvaView.SplashScreen:
-				await host.createWindow(location.origin);
+				await host.createWindow({
+					address: location.origin,
+					variant: T.HostWindowVariant.Splashscreen
+				});
 				return;
 		}
 	};

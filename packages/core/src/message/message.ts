@@ -94,7 +94,8 @@ export enum MessageType {
 	ToggleDevTools = 'toggle-dev-tools',
 	OpenWindow = 'open-window',
 	ShowUpdateDetails = 'show-update-details',
-	InstallUpdate = 'install-update'
+	InstallUpdate = 'install-update',
+	ProjectRecordsChanged = 'project-records-changed'
 }
 
 export type Message =
@@ -189,7 +190,8 @@ export type Message =
 	| UpdateUnavailable
 	| UpdateDownload
 	| ShowUpdateDetails
-	| InstallUpdate;
+	| InstallUpdate
+	| ProjectRecordsChanged;
 
 export type CreateNewFileRequest = Envelope<MessageType.CreateNewFileRequest, { replace: boolean }>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -513,3 +515,8 @@ export type UpdateDownload = Envelope<MessageType.UpdateDownload, Types.UpdateIn
 export type ShowUpdateDetails = Envelope<MessageType.ShowUpdateDetails, Types.UpdateInfo>;
 
 export type InstallUpdate = EmptyEnvelope<MessageType.InstallUpdate>;
+
+export type ProjectRecordsChanged = Envelope<
+	MessageType.ProjectRecordsChanged,
+	{ projects: Types.ProjectRecord[] }
+>;

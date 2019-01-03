@@ -10,6 +10,8 @@ import { AlvaApp, Project } from '../../model';
 import * as Serde from '../../sender/serde';
 import * as uuid from 'uuid';
 import * as Url from 'url';
+import { HostWindowVariant } from '../../types';
+import * as Mobx from 'mobx';
 
 const throat = require('throat');
 
@@ -47,7 +49,10 @@ export class ElectronAdapter {
 
 		Electron.app.on('activate', async () => {
 			if (process.platform === 'darwin' && this.windows.size === 0) {
-				await host.createWindow(server.location.origin);
+				await host.createWindow({
+					address: server.location.origin,
+					variant: HostWindowVariant.Splashscreen
+				});
 			}
 		});
 
@@ -88,7 +93,22 @@ export class ElectronAdapter {
 		);
 		sender.match<M.ExportHtmlProject>(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));
 		sender.match<M.OpenExternalURL>(MT.OpenExternalURL, Matchers.openExternalUrl(context));
-		sender.match<M.OpenFileRequest>(MT.OpenFileRequest, Matchers.openFileRequest(context));
+
+		sender.match<M.OpenFileRequest>(
+			MT.OpenFileRequest,
+			Matchers.openFileRequest(context, async (path: string) => {
+				const projectWindow = await this.getProjectWindowByPath(path);
+
+				if (projectWindow) {
+					projectWindow.window.show();
+					projectWindow.window.focus();
+					return true;
+				}
+
+				return false;
+			})
+		);
+
 		sender.match<M.OpenWindow>(MT.OpenWindow, Matchers.openWindow(context));
 		sender.match<M.Paste>(MT.Paste, Matchers.paste(context));
 		sender.match<M.Save>(MT.Save, Matchers.save(context, { passive: false }));
@@ -253,7 +273,10 @@ export class ElectronAdapter {
 			}
 
 			const project = Project.from((m.payload.project as Types.ProjectPayloadSuccess).contents);
-			await host.createWindow(`${server.location.origin}/project/${project.getId()}`);
+			await host.createWindow({
+				address: `${server.location.origin}/project/${project.getId()}`,
+				variant: HostWindowVariant.Normal
+			});
 		});
 
 		server.sender.match<M.Maximize>(MT.Maximize, async m => {
@@ -264,9 +287,27 @@ export class ElectronAdapter {
 			}
 		});
 
+		server.sender.match<M.SaveResult>(MT.SaveResult, () => this.server.dataHost.checkProjects());
+		server.sender.match<M.UseFileResponse>(MT.UseFileResponse, () =>
+			this.server.dataHost.checkProjects()
+		);
+
+		Mobx.autorun(async () => {
+			server.sender.send({
+				type: MT.ProjectRecordsChanged,
+				id: uuid.v4(),
+				payload: {
+					projects: await this.server.dataHost.getProjects()
+				}
+			});
+		});
+
 		// Open the splash screen when starting without file
 		if (!opts || !opts.filePath) {
-			await host.createWindow(server.location.origin);
+			await host.createWindow({
+				address: server.location.origin,
+				variant: HostWindowVariant.Splashscreen
+			});
 		} else {
 			this.server.sender.send({
 				type: MT.OpenFileRequest,
@@ -327,6 +368,14 @@ export class ElectronAdapter {
 		)).filter(
 			(item): item is { window: Electron.BrowserWindow; project: Project } =>
 				typeof item !== 'undefined' && typeof item.project !== 'undefined'
+		);
+	}
+
+	private async getProjectWindowByPath(
+		path: string
+	): Promise<{ project: Project; window: Electron.BrowserWindow } | undefined> {
+		return (await this.getProjectWindows()).find(
+			projectWindow => projectWindow.project.getPath() === path
 		);
 	}
 }

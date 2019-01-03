@@ -136,6 +136,11 @@ const StyledTertiaryButton = styled(SizedBaseButton)`
 	background: transparent;
 	border-color: ${Color.Grey90};
 	color: ${Color.Grey36};
+
+	&:active {
+		background: ${Color.Grey90};
+		color: ${Color.Black};
+	}
 `;
 
 export type AnyButton =

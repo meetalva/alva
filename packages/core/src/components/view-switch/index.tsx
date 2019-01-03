@@ -6,7 +6,7 @@ import { EditableTitleState } from '../../types';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
-const { ChevronLeft, ChevronRight } = require('react-feather');
+import { ChevronLeft, ChevronRight } from 'react-feather';
 const tag = require('tag-hoc').default;
 
 export type JustifyType = 'start' | 'center' | 'end' | 'stretch';

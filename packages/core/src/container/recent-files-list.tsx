@@ -37,7 +37,7 @@ const RecentFileItem: React.SFC<RecentFileItemProps> = props => {
 			}}
 		>
 			<C.Item
-				icon={<Archive style={{ color: C.Color.Grey20 }} />}
+				icon={<Archive color={C.Color.Grey20} strokeWidth={1.5} size={18} />}
 				title={
 					<C.Copy textColor={C.Color.Grey20} size={C.CopySize.M}>
 						{project.name}
@@ -76,7 +76,7 @@ const RecentDraftItem: React.SFC<RecentFileItemProps> = props => {
 		>
 			<C.Item
 				key={project.id}
-				icon={<Edit style={{ color: C.Color.Grey60 }} />}
+				icon={<Edit color={C.Color.Grey60} strokeWidth={1.5} size={18} />}
 				title={
 					<C.Copy textColor={C.Color.Grey60} size={C.CopySize.M}>
 						{project.name}

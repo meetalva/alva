@@ -10,8 +10,7 @@ import * as PreviewDocument from '../preview-document/preview-document';
 import * as Types from '../types';
 import * as _ from 'lodash';
 import * as Model from '../model';
-
-const { Layout } = require('react-feather');
+import { Layout } from 'react-feather';
 
 export interface PreviewPaneProps {
 	isDragging: boolean;

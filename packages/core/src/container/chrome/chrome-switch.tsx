@@ -3,8 +3,7 @@ import * as React from 'react';
 import * as Components from '../../components';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
-
-const { Check, ChevronDown } = require('react-feather');
+import { Check, ChevronDown } from 'react-feather';
 const ReactSelectComponents = require('react-select').components;
 const OutsideClickHandler = require('react-outside-click-handler').default;
 

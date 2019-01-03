@@ -4,7 +4,7 @@ import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
-const Icon = require('react-feather');
+import { Search as SearchIcon } from 'react-feather';
 
 export interface SearchProps {
 	className?: string;
@@ -61,7 +61,7 @@ const StyledSearch = styled.input`
 	}
 `;
 
-const StyledIcon = styled(Icon.Search)`
+const StyledIcon = styled(SearchIcon)`
 	position: absolute;
 	left: ${getSpace(SpaceSize.M)}px;
 	top: ${getSpace(SpaceSize.M) - 1}px; /* fix to propertly align icon */

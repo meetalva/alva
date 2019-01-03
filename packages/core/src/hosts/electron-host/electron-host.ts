@@ -40,65 +40,6 @@ export class ElectronHost implements Types.Host {
 	public async createWindow(options: Types.HostWindowOptions): Promise<Electron.BrowserWindow> {
 		const win = await createWindow(options);
 		this.windows.set(win.id, win);
-
-		/* win.on('close', async e => {
-			if (!this.windows.get(win.id)) {
-				return;
-			}
-
-			e.preventDefault();
-			const parsed = Url.parse(win.webContents.getURL());
-			const [prefix, id] = (parsed.pathname || '').split('/').filter(Boolean);
-			const project = await this.dataHost.getProject(id);
-
-			if (prefix === 'project' && project && project.getDraft()) {
-				const saveId = uuid.v4();
-				const cancelId = uuid.v4();
-				const discardId = uuid.v4();
-
-				const result = await this.showMessage({
-					type: 'warning',
-					message: `Do you want to save the changes you made to ${project.getName()}?`,
-					detail: "Your changes will be lost if you don't save them.",
-					buttons: [
-						{
-							label: 'Save',
-							id: saveId
-						},
-						{
-							label: 'Cancel',
-							id: cancelId
-						},
-						{
-							label: "Don't Save",
-							id: discardId
-						}
-					]
-				});
-
-				if (result && result.id === cancelId) {
-					return;
-				}
-
-				if (result && result.id === saveId) {
-					await this.sender.transaction<M.Save, M.SaveResult>(
-						{
-							type: M.MessageType.Save,
-							id: uuid.v4(),
-							payload: {
-								publish: false,
-								projectId: project.getId()
-							}
-						},
-						{ type: M.MessageType.SaveResult }
-					);
-				}
-			}
-
-			this.windows.delete(win.id);
-			win.close();
-		}); */
-
 		return win;
 	}
 

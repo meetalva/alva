@@ -34,7 +34,6 @@
     "url": "https://github.com/meetalva/alva/issues"
   },
   "build": {
-    "compression": "store",
     "appId": "io.github.meetalva",
     "npmRebuild": false,
     "productName": "Alva",

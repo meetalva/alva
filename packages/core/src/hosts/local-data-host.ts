@@ -5,7 +5,8 @@ import { Persistence } from '../persistence';
 import * as Fs from 'fs';
 import { sortBy } from 'lodash';
 import * as Mobx from 'mobx';
-import { pathExists } from 'fs-extra';
+
+const pathIsInside = require('path-is-inside');
 
 export class LocalDataHost implements Types.DataHost {
 	private host: Types.Host;
@@ -110,11 +111,11 @@ export class LocalDataHost implements Types.DataHost {
 				const editDate = valid ? (await this.host.stat(path)).mtimeMs : undefined;
 
 				const draft =
-					this.host.type === Types.HostType.Electron
-						? !Path.relative(tempPath, path).startsWith('../')
-						: true;
+					this.host.type === Types.HostType.Electron ? pathIsInside(path, tempPath) : true;
 
-				const displayPath = Path.dirname(path.replace(new RegExp(`^${userHome}`), '~'));
+				const displayPath = pathIsInside(path, userHome)
+					? `~${Path.sep}${Path.relative(userHome, path)}`
+					: path;
 
 				return {
 					draft,

@@ -48,7 +48,7 @@ export class ElectronHost implements Types.Host {
 		return {
 			...yargsParser(this.process.argv.slice(2), {
 				number: ['port'],
-				boolean: ['localhost']
+				boolean: ['localhost', 'force-updates']
 			}),
 			...this.forced
 		};

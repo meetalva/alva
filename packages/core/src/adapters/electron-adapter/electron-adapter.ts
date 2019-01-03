@@ -17,6 +17,7 @@ const throat = require('throat');
 
 export interface ElectronAdapterInit {
 	server: Types.AlvaServer;
+	forceUpdates: boolean;
 }
 
 export class ElectronAdapter {
@@ -28,10 +29,10 @@ export class ElectronAdapter {
 		return new Set(Electron.BrowserWindow.getAllWindows());
 	}
 
-	public constructor({ server }: ElectronAdapterInit) {
+	public constructor({ server, forceUpdates }: ElectronAdapterInit) {
 		this.server = server;
 		this.menu = new ElectronMainMenu({ server });
-		this.updater = new ElectronUpdater({ server });
+		this.updater = new ElectronUpdater({ server, force: forceUpdates });
 	}
 
 	public async start(opts?: { filePath?: string }): Promise<void> {

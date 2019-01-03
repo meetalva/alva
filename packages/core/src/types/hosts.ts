@@ -17,6 +17,7 @@ export interface HostFlags {
 	project?: string;
 	localhost?: boolean;
 	serve?: boolean;
+	forceUpdates?: boolean;
 }
 
 export interface HostFile {

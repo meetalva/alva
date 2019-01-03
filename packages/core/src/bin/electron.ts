@@ -33,7 +33,8 @@ async function main(forced?: ForcedFlags): Promise<void> {
 		dataHost: localDataHost
 	});
 
-	const adapter = new ElectronAdapter({ server: alvaServer });
+	const forceUpdates = (await electronHost.getFlags()).forceUpdates === true;
+	const adapter = new ElectronAdapter({ server: alvaServer, forceUpdates });
 
 	electronHost.log(
 		`Starting ${filePath ? 'with' : 'without'} file ${filePath ? `at ${filePath}` : ''}`

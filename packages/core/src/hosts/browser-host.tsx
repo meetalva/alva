@@ -58,6 +58,8 @@ export class BrowserHost implements Types.Host {
 					return Path.resolve('/app_data');
 				case Types.HostBase.UserData:
 					return Path.resolve('/user_data');
+				case Types.HostBase.UserHome:
+					return Path.resolve('/user_home');
 			}
 		};
 

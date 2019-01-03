@@ -28,7 +28,8 @@ export interface HostFile {
 export enum HostBase {
 	Source,
 	AppData,
-	UserData
+	UserData,
+	UserHome
 }
 
 export interface HostSelectFileOptions {

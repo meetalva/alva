@@ -102,7 +102,7 @@ export class LocalDataHost implements Types.DataHost {
 	public async checkProjects(): Promise<Types.ProjectRecord[]> {
 		const memory = await this.readMemory();
 		const tempPath = await this.host.resolveFrom(Types.HostBase.AppData, '.');
-		const userPath = Path.dirname(await this.host.resolveFrom(Types.HostBase.UserData, '.'));
+		const userHome = await this.host.resolveFrom(Types.HostBase.UserHome, '.');
 
 		const projects = await Promise.all(
 			Object.entries(memory.projects).map(async ([id, path]) => {
@@ -113,9 +113,8 @@ export class LocalDataHost implements Types.DataHost {
 					this.host.type === Types.HostType.Electron
 						? !Path.relative(tempPath, path).startsWith('../')
 						: true;
-				const displayPath = Path.dirname(
-					path.replace(new RegExp(`^(${tempPath}|${userPath})`), '~')
-				);
+
+				const displayPath = Path.dirname(path.replace(new RegExp(`^${userHome}`), '~'));
 
 				return {
 					draft,

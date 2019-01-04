@@ -6,12 +6,11 @@ const yargs = require('yargs-parser');
 const got = require('got');
 const pgu = require('parse-github-url');
 const semverUtils = require('semver-utils');
-const sortBy = require('lodash').sortBy;
+const semver = require('semver');
 const Util = require('util');
 
 const writeFile = Util.promisify(Fs.writeFile);
 
-const TAG = process.env.CIRCLE_TAG;
 const PR_NUMBER = process.env.CI_PULL_REQUEST ? Path.basename(process.env.CI_PULL_REQUEST) : '';
 const CHANNEL = PR_NUMBER ? `issue-${PR_NUMBER}` : `branch`;
 
@@ -26,76 +25,65 @@ async function main(cli) {
 		process.exit(1);
 	}
 
-	if (!TAG) {
-		if (process.env.CI === 'true' && !cli.dryRun) {
-			await execa('git', ['config', 'user.name', 'Alva Release']);
-			await execa('git', ['config', 'user.email', 'hello@meetalva.io']);
-		}
+	const prefix = cli.dryRun ? 'dry run: ' : '';
 
-		const prefix = cli.dryRun ? 'dry run: ' : '';
-		const projectPath = Path.resolve(process.cwd(), cli.project);
-		const manifest = require(Path.join(projectPath, 'package.json'));
+	if (process.env.CI === 'true' && !cli.dryRun) {
+		await execa('git', ['config', 'user.name', 'Alva Release']);
+		await execa('git', ['config', 'user.email', 'hello@meetalva.io']);
+	}
 
-		const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split(
-			'\n'
-		);
+	const projectPath = Path.resolve(process.cwd(), cli.project);
+	const manifest = require(Path.join(projectPath, 'package.json'));
 
-		const [hash] = (await execa('git', ['rev-parse', '--short', 'HEAD'])).stdout.split('\n');
+	const giturl =
+		typeof manifest.repository === 'object' ? manifest.repository.url : manifest.repository;
 
-		const channel = branch === 'master' ? 'alpha' : CHANNEL;
+	const repo = pgu(giturl);
+	const { body: releases } = await got(`https://api.github.com/repos/${repo.repo}/releases`, {
+		json: true,
+		auth: process.env.GH_TOKEN
+	});
 
-		const giturl =
-			typeof manifest.repository === 'object' ? manifest.repository.url : manifest.repository;
+	const sortedReleases = releases.slice(0).sort((a, b) => {
+		return semver.rcompare(a.tag_name, b.tag_name);
+	});
 
-		const repo = pgu(giturl);
-		const { body: releases } = await got(`https://api.github.com/repos/${repo.repo}/releases`, {
-			json: true,
-			auth: process.env.GH_TOKEN
+	const latestRelease = sortedReleases[0];
+
+	if (latestRelease && semver.gt(manifest.version, latestRelease.tag_name)) {
+		console.log(`${prefix}trigger full draft release for ${manifest.name}@${manifest.version}`);
+		return;
+	}
+
+	const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split('\n');
+	const [hash] = (await execa('git', ['rev-parse', '--short', 'HEAD'])).stdout.split('\n');
+
+	const channel = branch === 'master' ? 'alpha' : CHANNEL;
+
+	const major = semverUtils.parse( branch === 'master' ? semver.inc(manifest.version, 'major') : manifest.version);
+	const majorTarget = `${major.major}.${major.minor}.${major.patch}-${channel}.0+${hash}`;
+
+	const releaseVersions = sortedReleases
+		.map(release => semverUtils.parse(release.tag_name))
+		.filter(r => r.release)
+		.filter(r => {
+			return r.release.indexOf(channel) === 0;
 		});
 
-		const current = semverUtils.parse(manifest.version);
+	const sv = r =>
+		r.major === majorTarget.major &&
+		r.minor === majorTarget.minor &&
+		r.patch === majorTarget.patch;
 
-		const versions = sortBy(
-			releases
-				.map(release => semverUtils.parse(release.name))
-				.filter(
-					r =>
-						r.major === current.major &&
-						r.minor === current.minor &&
-						r.patch === current.patch
-				)
-				.filter(r => r.release.indexOf(channel) === 0)
-				.map(r => {
-					const raw = r.release.replace(new RegExp(`${channel}.`), '');
+	const iterations = releaseVersions.filter(sv);
+	const iteration = iterations[0] || majorTarget;
+	const version =  semver.inc(iteration, 'prerelease');
 
-					if (!/^[0-9]{1,4}$/.test(raw)) {
-						r.iteration = 0;
-						return r;
-					}
+	console.log(`${prefix}${manifest.name}@${version}`);
 
-					r.iteration = parseInt(raw, 10);
-					return r;
-				}),
-			'iteration'
-		).reverse();
-
-		const iteration = versions[0] ? versions[0].iteration + 1 : 1;
-
-		console.log(`${prefix}trigger release for ${manifest.name}@${manifest.version} on ${branch}`);
-
-		const version = `${manifest.version}-${channel}.${iteration}+${hash}`;
-		console.log(`${prefix}${manifest.name}@${manifest.version} => ${manifest.name}@${version}`);
-
-		if (cli.dryRun) {
-			console.log(`${prefix}dry run: ${version}`);
-		} else {
-			manifest.version = version;
-			await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
-		}
-
-		console.log(`${prefix}triggered release via ${version}`);
-	} else {
-		console.log(`${prefix}tag is set, skipping: ${TAG}`);
+	if (!cli.dryRun) {
+		manifest.version = version;
+		await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
 	}
 }
 

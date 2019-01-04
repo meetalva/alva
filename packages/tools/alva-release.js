@@ -16,14 +16,16 @@ async function main(cli) {
 	const projectPath = Path.resolve(process.cwd(), cli.project);
 	const prefix = cli.dryRun ? 'dry run: ' : '';
 
-	const releaseType = isDraft ? 'draft' : !TAG ? 'release' : 'prerelase';
-
 	if (cli.dryRun) {
 		console.log(`${prefix}electron-builder ${['-c.github.releaseType', releaseType, '--publish', 'always', ...cli._].join(' ')}`);
 	} else {
-		await execa('electron-builder', ['-c.github.releaseType', releaseType, '--publish', 'always', ...cli._], {
+		await execa('electron-builder', ['--publish', 'always', ...cli._], {
 			cwd: projectPath,
-			stdio: 'inherit'
+			stdio: 'inherit',
+			env: {
+				EP_DRAFT: isDraft ? 'true' : 'false',
+				EP_PRE_RELEASE: isDraft && !TAG ? 'false' : 'true'
+			}
 		});
 	}
 }

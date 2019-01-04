@@ -5,7 +5,7 @@ const yargs = require('yargs-parser');
 const semverUtils = require('semver-utils');
 const Util = require('util');
 
-const writeFile = Util.writeFile(Fs.writeFile);
+const writeFile = Util.promisify(Fs.writeFile);
 
 async function main(cli) {
 	if (!cli.project) {

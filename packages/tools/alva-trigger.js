@@ -9,7 +9,7 @@ const semverUtils = require('semver-utils');
 const sortBy = require('lodash').sortBy;
 const Util = require('util');
 
-const writeFile = Util.writeFile(Fs.writeFile);
+const writeFile = Util.promisify(Fs.writeFile);
 
 const TAG = process.env.CIRCLE_TAG;
 const PR_NUMBER = process.env.CI_PULL_REQUEST ? Path.basename(process.env.CI_PULL_REQUEST) : '';

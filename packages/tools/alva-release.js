@@ -22,14 +22,19 @@ async function main(cli) {
 
 	manifest.build.publish = [...(manifest.build.publish || []), {
 		provider: 'github',
-		releaseType: channel === 'alpha' ? 'prerelase' : 'draft'
+		releaseType: channel === 'alpha' ? 'prerelease' : 'draft'
 	}];
 
 	if (!cli.dryRun) {
 		await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
 
 		if (channel === 'alpha') {
+			manifest.build.productName = `Alva Canary`;
 			await execa.shell('cp ./src/resources/alpha/* ./src/resources', { cwd: projectPath });
+		}
+
+		if (channel === 'beta') {
+			manifest.build.productName = `Alva Beta`;
 		}
 
 		await execa('electron-builder', ['--publish', 'always', ...cli._], {

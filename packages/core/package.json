@@ -35,6 +35,7 @@
   },
   "build": {
     "appId": "io.github.meetalva",
+    "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
     "productName": "Alva",
     "copyright": "Copyright (c) 2017-2018 SinnerSchrader Deutschland GmbH",

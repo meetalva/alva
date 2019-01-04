@@ -22,7 +22,7 @@ async function main(cli) {
 
 	manifest.build.publish = [...(manifest.build.publish || []), {
 		provider: 'github',
-		releaseType: channel === 'alpha' ? 'release' : 'draft'
+		releaseType: channel === 'alpha' ? 'prerelase' : 'draft'
 	}];
 
 	if (!cli.dryRun) {

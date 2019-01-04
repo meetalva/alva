@@ -18,7 +18,7 @@ async function main(cli) {
 	const manifest = require(Path.join(projectPath, 'package.json'));
 
 	const current = semverUtils.parse(manifest.version);
-	const channel = current.release.split('.')[0];
+	const channel = current.release ? current.release.split('.')[0] : 'stable';
 
 	manifest.build.publish = [...(manifest.build.publish || []), {
 		provider: 'github',
@@ -29,14 +29,13 @@ async function main(cli) {
 		await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
 
 		if (channel === 'alpha') {
-			await execa('cp', ['src/resources/alpha/*', 'src/resources'], { cwd: projectPath });
+			await execa.shell('cp ./src/resources/alpha/* ./src/resources', { cwd: projectPath });
 		}
 
 		await execa('electron-builder', ['--publish', 'always', ...cli._], {
 			cwd: projectPath,
 			stdio: 'inherit'
 		});
-	}
 }
 
 process.on('unhandledRejection', (_, error) => {

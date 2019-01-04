@@ -218,6 +218,7 @@ workflows:
   version: 2
   build:
     jobs:
+      - trigger
       - install_macos
       - test
       - lint

@@ -27,6 +27,11 @@ async function main(cli) {
 
 	if (!cli.dryRun) {
 		await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
+
+		if (channel === 'alpha') {
+			await execa('cp', ['src/resources/alpha/*', 'src/resources'], { cwd: projectPath });
+		}
+
 		await execa('electron-builder', ['--publish', 'always', ...cli._], {
 			cwd: projectPath,
 			stdio: 'inherit'

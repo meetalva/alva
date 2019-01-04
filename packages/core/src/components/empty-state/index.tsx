@@ -19,7 +19,7 @@ const StyledEmptyState = styled.div`
 
 export const EmptyState: React.StatelessComponent<EmptyStateProps> = props => (
 	<StyledEmptyState>
-		<Headline type="primary" order={4} textColor={props.highlighted ? Color.Blue : Color.Black}>
+		<Headline order={4} textColor={props.highlighted ? Color.Blue : Color.Black}>
 			{props.headline}
 		</Headline>
 		<Space sizeTop={getSpace(SpaceSize.XS)} sizeBottom={getSpace(SpaceSize.L)}>

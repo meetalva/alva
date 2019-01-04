@@ -2,7 +2,7 @@ import { Color } from '../colors';
 import { Copy } from '../copy';
 import { Headline } from '../headline';
 import * as React from 'react';
-import { getSpace, SpaceSize } from '../space';
+import { getSpace, SpaceSize, Space } from '../space';
 import styled from 'styled-components';
 
 export interface PropertyBoxProps {
@@ -33,9 +33,8 @@ export const PropertyAction: React.SFC = props => <>{props.children}</>;
 
 export const PropertyBox: React.SFC<PropertyBoxProps> = props => (
 	<StyledPropertyBox>
-		<Headline type="primary" order={4}>
-			{props.headline}
-		</Headline>
+		<Headline order={4}>{props.headline}</Headline>
+		<Space sizeBottom={SpaceSize.XS} />
 		<Copy textColor={Color.Grey50}>{props.copy}</Copy>
 		{props.children}
 	</StyledPropertyBox>

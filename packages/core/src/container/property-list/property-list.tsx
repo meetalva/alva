@@ -67,11 +67,7 @@ export class PropertyListContainer extends React.Component<PropertyListContainer
 							open
 							onClick={e => e.preventDefault()}
 							key={groupName}
-							summary={
-								<Components.Headline type="primary" order={4}>
-									{groupName}
-								</Components.Headline>
-							}
+							summary={<Components.Headline order={4}>{groupName}</Components.Headline>}
 						>
 							{group.map(property => (
 								<PropertyListItem key={property.getId()} property={property} />
@@ -89,9 +85,7 @@ export class PropertyListContainer extends React.Component<PropertyListContainer
 						toggleable
 						summary={
 							<div>
-								<Components.Headline type="primary" order={4}>
-									Code Properties
-								</Components.Headline>
+								<Components.Headline order={4}>Code Properties</Components.Headline>
 								<Components.Space sizeBottom={Components.SpaceSize.XS} />
 								<Components.Copy>This component accepts code properties</Components.Copy>
 							</div>

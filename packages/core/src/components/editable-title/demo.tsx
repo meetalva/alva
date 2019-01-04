@@ -8,9 +8,7 @@ import { EditableTitle, EditableTitleState, EditableTitleType } from '.';
 export default (): JSX.Element => (
 	<DemoContainer title="Preview Tile">
 		<Space size={[SpaceSize.L, SpaceSize.XXXL]}>
-			<Headline type="primary" order={2}>
-				Editable Title
-			</Headline>
+			<Headline order={2}>Editable Title</Headline>
 			<EditableTitle
 				focused={true}
 				name="Well crafted title"
@@ -20,9 +18,7 @@ export default (): JSX.Element => (
 			/>
 		</Space>
 		<Space size={[SpaceSize.L, SpaceSize.XXXL]}>
-			<Headline type="primary" order={2}>
-				Editable Title
-			</Headline>
+			<Headline order={2}>Editable Title</Headline>
 			<EditableTitle
 				focused={true}
 				name="Well crafted title"

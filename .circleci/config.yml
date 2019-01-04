@@ -170,7 +170,7 @@ jobs:
 
       - run:
           name: Publish Release
-          command: lerna run release --stream
+          command: alva-release --project packages/core
 
   linux:
     docker:
@@ -189,7 +189,7 @@ jobs:
 
       - run:
           name: Publish Release
-          command: lerna run release --stream
+          command: alva-release --project packages/core
 
   windows:
     docker:
@@ -208,7 +208,7 @@ jobs:
 
       - run:
           name: Publish Release
-          command: lerna run release --stream -- --win
+          command: alva-release --project packages/core -- --win
 
 workflows:
   version: 2

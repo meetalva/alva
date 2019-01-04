@@ -5,7 +5,8 @@
   "bin": {
     "alva-deploy": "./alva-deploy.js",
     "alva-trigger": "./alva-trigger.js",
-    "alva-version": "./alva-version.js"
+    "alva-version": "./alva-version.js",
+    "alva-release": "./alva-release.js"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,11 @@
   },
   "dependencies": {
     "execa": "^1.0.0",
+    "got": "^9.5.0",
+    "lodash": "^4.17.11",
     "node-fetch": "2.1.2",
+    "parse-github-url": "^1.0.2",
+    "semver-utils": "^1.1.4",
     "surge": "0.20.1",
     "yargs-parser": "10.1.0"
   }

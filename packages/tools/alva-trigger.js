@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const Fs = require('fs');
 const Path = require('path');
 const execa = require('execa');
 const yargs = require('yargs-parser');
@@ -6,6 +7,9 @@ const got = require('got');
 const pgu = require('parse-github-url');
 const semverUtils = require('semver-utils');
 const sortBy = require('lodash').sortBy;
+const Util = require('util');
+
+const writeFile = Util.writeFile(Fs.writeFile);
 
 const TAG = process.env.CIRCLE_TAG;
 const PR_NUMBER = process.env.CI_PULL_REQUEST ? Path.basename(process.env.CI_PULL_REQUEST) : '';
@@ -83,9 +87,10 @@ async function main(cli) {
 		console.log(`${prefix}${manifest.name}@${manifest.version} => ${manifest.name}@${version}`);
 
 		if (cli.dryRun) {
-			console.log(`${prefix}dry run: yarn version --new-version ${version}`);
+			console.log(`${prefix}dry run: ${version}`);
 		} else {
-			await execa('yarn', ['version', '--new-version', version], { cwd: projectPath });
+			manifest.version = version;
+			await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
 		}
 
 		console.log(`${prefix}triggered release via ${version}`);

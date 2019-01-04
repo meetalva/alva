@@ -1,9 +1,11 @@
 #!/usr/bin/env node
+const Fs = require('fs');
 const Path = require('path');
-const execa = require('execa');
 const yargs = require('yargs-parser');
+const semverUtils = require('semver-utils');
+const Util = require('util');
 
-const TAG = process.env.CIRCLE_TAG;
+const writeFile = Util.writeFile(Fs.writeFile);
 
 async function main(cli) {
 	if (!cli.project) {
@@ -11,21 +13,22 @@ async function main(cli) {
 		process.exit(1);
 	}
 
-	const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split('\n');
-	const isDraft = branch !== 'master';
 	const projectPath = Path.resolve(process.cwd(), cli.project);
-	const prefix = cli.dryRun ? 'dry run: ' : '';
+	const manifest = require(Path.join(projectPath, 'package.json'));
 
-	if (cli.dryRun) {
-		console.log(`${prefix}electron-builder ${['-c.github.releaseType', releaseType, '--publish', 'always', ...cli._].join(' ')}`);
-	} else {
+	const current = semverUtils.parse(manifest.version);
+	const channel = current.release.split('.')[0];
+
+	manifest.build.publish = [...(manifest.build.publish || []), {
+		provider: 'github',
+		releaseType: channel === 'alpha' ? 'release' : 'draft'
+	}];
+
+	if (!cli.dryRun) {
+		await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
 		await execa('electron-builder', ['--publish', 'always', ...cli._], {
 			cwd: projectPath,
-			stdio: 'inherit',
-			env: {
-				EP_DRAFT: isDraft ? 'true' : 'false',
-				EP_PRE_RELEASE: isDraft && !TAG ? 'false' : 'true'
-			}
+			stdio: 'inherit'
 		});
 	}
 }

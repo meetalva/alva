@@ -34,14 +34,6 @@ commands:
           name: Add npm bin to path
           command: echo 'export PATH="$(npm bin):$PATH"' >> $BASH_ENV
 
-  trigger:
-    description: "Trigger an appropriate release"
-
-    steps:
-      - run:
-          name: Trigger Release
-          command: alva-trigger --project packages/core
-
 jobs:
   install_macos:
     macos:
@@ -153,6 +145,23 @@ jobs:
       - run: lerna run static --stream
       - run: alva-deploy --project packages/core/.static
 
+  trigger:
+    docker:
+      - image: circleci/node:8
+
+    steps:
+      - setup:
+          key: linux
+
+      - run:
+          name: Trigger Release
+          command: alva-trigger --project packages/core
+
+      - persist_to_workspace:
+          root: packages/core
+          paths:
+              - package.json
+
   macos:
     macos:
       xcode: "9.0"
@@ -165,8 +174,6 @@ jobs:
 
       - attach_workspace:
           at: packages/core
-
-      - trigger
 
       - run:
           name: Publish Release
@@ -185,8 +192,6 @@ jobs:
       - attach_workspace:
           at: packages/core
 
-      - trigger
-
       - run:
           name: Publish Release
           command: alva-release --project packages/core
@@ -204,11 +209,10 @@ jobs:
       - attach_workspace:
           at: packages/core
 
-      - trigger
-
       - run:
           name: Publish Release
           command: alva-release --project packages/core -- --win
+
 
 workflows:
   version: 2
@@ -221,26 +225,29 @@ workflows:
       - compile
       - static:
           requires:
-              - test
-              - lint
-              - compile
-              - bundle
+            - test
+            - lint
+            - compile
+            - bundle
       - macos:
           requires:
-              - install_macos
-              - test
-              - lint
-              - compile
-              - bundle
+            - install_macos
+            - test
+            - lint
+            - compile
+            - bundle
+            - trigger
       - linux:
           requires:
-              - test
-              - lint
-              - compile
-              - bundle
+            - test
+            - lint
+            - compile
+            - bundle
+            - trigger
       - windows:
           requires:
-              - test
-              - lint
-              - compile
-              - bundle
+            - test
+            - lint
+            - compile
+            - bundle
+            - trigger

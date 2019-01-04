@@ -9,12 +9,9 @@ const DemoOverlay: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer>
 		<PropertyDetails
 			open={true}
-			onClick={() => {}}
 			summary={
 				<div>
-					<Headline type="primary" order={4}>
-						Code Properties
-					</Headline>
+					<Headline order={4}>Code Properties</Headline>
 					<Space sizeBottom={SpaceSize.XS} />
 					<Copy>This component accepts code properties</Copy>
 				</div>

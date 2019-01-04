@@ -120,16 +120,14 @@ export class ViewDetails extends React.Component {
 						<div style={{ flexShrink: 0, height: 40 }}>
 							<PropertiesSwitch />
 						</div>
-						{onlyBuiltin &&
+						{props.store.getApp().getRightSidebarTab() === Types.RightSidebarTab.Properties &&
+							onlyBuiltin &&
 							mayConnect && (
 								<ConnectPaneContainer
-									onPrimaryButtonClick={() => props.store.connectPatternLibrary()}
-									onSecondaryButtonClick={() =>
-										props.store.getApp().send({
-											type: MessageType.OpenExternalURL,
-											id: uuid.v4(),
-											payload: 'https://media.meetalva.io/file/Website.alva'
-										})
+									onClick={() =>
+										props.store
+											.getApp()
+											.setRightSidebarTab(Types.RightSidebarTab.ProjectSettings)
 									}
 								/>
 							)}

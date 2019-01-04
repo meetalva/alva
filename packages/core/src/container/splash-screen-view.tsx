@@ -16,11 +16,11 @@ export class SplashScreenView extends React.Component<SplashScreenProps> {
 		return (
 			<C.SplashScreen>
 				<C.SplashScreenSlotLeft>
-					<C.Headline tagName="h1" type="secondary" textColor={C.Color.Grey20} order={2}>
+					<C.Headline tagName="h1" bold textColor={C.Color.Grey20} order={2}>
 						You’re new here?
 					</C.Headline>
 					<C.Space sizeBottom={C.SpaceSize.XL} />
-					<C.Headline type="primary" tagName="div" order={2}>
+					<C.Headline tagName="div" order={2}>
 						Get started with our easy-to-learn guides.
 					</C.Headline>
 					<C.Space sizeBottom={C.SpaceSize.XL} />

@@ -17,29 +17,28 @@ export class ProjectSettingsContainer extends React.Component {
 
 		return (
 			<div>
-				<Components.Space sizeBottom={SpaceSize.XS}>
-					<Components.Headline type="primary" order={3}>
-						Connected Libraries
-					</Components.Headline>
-					<Components.Copy textColor={Color.Grey50}>
-						You can connect one or multiple React component libraries.
-					</Components.Copy>
-				</Components.Space>
-				<Components.Space sizeBottom={SpaceSize.XL}>
-					<Components.Link
-						underline={true}
-						color={Color.Grey50}
-						onClick={() =>
-							store.getApp().send({
-								type: MessageType.OpenExternalURL,
-								id: uuid.v4(),
-								payload: 'https://github.com/meetalva/alva#pattern-requirements'
-							})
-						}
-					>
-						See Library Requirements
-					</Components.Link>
-				</Components.Space>
+				<Components.Headline order={4}>Connected Libraries</Components.Headline>
+				<Components.Space sizeBottom={SpaceSize.S} />
+				<Components.Copy textColor={Color.Grey50}>
+					Connect multiple component libraries to your prototype. Just select the package.json
+					file of your library.
+				</Components.Copy>
+				<Components.Space sizeBottom={SpaceSize.XS} />
+				<Components.Link
+					underline={true}
+					color={Color.Grey50}
+					onClick={() =>
+						store.getApp().send({
+							type: MessageType.OpenExternalURL,
+							id: uuid.v4(),
+							payload:
+								'https://meetalva.io/doc/docs/references/library-requirements.html?vvtjrhvg_p-enabled=true'
+						})
+					}
+				>
+					Library Requirements
+				</Components.Link>
+				<Components.Space sizeBottom={SpaceSize.XL} />
 				{store
 					.getPatternLibraries()
 					.map(library => (

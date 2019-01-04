@@ -36,6 +36,7 @@ async function main(cli) {
 			cwd: projectPath,
 			stdio: 'inherit'
 		});
+	}
 }
 
 process.on('unhandledRejection', (_, error) => {

@@ -4,6 +4,7 @@ const Path = require('path');
 const yargs = require('yargs-parser');
 const semverUtils = require('semver-utils');
 const Util = require('util');
+const execa = require('execa');
 
 const writeFile = Util.promisify(Fs.writeFile);
 

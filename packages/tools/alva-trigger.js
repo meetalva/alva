@@ -79,7 +79,7 @@ async function main(cli) {
 
 		console.log(`${prefix}trigger release for ${manifest.name}@${manifest.version} on ${branch}`);
 
-		const version = `${manifest.version}-${channel}+${hash}.${iteration}`;
+		const version = `${manifest.version}-${channel}.${iteration}+${hash}`;
 		console.log(`${prefix}${manifest.name}@${manifest.version} => ${manifest.name}@${version}`);
 
 		if (cli.dryRun) {

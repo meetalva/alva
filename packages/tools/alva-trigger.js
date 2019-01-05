@@ -11,9 +11,6 @@ const Util = require('util');
 
 const writeFile = Util.promisify(Fs.writeFile);
 
-const PR_NUMBER = process.env.CI_PULL_REQUEST ? Path.basename(process.env.CI_PULL_REQUEST) : '';
-const CHANNEL = PR_NUMBER ? `issue-${PR_NUMBER}` : `branch-${process.env.CIRCLE_WORKFLOW_ID}`;
-
 async function main(cli) {
 	if (!cli.project) {
 		console.log(`--project is required`);
@@ -58,7 +55,9 @@ async function main(cli) {
 	const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split('\n');
 	const [hash] = (await execa('git', ['rev-parse', '--short', 'HEAD'])).stdout.split('\n');
 
-	const channel = branch === 'master' ? 'alpha' : CHANNEL;
+	const channel = branch === 'master'
+		? 'alpha'
+		: branch.split('/').join('-');
 
 	const major = semverUtils.parse(branch === 'master' ? semver.inc(manifest.version, 'major') : manifest.version);
 	const majorTarget = `${major.major}.${major.minor}.${major.patch}-${channel}.0+${hash}`;

@@ -10,6 +10,7 @@ export enum Color {
 	Blue90 = 'rgb(222, 236, 252)',
 	Green = 'rgb(91, 226, 122)',
 	SignalGreen = 'rgb(31, 163, 133)',
+	Grey10 = 'rgb(30, 32, 36)',
 	Grey20 = 'rgb(52, 61, 69)',
 	Grey36 = 'rgb(92, 92, 92)',
 	Grey50 = 'rgb(103, 109, 115)',

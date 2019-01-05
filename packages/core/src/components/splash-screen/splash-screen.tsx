@@ -21,11 +21,9 @@ export const SplashScreen: React.SFC = props => {
 	return (
 		<Styles.StyledContainer>
 			<Styles.StyledSection type="primary" style={{ gridRowStart: 1, gridRowEnd: 3 }}>
-				<Styles.StyledBox type="primary">{left}</Styles.StyledBox>
+				{left}
 			</Styles.StyledSection>
-			<Styles.StyledSection type="secondary">
-				<Styles.StyledBox type="secondary">{right}</Styles.StyledBox>
-			</Styles.StyledSection>
+			<Styles.StyledSection type="secondary">{right}</Styles.StyledSection>
 			<div style={{ gridColumnStart: 2 }}>{bottom}</div>
 		</Styles.StyledContainer>
 	);

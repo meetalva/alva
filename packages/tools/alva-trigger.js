@@ -74,12 +74,12 @@ async function main(cli) {
 		});
 
 	const sv = r =>
-		r.major === majorTarget.major &&
-		r.minor === majorTarget.minor &&
-		r.patch === majorTarget.patch;
+		r.major === major.major &&
+		r.minor === major.minor &&
+		r.patch === major.patch;
 
 	const iterations = releaseVersions.filter(sv);
-	const iteration = iterations[0] || majorTarget;
+	const iteration = iterations[0] ? iterations[0].semver : majorTarget;
 
 	const prSegments = process.env.CIRCLE_PULL_REQUEST
 		? process.env.CIRCLE_PULL_REQUEST.split('/').filter(Boolean)

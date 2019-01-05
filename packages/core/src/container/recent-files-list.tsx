@@ -104,7 +104,7 @@ export class RecentFilesList extends React.Component {
 				{drafts.length === 0 && projects.length === 0 ? (
 					<C.EmptyState
 						headline="Welcome!"
-						copy="Create a new Alva Project or start with our Guides"
+						copy="Create a new Alva project or start with our guides"
 					/>
 				) : (
 					<C.Space size={C.SpaceSize.XL} sizeBottom={C.SpaceSize.XS}>

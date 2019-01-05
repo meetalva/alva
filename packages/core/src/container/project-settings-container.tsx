@@ -38,6 +38,20 @@ export class ProjectSettingsContainer extends React.Component {
 				>
 					Library Requirements
 				</Components.Link>
+				<Components.Space sizeBottom={SpaceSize.XXS} />
+				<Components.Link
+					underline={true}
+					color={Color.Grey50}
+					onClick={() =>
+						store.getApp().send({
+							type: MessageType.OpenExternalURL,
+							id: uuid.v4(),
+							payload: 'https://media.meetalva.io/file/Website.alva'
+						})
+					}
+				>
+					Download Example File with Library
+				</Components.Link>
 				<Components.Space sizeBottom={SpaceSize.XL} />
 				{store
 					.getPatternLibraries()

@@ -60,9 +60,7 @@ export class App extends React.Component {
 						]}
 					/>
 				)}
-				{props.store.getApp().getActiveView() !== Types.AlvaView.SplashScreen && (
-					<ChromeContainer />
-				)}
+				<ChromeContainer />
 				<Components.MainArea>
 					<AppView view={Types.AlvaView.SplashScreen}>
 						<SplashScreenContainer />

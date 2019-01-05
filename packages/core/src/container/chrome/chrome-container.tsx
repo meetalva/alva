@@ -42,6 +42,7 @@ export const ChromeContainer = MobxReact.inject('store')(
 						payload: undefined
 					});
 				}}
+				hidden={!hasProject}
 			>
 				{hasProject && <ChromeSwitch />}
 				<C.ViewSwitch
@@ -83,59 +84,67 @@ export const ChromeContainer = MobxReact.inject('store')(
 							{update.version}
 						</C.UpdateBadge>
 					)}
-					<C.ChromeButton
-						title="Help"
-						onClick={() => {
-							props.store.getApp().send({
-								type: MessageType.OpenExternalURL,
-								id: uuid.v4(),
-								payload: 'https://meetalva.io/doc/docs/start'
-							});
-						}}
-						onDoubleClick={event => {
-							event.stopPropagation();
-						}}
-					/>
-					<C.ChromeButton
-						title="Found a Bug?"
-						onClick={() => {
-							props.store.getApp().send({
-								type: MessageType.OpenExternalURL,
-								id: uuid.v4(),
-								payload: AlvaUtil.newIssueUrl({
-									user: 'meetalva',
-									repo: 'alva',
-									title: 'New bug report',
-									body: `Hey there, I just encountered the following error with Alva:`,
-									labels: ['type: bug']
-								})
-							});
-						}}
-						onDoubleClick={event => {
-							event.stopPropagation();
-						}}
-					/>
-					<C.ChromeButton
-						title="Export"
-						disabled={!hasProject}
-						icon={
-							<LogOut size={C.IconSize.XS} strokeWidth={1.5} style={{ display: 'block' }} />
-						}
-						onClick={() => {
-							if (!hasProject) {
-								return;
-							}
+					{hasProject && (
+						<>
+							<C.ChromeButton
+								title="Help"
+								onClick={() => {
+									props.store.getApp().send({
+										type: MessageType.OpenExternalURL,
+										id: uuid.v4(),
+										payload: 'https://meetalva.io/doc/docs/start'
+									});
+								}}
+								onDoubleClick={event => {
+									event.stopPropagation();
+								}}
+							/>
+							<C.ChromeButton
+								title="Found a Bug?"
+								onClick={() => {
+									props.store.getApp().send({
+										type: MessageType.OpenExternalURL,
+										id: uuid.v4(),
+										payload: AlvaUtil.newIssueUrl({
+											user: 'meetalva',
+											repo: 'alva',
+											title: 'New bug report',
+											body: `Hey there, I just encountered the following error with Alva:`,
+											labels: ['type: bug']
+										})
+									});
+								}}
+								onDoubleClick={event => {
+									event.stopPropagation();
+								}}
+							/>
+							<C.ChromeButton
+								title="Export"
+								disabled={!hasProject}
+								icon={
+									<LogOut
+										size={C.IconSize.XS}
+										strokeWidth={1.5}
+										style={{ display: 'block' }}
+									/>
+								}
+								onClick={() => {
+									if (!hasProject) {
+										return;
+									}
 
-							props.store.getApp().send({
-								id: uuid.v4(),
-								type: MessageType.ExportHtmlProject,
-								payload: { path: undefined, projectId: store.getProject().getId() }
-							});
-						}}
-						onDoubleClick={event => {
-							event.stopPropagation();
-						}}
-					/>
+									props.store.getApp().send({
+										id: uuid.v4(),
+										type: MessageType.ExportHtmlProject,
+										payload: { path: undefined, projectId: store.getProject().getId() }
+									});
+								}}
+								onDoubleClick={event => {
+									event.stopPropagation();
+								}}
+							/>
+						</>
+					)}
 				</div>
 				{props.children}
 			</C.Chrome>

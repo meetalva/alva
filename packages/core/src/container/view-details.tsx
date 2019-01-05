@@ -117,7 +117,7 @@ export class ViewDetails extends React.Component {
 						direction={Components.LayoutDirection.Column}
 						border={Components.LayoutBorder.Side}
 					>
-						<div style={{ flexShrink: 0, height: 40 }}>
+						<div style={{ flexShrink: 0, height: 30 }}>
 							<PropertiesSwitch />
 						</div>
 						{props.store.getApp().getRightSidebarTab() === Types.RightSidebarTab.Properties &&

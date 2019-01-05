@@ -21,7 +21,7 @@ export class ProjectSettingsContainer extends React.Component {
 				<Components.Space sizeBottom={SpaceSize.S} />
 				<Components.Copy textColor={Color.Grey50}>
 					Connect multiple component libraries to your prototype. Just select the package.json
-					file of your library.
+					file of your React &amp; Typescript library.
 				</Components.Copy>
 				<Components.Space sizeBottom={SpaceSize.XS} />
 				<Components.Link

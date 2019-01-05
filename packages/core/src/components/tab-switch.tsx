@@ -34,10 +34,12 @@ const StyledTabSwitch = styled.div`
 
 	width: ${(props: TabSwitchProps) => (props.type === TabSwitchType.Tab ? '50%' : 'auto')};
 
-	border-bottom: ${(props: TabSwitchProps) =>
-		props.type === TabSwitchType.Tab ? '3px solid' : 'none'};
-	border-bottom-color: ${(props: TabSwitchProps) =>
-		props.active === TabSwitchState.Active ? Color.Blue20 : 'transparent'};
+	background: ${(props: TabSwitchProps) =>
+		props.active === TabSwitchState.Active ? Color.Blue80 : 'transparent'};
+	border-bottom: 1px solid ${Color.Grey90};
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-bottom-width: 0.5px;
+	}
 
 	user-select: none;
 	cursor: default;

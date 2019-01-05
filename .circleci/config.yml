@@ -177,7 +177,7 @@ jobs:
       - persist_to_workspace:
           root: packages/core
           paths:
-              - package.json
+              - package.ncc.json
 
   macos:
     macos:
@@ -191,6 +191,10 @@ jobs:
 
       - attach_workspace:
           at: packages/core
+
+      - run:
+          name: List files
+          command: ls -la
 
       - run:
           name: Copy Scripts
@@ -214,6 +218,10 @@ jobs:
           at: packages/core
 
       - run:
+          name: List files
+          command: ls -la
+
+      - run:
           name: Copy Scripts
           command: cp -r build/scripts nccbuild/scripts
 
@@ -233,6 +241,10 @@ jobs:
 
       - attach_workspace:
           at: packages/core
+
+      - run:
+          name: List files
+          command: ls -la
 
       - run:
           name: Copy Scripts

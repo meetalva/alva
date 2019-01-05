@@ -1,22 +1,16 @@
 import * as Electron from 'electron';
-import * as Server from '../server';
 import * as Hosts from '../hosts';
-import * as Types from '../types';
-import * as Serde from '../sender/serde';
 import { ElectronAdapter } from '../adapters/electron-adapter';
+import { AlvaServer } from '../server';
+import * as isDev from 'electron-is-dev';
 
-const importFresh = require('import-fresh');
-const clearModule = require('clear-module');
 const yargsParser = require('yargs-parser');
-const serverPath = require.resolve('../server');
 
 export interface ForcedFlags {
 	port?: number;
 }
 
 async function main(forced?: ForcedFlags): Promise<void> {
-	const AlvaServer = importFresh(serverPath).AlvaServer as typeof Server.AlvaServer;
-
 	const electronHost = await Hosts.ElectronHost.from({
 		process,
 		forced
@@ -42,31 +36,6 @@ async function main(forced?: ForcedFlags): Promise<void> {
 
 	await alvaServer.start();
 	await adapter.start({ filePath });
-
-	const onRestart = async () => {
-		const port = alvaServer.port;
-		await alvaServer.stop();
-
-		const sourceDirectory = await electronHost.resolveFrom(Types.HostBase.Source, '.');
-		clearModule.match(new RegExp(`^${sourceDirectory}`));
-
-		await main({ port });
-	};
-
-	const onMessage = (envelope: string) => {
-		const message = Serde.deserialize(envelope);
-
-		if (!message) {
-			return;
-		}
-
-		if (message.type === 'reload') {
-			onRestart();
-			process.removeListener('message' as any, onMessage);
-		}
-	};
-
-	process.on('message', onMessage);
 }
 
 function getPassedFile(): Promise<string | undefined> {
@@ -87,6 +56,10 @@ function getPassedFile(): Promise<string | undefined> {
 }
 
 function getFileFromProcess(): string | undefined {
+	if (isDev) {
+		return undefined;
+	}
+
 	const { _: args } = yargsParser(process.argv);
 	const lastArgument = args[args.length - 1];
 	return args.length > 1 && lastArgument !== __filename ? lastArgument : undefined;

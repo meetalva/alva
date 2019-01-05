@@ -79,7 +79,9 @@ jobs:
       - setup:
           key: linux
 
-      - run: lerna run test --stream
+      - run:
+          name: Run unit tests
+          command: lerna run test --stream
 
   lint:
     docker:
@@ -105,12 +107,36 @@ jobs:
       - setup:
           key: linux
 
-      - run: lerna run compile --stream
+      - run:
+          name: Compile with tsc
+          command: lerna run compile --stream
 
       - persist_to_workspace:
           root: packages/core
           paths:
               - build
+
+  ncc:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: linux
+
+      - attach_workspace:
+          at: packages/core
+
+      - run:
+          name: Compile with ncc
+          command: lerna run compile:ncc --stream
+
+      - persist_to_workspace:
+          root: packages/core
+          paths:
+              - nccbuild
 
   bundle:
     docker:
@@ -122,12 +148,14 @@ jobs:
       - setup:
           key: linux
 
-      - run: lerna run bundle --stream
+      - run:
+          name: Create browser scripts
+          command: lerna run bundle --stream
 
       - persist_to_workspace:
           root: packages/core
           paths:
-              - build
+              - build/scripts
 
   static:
     docker:
@@ -142,8 +170,13 @@ jobs:
       - attach_workspace:
           at: packages/core
 
-      - run: lerna run static --stream
-      - run: alva-deploy --project packages/core/.static
+      - run:
+          name: Create static build
+          command: lerna run static --stream
+
+      - run:
+          name: Deploy to static hosting
+          command: alva-deploy --project packages/core/.static
 
   trigger:
     docker:
@@ -160,7 +193,7 @@ jobs:
       - persist_to_workspace:
           root: packages/core
           paths:
-              - package.json
+              - package.ncc.json
 
   macos:
     macos:
@@ -176,8 +209,12 @@ jobs:
           at: packages/core
 
       - run:
+          name: Copy Scripts
+          command: lerna run copy:scripts
+
+      - run:
           name: Publish Release
-          command: alva-release --project packages/core
+          command: alva-release --project packages/core/nccbuild
 
   linux:
     docker:
@@ -193,8 +230,12 @@ jobs:
           at: packages/core
 
       - run:
+          name: Copy Scripts
+          command: lerna run copy:scripts
+
+      - run:
           name: Publish Release
-          command: alva-release --project packages/core
+          command: alva-release --project packages/core/nccbuild
 
   windows:
     docker:
@@ -210,8 +251,12 @@ jobs:
           at: packages/core
 
       - run:
+          name: Copy Scripts
+          command: lerna run copy:scripts
+
+      - run:
           name: Publish Release
-          command: alva-release --project packages/core -- --win
+          command: alva-release --project packages/core/nccbuild -- --win
 
 
 workflows:
@@ -224,6 +269,9 @@ workflows:
       - lint
       - bundle
       - compile
+      - ncc:
+          requires:
+            - trigger
       - static:
           requires:
             - test
@@ -235,20 +283,17 @@ workflows:
             - install_macos
             - test
             - lint
-            - compile
+            - ncc
             - bundle
-            - trigger
       - linux:
           requires:
             - test
             - lint
-            - compile
+            - ncc
             - bundle
-            - trigger
       - windows:
           requires:
             - test
             - lint
-            - compile
+            - ncc
             - bundle
-            - trigger

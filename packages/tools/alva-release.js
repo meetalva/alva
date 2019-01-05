@@ -17,29 +17,57 @@ async function main(cli) {
 	const projectPath = Path.resolve(process.cwd(), cli.project);
 	const manifest = require(Path.join(projectPath, 'package.json'));
 
+	if (cli.debug) {
+		console.log('in:', manifest);
+	}
+
+	const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split('\n');
+
+	const publish = (branch === 'master' || process.env.CIRCLE_PULL_REQUEST)
+		? 'always'
+		: 'never';
+
 	const current = semverUtils.parse(manifest.version);
 	const channel = current.release ? current.release.split('.')[0] : 'stable';
 
-	manifest.build.publish = [...(manifest.build.publish || []), {
-		provider: 'github',
-		releaseType: channel === 'alpha' ? 'prerelease' : 'draft'
-	}];
+	manifest.build.publish = [
+		...(manifest.build.publish || []),
+		{
+			provider: 'github',
+			releaseType: channel === 'alpha' ? 'prerelease' : 'draft'
+		}
+	];
 
 	if (!cli.dryRun) {
 		await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
+	}
 
-		if (channel === 'alpha') {
-			manifest.build.productName = `Alva Canary`;
-			await execa.shell('cp ./src/resources/alpha/* ./src/resources', { cwd: projectPath });
-		}
+	if (channel === 'alpha') {
+		manifest.build.productName = `Alva Canary`;
+	}
 
-		if (channel === 'beta') {
-			manifest.build.productName = `Alva Beta`;
-		}
+	if (channel === 'beta') {
+		manifest.build.productName = `Alva Beta`;
+	}
 
-		await execa('electron-builder', ['--publish', 'always', ...cli._], {
+	if (channel === 'alpha' && !cli.dryRun) {
+		await execa.shell('cp ./src/resources/alpha/* ./src/resources', { cwd: projectPath });
+	}
+
+	if (cli.debug) {
+		console.log('out:', manifest);
+	}
+
+	console.log(`electron-builder ${['--publish', publish, ...cli._].join(' ')}`);
+
+	if (!cli.dryRun) {
+		await execa('electron-builder', ['--publish', publish, ...cli._], {
 			cwd: projectPath,
-			stdio: 'inherit'
+			stdio: 'inherit',
+			env: {
+				PUBLISH_FOR_PULL_REQUEST: typeof process.env.GH_TOKEN !== 'undefined',
+				CSC_FOR_PULL_REQUEST: typeof process.env.CSC_KEY_PASSWORD !== 'undefined' && typeof process.env.CSC_LINK !== 'undefined',
+			}
 		});
 	}
 }

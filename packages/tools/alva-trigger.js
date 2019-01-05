@@ -11,9 +11,6 @@ const Util = require('util');
 
 const writeFile = Util.promisify(Fs.writeFile);
 
-const PR_NUMBER = process.env.CI_PULL_REQUEST ? Path.basename(process.env.CI_PULL_REQUEST) : '';
-const CHANNEL = PR_NUMBER ? `issue-${PR_NUMBER}` : `branch`;
-
 async function main(cli) {
 	if (!cli.project) {
 		console.log(`--project is required`);
@@ -33,7 +30,7 @@ async function main(cli) {
 	}
 
 	const projectPath = Path.resolve(process.cwd(), cli.project);
-	const manifest = require(Path.join(projectPath, 'package.json'));
+	const manifest = require(Path.join(projectPath, 'package.ncc.json'));
 
 	const giturl =
 		typeof manifest.repository === 'object' ? manifest.repository.url : manifest.repository;
@@ -58,9 +55,15 @@ async function main(cli) {
 	const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split('\n');
 	const [hash] = (await execa('git', ['rev-parse', '--short', 'HEAD'])).stdout.split('\n');
 
-	const channel = branch === 'master' ? 'alpha' : CHANNEL;
+	if (branch !== 'master' && !process.env.CIRCLE_PULL_REQUEST) {
+		console.log(`${prefix}skipping, not on master or pr`);
+	}
 
-	const major = semverUtils.parse( branch === 'master' ? semver.inc(manifest.version, 'major') : manifest.version);
+	const channel = branch === 'master'
+		? 'alpha'
+		: 'pr'
+
+	const major = semverUtils.parse(branch === 'master' ? semver.inc(manifest.version, 'major') : manifest.version);
 	const majorTarget = `${major.major}.${major.minor}.${major.patch}-${channel}.0+${hash}`;
 
 	const releaseVersions = sortedReleases
@@ -77,13 +80,27 @@ async function main(cli) {
 
 	const iterations = releaseVersions.filter(sv);
 	const iteration = iterations[0] || majorTarget;
-	const version =  semver.inc(iteration, 'prerelease');
+
+	const prSegments = process.env.CIRCLE_PULL_REQUEST
+		? process.env.CIRCLE_PULL_REQUEST.split('/').filter(Boolean)
+		: ['0'];
+
+	const prNumber = prSegments[prSegments.length - 1] || '0';
+
+	const version = channel === 'pr'
+		? `${major.major}.${major.minor}.${major.patch}-${channel}.${prNumber}+${hash}`
+		: semver.inc(iteration, 'prerelease');
+
+	if (version === null) {
+		console.error(`Failed to determine new version from ${iteration}`);
+		process.exit(1);
+	}
 
 	console.log(`${prefix}${manifest.name}@${version}`);
 
 	if (!cli.dryRun) {
 		manifest.version = version;
-		await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
+		await writeFile(Path.join(projectPath, 'package.ncc.json'), JSON.stringify(manifest, null, '  '));
 	}
 }
 

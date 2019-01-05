@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"outDir": "build",
+		"sourceMap": true,
+		"module": "commonjs",
+		"target": "es2015",
+		"declaration": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"strict": true,
+		"jsx": "react",
+		"rootDir": "src"
+	}
+}

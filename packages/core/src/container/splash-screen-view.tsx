@@ -6,6 +6,7 @@ export interface SplashScreenProps {
 	onCreateClick?: React.MouseEventHandler<HTMLElement>;
 	onOpenClick?: React.MouseEventHandler<HTMLElement>;
 	onGuideClick?: React.MouseEventHandler<HTMLElement>;
+	onExampleClick?: React.MouseEventHandler<HTMLElement>;
 	openFileSlot?: React.ReactNode;
 }
 
@@ -31,6 +32,14 @@ export class SplashScreenView extends React.Component<SplashScreenProps> {
 							color={C.Color.Blue20}
 							size={C.TeaserSize.Medium}
 							onClick={props.onGuideClick}
+							icon="ExternalLink"
+						/>
+						<C.Teaser
+							headline="Download Example"
+							description="Download our Website as an Alva file"
+							color={C.Color.Grey20}
+							size={C.TeaserSize.Medium}
+							onClick={props.onExampleClick}
 							icon="ExternalLink"
 						/>
 					</C.TeaserRow>

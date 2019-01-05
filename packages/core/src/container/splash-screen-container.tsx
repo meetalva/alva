@@ -70,6 +70,13 @@ export class SplashScreenContainer extends React.Component {
 						payload: 'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
 					});
 				}}
+				onExampleClick={() => {
+					app.send({
+						type: MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: 'https://media.meetalva.io/file/Website.alva'
+					});
+				}}
 			/>
 		);
 	}

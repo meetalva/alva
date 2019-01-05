@@ -42,7 +42,7 @@ const StyledContainer = styled.div`
 			case TeaserSize.Medium:
 			default:
 				return `
-					width: 160px;
+					width: 180px;
 				`;
 		}
 	}};

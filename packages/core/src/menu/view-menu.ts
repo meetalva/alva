@@ -156,7 +156,7 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 			},
 			{
 				id: ids.showEditor,
-				label: 'Show Variable Editor',
+				label: 'Show Variables Editor',
 				type: 'checkbox',
 				checked: ctx.app && ctx.app.getPanes().has(Types.AppPane.DevelopmentPane),
 				enabled: ctx.app && ctx.app.getActiveView() === Types.AlvaView.PageDetail,

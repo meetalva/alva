@@ -144,7 +144,7 @@ jobs:
       - persist_to_workspace:
           root: packages/core
           paths:
-              - build
+              - build/scripts
 
   static:
     docker:

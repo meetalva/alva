@@ -80,7 +80,7 @@ export class ViewDetails extends React.Component {
 						<AppPane
 							force
 							pane={Types.AppPane.PatternsPane}
-							defaultSize={{ height: 500, width: '100%' }}
+							defaultSize={{ height: 400, width: '100%' }}
 							enable={{ top: true }}
 							minHeight={240}
 						>

@@ -27,6 +27,7 @@ export async function performAnalysis(
 		getGobalEnumOptionId,
 		getGlobalPatternId,
 		getGlobalPropertyId,
-		getGlobalSlotId
+		getGlobalSlotId,
+		analyzeBuiltins: true
 	});
 }

@@ -235,7 +235,7 @@ jobs:
 
       - run:
           name: Publish Release
-          command: alva-release --debug --project packages/core/nccbuild
+          command: alva-release --project packages/core/nccbuild
 
   windows:
     docker:

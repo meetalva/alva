@@ -59,9 +59,8 @@
 			"isPackage": true
 		}
 	},
-	"// dependencies": "Dependencies that are externals when compiling with ncc",
+	"// dependencies": "Dependencies that are externals and required in main process when compiling with ncc",
 	"dependencies": {
-		"monaco-editor": "0.13.1",
 		"webpack": "^4.28.2",
 		"ws": "5.1.1"
 	},

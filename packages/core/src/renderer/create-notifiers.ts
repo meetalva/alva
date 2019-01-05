@@ -43,9 +43,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 		app.send({
 			id: uuid.v4(),
 			payload: {
-				libraries: patternLibraries
-					.filter(l => l.getOrigin() === Types.PatternLibraryOrigin.UserProvided)
-					.map(l => l.getId())
+				libraries: patternLibraries.map(l => l.getId())
 			},
 			type: Message.MessageType.CheckLibraryRequest
 		});

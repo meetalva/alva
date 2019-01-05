@@ -45,7 +45,6 @@ export function createEnumProperty(
 		id: enumId,
 		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
-		origin: 'user-provided',
 		options: declaration.members.map((enumMember, index) => {
 			const optionContextId = enumMember.initializer
 				? String(enumMember.initializer.getText())

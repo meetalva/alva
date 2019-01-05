@@ -4,14 +4,13 @@ import { getInitialData } from './get-initial-data';
 import * as Message from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
-import { PreviewStore, SyntheticComponents } from './preview-store';
+import { PreviewStore } from './preview-store';
 import { Sender } from '../sender';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 
 export interface Renderer<T> {
 	render(store: PreviewStore<T>, container: HTMLElement): void;
-	getSynthetics(): SyntheticComponents<T>;
 }
 
 declare global {
@@ -96,15 +95,12 @@ async function main(): Promise<void> {
 
 	const project = projectResult.result;
 
-	project
-		.getPatternLibraries()
-		.filter(library => library.getOrigin() === Types.PatternLibraryOrigin.UserProvided)
-		.forEach(library => {
-			const script = document.createElement('script');
-			script.dataset.bundle = library.getBundleId();
-			script.textContent = library.getBundle();
-			document.body.appendChild(script);
-		});
+	project.getPatternLibraries().forEach(library => {
+		const script = document.createElement('script');
+		script.dataset.bundle = library.getBundleId();
+		script.textContent = library.getBundle();
+		document.body.appendChild(script);
+	});
 
 	// (2) Collect components from library scripts
 	const components = getComponents(project);
@@ -113,7 +109,6 @@ async function main(): Promise<void> {
 		mode,
 		components,
 		project,
-		synthetics: window.previewRenderer.getSynthetics(),
 		selectionArea: new ElementArea(),
 		highlightArea: new ElementArea()
 	});
@@ -170,7 +165,6 @@ async function main(): Promise<void> {
 			store
 				.getProject()
 				.getPatternLibraries()
-				.filter(library => library.getOrigin() === Types.PatternLibraryOrigin.UserProvided)
 				.forEach(library => {
 					const script = document.createElement('script');
 					script.dataset.bundle = library.getBundleId();

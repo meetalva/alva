@@ -1,5 +1,5 @@
 import * as Mobx from 'mobx';
-import { deserializeOrigin, PatternPropertyBase, serializeOrigin } from './property-base';
+import { PatternPropertyBase } from './property-base';
 import * as Types from '../../types';
 import { IconName } from '../../components';
 import * as uuid from 'uuid';
@@ -16,7 +16,6 @@ export interface PatternEnumPropertyInit {
 	inputType: Types.PatternPropertyInputType;
 	label: string;
 	options: PatternEnumPropertyOption[];
-	origin: Types.PatternPropertyOrigin;
 	propertyName: string;
 	required: boolean;
 }
@@ -44,7 +43,6 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			id: uuid.v4(),
 			inputType: Types.PatternPropertyInputType.Select,
 			options: [],
-			origin: Types.PatternPropertyOrigin.UserProvided,
 			propertyName: 'a',
 			required: false,
 			label: 'Enum Property',
@@ -66,7 +64,6 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			options: serialized.options.map(serializedOption =>
 				PatternEnumPropertyOption.from(serializedOption)
 			),
-			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
@@ -133,7 +130,6 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			label: this.label,
 			propertyName: this.propertyName,
 			options: [...this.options.values()].map(option => option.toJSON()),
-			origin: serializeOrigin(this.origin),
 			required: this.required,
 			type: this.type
 		};

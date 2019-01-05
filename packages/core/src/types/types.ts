@@ -167,11 +167,6 @@ export interface LibraryCheckPayload {
 	path: string | undefined;
 }
 
-export enum PatternFolderType {
-	Builtin = 'builtin',
-	UserProvided = 'user-provided'
-}
-
 export interface Watcher {
 	getPath(): string;
 	isActive(): boolean;
@@ -375,7 +370,6 @@ export interface PatternDependency {
 	id: string;
 	contextId: string;
 	libraryId: string;
-	origin: SerializedModel.SerializedPatternOrigin;
 	type: SerializedModel.SerializedPatternType;
 }
 

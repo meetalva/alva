@@ -130,7 +130,6 @@ function createUnknownProperty(
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
-		origin: 'user-provided',
 		propertyName: args.symbol.name,
 		required: false,
 		type: Types.PatternPropertyType.Unknown,
@@ -152,7 +151,6 @@ function createBooleanProperty(
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
-		origin: 'user-provided',
 		propertyName: args.symbol.name,
 		required: false,
 		type: Types.PatternPropertyType.Boolean
@@ -173,7 +171,6 @@ function createNumberProperty(
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
-		origin: 'user-provided',
 		propertyName: args.symbol.name,
 		required: false,
 		type: Types.PatternPropertyType.Number
@@ -198,7 +195,6 @@ function createStringProperty(
 			id: ctx.getPropertyId(args.symbol.name),
 			inputType: Types.PatternPropertyInputType.Default,
 			label: args.symbol.name,
-			origin: 'user-provided',
 			propertyName: args.symbol.name,
 			required: false,
 			type: Types.PatternPropertyType.Asset
@@ -216,7 +212,6 @@ function createStringProperty(
 			id: ctx.getPropertyId(args.symbol.name),
 			inputType: Types.PatternPropertyInputType.Default,
 			label: args.symbol.name,
-			origin: 'user-provided',
 			propertyName: args.symbol.name,
 			required: false,
 			type: Types.PatternPropertyType.Href
@@ -233,7 +228,6 @@ function createStringProperty(
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
-		origin: 'user-provided',
 		propertyName: args.symbol.name,
 		required: false,
 		type: Types.PatternPropertyType.String
@@ -258,7 +252,6 @@ function createEventHandlerProperty(
 		id: ctx.getPropertyId(args.symbol.name),
 		inputType: Types.PatternPropertyInputType.Default,
 		label: args.symbol.name,
-		origin: 'user-provided',
 		propertyName: args.symbol.name,
 		required: false,
 		type: Types.PatternPropertyType.EventHandler

@@ -17,6 +17,8 @@ export class ElectronUpdater {
 
 		this.updater = require('electron-updater').autoUpdater;
 		this.updater.autoDownload = false;
+		this.updater.autoInstallOnAppQuit = false;
+		this.updater.allowDowngrade = false;
 
 		this.updater.logger = {
 			debug: server.host.log,

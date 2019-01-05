@@ -58,6 +58,9 @@ async function main(cli) {
 		console.log('out:', manifest);
 	}
 
+
+	console.log(`${prefix}: 'electron-builder' ${['--publish', publish, ...cli._].join(' ')}`);
+
 	if (!cli.dryRun) {
 		await execa('electron-builder', ['--publish', publish, ...cli._], {
 			cwd: projectPath,

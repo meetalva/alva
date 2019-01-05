@@ -81,8 +81,14 @@ async function main(cli) {
 	const iterations = releaseVersions.filter(sv);
 	const iteration = iterations[0] || majorTarget;
 
+	const prSegments = process.env.CIRCLE_PULL_REQUEST
+		? process.env.CIRCLE_PULL_REQUEST.split('/').filter(Boolean)
+		: ['0'];
+
+	const prNumber = prSegments[prSegments.length - 1] || '0';
+
 	const version = channel === 'pr'
-		? `${major.major}.${major.minor}.${major.patch}-${channel}.${process.env.CIRCLE_PR_NUMBER}+${hash}`
+		? `${major.major}.${major.minor}.${major.patch}-${channel}.${prNumber}+${hash}`
 		: semver.inc(iteration, 'prerelease');
 
 	if (version === null) {

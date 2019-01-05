@@ -126,9 +126,13 @@ jobs:
       - setup:
           key: linux
 
+      - run: cat packages/core/package.ncc.json
+
       - run:
           name: Compile with ncc
           command: lerna run compile:ncc --stream
+
+      - run: cat packages/core/nccbuild/package.json
 
       - persist_to_workspace:
           root: packages/core

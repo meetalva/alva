@@ -11,6 +11,7 @@ export interface LinkProps {
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	uppercase?: boolean;
 	underline?: boolean;
+	title?: string;
 }
 
 const StyledLink: StyledComponentClass<LinkProps, {}> = styled.a`
@@ -30,6 +31,7 @@ export const Link: React.StatelessComponent<LinkProps> = props => (
 		onClick={props.onClick}
 		uppercase={props.uppercase}
 		underline={props.underline}
+		title={props.title}
 	>
 		{props.children}
 	</StyledLink>

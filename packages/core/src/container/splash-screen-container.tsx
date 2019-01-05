@@ -77,6 +77,27 @@ export class SplashScreenContainer extends React.Component {
 						payload: 'https://media.meetalva.io/file/Website.alva'
 					});
 				}}
+				onGithubClick={() => {
+					app.send({
+						type: MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: 'https://github.com/meetalva/alva'
+					});
+				}}
+				onWebsiteClick={() => {
+					app.send({
+						type: MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: 'https://meetalva.io'
+					});
+				}}
+				onMailClick={() => {
+					app.send({
+						type: MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: 'mailto:hey@meetalva.io'
+					});
+				}}
 			/>
 		);
 	}

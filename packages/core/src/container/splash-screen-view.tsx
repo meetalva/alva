@@ -1,12 +1,16 @@
 import * as C from '../components';
 import * as React from 'react';
 import { RecentFilesList } from './recent-files-list';
+import { GitHub, Mail, Link } from 'react-feather';
 
 export interface SplashScreenProps {
 	onCreateClick?: React.MouseEventHandler<HTMLElement>;
 	onOpenClick?: React.MouseEventHandler<HTMLElement>;
 	onGuideClick?: React.MouseEventHandler<HTMLElement>;
 	onExampleClick?: React.MouseEventHandler<HTMLElement>;
+	onGithubClick?: React.MouseEventHandler<HTMLElement>;
+	onWebsiteClick?: React.MouseEventHandler<HTMLElement>;
+	onMailClick?: React.MouseEventHandler<HTMLElement>;
 	openFileSlot?: React.ReactNode;
 }
 
@@ -44,6 +48,19 @@ export class SplashScreenView extends React.Component<SplashScreenProps> {
 						/>
 					</C.TeaserRow>
 					<C.Space sizeBottom={C.SpaceSize.XL} />
+					<C.Layout direction={C.LayoutDirection.Row} style={{ justifyContent: 'center' }}>
+						<C.Link onClick={props.onGithubClick} title="Alva on GitHub">
+							<GitHub color={C.Color.Grey60} size={C.IconSize.S} strokeWidth={2} />
+						</C.Link>
+						<C.Space sizeRight={C.SpaceSize.M} />
+						<C.Link onClick={props.onWebsiteClick} title="Our Website">
+							<Link color={C.Color.Grey60} size={C.IconSize.S} strokeWidth={2} />
+						</C.Link>
+						<C.Space sizeRight={C.SpaceSize.M} />
+						<C.Link onClick={props.onMailClick} title="Write us">
+							<Mail color={C.Color.Grey60} size={C.IconSize.S} strokeWidth={2} />
+						</C.Link>
+					</C.Layout>
 				</C.SplashScreenSlotLeft>
 				<C.SplashScreenSlotRight>
 					<RecentFilesList />

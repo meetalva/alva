@@ -85,6 +85,11 @@ async function main(cli) {
 		? `${major.major}.${major.minor}.${major.patch}-${channel}.${process.env.CIRCLE_PULL_REQUEST}+${hash}`
 		: semver.inc(iteration, 'prerelease');
 
+	if (version === null) {
+		console.error(`Failed to determine new version from ${iteration}`);
+		process.exit(1);
+	}
+
 	console.log(`${prefix}${manifest.name}@${version}`);
 
 	if (!cli.dryRun) {

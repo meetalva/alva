@@ -445,18 +445,15 @@ export class ElementList extends React.Component {
 			>
 				<Components.Element.ElementChildren>
 					{childContent ? <ElementContentContainer content={childContent} /> : null}
-					<div
-						style={{
-							position: 'absolute',
-							opacity: hasChildren ? 0 : 1
-						}}
-					>
+					{hasChildren ? (
+						''
+					) : (
 						<Components.EmptyState
 							headline="Elements"
-							copy="Drop components here from the library below"
+							copy="Drop Components here from the Library below"
 							image={Images.EmptyElements}
 						/>
-					</div>
+					)}
 				</Components.Element.ElementChildren>
 				<ElementDragImage element={store.getDraggedElement()} dragRef={this.dragImg} />
 			</Components.DragArea>

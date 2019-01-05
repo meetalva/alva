@@ -53,7 +53,15 @@ export class PropertyListContainer extends React.Component<PropertyListContainer
 		);
 
 		return (
-			<div>
+			<>
+				{relevantProps.length > 0 ? (
+					''
+				) : (
+					<Components.EmptyState
+						headline="Properties"
+						copy="Select an Element to edit Properties"
+					/>
+				)}
 				{ungroupedProps.map(elementProperty => (
 					<PropertyListItem key={elementProperty.getId()} property={elementProperty} />
 				))}
@@ -96,7 +104,7 @@ export class PropertyListContainer extends React.Component<PropertyListContainer
 						))}
 					</Components.PropertyDetails>
 				)}
-			</div>
+			</>
 		);
 	}
 }

@@ -10,7 +10,7 @@ export const ConnectPaneContainer: React.SFC<ConnectPaneProps> = props => (
 		<Teaser
 			headline="Connect a Library"
 			description={`
-				Use real code components for your prototype
+				Use real Code Components for your Prototype
 			`}
 			onClick={props.onClick}
 			size={TeaserSize.Large}

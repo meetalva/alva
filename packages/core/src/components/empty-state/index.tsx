@@ -14,7 +14,15 @@ export interface EmptyStateProps {
 
 const StyledEmptyState = styled.div`
 	text-align: center;
-	padding: ${getSpace(SpaceSize.XXXL)}px;
+	padding: ${getSpace(SpaceSize.XXXL)}px ${getSpace(SpaceSize.XXXL)}px
+		${getSpace(SpaceSize.XXXL + SpaceSize.XXL)}px;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	box-sizing: border-box;
+	user-select: none;
 `;
 
 export const EmptyState: React.StatelessComponent<EmptyStateProps> = props => (

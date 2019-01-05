@@ -126,6 +126,9 @@ jobs:
       - setup:
           key: linux
 
+      - attach_workspace:
+          at: packages/core
+
       - run: cat packages/core/package.ncc.json
 
       - run:
@@ -190,6 +193,8 @@ jobs:
       - run:
           name: Trigger Release
           command: alva-trigger --project packages/core
+
+      - run: cat packages/core/package.ncc.json
 
       - persist_to_workspace:
           root: packages/core

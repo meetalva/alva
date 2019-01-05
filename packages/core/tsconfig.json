@@ -3,7 +3,6 @@
 		"skipLibCheck": true,
 		"allowSyntheticDefaultImports": false,
 		"strict": true,
-		"declaration": true,
 		"downlevelIteration": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,

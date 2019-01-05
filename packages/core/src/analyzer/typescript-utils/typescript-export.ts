@@ -2,6 +2,7 @@
 
 import * as ts from 'typescript';
 import { TypeScriptType } from './typescript-type';
+import * as Types from '../../types';
 
 /**
  * A JavaScript export declaration
@@ -36,6 +37,11 @@ export interface TypescriptExport {
 	 * The type of the object exported
 	 */
 	type: TypeScriptType;
+
+	/**
+	 * The pattern type (like synthetic:page)
+	 */
+	patternType: Types.SerializedPatternType;
 
 	/**
 	 * If the export should be ignored

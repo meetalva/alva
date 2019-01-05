@@ -1,9 +1,4 @@
-import {
-	deserializeOrigin,
-	PatternPropertyBase,
-	serializeOrigin,
-	PatternPropertyInit
-} from './property-base';
+import { PatternPropertyBase, PatternPropertyInit } from './property-base';
 import * as Types from '../../types';
 import uuid = require('uuid');
 
@@ -30,7 +25,6 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 			id: uuid.v4(),
 			inputType: Types.PatternPropertyInputType.Default,
 			label: 'String Property',
-			origin: Types.PatternPropertyOrigin.UserProvided,
 			propertyName: 'stringProperty',
 			required: false,
 			...mixins
@@ -48,7 +42,6 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 			id: serialized.id,
 			inputType: serialized.inputType,
 			label: serialized.label,
-			origin: deserializeOrigin(serialized.origin),
 			propertyName: serialized.propertyName,
 			required: serialized.required
 		});
@@ -94,7 +87,6 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 			id: this.id,
 			inputType: this.inputType,
 			label: this.label,
-			origin: serializeOrigin(this.origin),
 			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type

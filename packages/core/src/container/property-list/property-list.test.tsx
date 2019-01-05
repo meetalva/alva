@@ -94,7 +94,6 @@ function createUnknownPropElement(project: Project, mixins?: Mixins): Element {
 			exportName: 'pattern',
 			icon: '',
 			name: 'Pattern',
-			origin: T.PatternOrigin.UserProvided,
 			propertyIds: [property.getId()],
 			slots: [],
 			type: T.PatternType.Pattern

@@ -291,13 +291,12 @@ export function analyzePatternExport(
 			id,
 			name:
 				ex.displayName || (exportName !== 'default' ? exportName : ctx.candidate.displayName),
-			origin: 'user-provided',
 			propertyIds: properties.map(p => {
 				const known = ctx.knownProperties.find(k => k.symbol === p.symbol);
 				return known ? known.property.id : p.property.id;
 			}),
 			slots,
-			type: 'pattern'
+			type: ex.patternType
 		},
 		properties: properties.filter(p => {
 			const unique = !ctx.knownProperties.some(k => k.symbol === p.symbol);

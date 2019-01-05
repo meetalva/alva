@@ -24,9 +24,7 @@ export function previewRouteFactory(server: Types.AlvaServer): Express.RequestHa
 		// in an edit interface
 		project.sync(server.sender);
 
-		const userLibraries = project
-			.getPatternLibraries()
-			.filter(lib => lib.getOrigin() === Types.PatternLibraryOrigin.UserProvided);
+		const userLibraries = project.getPatternLibraries();
 
 		const script = (lib: PatternLibrary) =>
 			`<script src="/project/${project.getId()}/library/${lib.getId()}" data-bundle="${lib.getBundleId()}"></script>`;

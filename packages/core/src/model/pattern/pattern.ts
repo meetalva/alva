@@ -14,7 +14,6 @@ export interface PatternInit {
 	id?: string;
 	icon: string;
 	name: string;
-	origin: Types.PatternOrigin;
 	propertyIds: string[];
 	slots: PatternSlot[];
 	type: Types.PatternType;
@@ -33,7 +32,6 @@ export class Pattern {
 	@Mobx.observable private icon: string;
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
-	@Mobx.observable private origin: Types.PatternOrigin;
 	private patternLibrary: PatternLibrary;
 	@Mobx.observable private propertyIds: Set<string> = new Set();
 	@Mobx.observable private slots: Map<string, PatternSlot> = new Map();
@@ -46,7 +44,6 @@ export class Pattern {
 		this.icon = init.icon;
 		this.id = init.id || uuid.v4();
 		this.name = AlvaUtil.guessName(init.name);
-		this.origin = init.origin;
 		this.patternLibrary = context.patternLibrary;
 		this.propertyIds = new Set(init.propertyIds || []);
 		this.type = init.type;
@@ -63,7 +60,6 @@ export class Pattern {
 				icon: serialized.icon,
 				id: serialized.id,
 				name: serialized.name,
-				origin: deserializeOrigin(serialized.origin),
 				propertyIds: serialized.propertyIds,
 				slots: serialized.slots.map(slot => PatternSlot.from(slot)),
 				type: deserializeType(serialized.type)
@@ -106,10 +102,6 @@ export class Pattern {
 
 	public getName(): string {
 		return this.name;
-	}
-
-	public getOrigin(): Types.PatternOrigin {
-		return this.origin;
 	}
 
 	public getPatternLibrary(): PatternLibrary {
@@ -173,7 +165,6 @@ export class Pattern {
 			icon: this.icon,
 			id: this.id,
 			name: this.name,
-			origin: serializeOrigin(this.origin),
 			propertyIds: Array.from(this.propertyIds),
 			slots: this.getSlots().map(slot => slot.toJSON()),
 			type: serializeType(this.type)
@@ -186,7 +177,6 @@ export class Pattern {
 		this.description = pattern.getDescription();
 		this.exportName = pattern.getExportName();
 		this.name = pattern.getName();
-		this.origin = pattern.getOrigin();
 		this.icon = pattern.getIcon();
 		this.patternLibrary = context ? context.patternLibrary : this.patternLibrary;
 		this.propertyIds = pattern.propertyIds;
@@ -201,16 +191,6 @@ export class Pattern {
 		slotChanges.changed.forEach(change => change.before.update(change.after));
 		slotChanges.removed.forEach(change => this.removeSlot(change.before));
 	}
-}
-
-function deserializeOrigin(input: Types.SerializedPatternOrigin): Types.PatternOrigin {
-	switch (input) {
-		case 'built-in':
-			return Types.PatternOrigin.BuiltIn;
-		case 'user-provided':
-			return Types.PatternOrigin.UserProvided;
-	}
-	throw new Error(`Unknown pattern type: ${input}`);
 }
 
 function deserializeType(input: Types.SerializedPatternType): Types.PatternType {
@@ -231,16 +211,6 @@ function deserializeType(input: Types.SerializedPatternType): Types.PatternType 
 			return Types.PatternType.Pattern;
 	}
 	throw new Error(`Unknown pattern type: ${input}`);
-}
-
-function serializeOrigin(input: Types.PatternOrigin): Types.SerializedPatternOrigin {
-	switch (input) {
-		case Types.PatternOrigin.BuiltIn:
-			return 'built-in';
-		case Types.PatternOrigin.UserProvided:
-			return 'user-provided';
-	}
-	throw new Error(`Unknown pattern origin: ${input}`);
 }
 
 function serializeType(input: Types.PatternType): Types.SerializedPatternType {

@@ -33,7 +33,6 @@ export interface PreviewStoreInit<V, T extends Types.PreviewDocumentMode> {
 	mode: T;
 	project: Model.Project;
 	selectionArea: ElementArea;
-	synthetics: SyntheticComponents<V>;
 }
 
 export interface Components {
@@ -57,7 +56,6 @@ export class PreviewStore<V> {
 	@Mobx.observable private mode: Types.PreviewDocumentMode;
 	@Mobx.observable private project: Model.Project;
 	@Mobx.observable private selectionArea: ElementArea;
-	@Mobx.observable private synthetics: SyntheticComponents<V>;
 	@Mobx.observable private scrollPosition?: Types.Point;
 
 	private sender?: Sender;
@@ -67,7 +65,6 @@ export class PreviewStore<V> {
 		this.mode = init.mode;
 		this.project = init.project;
 		this.components = init.components;
-		this.synthetics = init.synthetics;
 		this.selectionArea = init.selectionArea;
 		this.highlightArea = init.highlightArea;
 	}
@@ -93,33 +90,26 @@ export class PreviewStore<V> {
 			return;
 		}
 
-		const type = pattern.getType();
+		const component: unknown = this.components[pattern.getId()];
 
-		switch (type) {
-			case Types.PatternType.Pattern:
-				const component: unknown = this.components[pattern.getId()];
-
-				if (typeof component !== 'object' || component === null) {
-					throw new Error(
-						`Could not find component with id "${pattern.getId()}" for pattern "${pattern.getName()}:${pattern.getExportName()}".`
-					);
-				}
-
-				const exportName = pattern.getExportName();
-
-				if (!component.hasOwnProperty(exportName)) {
-					if (typeof component !== 'object') {
-						throw new Error(
-							`Could not find export ${exportName} on pattern "${pattern.getName()}:${pattern.getExportName()}".`
-						);
-					}
-				}
-
-				const c = component as { [key: string]: unknown };
-				return c[exportName] as V | undefined;
-			default:
-				return this.synthetics[type];
+		if (typeof component !== 'object' || component === null) {
+			throw new Error(
+				`Could not find component with id "${pattern.getId()}" for pattern "${pattern.getName()}:${pattern.getExportName()}".`
+			);
 		}
+
+		const exportName = pattern.getExportName();
+
+		if (!component.hasOwnProperty(exportName)) {
+			if (typeof component !== 'object') {
+				throw new Error(
+					`Could not find export ${exportName} on pattern "${pattern.getName()}:${pattern.getExportName()}".`
+				);
+			}
+		}
+
+		const c = component as { [key: string]: unknown };
+		return c[exportName] as V | undefined;
 	}
 
 	public getElementById(id: string): Model.Element | undefined {

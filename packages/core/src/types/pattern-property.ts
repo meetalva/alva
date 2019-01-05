@@ -26,13 +26,6 @@ export type SerializedPatternPropertyType =
 	| 'string'
 	| 'unknown';
 
-export enum PatternPropertyOrigin {
-	BuiltIn = 'built-in',
-	UserProvided = 'user-provided'
-}
-
-export type SerializedPatternPropertyOrigin = 'built-in' | 'user-provided';
-
 export enum PatternPropertyInputType {
 	Default = 'default',
 	Select = 'select',
@@ -63,7 +56,6 @@ export interface SerializedPropertyBase {
 	id: string;
 	inputType: PatternPropertyInputType;
 	label: string;
-	origin: SerializedPatternPropertyOrigin;
 	propertyName: string;
 	required: boolean;
 	type: SerializedPatternPropertyType;

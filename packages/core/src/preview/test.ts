@@ -62,7 +62,6 @@ export function getRenderProperties({
 		mode: Types.PreviewDocumentMode.Static,
 		components: {},
 		project,
-		synthetics: {} as any,
 		selectionArea: new ElementArea(),
 		highlightArea: new ElementArea()
 	});

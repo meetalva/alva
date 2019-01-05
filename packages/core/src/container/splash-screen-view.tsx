@@ -28,7 +28,7 @@ export class SplashScreenView extends React.Component<SplashScreenProps> {
 					<C.TeaserRow>
 						<C.Teaser
 							headline="Get Started"
-							description="Start with our easy-to-learn Guides"
+							description="Start with our easy-to-learn guides"
 							color={C.Color.Blue20}
 							size={C.TeaserSize.Medium}
 							onClick={props.onGuideClick}
@@ -36,7 +36,7 @@ export class SplashScreenView extends React.Component<SplashScreenProps> {
 						/>
 						<C.Teaser
 							headline="Download Example"
-							description="Download our Website as an Alva file"
+							description="Download our website as an Alva file"
 							color={C.Color.Grey20}
 							size={C.TeaserSize.Medium}
 							onClick={props.onExampleClick}

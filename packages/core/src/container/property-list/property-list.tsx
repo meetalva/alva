@@ -57,7 +57,7 @@ export class PropertyListContainer extends React.Component<PropertyListContainer
 				{relevantProps.length === 0 && (
 					<Components.EmptyState
 						headline="Properties"
-						copy="Select an Element to edit Properties"
+						copy="Select an element to edit properties"
 					/>
 				)}
 				{ungroupedProps.map(elementProperty => (

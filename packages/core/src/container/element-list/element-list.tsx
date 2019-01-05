@@ -448,7 +448,7 @@ export class ElementList extends React.Component {
 					{!hasChildren && (
 						<Components.EmptyState
 							headline="Elements"
-							copy="Drop Components here from the Library below"
+							copy="Drop components here from the library below"
 							image={Images.EmptyElements}
 						/>
 					)}

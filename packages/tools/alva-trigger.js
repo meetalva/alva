@@ -82,7 +82,7 @@ async function main(cli) {
 	const iteration = iterations[0] || majorTarget;
 
 	const version = channel === 'pr'
-		? `${major.major}.${major.minor}.${major.patch}-${channel}.${process.env.CIRCLE_PULL_REQUEST}+${hash}`
+		? `${major.major}.${major.minor}.${major.patch}-${channel}.${process.env.CIRCLE_PR_NUMBER}+${hash}`
 		: semver.inc(iteration, 'prerelease');
 
 	if (version === null) {

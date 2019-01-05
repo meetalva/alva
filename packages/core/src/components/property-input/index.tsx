@@ -3,6 +3,9 @@ import { Color } from '../colors';
 import { fonts } from '../fonts';
 import { getSpace, SpaceSize } from '../space';
 import styled, { css } from 'styled-components';
+import { ChevronUp, ChevronDown } from 'react-feather';
+import { IconSize } from '../icons';
+import { merge } from 'lodash';
 
 const INPUT_PADDING_RIGHT = (props: PropertyInputProps) =>
 	props.type && props.type === PropertyInputType.Number ? 0 : getSpace(SpaceSize.S);
@@ -30,6 +33,10 @@ export const PropertyInputStyles = css`
 	::-webkit-input-placeholder {
 		color: ${Color.Grey60};
 	}
+	::-webkit-outer-spin-button,
+	::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+	}
 	&:hover {
 		color: ${Color.Black};
 		border-color: ${Color.Grey60};
@@ -39,6 +46,56 @@ export const PropertyInputStyles = css`
 		border-color: ${Color.Blue40};
 		color: ${Color.Black};
 		box-shadow: 0 0 3px ${Color.BlueAlpha40};
+	}
+`;
+
+const StyledWrapper = styled.div`
+	position: relative;
+`;
+
+const StyledStepper = styled.div`
+	position: absolute;
+	height: 100%;
+	right: 0;
+	top: 0;
+	border-left: 1px solid ${Color.Grey90};
+
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-width: 0.5px;
+	}
+`;
+const StyledMajor = styled.div`
+	padding: ${getSpace(SpaceSize.XXS)}px;
+
+	border-bottom: 1px solid ${Color.Grey90};
+
+	@media screen and (-webkit-min-device-pixel-ratio: 2) {
+		border-width: 0.5px;
+	}
+
+	svg {
+		color: ${Color.Grey60};
+		display: block;
+	}
+
+	&:hover {
+		svg {
+			color: ${Color.Grey20};
+		}
+	}
+`;
+const StyledMinor = styled.div`
+	padding: ${getSpace(SpaceSize.XXS)}px;
+
+	svg {
+		color: ${Color.Grey60};
+		display: block;
+	}
+
+	&:hover {
+		svg {
+			color: ${Color.Grey20};
+		}
 	}
 `;
 
@@ -54,6 +111,9 @@ export interface PropertyInputProps {
 	placeholder?: string;
 	type?: PropertyInputType;
 	value?: string;
+
+	onDecrement?: React.MouseEventHandler;
+	onIncrement?: React.MouseEventHandler;
 }
 
 export enum PropertyInputType {
@@ -61,13 +121,26 @@ export enum PropertyInputType {
 	Number = 'number'
 }
 
+// tslint:disable-next-line:no-empty
+const NOOP = () => {};
+
 export const PropertyInput: React.SFC<PropertyInputProps> = props => (
-	<StyledInput
-		list={props.list}
-		onChange={props.onChange}
-		onBlur={props.onBlur}
-		type={props.type}
-		value={props.value || ''}
-		placeholder={props.placeholder}
-	/>
+	<StyledWrapper>
+		<StyledInput
+			list={props.list}
+			onChange={props.onChange}
+			onBlur={props.onBlur}
+			type={props.type}
+			value={props.value || ''}
+			placeholder={props.placeholder}
+		/>
+		<StyledStepper>
+			<StyledMajor onClick={props.onIncrement || NOOP}>
+				<ChevronUp size={IconSize.XXS} />
+			</StyledMajor>
+			<StyledMinor onClick={props.onDecrement || NOOP}>
+				<ChevronDown size={IconSize.XXS} />
+			</StyledMinor>
+		</StyledStepper>
+	</StyledWrapper>
 );

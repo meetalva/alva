@@ -19,9 +19,9 @@ async function main(cli) {
 
 	const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split('\n');
 
-	if (branch !== 'master' && !process.env.CIRCLE_PULL_REQUEST) {
-		console.log(`${prefix}skipping, not on master or pr`);
-	}
+	const publish = (branch === 'master' || !process.env.CIRCLE_PULL_REQUEST)
+		? 'always'
+		: 'never';
 
 	const current = semverUtils.parse(manifest.version);
 	const channel = current.release ? current.release.split('.')[0] : 'stable';
@@ -55,7 +55,7 @@ async function main(cli) {
 	}
 
 	if (!cli.dryRun) {
-		await execa('electron-builder', ['--publish', 'always', ...cli._], {
+		await execa('electron-builder', ['--publish', publish, ...cli._], {
 			cwd: projectPath,
 			stdio: 'inherit',
 			env: {

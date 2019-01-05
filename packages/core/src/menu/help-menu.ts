@@ -28,7 +28,7 @@ export const helpMenu = (ctx: Types.MenuContext): Types.MenuItem => ({
 		},
 		{
 			id: ids.github,
-			label: '&Github',
+			label: '&GitHub',
 			click: app => {
 				app.send({
 					type: Message.MessageType.OpenExternalURL,

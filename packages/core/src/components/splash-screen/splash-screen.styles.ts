@@ -6,10 +6,6 @@ export interface StyledSectionProps {
 	type: 'primary' | 'secondary';
 }
 
-export interface StyledBoxProps {
-	type: 'primary' | 'secondary';
-}
-
 export const StyledContainer = styled.div`
 	position: relative;
 	display: grid;
@@ -24,18 +20,10 @@ export const StyledSection =
 	styled.div <
 	StyledSectionProps >
 	`
+	display: ${props => (props.type === 'primary' ? 'flex' : '')};;
+	flex-direction: column;
+	justify-content: center;
 	background: ${props => (props.type === 'primary' ? Color.White : Color.Grey97)};
+	text-align: ${props => (props.type === 'primary' ? 'center' : '')};
 	overflow: auto;
-`;
-
-export const StyledBox =
-	styled.div <
-	StyledBoxProps >
-	`
-	padding: ${props =>
-		props.type === 'primary'
-			? `${getSpace(SpaceSize.XXXL * 1.5)}px ${getSpace(SpaceSize.XXXL)}px ${getSpace(
-					SpaceSize.XXXL
-			  )}px ${getSpace(SpaceSize.XXXL)}px`
-			: '0px'};
 `;

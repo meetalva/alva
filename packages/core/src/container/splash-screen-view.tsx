@@ -16,17 +16,25 @@ export class SplashScreenView extends React.Component<SplashScreenProps> {
 		return (
 			<C.SplashScreen>
 				<C.SplashScreenSlotLeft>
-					<C.Headline tagName="h1" bold textColor={C.Color.Grey20} order={2}>
-						You’re new here?
+					<C.Headline bold textColor={C.Color.Grey10} order={1}>
+						Meet Alva
 					</C.Headline>
+					<C.Space sizeBottom={C.SpaceSize.XS} />
+					<C.Copy textColor={C.Color.Grey20} size={C.CopySize.M}>
+						Create living prototypes with code components.
+					</C.Copy>
+					<C.Space sizeBottom={C.SpaceSize.XXXL} />
+					<C.TeaserRow>
+						<C.Teaser
+							headline="Get Started"
+							description="Start with our easy-to-learn Guides"
+							color={C.Color.Blue20}
+							size={C.TeaserSize.Medium}
+							onClick={props.onGuideClick}
+							icon="ExternalLink"
+						/>
+					</C.TeaserRow>
 					<C.Space sizeBottom={C.SpaceSize.XL} />
-					<C.Headline tagName="div" order={2}>
-						Get started with our easy-to-learn guides.
-					</C.Headline>
-					<C.Space sizeBottom={C.SpaceSize.XL} />
-					<C.Button onClick={props.onGuideClick} order={C.ButtonOrder.Primary}>
-						See Guides
-					</C.Button>
 				</C.SplashScreenSlotLeft>
 				<C.SplashScreenSlotRight>
 					<RecentFilesList />

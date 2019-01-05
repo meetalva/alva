@@ -1,5 +1,6 @@
 import { AppView } from './app-view';
 import { ChromeContainer } from './chrome/chrome-container';
+import { TutorialContainer } from './tutorial-container';
 import * as Components from '../components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
@@ -69,6 +70,7 @@ export class App extends React.Component {
 						<ViewDetails />
 					</AppView>
 				</Components.MainArea>
+				<TutorialContainer />
 				<Components.IconRegistry />
 			</Components.Layout>
 		);

@@ -1,0 +1,8 @@
+{
+	"displayName": "Tutorial",
+	"description": "Tutorial Screen for Alva",
+	"flag": "alpha",
+	"name": "tutorial",
+	"version": "1.0.0",
+	"tags": ["tutorial"]
+}

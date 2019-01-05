@@ -100,14 +100,26 @@ export class RecentFilesList extends React.Component {
 		const [drafts, projects] = partition(store.getProjects().filter(p => p.valid), 'draft');
 
 		return (
-			<div>
+			<>
+				{drafts.length === 0 && projects.length === 0 ? (
+					<C.EmptyState
+						headline="Welcome!"
+						copy="Create a new Alva Project or start with our Guides"
+					/>
+				) : (
+					<C.Space size={C.SpaceSize.XL} sizeBottom={C.SpaceSize.XS}>
+						<C.Copy size={C.CopySize.S} textColor={C.Color.Grey36}>
+							Recent Files
+						</C.Copy>
+					</C.Space>
+				)}
 				{projects.map(project => (
 					<RecentFileItem key={project.id} project={project} sender={store.getSender()} />
 				))}
 				{drafts.map(project => (
 					<RecentDraftItem key={project.id} project={project} sender={store.getSender()} />
 				))}
-			</div>
+			</>
 		);
 	}
 }

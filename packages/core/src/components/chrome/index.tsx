@@ -10,8 +10,11 @@ export interface ChromeProps {
 	hidden?: boolean;
 }
 
-const StyledChrome = styled.div`
-	${(props: ChromeProps) => props.hidden && 'position: absolute'};
+const StyledChrome =
+	styled.div <
+	ChromeProps >
+	`
+	${props => props.hidden && 'position: absolute'};
 	box-sizing: border-box;
 	display: grid;
 	flex: 0 0 40px;
@@ -21,11 +24,11 @@ const StyledChrome = styled.div`
 	width: 100%;
 	height: 40px;
 	padding: 0 ${getSpace(SpaceSize.M)}px;
-	border-bottom: ${(props: ChromeProps) => (props.hidden ? 'none' : `1px solid ${Color.Grey90}`)};
+	border-bottom: ${props => (props.hidden ? 'none' : `1px solid ${Color.Grey90}`)};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-bottom-width: 0.5px;
 	}
-	${(props: ChromeProps) => !props.hidden && `background: ${Color.White}`};
+	${props => !props.hidden && `background: ${Color.White}`};
 	font-family: ${fonts().NORMAL_FONT};
 	-webkit-app-region: drag;
 	-webkit-user-select: none;

@@ -1,4 +1,5 @@
 build
+nccbuild
 dist
 node_modules
 *.log

@@ -17,7 +17,7 @@ export interface Renderer<T> {
 declare global {
 	interface Window {
 		// tslint:disable-next-line:no-any
-		previewRenderer: Renderer<any>;
+		previewRenderer: any;
 		rpc: {
 			getDocumentSize(): Promise<{ width: number; height: number }>;
 			// tslint:disable-next-line:no-any

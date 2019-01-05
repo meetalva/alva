@@ -15,5 +15,6 @@
 		"rootDir": "src",
 		"target": "es2017",
 		"sourceMap": true
-	}
+	},
+	"include": ["src"]
 }

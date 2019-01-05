@@ -3,6 +3,8 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const yargs = require('yargs-parser');
 const flags = yargs(process.argv.slice(2));
 
+const out = flags.out ? flags.out : 'build';
+
 module.exports = {
 	mode: flags.production ? 'production' : 'development',
 	devtool: flags.production || flags.sourceMaps ? 'source-maps' : 'eval',
@@ -36,7 +38,7 @@ module.exports = {
 	plugins: [
 		new MonacoWebpackPlugin({
 			languages: ['typescript', 'json'],
-			output: '/scripts/'
+			output: ''
 		})
 	],
 	externals: {
@@ -46,7 +48,7 @@ module.exports = {
 		filename: '[name].js',
 		library: '[name]',
 		libraryTarget: 'window',
-		path: Path.join(__dirname, 'build', 'scripts'),
+		path: Path.join(__dirname, out, 'scripts'),
 		publicPath: '/scripts/'
 	}
 };

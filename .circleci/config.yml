@@ -112,6 +112,23 @@ jobs:
           paths:
               - build
 
+  ncc:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: linux
+
+      - run: lerna run compile:ncc --stream
+
+      - persist_to_workspace:
+          root: packages/core
+          paths:
+              - nccbuild
+
   bundle:
     docker:
       - image: circleci/node:8
@@ -176,8 +193,12 @@ jobs:
           at: packages/core
 
       - run:
+          name: Copy Scripts
+          command: cp -r build/scripts nccbuild/scripts
+
+      - run:
           name: Publish Release
-          command: alva-release --project packages/core
+          command: alva-release --project packages/core/nccbuild
 
   linux:
     docker:
@@ -193,8 +214,12 @@ jobs:
           at: packages/core
 
       - run:
+          name: Copy Scripts
+          command: cp -r build/scripts nccbuild/scripts
+
+      - run:
           name: Publish Release
-          command: alva-release --project packages/core
+          command: alva-release --project packages/core/nccbuild
 
   windows:
     docker:
@@ -210,8 +235,12 @@ jobs:
           at: packages/core
 
       - run:
+          name: Copy Scripts
+          command: cp -r build/scripts nccbuild/scripts
+
+      - run:
           name: Publish Release
-          command: alva-release --project packages/core -- --win
+          command: alva-release --project packages/core/nccbuild -- --win
 
 
 workflows:
@@ -224,6 +253,7 @@ workflows:
       - lint
       - bundle
       - compile
+      - ncc
       - static:
           requires:
             - test
@@ -235,20 +265,20 @@ workflows:
             - install_macos
             - test
             - lint
-            - compile
+            - ncc
             - bundle
             - trigger
       - linux:
           requires:
             - test
             - lint
-            - compile
+            - ncc
             - bundle
             - trigger
       - windows:
           requires:
             - test
             - lint
-            - compile
+            - ncc
             - bundle
             - trigger

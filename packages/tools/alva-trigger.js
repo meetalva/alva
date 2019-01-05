@@ -33,7 +33,7 @@ async function main(cli) {
 	}
 
 	const projectPath = Path.resolve(process.cwd(), cli.project);
-	const manifest = require(Path.join(projectPath, 'package.json'));
+	const manifest = require(Path.join(projectPath, 'package.ncc.json'));
 
 	const giturl =
 		typeof manifest.repository === 'object' ? manifest.repository.url : manifest.repository;
@@ -83,7 +83,7 @@ async function main(cli) {
 
 	if (!cli.dryRun) {
 		manifest.version = version;
-		await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
+		await writeFile(Path.join(projectPath, 'package.ncc.json'), JSON.stringify(manifest, null, '  '));
 	}
 }
 

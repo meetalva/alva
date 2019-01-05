@@ -84,6 +84,13 @@ export class SplashScreenContainer extends React.Component {
 						payload: 'https://github.com/meetalva/alva'
 					});
 				}}
+				onChatClick={() => {
+					app.send({
+						type: MessageType.OpenExternalURL,
+						id: uuid.v4(),
+						payload: 'https://gitter.im/meetalva'
+					});
+				}}
 				onWebsiteClick={() => {
 					app.send({
 						type: MessageType.OpenExternalURL,

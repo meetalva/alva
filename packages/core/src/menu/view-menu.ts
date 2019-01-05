@@ -12,8 +12,7 @@ const ids = {
 	showPages: uuid.v4(),
 	showElements: uuid.v4(),
 	showProperties: uuid.v4(),
-	showEditor: uuid.v4(),
-	devTools: uuid.v4()
+	showEditor: uuid.v4()
 };
 
 export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
@@ -179,19 +178,6 @@ export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				id: uuid.v4(),
 				type: 'separator',
 				visible: isElectron
-			},
-			{
-				id: ids.devTools,
-				label: 'Toggle &Developer Tools',
-				visible: isElectron,
-				accelerator: 'Alt+Command+I',
-				click: app => {
-					app.send({
-						id: uuid.v4(),
-						payload: undefined,
-						type: Message.MessageType.ToggleDevTools
-					});
-				}
 			}
 		]
 	};

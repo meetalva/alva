@@ -38,7 +38,7 @@
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
     "productName": "Alva",
-    "copyright": "Copyright (c) 2017-2018 SinnerSchrader Deutschland GmbH",
+    "copyright": "Copyright (c) 2017-present SinnerSchrader Deutschland GmbH",
     "files": [
       "build/**/*",
       "package.json"

@@ -51,7 +51,11 @@ async function main(cli) {
 	if (!cli.dryRun) {
 		await execa('electron-builder', ['--publish', 'always', ...cli._], {
 			cwd: projectPath,
-			stdio: 'inherit'
+			stdio: 'inherit',
+			env: {
+				PUBLISH_FOR_PULL_REQUEST: typeof process.env.GH_TOKEN !== 'undefined',
+				CSC_FOR_PULL_REQUEST: typeof process.env.CSC_KEY_PASSWORD !== 'undefined' && typeof process.env.CSC_LINK !== 'undefined',
+			}
 		});
 	}
 }

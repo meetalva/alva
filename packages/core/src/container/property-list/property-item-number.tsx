@@ -22,6 +22,16 @@ export class PropertyItemNumber extends React.Component<PropertyItemNumberProps>
 		}
 
 		const example = patternProperty.getExample();
+		const currentValue = property.getValue() === undefined ? 0 : (property.getValue() as number);
+
+		function decrement(e: React.MouseEvent) {
+			property.setValue((currentValue - 1).toString());
+			e.preventDefault();
+		}
+		function increment(e: React.MouseEvent) {
+			property.setValue((currentValue + 1).toString());
+			e.preventDefault();
+		}
 
 		return (
 			<Components.PropertyItemNumber
@@ -31,6 +41,8 @@ export class PropertyItemNumber extends React.Component<PropertyItemNumberProps>
 				onBlur={() => props.store.commit()}
 				onChange={e => property.setValue(e.target.value)}
 				placeholder={example ? `e.g.: ${example}` : ''}
+				onDecrement={e => decrement(e)}
+				onIncrement={e => increment(e)}
 			/>
 		);
 	}

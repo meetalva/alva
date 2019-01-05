@@ -10,6 +10,9 @@ export interface PropertyItemNumberProps {
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	placeholder?: string;
 	value?: number;
+
+	onDecrement?: React.MouseEventHandler;
+	onIncrement?: React.MouseEventHandler;
 }
 
 export const PropertyItemNumber: React.StatelessComponent<PropertyItemNumberProps> = props => (
@@ -18,6 +21,8 @@ export const PropertyItemNumber: React.StatelessComponent<PropertyItemNumberProp
 			onChange={props.onChange}
 			onBlur={props.onBlur}
 			type={PropertyInputType.Number}
+			onDecrement={props.onDecrement}
+			onIncrement={props.onIncrement}
 			value={
 				typeof props.value === 'undefined' || Number.isNaN(props.value)
 					? ''

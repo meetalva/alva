@@ -30,6 +30,7 @@ export const PropertyInputStyles = css`
 	font-size: 15px;
 	text-overflow: ellipsis;
 	transition: border-color 0.1s, box-shadow 0.1s, color 0.1s;
+	-moz-appearance: textfield;
 	::-webkit-input-placeholder {
 		color: ${Color.Grey60};
 	}

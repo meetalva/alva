@@ -20,23 +20,35 @@ async function main(cli) {
 	const current = semverUtils.parse(manifest.version);
 	const channel = current.release ? current.release.split('.')[0] : 'stable';
 
-	manifest.build.publish = [...(manifest.build.publish || []), {
-		provider: 'github',
-		releaseType: channel === 'alpha' ? 'prerelease' : 'draft'
-	}];
+	manifest.build.publish = [
+		...(manifest.build.publish || []),
+		{
+			provider: 'github',
+			releaseType: channel === 'alpha' ? 'prerelease' : 'draft'
+		}
+	];
 
 	if (!cli.dryRun) {
 		await writeFile(Path.join(projectPath, 'package.json'), JSON.stringify(manifest, null, '  '));
+	}
 
-		if (channel === 'alpha') {
-			manifest.build.productName = `Alva Canary`;
-			await execa.shell('cp ./src/resources/alpha/* ./src/resources', { cwd: projectPath });
-		}
+	if (channel === 'alpha') {
+		manifest.build.productName = `Alva Canary`;
+	}
 
-		if (channel === 'beta') {
-			manifest.build.productName = `Alva Beta`;
-		}
+	if (channel === 'beta') {
+		manifest.build.productName = `Alva Beta`;
+	}
 
+	if (channel === 'alpha' && !cli.dryRun) {
+		await execa.shell('cp ./src/resources/alpha/* ./src/resources', { cwd: projectPath });
+	}
+
+	if (cli.debug) {
+		console.log(manifest);
+	}
+
+	if (!cli.dryRun) {
 		await execa('electron-builder', ['--publish', 'always', ...cli._], {
 			cwd: projectPath,
 			stdio: 'inherit'

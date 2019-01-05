@@ -7,6 +7,7 @@
   },
   "scripts": {
     "alva": "node bin/alva",
+    "copy:scripts": "ncp build/scripts nccbuild/scripts",
     "compile": "tsc --project .",
     "compile:ncc": "yarn ncc build src/bin/electron.ts -e electron -e monaco-editor -e webpack -e ws -o nccbuild && ncp package.ncc.json nccbuild/package.json",
     "bundle": "webpack --production",

@@ -198,7 +198,7 @@ jobs:
 
       - run:
           name: Copy Scripts
-          command: cp -r build/scripts nccbuild/scripts
+          command: lerna run copy:scripts
 
       - run:
           name: Publish Release
@@ -223,7 +223,7 @@ jobs:
 
       - run:
           name: Copy Scripts
-          command: cp -r build/scripts nccbuild/scripts
+          command: lerna run copy:scripts
 
       - run:
           name: Publish Release
@@ -248,7 +248,7 @@ jobs:
 
       - run:
           name: Copy Scripts
-          command: cp -r build/scripts nccbuild/scripts
+          command: lerna run copy:scripts
 
       - run:
           name: Publish Release

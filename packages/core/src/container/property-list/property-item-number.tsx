@@ -11,14 +11,6 @@ export interface PropertyItemNumberProps {
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyItemNumber extends React.Component<PropertyItemNumberProps> {
-	/*private increment(e) {
-		property.setValue(e.target.value)
-	}
-
-	private decrement(e) {
-		alert('hi');
-	} */
-
 	public render(): JSX.Element | null {
 		const props = this.props as PropertyItemNumberProps & { store: ViewStore };
 		const { property } = props;
@@ -30,6 +22,16 @@ export class PropertyItemNumber extends React.Component<PropertyItemNumberProps>
 		}
 
 		const example = patternProperty.getExample();
+		const currentValue = property.getValue() === undefined ? 0 : (property.getValue() as number);
+
+		function decrement(e: React.MouseEvent) {
+			property.setValue((currentValue - 1).toString());
+			e.preventDefault();
+		}
+		function increment(e: React.MouseEvent) {
+			property.setValue((currentValue + 1).toString());
+			e.preventDefault();
+		}
 
 		return (
 			<Components.PropertyItemNumber
@@ -39,8 +41,8 @@ export class PropertyItemNumber extends React.Component<PropertyItemNumberProps>
 				onBlur={() => props.store.commit()}
 				onChange={e => property.setValue(e.target.value)}
 				placeholder={example ? `e.g.: ${example}` : ''}
-				onDecrement={e => property.setValue(e.target.value)}
-				onIncrement={e => this.increment(e)}
+				onDecrement={e => decrement(e)}
+				onIncrement={e => increment(e)}
 			/>
 		);
 	}

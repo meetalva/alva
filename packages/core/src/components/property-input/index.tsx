@@ -55,37 +55,35 @@ const StyledWrapper = styled.div`
 
 const StyledStepper = styled.div`
 	position: absolute;
-	height: 100%;
+	width: ${getSpace(SpaceSize.L)}px;
 	right: 0;
 	top: 0;
 	border-left: 1px solid ${Color.Grey90};
+	margin: 1px;
+
+	display: flex;
+	flex-direction: column;
 
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-width: 0.5px;
 	}
 `;
-const StyledMajor = styled.div`
-	padding: ${getSpace(SpaceSize.XXS)}px;
-
-	border-bottom: 1px solid ${Color.Grey90};
+const StyledClicker = styled.div`
+	width: 100%;
+	height: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	flex-grow: 1;
 
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-width: 0.5px;
 	}
 
-	svg {
-		color: ${Color.Grey60};
-		display: block;
+	&:first-of-type {
+		border-bottom: 1px solid ${Color.Grey90};
 	}
-
-	&:hover {
-		svg {
-			color: ${Color.Grey20};
-		}
-	}
-`;
-const StyledMinor = styled.div`
-	padding: ${getSpace(SpaceSize.XXS)}px;
 
 	svg {
 		color: ${Color.Grey60};
@@ -121,9 +119,6 @@ export enum PropertyInputType {
 	Number = 'number'
 }
 
-// tslint:disable-next-line:no-empty
-const NOOP = () => {};
-
 export const PropertyInput: React.SFC<PropertyInputProps> = props => (
 	<StyledWrapper>
 		<StyledInput
@@ -135,12 +130,12 @@ export const PropertyInput: React.SFC<PropertyInputProps> = props => (
 			placeholder={props.placeholder}
 		/>
 		<StyledStepper>
-			<StyledMajor onClick={props.onIncrement || NOOP}>
+			<StyledClicker onClick={props.onIncrement}>
 				<ChevronUp size={IconSize.XXS} />
-			</StyledMajor>
-			<StyledMinor onClick={props.onDecrement || NOOP}>
+			</StyledClicker>
+			<StyledClicker onClick={props.onDecrement}>
 				<ChevronDown size={IconSize.XXS} />
-			</StyledMinor>
+			</StyledClicker>
 		</StyledStepper>
 	</StyledWrapper>
 );

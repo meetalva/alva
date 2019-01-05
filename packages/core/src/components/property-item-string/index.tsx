@@ -30,7 +30,7 @@ export const LinkIcon: StyledComponentClass<{}, {}, any> = styled(Link2)`
 	transition: stroke 0.3s ease-in-out;
 	stroke: ${Color.Grey60};
 	&:hover {
-		stroke: ${Color.Blue20};
+		stroke: ${Color.Grey20};
 	}
 `;
 

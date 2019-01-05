@@ -52,6 +52,7 @@ export const PropertyInputStyles = css`
 
 const StyledWrapper = styled.div`
 	position: relative;
+	width: 100%;
 `;
 
 const StyledStepper = styled.div`

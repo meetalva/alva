@@ -17,6 +17,10 @@ async function main(cli) {
 	const projectPath = Path.resolve(process.cwd(), cli.project);
 	const manifest = require(Path.join(projectPath, 'package.json'));
 
+	if (cli.debug) {
+		console.log('in:', manifest);
+	}
+
 	const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split('\n');
 
 	const publish = (branch === 'master' || !process.env.CIRCLE_PULL_REQUEST)
@@ -51,7 +55,7 @@ async function main(cli) {
 	}
 
 	if (cli.debug) {
-		console.log(manifest);
+		console.log('out:', manifest);
 	}
 
 	if (!cli.dryRun) {

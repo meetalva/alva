@@ -265,7 +265,9 @@ workflows:
       - lint
       - bundle
       - compile
-      - ncc
+      - ncc:
+          requires:
+            - trigger
       - static:
           requires:
             - test
@@ -279,18 +281,15 @@ workflows:
             - lint
             - ncc
             - bundle
-            - trigger
       - linux:
           requires:
             - test
             - lint
             - ncc
             - bundle
-            - trigger
       - windows:
           requires:
             - test
             - lint
             - ncc
             - bundle
-            - trigger

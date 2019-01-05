@@ -1,0 +1,21 @@
+{
+  "name": "essentials",
+  "version": "1.0.0",
+  "description": "Built-in components for basic layouts and logic",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "9.6.5",
+    "@types/react": "16.7.17",
+    "@types/react-helmet": "5.0.6",
+    "typescript": "3.2.2"
+  },
+  "dependencies": {
+    "react": "16.7.0",
+    "react-helmet": "5.2.0"
+  }
+}

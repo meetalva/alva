@@ -23,7 +23,7 @@ async function main(cli) {
 
 	const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split('\n');
 
-	const publish = (branch === 'master' || !process.env.CIRCLE_PULL_REQUEST)
+	const publish = (branch === 'master' || process.env.CIRCLE_PULL_REQUEST)
 		? 'always'
 		: 'never';
 
@@ -57,7 +57,6 @@ async function main(cli) {
 	if (cli.debug) {
 		console.log('out:', manifest);
 	}
-
 
 	console.log(`${prefix}: 'electron-builder' ${['--publish', publish, ...cli._].join(' ')}`);
 

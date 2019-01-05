@@ -27,12 +27,10 @@ export class SplashScreenView extends React.Component<SplashScreenProps> {
 					<C.Space sizeBottom={C.SpaceSize.XXXL} />
 					<C.TeaserRow>
 						<C.Teaser
-							headline="Get Started"
-							description="Start with our easy-to-learn Guides"
+							headline="Essentials"
+							description="Discover the basics"
 							color={C.Color.Blue20}
 							size={C.TeaserSize.Medium}
-							onClick={props.onGuideClick}
-							icon="ExternalLink"
 						/>
 						<C.Teaser
 							headline="Download Example"

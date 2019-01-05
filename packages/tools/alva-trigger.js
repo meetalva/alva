@@ -55,9 +55,13 @@ async function main(cli) {
 	const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split('\n');
 	const [hash] = (await execa('git', ['rev-parse', '--short', 'HEAD'])).stdout.split('\n');
 
+	if (branch !== 'master' && !process.env.CIRCLE_PULL_REQUEST) {
+		console.log(`${prefix}skipping, not on master or pr`);
+	}
+
 	const channel = branch === 'master'
 		? 'alpha'
-		: branch.split('/').join('-');
+		: `pr-${process.env.CIRCLE_PULL_REQUEST}`
 
 	const major = semverUtils.parse(branch === 'master' ? semver.inc(manifest.version, 'major') : manifest.version);
 	const majorTarget = `${major.major}.${major.minor}.${major.patch}-${channel}.0+${hash}`;

@@ -20,6 +20,12 @@ async function main(cli) {
 	const current = semverUtils.parse(manifest.version);
 	const channel = current.release ? current.release.split('.')[0] : 'stable';
 
+	const [branch] = (await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'])).stdout.split('\n');
+
+	if (branch !== 'master' && !process.env.CIRCLE_PULL_REQUEST) {
+		console.log(`${prefix}skipping, not on master or pr`);
+	}
+
 	manifest.build.publish = [
 		...(manifest.build.publish || []),
 		{

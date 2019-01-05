@@ -101,13 +101,16 @@ export class PatternLibrary {
 
 	public static fromAnalysis(
 		analysis: Types.LibraryAnalysis,
-		{ project }: { project: Project }
+		{ project }: { project: Project },
+		{ analyzeBuiltins }: { analyzeBuiltins: boolean }
 	): PatternLibrary {
 		const library = PatternLibrary.create({
 			id: uuid.v4(),
 			name: analysis.name,
 			version: analysis.version,
-			origin: Types.PatternLibraryOrigin.UserProvided,
+			origin: analyzeBuiltins
+				? Types.PatternLibraryOrigin.BuiltIn
+				: Types.PatternLibraryOrigin.UserProvided,
 			patternProperties: [],
 			patterns: [],
 			bundle: analysis.bundle,

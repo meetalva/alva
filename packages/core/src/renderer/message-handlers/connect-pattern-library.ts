@@ -14,7 +14,12 @@ export function connectPatternLibrary({
 			return;
 		}
 
-		const library = PatternLibrary.fromAnalysis(m.payload.analysis, { project });
+		const library = PatternLibrary.fromAnalysis(
+			m.payload.analysis,
+			{ project },
+			{ analyzeBuiltins: false }
+		);
+
 		project.addPatternLibrary(library);
 
 		store.getApp().setRightSidebarTab(Types.RightSidebarTab.ProjectSettings);

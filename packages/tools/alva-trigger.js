@@ -61,7 +61,7 @@ async function main(cli) {
 
 	const channel = branch === 'master'
 		? 'alpha'
-		: `pr-${process.env.CIRCLE_PULL_REQUEST}`
+		: 'pr'
 
 	const major = semverUtils.parse(branch === 'master' ? semver.inc(manifest.version, 'major') : manifest.version);
 	const majorTarget = `${major.major}.${major.minor}.${major.patch}-${channel}.0+${hash}`;
@@ -80,7 +80,10 @@ async function main(cli) {
 
 	const iterations = releaseVersions.filter(sv);
 	const iteration = iterations[0] || majorTarget;
-	const version =  semver.inc(iteration, 'prerelease');
+
+	const version = channel === 'pr'
+		? `${major.major}.${major.minor}.${major.patch}-${channel}.${process.env.CIRCLE_PULL_REQUEST}+${hash}`
+		: semver.inc(iteration, 'prerelease');
 
 	console.log(`${prefix}${manifest.name}@${version}`);
 

@@ -54,7 +54,7 @@ const StyledTeaserRow = styled.div`
 	justify-content: center;
 	width: 100%;
 	box-sizing: border-box;
-	padding: ${getSpace(SpaceSize.L)}px ${getSpace(SpaceSize.S)}px;
+	padding: ${getSpace(SpaceSize.L)}px ${getSpace(SpaceSize.M)}px;
 `;
 
 export const TeaserRow: React.SFC = props => <StyledTeaserRow>{props.children}</StyledTeaserRow>;

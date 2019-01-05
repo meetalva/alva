@@ -76,6 +76,7 @@ const StyledBaseButton = styled.button`
 	box-sizing: border-box;
 	border: none;
 	outline: none;
+	user-select: none;
 `;
 
 const DecoratedBaseButton = styled(StyledBaseButton)`

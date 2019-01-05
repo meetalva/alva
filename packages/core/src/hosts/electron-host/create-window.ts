@@ -48,7 +48,7 @@ function getWindowVariant(variant: HostWindowVariant): Electron.BrowserWindowCon
 	switch (variant) {
 		case HostWindowVariant.Splashscreen:
 			return {
-				height: 490,
+				height: 500,
 				width: 820,
 				backgroundColor: ConvertColor(Color.White)
 					.hex()

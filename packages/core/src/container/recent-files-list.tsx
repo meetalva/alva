@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as MobxReact from 'mobx-react';
 import * as C from '../components';
 import { MessageType as MT } from '../message';
-import { Archive, Edit } from 'react-feather';
+import { File, FileText } from 'react-feather';
 import { ViewStore } from '../store';
 import { partition } from 'lodash';
 import * as Types from '../types';
@@ -37,7 +37,7 @@ const RecentFileItem: React.SFC<RecentFileItemProps> = props => {
 			}}
 		>
 			<C.Item
-				icon={<Archive color={C.Color.Grey20} strokeWidth={1.5} size={18} />}
+				icon={<FileText color={C.Color.Grey20} strokeWidth={1.5} size={18} />}
 				title={
 					<C.Copy textColor={C.Color.Grey20} size={C.CopySize.M}>
 						{project.name}
@@ -76,7 +76,7 @@ const RecentDraftItem: React.SFC<RecentFileItemProps> = props => {
 		>
 			<C.Item
 				key={project.id}
-				icon={<Edit color={C.Color.Grey60} strokeWidth={1.5} size={18} />}
+				icon={<File color={C.Color.Grey60} strokeWidth={1.5} size={18} />}
 				title={
 					<C.Copy textColor={C.Color.Grey60} size={C.CopySize.M}>
 						{project.name}
@@ -100,14 +100,26 @@ export class RecentFilesList extends React.Component {
 		const [drafts, projects] = partition(store.getProjects().filter(p => p.valid), 'draft');
 
 		return (
-			<div>
+			<>
+				{drafts.length === 0 && projects.length === 0 ? (
+					<C.EmptyState
+						headline="Welcome!"
+						copy="Create a new Alva project or start with our guides"
+					/>
+				) : (
+					<C.Space size={C.SpaceSize.XL} sizeBottom={C.SpaceSize.XS}>
+						<C.Copy size={C.CopySize.S} textColor={C.Color.Grey36}>
+							Recent Files
+						</C.Copy>
+					</C.Space>
+				)}
 				{projects.map(project => (
 					<RecentFileItem key={project.id} project={project} sender={store.getSender()} />
 				))}
 				{drafts.map(project => (
 					<RecentDraftItem key={project.id} project={project} sender={store.getSender()} />
 				))}
-			</div>
+			</>
 		);
 	}
 }

@@ -114,8 +114,8 @@ export class LocalDataHost implements Types.DataHost {
 					this.host.type === Types.HostType.Electron ? pathIsInside(path, tempPath) : true;
 
 				const displayPath = pathIsInside(path, userHome)
-					? `~${Path.sep}${Path.relative(userHome, path)}`
-					: path;
+					? `~${Path.sep}${Path.dirname(Path.relative(userHome, path))}`
+					: Path.dirname(path);
 
 				return {
 					draft,

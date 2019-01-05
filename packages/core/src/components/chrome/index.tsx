@@ -7,22 +7,28 @@ import styled from 'styled-components';
 export interface ChromeProps {
 	children?: React.ReactNode;
 	onDoubleClick?: React.MouseEventHandler<HTMLElement>;
+	hidden?: boolean;
 }
 
-const StyledChrome = styled.div`
+const StyledChrome =
+	styled.div <
+	ChromeProps >
+	`
+	${props => props.hidden && 'position: absolute'};
 	box-sizing: border-box;
 	display: grid;
 	flex: 0 0 40px;
+	z-index: 10;
 	grid-template-columns: 33.333% 33.333% 33.333%;
 	align-items: center;
 	width: 100%;
 	height: 40px;
 	padding: 0 ${getSpace(SpaceSize.M)}px;
-	border-bottom: 1px solid ${Color.Grey90};
+	border-bottom: ${props => (props.hidden ? 'none' : `1px solid ${Color.Grey90}`)};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-bottom-width: 0.5px;
 	}
-	background: ${Color.White};
+	${props => !props.hidden && `background: ${Color.White}`};
 	font-family: ${fonts().NORMAL_FONT};
 	-webkit-app-region: drag;
 	-webkit-user-select: none;
@@ -31,5 +37,7 @@ const StyledChrome = styled.div`
 `;
 
 export const Chrome: React.StatelessComponent<ChromeProps> = props => (
-	<StyledChrome onDoubleClick={props.onDoubleClick}>{props.children}</StyledChrome>
+	<StyledChrome onDoubleClick={props.onDoubleClick} hidden={props.hidden}>
+		{props.children}
+	</StyledChrome>
 );

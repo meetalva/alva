@@ -32,6 +32,7 @@ const StyledContainer = styled.div`
 	margin: 0 ${getSpace(SpaceSize.XS)}px;
 	flex-shrink: 0;
 	box-shadow: 3px 3px 18px 0 rgba(0, 0, 0, 0.3);
+	user-select: none;
 
 	${(props: TeaserProps) => {
 		switch (props.size) {

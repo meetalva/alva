@@ -8,6 +8,7 @@ export const Item = styled.div`
 	padding: ${Space.getSpace(Space.SpaceSize.XS + Space.SpaceSize.XXS)}px
 		${Space.getSpace(Space.SpaceSize.S) * 2}px;
 	cursor: default;
+	user-select: none;
 
 	&:hover {
 		background: ${Color.White};

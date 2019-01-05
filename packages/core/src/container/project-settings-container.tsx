@@ -20,8 +20,8 @@ export class ProjectSettingsContainer extends React.Component {
 				<Components.Headline order={4}>Connected Libraries</Components.Headline>
 				<Components.Space sizeBottom={SpaceSize.S} />
 				<Components.Copy textColor={Color.Grey50}>
-					Connect multiple component libraries to your prototype. Just select the package.json
-					file of your React &amp; Typescript library.
+					Connect multiple component libraries to your prototype. Select the package.json file
+					of your React &amp; Typescript library.
 				</Components.Copy>
 				<Components.Space sizeBottom={SpaceSize.XS} />
 				<Components.Link

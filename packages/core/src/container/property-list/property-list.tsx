@@ -54,9 +54,7 @@ export class PropertyListContainer extends React.Component<PropertyListContainer
 
 		return (
 			<>
-				{relevantProps.length > 0 ? (
-					''
-				) : (
+				{relevantProps.length === 0 && (
 					<Components.EmptyState
 						headline="Properties"
 						copy="Select an Element to edit Properties"

@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": false,
+		"strict": true,
+		"downlevelIteration": true,
+		"experimentalDecorators": true,
+		"forceConsistentCasingInFileNames": true,
+		"jsx": "react",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"lib": ["es2017", "dom"],
+		"outDir": "lib",
+		"rootDir": "src",
+		"target": "es2017",
+		"sourceMap": true
+	},
+	"include": ["src"]
+}

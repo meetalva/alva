@@ -40,6 +40,7 @@
     "@commitlint/config-conventional": "7.1.2",
     "@commitlint/prompt-cli": "7.1.2",
     "@meetalva/core": "0.9.0",
+    "@meetalva/site": "0.8.1",
     "@meetalva/tools": "0.8.1",
     "husky": "0.14.3",
     "lerna": "^3.6.0",
@@ -56,6 +57,7 @@
   "resolutions": {
     "**/acorn": "5.7.3",
     "**/source-map-support": "npm:@marionebl/source-map-support",
+    "**/styled-components": "4.0.3",
     "**/typescript": "3.2.2"
   }
 }

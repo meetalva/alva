@@ -22,7 +22,12 @@ async function main(cli) {
 		process.exit(1);
 	}
 
-	const domain = `alva-${TARGET_SUB}.surge.sh`;
+	if (!cli.prefix) {
+		console.log(`--prefix is required`);
+		process.exit(1);
+	}
+
+	const domain = `${cli.prefix}-${TARGET_SUB}.surge.sh`;
 
 	ChildProcess.spawnSync(SURGE_BIN, [cli.project, domain], {
 		stdio: 'inherit'

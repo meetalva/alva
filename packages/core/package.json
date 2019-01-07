@@ -40,7 +40,7 @@
     }
   },
   "devDependencies": {
-    "@patternplate/cli": "^3.2.4",
+    "@patternplate/cli": "^3.2.5",
     "@patternplate/render-styled-components": "2.5.18",
     "@types/jest": "22.2.2",
     "@zeit/ncc": "^0.8.1",

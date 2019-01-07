@@ -1,27 +1,36 @@
-const logo = `
-<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-	<g>
-	<path fill="#fff" d="m14.871744,28.90589c-7.587618,0 -13.760643,-6.173024 -13.760643,-13.760643s6.173024,-13.760643 13.760643,-13.760643s13.760643,6.173024 13.760643,13.760643s-6.173024,13.760643 -13.760643,13.760643"/>
-	<path fill="#EC0361" d="m20.089779,13.769184c0.231179,0 0.368785,0.269709 0.233931,0.462358l-6.307879,9.046246c-0.165128,0.231179 -0.520152,0.115589 -0.520152,-0.170632l0,-9.046246c0,-0.159623 0.12935,-0.291726 0.286221,-0.291726l6.307879,0z"/>
-	<path fill="#5802CD" d="m15.958834,6.888862a0.275213,0.275213 0 0 0 -0.228427,0.123846l-6.307879,9.046246c-0.137606,0.192649 0,0.462358 0.231179,0.462358l6.307879,0c0.156871,0 0.286221,-0.132102 0.286221,-0.291726l0,-9.046246c0,-0.18164 -0.143111,-0.294478 -0.288973,-0.294478m-1.087091,3.759408l0,4.496978l-3.137426,0l3.137426,-4.496978"/>
-	<path fill="#51004D" d="m16.247808,16.229587l0,-2.460403l-1.376064,0l0,1.376064l-1.376064,0l0,1.376064l2.465907,0c0.156871,0 0.286221,-0.132102 0.286221,-0.291726"/>
-	</g>
+const logo = `<svg width="50" height="50" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<path fill="#ffffff" d="M60 110c-27.57 0-50-22.43-50-50s22.43-50 50-50 50 22.43 50 50-22.43 50-50 50" id="b"/>
+	<path d="M78.96 55c.84 0 1.34.98.85 1.68L56.89 89.55c-.6.84-1.89.42-1.89-.62V56.06c0-.58.47-1.06 1.04-1.06h22.92z" fill="#EC0361"/>
+	<path d="M63.95 30a1 1 0 0 0-.83.45L40.2 63.32c-.5.7 0 1.68.84 1.68h22.92c.57 0 1.04-.48 1.04-1.06V31.07c0-.66-.52-1.07-1.05-1.07M60 43.66V60H48.6L60 43.66" fill="#5802CD"/>
+	<path d="M65 63.94V55h-5v5h-5v5h8.96c.57 0 1.04-.48 1.04-1.06" fill="#51004D"/>
 </svg>
 `;
 
+const favicon = `<svg width="50" height="50" viewBox="10 10 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<path fill="#ffffff" d="M60 110c-27.57 0-50-22.43-50-50s22.43-50 50-50 50 22.43 50 50-22.43 50-50 50" id="b"/>
+<path d="M78.96 55c.84 0 1.34.98.85 1.68L56.89 89.55c-.6.84-1.89.42-1.89-.62V56.06c0-.58.47-1.06 1.04-1.06h22.92z" fill="#EC0361"/>
+<path d="M63.95 30a1 1 0 0 0-.83.45L40.2 63.32c-.5.7 0 1.68.84 1.68h22.92c.57 0 1.04-.48 1.04-1.06V31.07c0-.66-.52-1.07-1.05-1.07M60 43.66V60H48.6L60 43.66" fill="#5802CD"/>
+<path d="M65 63.94V55h-5v5h-5v5h8.96c.57 0 1.04-.48 1.04-1.06" fill="#51004D"/>
+</svg>
+`
+
 module.exports = {
-	docs: [
-		'*.md',
-		'docs/*.md'
-	],
-	entry: ['packages/core/build/components/**/demo.js'],
-	render: '@patternplate/render-react/render',
-	mount: '@patternplate/render-react/mount',
+	docs: ["*.md", "docs/**/*.md"],
+	entry: ["packages/core/build/components/**/demo.js"],
+	mount: "@patternplate/render-default/mount",
+	render: "@patternplate/render-default/render",
+	cover: "@meetalva/site",
 	ui: {
-		logo: logo,
-		colorBackgroundDark: "rgb(15, 15, 50)",
-		colorBackgroundSecondaryDark: "rgb(26, 24, 68)",
-		colorBackgroundTertiaryDark: "rgb(26, 24, 68)",
-		colorBorderDark: "rgb(26, 24, 68)"
+		logo,
+		favicon,
+		colorBackgroundDark: "rgb(0, 0, 0)",
+		colorBackgroundSecondaryDark: "rgb(10, 10, 10)",
+		colorBackgroundTertiaryDark: "rgb(10, 10, 10)",
+		colorBorderDark: "rgb(10, 10, 10)",
+		colorTextDark: "rgb(242, 242, 242)",
+		colorRecessDark: "rgb(153, 153, 153)",
+		colorActive: "rgb(215, 0, 82)",
+		showComponents: process.env.NODE_ENV !== 'production'
 	}
 };
+

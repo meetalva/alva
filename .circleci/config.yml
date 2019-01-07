@@ -176,7 +176,7 @@ jobs:
 
       - run:
           name: Deploy to static hosting
-          command: alva-deploy --project packages/core/.static
+          command: alva-deploy --prefix=alva --project packages/core/.static
 
   trigger:
     docker:
@@ -257,6 +257,28 @@ jobs:
       - run:
           name: Publish Release
           command: alva-release --project packages/core/nccbuild -- --win
+
+  site:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: linux
+
+      - run:
+          name: Compile site
+          command: lerna run compile --scope=@meetalva/site --stream
+
+      - run:
+          name: Create static site
+          command: lerna run build --scope=@meetalva/site --stream
+
+      - run:
+          name: Deploy to static hosting
+          command: alva-deploy --prefix=alva-site --project packages/site/.static
 
 
 workflows:

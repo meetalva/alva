@@ -291,6 +291,7 @@ workflows:
       - lint
       - bundle
       - compile
+      - site
       - ncc:
           requires:
             - trigger

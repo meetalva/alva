@@ -5,7 +5,7 @@
   "main": "./lib/site",
   "scripts": {
     "compile": "tsc --project .",
-    "build:site": "patternplate --out=.static --base=/"
+    "build": "patternplate build --out=./.static --base=/"
   },
   "repository": {
     "type": "git",

@@ -551,7 +551,15 @@ export class Project {
 	}
 
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
-		return this.patternProperties.find(p => p.getId() === id);
+		return Array.from(this.patternLibraries.values()).reduce<AnyPatternProperty | undefined>(
+			(result, lib) => {
+				if (result) {
+					return result;
+				}
+				return lib.getPatternPropertyById(id);
+			},
+			undefined
+		);
 	}
 
 	public getPatternSearch(): PatternSearch {

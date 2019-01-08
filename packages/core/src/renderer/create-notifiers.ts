@@ -5,6 +5,7 @@ import { ViewStore } from '../store';
 import * as Types from '../types';
 import * as uuid from 'uuid';
 import * as MobxUtils from 'mobx-utils';
+import { string } from 'prop-types';
 
 export interface NotifierContext {
 	app: Model.AlvaApp;
@@ -60,29 +61,53 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 		});
 	}, opts);
 
-	let stopProjectSync: MobxUtils.IDisposer;
+	const projectSync: { id?: string; stop?(): void } = {};
 
-	Mobx.autorun(() => {
-		const project = store.getProject();
+	Mobx.autorun(
+		() => {
+			const project = store.getProject();
 
-		if (typeof stopProjectSync === 'function') {
-			stopProjectSync();
+			if (
+				projectSync.id &&
+				projectSync.id !== project.getId() &&
+				typeof projectSync.stop === 'function'
+			) {
+				projectSync.stop();
+			}
+
+			if (!projectSync.id) {
+				projectSync.stop = MobxUtils.deepObserve<Model.Project>(project, onProjectChange(app));
+				projectSync.id = project.getId();
+			}
+		},
+		{
+			scheduler: window.requestIdleCallback
 		}
+	);
 
-		stopProjectSync = MobxUtils.deepObserve<Model.Project>(project, onProjectChange(app));
-	});
+	const appSync: { id?: string; stop?(): void } = {};
 
-	let stopAppSync: MobxUtils.IDisposer;
+	Mobx.autorun(
+		() => {
+			const app = store.getApp();
 
-	Mobx.autorun(() => {
-		const app = store.getApp();
+			if (
+				projectSync.id &&
+				projectSync.id !== app.getId() &&
+				typeof appSync.stop === 'function'
+			) {
+				appSync.stop();
+			}
 
-		if (typeof stopAppSync === 'function') {
-			stopAppSync();
+			if (!appSync.id) {
+				appSync.stop = MobxUtils.deepObserve<Model.AlvaApp>(app, onAppChange(app));
+				appSync.id = app.getId();
+			}
+		},
+		{
+			scheduler: window.requestIdleCallback
 		}
-
-		stopAppSync = MobxUtils.deepObserve<Model.AlvaApp>(app, onAppChange(app));
-	});
+	);
 }
 
 type MobxChange =

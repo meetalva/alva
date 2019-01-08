@@ -16,5 +16,10 @@
 		"no-this-assignment": false,
 		"no-duplicate-imports": false,
 		"no-shadowed-variable": false
+	},
+	"linterOptions": {
+		"exclude": [
+			"build"
+		]
 	}
 }

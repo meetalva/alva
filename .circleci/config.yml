@@ -280,6 +280,27 @@ jobs:
           name: Deploy to static hosting
           command: alva-deploy --prefix=alva-site --project packages/site/.static
 
+  site_master:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: linux
+
+      - run:
+          name: Compile site
+          command: lerna run compile --scope=@meetalva/site --stream
+
+      - run:
+          name: Create static site
+          command: lerna run build --scope=@meetalva/site --stream
+
+      - run:
+          name: Deploy to static hosting
+          command: surge packages/site/.static https://meetalva.io
 
 workflows:
   version: 2
@@ -292,6 +313,11 @@ workflows:
       - bundle
       - compile
       - site
+      - site_master
+          filters:
+             branches:
+                only:
+                   - master
       - ncc:
           requires:
             - trigger

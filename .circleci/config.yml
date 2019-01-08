@@ -269,6 +269,11 @@ jobs:
           key: linux
 
       - run:
+          name: Fetch release data
+          command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/release-data.ts
+
+
+      - run:
           name: Compile site
           command: lerna run compile --scope=@meetalva/site --stream
 
@@ -289,6 +294,10 @@ jobs:
     steps:
       - setup:
           key: linux
+
+      - run:
+          name: Fetch release data
+          command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/release-data.ts
 
       - run:
           name: Compile site
@@ -312,8 +321,20 @@ workflows:
       - lint
       - bundle
       - compile
-      - site
+      - site:
+          requires:
+            - macos
+            - linux
+            - windows
+          filters:
+             branches:
+                ignore:
+                   - master
       - site_master:
+          requires:
+            - macos
+            - linux
+            - windows
           filters:
              branches:
                 only:

@@ -17,8 +17,8 @@ const favicon = `<svg width="50" height="50" viewBox="10 10 100 100" xmlns="http
 module.exports = {
 	docs: ["*.md", "docs/**/*.md"],
 	entry: ["packages/core/build/components/**/demo.js"],
-	mount: "@patternplate/render-default/mount",
-	render: "@patternplate/render-default/render",
+	mount: "@patternplate/render-react/mount",
+	render: "@patternplate/render-react/render",
 	cover: "@meetalva/site",
 	ui: {
 		logo,

@@ -1,15 +1,14 @@
 import * as React from 'react';
-// tslint:disable-next-line:no-submodule-imports
-import * as ReactDOM from 'react-dom/server';
 import { Helmet } from 'react-helmet';
-import { ServerStyleSheet } from 'styled-components';
 import * as D from '@meetalva/designkit';
 import { globalCss } from './global-css';
 
 export const render = (input: any) => {
+	// tslint:disable-next-line:no-submodule-imports
+	const ReactDOM = require('react-dom/server');
+
+	const html = ReactDOM.renderToString(input.default());
 	const helmet = Helmet.renderStatic();
-	const sheet = new ServerStyleSheet();
-	const html = ReactDOM.renderToString(sheet.collectStyles(input.default()));
 
 	return {
 		head: [
@@ -17,7 +16,6 @@ export const render = (input: any) => {
 			helmet.meta.toString(),
 			helmet.link.toString(),
 			`<style>${globalCss}</style>`,
-			sheet.getStyleTags(),
 			helmet.style.toString()
 		].join('\n'),
 		html,

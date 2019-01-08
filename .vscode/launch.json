@@ -6,17 +6,46 @@
 	"configurations": [
 		{
 			"type": "chrome",
-			"request": "attach",
-			"name": "Attach to browser",
+			"request": "launch",
+			"name": "Launch alva (debug browser)",
 			"port": 9222,
-			"webRoot": "${workspaceFolder}",
-			"urlFilter": "http://localhost:*/"
+			"sourceMaps": true,
+			"webRoot": "${workspaceFolder}/packages/core",
+			"urlFilter": "*/project/*",
+			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+			"cwd": "${workspaceFolder}/packages/core",
+			"runtimeArgs": [
+				"build/bin/electron",
+				"--inspect=9223",
+				"--remote-debugging-port=9222"
+			]
 		},
 		{
-			"name": "Attach to electron host application",
+			"name": "Launch alva (debug node)",
+			"type": "node",
+			"request": "launch",
+			"cwd": "${workspaceRoot}/packages/core",
+			"port": 9223,
+			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+			"runtimeArgs": [
+				"build/bin/electron",
+				"--inspect=9223",
+				"--remote-debugging-port=9222"
+			]
+		},
+		{
+			"type": "chrome",
+			"request": "attach",
+			"name": "Attach to alva (debug browser)",
+			"port": 9222,
+			"sourceMaps": true,
+			"webRoot": "${workspaceFolder}/packages/core"
+		},
+		{
+			"name": "Attach to alva (debug node)",
 			"type": "node",
 			"request": "attach",
-			"cwd": "${workspaceRoot}",
+			"cwd": "${workspaceRoot}/packages/core",
 			"port": 9223
 		},
 		{

@@ -328,7 +328,7 @@ workflows:
             - windows
           filters:
              branches:
-                except:
+                ignore:
                    - master
       - site_master:
           requires:

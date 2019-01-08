@@ -1,3 +1,8 @@
+---
+tags:
+  - contributing
+---
+
 # Alva Data Flow
 
 A diagram describing the technical data flow inside Alva.

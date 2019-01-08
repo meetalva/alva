@@ -59,7 +59,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 				<link rel="icon" href="https://media.meetalva.io/meta/icon_48.png" sizes="48x48" />
 				<link rel="icon" href="https://media.meetalva.io/meta/icon_96.png" sizes="96x96" />
 				<link rel="icon" href="https://media.meetalva.io/meta/icon_192.png" sizes="192x192" />
-				<link rel="icon" href="https://media.meetalva.io/meta/alva.svg" type="image/x-icon" />
+				<link rel="icon" href="https://media.meetalva.io/alva.svg" type="image/x-icon" />
 			</Helmet>
 			<D.Menu logo="https://media.meetalva.io/alva.svg">
 				<D.MenuItem

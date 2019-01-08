@@ -1,31 +1,9 @@
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
 import * as D from '@meetalva/designkit';
-import { globalCss } from './global-css';
+import { Releases } from './releases';
 
-export const render = (input: any) => {
-	// tslint:disable-next-line:no-submodule-imports
-	const ReactDOM = require('react-dom/server');
-
-	const html = ReactDOM.renderToString(input.default());
-	const helmet = Helmet.renderStatic();
-
-	return {
-		head: [
-			helmet.title.toString(),
-			helmet.meta.toString(),
-			helmet.link.toString(),
-			`<style>${globalCss}</style>`,
-			helmet.style.toString()
-		].join('\n'),
-		html,
-		after: [helmet.script.toString()].join('\n')
-	};
-};
-
-const MACOS_RELEASE = 'https://github.com/meetalva/alva/releases/download/v0.8.0/Alva-0.8.0.dmg';
-const WINDOW_RELEASE = 'https://github.com/meetalva/alva/releases/download/v0.8.0/Alva-0.8.0.exe';
-const LINUX_RELEASE = 'https://github.com/meetalva/alva/releases/latest';
+export * from './render';
 
 const Page: React.StatelessComponent<void> = (): JSX.Element => {
 	return (
@@ -103,20 +81,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					</D.Copy>
 				</D.Layout>
 				<D.Space size={D.SpaceSize.L} />
-				<a href={MACOS_RELEASE} target="_blank" rel="noopener">
-					<D.Button order={D.ButtonOrder.Primary}>Download Beta for macOS</D.Button>
-				</a>
-				<D.Space size={D.SpaceSize.S} />
-				<D.Copy color={D.Color.Grey70} size={D.CopySize.Small}>
-					Also available for{' '}
-					<a href={WINDOW_RELEASE} target="_blank" style={{ color: '#fff' }}>
-						Windows
-					</a>{' '}
-					and{' '}
-					<a href={LINUX_RELEASE} target="_blank" style={{ color: '#fff' }}>
-						Linux
-					</a>
-				</D.Copy>
+				<Releases />
 				<D.Space size={D.SpaceSize.XL} />
 			</D.Section>
 			<D.Feature

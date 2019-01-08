@@ -47,6 +47,22 @@ async function main(cli) {
 
 	const latestRelease = sortedReleases[0];
 
+	if (cli.data) {
+		const releases = sortedReleases.map(release => ({
+			parsed: semverUtils.parse(release.tag_name),
+			release
+		}));
+
+		await writeFile(cli.data, `export default ${JSON.stringify({
+			releases: sortedReleases,
+			stable: releases.filter(r => !r.parsed.release).map(r => r.release.id),
+			canary: releases.filter(r => r.parsed.release && r.parsed.release.includes('alpha')).map(r => r.release.id),
+			beta: releases.filter(r => r.parsed.release && r.parsed.release.includes('beta')).map(r => r.release.id),
+		}, null, '  ')}`);
+
+		return;
+	}
+
 	if (latestRelease && semver.gt(manifest.version, latestRelease.tag_name)) {
 		console.log(`${prefix}trigger full draft release for ${manifest.name}@${manifest.version}`);
 		return;

@@ -280,36 +280,6 @@ jobs:
           name: Deploy to static hosting
           command: alva-deploy --prefix=alva-site --project packages/site/.static
 
-    site_master:
-        docker:
-        - image: circleci/node:8
-
-        working_directory: ~/repo
-
-        steps:
-        - setup:
-            key: linux
-
-        - run:
-            name: Compile site
-            command: lerna run compile --scope=@meetalva/site --stream
-
-        - run:
-            name: Create static site
-            command: lerna run build --scope=@meetalva/site --stream
-
-        - run:
-            name: Set Git Author
-            command: git config --global user.name "Alva" && git config --global user.email "hey@meetalva.io"
-
-        - run:
-            name: Create temporary git repo
-            command: cd ~/repo/packages/site/.static && git init && git remote add origin https://marionebl:${GH_PUSH_TOKEN}@github.com/meetalva/website.git
-
-        - run:
-            name: Deploy to GitHub Pages
-            command: cd ~/repo/packages/site/.static && git push
-
 
 workflows:
   version: 2

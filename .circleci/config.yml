@@ -313,7 +313,7 @@ workflows:
       - bundle
       - compile
       - site
-      - site_master
+      - site_master:
           filters:
              branches:
                 only:

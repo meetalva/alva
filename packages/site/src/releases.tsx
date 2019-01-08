@@ -1,7 +1,8 @@
 import * as React from 'react';
-import data from './releases-data';
 import * as Path from 'path';
 import * as D from '@meetalva/designkit';
+import styled from '@emotion/styled';
+import data from './releases-data';
 
 enum Os {
 	macOS = 'macOS  ',
@@ -16,6 +17,22 @@ enum Extension {
 	appimage = 'AppImage',
 	Unknown = 'Unknown'
 }
+
+const StyledLink =
+	styled.a <
+	{ white: boolean } >
+	`
+	cursor: pointer;
+	color: ${props => (props.white ? D.Color.White : 'inherit')};
+`;
+
+const Link: React.SFC<{ href: string; white: boolean }> = props => {
+	return (
+		<StyledLink href={props.href} target="_blank" rel="noopener" white={props.white}>
+			{props.children}
+		</StyledLink>
+	);
+};
 
 export class Releases extends React.Component {
 	public state = {
@@ -50,37 +67,33 @@ export class Releases extends React.Component {
 		return (
 			<div>
 				<div style={{ display: 'flex' }}>
-					<a href={stableLink.link} target="_blank" rel="noopener">
+					<Link href={stableLink.link} white={false}>
 						<D.Button order={D.ButtonOrder.Primary}>
 							Get Alva {this.state.os !== Os.Unknown ? `for` : '   '} {this.state.os}
 						</D.Button>
-					</a>
+					</Link>
 					<D.Space size={D.SpaceSize.XS} />
-					<a href={alphaLink.link} target="_blank" rel="noopener">
+					<Link href={alphaLink.link} white={false}>
 						<D.Button order={D.ButtonOrder.Secondary}>Get Alva Canary</D.Button>
-					</a>
+					</Link>
 				</div>
 				<D.Space size={D.SpaceSize.S} />
 				<D.Copy color={D.Color.Grey70} size={D.CopySize.Small}>
 					Also available for{' '}
 					{stableLinks.map((link, i) => (
 						<React.Fragment key={link.os}>
-							<a href={link.link} target="_blank" style={{ color: D.Color.White }}>
+							<Link href={link.link} white>
 								{link.os}
-							</a>
+							</Link>
 							{getSeperator(stableLinks.length, i)}
 						</React.Fragment>
 					))}.
 				</D.Copy>
 				<D.Copy color={D.Color.Grey70} size={D.CopySize.Small}>
 					Check all{' '}
-					<a
-						href={stable ? stable.html_url : ''}
-						target="_blank"
-						style={{ color: D.Color.White }}
-					>
+					<Link href={stable ? stable.html_url : ''} white>
 						supported platforms
-					</a>
+					</Link>
 					.
 				</D.Copy>
 			</div>

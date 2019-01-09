@@ -270,8 +270,7 @@ jobs:
 
       - run:
           name: Fetch release data
-          command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/releases-data.ts
-
+          command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/releases-data.ts && cat packages/site/src/releases-data.ts
 
       - run:
           name: Compile site
@@ -297,7 +296,7 @@ jobs:
 
       - run:
           name: Fetch release data
-          command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/releases-data.ts
+          command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/releases-data.ts && cat packages/site/src/releases-data.ts
 
       - run:
           name: Compile site

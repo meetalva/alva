@@ -6,6 +6,7 @@ import { ViewStore } from '../../store';
 
 export interface PropertyItemStringProps {
 	property: Model.ElementProperty;
+	onDidRender?(): void;
 }
 
 @MobxReact.inject('store')
@@ -29,7 +30,12 @@ export class PropertyItemString extends React.Component<PropertyItemStringProps>
 				label={patternProperty.getLabel()}
 				value={property.getValue() as string}
 				onBlur={() => props.store.commit()}
-				onChange={e => property.setValue(e.target.value)}
+				onChange={e => {
+					property.setValue(e.target.value);
+				}}
+				onResize={() => {
+					return this.props.onDidRender && this.props.onDidRender();
+				}}
 				placeholder={example ? `e.g.: ${example}` : ''}
 			/>
 		);

@@ -4,6 +4,7 @@ import * as React from 'react';
 import * as ReactLoadable from 'react-loadable';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
+import * as Mobx from 'mobx';
 
 import { PropertyItemAsset } from './property-item-asset';
 import { PropertyItemBoolean } from './property-item-boolean';
@@ -17,6 +18,7 @@ import { PropertyUnknownEditorSkeleton } from './property-unknown-editor-skeleto
 
 export interface PropertyListItemProps {
 	property: Model.ElementProperty;
+	onDidRender?(): void;
 }
 
 export interface StoreInjection {
@@ -62,7 +64,12 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 				return inputType === Types.PatternPropertyInputType.RadioGroup ? (
 					<PropertyItemRadioGroup key={id} property={property} />
 				) : (
-					<ReferenceSelect key={id} property={property} iconPosition={IconPosition.Indent}>
+					<ReferenceSelect
+						key={id}
+						property={property}
+						iconPosition={IconPosition.Indent}
+						onDidRender={props.onDidRender}
+					>
 						<PropertyItemEnum property={property} />
 					</ReferenceSelect>
 				);
@@ -79,7 +86,7 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 			case Types.PatternPropertyType.String:
 				return (
 					<ReferenceSelect key={id} property={property}>
-						<PropertyItemString property={property} />
+						<PropertyItemString property={property} onDidRender={props.onDidRender} />
 					</ReferenceSelect>
 				);
 			case Types.PatternPropertyType.Unknown:

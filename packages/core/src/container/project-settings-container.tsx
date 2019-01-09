@@ -16,7 +16,7 @@ export class ProjectSettingsContainer extends React.Component {
 		const app = store.getApp();
 
 		return (
-			<div>
+			<div style={{ padding: Components.SpaceSize.M }}>
 				<Components.Headline order={4}>Connected Libraries</Components.Headline>
 				<Components.Space sizeBottom={SpaceSize.S} />
 				<Components.Copy textColor={Color.Grey50}>

@@ -6,7 +6,6 @@ const StyledPropertyPane = styled.div`
 	flex-grow: 1;
 	flex-shrink: 0;
 	flex-basis: 40%;
-	padding: ${getSpace(SpaceSize.M)}px;
 	overflow: auto;
 `;
 

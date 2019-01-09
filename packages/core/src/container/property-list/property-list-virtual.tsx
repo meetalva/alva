@@ -98,6 +98,7 @@ export class PropertyListVirtual extends React.Component<PropertyListVirtualProp
 							}}
 							rowRenderer={item => {
 								const row = rows[item.index];
+
 								if (!row) {
 									return null;
 								}

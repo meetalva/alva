@@ -15,6 +15,7 @@ export interface PropertyItemStringProps {
 	placeholder?: string;
 	value?: string;
 	children?(renderProps: PropertyItemStringProps): JSX.Element | null;
+	onResize?(): void;
 }
 
 // tslint:disable-next-line:no-any
@@ -44,6 +45,7 @@ export const PropertyItemString: React.StatelessComponent<PropertyItemStringProp
 		<StyledTextArea
 			onChange={props.onChange}
 			onBlur={props.onBlur}
+			onHeightChange={props.onResize}
 			useCacheForDOMMeasurements
 			value={props.value || ''}
 			placeholder={props.placeholder}

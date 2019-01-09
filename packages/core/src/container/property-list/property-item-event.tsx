@@ -7,9 +7,11 @@ import * as Model from '../../model';
 import * as React from 'react';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
+import * as Mobx from 'mobx';
 
 export interface PropertyItemEventProps {
 	property: Model.ElementProperty;
+	onDidRender?(): void;
 }
 
 export interface StoreInjection {
@@ -19,6 +21,26 @@ export interface StoreInjection {
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
+	// tslint:disable-next-line:no-empty
+	private dispose = () => {};
+
+	public componentDidMount() {
+		const props = this.props as PropertyItemEventProps & StoreInjection;
+		const project = props.store.getProject();
+		const elementAction = project.getElementActionById(String(props.property.getValue()));
+
+		this.dispose = Mobx.reaction(
+			() => elementAction,
+			() => {
+				return this.props.onDidRender && this.props.onDidRender();
+			}
+		);
+	}
+
+	public componentWillUnmount() {
+		this.dispose();
+	}
+
 	private handleActionChange(
 		item: Components.SimpleSelectOption | Components.SimpleSelectOption[]
 	): void {
@@ -162,6 +184,9 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 						<Components.PropertyLabel label="Perform" />
 						<Components.Select
 							onChange={e => this.handleActionChange(e)}
+							onMenuOpen={() => {
+								return this.props.onDidRender && this.props.onDidRender();
+							}}
 							options={userStore
 								.getActions()
 								.map(a => ({ label: a.getName(), value: a.getId() }))}

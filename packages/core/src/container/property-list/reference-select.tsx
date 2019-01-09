@@ -8,10 +8,12 @@ import styled from 'styled-components';
 import * as Types from '../../types';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
+import * as Mobx from 'mobx';
 
 export interface ReferenceSelectProps {
 	property: Model.ElementProperty;
 	iconPosition?: IconPosition;
+	onDidRender?(): void;
 }
 
 export enum IconPosition {
@@ -44,6 +46,22 @@ const PositionedLinkIcon = styled(Components.LinkIcon)`
 @MobxReact.inject('store')
 @MobxReact.observer
 export class ReferenceSelect extends React.Component<ReferenceSelectProps> {
+	// tslint:disable-next-line:no-empty
+	private dispose = () => {};
+
+	public componentDidMount() {
+		this.dispose = Mobx.reaction(
+			() => this.props.property.getUserStoreReference(),
+			() => {
+				return this.props.onDidRender && this.props.onDidRender();
+			}
+		);
+	}
+
+	public componentWillUnmount() {
+		this.dispose();
+	}
+
 	private handleConnect(e: React.MouseEvent<HTMLElement>): void {
 		const props = this.props as ReferenceSelectProps & { store: ViewStore };
 		const store = props.store.getProject().getUserStore();

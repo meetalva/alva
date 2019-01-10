@@ -64,6 +64,12 @@ export class Releases extends React.Component {
 			getReleaseLink(stable, Os.Linux)
 		].filter(l => l.os !== stableLink.os);
 
+		console.log({
+			releases: releases.map(r => r.tag_name),
+			alphaReleases: alphaReleases.map(a => a!.tag_name),
+			stableReleases: stableReleases.map(s => s!.tag_name)
+		});
+
 		return (
 			<div>
 				<div style={{ display: 'flex' }}>

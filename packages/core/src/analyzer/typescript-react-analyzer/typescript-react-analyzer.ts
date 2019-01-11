@@ -44,6 +44,7 @@ interface AnalyzeContext {
 	program: ts.Program;
 	project: Tsa.Project;
 	knownProperties: Types.PropertyAnalysis[];
+	knownPatterns: Types.InternalPatternAnalysis[];
 }
 
 type PatternAnalyzer = (
@@ -101,7 +102,8 @@ export async function analyze(
 				name: pkg.name || 'Unnamed Library',
 				description: pkg.description || '',
 				patterns: patterns.map(p => ({
-					...p,
+					path: p.path,
+					pattern: p.pattern,
 					properties: p.properties.map(prop => prop.property)
 				})),
 				path: pkgPath,
@@ -184,11 +186,18 @@ export function getPatternAnalyzer(
 			return [];
 		}
 
-		const result = TypeScriptUtils.getExports(sourceFile, program)
-			.map(ex => predicate(ex, { program, project, candidate, options, knownProperties }))
+		return TypeScriptUtils.getExports(sourceFile, program)
+			.map(ex =>
+				predicate(ex, {
+					program,
+					project,
+					candidate,
+					options,
+					knownProperties,
+					knownPatterns: previous
+				})
+			)
 			.filter((p): p is Types.InternalPatternAnalysis => typeof p !== 'undefined');
-
-		return result;
 	};
 }
 
@@ -209,6 +218,21 @@ export function analyzePatternExport(
 	}
 
 	const [propTypes] = reactTypeArguments;
+
+	if (!propTypes) {
+		return;
+	}
+
+	const symbol = propTypes.type.symbol;
+
+	if (!symbol) {
+		return;
+	}
+
+	if (ctx.knownPatterns.some(p => p.symbol === symbol)) {
+		return;
+	}
+
 	const exportName = ex.exportName || 'default';
 
 	const contextId = `${ctx.candidate.id}:${exportName}`;
@@ -256,6 +280,7 @@ export function analyzePatternExport(
 	}
 
 	return {
+		symbol,
 		path: ctx.candidate.artifactPath,
 		pattern: {
 			model: Types.ModelName.Pattern,

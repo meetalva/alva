@@ -144,7 +144,7 @@ async function createPatternCompiler(
 	});
 }
 
-function getPatternAnalyzer(
+export function getPatternAnalyzer(
 	program: ts.Program,
 	project: Tsa.Project,
 	options: AnalyzeOptions
@@ -172,7 +172,7 @@ function getPatternAnalyzer(
 	};
 }
 
-function analyzePatternExport(
+export function analyzePatternExport(
 	ex: TypeScriptUtils.TypescriptExport,
 	ctx: AnalyzeContext
 ): Types.InternalPatternAnalysis | undefined {

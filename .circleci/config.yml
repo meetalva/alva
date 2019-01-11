@@ -269,9 +269,12 @@ jobs:
           key: linux
 
       - run:
-          name: Fetch release data
-          command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/release-data.ts
+          name: Remove dev data
+          command: rm packages/site/src/releases-data.ts
 
+      - run:
+          name: Fetch release data
+          command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/releases-data.ts && cat packages/site/src/releases-data.ts
 
       - run:
           name: Compile site
@@ -296,8 +299,12 @@ jobs:
           key: linux
 
       - run:
+          name: Remove dev data
+          command: rm packages/site/src/releases-data.ts
+
+      - run:
           name: Fetch release data
-          command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/release-data.ts
+          command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/releases-data.ts && cat packages/site/src/releases-data.ts
 
       - run:
           name: Compile site

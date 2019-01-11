@@ -61,8 +61,8 @@
 	},
 	"// dependencies": "Dependencies that are externals and required in main process when compiling with ncc",
 	"dependencies": {
-		"webpack": "^4.28.2",
-		"ws": "5.1.1"
+		"ws": "5.1.1",
+		"webpack": "^4.28.2"
 	},
 	"homepage": "https://meetalva.github.io/"
 }

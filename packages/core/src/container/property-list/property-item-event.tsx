@@ -185,7 +185,6 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 						<Components.Select
 							onChange={e => this.handleActionChange(e)}
 							onMenuOpen={() => {
-								console.log('!');
 								return this.props.onDidRender && this.props.onDidRender();
 							}}
 							options={userStore

@@ -12,10 +12,7 @@ import * as PropertyCreators from './property-creators';
  * @param typechecker The type checker used when creating the type.
  * @return The Alva-supported properties.
  */
-export function analyze(
-	type: Ts.Type,
-	ctx: PropertyAnalyzeContext
-): Types.SerializedPatternProperty[] {
+export function analyze(type: Ts.Type, ctx: PropertyAnalyzeContext): Types.PropertyAnalysis[] {
 	const typechecker = ctx.program.getTypeChecker();
 
 	return type
@@ -58,9 +55,12 @@ export function analyze(
 				ctx
 			);
 
-			return setPropertyMetaData({ property, symbol });
+			return {
+				symbol,
+				property: setPropertyMetaData({ property, symbol })
+			};
 		})
-		.filter((p): p is Types.SerializedPatternProperty => typeof p !== 'undefined');
+		.filter((p): p is Types.PropertyAnalysis => typeof p !== 'undefined');
 }
 
 function getSymbolType(

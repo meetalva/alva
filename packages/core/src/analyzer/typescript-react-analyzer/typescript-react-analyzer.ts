@@ -13,7 +13,7 @@ import * as uuid from 'uuid';
 import { Compiler } from 'webpack';
 import * as resolve from 'resolve';
 import { last } from 'lodash';
-import { PatternAnalysis } from '../../types';
+import { InternalPatternAnalysis } from '../../types';
 import * as Tsa from 'ts-simple-ast';
 import { usesChildren } from '../react-utils/uses-children';
 import { getTsaExport } from '../typescript-utils/get-tsa-export';
@@ -43,16 +43,19 @@ interface AnalyzeContext {
 	options: AnalyzeOptions;
 	program: ts.Program;
 	project: Tsa.Project;
+	knownProperties: Types.PropertyAnalysis[];
 }
 
 type PatternAnalyzer = (
 	candidate: PatternCandidate,
+	previous: Types.InternalPatternAnalysis[],
 	predicate: PatternAnalyzerPredicate
-) => Types.PatternAnalysis[];
+) => Types.InternalPatternAnalysis[];
+
 type PatternAnalyzerPredicate = (
 	ex: TypeScriptUtils.TypescriptExport,
 	ctx: AnalyzeContext
-) => Types.PatternAnalysis | undefined;
+) => Types.InternalPatternAnalysis | undefined;
 
 export async function analyze(
 	pkgPath: string,
@@ -97,7 +100,10 @@ export async function analyze(
 				bundle: await getBundle(),
 				name: pkg.name || 'Unnamed Library',
 				description: pkg.description || '',
-				patterns,
+				patterns: patterns.map(p => ({
+					...p,
+					properties: p.properties.map(prop => prop.property)
+				})),
 				path: pkgPath,
 				version: pkg.version || '1.0.0'
 			}
@@ -115,7 +121,7 @@ async function analyzePatterns(context: {
 	pkgPath: string;
 	options: AnalyzeOptions;
 	pkg: unknown;
-}): Promise<Types.PatternAnalysis[]> {
+}): Promise<Types.InternalPatternAnalysis[]> {
 	const patternCandidates = await findPatternCandidates({ cwd: context.cwd, pkg: context.pkg });
 
 	const declarationPaths = patternCandidates.map(p => p.declarationPath);
@@ -135,14 +141,15 @@ async function analyzePatterns(context: {
 	});
 
 	const analyzePattern = getPatternAnalyzer(program, project, context.options);
-	return patternCandidates.reduce<PatternAnalysis[]>(
-		(acc, candidate) => [...acc, ...analyzePattern(candidate, analyzePatternExport)],
+
+	return patternCandidates.reduce<InternalPatternAnalysis[]>(
+		(acc, candidate) => [...acc, ...analyzePattern(candidate, acc, analyzePatternExport)],
 		[]
 	);
 }
 
 async function createPatternCompiler(
-	patterns: Types.PatternAnalysis[],
+	patterns: Types.InternalPatternAnalysis[],
 	context: { cwd: string; id: string }
 ): Promise<Compiler> {
 	const compilerPatterns = patterns.map(({ path: patternPath, pattern }) => ({
@@ -157,33 +164,38 @@ async function createPatternCompiler(
 	});
 }
 
-function getPatternAnalyzer(
+export function getPatternAnalyzer(
 	program: ts.Program,
 	project: Tsa.Project,
 	options: AnalyzeOptions
 ): PatternAnalyzer {
 	return (
 		candidate: PatternCandidate,
+		previous: Types.InternalPatternAnalysis[],
 		predicate: PatternAnalyzerPredicate
-	): Types.PatternAnalysis[] => {
+	): Types.InternalPatternAnalysis[] => {
 		const sourceFile = program.getSourceFile(candidate.declarationPath);
+		const knownProperties = previous.reduce<Types.PropertyAnalysis[]>(
+			(a, p) => [...a, ...p.properties],
+			[]
+		);
 
 		if (!sourceFile) {
 			return [];
 		}
 
 		const result = TypeScriptUtils.getExports(sourceFile, program)
-			.map(ex => predicate(ex, { program, project, candidate, options }))
-			.filter((p): p is Types.PatternAnalysis => typeof p !== 'undefined');
+			.map(ex => predicate(ex, { program, project, candidate, options, knownProperties }))
+			.filter((p): p is Types.InternalPatternAnalysis => typeof p !== 'undefined');
 
 		return result;
 	};
 }
 
-function analyzePatternExport(
+export function analyzePatternExport(
 	ex: TypeScriptUtils.TypescriptExport,
 	ctx: AnalyzeContext
-): Types.PatternAnalysis | undefined {
+): Types.InternalPatternAnalysis | undefined {
 	const reactType = ReactUtils.findReactComponentType(ex.type, { program: ctx.program });
 
 	if (!reactType) {
@@ -255,11 +267,17 @@ function analyzePatternExport(
 			name:
 				ex.displayName || (exportName !== 'default' ? exportName : ctx.candidate.displayName),
 			origin: 'user-provided',
-			propertyIds: properties.map(p => p.id),
+			propertyIds: properties.map(p => {
+				const known = ctx.knownProperties.find(k => k.symbol === p.symbol);
+				return known ? known.property.id : p.property.id;
+			}),
 			slots,
 			type: 'pattern'
 		},
-		properties
+		properties: properties.filter(p => {
+			const unique = !ctx.knownProperties.some(k => k.symbol === p.symbol);
+			return unique;
+		})
 	};
 }
 

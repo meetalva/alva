@@ -1,6 +1,7 @@
 import * as PatternProperty from './pattern-property';
 import * as SerializedModel from './serialized-model';
 import * as UserStore from './user-store';
+import * as Ts from 'typescript';
 
 export enum AppState {
 	Starting = 'starting',
@@ -67,6 +68,17 @@ export interface LibraryAnalysisSuccess {
 export interface LibraryAnalysisError {
 	type: LibraryAnalysisResultType.Error;
 	error: Error;
+}
+
+export interface PropertyAnalysis {
+	property: PatternProperty.SerializedPatternProperty;
+	symbol: Ts.Symbol;
+}
+
+export interface InternalPatternAnalysis {
+	path: string;
+	pattern: SerializedModel.SerializedPattern;
+	properties: PropertyAnalysis[];
 }
 
 export interface PatternAnalysis {
@@ -138,7 +150,7 @@ export interface ImportPayload {
 	id: string;
 	name: string;
 	path: string;
-	patterns: PatternAnalysis[];
+	patterns: InternalPatternAnalysis[];
 	version: string;
 }
 

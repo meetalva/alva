@@ -17,23 +17,35 @@ export interface Export {
 }
 
 export const getFixtureSourceFile = (
-	name: string,
+	name: string | string[],
 	ctx: { fixtures: Fixtures }
-): { sourceFile: TypeScript.SourceFile; program: TypeScript.Program } => {
-	const filePath = ctx.fixtures.find(name);
+): {
+	sourceFile: TypeScript.SourceFile;
+	sourceFiles: TypeScript.SourceFile[];
+	program: TypeScript.Program;
+} => {
+	const names = Array.isArray(name) ? name : [name];
+	const paths = names
+		.map(n => ctx.fixtures.find(n))
+		.filter((n): n is string => typeof n !== 'undefined');
 
-	if (!filePath) {
-		throw new Error(`Could not find fixture file ${filePath}`);
+	if (paths.length === 0) {
+		throw new Error(`Could not find fixture file ${names.join(', ')}`);
 	}
 
-	const program = TypeScript.createProgram([filePath], {});
-	const sourceFile = program.getSourceFile(filePath);
+	const program = TypeScript.createProgram(paths, {});
 
-	if (!sourceFile) {
-		throw new Error(`Could not obtain source file ${name} from ${filePath}`);
-	}
+	const sourceFiles = paths.map(path => {
+		const sourceFile = program.getSourceFile(path);
 
-	return { sourceFile, program };
+		if (!sourceFile) {
+			throw new Error(`Could not obtain source file ${name} from ${path}`);
+		}
+
+		return sourceFile;
+	});
+
+	return { sourceFile: sourceFiles[0]!, sourceFiles, program };
 };
 
 export const getFirstPropType = (

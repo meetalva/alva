@@ -33,17 +33,6 @@ async function main(cli) {
 	const mainManifest = require(Path.join(projectPath, 'package.json'));
 	const manifest = require(Path.join(projectPath, 'package.ncc.json'));
 
-	if (semver.gt(mainManifest.version, manifest.version)) {
-		console.log(`${prefix}trigger full draft release for ${manifest.name}@${manifest.version}`);
-
-		if (!cli.dryRun) {
-			manifest.version = mainManifest.version;
-			await writeFile(Path.join(projectPath, 'package.ncc.json'), JSON.stringify(manifest, null, '  '));
-		}
-
-		return;
-	}
-
 	const giturl =
 		typeof manifest.repository === 'object' ? manifest.repository.url : manifest.repository;
 
@@ -57,18 +46,70 @@ async function main(cli) {
 		return semver.rcompare(a.tag_name, b.tag_name);
 	});
 
+	if (semver.gt(mainManifest.version, manifest.version)) {
+		console.log(`${prefix}trigger full draft release for ${manifest.name}@${manifest.version}`);
+
+		if (!cli.dryRun) {
+			manifest.version = mainManifest.version;
+			await writeFile(
+				Path.join(projectPath, 'package.ncc.json'),
+				JSON.stringify(manifest, null, '  ')
+			);
+		}
+
+		if (cli.data) {
+			const releases = sortedReleases.map(release => ({
+				parsed: semverUtils.parse(release.tag_name),
+				release
+			}));
+
+			await writeFile(
+				cli.data,
+				`export default ${JSON.stringify(
+					{
+						releases: sortedReleases,
+						stable: releases.filter(r => !r.parsed.release).map(r => r.release.id),
+						canary: releases
+							.filter(r => r.parsed.release && r.parsed.release.includes('alpha'))
+							.map(r => r.release.id),
+						beta: releases
+							.filter(r => r.parsed.release && r.parsed.release.includes('beta'))
+							.map(r => r.release.id)
+					},
+					null,
+					'  '
+				)}`
+			);
+
+			return;
+		}
+
+		return;
+	}
+
 	if (cli.data) {
 		const releases = sortedReleases.map(release => ({
 			parsed: semverUtils.parse(release.tag_name),
 			release
 		}));
 
-		await writeFile(cli.data, `export default ${JSON.stringify({
-			releases: sortedReleases,
-			stable: releases.filter(r => !r.parsed.release).map(r => r.release.id),
-			canary: releases.filter(r => r.parsed.release && r.parsed.release.includes('alpha')).map(r => r.release.id),
-			beta: releases.filter(r => r.parsed.release && r.parsed.release.includes('beta')).map(r => r.release.id),
-		}, null, '  ')}`);
+		await writeFile(
+			cli.data,
+			`export default ${JSON.stringify(
+				{
+					releases: sortedReleases,
+					stable: releases.filter(r => !r.parsed.release).map(r => r.release.id),
+					canary: releases
+						.filter(r => r.parsed.release && r.parsed.release.includes('alpha'))
+						.map(r => r.release.id),
+					beta: releases
+						.filter(r => r.parsed.release && r.parsed.release.includes('beta'))
+						.map(r => r.release.id)
+				},
+				null,
+				'  '
+			)}`
+		);
 
 		return;
 	}
@@ -80,11 +121,11 @@ async function main(cli) {
 		console.log(`${prefix}skipping, not on master or pr`);
 	}
 
-	const channel = branch === 'master'
-		? 'alpha'
-		: 'pr'
+	const channel = branch === 'master' ? 'alpha' : 'pr';
 
-	const major = semverUtils.parse(branch === 'master' ? semver.inc(manifest.version, 'major') : manifest.version);
+	const major = semverUtils.parse(
+		branch === 'master' ? semver.inc(manifest.version, 'major') : manifest.version
+	);
 	const majorTarget = `${major.major}.${major.minor}.${major.patch}-${channel}.0+${hash}`;
 
 	const releaseVersions = sortedReleases
@@ -94,10 +135,7 @@ async function main(cli) {
 			return r.release.indexOf(channel) === 0;
 		});
 
-	const sv = r =>
-		r.major === major.major &&
-		r.minor === major.minor &&
-		r.patch === major.patch;
+	const sv = r => r.major === major.major && r.minor === major.minor && r.patch === major.patch;
 
 	const iterations = releaseVersions.filter(sv);
 	const iteration = iterations[0] ? iterations[0].semver : majorTarget;
@@ -106,11 +144,12 @@ async function main(cli) {
 		? process.env.CIRCLE_PULL_REQUEST.split('/').filter(Boolean)
 		: ['0'];
 
-	const prNumber = prSegments[prSegments.length - 1] || '0';
+	const prNumber = prSegments[prSegments.length - 1] || '0';
 
-	const version = channel === 'pr'
-		? `${major.major}.${major.minor}.${major.patch}-${channel}.${prNumber}+${hash}`
-		: semver.inc(iteration, 'prerelease');
+	const version =
+		channel === 'pr'
+			? `${major.major}.${major.minor}.${major.patch}-${channel}.${prNumber}+${hash}`
+			: semver.inc(iteration, 'prerelease');
 
 	if (version === null) {
 		console.error(`Failed to determine new version from ${iteration}`);
@@ -121,7 +160,10 @@ async function main(cli) {
 
 	if (!cli.dryRun) {
 		manifest.version = version;
-		await writeFile(Path.join(projectPath, 'package.ncc.json'), JSON.stringify(manifest, null, '  '));
+		await writeFile(
+			Path.join(projectPath, 'package.ncc.json'),
+			JSON.stringify(manifest, null, '  ')
+		);
 	}
 }
 

@@ -66,7 +66,27 @@ export async function analyze(
 
 		const getBundle = async () => {
 			const compiler = await createPatternCompiler(patterns, { cwd, id });
-			await Util.promisify(compiler.run).bind(compiler)();
+			const stats = await Util.promisify(compiler.run).bind(compiler)();
+
+			if (stats.hasErrors()) {
+				const message = stats.toString({
+					chunks: false,
+					colors: false
+				});
+
+				console.error(message);
+				throw new Error();
+			}
+
+			if (stats.hasWarnings()) {
+				console.warn(
+					stats.toString({
+						chunks: false,
+						colors: false
+					})
+				);
+			}
+
 			return (compiler.outputFileSystem as any).readFileSync(`/${id}.js`).toString();
 		};
 

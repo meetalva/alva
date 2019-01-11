@@ -30,7 +30,19 @@ async function main(cli) {
 	}
 
 	const projectPath = Path.resolve(process.cwd(), cli.project);
+	const mainManifest = require(Path.join(projectPath, 'package.json'));
 	const manifest = require(Path.join(projectPath, 'package.ncc.json'));
+
+	if (semver.gt(mainManifest.version, manifest.version)) {
+		console.log(`${prefix}trigger full draft release for ${manifest.name}@${manifest.version}`);
+
+		if (!cli.dryRun) {
+			manifest.version = mainManifest.version;
+			await writeFile(Path.join(projectPath, 'package.ncc.json'), JSON.stringify(manifest, null, '  '));
+		}
+
+		return;
+	}
 
 	const giturl =
 		typeof manifest.repository === 'object' ? manifest.repository.url : manifest.repository;
@@ -45,8 +57,6 @@ async function main(cli) {
 		return semver.rcompare(a.tag_name, b.tag_name);
 	});
 
-	const latestRelease = sortedReleases[0];
-
 	if (cli.data) {
 		const releases = sortedReleases.map(release => ({
 			parsed: semverUtils.parse(release.tag_name),
@@ -60,11 +70,6 @@ async function main(cli) {
 			beta: releases.filter(r => r.parsed.release && r.parsed.release.includes('beta')).map(r => r.release.id),
 		}, null, '  ')}`);
 
-		return;
-	}
-
-	if (latestRelease && semver.gt(manifest.version, latestRelease.tag_name)) {
-		console.log(`${prefix}trigger full draft release for ${manifest.name}@${manifest.version}`);
 		return;
 	}
 

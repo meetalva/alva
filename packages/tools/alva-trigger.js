@@ -90,7 +90,7 @@ async function main(cli) {
 				await execa('git', ['config', '--global', 'user.email', 'hey@meetalva.io']);
 
 				await execa('git', ['add', Path.join(projectPath, 'package.ncc.json')]);
-				await execa('git', ['commit', 'chore: switch back to alpha release channel']);
+				await execa('git', ['commit', '-m', 'chore: switch back to alpha release channel']);
 
 				await execa('git', ['remote', 'add', 'update', `https://marionebl:${process.env.GH_PUSH_TOKEN}@github.com/${repo.repo}.git`]);
 				await execc('git', ['push', 'update']);

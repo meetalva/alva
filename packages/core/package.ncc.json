@@ -1,68 +1,78 @@
 {
-	"name": "@meetalva/core",
-	"version": "0.9.1",
-	"description": "Create living prototypes with code components",
-	"main": "./index.js",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/meetalva/alva.git"
-	},
-	"author": {
-		"email": "hey@meetalva.io",
-		"name": "Meet Alva Team",
-		"url": "https://meetalva.io/"
-	},
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/meetalva/alva/issues"
-	},
-	"build": {
-		"appId": "io.github.meetalva",
-		"generateUpdatesFilesForAllChannels": true,
-		"npmRebuild": false,
-		"productName": "Alva",
-		"copyright": "Copyright (c) 2017-present SinnerSchrader Deutschland GmbH",
-		"files": [
-			"**/*"
-		],
-		"directories": {
-			"buildResources": "src/resources",
-			"output": "dist"
-		},
-		"mac": {
-			"category": "public.app-category.graphics-design",
-			"target": ["dmg", "zip"]
-		},
-		"nsis": {
-			"artifactName": "${productName}-${version}.${ext}",
-			"oneClick": false,
-			"perMachine": true,
-			"allowElevation": true,
-			"allowToChangeInstallationDirectory": true
-		},
-		"portable": {
-			"artifactName": "${productName}-portable-${version}.${ext}"
-		},
-		"linux": {
-			"artifactName": "${productName}-${version}.${ext}",
-			"executableName": "Alva",
-			"target": ["appimage", "snap", "deb"]
-		},
-		"win": {
-			"target": ["portable", "nsis"]
-		},
-		"fileAssociations": {
-			"ext": "alva",
-			"name": "Alva",
-			"icon": "document.icns",
-			"role": "Editor",
-			"isPackage": true
-		}
-	},
-	"// dependencies": "Dependencies that are externals and required in main process when compiling with ncc",
-	"dependencies": {
-		"ws": "5.1.1",
-		"webpack": "^4.28.2"
-	},
-	"homepage": "https://meetalva.github.io/"
+  "name": "@meetalva/core",
+  "version": "0.9.2",
+  "description": "Create living prototypes with code components",
+  "main": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetalva/alva.git"
+  },
+  "author": {
+    "email": "hey@meetalva.io",
+    "name": "Meet Alva Team",
+    "url": "https://meetalva.io/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meetalva/alva/issues"
+  },
+  "build": {
+    "appId": "io.github.meetalva",
+    "generateUpdatesFilesForAllChannels": true,
+    "npmRebuild": false,
+    "productName": "Alva",
+    "copyright": "Copyright (c) 2017-present SinnerSchrader Deutschland GmbH",
+    "files": [
+      "**/*"
+    ],
+    "directories": {
+      "buildResources": "src/resources",
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "nsis": {
+      "artifactName": "${productName}-${version}.${ext}",
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "portable": {
+      "artifactName": "${productName}-portable-${version}.${ext}"
+    },
+    "linux": {
+      "artifactName": "${productName}-${version}.${ext}",
+      "executableName": "Alva",
+      "target": [
+        "appimage",
+        "snap",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": [
+        "portable",
+        "nsis"
+      ]
+    },
+    "fileAssociations": {
+      "ext": "alva",
+      "name": "Alva",
+      "icon": "document.icns",
+      "role": "Editor",
+      "isPackage": true
+    }
+  },
+  "// dependencies": "Dependencies that are externals and required in main process when compiling with ncc",
+  "dependencies": {
+    "ws": "5.1.1",
+    "webpack": "^4.28.2"
+  },
+  "homepage": "https://meetalva.github.io/"
 }

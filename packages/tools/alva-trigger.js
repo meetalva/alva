@@ -93,7 +93,7 @@ async function main(cli) {
 				await execa('git', ['commit', '-m', 'chore: switch back to alpha release channel']);
 
 				await execa('git', ['remote', 'add', 'update', `https://marionebl:${process.env.GH_PUSH_TOKEN}@github.com/${repo.repo}.git`]);
-				await execc('git', ['push', 'update']);
+				await execa('git', ['push', 'update']);
 				await execa('git', ['remote', 'remove', 'update']);
 			}
 		}

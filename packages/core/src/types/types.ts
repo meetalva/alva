@@ -46,8 +46,8 @@ export interface RenderPage {
 export type LibraryAnalysisResult = LibraryAnalysisSuccess | LibraryAnalysisError;
 
 export enum LibraryAnalysisResultType {
-	Success,
-	Error
+	Success = 'LibraryAnalysisSuccess',
+	Error = 'LibraryAnalysisError'
 }
 
 export interface LibraryAnalysis {
@@ -79,6 +79,7 @@ export interface InternalPatternAnalysis {
 	path: string;
 	pattern: SerializedModel.SerializedPattern;
 	properties: PropertyAnalysis[];
+	symbol: Ts.Symbol;
 }
 
 export interface PatternAnalysis {

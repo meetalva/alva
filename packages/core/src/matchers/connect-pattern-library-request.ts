@@ -86,6 +86,7 @@ export function connectPatternLibrary({
 			app.send({
 				type: M.MessageType.ConnectPatternLibraryResponse,
 				id: m.id,
+				transaction: m.transaction,
 				payload: {
 					analysis: analysisResult.result,
 					path,
@@ -96,6 +97,7 @@ export function connectPatternLibrary({
 			app.send({
 				type: M.MessageType.UpdatePatternLibraryResponse,
 				id: m.id,
+				transaction: m.transaction,
 				payload: {
 					analysis: analysisResult.result,
 					path,

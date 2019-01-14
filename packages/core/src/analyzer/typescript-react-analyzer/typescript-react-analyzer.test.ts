@@ -20,6 +20,7 @@ test('reuses properties from shared interfaces', () => {
 	const project = new Project();
 
 	const analyzePattern = getPatternAnalyzer(program, project, {
+		analyzeBuiltins: false,
 		getGlobalPatternId: () => uuid.v4(),
 		getGlobalPropertyId: () => uuid.v4(),
 		getGlobalSlotId: () => uuid.v4(),

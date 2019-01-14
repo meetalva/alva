@@ -6,13 +6,14 @@ import * as Util from 'util';
 import * as WS from 'ws';
 import * as Routes from './routes';
 import * as Sender from '../sender';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
+import { Project } from '../model/project';
 
 interface AlvaServerInit {
 	app: express.Express;
 	host: Types.Host;
 	interface?: string;
-	dataHost: Types.DataHost;
+	dataHost: Types.DataHost<Project>;
 	http: Http.Server;
 	ws: WS.Server;
 	options: {
@@ -20,11 +21,11 @@ interface AlvaServerInit {
 	};
 }
 
-export class AlvaServer implements Types.AlvaServer {
+export class AlvaServer implements Types.AlvaServer<Project> {
 	private app: express.Express;
 	private http: Http.Server;
 	private ws: WS.Server;
-	public readonly dataHost: Types.DataHost;
+	public readonly dataHost: Types.DataHost<Project>;
 	public readonly host: Types.Host;
 	public sender: Sender.Sender;
 	public readonly port: number;
@@ -121,7 +122,7 @@ export class AlvaServer implements Types.AlvaServer {
 		dataHost
 	}: {
 		host: Types.Host;
-		dataHost: Types.DataHost;
+		dataHost: Types.DataHost<Project>;
 	}): Promise<AlvaServer> {
 		const flags = await host.getFlags();
 		const port = await host.getPort(flags.port);

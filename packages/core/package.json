@@ -67,6 +67,7 @@
   "dependencies": {
     "@marionebl/browserfs": "2.0.0",
     "@marionebl/sander": "0.6.1",
+    "@meetalva/types": "0.9.2",
     "@types/color": "^3.0.0",
     "@types/dargs": "5.1.0",
     "@types/electron-devtools-installer": "2.0.3",

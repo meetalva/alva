@@ -6,7 +6,7 @@ import {
 } from './typescript-react-analyzer';
 import Project from 'ts-simple-ast';
 import * as uuid from 'uuid';
-import { InternalPatternAnalysis } from '../../types';
+import * as Types from '@meetalva/types';
 import * as Path from 'path';
 
 const fixtures = require('fixturez')(__dirname);
@@ -33,26 +33,9 @@ test('reuses properties from shared interfaces', () => {
 		sourcePath: s.fileName,
 		description: s.fileName,
 		displayName: Path.basename(s.fileName, Path.extname(s.fileName))
-	})); /* [
-		{
-			id: uuid.v4(),
-			artifactPath: path,
-			declarationPath: path,
-			sourcePath: path,
-			description: '',
-			displayName: 'B'
-		},
-		{
-			id: uuid.v4(),
-			artifactPath: path,
-			declarationPath: path,
-			sourcePath: path,
-			description: '',
-			displayName: 'C'
-		}
-	]; */
+	}));
 
-	const [A, B] = candidates.reduce<InternalPatternAnalysis[]>((acc, candidate) => {
+	const [A, B] = candidates.reduce<Types.InternalPatternAnalysis[]>((acc, candidate) => {
 		return [...acc, ...analyzePattern(candidate, acc, analyzePatternExport)];
 	}, []);
 

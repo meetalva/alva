@@ -1,13 +1,14 @@
 import * as M from '../../message';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as AU from 'electron-updater';
 import * as uuid from 'uuid';
 import * as isDev from 'electron-is-dev';
 import * as Path from 'path';
 import * as semver from 'semver';
+import { Project } from '../../model';
 
 export class ElectronUpdater {
-	private readonly server: Types.AlvaServer;
+	private readonly server: Types.AlvaServer<Project>;
 	private updater: typeof AU.autoUpdater;
 	private force: boolean = false;
 

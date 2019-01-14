@@ -1,0 +1,71 @@
+{
+    "name": "@meetalva/analyse",
+    "version": "0.9.2",
+    "description": "Analyse TypeScript projects for Alva components",
+    "bin": {
+      "alva": "./bin/analyse.js"
+    },
+    "scripts": {
+      "compile": "tsc --project .",
+      "build:clean": "npm run clean && npm run build",
+      "clean": "rm -rf lib && rm -rf dist",
+      "test": "jest --maxWorkers 4",
+      "watch": "tsc --project . --watch",
+      "watch:tests": "jest --watch"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/meetalva/alva.git"
+    },
+    "author": {
+      "email": "hey@meetalva.io",
+      "name": "Meet Alva Team",
+      "url": "https://meetalva.io/"
+    },
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/meetalva/alva/issues"
+    },
+    "standard-version": {
+      "scripts": {
+        "prebump": "rm -f package-lock.json"
+      }
+    },
+    "devDependencies": {
+      "@types/jest": "22.2.2",
+      "fixturez": "1.1.0",
+      "jest": "^23.6.0",
+      "jest-dom": "^3.0.0",
+      "jest-util": "^23.4.0",
+      "prettier": "1.12.0",
+      "ts-jest": "^23.10.5",
+      "tslint": "5.11.0",
+      "tslint-config-prettier": "1.15.0",
+      "typescript": "3.2.2"
+    },
+    "dependencies": {
+      "@meetalva/types": "0.9.2",
+      "@types/lodash": "4.14.107",
+      "@types/node": "^10.12.18",
+      "@types/react": "16.4.11",
+      "@types/read-pkg": "3.0.0",
+      "@types/uuid": "3.4.3",
+      "@types/webpack": "^4.4.21",
+      "@types/ws": "5.1.0",
+      "lodash": "4.17.5",
+      "monaco-editor": "0.13.1",
+      "path-is-inside": "^1.0.2",
+      "pkg-dir": "3.0.0",
+      "precinct": "5.0.1",
+      "read-pkg": "3.0.0",
+      "resolve": "1.8.1",
+      "semver": "^5.6.0",
+      "ts-simple-ast": "20.0.0",
+      "tslib": "1.9.0",
+      "typescript": "3.2.2",
+      "typescript-eslint-parser": "^21.0.2",
+      "uuid": "3.2.1",
+      "webpack": "^4.28.2"
+    },
+    "homepage": "https://meetalva.github.io/"
+  }

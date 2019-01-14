@@ -1,4 +1,4 @@
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as M from '../message';
 import { MessageType as MT } from '../message';
 import * as Store from '../store';

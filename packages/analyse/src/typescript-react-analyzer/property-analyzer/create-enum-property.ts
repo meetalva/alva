@@ -1,5 +1,5 @@
 // tslint:disable:no-bitwise
-import * as Types from '../../../types';
+import * as Types from '@meetalva/types';
 import { PropertyInit, PropertyAnalyzeContext } from './types';
 import * as Ts from 'typescript';
 import * as TypescriptUtils from '../../typescript-utils';

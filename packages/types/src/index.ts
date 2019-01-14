@@ -1,3 +1,4 @@
+export * from './app';
 export * from './export';
 export * from './mobx';
 export * from './serialized-model';

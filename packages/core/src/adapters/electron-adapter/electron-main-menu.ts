@@ -4,17 +4,18 @@ import * as Model from '../../model';
 import * as M from '../../message';
 import { MessageType as MT } from '../../message';
 import * as Menu from '../../menu';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as Url from 'url';
-import uuid = require('uuid');
+import * as uuid from 'uuid';
+import { Project } from '../../model';
 
 export class ElectronMainMenu {
-	private server: Types.AlvaServer;
+	private server: Types.AlvaServer<Project>;
 
 	@Mobx.observable private focusedApp: Model.AlvaApp | undefined;
 	@Mobx.observable private focusedProject: Model.Project | undefined;
 
-	public constructor(init: { server: Types.AlvaServer }) {
+	public constructor(init: { server: Types.AlvaServer<Project> }) {
 		this.server = init.server;
 	}
 

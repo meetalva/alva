@@ -1,15 +1,9 @@
 {
-	"references": [
-		{
-			"path": "../analyse"
-		}
-	],
 	"compilerOptions": {
 		"composite": true,
-		"outDir": "build",
+		"outDir": "lib",
 		"rootDir": "src",
-		"lib": ["es2017", "dom"],
-		"jsx": "react",
+		"lib": ["es2017"],
 		"downlevelIteration": true,
 		"skipLibCheck": true,
 		"allowSyntheticDefaultImports": false,

@@ -1,4 +1,4 @@
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 export type ParseResult<T> = ParseSuccess<T> | ParseError;
 

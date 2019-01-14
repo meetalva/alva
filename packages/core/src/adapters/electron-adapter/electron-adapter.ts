@@ -1,5 +1,5 @@
 import * as Electron from 'electron';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as M from '../../message';
 import * as Matchers from '../../matchers';
 import { MessageType as MT } from '../../message';
@@ -10,18 +10,17 @@ import { AlvaApp, Project } from '../../model';
 import * as Serde from '../../sender/serde';
 import * as uuid from 'uuid';
 import * as Url from 'url';
-import { HostWindowVariant } from '../../types';
 import * as Mobx from 'mobx';
 
 const throat = require('throat');
 
 export interface ElectronAdapterInit {
-	server: Types.AlvaServer;
+	server: Types.AlvaServer<Project>;
 	forceUpdates: boolean;
 }
 
 export class ElectronAdapter {
-	private server: Types.AlvaServer;
+	private server: Types.AlvaServer<Project>;
 	private menu: ElectronMainMenu;
 	private updater: ElectronUpdater;
 
@@ -52,7 +51,7 @@ export class ElectronAdapter {
 			if (process.platform === 'darwin' && this.windows.size === 0) {
 				await host.createWindow({
 					address: server.location.origin,
-					variant: HostWindowVariant.Splashscreen
+					variant: Types.HostWindowVariant.Splashscreen
 				});
 			}
 		});
@@ -276,7 +275,7 @@ export class ElectronAdapter {
 			const project = Project.from((m.payload.project as Types.ProjectPayloadSuccess).contents);
 			await host.createWindow({
 				address: `${server.location.origin}/project/${project.getId()}`,
-				variant: HostWindowVariant.Normal
+				variant: Types.HostWindowVariant.Normal
 			});
 		});
 
@@ -307,7 +306,7 @@ export class ElectronAdapter {
 		if (!opts || !opts.filePath) {
 			await host.createWindow({
 				address: server.location.origin,
-				variant: HostWindowVariant.Splashscreen
+				variant: Types.HostWindowVariant.Splashscreen
 			});
 		} else {
 			this.server.sender.send({

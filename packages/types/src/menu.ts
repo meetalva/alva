@@ -1,5 +1,5 @@
-import * as Message from '../message';
-import { AlvaApp, Project, Element } from '../model';
+import { AlvaApp } from '.';
+import { Message } from './message';
 
 export type MenuItem = ContentMenuItem | SeperatorMenuItem;
 
@@ -22,7 +22,7 @@ export interface ActionableMenuItem {
 	accelerator?: string;
 	enabled?: boolean;
 	label: string;
-	message?: Message.Message;
+	message?: Message;
 	role?: MenuItemRole;
 	visible?: boolean;
 }
@@ -34,7 +34,7 @@ export interface CheckboxMenuItem {
 	enabled?: boolean;
 	checked: boolean;
 	label: string;
-	message?: Message.Message;
+	message?: Message;
 	role?: MenuItemRole;
 	visible?: boolean;
 	type?: 'checkbox';
@@ -63,14 +63,14 @@ export interface NestedMenuItem {
 	enabled?: boolean;
 }
 
-export interface MenuContext {
+export interface MenuContext<T = unknown> {
 	app?: AlvaApp;
-	project?: Project;
+	project?: T;
 }
 
-export interface ElementMenuContext {
+export interface ElementMenuContext<T = unknown> {
 	app: AlvaApp;
-	project: Project;
+	project: T;
 	element: Element;
 }
 

@@ -1,4 +1,3 @@
-import { IconName } from '../components';
 import { ModelName } from './types';
 
 export enum PatternPropertyType {
@@ -94,7 +93,7 @@ export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
 export interface SerializedEnumOption {
 	model: ModelName.PatternEnumPropertyOption;
 	contextId: string;
-	icon: IconName | undefined;
+	icon: string | undefined;
 	id: string;
 	name: string;
 	ordinal: string;

@@ -22,7 +22,7 @@ export class EditHistory {
 		}
 
 		this.commits.unshift(this.stage.toCommit());
-		this.stage = new EditHistoryStage();
+		this.clearStage();
 	}
 
 	public peek(offset: number = 0): EditHistoryCommit | undefined {
@@ -38,7 +38,6 @@ export class EditHistory {
 
 		const revert = commit.revert();
 		this.reverts.unshift(revert);
-
 		return revert;
 	}
 
@@ -51,7 +50,10 @@ export class EditHistory {
 
 		const commit = revert.revert();
 		this.commits.unshift(commit);
-
 		return commit;
+	}
+
+	public clearStage(): void {
+		this.stage = new EditHistoryStage();
 	}
 }

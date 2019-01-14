@@ -689,6 +689,8 @@ export class ViewStore {
 				project.apply(change);
 			}
 		});
+
+		this.editHistory.clearStage();
 	}
 
 	@Mobx.action
@@ -949,6 +951,8 @@ export class ViewStore {
 				project.apply(change);
 			}
 		});
+
+		this.editHistory.clearStage();
 	}
 
 	@Mobx.action

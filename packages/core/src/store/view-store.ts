@@ -361,6 +361,7 @@ export class ViewStore {
 		}
 
 		const selectNext = this.removeElement(selectedElement);
+
 		selectNext();
 		this.commit();
 		return selectedElement;
@@ -671,7 +672,6 @@ export class ViewStore {
 		}
 
 		init.content.insert({ element: init.element, at: init.index });
-		init.element.setContainer(init.content);
 	}
 
 	@Mobx.action

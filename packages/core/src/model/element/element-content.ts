@@ -145,7 +145,6 @@ export class ElementContent {
 
 		clonedElements.forEach(clonedElement => {
 			target.addElement(clonedElement);
-			clonedElement.setContainer(clone);
 		});
 
 		return clone;
@@ -206,8 +205,6 @@ export class ElementContent {
 
 	@Mobx.action
 	public insert(options: { at: number; element: Element }): void {
-		options.element.setContainer(this);
-
 		const id = options.element.getId();
 
 		if (this.elementIds.find(eid => eid === id)) {
@@ -225,7 +222,6 @@ export class ElementContent {
 			return;
 		}
 
-		options.element.unsetContainer();
 		this.elementIds.splice(index, 1);
 	}
 

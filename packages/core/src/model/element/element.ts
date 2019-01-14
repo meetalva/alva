@@ -14,7 +14,6 @@ import { PatternLibrary } from '../pattern-library';
 import { PlaceholderPosition } from '../../components';
 
 export interface ElementInit {
-	containerId?: string;
 	contentIds: string[];
 	dragged: boolean;
 	focused: boolean;
@@ -152,7 +151,6 @@ export class Element {
 		this.shouldPlaceholderHighlight = init.placeholderHighlighted;
 		this.id = init.id ? init.id : uuid.v4();
 		this.patternId = init.patternId;
-		this.containerId = init.containerId;
 		this.open = init.open;
 		this.forcedOpen = init.forcedOpen;
 		this.project = context.project;
@@ -183,7 +181,6 @@ export class Element {
 				name: serialized.name,
 				patternId: serialized.patternId,
 				placeholderHighlighted: serialized.placeholderHighlighted as PlaceholderPosition,
-				containerId: serialized.containerId,
 				contentIds: serialized.contentIds,
 				open: serialized.open,
 				forcedOpen: serialized.forcedOpen,
@@ -320,7 +317,6 @@ export class Element {
 				focused: withState ? this.focused : false,
 				highlighted: withState ? this.shouldHighlight : false,
 				id: uuid.v4(),
-				containerId: withState ? this.containerId : undefined,
 				contentIds: clonedContents.map(content => content.getId()),
 				name: this.name,
 				open: withState ? this.open : false,
@@ -405,10 +401,7 @@ export class Element {
 	}
 
 	public getContainer(): ElementContent | undefined {
-		if (!this.containerId) {
-			return;
-		}
-		return this.project.getElementContentById(this.containerId);
+		return this.project.getElementContentByElement(this);
 	}
 
 	public getContainerType(): undefined | Types.SlotType {
@@ -635,11 +628,6 @@ export class Element {
 	}
 
 	@Mobx.action
-	public setContainer(container: ElementContent): void {
-		this.containerId = container.getId();
-	}
-
-	@Mobx.action
 	public setDragged(dragged: boolean): void {
 		this.dragged = dragged;
 	}
@@ -715,7 +703,6 @@ export class Element {
 
 		if (container) {
 			container.insert({ element: this, at: init.index });
-			this.setContainer(container);
 		}
 	}
 
@@ -763,7 +750,6 @@ export class Element {
 	public toJSON(): Types.SerializedElement {
 		return {
 			model: this.model,
-			containerId: this.containerId,
 			contentIds: Array.from(this.contentIds),
 			dragged: this.dragged,
 			focused: this.focused,
@@ -781,13 +767,7 @@ export class Element {
 	}
 
 	@Mobx.action
-	public unsetContainer(): void {
-		this.containerId = undefined;
-	}
-
-	@Mobx.action
 	public update(b: Element): void {
-		this.containerId = b.containerId;
 		this.name = b.name;
 
 		Array.from(b.propertyValues.entries()).forEach(([key, value]) => {

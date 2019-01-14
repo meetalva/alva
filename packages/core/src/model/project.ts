@@ -384,6 +384,12 @@ export class Project {
 		return this.elementContents.get(id);
 	}
 
+	public getElementContentByElement(element: Element): undefined | ElementContent {
+		return this.getElementContents().find(content =>
+			content.getElements().some(e => e.getId() === element.getId())
+		);
+	}
+
 	public getElementContents(): ElementContent[] {
 		return [...this.elementContents.values()];
 	}

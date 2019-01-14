@@ -21,6 +21,7 @@ export class EditHistory {
 			return;
 		}
 
+		this.reverts = [];
 		this.commits.unshift(this.stage.toCommit());
 		this.clearStage();
 	}

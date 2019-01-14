@@ -17,6 +17,7 @@ export class PropertyItemEnum extends React.Component<PropertyItemEnumProps> {
 		const selectedOption = patternProperty.getOptionById(item.value);
 		const selectedValue = selectedOption ? selectedOption.getValue() : undefined;
 		this.props.property.setValue(selectedValue);
+		props.store.getApp().setHasFocusedInput(false);
 		props.store.commit();
 	}
 

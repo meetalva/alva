@@ -5,7 +5,6 @@ import { getSpace, SpaceSize } from '../space';
 import styled, { css } from 'styled-components';
 import { ChevronUp, ChevronDown } from 'react-feather';
 import { IconSize } from '../icons';
-import { merge } from 'lodash';
 
 const INPUT_PADDING_RIGHT = (props: PropertyInputProps) =>
 	props.type && props.type === PropertyInputType.Number ? 0 : getSpace(SpaceSize.S);
@@ -111,9 +110,8 @@ export interface PropertyInputProps {
 	placeholder?: string;
 	type?: PropertyInputType;
 	value?: string;
-
-	onDecrement?: React.MouseEventHandler;
-	onIncrement?: React.MouseEventHandler;
+	onMinusClick?: React.MouseEventHandler;
+	onPlusClick?: React.MouseEventHandler;
 }
 
 export enum PropertyInputType {
@@ -131,13 +129,15 @@ export const PropertyInput: React.SFC<PropertyInputProps> = props => (
 			value={props.value || ''}
 			placeholder={props.placeholder}
 		/>
-		<StyledStepper>
-			<StyledClicker onClick={props.onIncrement}>
-				<ChevronUp size={IconSize.XXS} />
-			</StyledClicker>
-			<StyledClicker onClick={props.onDecrement}>
-				<ChevronDown size={IconSize.XXS} />
-			</StyledClicker>
-		</StyledStepper>
+		{props.type === 'number' && (
+			<StyledStepper>
+				<StyledClicker onClick={props.onPlusClick}>
+					<ChevronUp size={IconSize.XXS} />
+				</StyledClicker>
+				<StyledClicker onClick={props.onMinusClick}>
+					<ChevronDown size={IconSize.XXS} />
+				</StyledClicker>
+			</StyledStepper>
+		)}
 	</StyledWrapper>
 );

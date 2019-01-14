@@ -47,7 +47,6 @@ test('un-highlight highlighted element content onDragLeave', () => {
 	});
 
 	element.setOpen(true);
-	element.setContainer(content);
 	content.insert({ at: 0, element });
 	project.addElement(element);
 

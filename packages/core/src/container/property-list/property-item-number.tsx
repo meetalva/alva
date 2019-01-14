@@ -38,7 +38,7 @@ export class PropertyItemNumber extends React.Component<PropertyItemNumberProps>
 				description={patternProperty.getDescription()}
 				label={patternProperty.getLabel()}
 				value={property.getValue() as number | undefined}
-				onBlur={() => props.store.commit()}
+				onBlur={() => window.requestIdleCallback(() => props.store.commit())}
 				onChange={e => property.setValue(e.target.value)}
 				placeholder={example ? `e.g.: ${example}` : ''}
 				onDecrement={e => decrement(e)}

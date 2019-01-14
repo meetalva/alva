@@ -323,7 +323,7 @@ export type Save = Envelope<MessageType.Save, { publish: boolean; projectId: str
 export type SaveAs = Envelope<MessageType.SaveAs, { projectId: string }>;
 export type SaveResult = Envelope<
 	MessageType.SaveResult,
-	{ project: Types.SerializedProject; previous: string }
+	{ project: { id: string; draft: boolean; name: string; path: string }; previous: string }
 >;
 export type SetPane = Envelope<MessageType.SetPane, { pane: Types.AppPane; visible: boolean }>;
 export type ShowError = Envelope<
@@ -446,14 +446,13 @@ export type MobxChange =
 	| Mobx.IArraySplice
 	| Mobx.IMapDidChange;
 
-export type ProjectUpdate = Envelope<
-	MessageType.ProjectUpdate,
-	{
-		change: MobxChange;
-		path: string;
-		projectId: string;
-	}
->;
+export interface ProjectUpdatePayload {
+	change: MobxChange;
+	path: string;
+	projectId: string;
+}
+
+export type ProjectUpdate = Envelope<MessageType.ProjectUpdate, ProjectUpdatePayload>;
 
 export type AppUpdate = Envelope<
 	MessageType.AppUpdate,

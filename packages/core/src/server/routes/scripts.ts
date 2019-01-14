@@ -22,6 +22,7 @@ export function scriptsRouteFactory(server: Types.AlvaServer): Express.RequestHa
 		);
 
 		if (result) {
+			res.type('js');
 			res.send(result.file.buffer);
 			return;
 		}

@@ -104,7 +104,6 @@ export class ElementList extends React.Component {
 
 		if (store.getSelectedElement() !== element) {
 			store.setSelectedElement(element);
-			store.stage();
 		}
 	}
 

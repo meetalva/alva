@@ -1,6 +1,6 @@
 import { Sender } from '../sender';
 import { isEqual } from 'lodash';
-import { MessageType } from '../message';
+import { MessageType, ProjectUpdate } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
 import * as Types from '../types';
@@ -130,28 +130,10 @@ export class ViewStore {
 	}
 
 	public commit(): void {
-		if (!this.project || !this.app) {
-			return;
-		}
-
-		this.editHistory.push({
-			app: this.app.toJSON(),
-			project: this.project.toJSON()
-		});
+		this.editHistory.commit();
 
 		window.requestIdleCallback(() => {
 			this.save();
-		});
-	}
-
-	public stage(): void {
-		if (!this.project || !this.app) {
-			return;
-		}
-
-		this.editHistory.replace({
-			app: this.app.toJSON(),
-			project: this.project.toJSON()
 		});
 	}
 
@@ -694,44 +676,19 @@ export class ViewStore {
 
 	@Mobx.action
 	public redo(): void {
-		const p = this.project;
+		const commit = this.editHistory.redo();
 
-		if (!p) {
+		if (!commit) {
 			return;
 		}
 
-		const item = this.editHistory.forward();
+		commit.changes.forEach(change => {
+			const project = this.getProject();
 
-		if (!item) {
-			return;
-		}
-
-		const project = Model.Project.from(item.project);
-
-		if (this.project && isEqual(project.toJSON(), this.project.toJSON())) {
-			return;
-		}
-
-		const nowSelected = p.getSelectedElement();
-
-		this.setApp(Model.AlvaApp.from(item.app, { sender: this.getSender() }));
-		this.getProject().update(project);
-
-		const previouslySelected = project.getSelectedElement();
-
-		const elementToSelect = previouslySelected
-			? p.getElementById(previouslySelected.getId())
-			: undefined;
-
-		const elementToUnselect = nowSelected ? p.getElementById(nowSelected.getId()) : undefined;
-
-		if (elementToUnselect) {
-			elementToUnselect.setSelected(false);
-		}
-
-		if (elementToSelect) {
-			this.setSelectedElement(elementToSelect);
-		}
+			if (project && project.getId() === change.projectId) {
+				project.apply(change);
+			}
+		});
 	}
 
 	@Mobx.action
@@ -979,48 +936,19 @@ export class ViewStore {
 
 	@Mobx.action
 	public undo(): void {
-		const p = this.project;
+		const commit = this.editHistory.undo();
 
-		if (typeof p === 'undefined') {
+		if (!commit) {
 			return;
 		}
 
-		const item = this.editHistory.back();
+		commit.changes.forEach(change => {
+			const project = this.getProject();
 
-		if (!item) {
-			console.debug(`store.undo: no edit history item`);
-			return;
-		}
-
-		const project = Model.Project.from(item.project);
-
-		const app = Model.AlvaApp.from(item.app, { sender: this.getSender() });
-
-		if (this.project && isEqual(project.toJSON(), this.project.toJSON())) {
-			console.debug(`store.undo: versions of project ${project.getName()} are equal`);
-			return;
-		}
-
-		const nowSelected = p.getSelectedElement();
-
-		this.setApp(app);
-		this.getProject().update(project);
-
-		const previouslySelected = project.getSelectedElement();
-
-		const elementToSelect = previouslySelected
-			? p.getElementById(previouslySelected.getId())
-			: undefined;
-
-		const elementToUnselect = nowSelected ? p.getElementById(nowSelected.getId()) : undefined;
-
-		if (elementToUnselect) {
-			elementToUnselect.setSelected(false);
-		}
-
-		if (elementToSelect) {
-			this.setSelectedElement(elementToSelect);
-		}
+			if (project && project.getId() === change.projectId) {
+				project.apply(change);
+			}
+		});
 	}
 
 	@Mobx.action

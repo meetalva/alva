@@ -44,7 +44,7 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 										type={Components.PropertyInputType.Text}
 										value={props.elementAction.getPayload()}
 										onChange={e => props.elementAction.setPayload(e.target.value)}
-										onBlur={() => props.store.commit()}
+										onBlur={() => window.requestIdleCallback(() => props.store.commit())}
 									/>
 									<Components.LinkIcon
 										onClick={() => {

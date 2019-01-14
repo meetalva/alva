@@ -217,11 +217,6 @@ export interface PaneSize {
 	height?: number;
 }
 
-export interface EditHistoryItem {
-	app: SerializedModel.SerializedAlvaApp;
-	project: SerializedModel.SerializedProject;
-}
-
 export type ElementPropertyValue =
 	| undefined
 	| boolean

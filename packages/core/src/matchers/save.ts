@@ -92,7 +92,12 @@ export function save(
 				id: uuid.v4(),
 				payload: {
 					previous: m.payload.projectId,
-					project: project.toJSON()
+					project: {
+						id: project.getId(),
+						path: project.getPath(),
+						draft: project.getDraft(),
+						name: project.getName()
+					}
 				}
 			});
 		} catch (err) {

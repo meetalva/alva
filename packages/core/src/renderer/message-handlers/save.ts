@@ -1,6 +1,5 @@
 import * as M from '../../message';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
-import * as Model from '../../model';
 
 export function save({ store }: MessageHandlerContext): MessageHandler<M.SaveResult> {
 	return m => {
@@ -11,13 +10,11 @@ export function save({ store }: MessageHandlerContext): MessageHandler<M.SaveRes
 		}
 
 		const previousDraft = project.getDraft();
-		const nextProject = Model.Project.from(m.payload.project);
 
-		project.setPath(nextProject.getPath());
-		project.setId(nextProject.getId());
-		project.setName(nextProject.getName());
-
-		project.setDraft(nextProject.getDraft());
+		project.setPath(m.payload.project.path);
+		project.setId(m.payload.project.id);
+		project.setName(m.payload.project.name);
+		project.setDraft(m.payload.project.draft);
 
 		if (previousDraft !== project.getDraft()) {
 			store.commit();

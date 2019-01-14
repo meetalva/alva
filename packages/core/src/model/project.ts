@@ -384,6 +384,12 @@ export class Project {
 		return this.elementContents.get(id);
 	}
 
+	public getElementContentByElement(element: Element): undefined | ElementContent {
+		return this.getElementContents().find(content =>
+			content.getElements().some(e => e.getId() === element.getId())
+		);
+	}
+
 	public getElementContents(): ElementContent[] {
 		return [...this.elementContents.values()];
 	}
@@ -852,23 +858,21 @@ export class Project {
 		sender.unmatch(Message.MessageType.ProjectUpdate, this.onProjectUpdate);
 	}
 
-	private onProjectUpdate(m: Message.ProjectUpdate) {
-		const { change, path, projectId } = m.payload;
+	public apply(change: Message.ProjectUpdatePayload) {
+		const target = this.getByPath(change.path);
 
-		if (projectId !== this.getId()) {
+		if (!target) {
 			return;
 		}
 
-		const target = this.getByPath(path);
-
 		if (Mobx.isObservableMap(target)) {
-			const c = change as Mobx.IMapDidChange;
+			const c = change.change as Mobx.IMapDidChange;
 
 			switch (c.type) {
 				case 'add':
 				case 'update': {
 					const ValueModel =
-						typeof c.newValue === 'object'
+						typeof c.newValue === 'object' && c.newValue !== null
 							? ModelTree.getModelByName(c.newValue.model as Types.ModelName)
 							: undefined;
 
@@ -885,7 +889,7 @@ export class Project {
 		}
 
 		if (Mobx.isObservableObject(target)) {
-			const c = change as Mobx.IObjectDidChange;
+			const c = change.change as Mobx.IObjectDidChange;
 
 			switch (c.type) {
 				case 'add':
@@ -907,11 +911,21 @@ export class Project {
 			return;
 		}
 
-		if (Mobx.isObservableArray(target) && change.type === 'splice') {
-			const c = change as Mobx.IArraySplice;
+		if (Mobx.isObservableArray(target) && change.change.type === 'splice') {
+			const c = change.change as Mobx.IArraySplice;
 			target.splice(c.index, c.removedCount, ...c.added);
 			return;
 		}
+	}
+
+	private onProjectUpdate(m: Message.ProjectUpdate) {
+		const { projectId } = m.payload;
+
+		if (projectId !== this.getId()) {
+			return;
+		}
+
+		this.apply(m.payload);
 	}
 
 	@Mobx.action

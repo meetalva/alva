@@ -53,6 +53,7 @@ const StyledPageTile = styled.div`
 	justify-content: center;
 	transition: box-shadow 0.2s, color 0.2s;
 	color: ${Color.Grey20};
+	text-align: center;
 
 	&:hover {
 		box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.3);

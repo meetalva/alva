@@ -105,8 +105,10 @@ export class ReferenceSelect extends React.Component<ReferenceSelectProps> {
 
 				if (storeProperty && userStoreReference) {
 					userStoreReference.setUserStoreProperty(storeProperty);
-					userStoreReference.setOpen(false);
 					props.store.commit();
+
+					userStoreReference.setOpen(false);
+					props.store.getApp().setHasFocusedInput(false);
 				}
 
 				break;
@@ -121,8 +123,10 @@ export class ReferenceSelect extends React.Component<ReferenceSelectProps> {
 
 				userStore.addProperty(newProperty);
 				userStoreReference.setUserStoreProperty(newProperty);
-				userStoreReference.setOpen(false);
 				props.store.commit();
+
+				userStoreReference.setOpen(false);
+				props.store.getApp().setHasFocusedInput(false);
 		}
 	}
 

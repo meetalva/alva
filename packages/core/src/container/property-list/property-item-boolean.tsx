@@ -2,9 +2,8 @@ import * as Components from '../../components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
-// import { UserStorePropertySelect } from '../user-store-property-select';
-// import { UserStoreReferenceContainer } from './user-store-reference';
 import { ViewStore } from '../../store';
+import { debounce } from 'lodash';
 
 export interface PropertyItemBooleanProps {
 	property: Model.ElementProperty;
@@ -13,11 +12,16 @@ export interface PropertyItemBooleanProps {
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyItemBoolean extends React.Component<PropertyItemBooleanProps> {
+	private commit = debounce(() => {
+		const props = this.props as PropertyItemBooleanProps & { store: ViewStore };
+		props.store.commit();
+	}, 300);
+
 	private handleChange(e: React.ChangeEvent<HTMLElement>): void {
 		const props = this.props as PropertyItemBooleanProps & { store: ViewStore };
 		const target = e.target as HTMLInputElement;
 		props.property.setValue(target.checked);
-		props.store.commit();
+		this.commit();
 	}
 
 	public render(): JSX.Element | null {

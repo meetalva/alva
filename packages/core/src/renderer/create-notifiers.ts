@@ -67,6 +67,10 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 		() => {
 			const project = store.getProject();
 
+			if (!project) {
+				return;
+			}
+
 			if (
 				projectSync.id &&
 				projectSync.id !== project.getId() &&
@@ -90,6 +94,10 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 	Mobx.autorun(
 		() => {
 			const app = store.getApp();
+
+			if (!app) {
+				return;
+			}
 
 			if (
 				projectSync.id &&

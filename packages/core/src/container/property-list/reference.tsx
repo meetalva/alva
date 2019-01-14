@@ -29,7 +29,10 @@ export class Reference extends React.Component<ReferenceProps> {
 				name={storeProperty.getName()}
 				value={String(elementProperty.getValue())}
 				onClick={() => props.reference.setOpen(true)}
-				onLinkClick={() => store.removeReference(props.reference)}
+				onLinkClick={() => {
+					store.removeReference(props.reference);
+					props.store.commit();
+				}}
 			/>
 		);
 	}

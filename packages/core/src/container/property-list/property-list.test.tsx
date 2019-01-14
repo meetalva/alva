@@ -38,8 +38,6 @@ test.skip('executes toggleCodeDetails on click', async () => {
 		</MobxReact.Provider>
 	);
 
-	console.log(rendered.container.innerHTML);
-
 	const details = rendered.queryByText('Code Properties');
 
 	expect(details).not.toBeNull();

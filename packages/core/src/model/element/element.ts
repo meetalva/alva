@@ -14,7 +14,6 @@ import { PatternLibrary } from '../pattern-library';
 import { PlaceholderPosition } from '../../components';
 
 export interface ElementInit {
-	containerId?: string;
 	contentIds: string[];
 	dragged: boolean;
 	focused: boolean;
@@ -37,8 +36,6 @@ export interface ElementContext {
 
 export class Element {
 	public readonly model = Types.ModelName.Element;
-
-	@Mobx.observable private containerId?: string;
 
 	@Mobx.observable private readonly contentIds: string[] = [];
 
@@ -73,6 +70,8 @@ export class Element {
 	@Mobx.observable private role: Types.ElementRole;
 
 	@Mobx.observable private selected: boolean;
+
+	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Neutral;
 
 	/**
 	/* TODO: Remove before beta
@@ -152,7 +151,6 @@ export class Element {
 		this.shouldPlaceholderHighlight = init.placeholderHighlighted;
 		this.id = init.id ? init.id : uuid.v4();
 		this.patternId = init.patternId;
-		this.containerId = init.containerId;
 		this.open = init.open;
 		this.forcedOpen = init.forcedOpen;
 		this.project = context.project;
@@ -165,6 +163,8 @@ export class Element {
 
 		this.name =
 			typeof init.name !== 'undefined' ? init.name : pattern ? pattern.getName() : 'New Element';
+
+		this.editedName = this.name;
 
 		this.propertyValues = new Map(init.propertyValues);
 
@@ -183,7 +183,6 @@ export class Element {
 				name: serialized.name,
 				patternId: serialized.patternId,
 				placeholderHighlighted: serialized.placeholderHighlighted as PlaceholderPosition,
-				containerId: serialized.containerId,
 				contentIds: serialized.contentIds,
 				open: serialized.open,
 				forcedOpen: serialized.forcedOpen,
@@ -320,7 +319,6 @@ export class Element {
 				focused: withState ? this.focused : false,
 				highlighted: withState ? this.shouldHighlight : false,
 				id: uuid.v4(),
-				containerId: withState ? this.containerId : undefined,
 				contentIds: clonedContents.map(content => content.getId()),
 				name: this.name,
 				open: withState ? this.open : false,
@@ -405,10 +403,7 @@ export class Element {
 	}
 
 	public getContainer(): ElementContent | undefined {
-		if (!this.containerId) {
-			return;
-		}
-		return this.project.getElementContentById(this.containerId);
+		return this.project.getElementContentByElement(this);
 	}
 
 	public getContainerType(): undefined | Types.SlotType {
@@ -524,12 +519,34 @@ export class Element {
 		return container.getElementIndexById(this.getId());
 	}
 
-	public getName(opts?: { unedited: boolean }): string {
-		if ((!opts || !opts.unedited) && this.nameEditable && this.editedName) {
-			return this.editedName;
+	public getEditableState(): Types.EditableTitleState {
+		if (!this.focused) {
+			return Types.EditableTitleState.Neutral;
+		}
+
+		return this.focused && this.nameState === Types.EditableTitleState.Editing
+			? Types.EditableTitleState.Editing
+			: Types.EditableTitleState.Editable;
+	}
+
+	public setEditableState(state: Types.EditableTitleState): void {
+		this.nameState = state;
+	}
+
+	public getName(options?: { unedited: boolean }): string {
+		if ((!options || !options.unedited) && this.nameState === Types.EditableTitleState.Editing) {
+			return this.editedName || '';
 		}
 
 		return this.name;
+	}
+
+	public getEditableName(): string {
+		return this.editedName || '';
+	}
+
+	public setEditableName(editableName: string): void {
+		this.editedName = editableName;
 	}
 
 	public getNameEditable(): boolean {
@@ -635,11 +652,6 @@ export class Element {
 	}
 
 	@Mobx.action
-	public setContainer(container: ElementContent): void {
-		this.containerId = container.getId();
-	}
-
-	@Mobx.action
 	public setDragged(dragged: boolean): void {
 		this.dragged = dragged;
 	}
@@ -657,6 +669,10 @@ export class Element {
 	@Mobx.action
 	public setFocused(focused: boolean): void {
 		this.shouldFocus = focused;
+
+		if (!focused) {
+			this.nameState = Types.EditableTitleState.Neutral;
+		}
 	}
 
 	@Mobx.action
@@ -680,22 +696,14 @@ export class Element {
 
 	@Mobx.action
 	public setName(name: string): void {
-		if (this.nameEditable) {
-			this.editedName = name;
-		} else {
-			this.name = name;
-		}
+		this.name = name;
+		this.editedName = name;
 	}
 
 	@Mobx.action
-	public setNameEditable(nameEditable: boolean): void {
-		if (nameEditable) {
-			this.editedName = this.name;
-		} else {
-			this.name = this.editedName || this.name;
-		}
-
-		this.nameEditable = nameEditable;
+	public setNameState(state: Types.EditableTitleState): void {
+		this.editedName = this.name;
+		this.nameState = state;
 	}
 
 	@Mobx.action
@@ -715,7 +723,6 @@ export class Element {
 
 		if (container) {
 			container.insert({ element: this, at: init.index });
-			this.setContainer(container);
 		}
 	}
 
@@ -763,7 +770,6 @@ export class Element {
 	public toJSON(): Types.SerializedElement {
 		return {
 			model: this.model,
-			containerId: this.containerId,
 			contentIds: Array.from(this.contentIds),
 			dragged: this.dragged,
 			focused: this.focused,
@@ -781,13 +787,7 @@ export class Element {
 	}
 
 	@Mobx.action
-	public unsetContainer(): void {
-		this.containerId = undefined;
-	}
-
-	@Mobx.action
 	public update(b: Element): void {
-		this.containerId = b.containerId;
 		this.name = b.name;
 
 		Array.from(b.propertyValues.entries()).forEach(([key, value]) => {

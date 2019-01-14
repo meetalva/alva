@@ -209,7 +209,7 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 									type={Components.PropertyInputType.Text}
 									value={elementAction.getPayload()}
 									placeholder="https://meetalva.io"
-									onBlur={() => props.store.commit()}
+									onBlur={() => window.requestIdleCallback(() => props.store.commit())}
 									onChange={e => elementAction.setPayload(e.target.value)}
 								/>
 							</div>

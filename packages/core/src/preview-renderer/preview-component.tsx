@@ -50,7 +50,12 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 	});
 
 	private getDomElement(): Element | undefined {
-		const node = ReactDom.findDOMNode(this);
+		const node = (() => {
+			// tslint:disable-next-line:no-empty
+			try {
+				return ReactDom.findDOMNode(this);
+			} catch (err) {}
+		})();
 
 		if (!node) {
 			return;

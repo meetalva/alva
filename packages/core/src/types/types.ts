@@ -24,6 +24,7 @@ export enum AlvaView {
 }
 
 export enum EditableTitleState {
+	Neutral = 'Neutral',
 	Editable = 'Editable',
 	Editing = 'Editing'
 }
@@ -215,11 +216,6 @@ export interface PaneSize {
 	pane: AppPane;
 	width?: number;
 	height?: number;
-}
-
-export interface EditHistoryItem {
-	app: SerializedModel.SerializedAlvaApp;
-	project: SerializedModel.SerializedProject;
 }
 
 export type ElementPropertyValue =

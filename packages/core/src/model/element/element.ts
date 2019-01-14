@@ -518,7 +518,11 @@ export class Element {
 	}
 
 	public getName(opts?: { unedited: boolean }): string {
-		if ((!opts || !opts.unedited) && this.nameEditable && this.editedName) {
+		if (
+			(!opts || !opts.unedited) &&
+			this.nameEditable &&
+			typeof this.editedName !== 'undefined'
+		) {
 			return this.editedName;
 		}
 

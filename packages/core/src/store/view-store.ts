@@ -939,6 +939,7 @@ export class ViewStore {
 	@Mobx.action
 	public undo(): void {
 		const commit = this.editHistory.undo();
+		console.log({ commit });
 
 		if (!commit) {
 			return;

@@ -50,8 +50,9 @@ export class ElementList extends React.Component {
 		const editableElement = store.getNameEditableElement();
 
 		if (editableElement) {
-			store.executeElementRename(editableElement);
 			store.setNameEditableElement();
+			store.getApp().setHasFocusedInput(false);
+			store.executeElementRename(editableElement);
 		}
 	}
 
@@ -326,8 +327,9 @@ export class ElementList extends React.Component {
 				const editableElement = store.getNameEditableElement();
 
 				if (editableElement) {
-					store.executeElementRename(editableElement);
 					store.setNameEditableElement();
+					store.getApp().setHasFocusedInput(false);
+					store.executeElementRename(editableElement);
 				}
 				break;
 			}
@@ -341,6 +343,7 @@ export class ElementList extends React.Component {
 					const name = editableElement.getName({ unedited: true });
 					store.setNameEditableElement();
 					editableElement.setName(name);
+					store.getApp().setHasFocusedInput(false);
 				}
 			}
 		}

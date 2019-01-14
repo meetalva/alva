@@ -861,25 +861,6 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public setNameEditableElement(editableElement?: Model.Element): void {
-		const project = this.project;
-
-		if (typeof project === 'undefined') {
-			return;
-		}
-
-		const previousElement = project.getElements().find(element => element.getNameEditable());
-
-		if (previousElement && previousElement !== editableElement) {
-			previousElement.setNameEditable(false);
-		}
-
-		if (editableElement) {
-			editableElement.setNameEditable(true);
-		}
-	}
-
-	@Mobx.action
 	public setPatternSearchTerm(patternSearchTerm: string): void {
 		this.app.setSearchTerm(patternSearchTerm);
 	}
@@ -905,10 +886,6 @@ export class ViewStore {
 		}
 
 		const previousSelectedElement = this.getSelectedElement();
-
-		if (previousSelectedElement && previousSelectedElement !== selectedElement) {
-			this.setNameEditableElement();
-		}
 
 		if (previousSelectedElement) {
 			previousSelectedElement.setSelected(false);

@@ -37,8 +37,6 @@ export interface ElementContext {
 export class Element {
 	public readonly model = Types.ModelName.Element;
 
-	@Mobx.observable private containerId?: string;
-
 	@Mobx.observable private readonly contentIds: string[] = [];
 
 	@Mobx.observable private dragged: boolean;
@@ -72,6 +70,8 @@ export class Element {
 	@Mobx.observable private role: Types.ElementRole;
 
 	@Mobx.observable private selected: boolean;
+
+	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Neutral;
 
 	/**
 	/* TODO: Remove before beta
@@ -163,6 +163,8 @@ export class Element {
 
 		this.name =
 			typeof init.name !== 'undefined' ? init.name : pattern ? pattern.getName() : 'New Element';
+
+		this.editedName = this.name;
 
 		this.propertyValues = new Map(init.propertyValues);
 
@@ -517,16 +519,34 @@ export class Element {
 		return container.getElementIndexById(this.getId());
 	}
 
-	public getName(opts?: { unedited: boolean }): string {
-		if (
-			(!opts || !opts.unedited) &&
-			this.nameEditable &&
-			typeof this.editedName !== 'undefined'
-		) {
-			return this.editedName;
+	public getEditableState(): Types.EditableTitleState {
+		if (!this.focused) {
+			return Types.EditableTitleState.Neutral;
+		}
+
+		return this.focused && this.nameState === Types.EditableTitleState.Editing
+			? Types.EditableTitleState.Editing
+			: Types.EditableTitleState.Editable;
+	}
+
+	public setEditableState(state: Types.EditableTitleState): void {
+		this.nameState = state;
+	}
+
+	public getName(options?: { unedited: boolean }): string {
+		if ((!options || !options.unedited) && this.nameState === Types.EditableTitleState.Editing) {
+			return this.editedName || '';
 		}
 
 		return this.name;
+	}
+
+	public getEditableName(): string {
+		return this.editedName || '';
+	}
+
+	public setEditableName(editableName: string): void {
+		this.editedName = editableName;
 	}
 
 	public getNameEditable(): boolean {
@@ -649,6 +669,10 @@ export class Element {
 	@Mobx.action
 	public setFocused(focused: boolean): void {
 		this.shouldFocus = focused;
+
+		if (!focused) {
+			this.nameState = Types.EditableTitleState.Neutral;
+		}
 	}
 
 	@Mobx.action
@@ -672,22 +696,14 @@ export class Element {
 
 	@Mobx.action
 	public setName(name: string): void {
-		if (this.nameEditable) {
-			this.editedName = name;
-		} else {
-			this.name = name;
-		}
+		this.name = name;
+		this.editedName = name;
 	}
 
 	@Mobx.action
-	public setNameEditable(nameEditable: boolean): void {
-		if (nameEditable) {
-			this.editedName = this.name;
-		} else {
-			this.name = this.editedName || this.name;
-		}
-
-		this.nameEditable = nameEditable;
+	public setNameState(state: Types.EditableTitleState): void {
+		this.editedName = this.name;
+		this.nameState = state;
 	}
 
 	@Mobx.action

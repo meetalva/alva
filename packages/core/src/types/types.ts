@@ -24,6 +24,7 @@ export enum AlvaView {
 }
 
 export enum EditableTitleState {
+	Neutral = 'Neutral',
 	Editable = 'Editable',
 	Editing = 'Editing'
 }

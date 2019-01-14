@@ -57,11 +57,7 @@ export class PageTileContainer extends React.Component<PageTileContainerProps> {
 				onClick={e => this.handleClick(e)}
 				onFocus={e => this.handleFocus()}
 			>
-				<EditableTitleContainer
-					focused={props.focused}
-					page={props.page}
-					secondary={Types.EditableTitleType.Primary}
-				/>
+				<EditableTitleContainer item={props.page} />
 			</PageTile>
 		);
 	}

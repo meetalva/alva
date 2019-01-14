@@ -41,7 +41,6 @@ export interface ElementProps {
 	contentId: string;
 	dragging: boolean;
 	id: string;
-	onChange: React.FormEventHandler<HTMLInputElement>;
 	open: boolean;
 	placeholder: boolean;
 	placeholderHighlighted?: PlaceholderPosition;
@@ -137,30 +136,19 @@ const StyledIcon = styled(Icon)`
 	${(props: StyledIconProps) => (props.active ? `fill: ${Color.Blue20}` : '')};
 `;
 
-const LabelContent = styled.div`
+export const ElementLabel = styled.div`
 	box-sizing: border-box;
 	margin-left: ${getSpace(SpaceSize.XXL) - 3}px;
 	overflow: hidden;
-	padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.L)}px ${getSpace(SpaceSize.XS)}px 3px;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	width: 100%;
-	cursor: ${(props: LabelContentProps) => (props.active && props.editable ? 'text' : 'default')};
 	user-select: none;
-`;
-
-const StyledSeamlessInput = styled.input`
-	box-sizing: border-box;
-	width: 100%;
-	color: ${Color.Grey20};
-	font-size: inherit;
 	line-height: inherit;
-	padding: ${getSpace(SpaceSize.XS - 1)}px ${getSpace(SpaceSize.L - 1)}px
-		${getSpace(SpaceSize.XS - 1)}px 3px;
-	margin: 1px 1px 1px ${getSpace(SpaceSize.XXL - 3)}px;
-	border: 0;
-	&:focus {
-		outline: none;
+
+	> * {
+		padding: ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.L)}px ${getSpace(SpaceSize.XS)}px
+			3px;
 	}
 `;
 
@@ -193,37 +181,8 @@ const StyledElementDescription = styled.div`
 	}
 `;
 
-interface SeamlessInputProps {
-	autoFocus?: boolean;
-	autoSelect?: boolean;
-	onChange?: React.FormEventHandler<HTMLInputElement>;
-	value: string;
-}
-
-class SeamlessInput extends React.Component<SeamlessInputProps> {
-	private ref: HTMLInputElement | null = null;
-
-	public componentDidMount(): void {
-		if (this.ref !== null && this.props.autoSelect && this.props.autoFocus) {
-			const ref = this.ref as HTMLInputElement;
-			ref.setSelectionRange(0, this.props.value.length);
-		}
-	}
-
-	public render(): JSX.Element {
-		const { props } = this;
-		return (
-			<StyledSeamlessInput
-				autoFocus={props.autoFocus}
-				ref={(ref: any) => (this.ref = ref)}
-				value={props.value}
-				onChange={props.onChange}
-			/>
-		);
-	}
-}
-
 export class Element extends React.Component<ElementProps> {
+	public static ElementTitle: React.SFC = props => <>{props.children}</>;
 	public static ElementChildren: React.SFC = props => <>{props.children}</>;
 	public static ElementSlots: React.SFC = props => <>{props.children}</>;
 
@@ -258,28 +217,11 @@ export class Element extends React.Component<ElementProps> {
 							active={props.state === ElementState.Active}
 						/>
 					)}
-					{props.state === ElementState.Editable &&
-					props.capabilities.includes(ElementCapability.Editable) ? (
-						<SeamlessInput
-							{...{ [ElementAnchors.label]: true }}
-							value={props.title}
-							onChange={props.onChange}
-							autoFocus
-							autoSelect
-						/>
-					) : (
-						<LabelContent
-							active={props.state === ElementState.Active}
-							editable={props.capabilities.includes(ElementCapability.Editable)}
-							{...{ [ElementAnchors.label]: true }}
-						>
-							{props.title}
-							{props.description && (
-								<StyledElementDescription state={props.state}>
-									{props.description}
-								</StyledElementDescription>
-							)}
-						</LabelContent>
+					{containered(props.children, Element.ElementTitle)}
+					{props.description && (
+						<StyledElementDescription state={props.state}>
+							{props.description}
+						</StyledElementDescription>
 					)}
 				</StyledElementLabel>
 				<StyledElementChildren>
@@ -299,7 +241,7 @@ export class Element extends React.Component<ElementProps> {
 }
 
 function containered<T>(children: React.ReactNode, Container: React.SFC): React.ReactElement<T>[] {
-	return React.Children.map(children, child => {
+	return React.Children.map(children || [], child => {
 		if (child === null) {
 			return;
 		}

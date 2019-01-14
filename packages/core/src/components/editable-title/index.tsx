@@ -2,25 +2,15 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import styled from 'styled-components';
 
-import { Color } from '../colors';
-import { CopySize } from '../copy';
-import { getSpace, SpaceSize } from '../space';
-
 export enum EditableTitleState {
 	Editable = 'Editable',
-	Editing = 'Editing'
-}
-
-export enum EditableTitleType {
-	Primary,
-	Secondary
+	Editing = 'Editing',
+	Neutral = 'Neutral'
 }
 
 export interface EditableTitleProps {
-	category: EditableTitleType;
-	focused: boolean;
 	name: string;
-	nameState: EditableTitleState;
+	state: EditableTitleState;
 	value: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
@@ -30,7 +20,6 @@ export interface EditableTitleProps {
 }
 
 interface EditableInputProps {
-	category: EditableTitleType;
 	autoFocus: boolean;
 	autoSelect: boolean;
 	value: string;
@@ -42,77 +31,41 @@ interface EditableInputProps {
 }
 
 interface StyledEditableTitleProps {
-	children: React.ReactNode;
+	children?: React.ReactNode;
 	editable: boolean;
 	focused?: boolean;
-	category: EditableTitleType;
 }
 
-interface StyledInputProps {
-	category: EditableTitleType;
-}
-
-const categorizedTitleStyles = (props: StyledEditableTitleProps) => {
-	switch (props.category) {
-		case EditableTitleType.Secondary:
-			return `
-				width: 200px;
-				margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
-				font-size: ${CopySize.M}px;
-				color: ${Color.Grey36};
-		`;
-		case EditableTitleType.Primary:
-		default:
-			return `
-				width: 100%;
-				margin: 0;
-				font-size: ${CopySize.S}px;
-				color: ${Color.Black};
-		`;
-	}
-};
-
-const StyledTitle = styled.strong`
+const StyledTitle =
+	styled.div <
+	StyledEditableTitleProps >
+	`
 	box-sizing: border-box;
-	display: inline-block;
-	padding: 0;
-	overflow: hidden;
-	font-weight: normal;
-	text-align: center;
-	cursor: ${(props: StyledEditableTitleProps) => (props.editable ? 'text' : 'default')};
-	white-space: nowrap;
-	text-overflow: ellipsis;
-
-	${categorizedTitleStyles};
-`;
-
-const categorizedEditableTitleStyles = (props: StyledInputProps) => {
-	switch (props.category) {
-		case EditableTitleType.Secondary:
-			return `
-				width: 200px;
-				margin: 0 ${getSpace(SpaceSize.XS)}px ${getSpace(SpaceSize.XXS)}px;
-				font-size: ${CopySize.M}px;
-		`;
-		case EditableTitleType.Primary:
-		default:
-			return `
-				width: 100%;
-				margin: 0;
-				font-size: ${CopySize.S}px;
-		`;
-	}
-};
-
-const StyledEditableTitle = styled.input`
-	box-sizing: border-box;
-	display: inline-block;
 	border: 0;
 	padding: 0;
 	overflow: hidden;
-	text-align: center;
+	color: inherit;
+	text-align: inherit;
+	font-size: inherit;
+	font-weight: normal;
+	cursor: ${props => (props.editable ? 'text' : 'default')};
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	line-height: inherit;
+`;
 
-	${categorizedEditableTitleStyles} :focus {
+const StyledEditableTitle = styled.input`
+	box-sizing: border-box;
+	border: 0;
+	padding: 0;
+	overflow: hidden;
+	color: inherit;
+	text-align: inherit;
+	font-size: inherit;
+	font-weight: normal;
+	line-height: inherit;
+	cursor: text;
+	&:focus {
 		outline: none;
 	}
 `;
@@ -140,7 +93,6 @@ class EditableInput extends React.Component<EditableInputProps> {
 				onChange={props.onChange}
 				onFocus={props.onFocus}
 				onKeyDown={props.onKeyDown}
-				category={props.category}
 				value={props.value}
 			/>
 		);
@@ -149,11 +101,10 @@ class EditableInput extends React.Component<EditableInputProps> {
 
 export const EditableTitle: React.SFC<EditableTitleProps> = (props): JSX.Element => (
 	<React.Fragment>
-		{props.nameState === EditableTitleState.Editing ? (
+		{props.state === EditableTitleState.Editing ? (
 			<EditableInput
 				autoFocus
 				autoSelect
-				category={props.category}
 				data-title={true}
 				onBlur={props.onBlur}
 				onClick={props.onClick}
@@ -164,9 +115,8 @@ export const EditableTitle: React.SFC<EditableTitleProps> = (props): JSX.Element
 			/>
 		) : (
 			<StyledTitle
-				category={props.category}
 				data-title={true}
-				editable={props.focused}
+				editable={props.state === EditableTitleState.Editable}
 				onClick={props.onClick}
 			>
 				{props.name}

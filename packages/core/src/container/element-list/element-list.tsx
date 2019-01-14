@@ -19,15 +19,11 @@ export class ElementList extends React.Component {
 	private dragImg: React.RefObject<any> = React.createRef();
 	private globalDragEndListener?: (e: DragEvent) => void;
 	private globalDropListener?: (e: DragEvent) => void;
-	private globalKeyDownListener?: (e: KeyboardEvent) => void;
 
 	public componentDidMount(): void {
 		const { store } = this.props as { store: Store.ViewStore };
-		this.globalKeyDownListener = e => this.handleKeyDown(e);
 		this.globalDragEndListener = e => store.unsetDraggedElement();
 		this.globalDropListener = this.globalDragEndListener;
-
-		window.addEventListener('keydown', this.globalKeyDownListener);
 		window.addEventListener('drop', this.globalDropListener);
 		window.addEventListener('dragend', this.globalDragEndListener);
 	}
@@ -38,32 +34,6 @@ export class ElementList extends React.Component {
 		}
 		if (this.globalDragEndListener) {
 			window.removeEventListener('drop', this.globalDragEndListener);
-		}
-		if (this.globalKeyDownListener) {
-			window.removeEventListener('keydown', this.globalKeyDownListener);
-		}
-	}
-
-	@Mobx.action
-	private handleBlur(e: React.FormEvent<HTMLElement>): void {
-		const { store } = this.props as { store: Store.ViewStore };
-		const editableElement = store.getNameEditableElement();
-
-		if (editableElement) {
-			store.setNameEditableElement();
-			store.getApp().setHasFocusedInput(false);
-			store.executeElementRename(editableElement);
-		}
-	}
-
-	@Mobx.action
-	private handleChange(e: React.FormEvent<HTMLElement>): void {
-		const { store } = this.props as { store: Store.ViewStore };
-		const target = e.target as HTMLInputElement;
-		const changedElement = utils.elementFromTarget(e.target, { sibling: false, store });
-
-		if (changedElement) {
-			changedElement.setName(target.value);
 		}
 	}
 
@@ -97,10 +67,6 @@ export class ElementList extends React.Component {
 		if (icon) {
 			element.toggleOpen();
 			return;
-		}
-
-		if (store.getSelectedElement() === element && label) {
-			store.setNameEditableElement(element);
 		}
 
 		if (store.getSelectedElement() !== element) {
@@ -309,47 +275,6 @@ export class ElementList extends React.Component {
 	}
 
 	@Mobx.action
-	private handleKeyDown(e: KeyboardEvent): void {
-		const { store } = this.props as { store: Store.ViewStore };
-
-		// Only handle key events if either
-		// (1) it is global, thus fires on body
-		// (2) is a node inside the page element list
-		// if (e.target !== document.body && !contains(node)) {
-		// 	return;
-		// }
-
-		switch (e.keyCode) {
-			case 13: {
-				// ENTER
-				e.stopPropagation();
-
-				const editableElement = store.getNameEditableElement();
-
-				if (editableElement) {
-					store.setNameEditableElement();
-					store.getApp().setHasFocusedInput(false);
-					store.executeElementRename(editableElement);
-				}
-				break;
-			}
-			case 27: {
-				// ESC
-				e.stopPropagation();
-
-				const editableElement = store.getNameEditableElement();
-
-				if (editableElement) {
-					const name = editableElement.getName({ unedited: true });
-					store.setNameEditableElement();
-					editableElement.setName(name);
-					store.getApp().setHasFocusedInput(false);
-				}
-			}
-		}
-	}
-
-	@Mobx.action
 	private handleMouseLeave(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const element = utils.elementFromTarget(e.target as HTMLElement, { sibling: false, store });
@@ -432,8 +357,6 @@ export class ElementList extends React.Component {
 		return (
 			<Components.DragArea
 				anchors={this.getDragAnchors()}
-				onBlur={e => this.handleBlur(e)}
-				onChange={e => this.handleChange(e)}
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
 				onDragEnter={e => this.handleDragEnter(e)}
@@ -441,7 +364,6 @@ export class ElementList extends React.Component {
 				onDragOver={e => this.handleDragOver(e)}
 				onDragStart={e => this.handleDragStart(e)}
 				onDrop={e => this.handleDrop(e)}
-				onKeyDown={e => this.handleKeyDown(e.nativeEvent)}
 				onMouseLeave={e => this.handleMouseLeave(e)}
 				onMouseOver={e => this.handleMouseOver(e)}
 			>

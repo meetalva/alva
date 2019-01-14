@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import DemoContainer from '../demo-container';
-import { EditableTitle, EditableTitleState, EditableTitleType } from '../editable-title';
+import { EditableTitle, EditableTitleState } from '../editable-title';
 import { Layout, LayoutDirection } from '../layout';
 import { Space, SpaceSize } from '../space';
 import { PageTile } from '.';
@@ -18,13 +18,7 @@ export default (): JSX.Element => (
 					isDroppable={{ back: false, next: false }}
 					onChange={handleChange}
 				>
-					<EditableTitle
-						category={EditableTitleType.Primary}
-						focused={false}
-						name="foo"
-						nameState={EditableTitleState.Editable}
-						value="foo"
-					/>
+					<EditableTitle name="foo" state={EditableTitleState.Editable} value="foo" />
 				</PageTile>
 			</Space>
 			<Space size={[SpaceSize.S, SpaceSize.S, 0]}>
@@ -34,13 +28,7 @@ export default (): JSX.Element => (
 					isDroppable={{ back: true, next: false }}
 					onChange={handleChange}
 				>
-					<EditableTitle
-						category={EditableTitleType.Primary}
-						focused={false}
-						name="foo"
-						nameState={EditableTitleState.Editable}
-						value="foo"
-					/>
+					<EditableTitle name="foo" state={EditableTitleState.Editable} value="foo" />
 				</PageTile>
 			</Space>
 			<Space size={[SpaceSize.S, SpaceSize.S, 0]}>
@@ -50,13 +38,7 @@ export default (): JSX.Element => (
 					isDroppable={{ back: false, next: true }}
 					onChange={handleChange}
 				>
-					<EditableTitle
-						category={EditableTitleType.Primary}
-						focused={false}
-						name="foo"
-						nameState={EditableTitleState.Editable}
-						value="foo"
-					/>
+					<EditableTitle name="foo" state={EditableTitleState.Editable} value="foo" />
 				</PageTile>
 			</Space>
 		</Layout>

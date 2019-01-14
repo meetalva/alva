@@ -1,4 +1,3 @@
-import * as AlvaUtil from '../../alva-util';
 import * as Components from '../../components';
 import { ElementContentContainer } from './element-content-container';
 import { ElementSlotContainer } from './element-slot-container';
@@ -9,6 +8,8 @@ import * as React from 'react';
 import * as Types from '../../types';
 import { ViewStore } from '../../store';
 import { PlaceholderPosition } from '../../components';
+import { EditableTitleContainer } from '../editable-title/editable-title-container';
+import { Type } from 'ts-simple-ast';
 
 export interface ElementContainerProps {
 	element: Model.Element;
@@ -32,6 +33,16 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 				content.getSlotType() === Types.SlotType.Children
 		);
 
+		const patternName = pattern && pattern.getName();
+
+		const patternNameDescription =
+			patternName && patternName !== props.element.getName() ? patternName : undefined;
+
+		const description =
+			props.element.getEditableState() !== Types.EditableTitleState.Editing
+				? patternNameDescription
+				: undefined;
+
 		return (
 			<Components.Element
 				capabilities={[
@@ -44,19 +55,19 @@ export class ElementContainer extends React.Component<ElementContainerProps> {
 				id={props.element.getId()}
 				contentId={childContent ? childContent.getId() : ''}
 				open={open}
-				onChange={AlvaUtil.noop}
 				placeholder={props.element.getRole() !== Types.ElementRole.Root}
 				placeholderHighlighted={
 					props.element.getPlaceholderHighlighted() || PlaceholderPosition.None
 				}
 				state={getElementState(props.element, store)}
-				title={
-					props.element.getRole() === Types.ElementRole.Root ? 'Page' : props.element.getName()
-				}
-				description={
-					pattern && props.element.getName() !== pattern.getName() ? pattern.getName() : ''
-				}
+				title={props.element.getName()}
+				description={description}
 			>
+				<Components.Element.ElementTitle>
+					<Components.ElementLabel>
+						<EditableTitleContainer item={props.element} />
+					</Components.ElementLabel>
+				</Components.Element.ElementTitle>
 				<Components.Element.ElementSlots>
 					{slotContents.map(slotContent => (
 						<ElementSlotContainer key={slotContent.getId()} content={slotContent} />

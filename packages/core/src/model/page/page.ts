@@ -41,7 +41,7 @@ export class Page {
 	@Mobx.observable private editedName: string = '';
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string = 'Page';
-	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Editable;
+	@Mobx.observable public nameState: Types.EditableTitleState = Types.EditableTitleState.Neutral;
 
 	/**
 	 * UI property flags to highlight the area
@@ -212,8 +212,22 @@ export class Page {
 		return this.focused;
 	}
 
-	public getEditedName(): string {
+	public getEditableName(): string {
 		return this.editedName;
+	}
+
+	public getEditableState(): Types.EditableTitleState {
+		if (!this.focused) {
+			return Types.EditableTitleState.Neutral;
+		}
+
+		return this.focused && this.nameState === Types.EditableTitleState.Editing
+			? Types.EditableTitleState.Editing
+			: Types.EditableTitleState.Editable;
+	}
+
+	public setEditableState(state: Types.EditableTitleState): void {
+		this.nameState = state;
 	}
 
 	public getElementById(id: string): Element | undefined {

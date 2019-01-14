@@ -1,10 +1,8 @@
 import DemoContainer from '../demo-container';
 import { Element, ElementCapability, ElementState } from './index';
 import * as React from 'react';
-import { PlaceholderPosition } from './element';
-
-// tslint:disable-next-line:no-empty
-const NOOP = () => {};
+import { PlaceholderPosition, ElementLabel } from './element';
+import { EditableTitle, EditableTitleState } from '../editable-title';
 
 const CHILD = (
 	<Element
@@ -14,7 +12,6 @@ const CHILD = (
 		capabilities={[ElementCapability.Editable]}
 		open={false}
 		placeholder={true}
-		onChange={NOOP}
 		title="Child Element"
 		dragging={false}
 	/>
@@ -30,11 +27,20 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				state={ElementState.Default}
 				capabilities={[ElementCapability.Editable]}
 				open={false}
-				onChange={NOOP}
 				placeholder={true}
 				title="Element"
 				dragging={false}
-			/>
+			>
+				<Element.ElementTitle>
+					<ElementLabel>
+						<EditableTitle
+							name="Element"
+							state={EditableTitleState.Editable}
+							value="Element"
+						/>
+					</ElementLabel>
+				</Element.ElementTitle>
+			</Element>
 		</>
 		<>
 			Active
@@ -43,12 +49,21 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				contentId="2"
 				capabilities={[ElementCapability.Editable]}
 				open={false}
-				onChange={NOOP}
 				placeholder={true}
 				state={ElementState.Active}
 				title="Element"
 				dragging={false}
-			/>
+			>
+				<Element.ElementTitle>
+					<ElementLabel>
+						<EditableTitle
+							name="Element"
+							state={EditableTitleState.Editable}
+							value="Element"
+						/>
+					</ElementLabel>
+				</Element.ElementTitle>
+			</Element>
 		</>
 		<>
 			Highlighted
@@ -57,12 +72,21 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				contentId="2"
 				capabilities={[ElementCapability.Editable]}
 				open={false}
-				onChange={NOOP}
 				placeholder={true}
 				state={ElementState.Highlighted}
 				title="Element"
 				dragging={false}
-			/>
+			>
+				<Element.ElementTitle>
+					<ElementLabel>
+						<EditableTitle
+							name="Element"
+							state={EditableTitleState.Editable}
+							value="Element"
+						/>
+					</ElementLabel>
+				</Element.ElementTitle>
+			</Element>
 		</>
 		<>
 			Placeholder Highlighted
@@ -71,13 +95,22 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				contentId="2"
 				capabilities={[ElementCapability.Editable]}
 				open={false}
-				onChange={NOOP}
 				placeholder={true}
 				placeholderHighlighted={PlaceholderPosition.Before}
 				state={ElementState.Default}
 				title="Element"
 				dragging={true}
-			/>
+			>
+				<Element.ElementTitle>
+					<ElementLabel>
+						<EditableTitle
+							name="Element"
+							state={EditableTitleState.Editable}
+							value="Element"
+						/>
+					</ElementLabel>
+				</Element.ElementTitle>
+			</Element>
 		</>
 		<>
 			Placeholder Highlighted after
@@ -86,13 +119,22 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				contentId="2"
 				capabilities={[ElementCapability.Editable]}
 				open={false}
-				onChange={NOOP}
 				placeholder={true}
 				placeholderHighlighted={PlaceholderPosition.After}
 				state={ElementState.Default}
 				title="Element"
 				dragging={true}
-			/>
+			>
+				<Element.ElementTitle>
+					<ElementLabel>
+						<EditableTitle
+							name="Element"
+							state={EditableTitleState.Editable}
+							value="Element"
+						/>
+					</ElementLabel>
+				</Element.ElementTitle>
+			</Element>
 		</>
 		<>
 			Editable
@@ -101,12 +143,21 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				contentId="2"
 				capabilities={[ElementCapability.Editable]}
 				open={false}
-				onChange={NOOP}
 				placeholder={true}
 				state={ElementState.Editable}
 				title="Element"
 				dragging={false}
-			/>
+			>
+				<Element.ElementTitle>
+					<ElementLabel>
+						<EditableTitle
+							name="Element"
+							state={EditableTitleState.Editing}
+							value="Element"
+						/>
+					</ElementLabel>
+				</Element.ElementTitle>
+			</Element>
 		</>
 		<>
 			May open, closed
@@ -114,13 +165,21 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				id="3"
 				contentId="3"
 				capabilities={[ElementCapability.Editable, ElementCapability.Openable]}
-				onChange={NOOP}
 				open={false}
 				placeholder={true}
 				title="Element"
 				state={ElementState.Default}
 				dragging={false}
 			>
+				<Element.ElementTitle>
+					<ElementLabel>
+						<EditableTitle
+							name="Element"
+							state={EditableTitleState.Editable}
+							value="Element"
+						/>
+					</ElementLabel>
+				</Element.ElementTitle>
 				{CHILD}
 			</Element>
 		</>
@@ -130,13 +189,21 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				id="3"
 				contentId="3"
 				capabilities={[ElementCapability.Editable, ElementCapability.Openable]}
-				onChange={NOOP}
 				open
 				placeholder={true}
 				title="Element"
 				state={ElementState.Default}
 				dragging={false}
 			>
+				<Element.ElementTitle>
+					<ElementLabel>
+						<EditableTitle
+							name="Element"
+							state={EditableTitleState.Editable}
+							value="Element"
+						/>
+					</ElementLabel>
+				</Element.ElementTitle>
 				{CHILD}
 			</Element>
 		</>
@@ -146,13 +213,21 @@ const ElementDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				id="4"
 				contentId="4"
 				capabilities={[ElementCapability.Editable, ElementCapability.Openable]}
-				onChange={NOOP}
 				open
 				placeholder={true}
 				title="Element"
 				state={ElementState.Active}
 				dragging={false}
 			>
+				<Element.ElementTitle>
+					<ElementLabel>
+						<EditableTitle
+							name="Element"
+							state={EditableTitleState.Editable}
+							value="Element"
+						/>
+					</ElementLabel>
+				</Element.ElementTitle>
 				{CHILD}
 			</Element>
 		</>

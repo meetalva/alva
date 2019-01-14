@@ -691,6 +691,7 @@ export class ViewStore {
 		});
 
 		this.editHistory.clearStage();
+		this.unsetDraggedElement();
 	}
 
 	@Mobx.action
@@ -916,7 +917,6 @@ export class ViewStore {
 	@Mobx.action
 	public undo(): void {
 		const commit = this.editHistory.undo();
-		console.log({ commit });
 
 		if (!commit) {
 			return;
@@ -931,6 +931,7 @@ export class ViewStore {
 		});
 
 		this.editHistory.clearStage();
+		this.unsetDraggedElement();
 	}
 
 	@Mobx.action

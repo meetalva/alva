@@ -7,9 +7,8 @@
   },
   "scripts": {
     "alva": "node bin/alva",
-    "copy:scripts": "ncp build/scripts nccbuild/scripts",
-    "compile": "tsc --project .",
-    "compile:ncc": "yarn ncc build src/bin/electron.ts -e webpack -e electron -e monaco-editor -e ws -o nccbuild && yarn ncc build src/preview/preview-loader.ts -e webpack --out nccbuild/preview-loader && ncp package.ncc.json nccbuild/package.json",
+    "copy:scripts": "ncp lib/scripts nccbuild/scripts",
+    "compile:ncc": "yarn ncc build src/bin/electron.ts -e webpack -e electron -e monaco-editor -e ws -e @meetalva/loader -o nccbuild",
     "bundle": "webpack --production",
     "build:clean": "npm run clean && npm run build",
     "build:electron": "electron-builder --project nccbuild",
@@ -17,9 +16,7 @@
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
     "release": "electron-builder --publish always",
     "static": "node build/bin/alva --out=.static --host=static",
-    "test": "jest --maxWorkers 4",
-    "watch": "concurrently \"tsc --project . --watch\" \"webpack -w\"",
-    "watch:tests": "jest --watch"
+    "test": "jest --maxWorkers 4"
   },
   "repository": {
     "type": "git",
@@ -67,8 +64,9 @@
   "dependencies": {
     "@marionebl/browserfs": "2.0.0",
     "@marionebl/sander": "0.6.1",
+    "@meetalva/essentials": "1.0.0",
     "@types/color": "^3.0.0",
-    "@types/dargs": "5.1.0",
+    "@types/dargs": "^5.1.0",
     "@types/electron-devtools-installer": "2.0.3",
     "@types/electron-is-dev": "0.3.0",
     "@types/execa": "0.9.0",
@@ -109,7 +107,7 @@
     "clear-module": "2.1.0",
     "color": "3.0.0",
     "commondir": "1.0.1",
-    "dargs": "6.0.0",
+    "dargs": "^6.0.0",
     "devtron": "1.4.0",
     "electron-devtools-installer": "2.2.4",
     "electron-is-dev": "0.3.0",

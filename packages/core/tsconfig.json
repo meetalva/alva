@@ -1,19 +1,23 @@
 {
+	"references": [
+		{
+			"path": "../essentials"
+		},
+		{
+			"path": "../loader"
+		}
+	],
 	"compilerOptions": {
+		"composite": true,
+		"outDir": "lib",
 		"skipLibCheck": true,
-		"allowSyntheticDefaultImports": false,
-		"strict": true,
-		"downlevelIteration": true,
+		"lib": ["dom", "es2017"],
 		"experimentalDecorators": true,
-		"forceConsistentCasingInFileNames": true,
-		"jsx": "react",
-		"module": "commonjs",
 		"moduleResolution": "node",
-		"lib": ["es2017", "dom"],
-		"outDir": "build",
+		"module": "commonjs",
 		"rootDir": "src",
 		"target": "es2017",
-		"sourceMap": true
+		"jsx": "react"
 	},
 	"include": ["src"]
 }

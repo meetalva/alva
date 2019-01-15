@@ -8,8 +8,6 @@ import * as Types from '../types';
 import * as uuid from 'uuid';
 import { PlaceholderPosition } from '../components';
 
-const EMPTY_ARRAY: never[] = [];
-
 export interface ViewStoreInit {
 	app: Model.AlvaApp;
 	sender: Sender;
@@ -67,7 +65,7 @@ export class ViewStore {
 	@Mobx.computed
 	private get elements(): Model.Element[] {
 		if (!this.project) {
-			return EMPTY_ARRAY;
+			return [];
 		}
 
 		return this.project.getElements();
@@ -76,7 +74,7 @@ export class ViewStore {
 	@Mobx.computed
 	private get elementContents(): Model.ElementContent[] {
 		if (!this.project) {
-			return EMPTY_ARRAY;
+			return [];
 		}
 
 		return this.project.getElementContents();

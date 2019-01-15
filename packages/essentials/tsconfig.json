@@ -6,7 +6,7 @@
 		"jsx": "react",
 		"skipLibCheck": true,
 		"moduleResolution": "node",
-		"lib": ["dom", "es2017"]
+		"module": "commonjs",
 	},
 	"include": ["src"]
 }

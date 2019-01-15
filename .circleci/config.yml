@@ -181,11 +181,11 @@ jobs:
 
       - run:
           name: Create static build
-          command: lerna run static --stream
+          command: yarn alva --out=.static --host=static
 
       - run:
           name: Deploy to static hosting
-          command: alva-deploy --prefix=alva --project packages/core/.static
+          command: alva-deploy --prefix=alva --project .static
 
   trigger:
     docker:

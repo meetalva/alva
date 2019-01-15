@@ -14,8 +14,7 @@
     "build:electron": "electron-builder --project nccbuild",
     "clean": "rm -rf build && rm -rf dist",
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
-    "release": "electron-builder --publish always",
-    "static": "node build/bin/alva --out=.static --host=static"
+    "release": "electron-builder --publish always"
   },
   "repository": {
     "type": "git",

@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 import * as ChildProcess from 'child_process';
 import * as uuid from 'uuid';
+import * as dargs from 'dargs';
 import * as Hosts from '../hosts';
 import * as Message from '../message';
 import * as Serde from '../sender/serde';
 
 const yargsParser = require('yargs-parser');
 const electron = (require('electron') as any) as string;
+
+const commands = ['start', 'analyze'];
 
 function sendTo(cp: ChildProcess.ChildProcess) {
 	return (payload: Message.Message): void => {
@@ -19,16 +22,18 @@ function sendTo(cp: ChildProcess.ChildProcess) {
 
 async function main(): Promise<void> {
 	const flags = yargsParser(process.argv.slice(2));
-	const host = flags.host || 'electron';
+	const cmd = commands.find(cmd => cmd === flags._[0]) || 'start';
+	const host = cmd === 'start' ? flags.host || 'electron' : 'node';
+	const entry = getEntry(host, cmd);
 
 	const spawn =
-		host !== 'electron'
+		host !== 'electron' || cmd !== 'start'
 			? (e: string, a?: string[], o?: any) => ChildProcess.fork(entry, a, o)
 			: (e: string, a?: string[], o?: any) =>
 					ChildProcess.spawn(electron, [entry, ...(a || [])], o);
 
-	const entry = getEntry(host);
-	const cp = spawn(entry, process.argv.slice(2), { stdio: ['pipe', 'pipe', 'pipe', 'ipc'] });
+	const args = dargs({ ...flags, _: [] });
+	const cp = spawn(entry, args, { stdio: ['pipe', 'pipe', 'pipe', 'ipc'] });
 	const send = sendTo(cp);
 
 	cp.stdout.pipe(process.stdout);
@@ -46,7 +51,11 @@ async function main(): Promise<void> {
 	});
 }
 
-function getEntry(host: string = 'electron'): string {
+function getEntry(host: string = 'electron', cmd: string): string {
+	if (cmd === 'analyze') {
+		return require.resolve('./analyze');
+	}
+
 	switch (host) {
 		case 'node':
 		case 'static':

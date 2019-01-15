@@ -3,15 +3,15 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const yargs = require('yargs-parser');
 const flags = yargs(process.argv.slice(2));
 
-const out = flags.out ? flags.out : 'build';
+const out = flags.out ? flags.out : './packages/core/lib';
 
 module.exports = {
 	mode: flags.production ? 'production' : 'development',
 	devtool: flags.production || flags.sourceMaps ? 'source-maps' : 'eval',
 	entry: {
-		preview: require.resolve('./src/preview/preview.ts'),
-		previewRenderer: require.resolve('./src/preview-renderer/index.ts'),
-		renderer: require.resolve('./src/renderer/index.tsx'),
+		preview: require.resolve('./packages/core/src/preview/preview.ts'),
+		previewRenderer: require.resolve('./packages/core/src/preview-renderer/index.ts'),
+		renderer: require.resolve('./packages/core/src/renderer/index.tsx'),
 		Mobx: require.resolve('mobx')
 	},
 	module: {

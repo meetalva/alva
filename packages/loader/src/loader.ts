@@ -1,27 +1,26 @@
 import { getOptions } from 'loader-utils';
 import { loader } from 'webpack';
+import * as _ from 'lodash';
 
 // No typings available for commondir
 const commondir = require('commondir');
-
-module.exports = alvaEntryLoader;
 
 interface StringMap {
 	[name: string]: string;
 }
 
-export function alvaEntryLoader(this: loader.LoaderContext): string {
+export default function alvaEntryLoader(this: loader.LoaderContext): string {
 	// tslint:disable-next-line:no-any
 	const options = getOptions(this as any);
 
 	const components: StringMap = JSON.parse(options.components);
-	const componentDirs = Object.values(components);
+	const componentDirs = _.values(components);
 
 	if (componentDirs.length > 0) {
 		this.addContextDependency(commondir(options.cwd, componentDirs));
 	}
 
-	return Object.entries(components)
+	return _.entries(components)
 		.map(([name, id]) => createExport(name, id))
 		.join('\n');
 }

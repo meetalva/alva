@@ -12,19 +12,26 @@ const writeFile = Util.promisify(Fs.writeFile);
 
 async function main() {
 	const flags = yargsParser(process.argv.slice(2));
-	const [rawPath] = flags._;
 
-	const path = Path.resolve(flags.cwd || process.cwd(), rawPath);
+	const missing = ['in', 'out'].filter(
+		flag => !flags.hasOwnProperty(flag) || typeof flags[flag] !== 'string'
+	);
 
-	const outPath = flags.out ? Path.resolve(flags.cwd || process.cwd(), flags.out) : undefined;
+	if (missing.length > 0) {
+		console.error(`missing required flags: ${missing.map(m => `--${m}`).join(', ')}`);
+		process.exit(1);
+	}
 
-	const previousPath = flags.previous
-		? Path.resolve(flags.cwd || process.cwd(), flags.previous)
+	const cwd = flags.cwd || process.cwd();
+	const path = Path.resolve(cwd, flags.in);
+	const outPath = flags.out ? Path.resolve(cwd, flags.out) : undefined;
+
+	const previousLibrary = Fs.existsSync(outPath)
+		? Model.PatternLibrary.from(
+				JSON.parse(String(await readFile(outPath)).replace(/^export const analysis = /, ''))
+		  )
 		: undefined;
 
-	const previousLibrary = previousPath
-		? Model.PatternLibrary.from(JSON.parse(String(await readFile(previousPath))))
-		: undefined;
 	const analysis = await performAnalysis(path, { previousLibrary });
 
 	if (analysis.type === Types.LibraryAnalysisResultType.Error) {
@@ -40,9 +47,10 @@ async function main() {
 		{ analyzeBuiltins: true }
 	);
 
-	if (typeof outPath !== 'undefined') {
-		await writeFile(outPath, JSON.stringify(library.toJSON()));
-	}
+	await writeFile(
+		outPath,
+		`export const analysis = ${JSON.stringify(library.toJSON(), null, '  ')}`
+	);
 }
 
 main().catch(err => {

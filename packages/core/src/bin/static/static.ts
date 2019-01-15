@@ -50,13 +50,14 @@ async function main(forced?: ForcedFlags): Promise<void> {
 	const projectData = projectFile
 		? await Persistence.Persistence.parse<Types.SerializedProject>(projectFile)
 		: undefined;
+
 	const projectResult = projectData ? Model.Project.fromResult(projectData) : undefined;
 
-	if (projectResult && projectResult.status === Types.ProjectStatus.Error) {
+	if (projectResult.status === Types.ProjectStatus.Error) {
 		throw projectResult.error;
 	}
 
-	if (projectResult) {
+	if (projectResult.status === Types.ProjectStatus.Ok) {
 		const p = projectResult.result;
 		nodeHost.log(`Embedding ${p.getName()} at http://127.0.0.1:${port}/project/${p.getId()}`);
 	}

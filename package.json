@@ -8,7 +8,8 @@
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
     "precommit": "lint-staged",
-    "watch": "lerna run watch --stream"
+    "watch": "lerna run watch --stream",
+    "analyse:essentials": "alva analyze --out=packages/essentials/src/analysis.ts --in=packages/essentials/package.json"
   },
   "repository": {
     "type": "git",

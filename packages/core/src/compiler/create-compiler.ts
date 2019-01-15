@@ -3,6 +3,7 @@ import * as Path from 'path';
 import * as QueryString from 'querystring';
 import * as webpack from 'webpack';
 import * as Fs from 'fs';
+import * as resolve from 'resolve';
 
 // memory-fs typings on @types are faulty
 const MemoryFs = require('memory-fs');
@@ -25,9 +26,7 @@ export function createCompiler(
 		return acc;
 	}, {});
 
-	const sourcePath = Path.join(__dirname, '..', 'preview', 'preview-loader.js');
-	const nccPath = Path.join(__dirname, 'preview-loader', 'index.js');
-	const loaderPath = Fs.existsSync(sourcePath) ? sourcePath : nccPath;
+	const loaderPath = resolve.sync('meetalva-loader');
 
 	entry[options.id] = `${loaderPath}?${QueryString.stringify({
 		cwd: options.cwd,

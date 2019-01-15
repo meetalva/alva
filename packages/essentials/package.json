@@ -1,10 +1,10 @@
 {
-  "name": "essentials",
+  "name": "@meetalva/essentials",
   "version": "1.0.0",
   "description": "Built-in components for basic layouts and logic",
-  "main": "build/index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "tsc",
+    "compile": "tsc",
     "watch": "tsc --watch"
   },
   "license": "MIT",

@@ -1,0 +1,26 @@
+{
+	"files": [],
+	"include": [],
+	"references": [
+		{
+			"path": "./packages/core"
+		},
+		{
+			"path": "./packages/site"
+		}
+	],
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": false,
+		"composite": true,
+		"downlevelIteration": true,
+		"experimentalDecorators": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"jsx": "react",
+		"module": "es2015",
+		"moduleResolution": "node",
+		"lib": ["dom", "es2017"],
+		"target": "es2017",
+		"sourceMap": true
+	}
+}

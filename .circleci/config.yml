@@ -330,7 +330,7 @@ workflows:
       - install_macos
       - lint
       - compile
-      - test
+      - test:
           requires:
             - compile
       - bundle:

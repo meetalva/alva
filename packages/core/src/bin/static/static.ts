@@ -53,16 +53,20 @@ async function main(forced?: ForcedFlags): Promise<void> {
 
 	const projectResult = projectData ? Model.Project.fromResult(projectData) : undefined;
 
-	if (projectResult.status === Types.ProjectStatus.Error) {
+	if (typeof projectResult !== 'undefined' && projectResult.status === Types.ProjectStatus.Error) {
 		throw projectResult.error;
 	}
 
-	if (projectResult.status === Types.ProjectStatus.Ok) {
+	if (typeof projectResult !== 'undefined' && projectResult.status === Types.ProjectStatus.Ok) {
 		const p = projectResult.result;
 		nodeHost.log(`Embedding ${p.getName()} at http://127.0.0.1:${port}/project/${p.getId()}`);
 	}
 
-	await build({ path, host: nodeHost, project: projectResult ? projectResult.result : undefined });
+	await build({
+		path,
+		host: nodeHost,
+		project: typeof projectResult !== 'undefined' ? projectResult.result : undefined
+	});
 
 	const onRestart = async () => {
 		const sourceDirectory = await nodeHost.resolveFrom(Types.HostBase.Source, '.');

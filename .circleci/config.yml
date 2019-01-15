@@ -81,7 +81,7 @@ jobs:
 
       - run:
           name: Run unit tests
-          command: lerna run test --stream
+          command: yarn jest --maxWorkers 4
 
   lint:
     docker:

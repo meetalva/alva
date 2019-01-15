@@ -161,7 +161,7 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths:
-              - build/scripts
+              - packages/core/build/scripts
 
   static:
     docker:

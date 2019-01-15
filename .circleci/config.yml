@@ -279,6 +279,9 @@ jobs:
       - setup:
           key: linux
 
+      - attach_workspace:
+          at: ~/repo
+
       - run:
           name: Remove dev data
           command: rm packages/site/src/releases-data.ts
@@ -289,7 +292,7 @@ jobs:
 
       - run:
           name: Create static site
-          command: lerna run build --scope=@meetalva/site --stream
+          command: patternplate build --out=./.static --base=/
 
       - run:
           name: Deploy to static hosting

@@ -4,8 +4,7 @@
   "private": true,
   "main": "./lib/site",
   "scripts": {
-    "compile": "tsc --project .",
-    "build": "patternplate build --out=./.static --base=/"
+    "compile": "tsc --project ."
   },
   "repository": {
     "type": "git",

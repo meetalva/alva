@@ -328,9 +328,11 @@ workflows:
     jobs:
       - trigger
       - install_macos
-      - test
       - lint
       - compile
+      - test
+          requires:
+            - compile
       - bundle:
           requires:
             - compile

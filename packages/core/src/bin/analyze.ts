@@ -5,6 +5,7 @@ import * as Path from 'path';
 import * as Model from '../model';
 import * as Types from '../types';
 import * as Util from 'util';
+import * as JSON5 from 'json5';
 
 const yargsParser = require('yargs-parser');
 const readFile = Util.promisify(Fs.readFile);
@@ -28,7 +29,11 @@ async function main() {
 
 	const previousLibrary = Fs.existsSync(outPath)
 		? Model.PatternLibrary.from(
-				JSON.parse(String(await readFile(outPath)).replace(/^export const analysis = /, ''))
+				JSON5.parse(
+					String(await readFile(outPath))
+						.replace(/^export const analysis = /, '')
+						.replace(/\;\n$/, '\n')
+				)
 		  )
 		: undefined;
 

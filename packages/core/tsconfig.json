@@ -17,8 +17,7 @@
 		"module": "commonjs",
 		"rootDir": "src",
 		"target": "es2017",
-		"jsx": "react",
-		"esModuleInterop": true
+		"jsx": "react"
 	},
 	"include": ["src"]
 }

@@ -109,12 +109,15 @@ jobs:
 
       - run:
           name: Compile with tsc
-          command: lerna run compile --stream
+          command: yarn tsc -b -v
 
       - persist_to_workspace:
-          root: packages/core
+          root: ~/repo
           paths:
-              - build
+              - packages/core/lib
+              - packages/essentials/lib
+              - packages/loader/lib
+              - packages/site/lib
 
   ncc:
     docker:
@@ -150,7 +153,7 @@ jobs:
 
       - run:
           name: Create browser scripts
-          command: lerna run bundle --stream
+          command: yarn webpack
 
       - persist_to_workspace:
           root: packages/core
@@ -277,10 +280,6 @@ jobs:
           command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/releases-data.ts && cat packages/site/src/releases-data.ts
 
       - run:
-          name: Compile site
-          command: lerna run compile --scope=@meetalva/site --stream
-
-      - run:
           name: Create static site
           command: lerna run build --scope=@meetalva/site --stream
 
@@ -330,6 +329,7 @@ workflows:
       - compile
       - site:
           requires:
+            - compile
             - macos
             - linux
             - windows
@@ -339,6 +339,7 @@ workflows:
                    - master
       - site_master:
           requires:
+            - compile
             - macos
             - linux
             - windows
@@ -349,6 +350,7 @@ workflows:
       - ncc:
           requires:
             - trigger
+            - compile
       - static:
           requires:
             - test

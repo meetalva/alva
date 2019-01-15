@@ -328,8 +328,10 @@ workflows:
       - install_macos
       - test
       - lint
-      - bundle
       - compile
+      - bundle:
+          requires:
+            - compile
       - site:
           requires:
             - compile

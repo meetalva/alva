@@ -79,6 +79,9 @@ jobs:
       - setup:
           key: linux
 
+      - attach_workspace:
+          at: ~/repo
+
       - run:
           name: Run unit tests
           command: yarn jest --maxWorkers 4

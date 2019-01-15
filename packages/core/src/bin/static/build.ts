@@ -28,7 +28,7 @@ export async function build({
 		}
 	});
 
-	await Fs.copy(Path.join(base, 'build', 'scripts'), Path.join(path, 'scripts'));
+	await Fs.copy(Path.join(base, 'lib', 'scripts'), Path.join(path, 'scripts'));
 
 	await host.writeFile(Path.join(path, 'index.html'), renderDoc);
 	await host.writeFile(Path.join(path, '200.html'), renderDoc);

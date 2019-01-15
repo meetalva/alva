@@ -188,6 +188,8 @@ jobs:
     docker:
       - image: circleci/node:8
 
+    working_directory: ~/repo
+
     steps:
       - setup:
           key: linux

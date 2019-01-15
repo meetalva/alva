@@ -130,16 +130,16 @@ jobs:
           key: linux
 
       - attach_workspace:
-          at: packages/core
+          at: ~/repo
 
       - run:
           name: Compile with ncc
           command: lerna run compile:ncc --stream
 
       - persist_to_workspace:
-          root: packages/core
+          root: ~/repo
           paths:
-              - nccbuild
+              - packages/core/nccbuild
 
   bundle:
     docker:
@@ -151,12 +151,15 @@ jobs:
       - setup:
           key: linux
 
+      - attach_workspace:
+          at: ~/repo
+
       - run:
           name: Create browser scripts
           command: yarn webpack
 
       - persist_to_workspace:
-          root: packages/core
+          root: ~/repo
           paths:
               - build/scripts
 
@@ -171,7 +174,7 @@ jobs:
           key: linux
 
       - attach_workspace:
-          at: packages/core
+          at: ~/repo
 
       - run:
           name: Create static build
@@ -194,9 +197,9 @@ jobs:
           command: alva-trigger --project packages/core
 
       - persist_to_workspace:
-          root: packages/core
+          root: ~/repo
           paths:
-              - package.ncc.json
+              - packages/core/package.ncc.json
 
   macos:
     macos:
@@ -209,7 +212,7 @@ jobs:
           key: macos
 
       - attach_workspace:
-          at: packages/core
+          at: ~/repo
 
       - run:
           name: Copy Scripts
@@ -230,7 +233,7 @@ jobs:
           key: linux
 
       - attach_workspace:
-          at: packages/core
+          at: ~/repo
 
       - run:
           name: Copy Scripts
@@ -251,7 +254,7 @@ jobs:
           key: windows
 
       - attach_workspace:
-          at: packages/core
+          at: ~/repo
 
       - run:
           name: Copy Scripts

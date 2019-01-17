@@ -3,6 +3,7 @@ import * as Yaml from 'js-yaml';
 import * as Util from 'util';
 import { ZeroOneMigration } from './migration-v0-v1';
 import * as T from '../types';
+import * as M from '../model';
 import { builtinPatternLibrary } from '../model';
 
 const readFile = Util.promisify(Fs.readFile);
@@ -91,6 +92,34 @@ test('replaces element content slot ids', async () => {
 	expect(boxContent.slotId).toBe(childrenSlot.getId());
 });
 
+test('replaces element property slot ids', async () => {
+	const path = fixtures.find('v0-conditional.alva');
+	const project = Yaml.load(await readFile(path, 'utf-8')) as T.VersionZeroSerializedProject;
+	const syntheticConditional = builtinPatternLibrary.getPatternByType(
+		T.PatternType.SyntheticConditional
+	);
+	const truthySlot = syntheticConditional.getSlotByContextId('truthy');
+	const falsySlot = syntheticConditional.getSlotByContextId('falsy');
+
+	const migration = new ZeroOneMigration();
+
+	const result = await migration.transform({
+		project,
+		steps: []
+	});
+
+	const conditionalElement = result.project.elements.find(
+		e => e.patternId === syntheticConditional.getId()
+	);
+	const contents = result.project.elementContents.filter(
+		c => c.parentElementId === conditionalElement.id
+	);
+
+	expect(contents.map(c => c.slotId)).toEqual(
+		expect.arrayContaining([truthySlot.getId(), falsySlot.getId()])
+	);
+});
+
 test('replaces old pattern library with new one', async () => {
 	const path = fixtures.find('v0.alva');
 	const project = Yaml.load(await readFile(path, 'utf-8')) as T.VersionZeroSerializedProject;
@@ -114,6 +143,43 @@ test('replaces old pattern library with new one', async () => {
 	expect(result.project.patternLibraries).toContainEqual(
 		expect.objectContaining({
 			id: builtinPatternLibrary.getId()
+		})
+	);
+});
+
+test('replaces property ids in user store references', async () => {
+	const path = fixtures.find('v0-user-property.alva');
+	const project = Yaml.load(await readFile(path, 'utf-8')) as T.VersionZeroSerializedProject;
+
+	const textPattern = builtinPatternLibrary.getPatternByType(T.PatternType.SyntheticText);
+	const textPatternProp = textPattern.getPropertyByContextId('text');
+
+	const migration = new ZeroOneMigration();
+
+	const result = await migration.transform({
+		project,
+		steps: []
+	});
+
+	const textElement = M.Element.from(
+		result.project.elements.find(e => e.patternId === textPattern.getId()),
+		{
+			project: M.Project.from({
+				...result.project,
+				draft: true,
+				path: ''
+			})
+		}
+	);
+
+	const textProp = textElement
+		.getProperties()
+		.find(p => p.getPatternPropertyId() === textPatternProp.getId());
+	const refs = result.project.userStore.references;
+
+	expect(refs).toContainEqual(
+		expect.objectContaining({
+			elementPropertyId: textProp.getId()
 		})
 	);
 });

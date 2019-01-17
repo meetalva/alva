@@ -34,24 +34,7 @@ test('reuses properties from shared interfaces', () => {
 		sourcePath: s.fileName,
 		description: s.fileName,
 		displayName: Path.basename(s.fileName, Path.extname(s.fileName))
-	})); /* [
-		{
-			id: uuid.v4(),
-			artifactPath: path,
-			declarationPath: path,
-			sourcePath: path,
-			description: '',
-			displayName: 'B'
-		},
-		{
-			id: uuid.v4(),
-			artifactPath: path,
-			declarationPath: path,
-			sourcePath: path,
-			description: '',
-			displayName: 'C'
-		}
-	]; */
+	}));
 
 	const [A, B] = candidates.reduce<InternalPatternAnalysis[]>((acc, candidate) => {
 		return [...acc, ...analyzePattern(candidate, acc, analyzePatternExport)];

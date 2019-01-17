@@ -31,3 +31,36 @@ test('uses member name as context id', () => {
 		})
 	);
 });
+
+test('ignores @name declarations for contextId', () => {
+	const { sourceFile, program } = TestUtils.getFixtureSourceFile('enum-member-name.ts', {
+		fixtures
+	});
+	const typechecker = program.getTypeChecker();
+	const { symbol, type } = TestUtils.getFirstPropType(sourceFile, { program });
+	const mockContext = { program, getEnumOptionId: jest.fn(), getPropertyId: jest.fn() };
+
+	const enumProperty = createEnumProperty(
+		{
+			typechecker,
+			symbol,
+			type
+		},
+		mockContext
+	);
+
+	expect(enumProperty).toEqual(
+		expect.objectContaining({
+			options: expect.arrayContaining([
+				expect.objectContaining({
+					contextId: 'One',
+					name: 'I'
+				}),
+				expect.objectContaining({
+					contextId: 'Two',
+					name: 'II'
+				})
+			])
+		})
+	);
+});

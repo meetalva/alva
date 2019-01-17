@@ -1,5 +1,5 @@
 import * as T from '../types';
-import { builtinPatternLibrary } from '../model';
+import { builtinPatternLibrary, ElementProperty } from '../model';
 import { AbstractMigration, MigrationItem } from './abstract-migration';
 import { camelCase } from 'lodash';
 
@@ -53,6 +53,17 @@ export class ZeroOneMigration
 
 						if (!newPatternProp) {
 							return;
+						}
+
+						const oldElementPropertyId = [e.id, oldProperty.id].join('-');
+						const newElementPropertyId = [e.id, newPatternProp.getId()].join('-');
+
+						if (oldElementPropertyId && newElementPropertyId) {
+							project.userStore.references.forEach(ref => {
+								if (ref.elementPropertyId === oldElementPropertyId) {
+									ref.elementPropertyId = newElementPropertyId;
+								}
+							});
 						}
 
 						return [newPatternProp.getId(), pv[1]];

@@ -95,7 +95,8 @@ export enum MessageType {
 	OpenWindow = 'open-window',
 	ShowUpdateDetails = 'show-update-details',
 	InstallUpdate = 'install-update',
-	ProjectRecordsChanged = 'project-records-changed'
+	ProjectRecordsChanged = 'project-records-changed',
+	CspReport = 'csp-report'
 }
 
 export type Message =
@@ -191,7 +192,8 @@ export type Message =
 	| UpdateDownload
 	| ShowUpdateDetails
 	| InstallUpdate
-	| ProjectRecordsChanged;
+	| ProjectRecordsChanged
+	| CspReport;
 
 export type CreateNewFileRequest = Envelope<MessageType.CreateNewFileRequest, { replace: boolean }>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -519,3 +521,5 @@ export type ProjectRecordsChanged = Envelope<
 	MessageType.ProjectRecordsChanged,
 	{ projects: Types.ProjectRecord[] }
 >;
+
+export type CspReport = Envelope<MessageType.CspReport, unknown>;

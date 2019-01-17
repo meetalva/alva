@@ -12,6 +12,7 @@ import * as uuid from 'uuid';
 import * as Url from 'url';
 import { HostWindowVariant } from '../../types';
 import * as Mobx from 'mobx';
+import * as Sentry from '@sentry/electron';
 
 const throat = require('throat');
 
@@ -41,6 +42,10 @@ export class ElectronAdapter {
 		const host = this.server.host;
 		const dataHost = this.server.dataHost;
 		const context = { dataHost, host, location: server.location };
+
+		const sentry = Sentry.init({
+			dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
+		});
 
 		Electron.app.on('window-all-closed', () => {
 			if (process.platform !== 'darwin') {
@@ -292,6 +297,19 @@ export class ElectronAdapter {
 		server.sender.match<M.UseFileResponse>(MT.UseFileResponse, () =>
 			this.server.dataHost.checkProjects()
 		);
+
+		server.sender.match<M.CspReport>(MT.CspReport, m => {
+			Sentry.withScope(scope => {
+				scope.setTag('report-type', 'csp');
+				scope.setLevel(Sentry.Severity.Error);
+				scope.setExtra('referrer', (m.payload as any).referrer);
+				scope.setExtra('violated-directive', (m.payload as any)['violated-directive']);
+				scope.setExtra('blocked-uri', (m.payload as any)['blocked-uri']);
+				scope.setExtra('source-file', (m.payload as any)['source-file']);
+				scope.setExtra('reprot', JSON.stringify(m.payload));
+				Sentry.captureMessage('Received CSP violation report');
+			});
+		});
 
 		Mobx.autorun(async () => {
 			server.sender.send({

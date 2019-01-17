@@ -4,9 +4,14 @@ import * as express from 'express';
 import * as Http from 'http';
 import * as Util from 'util';
 import * as WS from 'ws';
+import * as uuid from 'uuid';
 import * as Routes from './routes';
 import * as Sender from '../sender';
 import * as Types from '../types';
+import bodyParser = require('body-parser');
+import { MessageType } from '../message';
+
+const csp = require('helmet-csp');
 
 interface AlvaServerInit {
 	app: express.Express;
@@ -85,14 +90,49 @@ export class AlvaServer implements Types.AlvaServer {
 			this.host.log(e);
 		});
 
-		this.app.use((req, res, next) => {
-			this.host.log('↥', req.method, req.url);
+		this.app.use(
+			bodyParser.json({
+				type: ['json', 'application/csp-report']
+			})
+		);
 
-			res.on('finish', () => {
-				this.host.log('↧', res.statusCode, req.url);
-			});
-			next();
+		this.app.post('/csp-report', (req, res) => {
+			if (req.body) {
+				this.sender.send({
+					type: MessageType.CspReport,
+					id: uuid.v4(),
+					payload: req.body['csp-report']
+				});
+			}
+			res.status(204).end();
 		});
+
+		this.app
+			.use((_, res, next) => {
+				res.locals.nonce = uuid.v4();
+				next();
+			})
+			.use((req, res, next) => {
+				this.host.log('↥', req.method, req.url);
+
+				res.on('finish', () => {
+					this.host.log('↧', res.statusCode, req.url);
+				});
+				next();
+			})
+			.use(
+				csp({
+					directives: {
+						defaultSrc: [this.address, (_, res) => `'nonce-${res.locals.nonce}'`],
+						scriptSrc: [this.address, "'unsafe-inline'"],
+						styleSrc: ["'unsafe-inline'"],
+						connectSrc: [this.endpoint],
+						reportUri: '/csp-report'
+					},
+					setAllHeaders: true,
+					browserSniff: false
+				})
+			);
 
 		/** Splash view, recent project list */
 		this.app.get('/', Routes.mainRouteFactory(this));
@@ -102,12 +142,6 @@ export class AlvaServer implements Types.AlvaServer {
 
 		/** Project edit view */
 		this.app.get('/project/:id', Routes.projectRouteFactory(this));
-
-		/** Project preview view */
-		this.app.get('/preview/:id', Routes.previewRouteFactory(this));
-
-		/** Component library scripts */
-		this.app.get('/project/:projectId/library/:libraryId', Routes.libraryRouteFactory(this));
 
 		/** Project export */
 		this.app.get('/project/export/:id', Routes.exportRouteFactory(this));

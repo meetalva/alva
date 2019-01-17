@@ -291,6 +291,10 @@ jobs:
           command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/releases-data.ts && cat packages/site/src/releases-data.ts
 
       - run:
+          name: Compile release data
+          command: yarn tsc packages/site/src/releases-data.ts --outDir packages/site/lib/
+
+      - run:
           name: Create static site
           command: patternplate build --out=./.static --base=/
 
@@ -318,6 +322,10 @@ jobs:
       - run:
           name: Fetch release data
           command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/releases-data.ts && cat packages/site/src/releases-data.ts
+
+      - run:
+          name: Compile release data
+          command: yarn tsc packages/site/src/releases-data.ts --outDir packages/site/lib/
 
       - run:
           name: Create static site

@@ -52,15 +52,15 @@ elements:
       - - c748451a-496f-4364-bbb8-37c383838149
         - 100px
       - - 572ada93-d4d0-4d4c-a483-03f457a48e73
-        - true
+        - false
       - - 840adee5-8286-4040-8809-03c3306d1163
-        - null
+        - row
       - - bd8a0d72-0bb3-4dfa-8df6-90e3f4edf427
-        - null
+        - flex-start
       - - 9bf8cd10-0443-4750-b64a-807ec34b545c
         - null
       - - c55ab2e8-0edf-4772-bd88-738f3e575885
-        - null
+        - false
       - - bf5a1750-86b7-4088-9b22-6f50ffb36f61
         - null
       - - 7b0c59c5-c16c-4cab-ab4c-850a2221855d

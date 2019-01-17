@@ -8,10 +8,10 @@ export interface ConditionalProps {
 	condition?: boolean;
 
 	/** @name If True */
-	ifTrue?: React.ReactNode;
+	truthy?: React.ReactNode;
 
 	/** @name If False */
-	ifFalse?: React.ReactNode;
+	falsy?: React.ReactNode;
 }
 
 /**
@@ -21,5 +21,5 @@ export interface ConditionalProps {
  * @patternType synthetic:conditional
  */
 export const Conditional: React.SFC<ConditionalProps> = props => {
-	return <>{props.condition ? props.ifTrue : props.ifFalse}</>;
+	return <>{props.condition ? props.truthy : props.falsy}</>;
 };

@@ -19,14 +19,14 @@ export interface BoxProps {
 	 * @default Center
 	 * @group Alignment
 	 * */
-	justifyContent?: FlexAlignHorizontal;
+	justifyContent?: JustifyContent;
 
 	/**
 	 * @name Vertical
 	 * @default Center
 	 * @group Alignment
 	 * */
-	alignItems?: FlexAlignVertical;
+	alignItems?: AlignItems;
 
 	/** @name Wrap */
 	flexWrap?: boolean;
@@ -59,7 +59,7 @@ export enum FlexDirection {
 	column = 'column'
 }
 
-export enum FlexAlignHorizontal {
+export enum JustifyContent {
 	/** @name Left */
 	'flex-start' = 'flex-start',
 	/** @name Center */
@@ -76,7 +76,7 @@ export enum FlexAlignHorizontal {
 	'space-evenly' = 'space-evenly'
 }
 
-export enum FlexAlignVertical {
+export enum AlignItems {
 	/** @name Top */
 	'flex-start' = 'flex-start',
 	/** @name Center */
@@ -90,7 +90,9 @@ export enum FlexAlignVertical {
 	/** @name Space Around */
 	'space-around' = 'space-around',
 	/** @name Space Evenly */
-	'space-evenly' = 'space-evenly'
+	'space-evenly' = 'space-evenly',
+	/** @name Baseline */
+	baseline = 'baseline'
 }
 
 /**
@@ -108,11 +110,9 @@ export const Box: React.SFC<BoxProps> = props => {
 				flexWrap: props.flexWrap ? 'wrap' : 'nowrap',
 				flexGrow: props.flexGrow,
 				flexShrink: props.flexShrink,
-				alignItems:
-					props.flexDirection === FlexDirection.row ? props.alignItems : props.justifyContent,
+				alignItems: props.alignItems,
 				display: props.flex ? 'flex' : 'block',
-				justifyContent:
-					props.flexDirection === FlexDirection.row ? props.justifyContent : props.alignItems,
+				justifyContent: props.justifyContent,
 				width: props.width,
 				height: props.height,
 				backgroundColor: props.backgroundColor

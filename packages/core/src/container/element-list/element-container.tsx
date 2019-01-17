@@ -9,7 +9,6 @@ import * as Types from '../../types';
 import { ViewStore } from '../../store';
 import { PlaceholderPosition } from '../../components';
 import { EditableTitleContainer } from '../editable-title/editable-title-container';
-import { Type } from 'ts-simple-ast';
 
 export interface ElementContainerProps {
 	element: Model.Element;

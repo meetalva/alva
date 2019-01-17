@@ -60,7 +60,7 @@ export function createEnumProperty(
 
 			const option: Types.SerializedEnumOption = {
 				model: Types.ModelName.PatternEnumPropertyOption,
-				contextId: name,
+				contextId: enumMember.name.getText(),
 				icon: undefined,
 				id: ctx.getEnumOptionId(enumId, name),
 				name,

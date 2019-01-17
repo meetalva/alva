@@ -50,7 +50,7 @@ test('un-highlight highlighted element content onDragLeave', () => {
 	content.insert({ at: 0, element });
 	project.addElement(element);
 
-	const truthySlot = pattern.getSlots().find(slot => slot.getPropertyName() === 'ifTrue')!;
+	const truthySlot = pattern.getSlotByContextId('truthy');
 
 	const truthyContent = Model.ElementContent.fromSlot(truthySlot, { project });
 	truthyContent.setOpen(true);

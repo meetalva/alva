@@ -172,44 +172,30 @@ export class ElectronHost implements Types.Host {
 			b => typeof b.selected !== 'undefined' && b.selected
 		);
 
-		return new Promise<Types.HostMessageButton | undefined>(resolve => {
-			Electron.dialog.showMessageBox(
-				{
-					type: opts.type,
-					message: opts.message,
-					detail: opts.detail,
-					checkboxChecked: opts.checkboxChecked,
-					checkboxLabel: opts.checkboxLabel,
-					cancelId,
-					defaultId,
-					buttons: opts.buttons.map(button => button.label)
-				},
-				(result, checked) => {
-					if (typeof result === 'undefined') {
-						return resolve();
-					}
-
-					const button = opts.buttons[result];
-
-					if (!button) {
-						return resolve();
-					}
-
-					if (button.message && button && this.sender) {
-						const message =
-							typeof button.message === 'function'
-								? button.message({ checked })
-								: button.message;
-						const messages = (Array.isArray(message) ? message : [message]).filter(
-							i => typeof i !== 'undefined'
-						);
-						messages.forEach(m => this.sender.send(m));
-					}
-
-					resolve(button);
-				}
-			);
+		const result = Electron.dialog.showMessageBox({
+			type: opts.type,
+			message: opts.message,
+			detail: opts.detail,
+			cancelId,
+			defaultId,
+			buttons: opts.buttons.map(button => button.label)
 		});
+
+		if (typeof result === 'undefined') {
+			return;
+		}
+
+		const button = opts.buttons[result];
+
+		if (!button) {
+			return;
+		}
+
+		if (button.message && button && this.sender) {
+			this.sender.send(button.message);
+		}
+
+		return button;
 	}
 
 	public async showContextMenu(opts: {

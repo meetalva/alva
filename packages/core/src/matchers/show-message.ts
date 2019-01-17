@@ -12,12 +12,9 @@ export function showMessage({ host }: T.MatcherContext): T.Matcher<M.ShowMessage
 
 		const sender = app || (await host.getSender());
 		const button = await host.showMessage(m.payload);
-		const result =
-			typeof button.message === 'function' ? button.message({ checked: false }) : button.message;
 
 		if (button && button.message) {
-			const msgs = Array.isArray(result) ? result : [result];
-			msgs.forEach(m => sender.send(m));
+			sender.send({ ...button.message });
 		}
 	};
 }

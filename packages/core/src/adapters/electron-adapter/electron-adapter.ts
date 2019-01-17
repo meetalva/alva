@@ -306,8 +306,17 @@ export class ElectronAdapter {
 				scope.setExtra('violated-directive', (m.payload as any)['violated-directive']);
 				scope.setExtra('blocked-uri', (m.payload as any)['blocked-uri']);
 				scope.setExtra('source-file', (m.payload as any)['source-file']);
-				scope.setExtra('reprot', JSON.stringify(m.payload));
+				scope.setExtra('report', JSON.stringify(m.payload));
 				Sentry.captureMessage('Received CSP violation report');
+			});
+		});
+
+		server.sender.match<M.UserReport>(MT.UserReport, m => {
+			Sentry.withScope(scope => {
+				scope.setTag('report-type', 'user');
+				scope.setLevel(Sentry.Severity.Critical);
+				scope.setExtra('report', JSON.stringify(m.payload));
+				Sentry.captureMessage(`User report: ${m.payload.message}`);
 			});
 		});
 

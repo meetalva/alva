@@ -54,16 +54,20 @@ export interface HostSelectSaveFileOptions {
 	filters?: ({ name?: string; extensions?: string[] })[];
 }
 
+type MessageCreator = (ctx: { checked: boolean }) => Message.Message[];
+
 export interface HostMessageButton {
 	selected?: boolean;
 	cancel?: boolean;
 	id?: string;
 	label: string;
-	message?: Message.Message;
+	message?: Message.Message | MessageCreator;
 }
 
 export interface HostMessageOptions {
 	type?: 'info' | 'warning' | 'error';
+	checkboxLabel?: string;
+	checkboxChecked?: boolean;
 	message: string;
 	detail?: string;
 	buttons: HostMessageButton[];

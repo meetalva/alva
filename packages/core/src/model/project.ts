@@ -22,6 +22,7 @@ import { builtinPatternLibrary } from './pattern-library/builtin-pattern-library
 export interface ProjectProperties {
 	draft: boolean;
 	id?: string;
+	version?: 0 | 1;
 	name: string;
 	pages: Page[];
 	path: string;
@@ -37,6 +38,8 @@ export interface ProjectCreateInit {
 
 export class Project {
 	public readonly model = Types.ModelName.Project;
+
+	private readonly version: 0 | 1 = 0;
 
 	private syncing: boolean = false;
 
@@ -175,6 +178,7 @@ export class Project {
 		this.path = init.path;
 		this.userStore = init.userStore;
 		this.draft = init.draft;
+		this.version = init.version;
 
 		init.pages.forEach(page => {
 			this.addPage(page);
@@ -786,7 +790,8 @@ export class Project {
 			pageList: Array.from(this.pageList),
 			path: this.path,
 			patternLibraries: this.getPatternLibraries().map(p => p.toJSON()),
-			userStore: this.userStore.toJSON()
+			userStore: this.userStore.toJSON(),
+			version: this.version
 		};
 	}
 

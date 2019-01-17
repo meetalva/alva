@@ -1,0 +1,662 @@
+draft: false
+model: Project
+elements:
+  - model: Element
+    contentIds:
+      - 0dceae4c-6143-4491-a910-c13c8af73aec
+    dragged: false
+    focused: false
+    highlighted: false
+    id: 46d6bd9f-a704-4422-b345-8f86292b00e9
+    name: Page 1
+    open: true
+    forcedOpen: false
+    patternId: f669d485-b1c3-485c-b8d4-62a2682f2c73
+    placeholderHighlighted: none
+    propertyValues: []
+    role: root
+    selected: false
+  - model: Element
+    containerId: aef4137d-f4c4-4d8b-8563-c410f1febe72
+    contentIds: []
+    dragged: false
+    focused: false
+    highlighted: false
+    id: 434237eb-3138-44dd-a63b-a85757354205
+    name: Text
+    open: false
+    forcedOpen: false
+    patternId: cb04e9a3-7724-4e46-b887-fc03d205a078
+    placeholderHighlighted: none
+    propertyValues:
+      - - 1c596f6b-9074-4d4e-8b21-672c95da277d
+        - Some text
+    role: node
+    selected: false
+  - model: Element
+    containerId: 0dceae4c-6143-4491-a910-c13c8af73aec
+    contentIds:
+      - aef4137d-f4c4-4d8b-8563-c410f1febe72
+    dragged: false
+    focused: false
+    highlighted: false
+    id: 25a3e350-a8f9-4915-9861-eac0aab32f2a
+    name: Box
+    open: true
+    forcedOpen: false
+    patternId: b25ffd1e-0740-4385-b49c-f71137579e45
+    placeholderHighlighted: none
+    propertyValues:
+      - - 48e7cd14-ce8a-4752-9127-802ecf3bc555
+        - 100px
+      - - c748451a-496f-4364-bbb8-37c383838149
+        - 100px
+      - - 572ada93-d4d0-4d4c-a483-03f457a48e73
+        - true
+      - - 840adee5-8286-4040-8809-03c3306d1163
+        - null
+      - - bd8a0d72-0bb3-4dfa-8df6-90e3f4edf427
+        - null
+      - - 9bf8cd10-0443-4750-b64a-807ec34b545c
+        - null
+      - - c55ab2e8-0edf-4772-bd88-738f3e575885
+        - null
+      - - bf5a1750-86b7-4088-9b22-6f50ffb36f61
+        - null
+      - - 7b0c59c5-c16c-4cab-ab4c-850a2221855d
+        - null
+      - - a56cb19c-c3a0-473d-8be9-66a4841f6e1b
+        - null
+      - - f325b556-e9e5-4b95-bd46-a347cd9ae4d4
+        - '#eee'
+    role: node
+    selected: false
+elementActions: []
+elementContents:
+  - model: ElementContent
+    elementIds:
+      - 25a3e350-a8f9-4915-9861-eac0aab32f2a
+    forcedOpen: true
+    highlighted: false
+    id: 0dceae4c-6143-4491-a910-c13c8af73aec
+    open: false
+    parentElementId: 46d6bd9f-a704-4422-b345-8f86292b00e9
+    slotId: 900bb2ab-4f7c-4401-b18f-7910f5555dd7
+  - model: ElementContent
+    elementIds:
+      - 434237eb-3138-44dd-a63b-a85757354205
+    forcedOpen: false
+    highlighted: false
+    id: aef4137d-f4c4-4d8b-8563-c410f1febe72
+    open: false
+    parentElementId: 25a3e350-a8f9-4915-9861-eac0aab32f2a
+    slotId: 422462e0-c4f3-45f3-95e1-c95561137be3
+id: dc98269b-9f67-4356-ade9-2fc46ca966b0
+name: v0
+pages:
+  - model: Page
+    active: true
+    focused: false
+    id: bc5a6e5b-01b5-4877-ab3f-9374402313c9
+    name: Page 1
+    rootId: 46d6bd9f-a704-4422-b345-8f86292b00e9
+pageList:
+  - bc5a6e5b-01b5-4877-ab3f-9374402313c9
+path: /Users/marneb/Documents/alva/alva/packages/core/src/migrator/fixtures/v0.alva
+patternLibraries:
+  - model: PatternLibrary
+    bundleId: ''
+    bundle: ''
+    description: Built-in components for basic layouts and logic
+    id: 0b8e03ea-5dec-4e9b-ba08-bd366fe8cd81
+    name: Essentials
+    version: 1.0.0
+    origin: built-in
+    patterns:
+      - model: Pattern
+        contextId: 'synthetic:page'
+        description: ''
+        exportName: default
+        icon: ''
+        id: f669d485-b1c3-485c-b8d4-62a2682f2c73
+        name: Page
+        origin: built-in
+        propertyIds: []
+        slots:
+          - model: PatternSlot
+            contextId: children
+            description: ''
+            example: ''
+            hidden: false
+            label: Children
+            propertyName: children
+            id: 900bb2ab-4f7c-4401-b18f-7910f5555dd7
+            required: false
+            type: children
+        type: 'synthetic:page'
+      - model: Pattern
+        contextId: 'synthetic:text'
+        description: 'for Headlines, Copy and more'
+        exportName: default
+        icon: Type
+        id: cb04e9a3-7724-4e46-b887-fc03d205a078
+        name: Text
+        origin: built-in
+        propertyIds:
+          - 1c596f6b-9074-4d4e-8b21-672c95da277d
+        slots: []
+        type: 'synthetic:text'
+      - model: Pattern
+        contextId: 'synthetic:box'
+        description: for Flexbox Layouts
+        exportName: default
+        icon: Box
+        id: b25ffd1e-0740-4385-b49c-f71137579e45
+        name: Box
+        origin: built-in
+        propertyIds:
+          - 48e7cd14-ce8a-4752-9127-802ecf3bc555
+          - c748451a-496f-4364-bbb8-37c383838149
+          - 572ada93-d4d0-4d4c-a483-03f457a48e73
+          - 840adee5-8286-4040-8809-03c3306d1163
+          - bd8a0d72-0bb3-4dfa-8df6-90e3f4edf427
+          - 9bf8cd10-0443-4750-b64a-807ec34b545c
+          - c55ab2e8-0edf-4772-bd88-738f3e575885
+          - bf5a1750-86b7-4088-9b22-6f50ffb36f61
+          - 7b0c59c5-c16c-4cab-ab4c-850a2221855d
+          - a56cb19c-c3a0-473d-8be9-66a4841f6e1b
+          - f325b556-e9e5-4b95-bd46-a347cd9ae4d4
+        slots:
+          - model: PatternSlot
+            contextId: children
+            description: ''
+            example: ''
+            hidden: false
+            label: Children
+            propertyName: children
+            id: 422462e0-c4f3-45f3-95e1-c95561137be3
+            required: false
+            type: children
+        type: 'synthetic:box'
+      - model: Pattern
+        contextId: 'synthetic:conditional'
+        description: for Show and Hide Logic
+        exportName: default
+        icon: ToggleRight
+        id: cedfe77c-67fd-41c6-8944-7099908d5561
+        name: Conditional
+        origin: built-in
+        propertyIds:
+          - a80a5dab-e97c-42a9-b9a2-76c1b6bd7d99
+        slots:
+          - model: PatternSlot
+            contextId: truthy
+            description: ''
+            example: ''
+            hidden: false
+            label: If True
+            propertyName: ifTrue
+            id: 45acf876-c33f-4607-9a98-a9e89d341bb8
+            required: false
+            type: property
+          - model: PatternSlot
+            contextId: falsy
+            description: ''
+            example: ''
+            hidden: false
+            label: If False
+            propertyName: ifFalse
+            id: fcd2f27a-0e01-492f-ab4d-5db50bf883e9
+            required: false
+            type: property
+        type: 'synthetic:conditional'
+      - model: Pattern
+        contextId: 'synthetic:image'
+        description: for Design Drafts
+        exportName: default
+        icon: Image
+        id: 68badbdd-146e-4870-92df-aef8f5a89e7f
+        name: Design
+        origin: built-in
+        propertyIds:
+          - a0ce7380-8a3f-472d-a6c0-1a83a2667241
+          - 73b65e1f-7fc8-4cf0-9a55-c35c7431f8e4
+          - 41312a07-68b0-4c1d-939a-3d20104fb778
+          - 348f419d-1531-4ae8-a727-a31e29dbbc82
+          - 01238fb7-63d7-46b2-9257-30513c92ed9e
+          - e8150238-2ade-4c88-8fc1-f035323488c7
+          - 233883cc-a052-40dd-a277-912504df8a2d
+          - 8b8bc109-6f5b-4b1e-b2a0-da36fdafa01f
+        slots: []
+        type: 'synthetic:image'
+      - model: Pattern
+        contextId: 'synthetic:link'
+        description: for Interaction
+        exportName: default
+        icon: ExternalLink
+        id: 4d37e939-283f-455e-aaa7-f3acf7fc02f2
+        name: Link
+        origin: built-in
+        propertyIds:
+          - edb191c6-0fa7-4391-8af1-d86122d86707
+        slots:
+          - model: PatternSlot
+            contextId: children
+            description: ''
+            example: ''
+            hidden: false
+            label: Children
+            propertyName: children
+            id: b4f231e9-81f0-4143-89ad-011343afe32c
+            required: false
+            type: children
+        type: 'synthetic:link'
+    patternProperties:
+      - model: PatternProperty
+        contextId: src
+        example: ''
+        group: ''
+        hidden: false
+        id: a0ce7380-8a3f-472d-a6c0-1a83a2667241
+        inputType: default
+        label: Image
+        origin: built-in
+        propertyName: src
+        required: false
+        type: asset
+      - model: PatternProperty
+        contextId: width
+        example: ''
+        group: ''
+        hidden: false
+        id: 73b65e1f-7fc8-4cf0-9a55-c35c7431f8e4
+        inputType: default
+        label: Width
+        origin: built-in
+        propertyName: width
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: height
+        example: ''
+        group: ''
+        hidden: false
+        id: 41312a07-68b0-4c1d-939a-3d20104fb778
+        inputType: default
+        label: Height
+        origin: built-in
+        propertyName: height
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: min-width
+        example: ''
+        group: ''
+        hidden: false
+        id: 348f419d-1531-4ae8-a727-a31e29dbbc82
+        inputType: default
+        label: Min Width
+        origin: built-in
+        propertyName: minWidth
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: min-height
+        example: ''
+        group: ''
+        hidden: false
+        id: 01238fb7-63d7-46b2-9257-30513c92ed9e
+        inputType: default
+        label: Min Height
+        origin: built-in
+        propertyName: minHeight
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: max-width
+        example: ''
+        group: ''
+        hidden: false
+        id: e8150238-2ade-4c88-8fc1-f035323488c7
+        inputType: default
+        label: Max Width
+        origin: built-in
+        propertyName: maxWidth
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: max-height
+        example: ''
+        group: ''
+        hidden: false
+        id: 233883cc-a052-40dd-a277-912504df8a2d
+        inputType: default
+        label: Max Height
+        origin: built-in
+        propertyName: maxHeight
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: onClick
+        description: You can set an interaction that happens on Click.
+        event:
+          type: MouseEvent
+        example: ''
+        group: ''
+        hidden: false
+        id: 8b8bc109-6f5b-4b1e-b2a0-da36fdafa01f
+        inputType: default
+        label: Interaction
+        origin: built-in
+        propertyName: onClick
+        required: false
+        type: EventHandler
+      - model: PatternProperty
+        contextId: text
+        defaultValue: Text
+        example: ''
+        group: ''
+        hidden: false
+        id: 1c596f6b-9074-4d4e-8b21-672c95da277d
+        inputType: default
+        label: Text
+        origin: built-in
+        propertyName: text
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: width
+        defaultValue: auto
+        example: ''
+        group: ''
+        hidden: false
+        id: 48e7cd14-ce8a-4752-9127-802ecf3bc555
+        inputType: default
+        label: Width
+        origin: built-in
+        propertyName: width
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: height
+        defaultValue: auto
+        example: ''
+        group: ''
+        hidden: false
+        id: c748451a-496f-4364-bbb8-37c383838149
+        inputType: default
+        label: Height
+        origin: built-in
+        propertyName: height
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: flex
+        defaultValue: true
+        example: ''
+        group: ''
+        hidden: false
+        id: 572ada93-d4d0-4d4c-a483-03f457a48e73
+        inputType: default
+        label: Flex
+        origin: built-in
+        propertyName: flex
+        required: false
+        type: boolean
+      - model: PatternProperty
+        contextId: flex-direction
+        defaultOptionId: 06573d43-7e64-41e0-9b88-a9d1476d8489
+        example: ''
+        group: ''
+        hidden: false
+        id: 840adee5-8286-4040-8809-03c3306d1163
+        inputType: radio-group
+        label: Direction
+        propertyName: flexDirection
+        options:
+          - model: PatternEnumPropertyOption
+            contextId: row
+            id: 06573d43-7e64-41e0-9b88-a9d1476d8489
+            name: Horizontal
+            ordinal: '0'
+            value: row
+          - model: PatternEnumPropertyOption
+            contextId: column
+            id: fc7efdec-1697-4d91-9bba-d6ac133bf48c
+            name: Vertical
+            ordinal: '1'
+            value: column
+        origin: built-in
+        required: false
+        type: enum
+      - model: PatternProperty
+        contextId: align-items
+        defaultOptionId: d4a00add-9c0d-4ce2-b779-891d89652925
+        example: ''
+        group: ''
+        hidden: false
+        id: bd8a0d72-0bb3-4dfa-8df6-90e3f4edf427
+        inputType: radio-group
+        label: Align
+        propertyName: alignItems
+        options:
+          - model: PatternEnumPropertyOption
+            contextId: flex-start
+            icon: 2
+            id: 0490a63a-de40-421c-bb79-6cca0a2d2a6f
+            name: Start
+            ordinal: '0'
+            value: flex-start
+          - model: PatternEnumPropertyOption
+            contextId: center
+            icon: 3
+            id: d4a00add-9c0d-4ce2-b779-891d89652925
+            name: Center
+            ordinal: '1'
+            value: center
+          - model: PatternEnumPropertyOption
+            contextId: flex-end
+            icon: 4
+            id: c4278eb2-3ff8-4178-886c-71d28672ca7c
+            name: End
+            ordinal: '2'
+            value: flex-end
+          - model: PatternEnumPropertyOption
+            contextId: stretch
+            icon: 5
+            id: 7e53fb76-4af5-4550-b9ec-bee7f6c9c85b
+            name: Stretch
+            ordinal: '3'
+            value: stretch
+          - model: PatternEnumPropertyOption
+            contextId: baseline
+            icon: 6
+            id: 684e4444-7755-40c8-8cbd-a3c63f8b9002
+            name: Baseline
+            ordinal: '4'
+            value: baseline
+        origin: built-in
+        required: false
+        type: enum
+      - model: PatternProperty
+        contextId: justify-content
+        defaultOptionId: b3ba55ea-9742-4900-af31-7d0ce3cdce50
+        example: ''
+        group: ''
+        hidden: false
+        id: 9bf8cd10-0443-4750-b64a-807ec34b545c
+        inputType: select
+        label: Justify
+        propertyName: justifyContent
+        options:
+          - model: PatternEnumPropertyOption
+            contextId: flex-start
+            id: a3d4d3ed-fbb7-4536-a588-f277dbffdad9
+            name: Start
+            ordinal: '0'
+            value: flex-start
+          - model: PatternEnumPropertyOption
+            contextId: flex-end
+            id: 51612107-133e-4429-aa38-c575c4760f7e
+            name: End
+            ordinal: '1'
+            value: flex-end
+          - model: PatternEnumPropertyOption
+            contextId: center
+            id: b3ba55ea-9742-4900-af31-7d0ce3cdce50
+            name: Center
+            ordinal: '2'
+            value: center
+          - model: PatternEnumPropertyOption
+            contextId: space-between
+            id: 8a7c4083-acef-46f2-982a-ddefe061438e
+            name: Space Between
+            ordinal: '3'
+            value: space-between
+          - model: PatternEnumPropertyOption
+            contextId: space-around
+            id: 1600b418-df35-48bd-87f3-4bf82a744a74
+            name: Space Around
+            ordinal: '4'
+            value: space-around
+          - model: PatternEnumPropertyOption
+            contextId: space-evenly
+            id: 41948a5f-0c8a-4941-ba15-62de412e24c1
+            name: Space Evenly
+            ordinal: '5'
+            value: space-evenly
+        origin: built-in
+        required: false
+        type: enum
+      - model: PatternProperty
+        contextId: flex-wrap
+        defaultValue: false
+        example: ''
+        group: ''
+        hidden: false
+        id: c55ab2e8-0edf-4772-bd88-738f3e575885
+        inputType: default
+        label: Wrap
+        origin: built-in
+        propertyName: wrap
+        required: false
+        type: boolean
+      - model: PatternProperty
+        contextId: flex-grow
+        example: ''
+        group: ''
+        hidden: false
+        id: bf5a1750-86b7-4088-9b22-6f50ffb36f61
+        inputType: default
+        label: Grow
+        origin: built-in
+        propertyName: flexGrow
+        required: false
+        type: number
+      - model: PatternProperty
+        contextId: flex-shrink
+        example: ''
+        group: ''
+        hidden: false
+        id: 7b0c59c5-c16c-4cab-ab4c-850a2221855d
+        inputType: default
+        label: Shrink
+        origin: built-in
+        propertyName: flexShrink
+        required: false
+        type: number
+      - model: PatternProperty
+        contextId: flex-basis
+        defaultValue: auto
+        example: ''
+        group: ''
+        hidden: false
+        id: a56cb19c-c3a0-473d-8be9-66a4841f6e1b
+        inputType: default
+        label: Size
+        origin: built-in
+        propertyName: flexBasis
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: background-color
+        example: ''
+        group: ''
+        hidden: false
+        id: f325b556-e9e5-4b95-bd46-a347cd9ae4d4
+        inputType: default
+        label: Background Color
+        origin: built-in
+        propertyName: backgroundColor
+        required: false
+        type: string
+      - model: PatternProperty
+        contextId: condition
+        defaultValue: true
+        description: 'Show the "True" slot, disable to show the "False" slot'
+        example: ''
+        group: ''
+        hidden: false
+        id: a80a5dab-e97c-42a9-b9a2-76c1b6bd7d99
+        inputType: default
+        label: Condition
+        origin: built-in
+        propertyName: condition
+        required: true
+        type: boolean
+      - model: PatternProperty
+        contextId: onClick
+        description: You can set an interaction that happens on Click.
+        event:
+          type: MouseEvent
+        example: ''
+        group: ''
+        hidden: false
+        id: edb191c6-0fa7-4391-8af1-d86122d86707
+        inputType: default
+        label: Interaction
+        origin: built-in
+        propertyName: onClick
+        required: false
+        type: EventHandler
+    state: connected
+userStore:
+  model: UserStore
+  actions:
+    - model: UserStoreAction
+      acceptsProperty: false
+      id: 0e4da947-5e95-44bf-aed2-9f399e8a6a97
+      name: No Interaction
+      type: noop
+    - model: UserStoreAction
+      acceptsProperty: false
+      id: 6d5e4794-0aeb-492a-9b16-5d1eb5ab58dc
+      name: Switch Page
+      storePropertyId: 69c8bf99-016f-443d-8eea-fc9bf6de0b6d
+      type: set
+    - model: UserStoreAction
+      acceptsProperty: false
+      id: e1794ad8-e229-43c9-ab54-7b8ad4cbdc02
+      name: Navigate
+      type: open-external
+    - model: UserStoreAction
+      acceptsProperty: true
+      id: 1556dd3f-6d2d-4694-aeeb-26c2e440a4a5
+      name: Set Variable
+      type: set
+  currentPageProperty:
+    model: UserStoreProperty
+    id: 69c8bf99-016f-443d-8eea-fc9bf6de0b6d
+    name: Current Page
+    concreteValue: bc5a6e5b-01b5-4877-ab3f-9374402313c9
+    initialValue: ''
+    type: concrete
+    valueType: page
+  enhancer:
+    model: UserStoreEnhancer
+    id: 87b7b1dd-7585-4db1-8238-d33d4a08e171
+    typeScript: "import * as Alva from 'alva';\n\nexport function onStoreCreate(store: Alva.DesignTimeUserStore): Alva.DesignTimeUserStore {\n\t// Add properties to your store here, e.g.:\n\t// store.defineProperty('hello', { value: 'Hello' });\n\t// store.defineProperty('world', { value: 'World' });\n\t// store.defineProperty('helloWorld', { get: () => store.getProperty('hello').getValue() + ' ' + store.getProperty('world').getValue() });\n\treturn store;\n}\n"
+    javaScript: 'exports.onStoreCreate = function onStoreCreate(store) { return store; }'
+  id: 2f5f1b9a-eba4-4085-a917-6b0ddab987af
+  properties: []
+  references: []

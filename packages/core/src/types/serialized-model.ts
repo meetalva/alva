@@ -85,7 +85,26 @@ export interface SerializedPatternLibrary {
 	state: PatternLibraryState;
 }
 
-export interface SavedProject {
+export type SavedProject = VersionOneSerializedProject;
+
+export type MigratableProject = VersionZeroSerializedProject | VersionOneSerializedProject;
+
+export interface VersionZeroSerializedProject {
+	version?: number;
+	model: Types.ModelName.Project;
+	elementActions: SerializedElementAction[];
+	elementContents: SerializedElementContent[];
+	elements: SerializedElement[];
+	id: string;
+	name: string;
+	pages: SerializedPage[];
+	pageList: string[];
+	patternLibraries: SerializedPatternLibrary[];
+	userStore: UserStore.SerializedUserStore;
+}
+
+export interface VersionOneSerializedProject {
+	version: number;
 	model: Types.ModelName.Project;
 	elementActions: SerializedElementAction[];
 	elementContents: SerializedElementContent[];

@@ -296,7 +296,7 @@ jobs:
 
       - run:
           name: Deploy to static hosting
-          command: alva-deploy --prefix=alva-site --project packages/site/.static
+          command: alva-deploy --prefix=alva-site --project .static
 
   site_master:
     docker:
@@ -308,6 +308,9 @@ jobs:
       - setup:
           key: linux
 
+      - attach_workspace:
+          at: ~/repo
+
       - run:
           name: Remove dev data
           command: rm packages/site/src/releases-data.ts
@@ -317,16 +320,12 @@ jobs:
           command: alva-trigger --dry-run --project=packages/core --data=packages/site/src/releases-data.ts && cat packages/site/src/releases-data.ts
 
       - run:
-          name: Compile site
-          command: lerna run compile --scope=@meetalva/site --stream
-
-      - run:
           name: Create static site
-          command: lerna run build --scope=@meetalva/site --stream
+          command: patternplate build --out=./.static --base=/
 
       - run:
           name: Deploy to static hosting
-          command: surge packages/site/.static https://meetalva.io
+          command: surge .static https://meetalva.io
 
 workflows:
   version: 2

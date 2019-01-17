@@ -63,25 +63,6 @@ const StyledTop = styled.div`
 	padding: ${getSpace(SpaceSize.L)}px ${getSpace(SpaceSize.XL)}px 0;
 `;
 
-const Spinner = styled.div`
-	width: 28px;
-	height: 28px;
-	border: 1.5px solid ${Color.White};
-	border-right-color: transparent;
-	border-radius: 50%;
-	animation: load 1s infinite ease;
-	box-sizing: border-box;
-
-	@keyframes load {
-		0% {
-			transform: rotate(0deg);
-		}
-		100% {
-			transform: rotate(360deg);
-		}
-	}
-`;
-
 const Loader = styled.div`
 	width: 100%;
 	height: 2px;
@@ -96,12 +77,12 @@ const Loader = styled.div`
 		width: 20px;
 		height: 100%;
 		background: ${Color.White};
-		animation: load2 1.5s infinite ease;
+		animation: load 1.5s infinite ease;
 		transform: scaleX(1);
 		transform-origin: 0 0;
 	}
 
-	@keyframes load2 {
+	@keyframes load {
 		0% {
 			margin-left: -20px;
 		}

@@ -4,6 +4,7 @@ import * as Model from '../model';
 import * as React from 'react';
 import { WithStore } from '../store';
 import * as Types from '../types';
+import { ButtonSize } from '../components';
 
 export interface LibrarySettingsContainerProps {
 	library: Model.PatternLibrary;
@@ -37,16 +38,115 @@ export class LibraryContainer extends React.Component<LibrarySettingsContainerPr
 				}
 				version={props.library.getVersion()}
 				install={
-					<Components.Button
+					mayUpdate ? (
+						<Components.Button
+							disabled={props.library.getState() === Types.PatternLibraryState.Connecting}
+							size={ButtonSize.Medium}
+							inverted
+							textColor={Components.Color.Grey50}
+							onClick={() => {
+								if (props.library.getState() === Types.PatternLibraryState.Connecting) {
+									return;
+								}
+
+								props.library.setState(Types.PatternLibraryState.Connecting);
+								props.store.updatePatternLibrary(props.library);
+							}}
+						>
+							{props.library.getState() === Types.PatternLibraryState.Connecting
+								? 'Updating …'
+								: 'Update'}
+						</Components.Button>
+					) : (
+						mayReconnect && (
+							<Components.Button
+								disabled={props.library.getState() === Types.PatternLibraryState.Connecting}
+								size={ButtonSize.Medium}
+								inverted
+								textColor={Components.Color.Grey50}
+								onClick={() => {
+									if (props.library.getState() === Types.PatternLibraryState.Connecting) {
+										return;
+									}
+
+									props.library.setState(Types.PatternLibraryState.Connecting);
+									props.store.connectPatternLibrary(props.library);
+								}}
+							>
+								{props.library.getState() === Types.PatternLibraryState.Connecting
+									? 'Connecting …'
+									: 'Connect'}
+							</Components.Button>
+						)
+					)
+				}
+			/>
+		);
+	}
+}
+{
+	/*
+
+				<Components.Button
 						order={Components.ButtonOrder.Primary}
 						size={Components.ButtonSize.Medium}
 						textColor={props.library.getColor() || Components.Color.Grey50}
 						inverted
+						disabled={props.library.getState() === Types.PatternLibraryState.Connecting}
 					>
-						Already installed
+						Update
 					</Components.Button>
-				}
-			/>
+					</>
+					</>
+			{mayUpdate && (
+								<Components.ButtonGroupButton
+									disabled={
+										props.library.getState() ===
+										Types.PatternLibraryState.Connecting
+									}
+									onClick={() => {
+										if (
+											props.library.getState() ===
+											Types.PatternLibraryState.Connecting
+										) {
+											return;
+										}
+
+										props.library.setState(Types.PatternLibraryState.Connecting);
+										props.store.updatePatternLibrary(props.library);
+									}}
+								>
+									{props.library.getState() ===
+									Types.PatternLibraryState.Connecting
+										? 'Updating …'
+										: 'Update'}
+								</Components.ButtonGroupButton>
+							)}
+							{!mayUpdate &&
+								mayReconnect && (
+									<Components.ButtonGroupButton
+										disabled={props.library.getState() === Types.PatternLibraryState.Connecting}
+										onClick={() => {
+											if (
+												props.library.getState() ===
+												Types.PatternLibraryState.Connecting
+											) {
+												return;
+											}
+
+											props.library.setState(
+												Types.PatternLibraryState.Connecting
+											);
+											props.store.connectPatternLibrary(props.library);
+										}}
+									>
+										{props.library.getState() ===
+										Types.PatternLibraryState.Connecting
+											? 'Connecting …'
+											: 'Connect'}
+									</Components.ButtonGroupButton>
+								)}
+			</>
 		);
 	}
 }

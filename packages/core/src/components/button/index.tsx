@@ -15,7 +15,7 @@ export interface ButtonProps {
 	buttonRole?: ButtonRole;
 	/** @description Spatial weight @default */
 	size?: ButtonSize;
-	textColor?: Color;
+	textColor?: string;
 	as?: keyof JSX.IntrinsicElements;
 	style?: React.CSSProperties;
 	className?: string;

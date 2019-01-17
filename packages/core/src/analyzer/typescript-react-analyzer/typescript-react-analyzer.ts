@@ -100,14 +100,17 @@ export async function analyze(
 			result: {
 				id,
 				bundle: await getBundle(),
-				name: pkg.name || 'Unnamed Library',
+				name: pkg.name || 'Library',
 				description: pkg.description || '',
+				image: pkg.alva.image || '',
+				color: pkg.alva.color || '',
 				patterns: patterns.map(p => ({
 					path: p.path,
 					pattern: p.pattern,
 					properties: p.properties.map(prop => prop.property)
 				})),
 				path: pkgPath,
+				packageFile: pkg,
 				version: pkg.version || '1.0.0'
 			}
 		};

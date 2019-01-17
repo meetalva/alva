@@ -13,12 +13,15 @@ const md5 = require('md5');
 export interface PatternLibraryInit {
 	bundleId: string;
 	bundle: string;
+	color: string;
 	description: string;
 	id: string;
+	image: string;
 	name: string;
 	version: string;
 	origin: Types.PatternLibraryOrigin;
 	patternProperties: AnyPatternProperty[];
+	packageFile: { [key: string]: unknown };
 	patterns: Pattern[];
 	state: Types.PatternLibraryState;
 }
@@ -46,13 +49,16 @@ export class PatternLibrary {
 
 	@Mobx.observable private bundleId: string;
 	@Mobx.observable private bundle: string;
+	@Mobx.observable private color: string;
 	@Mobx.observable private description: string;
 	@Mobx.observable private name: string;
+	@Mobx.observable private image: string;
 	@Mobx.observable private version: string;
 	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
 	@Mobx.observable private patterns: Map<string, Pattern> = new Map();
 	@Mobx.observable private origin: Types.PatternLibraryOrigin;
 	@Mobx.observable private state: Types.PatternLibraryState;
+	@Mobx.observable private packageFile: { [key: string]: unknown };
 
 	@Mobx.computed
 	private get slots(): PatternSlot[] {
@@ -70,11 +76,14 @@ export class PatternLibrary {
 	public constructor(init: PatternLibraryInit) {
 		this.bundleId = init.bundleId;
 		this.bundle = init.bundle;
+		this.color = init.color;
 		this.description = init.description;
 		this.id = init.id || uuid.v4();
 		this.name = init.name;
+		this.image = init.image;
 		this.version = init.version;
 		this.origin = init.origin;
+		this.packageFile = init.packageFile;
 		init.patterns.forEach(pattern => this.patterns.set(pattern.getId(), pattern));
 		init.patternProperties.forEach(prop => this.patternProperties.set(prop.getId(), prop));
 		this.state = init.state;
@@ -84,14 +93,17 @@ export class PatternLibrary {
 		return {
 			bundleId: uuid.v4(),
 			bundle: '',
+			color: '',
 			description: '',
 			id: uuid.v4(),
+			image: '',
 			name: 'Library',
 			version: '1.0.0',
 			origin: Types.PatternLibraryOrigin.UserProvided,
 			patterns: [],
 			patternProperties: [],
-			state: Types.PatternLibraryState.Connected
+			state: Types.PatternLibraryState.Connected,
+			packageFile: {}
 		};
 	}
 
@@ -116,7 +128,10 @@ export class PatternLibrary {
 			bundle: analysis.bundle,
 			bundleId: analysis.id,
 			description: analysis.description,
-			state: Types.PatternLibraryState.Connected
+			image: analysis.image,
+			color: analysis.color,
+			state: Types.PatternLibraryState.Connected,
+			packageFile: analysis.packageFile
 		});
 
 		library.import(analysis, { project });
@@ -130,14 +145,17 @@ export class PatternLibrary {
 		const patternLibrary = new PatternLibrary({
 			bundleId: serialized.bundleId,
 			bundle: serialized.bundle,
+			color: serialized.color,
 			description: serialized.description,
 			id: serialized.id,
+			image: serialized.image,
 			name: serialized.name,
 			version: serialized.version,
 			origin: deserializeOrigin(serialized.origin),
 			patterns: [],
 			patternProperties: serialized.patternProperties.map(p => PatternProperty.from(p)),
-			state
+			state,
+			packageFile: serialized.packageFile
 		});
 
 		serialized.patterns.forEach(pattern => {
@@ -303,6 +321,10 @@ export class PatternLibrary {
 		return md5(this.bundle);
 	}
 
+	public getColor(): string {
+		return this.color;
+	}
+
 	public getCapabilites(): Types.LibraryCapability[] {
 		const isUserProvided = this.origin === Types.PatternLibraryOrigin.UserProvided;
 
@@ -380,6 +402,10 @@ export class PatternLibrary {
 		return this.state;
 	}
 
+	public getImage(): string {
+		return this.image;
+	}
+
 	@Mobx.action
 	public removePattern(pattern: Pattern): void {
 		this.patterns.delete(pattern.getId());
@@ -420,14 +446,17 @@ export class PatternLibrary {
 			model: this.model,
 			bundleId: this.bundleId,
 			bundle: this.bundle,
+			color: this.color,
 			description: this.description,
 			id: this.id,
+			image: this.image,
 			name: this.name,
 			version: this.version,
 			origin: serializeOrigin(this.origin),
 			patterns: this.getPatterns().map(p => p.toJSON()),
 			patternProperties: this.getPatternProperties().map(p => p.toJSON()),
-			state: this.state
+			state: this.state,
+			packageFile: this.packageFile
 		};
 	}
 
@@ -436,6 +465,7 @@ export class PatternLibrary {
 		this.bundleId = b.bundleId;
 		this.bundle = b.bundle;
 		this.description = b.description;
+		this.image = b.image;
 		this.name = b.name;
 		this.origin = b.origin;
 		this.state = this.state;

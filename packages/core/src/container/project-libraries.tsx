@@ -77,7 +77,6 @@ export class ProjectLibraries extends React.Component {
 						>
 							<Components.LibraryBox
 								color="#F4777A"
-								textColor={Components.Color.White}
 								image="http://zwainhaus.com/artanddesign/landscape_03.jpg"
 								name="Material Design"
 								description="A visual language that synthesizes the classic principles of good design with the innovation of technology and science."
@@ -96,7 +95,6 @@ export class ProjectLibraries extends React.Component {
 
 							<Components.LibraryBox
 								color="#1F282B"
-								textColor={Components.Color.White}
 								image="http://zwainhaus.com/artanddesign/tinyhouse1.jpg"
 								name="Wireframe Kit"
 								description="Simple wireframing kit to kickstart your product ideas."
@@ -176,6 +174,16 @@ export class ProjectLibraries extends React.Component {
 										<Components.Button
 											order={Components.ButtonOrder.Primary}
 											size={Components.ButtonSize.Medium}
+											onClick={() =>
+												app.send({
+													id: uuid.v4(),
+													payload: {
+														library: undefined,
+														projectId: store.getProject().getId()
+													},
+													type: MessageType.ConnectPatternLibraryRequest
+												})
+											}
 										>
 											Connect Local Library
 										</Components.Button>

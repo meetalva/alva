@@ -8,7 +8,6 @@ import { PatternLibraryState } from '../../types';
 
 export interface LibraryBoxProps {
 	color?: string;
-	textColor?: string;
 	image?: string;
 	name?: string;
 	description?: string;
@@ -25,7 +24,7 @@ const StyledBox =
 	background: ${props => (props.color ? props.color : Color.Grey50)};
 	border-radius: 6px;
 	box-shadow: 0 0 24px 0 ${Color.BlackAlpha15};
-	color: ${props => (props.textColor ? props.textColor : Color.White)};
+	color: ${Color.White};
 	text-align: left;
 	margin: ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.XS)}px;
 	user-select: none;
@@ -96,7 +95,7 @@ const Loader = styled.div`
 		display: block;
 		width: 20px;
 		height: 100%;
-		background: ${(props: LibraryBoxProps) => props.textColor};
+		background: ${Color.White};
 		animation: load2 1.5s infinite ease;
 		transform: scaleX(1);
 		transform-origin: 0 0;

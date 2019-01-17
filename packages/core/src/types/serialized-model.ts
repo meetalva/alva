@@ -75,14 +75,17 @@ export interface SerializedPatternLibrary {
 	model: Types.ModelName.PatternLibrary;
 	bundleId: string;
 	bundle: string;
+	color: string;
 	description: string;
 	id: string;
+	image: string;
 	name: string;
 	version: string;
 	origin: SerializedPatternLibraryOrigin;
 	patternProperties: PatternProperty.SerializedPatternProperty[];
 	patterns: SerializedPattern[];
 	state: PatternLibraryState;
+	packageFile: { [key: string]: unknown };
 }
 
 export type SavedProject = VersionOneSerializedProject;

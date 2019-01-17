@@ -30,14 +30,18 @@ export class LibraryContainer extends React.Component<LibrarySettingsContainerPr
 				name={props.library.getName()}
 				description={props.library.getDescription()}
 				state={props.library.getState()}
-				color="#ffffff"
-				textColor={Components.Color.Grey20}
-				image="http://zwainhaus.com/artanddesign/landscape_03.jpg"
+				color={props.library.getColor() || Components.Color.Grey50}
+				image={
+					props.library.getImage() ||
+					'https://upload.wikimedia.org/wikipedia/commons/8/84/Example.svg'
+				}
 				version={props.library.getVersion()}
 				install={
 					<Components.Button
 						order={Components.ButtonOrder.Primary}
 						size={Components.ButtonSize.Medium}
+						textColor={props.library.getColor() || Components.Color.Grey50}
+						inverted
 					>
 						Already installed
 					</Components.Button>

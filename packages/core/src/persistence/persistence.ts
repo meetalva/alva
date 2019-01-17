@@ -1,12 +1,19 @@
 import * as Yaml from 'js-yaml';
+import { Migrator } from '../migrator';
 import * as Types from '../types';
 
 export class Persistence {
-	public static async parse<T>(contents: string): Promise<Types.PersistenceParseResult<T>> {
+	public static async parse<T extends Types.SerializedProject>(
+		contents: string
+	): Promise<Types.PersistenceParseResult<T>> {
 		try {
+			const parsed = (Yaml.load(String(contents)) as unknown) as T;
+			const migrator = new Migrator();
+			const migrated = (await migrator.migrate(parsed)) as T;
+
 			return {
 				state: Types.PersistenceState.Success,
-				contents: (Yaml.load(String(contents)) as unknown) as T
+				contents: migrated
 			};
 		} catch (error) {
 			return {

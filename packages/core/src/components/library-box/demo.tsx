@@ -8,8 +8,7 @@ import { PatternLibraryState } from '../../types';
 const LibraryBoxDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer>
 		<LibraryBox
-			color={Color.White}
-			textColor={Color.Grey20}
+			color={Color.Black}
 			image="http://zwainhaus.com/artanddesign/landscape_03.jpg"
 			name="Wireframe Kit"
 			description="Simple wireframing kit to kickstart your product ideas."

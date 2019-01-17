@@ -6,9 +6,6 @@ import styled, { css } from 'styled-components';
 import { ChevronUp, ChevronDown } from 'react-feather';
 import { IconSize } from '../icons';
 
-const INPUT_PADDING_RIGHT = (props: PropertyInputProps) =>
-	props.type && props.type === PropertyInputType.Number ? 0 : getSpace(SpaceSize.S);
-
 export const PropertyInputStyles = css`
 	display: block;
 	box-sizing: border-box;
@@ -16,7 +13,7 @@ export const PropertyInputStyles = css`
 	height: 30px;
 	border: 0.5px solid ${Color.Grey90};
 	padding-top: ${getSpace(SpaceSize.XS)}px;
-	padding-right: ${INPUT_PADDING_RIGHT}px;
+	padding-right: ${getSpace(SpaceSize.S)}px;
 	padding-bottom: ${getSpace(SpaceSize.XS)}px;
 	padding-left: ${getSpace(SpaceSize.XS + SpaceSize.XXS)}px;
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
@@ -100,6 +97,8 @@ const StyledClicker = styled.div`
 
 const StyledInput = styled.input`
 	${PropertyInputStyles};
+	${(props: PropertyInputProps) =>
+		props.type && props.type === PropertyInputType.Number && 'padding-right: 0;'};
 `;
 
 export interface PropertyInputProps {

@@ -11,7 +11,6 @@ export interface AlvaAppInit {
 	hostType: Types.HostType;
 	panes: Set<Types.AppPane>;
 	paneSizes: Types.PaneSize[];
-	rightSidebarTab: Types.RightSidebarTab;
 	searchTerm: string;
 	state: Types.AppState;
 }
@@ -27,7 +26,6 @@ export class AlvaApp {
 			Types.AppPane.PropertiesPane
 		]),
 		paneSizes: [],
-		rightSidebarTab: Types.RightSidebarTab.Properties,
 		searchTerm: '',
 		state: Types.AppState.Starting
 	};
@@ -39,10 +37,9 @@ export class AlvaApp {
 	@Mobx.observable private hostType: Types.HostType;
 
 	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
-	@Mobx.observable private paneSelectOpen: boolean = false;
-
 	@Mobx.observable
-	private rightSidebarTab: Types.RightSidebarTab = Types.RightSidebarTab.Properties;
+	private projectViewMode: Types.ProjectViewMode = Types.ProjectViewMode.Libraries;
+	@Mobx.observable private paneSelectOpen: boolean = false;
 
 	@Mobx.observable private searchTerm: string = '';
 	@Mobx.observable private state: Types.AppState = Types.AppState.Starting;
@@ -87,7 +84,6 @@ export class AlvaApp {
 					height: p.height,
 					pane: deserializePane(p.pane)
 				})),
-				rightSidebarTab: deserializeRightSidebarTab(serialized.rightSidebarTab),
 				searchTerm: serialized.searchTerm,
 				state: deserializeState(serialized.state)
 			},
@@ -139,16 +135,16 @@ export class AlvaApp {
 		return this.paneSizes.get(pane);
 	}
 
-	public getRightSidebarTab(): Types.RightSidebarTab {
-		return this.rightSidebarTab;
-	}
-
 	public getSearchTerm(): string {
 		return this.searchTerm;
 	}
 
 	public getState(): Types.AppState {
 		return this.state;
+	}
+
+	public getProjectViewMode(): Types.ProjectViewMode {
+		return this.projectViewMode;
 	}
 
 	public isVisible(pane: Types.AppPane): boolean {
@@ -158,6 +154,11 @@ export class AlvaApp {
 	@Mobx.action
 	public setActiveView(view: Types.AlvaView): void {
 		this.activeView = view;
+	}
+
+	@Mobx.action
+	public setProjectViewMode(mode: Types.ProjectViewMode): void {
+		this.projectViewMode = mode;
 	}
 
 	@Mobx.action
@@ -198,11 +199,6 @@ export class AlvaApp {
 	}
 
 	@Mobx.action
-	public setRightSidebarTab(rightSidebarTab: Types.RightSidebarTab): void {
-		this.rightSidebarTab = rightSidebarTab;
-	}
-
-	@Mobx.action
 	public setSearchTerm(term: string): void {
 		this.searchTerm = term;
 	}
@@ -238,7 +234,6 @@ export class AlvaApp {
 				height: paneSize.height,
 				pane: serializePane(paneSize.pane)
 			})),
-			rightSidebarTab: serializeRightSidebarTab(this.rightSidebarTab),
 			searchTerm: this.searchTerm,
 			state: serializeState(this.state)
 		};
@@ -249,7 +244,6 @@ export class AlvaApp {
 		this.activeView = b.activeView;
 		this.panes = b.panes;
 		this.paneSizes = b.paneSizes;
-		this.rightSidebarTab = b.rightSidebarTab;
 		this.searchTerm = b.searchTerm;
 		this.state = b.state;
 	}
@@ -297,16 +291,6 @@ function deserializePane(state: Types.SerializedAppPane): Types.AppPane {
 	throw new Error(`Unknown app pane: ${state}`);
 }
 
-function deserializeRightSidebarTab(tab: Types.SerializedRightSidebarTab): Types.RightSidebarTab {
-	switch (tab) {
-		case 'properties':
-			return Types.RightSidebarTab.Properties;
-		case 'project-settings':
-			return Types.RightSidebarTab.ProjectSettings;
-	}
-	throw new Error(`Unknown tab: ${tab}`);
-}
-
 function deserializeState(state: Types.SerializedAppState): Types.AppState {
 	switch (state) {
 		case 'starting':
@@ -341,16 +325,6 @@ function serializePane(pane: Types.AppPane): Types.SerializedAppPane {
 			return 'development-pane';
 	}
 	throw new Error(`Unknown app pane: ${pane}`);
-}
-
-function serializeRightSidebarTab(tab: Types.RightSidebarTab): Types.SerializedRightSidebarTab {
-	switch (tab) {
-		case Types.RightSidebarTab.Properties:
-			return 'properties';
-		case Types.RightSidebarTab.ProjectSettings:
-			return 'project-settings';
-	}
-	throw new Error(`Unknown tab: ${tab}`);
 }
 
 function serializeState(state: Types.AppState): Types.SerializedAppState {

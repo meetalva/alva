@@ -18,6 +18,7 @@ export interface ButtonProps {
 	textColor?: Color;
 	as?: keyof JSX.IntrinsicElements;
 	style?: React.CSSProperties;
+	className?: string;
 }
 
 export enum ButtonOrder {
@@ -53,9 +54,9 @@ const toPadding = (sizes: SpaceSize[]) => sizes.map(s => `${getSpace(s)}px`).joi
 const BUTTON_PADDING = (props: ButtonProps): string => {
 	switch (props.size) {
 		case ButtonSize.Small:
-			return toPadding([SpaceSize.XXS, SpaceSize.M]);
+			return toPadding([SpaceSize.XXS, SpaceSize.XS]);
 		case ButtonSize.Medium:
-			return toPadding([SpaceSize.XS, SpaceSize.L]);
+			return toPadding([SpaceSize.XS, SpaceSize.M]);
 		case ButtonSize.Large:
 		default:
 			return toPadding([SpaceSize.M, SpaceSize.XXXL]);
@@ -102,7 +103,7 @@ const StyledPrimaryButton = styled(SizedBaseButton)`
 	align-content: center;
 	text-align: center;
 	background: ${props => (props.inverted ? Color.White : Color.Blue20)};
-	border-color: ${props => (props.inverted ? Color.White : Color.Blue20)};
+	border: none;
 	color: ${props => (props.inverted ? Color.Blue20 : Color.White)};
 
 	&:active {
@@ -119,7 +120,7 @@ const StyledSecondaryButton = styled(SizedBaseButton)`
 	align-content: center;
 	text-align: center;
 	background: transparent;
-	border-color: ${Color.Grey50};
+	border-color: ${(props: ButtonProps) => (props.textColor ? props.textColor : Color.Grey50)};
 	color: ${Color.Grey50};
 
 	&:active {
@@ -176,6 +177,7 @@ export const Button: React.StatelessComponent<ButtonProps> = props => {
 			style={{ color: props.textColor, ...props.style }}
 			disabled={props.disabled}
 			as={props.as}
+			className={props.className}
 		>
 			{props.children}
 		</Component>

@@ -9,7 +9,7 @@ const StyledPatternsPane = styled.div`
 	padding: 0 ${getSpace(SpaceSize.M)}px;
 	overflow-y: auto;
 	height: 100%;
-	border-top: 1px solid ${Color.BlackAlpha13};
+	border-top: 1px solid ${Color.BlackAlpha15};
 
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-top-width: 0.5px;

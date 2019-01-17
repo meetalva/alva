@@ -9,12 +9,6 @@ export interface TabSwitchProps {
 	label: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 	title: string;
-	type: TabSwitchType;
-}
-
-export enum TabSwitchType {
-	Toggle,
-	Tab
 }
 
 export enum TabSwitchState {
@@ -31,8 +25,7 @@ const StyledTabSwitch = styled.div`
 	height: 100%;
 	align-items: center;
 	justify-content: center;
-
-	width: ${(props: TabSwitchProps) => (props.type === TabSwitchType.Tab ? '50%' : 'auto')};
+	width: auto;
 
 	background: ${(props: TabSwitchProps) =>
 		props.active === TabSwitchState.Active ? Color.Blue80 : 'transparent'};
@@ -53,7 +46,6 @@ export const TabSwitch: React.SFC<TabSwitchProps> = props => (
 	<StyledTabSwitch
 		active={props.active}
 		label={props.label}
-		type={props.type}
 		onClick={props.onClick}
 		title={props.title}
 	>

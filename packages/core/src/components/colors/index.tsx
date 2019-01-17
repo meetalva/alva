@@ -1,6 +1,7 @@
 export enum Color {
 	Black = 'rgb(1, 12, 22)',
-	BlackAlpha13 = 'rgba(0, 0, 0, .13)',
+	BlackAlpha15 = 'rgba(0, 0, 0, .15)',
+	BlackAlpha50 = 'rgba(0, 0, 0, .5)',
 	Blue = 'rgb(0, 112, 214)',
 	BlueAlpha40 = 'rgba(0, 112, 214, .4)',
 	Blue20 = 'rgb(51, 141, 222)',
@@ -19,6 +20,7 @@ export enum Color {
 	Grey90 = 'rgb(229, 230, 231)',
 	Grey97 = 'rgb(247, 247, 247)',
 	Orange = 'rgb(255, 127, 115)',
+	Yellow = 'rgb(251, 186, 80)',
 	Red = 'rgb(187, 50, 94)',
 	White = 'rgb(255, 255, 255)',
 	WhiteAlpha75 = 'rgba(255, 255, 255, .75)'

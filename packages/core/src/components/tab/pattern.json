@@ -1,0 +1,8 @@
+{
+	"name": "page-tile",
+	"displayName": "Page Tile",
+	"description": "Represent a page",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": ["atom"]
+ }

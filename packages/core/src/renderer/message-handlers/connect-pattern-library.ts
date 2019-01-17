@@ -22,7 +22,7 @@ export function connectPatternLibrary({
 
 		project.addPatternLibrary(library);
 
-		store.getApp().setRightSidebarTab(Types.RightSidebarTab.ProjectSettings);
+		// store.getApp().setRightSidebarTab(Types.RightSidebarTab.ProjectSettings);
 		store.commit();
 
 		store.getSender().send({

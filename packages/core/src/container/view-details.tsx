@@ -8,8 +8,7 @@ import { PageListContainer } from './page-list/page-list-container';
 import { PatternListContainer } from './pattern-list';
 import { PreviewPaneWrapper } from './preview-pane-wrapper';
 import { PropertyListContainer } from './property-list';
-import { PropertiesSwitch } from './properties-switch';
-import { ProjectSettingsContainer } from './project-settings-container';
+import { ProjectLibraries } from './project-libraries';
 import * as React from 'react';
 import * as ReactLoadable from 'react-loadable';
 import * as Types from '../types';
@@ -48,50 +47,57 @@ export class ViewDetails extends React.Component {
 
 		return (
 			<React.Fragment>
-				<AppPane
-					pane={Types.AppPane.PagesPane}
-					defaultSize={{ width: 140, height: '100%' }}
-					enable={{ right: true }}
-					minWidth={140}
-				>
-					<Components.SideBar
-						side={Components.LayoutSide.Left}
-						direction={Components.LayoutDirection.Column}
-						border={Components.LayoutBorder.Side}
-					>
-						<PageListContainer />
-					</Components.SideBar>
-				</AppPane>
-				<AppPane
-					pane={Types.AppPane.ElementsPane}
-					defaultSize={{ width: 240, height: '100%' }}
-					enable={{ right: true }}
-					minWidth={240}
-				>
-					<Components.SideBar
-						side={Components.LayoutSide.Left}
-						direction={Components.LayoutDirection.Column}
-						border={Components.LayoutBorder.Side}
-					>
-						<Components.ElementPane>
-							<ElementList />
-						</Components.ElementPane>
-
+				{props.store.getApp().getProjectViewMode() === Types.ProjectViewMode.Design && (
+					<>
 						<AppPane
-							force
-							pane={Types.AppPane.PatternsPane}
-							defaultSize={{ height: 500, width: '100%' }}
-							enable={{ top: true }}
-							minHeight={240}
+							pane={Types.AppPane.PagesPane}
+							defaultSize={{ width: 140, height: '100%' }}
+							enable={{ right: true }}
+							minWidth={140}
 						>
-							<Components.PatternsPane>
-								<PatternListContainer />
-							</Components.PatternsPane>
+							<Components.SideBar
+								side={Components.LayoutSide.Left}
+								direction={Components.LayoutDirection.Column}
+								border={Components.LayoutBorder.Side}
+							>
+								<PageListContainer />
+							</Components.SideBar>
 						</AppPane>
-					</Components.SideBar>
-				</AppPane>
+						<AppPane
+							pane={Types.AppPane.ElementsPane}
+							defaultSize={{ width: 240, height: '100%' }}
+							enable={{ right: true }}
+							minWidth={240}
+						>
+							<Components.SideBar
+								side={Components.LayoutSide.Left}
+								direction={Components.LayoutDirection.Column}
+								border={Components.LayoutBorder.Side}
+							>
+								<Components.ElementPane>
+									<ElementList />
+								</Components.ElementPane>
+								<AppPane
+									force
+									pane={Types.AppPane.PatternsPane}
+									defaultSize={{ height: 500, width: '100%' }}
+									enable={{ top: true }}
+									minHeight={240}
+								>
+									<Components.PatternsPane>
+										<PatternListContainer />
+									</Components.PatternsPane>
+								</AppPane>
+							</Components.SideBar>
+						</AppPane>
+					</>
+				)}
 				<div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column' }}>
-					<PreviewPaneWrapper isDragging={props.store.getDragging()} key="center" />
+					{props.store.getApp().getProjectViewMode() === Types.ProjectViewMode.Libraries ? (
+						<ProjectLibraries />
+					) : (
+						<PreviewPaneWrapper isDragging={props.store.getDragging()} key="center" />
+					)}
 					<AppPane
 						pane={Types.AppPane.DevelopmentPane}
 						defaultSize={{ width: '100%', height: 500 }}
@@ -106,39 +112,24 @@ export class ViewDetails extends React.Component {
 						</div>
 					)}
 				</div>
-				<AppPane
-					pane={Types.AppPane.PropertiesPane}
-					defaultSize={{ width: 240, height: '100%' }}
-					enable={{ left: true }}
-					minWidth={240}
-				>
-					<Components.SideBar
-						side={Components.LayoutSide.Right}
-						direction={Components.LayoutDirection.Column}
-						border={Components.LayoutBorder.Side}
+				{props.store.getApp().getProjectViewMode() !== Types.ProjectViewMode.Libraries && (
+					<AppPane
+						pane={Types.AppPane.PropertiesPane}
+						defaultSize={{ width: 240, height: '100%' }}
+						enable={{ left: true }}
+						minWidth={240}
 					>
-						<div style={{ flexShrink: 0, height: 30 }}>
-							<PropertiesSwitch />
-						</div>
-						{props.store.getApp().getRightSidebarTab() === Types.RightSidebarTab.Properties &&
-							onlyBuiltin &&
-							mayConnect && (
-								<ConnectPaneContainer
-									onClick={() =>
-										props.store
-											.getApp()
-											.setRightSidebarTab(Types.RightSidebarTab.ProjectSettings)
-									}
-								/>
-							)}
-						<Components.PropertyPane>
-							{props.store.getApp().getRightSidebarTab() ===
-								Types.RightSidebarTab.Properties && <PropertyListContainer />}
-							{props.store.getApp().getRightSidebarTab() ===
-								Types.RightSidebarTab.ProjectSettings && <ProjectSettingsContainer />}
-						</Components.PropertyPane>
-					</Components.SideBar>
-				</AppPane>
+						<Components.SideBar
+							side={Components.LayoutSide.Right}
+							direction={Components.LayoutDirection.Column}
+							border={Components.LayoutBorder.Side}
+						>
+							<Components.PropertyPane>
+								<PropertyListContainer />
+							</Components.PropertyPane>
+						</Components.SideBar>
+					</AppPane>
+				)}
 			</React.Fragment>
 		);
 	}

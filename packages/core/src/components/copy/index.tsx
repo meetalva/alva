@@ -7,6 +7,7 @@ export interface CopyProps {
 	textColor?: Color;
 	children?: React.ReactNode;
 	cut?: boolean;
+	className?: string;
 }
 
 export interface StyledCopyProps {
@@ -25,7 +26,7 @@ const StyledCopy =
 	StyledCopyProps >
 	`
 	margin: 0;
-	line-height: 1.5;
+	line-height: 1.4;
 	cursor: default;
 	${props => (typeof props.size !== 'undefined' ? `font-size: ${props.size}px;` : 'font-size: 12px')};
 	${props => (typeof props.textColor !== 'undefined' ? `color: ${props.textColor};` : '')};
@@ -35,7 +36,12 @@ const StyledCopy =
 `;
 
 export const Copy: React.StatelessComponent<CopyProps> = props => (
-	<StyledCopy textColor={props.textColor} size={props.size} cut={props.cut}>
+	<StyledCopy
+		textColor={props.textColor}
+		size={props.size}
+		cut={props.cut}
+		className={props.className}
+	>
 		{props.children}
 	</StyledCopy>
 );

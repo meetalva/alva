@@ -190,7 +190,6 @@ export interface SerializedAlvaApp {
 	hostType: string;
 	panes: SerializedAppPane[];
 	paneSizes: SerializedPaneSize[];
-	rightSidebarTab: SerializedRightSidebarTab;
 	searchTerm: string;
 	state: SerializedAppState;
 }

@@ -899,7 +899,6 @@ export class ViewStore {
 
 		selectedElement.setSelected(true);
 
-		this.app.setRightSidebarTab(Types.RightSidebarTab.Properties);
 		project.setFocusedItem(selectedElement);
 
 		selectedElement.getAncestors().forEach(ancestor => {

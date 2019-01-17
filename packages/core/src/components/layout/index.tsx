@@ -76,7 +76,7 @@ export const Layout = styled.div`
 	flex-wrap: ${(props: LayoutProps) => (props.wrap === LayoutWrap.Wrap ? 'wrap' : 'nowrap')};
 	border-width: 0;
 	border-style: solid;
-	border-color: ${Color.BlackAlpha13};
+	border-color: ${Color.BlackAlpha15};
 	border-right-width: ${props =>
 		props.side === LayoutSide.Left && props.border === LayoutBorder.Side ? 1 : 0}px;
 	border-left-width: ${props =>

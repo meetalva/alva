@@ -23,6 +23,11 @@ export enum AlvaView {
 	SplashScreen = 'SplashScreen'
 }
 
+export enum ProjectViewMode {
+	Design = 'Design',
+	Libraries = 'Libraries'
+}
+
 export enum EditableTitleState {
 	Neutral = 'Neutral',
 	Editable = 'Editable',
@@ -222,11 +227,6 @@ export type ElementPropertyValue =
 	| string
 	| string[]
 	| unknown;
-
-export enum RightSidebarTab {
-	Properties = 'properties',
-	ProjectSettings = 'project-settings'
-}
 
 export interface SerializedPatternLibraryFile {
 	content: Buffer;

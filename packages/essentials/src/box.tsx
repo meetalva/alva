@@ -1,20 +1,35 @@
 import * as React from 'react';
 
 export interface BoxProps {
-	/** @name Flex @default true */
+	/**
+	 * @name Flex
+	 * @default true
+	 * */
 	flex?: boolean;
 
-	/** @name Direction @default Vertical @group Alignment */
+	/**
+	 * @name Direction
+	 * @default Vertical
+	 * @group Alignment
+	 * */
 	flexDirection?: FlexDirection;
 
-	/** @name Horizontal @default Center @group Alignment */
-	horizontal?: FlexAlignHorizontal;
+	/**
+	 * @name Horizontal
+	 * @default Center
+	 * @group Alignment
+	 * */
+	justifyContent?: FlexAlignHorizontal;
 
-	/** @name Vertical @default Center @group Alignment */
-	vertical?: FlexAlignVertical;
+	/**
+	 * @name Vertical
+	 * @default Center
+	 * @group Alignment
+	 * */
+	alignItems?: FlexAlignVertical;
 
 	/** @name Wrap */
-	wrap?: boolean;
+	flexWrap?: boolean;
 
 	/** @name Basis */
 	flexBasis?: number;
@@ -38,28 +53,44 @@ export interface BoxProps {
 }
 
 export enum FlexDirection {
-	Vertical = 'column',
-	Horizontal = 'row'
+	/** @name Horizontal */
+	row = 'row',
+	/** @name Vertical */
+	column = 'column'
 }
 
 export enum FlexAlignHorizontal {
-	Left = 'flex-start',
-	Center = 'center',
-	Right = 'flex-end',
-	Stretch = 'stretch',
-	SpaceBetween = 'space-between',
-	SpaceAround = 'space-around',
-	SpaceEvenly = 'space-evenly'
+	/** @name Left */
+	'flex-start' = 'flex-start',
+	/** @name Center */
+	center = 'center',
+	/** @name End */
+	'flex-end' = 'flex-end',
+	/** @name Stretch */
+	stretch = 'stretch',
+	/** @name Space Between */
+	'space-between' = 'space-between',
+	/** @name Space Around */
+	'space-around' = 'space-around',
+	/** @name Space Evenly */
+	'space-evenly' = 'space-evenly'
 }
 
 export enum FlexAlignVertical {
-	Top = 'flex-start',
-	Center = 'center',
-	Bottom = 'flex-end',
-	Stretch = 'stretch',
-	SpaceBetween = 'space-between',
-	SpaceAround = 'space-around',
-	SpaceEvenly = 'space-evenly'
+	/** @name Top */
+	'flex-start' = 'flex-start',
+	/** @name Center */
+	center = 'center',
+	/** @name Bottom */
+	'flex-end' = 'flex-end',
+	/** @name Stretch */
+	stretch = 'stretch',
+	/** @name Space Between */
+	'space-between' = 'space-between',
+	/** @name Space Around */
+	'space-around' = 'space-around',
+	/** @name Space Evenly */
+	'space-evenly' = 'space-evenly'
 }
 
 /**
@@ -74,14 +105,14 @@ export const Box: React.SFC<BoxProps> = props => {
 			style={{
 				flexBasis: props.flexBasis,
 				flexDirection: props.flexDirection,
-				flexWrap: props.wrap ? 'wrap' : 'nowrap',
+				flexWrap: props.flexWrap ? 'wrap' : 'nowrap',
 				flexGrow: props.flexGrow,
 				flexShrink: props.flexShrink,
 				alignItems:
-					props.flexDirection === FlexDirection.Horizontal ? props.vertical : props.horizontal,
+					props.flexDirection === FlexDirection.row ? props.alignItems : props.justifyContent,
 				display: props.flex ? 'flex' : 'block',
 				justifyContent:
-					props.flexDirection === FlexDirection.Horizontal ? props.horizontal : props.vertical,
+					props.flexDirection === FlexDirection.row ? props.justifyContent : props.alignItems,
 				width: props.width,
 				height: props.height,
 				backgroundColor: props.backgroundColor

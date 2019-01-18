@@ -1,10 +1,4 @@
 #!/usr/bin/env node
-import * as Sentry from '@sentry/node';
-
-Sentry.init({
-	dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
-});
-
 import * as ChildProcess from 'child_process';
 import * as uuid from 'uuid';
 import * as dargs from 'dargs';

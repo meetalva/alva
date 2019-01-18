@@ -59,13 +59,17 @@ export interface HostMessageButton {
 	cancel?: boolean;
 	id?: string;
 	label: string;
-	message?: Message.Message;
+	message?({ checked: boolean }): Message.Message | undefined;
 }
 
 export interface HostMessageOptions {
 	type?: 'info' | 'warning' | 'error';
 	message: string;
 	detail?: string;
+	checkbox?: {
+		label: string;
+		checked: boolean;
+	};
 	buttons: HostMessageButton[];
 }
 

@@ -1,9 +1,3 @@
-import * as Sentry from '@sentry/browser';
-
-Sentry.init({
-	dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
-});
-
 import { ElementArea } from './element-area';
 import { getComponents } from './get-components';
 import { getInitialData } from './get-initial-data';

@@ -43,10 +43,6 @@ export class ElectronAdapter {
 		const dataHost = this.server.dataHost;
 		const context = { dataHost, host, location: server.location };
 
-		const sentry = Sentry.init({
-			dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
-		});
-
 		Electron.app.on('window-all-closed', () => {
 			if (process.platform !== 'darwin') {
 				Electron.app.quit();
@@ -299,6 +295,13 @@ export class ElectronAdapter {
 		);
 
 		server.sender.match<M.CspReport>(MT.CspReport, m => {
+			Sentry.init({
+				enableNative: false,
+				enableUnresponsive: false,
+				defaultIntegrations: false,
+				dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
+			});
+
 			Sentry.withScope(scope => {
 				scope.setTag('report-type', 'csp');
 				scope.setLevel(Sentry.Severity.Error);
@@ -306,8 +309,24 @@ export class ElectronAdapter {
 				scope.setExtra('violated-directive', (m.payload as any)['violated-directive']);
 				scope.setExtra('blocked-uri', (m.payload as any)['blocked-uri']);
 				scope.setExtra('source-file', (m.payload as any)['source-file']);
-				scope.setExtra('reprot', JSON.stringify(m.payload));
+				scope.setExtra('report', JSON.stringify(m.payload));
 				Sentry.captureMessage('Received CSP violation report');
+			});
+		});
+
+		server.sender.match<M.UserReport>(MT.UserReport, m => {
+			Sentry.init({
+				enableNative: false,
+				enableUnresponsive: false,
+				defaultIntegrations: false,
+				dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
+			});
+
+			Sentry.withScope(scope => {
+				scope.setTag('report-type', 'user-report');
+				scope.setLevel(Sentry.Severity.Error);
+				scope.setExtra('report', JSON.stringify(m.payload));
+				Sentry.captureMessage('Received User report');
 			});
 		});
 

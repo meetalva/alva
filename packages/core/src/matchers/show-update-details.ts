@@ -18,11 +18,11 @@ export function showUpdateDetails({ host }: T.MatcherContext): T.Matcher<M.ShowU
 				{
 					label: 'Restart & Install',
 					selected: true,
-					message: {
+					message: () => ({
 						id: uuid.v4(),
 						type: M.MessageType.InstallUpdate,
 						payload: undefined
-					}
+					})
 				},
 				{
 					label: 'Later',

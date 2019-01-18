@@ -161,16 +161,18 @@ test('replaces property ids in user store references', async () => {
 		steps: []
 	});
 
-	const textElement = M.Element.from(
-		result.project.elements.find(e => e.patternId === textPattern.getId()),
-		{
-			project: M.Project.from({
-				...result.project,
-				draft: true,
-				path: ''
-			})
-		}
+	const serializedTextElement = result.project.elements.find(
+		e => e.patternId === textPattern.getId()
 	);
+	expect(serializedTextElement).not.toBeUndefined();
+
+	const textElement = M.Element.from(serializedTextElement, {
+		project: M.Project.from({
+			...result.project,
+			draft: true,
+			path: ''
+		})
+	});
 
 	const textProp = textElement
 		.getProperties()

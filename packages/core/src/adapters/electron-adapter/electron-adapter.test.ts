@@ -5,6 +5,7 @@ import * as M from '../../message';
 import * as Matchers from '../../matchers';
 
 jest.mock('mobx');
+jest.mock('@sentry/electron');
 jest.mock('./electron-updater');
 
 jest.mock('../../matchers', () => {

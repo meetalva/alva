@@ -6,7 +6,7 @@ import { MessageType as MT } from '../../message';
 import * as Menu from '../../menu';
 import * as Types from '../../types';
 import * as Url from 'url';
-import uuid = require('uuid');
+import * as uuid from 'uuid';
 
 export class ElectronMainMenu {
 	private server: Types.AlvaServer;

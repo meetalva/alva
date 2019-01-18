@@ -8,13 +8,10 @@
   "scripts": {
     "alva": "node bin/alva",
     "copy:scripts": "ncp lib/scripts nccbuild/scripts",
-    "compile:ncc": "yarn ncc build src/bin/electron.ts -e webpack -e electron -e monaco-editor -e ws -e @meetalva/loader -o nccbuild && ncp package.ncc.json nccbuild/package.json",
+    "compile:ncc": "yarn ncc build src/bin/electron.ts --source-map -e webpack -e electron -e monaco-editor -e ws -e @meetalva/loader -o nccbuild && ncp package.ncc.json nccbuild/package.json",
     "bundle": "webpack --production",
     "build:clean": "npm run clean && npm run build",
-    "build:electron": "electron-builder --project nccbuild",
-    "clean": "rm -rf build && rm -rf dist",
-    "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
-    "release": "electron-builder --publish always"
+    "build:electron": "electron-builder --project nccbuild"
   },
   "repository": {
     "type": "git",
@@ -59,6 +56,9 @@
     "@marionebl/browserfs": "2.0.0",
     "@marionebl/sander": "0.6.1",
     "@meetalva/essentials": "1.0.0",
+    "@sentry/browser": "4.3.4",
+    "@sentry/electron": "^0.14.0",
+    "@sentry/node": "^4.4.2",
     "@types/color": "^3.0.0",
     "@types/dargs": "^5.1.0",
     "@types/electron-devtools-installer": "2.0.3",
@@ -102,7 +102,6 @@
     "color": "3.0.0",
     "commondir": "1.0.1",
     "dargs": "^6.0.0",
-    "devtron": "1.4.0",
     "electron-devtools-installer": "2.2.4",
     "electron-is-dev": "0.3.0",
     "electron-log": "2.2.17",
@@ -114,6 +113,7 @@
     "feather-icons": "4.7.3",
     "fuse.js": "3.2.0",
     "get-port": "3.2.0",
+    "helmet-csp": "^2.7.1",
     "import-fresh": "2.0.0",
     "isomorphic-fetch": "2.2.1",
     "js-yaml": "3.11.0",

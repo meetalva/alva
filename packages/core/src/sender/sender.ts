@@ -8,8 +8,7 @@ import * as uuid from 'uuid';
 import { EventEmitter } from 'electron';
 import * as Types from '../types';
 
-// tslint:disable-next-line:no-eval
-const WS = typeof window !== 'undefined' ? WebSocket : (eval('require("ws")') as typeof WebSocket);
+const WS = typeof window !== 'undefined' ? WebSocket : (require('ws') as typeof WebSocket);
 
 export interface WebSocketInit {
 	endpoint: string;

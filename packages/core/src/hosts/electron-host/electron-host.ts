@@ -171,31 +171,39 @@ export class ElectronHost implements Types.Host {
 		const defaultId = opts.buttons.findIndex(
 			b => typeof b.selected !== 'undefined' && b.selected
 		);
+		return new Promise(resolve => {
+			Electron.dialog.showMessageBox(
+				{
+					type: opts.type,
+					message: opts.message,
+					detail: opts.detail,
+					cancelId,
+					defaultId,
+					checkboxLabel: opts.checkbox ? opts.checkbox.label : undefined,
+					checkboxChecked: opts.checkbox ? opts.checkbox.checked : undefined,
+					buttons: opts.buttons.map(button => button.label)
+				},
+				(result, checked) => {
+					if (typeof result === 'undefined') {
+						return resolve();
+					}
 
-		const result = Electron.dialog.showMessageBox({
-			type: opts.type,
-			message: opts.message,
-			detail: opts.detail,
-			cancelId,
-			defaultId,
-			buttons: opts.buttons.map(button => button.label)
+					const button = opts.buttons[result];
+
+					if (!button) {
+						return resolve();
+					}
+
+					const message = button && button.message ? button.message({ checked }) : undefined;
+
+					if (message && this.sender) {
+						this.sender.send(message);
+					}
+
+					return button;
+				}
+			);
 		});
-
-		if (typeof result === 'undefined') {
-			return;
-		}
-
-		const button = opts.buttons[result];
-
-		if (!button) {
-			return;
-		}
-
-		if (button.message && button && this.sender) {
-			this.sender.send(button.message);
-		}
-
-		return button;
 	}
 
 	public async showContextMenu(opts: {

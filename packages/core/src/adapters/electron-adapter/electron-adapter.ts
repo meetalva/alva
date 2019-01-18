@@ -12,6 +12,7 @@ import * as uuid from 'uuid';
 import * as Url from 'url';
 import { HostWindowVariant } from '../../types';
 import * as Mobx from 'mobx';
+import * as Sentry from '@sentry/node';
 
 const throat = require('throat');
 
@@ -292,6 +293,47 @@ export class ElectronAdapter {
 		server.sender.match<M.UseFileResponse>(MT.UseFileResponse, () =>
 			this.server.dataHost.checkProjects()
 		);
+
+		server.sender.match<M.CspReport>(MT.CspReport, m => {
+			Sentry.init({
+				enableNative: false,
+				enableUnresponsive: false,
+				defaultIntegrations: false,
+				dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
+			});
+
+			Sentry.withScope(scope => {
+				scope.setTag('report-type', 'csp');
+				scope.setLevel(Sentry.Severity.Error);
+				scope.setExtra('referrer', (m.payload as any).referrer);
+				scope.setExtra('violated-directive', (m.payload as any)['violated-directive']);
+				scope.setExtra('blocked-uri', (m.payload as any)['blocked-uri']);
+				scope.setExtra('source-file', (m.payload as any)['source-file']);
+				scope.setExtra('report', JSON.stringify(m.payload));
+				Sentry.captureMessage(`CSP violation: ${(m.payload as any)['blocked-uri']}`);
+			});
+		});
+
+		server.sender.match<M.UserReport>(MT.UserReport, m => {
+			Sentry.init({
+				enableNative: false,
+				enableUnresponsive: false,
+				defaultIntegrations: false,
+				dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
+			});
+
+			const message =
+				typeof m.payload === 'object' && typeof (m.payload as any).message === 'string'
+					? (m.payload as any).message
+					: '';
+
+			Sentry.withScope(scope => {
+				scope.setTag('report-type', 'user-report');
+				scope.setLevel(Sentry.Severity.Error);
+				scope.setExtra('report', JSON.stringify(m.payload));
+				Sentry.captureMessage(`User report: ${message}`);
+			});
+		});
 
 		Mobx.autorun(async () => {
 			server.sender.send({

@@ -11,10 +11,19 @@ export function showMessage({ host }: T.MatcherContext): T.Matcher<M.ShowMessage
 		}
 
 		const sender = app || (await host.getSender());
-		const button = await host.showMessage(m.payload);
 
-		if (button && button.message) {
-			sender.send({ ...button.message });
+		const button = await host.showMessage({
+			message: m.payload.message,
+			buttons: m.payload.buttons.map(b => ({
+				...b,
+				message: () => b.message
+			}))
+		});
+
+		const message = button && button.message ? button.message({ checked: true }) : undefined;
+
+		if (message) {
+			sender.send(message);
 		}
 	};
 }

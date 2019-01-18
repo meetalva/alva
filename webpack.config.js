@@ -9,7 +9,7 @@ const out = flags.out ? flags.out : './packages/core/lib';
 
 module.exports = {
 	mode: flags.production ? 'production' : 'development',
-	devtool: flags.production || flags.sourceMaps ? 'source-maps' : 'eval',
+	devtool: flags.production || flags.sourceMaps ? 'source-maps' : 'cheap-source-map',
 	entry: {
 		preview: require.resolve('./packages/core/src/preview/preview.ts'),
 		createWindowPreload: require.resolve('./packages/core/src/hosts/electron-host/create-window-preload.ts'),

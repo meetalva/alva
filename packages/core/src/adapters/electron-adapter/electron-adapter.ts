@@ -12,6 +12,7 @@ import * as uuid from 'uuid';
 import * as Url from 'url';
 import { HostWindowVariant } from '../../types';
 import * as Mobx from 'mobx';
+import * as RouteParser from 'route-parser';
 
 const throat = require('throat');
 
@@ -351,19 +352,20 @@ export class ElectronAdapter {
 	private async getProjectWindows(): Promise<
 		{ project: Project; window: Electron.BrowserWindow }[]
 	> {
+		const projectRoute = new RouteParser('/project/:id(/store)');
+
 		return (await Promise.all(
 			Array.from((await this.getAppWindows()).values()).map(async win => {
 				const parsed = Url.parse(win.webContents.getURL());
-				if (!parsed.pathname || !parsed.pathname.startsWith('/project')) {
+				const match = projectRoute.match(parsed.pathname || '');
+
+				if (!match || !match.id) {
 					return;
 				}
 
-				const fragments = parsed.pathname.split('/').filter(Boolean);
-				const id = fragments[fragments.length - 1];
-
 				return {
 					window: win,
-					project: await this.server.dataHost.getProject(id)
+					project: await this.server.dataHost.getProject(match.id)
 				};
 			})
 		)).filter(

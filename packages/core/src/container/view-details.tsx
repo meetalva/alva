@@ -1,8 +1,6 @@
 import { AppPane } from './app-pane';
 import * as Components from '../components';
-import { ConnectPaneContainer } from './connect-pane-container';
 import { ElementList } from './element-list';
-import { MessageType } from '../message';
 import * as MobxReact from 'mobx-react';
 import { PageListContainer } from './page-list/page-list-container';
 import { PatternListContainer } from './pattern-list';
@@ -12,7 +10,6 @@ import { ProjectLibraries } from './project-libraries';
 import * as React from 'react';
 import * as ReactLoadable from 'react-loadable';
 import * as Types from '../types';
-import * as uuid from 'uuid';
 import { ViewStore } from '../store';
 
 const PaneDevelopmentEditor = ReactLoadable({
@@ -25,25 +22,6 @@ const PaneDevelopmentEditor = ReactLoadable({
 export class ViewDetails extends React.Component {
 	public render(): JSX.Element {
 		const props = this.props as { store: ViewStore };
-
-		/**
-		 * TODO: Remove before releasing BETA
-		 * Hack for backwards compat with versions that computed js output instead of saving -
-		 * for those we have to transpile the ts payload once, thus create an editor
-		 */
-		const forceEditor =
-			!props.store.getApp().isVisible(Types.AppPane.DevelopmentPane) &&
-			typeof props.store
-				.getProject()
-				.getUserStore()
-				.getEnhancer()
-				.getJavaScript() === 'undefined';
-
-		const onlyBuiltin = props.store
-			.getPatternLibraries()
-			.every(lib => lib.getOrigin() === Types.PatternLibraryOrigin.BuiltIn);
-
-		const mayConnect = props.store.getApp().hasFileAccess();
 
 		return (
 			<React.Fragment>
@@ -106,11 +84,6 @@ export class ViewDetails extends React.Component {
 					>
 						<PaneDevelopmentEditor />
 					</AppPane>
-					{forceEditor && (
-						<div style={{ position: 'fixed', top: '100vh' }}>
-							<PaneDevelopmentEditor />
-						</div>
-					)}
 				</div>
 				{props.store.getApp().getProjectViewMode() !== Types.ProjectViewMode.Libraries && (
 					<AppPane

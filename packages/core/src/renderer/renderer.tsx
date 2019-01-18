@@ -40,6 +40,10 @@ export async function startRenderer(): Promise<void> {
 		app.setActiveView(data.view);
 	}
 
+	if (data.projectViewMode) {
+		app.setProjectViewMode(data.projectViewMode);
+	}
+
 	if (data.update) {
 		app.setUpdate(data.update);
 	}
@@ -101,6 +105,11 @@ export async function startRenderer(): Promise<void> {
 			if (project) {
 				store.setProject(project);
 				store.setActiveAppView(Types.AlvaView.PageDetail);
+
+				if (fragments[fragments.length - 1] === 'store') {
+					app.setProjectViewMode(Types.ProjectViewMode.Libraries);
+				}
+
 				store.commit();
 			}
 		}
@@ -135,12 +144,25 @@ export async function startRenderer(): Promise<void> {
 
 		if (
 			app.isActiveView(Types.AlvaView.PageDetail) &&
-			typeof store.getProject() !== 'undefined'
+			typeof store.getProject() !== 'undefined' &&
+			app.getProjectViewMode() === Types.ProjectViewMode.Design
 		) {
 			window.history.pushState(
 				app.toJSON(),
 				document.title,
 				`/project/${store.getProject().getId()}${hash}`
+			);
+		}
+
+		if (
+			app.isActiveView(Types.AlvaView.PageDetail) &&
+			typeof store.getProject() !== 'undefined' &&
+			app.getProjectViewMode() === Types.ProjectViewMode.Libraries
+		) {
+			window.history.pushState(
+				app.toJSON(),
+				document.title,
+				`/project/${store.getProject().getId()}/store${hash}`
 			);
 		}
 

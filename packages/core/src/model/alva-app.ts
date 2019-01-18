@@ -37,8 +37,7 @@ export class AlvaApp {
 	@Mobx.observable private hostType: Types.HostType;
 
 	@Mobx.observable private activeView: Types.AlvaView = Types.AlvaView.SplashScreen;
-	@Mobx.observable
-	private projectViewMode: Types.ProjectViewMode = Types.ProjectViewMode.Libraries;
+	@Mobx.observable private projectViewMode: Types.ProjectViewMode = Types.ProjectViewMode.Design;
 	@Mobx.observable private paneSelectOpen: boolean = false;
 
 	@Mobx.observable private searchTerm: string = '';

@@ -7,6 +7,7 @@ export interface RenderDocumentData {
 	payload: {
 		host: Types.HostType;
 		view: Types.AlvaView;
+		projectViewMode: Types.ProjectViewMode;
 		project?: Model.Project;
 		update?: Types.UpdateInfo;
 		projects?: { path: string; name: string; valid: boolean }[];

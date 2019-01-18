@@ -3,6 +3,7 @@ import * as Path from 'path';
 import * as RendererDocument from '../../renderer/renderer-document';
 import * as Types from '../../types';
 import * as Model from '../../model';
+import { Type } from 'js-yaml';
 
 export async function build({
 	path,
@@ -24,6 +25,7 @@ export async function build({
 		payload: {
 			host: Types.HostType.Browser,
 			view: project ? Types.AlvaView.PageDetail : Types.AlvaView.SplashScreen,
+			projectViewMode: Types.ProjectViewMode.Design,
 			project
 		}
 	});

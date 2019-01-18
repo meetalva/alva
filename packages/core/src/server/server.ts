@@ -100,6 +100,9 @@ export class AlvaServer implements Types.AlvaServer {
 		/** For debugging */
 		this.app.get('/echo/:message', (req, res) => res.send(req.params.message));
 
+		/** Project store view */
+		this.app.get('/project/:id/store', Routes.projectStoureRouteFactory(this));
+
 		/** Project edit view */
 		this.app.get('/project/:id', Routes.projectRouteFactory(this));
 

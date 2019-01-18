@@ -65,7 +65,7 @@ export function showError({ host }: T.MatcherContext): T.Matcher<M.ShowError> {
 							'',
 							'',
 							'Send us anonymized data to help making Alva better.',
-							'Reach us directly by filing a GitHub issue.'
+							'Reach us directly by creating a GitHub issue.'
 					  ]
 					: [])
 			].join('\n'),

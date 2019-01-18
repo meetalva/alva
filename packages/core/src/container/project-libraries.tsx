@@ -188,7 +188,16 @@ export class ProjectLibraries extends React.Component {
 											Connect Local Library
 										</Components.Button>
 										<Components.Space sizeBottom={SpaceSize.S} />
-										<Components.Link color={Color.Grey50}>
+										<Components.Link
+											color={Color.Grey50}
+											onClick={() => {
+												store.getSender().send({
+													type: MessageType.OpenExternalURL,
+													id: uuid.v4(),
+													payload: 'https://meetalva.io/doc/docs/guides/library.html'
+												});
+											}}
+										>
 											<div style={{ display: 'flex', alignItems: 'center' }}>
 												<ExternalLink size={Components.IconSize.XS} strokeWidth={1.5} />
 												<Components.Space sizeRight={SpaceSize.XXS} />
@@ -203,30 +212,6 @@ export class ProjectLibraries extends React.Component {
 						<Components.Space sizeTop={SpaceSize.XXXL} />
 					</div>
 				</div>
-
-				{/*
-				{store
-					.getPatternLibraries()
-					.map(library => (
-						<LibrarySettingsContainer key={library.getId()} library={library} />
-					))}
-				<Components.AddButton
-					title={
-						app.hasFileAccess()
-							? ''
-							: 'Local library connect not available without file access'
-					}
-					disabled={!app.hasFileAccess()}
-					onClick={() =>
-						app.send({
-							id: uuid.v4(),
-							payload: { library: undefined, projectId: store.getProject().getId() },
-							type: MessageType.ConnectPatternLibraryRequest
-						})
-					}
-				>
-					Connect Library
-				</Components.AddButton>*/}
 			</div>
 		);
 	}

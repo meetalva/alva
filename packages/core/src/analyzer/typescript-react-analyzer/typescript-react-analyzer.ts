@@ -102,8 +102,8 @@ export async function analyze(
 				bundle: await getBundle(),
 				name: pkg.name || 'Library',
 				description: pkg.description || '',
-				image: pkg.alva.image || '',
-				color: pkg.alva.color || '',
+				image: pkg.alva ? pkg.alva.image || '' : undefined,
+				color: pkg.alva ? pkg.alva.color || '' : undefined,
 				patterns: patterns.map(p => ({
 					path: p.path,
 					pattern: p.pattern,

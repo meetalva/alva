@@ -12,7 +12,7 @@ import * as uuid from 'uuid';
 import * as Url from 'url';
 import { HostWindowVariant } from '../../types';
 import * as Mobx from 'mobx';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/node';
 
 const throat = require('throat');
 

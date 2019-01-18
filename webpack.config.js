@@ -46,6 +46,7 @@ module.exports = {
 		new Webpack.EnvironmentPlugin(['NODE_ENV'])
 	],
 	externals: {
+		ws: 'commonjs ws',
 		electron: 'commonjs electron',
 		mobx: 'Mobx'
 	},

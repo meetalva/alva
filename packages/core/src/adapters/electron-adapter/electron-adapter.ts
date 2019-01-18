@@ -310,7 +310,7 @@ export class ElectronAdapter {
 				scope.setExtra('blocked-uri', (m.payload as any)['blocked-uri']);
 				scope.setExtra('source-file', (m.payload as any)['source-file']);
 				scope.setExtra('report', JSON.stringify(m.payload));
-				Sentry.captureMessage('Received CSP violation report');
+				Sentry.captureMessage(`CSP violation: ${(m.payload as any)['blocked-uri']}`);
 			});
 		});
 
@@ -322,11 +322,16 @@ export class ElectronAdapter {
 				dsn: 'https://32e87a490c1d47d4af05741996b8c5fa@sentry.io/1360222'
 			});
 
+			const message =
+				typeof m.payload === 'object' && typeof (m.payload as any).message === 'string'
+					? (m.payload as any).message
+					: '';
+
 			Sentry.withScope(scope => {
 				scope.setTag('report-type', 'user-report');
 				scope.setLevel(Sentry.Severity.Error);
 				scope.setExtra('report', JSON.stringify(m.payload));
-				Sentry.captureMessage('Received User report');
+				Sentry.captureMessage(`User report: ${message}`);
 			});
 		});
 

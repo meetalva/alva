@@ -20,7 +20,7 @@ export function showMessage({ host }: T.MatcherContext): T.Matcher<M.ShowMessage
 			}))
 		});
 
-		const message = button.message ? button.message({ checked: true }) : undefined;
+		const message = button && button.message ? button.message({ checked: true }) : undefined;
 
 		if (message) {
 			sender.send(message);

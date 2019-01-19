@@ -3,9 +3,8 @@ module.exports = {
 	preset: "ts-jest",
 	testMatch: ["**/*.test.ts", "**/*.test.tsx"],
 	roots: [
-		"packages/core/",
+		"packages/core",
 		"packages/essentials",
-		"packages/loader",
 		"packages/site",
 		"packages/tools"
 	],

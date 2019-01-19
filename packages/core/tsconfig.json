@@ -2,9 +2,6 @@
 	"references": [
 		{
 			"path": "../essentials"
-		},
-		{
-			"path": "../loader"
 		}
 	],
 	"compilerOptions": {

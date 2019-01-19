@@ -1,11 +1,9 @@
 import { compilerSafeName } from './compiler-safe-name';
 import * as Path from 'path';
-import * as QueryString from 'querystring';
 import * as webpack from 'webpack';
+import { ufs } from 'unionfs';
 import * as Fs from 'fs';
-import * as resolve from 'resolve';
 
-// memory-fs typings on @types are faulty
 const MemoryFs = require('memory-fs');
 
 export interface CompilerPattern {
@@ -17,26 +15,21 @@ export function createCompiler(
 	patterns: CompilerPattern[],
 	options: { id: string; cwd: string; infrastructure: boolean }
 ): webpack.Compiler {
-	const entry: { [name: string]: string } = {};
+	const inputFs = new MemoryFs();
+	inputFs.mkdirpSync(options.cwd);
 
-	const components = patterns.reduce((acc, pattern) => {
-		(acc as any)[compilerSafeName(pattern.id)] = `./${Path.relative(options.cwd, pattern.path)
-			.split(Path.sep)
-			.join('/')}`;
-		return acc;
-	}, {});
+	const layeredInputFileSystem = ufs.use(inputFs).use(Fs);
+	const outputFs = new MemoryFs();
 
-	const loaderPath = resolve.sync('meetalva-loader');
-
-	entry[options.id] = `${loaderPath}?${QueryString.stringify({
-		cwd: options.cwd,
-		components: JSON.stringify(components)
-	})}!`;
+	const entryFile = createEntryFile(patterns);
+	inputFs.writeFileSync(inputFs.join(options.cwd, `/${options.id}.js`), entryFile);
 
 	const compiler = webpack({
 		mode: 'development',
 		context: options.cwd,
-		entry,
+		entry: {
+			[options.id]: inputFs.join(options.cwd, `/${options.id}.js`)
+		},
 		output: {
 			filename: '[name].js',
 			library: '[name]',
@@ -45,6 +38,24 @@ export function createCompiler(
 		}
 	});
 
-	compiler.outputFileSystem = new MemoryFs() as any;
+	compiler.inputFileSystem = layeredInputFileSystem as any;
+	compiler.outputFileSystem = outputFs;
+
 	return compiler;
+}
+
+function createEntryFile(components: CompilerPattern[]): string {
+	return components
+		.map(pattern => ({
+			id: compilerSafeName(pattern.id),
+			path: pattern.path.split(Path.sep).join('/')
+		}))
+		.reduce<string[]>(
+			(entryFile, pattern) => [
+				...entryFile,
+				`module.exports['${pattern.id}'] = require('${pattern.path}')`
+			],
+			[]
+		)
+		.join(';\n');
 }

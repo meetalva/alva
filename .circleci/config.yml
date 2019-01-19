@@ -119,7 +119,6 @@ jobs:
           paths:
               - packages/core/lib
               - packages/essentials/lib
-              - packages/loader/lib
               - packages/site/lib
 
   ncc:

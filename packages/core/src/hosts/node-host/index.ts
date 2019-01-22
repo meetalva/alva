@@ -5,6 +5,7 @@ import * as Util from 'util';
 import * as Types from '../../types';
 import * as getPort from 'get-port';
 import * as Model from '../../model';
+import * as execa from 'execa';
 
 export class NodeHost implements Types.Host {
 	public type = Types.HostType.Node;

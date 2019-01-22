@@ -25,12 +25,14 @@ export interface InputButtonProps {
 	className?: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	onSubmit?: React.FormEventHandler<HTMLElement>;
 	placeholder?: string;
 	value?: string;
+	isValid: () => boolean;
 }
 
 export const InputButton: React.SFC<InputButtonProps> = props => (
-	<StyledWrapper>
+	<StyledWrapper as="form" onSubmit={props.onSubmit}>
 		<StyledInput
 			onChange={props.onChange}
 			onBlur={props.onBlur}
@@ -38,6 +40,12 @@ export const InputButton: React.SFC<InputButtonProps> = props => (
 			value={props.value || ''}
 			placeholder={props.placeholder}
 		/>
-		<StyledButton size={ButtonSize.Medium}>{props.children}</StyledButton>
+		<StyledButton
+			type="submit"
+			disabledAppearance={props.isValid ? !props.isValid() : true}
+			size={ButtonSize.Medium}
+		>
+			{props.children}
+		</StyledButton>
 	</StyledWrapper>
 );

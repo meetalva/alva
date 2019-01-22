@@ -59,6 +59,8 @@ export function connectPatternLibrary({
 		const analysisResult = await performAnalysis(path, { previousLibrary });
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
+			host.log(analysisResult.error.message);
+
 			app.send({
 				type: MessageType.ShowError,
 				id: uuid.v4(),

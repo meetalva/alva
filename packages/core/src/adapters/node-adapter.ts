@@ -54,6 +54,10 @@ export class NodeAdapter {
 
 		sender.match<M.SaveResult>(MT.SaveResult, () => this.dataHost.checkProjects());
 		sender.match<M.UseFileResponse>(MT.UseFileResponse, () => this.dataHost.checkProjects());
+		sender.match<M.ConnectNpmPatternLibraryRequest>(
+			MT.ConnectNpmPatternLibraryRequest,
+			Matchers.connectNpmPatternLibrary(context)
+		);
 
 		Mobx.autorun(async () => {
 			sender.send({

@@ -6,7 +6,7 @@ import { PageListContainer } from './page-list/page-list-container';
 import { PatternListContainer } from './pattern-list';
 import { PreviewPaneWrapper } from './preview-pane-wrapper';
 import { PropertyListContainer } from './property-list';
-import { ProjectLibraries } from './project-libraries';
+import { LibraryStoreContainer } from './library-store-container';
 import * as React from 'react';
 import * as ReactLoadable from 'react-loadable';
 import * as Types from '../types';
@@ -72,7 +72,7 @@ export class ViewDetails extends React.Component {
 				)}
 				<div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column' }}>
 					{props.store.getApp().getProjectViewMode() === Types.ProjectViewMode.Libraries ? (
-						<ProjectLibraries />
+						<LibraryStoreContainer />
 					) : (
 						<PreviewPaneWrapper isDragging={props.store.getDragging()} key="center" />
 					)}

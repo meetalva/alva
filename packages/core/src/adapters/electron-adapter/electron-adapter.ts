@@ -79,6 +79,10 @@ export class ElectronAdapter {
 			}
 		});
 
+		sender.match<M.ConnectNpmPatternLibraryRequest>(
+			MT.ConnectNpmPatternLibraryRequest,
+			Matchers.connectNpmPatternLibrary(context)
+		);
 		sender.match<M.ConnectPatternLibraryRequest>(
 			MT.ConnectPatternLibraryRequest,
 			Matchers.connectPatternLibrary(context)

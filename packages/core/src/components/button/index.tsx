@@ -6,6 +6,7 @@ import styled from 'styled-components';
 export interface ButtonProps {
 	children?: React.ReactNode;
 	disabled?: boolean;
+	disabledAppearance?: boolean;
 	/** @description For dark backgrounds */
 	inverted?: boolean;
 	onClick?: React.MouseEventHandler<HTMLElement>;
@@ -19,6 +20,7 @@ export interface ButtonProps {
 	as?: keyof JSX.IntrinsicElements;
 	style?: React.CSSProperties;
 	className?: string;
+	type?: 'submit' | 'button';
 }
 
 export enum ButtonOrder {
@@ -96,19 +98,24 @@ const SizedBaseButton = styled(DecoratedBaseButton)`
 	flex-grow: ${BUTTON_GROW};
 `;
 
+const primaryFill = props =>
+	props.disabled || props.disabledAppearance ? Color.Grey60 : Color.Blue20;
+const primaryFillActive = props =>
+	props.disabled || props.disabledAppearance ? Color.Grey60 : Color.Blue;
+
 const StyledPrimaryButton = styled(SizedBaseButton)`
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	align-content: center;
 	text-align: center;
-	background: ${props => (props.inverted ? Color.White : Color.Blue20)};
+	background: ${props => (props.inverted ? Color.White : primaryFill(props))};
 	border: none;
-	color: ${props => (props.inverted ? Color.Blue20 : Color.White)};
+	color: ${props => (props.inverted ? primaryFill(props) : Color.White)};
 
 	&:active {
-		background: ${props => (props.inverted ? '' : Color.Blue)};
-		border-color: ${props => (props.inverted ? '' : Color.Blue)};
+		background: ${props => (props.inverted ? '' : primaryFillActive(props))};
+		border-color: ${props => (props.inverted ? '' : primaryFillActive(props))};
 		opacity: ${props => (props.inverted ? 0.8 : 1)};
 	}
 `;
@@ -167,17 +174,18 @@ export const Button: React.StatelessComponent<ButtonProps> = props => {
 
 	return (
 		<Component
+			as={props.as}
+			buttonRole={props.buttonRole}
+			className={props.className}
+			disabled={props.disabled}
+			disabledAppearance={props.disabledAppearance}
+			inverted={props.inverted}
 			onClick={props.onClick}
 			onDoubleClick={props.onDoubleClick}
-			textColor={props.textColor}
 			order={props.order}
-			buttonRole={props.buttonRole}
 			size={props.size}
-			inverted={props.inverted}
 			style={{ color: props.textColor, ...props.style }}
-			disabled={props.disabled}
-			as={props.as}
-			className={props.className}
+			textColor={props.textColor}
 		>
 			{props.children}
 		</Component>

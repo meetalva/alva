@@ -42,7 +42,9 @@ module.exports = {
 		})
 	],
 	externals: {
-		mobx: 'Mobx'
+		mobx: 'Mobx',
+		osenv: false,
+		child_process: false
 	},
 	output: {
 		filename: '[name].js',

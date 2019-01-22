@@ -8,7 +8,8 @@
   "scripts": {
     "alva": "node bin/alva",
     "copy:scripts": "ncp lib/scripts nccbuild/scripts",
-    "compile:ncc": "yarn ncc build src/bin/electron.ts -e webpack -e electron -e monaco-editor -e ws -e @meetalva/loader -o nccbuild && ncp package.ncc.json nccbuild/package.json",
+    "copy:vendor": "ncp vendor nccbuild/vendor",
+    "compile:ncc": "yarn ncc build src/bin/electron.ts -e webpack -e electron -e monaco-editor -e ws -o nccbuild && ncp package.ncc.json nccbuild/package.json",
     "bundle": "webpack --production",
     "build:clean": "npm run clean && npm run build",
     "build:electron": "electron-builder --project nccbuild",
@@ -79,6 +80,7 @@
     "@types/mock-fs": "3.6.30",
     "@types/node": "^10.12.18",
     "@types/node-fetch": "2.1.1",
+    "@types/npm-package-arg": "^6.1.0",
     "@types/object-path": "0.9.29",
     "@types/opn": "5.1.0",
     "@types/react": "16.7.18",
@@ -131,6 +133,8 @@
     "mobx-utils": "5.1.0",
     "mock-fs": "4.4.2",
     "monaco-editor": "0.13.1",
+    "npm-package-arg": "^6.1.0",
+    "pacote": "^9.4.0",
     "path-is-inside": "^1.0.2",
     "pkg-dir": "3.0.0",
     "precinct": "5.0.1",
@@ -148,6 +152,7 @@
     "read-pkg": "3.0.0",
     "request-idle-callback": "1.0.2",
     "resolve": "1.8.1",
+    "resolve-pkg": "^1.0.0",
     "route-parser": "^0.0.5",
     "semver": "^5.6.0",
     "serve-handler": "5.0.7",
@@ -163,9 +168,11 @@
     "url-search-params": "0.10.0",
     "util.promisify": "1.0.0",
     "uuid": "3.2.1",
+    "validate-npm-package-name": "^3.0.0",
     "webpack": "^4.28.2",
     "ws": "5.1.1",
-    "yargs-parser": "10.1.0"
+    "yargs-parser": "10.1.0",
+    "yarn": "^1.13.0"
   },
   "homepage": "https://meetalva.github.io/"
 }

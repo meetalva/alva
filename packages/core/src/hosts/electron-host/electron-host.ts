@@ -10,9 +10,13 @@ import { AlvaApp } from '../../model';
 import * as Mobx from 'mobx';
 import * as Message from '../../message';
 import * as ElectronLog from 'electron-log';
+import * as execa from 'execa';
+import { getPackage } from '../../analyzer/get-package';
 
 ElectronLog.transports.console.level = 'info';
 ElectronLog.transports.file.level = 'silly';
+
+const YARN = Path.join(__dirname, '..', '..', '..', 'vendor', 'yarn.js');
 
 export interface ElectronHostInit {
 	process: NodeJS.Process;

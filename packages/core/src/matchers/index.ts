@@ -1,4 +1,5 @@
 export * from './add-app';
+export * from './connect-npm-pattern-library-request';
 export * from './connect-pattern-library-request';
 export * from './update-pattern-library-request';
 export * from './copy';

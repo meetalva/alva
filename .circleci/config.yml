@@ -1,6 +1,24 @@
 version: 2.1
 
 commands:
+  build_electron:
+    description: "Perform an electron-build of @meetalva/core"
+    parameters:
+        args:
+          type: string
+    steps:
+      - run:
+          name: Copy Scripts
+          command: lerna run copy:scripts --stream
+
+      - run:
+          name: Copy Vendors
+          command: lerna run copy:vendor --stream
+
+      - run:
+          name: Publish Release
+          command: alva-release --project packages/core/nccbuild << parameters.args >>
+
   setup:
     description: "Set up the repo to work on"
     parameters:
@@ -218,13 +236,8 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run:
-          name: Copy Scripts
-          command: lerna run copy:scripts
-
-      - run:
-          name: Publish Release
-          command: alva-release --project packages/core/nccbuild
+      - build_electron:
+          args: ''
 
   linux:
     docker:
@@ -243,9 +256,8 @@ jobs:
           name: Copy Scripts
           command: lerna run copy:scripts
 
-      - run:
-          name: Publish Release
-          command: alva-release --project packages/core/nccbuild
+      - build_electron:
+          args: ''
 
   windows:
     docker:
@@ -260,13 +272,8 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run:
-          name: Copy Scripts
-          command: lerna run copy:scripts
-
-      - run:
-          name: Publish Release
-          command: alva-release --project packages/core/nccbuild -- --win
+      - build_electron:
+          args: '-- --win'
 
   site:
     docker:

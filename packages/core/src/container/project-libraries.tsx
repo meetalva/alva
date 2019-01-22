@@ -8,7 +8,7 @@ import { Color } from '../components/colors';
 import { MessageType } from '../message';
 import * as uuid from 'uuid';
 import { ExternalLink } from 'react-feather';
-import { PatternLibraryState } from '../types';
+import * as T from '../types';
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -75,12 +75,12 @@ export class ProjectLibraries extends React.Component {
 								display: 'flex'
 							}}
 						>
-							<Components.LibraryBox
+							{/* <Components.LibraryBox
 								color="#F4777A"
 								image="http://zwainhaus.com/artanddesign/landscape_03.jpg"
 								name="Material Design"
 								description="A visual language that synthesizes the classic principles of good design with the innovation of technology and science."
-								state={PatternLibraryState.Connecting}
+								state={PatternLibraryState.Pristine}
 								install={
 									<Components.Button
 										size={Components.ButtonSize.Medium}
@@ -111,7 +111,7 @@ export class ProjectLibraries extends React.Component {
 									</Components.Button>
 								}
 								version="v1"
-							/>
+							/> */}
 						</div>
 
 						<Components.Space sizeTop={SpaceSize.XXXL} />
@@ -152,61 +152,67 @@ export class ProjectLibraries extends React.Component {
 								</Components.Space>
 							</div>
 							<div style={{ width: '50%', flexShrink: 0 }}>
-								<Components.Space size={SpaceSize.XS}>
-									<div style={{ maxWidth: '360px' }}>
-										<Components.Headline
-											order={4}
-											bold
-											textColor={Components.Color.Grey10}
-										>
-											Install Local Library
-										</Components.Headline>
-										<Components.Space sizeBottom={SpaceSize.XS} />
-										<Components.Copy
-											textColor={Color.Grey36}
-											size={Components.CopySize.M}
-										>
-											Select a library running on your local computer. Build it and
-											connect the package.json in the library folder.
-										</Components.Copy>
-										<Components.Space sizeBottom={SpaceSize.M} />
+								{store.getApp().isHostType(T.HostType.Electron) && (
+									<Components.Space size={SpaceSize.XS}>
+										<div style={{ maxWidth: '360px' }}>
+											<Components.Headline
+												order={4}
+												bold
+												textColor={Components.Color.Grey10}
+											>
+												Install Local Library
+											</Components.Headline>
+											<Components.Space sizeBottom={SpaceSize.XS} />
+											<Components.Copy
+												textColor={Color.Grey36}
+												size={Components.CopySize.M}
+											>
+												Select a library running on your local computer. Build it and
+												connect the package.json in the library folder.
+											</Components.Copy>
+											<Components.Space sizeBottom={SpaceSize.M} />
 
-										<Components.Button
-											order={Components.ButtonOrder.Primary}
-											size={Components.ButtonSize.Medium}
-											onClick={() =>
-												app.send({
-													id: uuid.v4(),
-													payload: {
-														library: undefined,
-														projectId: store.getProject().getId()
-													},
-													type: MessageType.ConnectPatternLibraryRequest
-												})
-											}
-										>
-											Connect Local Library
-										</Components.Button>
-										<Components.Space sizeBottom={SpaceSize.S} />
-										<Components.Link
-											color={Color.Grey50}
-											onClick={() => {
-												store.getSender().send({
-													type: MessageType.OpenExternalURL,
-													id: uuid.v4(),
-													payload: 'https://meetalva.io/doc/docs/guides/library.html'
-												});
-											}}
-										>
-											<div style={{ display: 'flex', alignItems: 'center' }}>
-												<ExternalLink size={Components.IconSize.XS} strokeWidth={1.5} />
-												<Components.Space sizeRight={SpaceSize.XXS} />
-												See Guide
-											</div>
-										</Components.Link>
-										<Components.Space sizeTop={SpaceSize.XXL} />
-									</div>
-								</Components.Space>
+											<Components.Button
+												order={Components.ButtonOrder.Primary}
+												size={Components.ButtonSize.Medium}
+												onClick={() =>
+													app.send({
+														id: uuid.v4(),
+														payload: {
+															library: undefined,
+															projectId: store.getProject().getId()
+														},
+														type: MessageType.ConnectPatternLibraryRequest
+													})
+												}
+											>
+												Connect Local Library
+											</Components.Button>
+											<Components.Space sizeBottom={SpaceSize.S} />
+											<Components.Link
+												color={Color.Grey50}
+												onClick={() => {
+													store.getSender().send({
+														type: MessageType.OpenExternalURL,
+														id: uuid.v4(),
+														payload:
+															'https://meetalva.io/doc/docs/guides/library.html'
+													});
+												}}
+											>
+												<div style={{ display: 'flex', alignItems: 'center' }}>
+													<ExternalLink
+														size={Components.IconSize.XS}
+														strokeWidth={1.5}
+													/>
+													<Components.Space sizeRight={SpaceSize.XXS} />
+													See Guide
+												</div>
+											</Components.Link>
+											<Components.Space sizeTop={SpaceSize.XXL} />
+										</div>
+									</Components.Space>
+								)}
 							</div>
 						</div>
 						<Components.Space sizeTop={SpaceSize.XXXL} />

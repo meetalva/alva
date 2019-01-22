@@ -1,6 +1,6 @@
 import { Sender } from '../sender';
 import { isEqual } from 'lodash';
-import { MessageType, ProjectUpdate } from '../message';
+import { MessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
 import * as Types from '../types';
@@ -12,6 +12,7 @@ export interface ViewStoreInit {
 	app: Model.AlvaApp;
 	sender: Sender;
 	history: Model.EditHistory;
+	libraryStore: Model.LibraryStore;
 }
 
 export enum ClipBoardType {
@@ -51,6 +52,8 @@ export class ViewStore {
 	@Mobx.observable private clipboardItem?: ClipBoardItem;
 
 	private editHistory: Model.EditHistory;
+
+	private libraryStore: Model.LibraryStore;
 
 	@Mobx.observable private metaDown: boolean = false;
 
@@ -106,6 +109,7 @@ export class ViewStore {
 		this.app = init.app;
 		this.editHistory = init.history;
 		this.sender = init.sender;
+		this.libraryStore = init.libraryStore;
 	}
 
 	@Mobx.action

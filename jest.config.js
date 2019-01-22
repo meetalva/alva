@@ -6,7 +6,8 @@ module.exports = {
 		"packages/core",
 		"packages/essentials",
 		"packages/site",
-		"packages/tools"
+		"packages/tools",
+		"packages/unipm"
 	],
 	testPathIgnorePatterns: [
 		"node_modules",

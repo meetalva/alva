@@ -43,7 +43,8 @@ function ServerApp({ sender }: { sender: Types.Sender }) {
 	const store = new Store.ViewStore({
 		app,
 		history,
-		sender: sender as any
+		sender: sender as any,
+		libraryStore: new Model.LibraryStore()
 	});
 
 	return (

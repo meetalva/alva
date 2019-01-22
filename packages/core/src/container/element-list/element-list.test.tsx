@@ -22,8 +22,9 @@ test('un-highlight highlighted element content onDragLeave', () => {
 	const sender = new Sender({ endpoint: '' });
 	const app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender });
 	const history = new Model.EditHistory();
+	const libraryStore = new Model.LibraryStore();
 
-	const store = new ViewStore({ app, history, sender });
+	const store = new ViewStore({ app, history, sender, libraryStore });
 
 	const project = Model.Project.create({
 		name: '',

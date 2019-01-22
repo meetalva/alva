@@ -3,6 +3,7 @@ export * from './edit-history';
 export * from './element';
 export * from './element-action';
 export * from './page';
+export * from './library-store';
 export * from './pattern-library';
 export * from './pattern-property';
 export * from './pattern';

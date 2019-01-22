@@ -28,6 +28,7 @@ commands:
             - node_modules
             - packages/core/node_modules
             - packages/tools/node_modules
+            - packages/unipm/node_modules
           key: v5-dependencies-<< parameters.key >>-{{ checksum "yarn.lock" }}
 
       - run:
@@ -63,6 +64,7 @@ jobs:
             - node_modules
             - packages/core/node_modules
             - packages/tools/node_modules
+            - packages/unipm/node_modules
           key: v5-dependencies-macos-{{ checksum "yarn.lock" }}
 
       - run:

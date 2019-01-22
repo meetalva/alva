@@ -50,8 +50,10 @@ export async function startRenderer(): Promise<void> {
 
 	app.setSender(sender);
 
+	const libraryStore = new Model.LibraryStore();
+
 	history = new Model.EditHistory();
-	store = new ViewStore({ app, history, sender });
+	store = new ViewStore({ app, history, sender, libraryStore });
 
 	store.setServerPort(parseInt(window.location.port, 10));
 

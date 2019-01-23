@@ -70,6 +70,10 @@ export async function analyze(
 		const patterns = await analyzePatterns({ pkgPath, options, pkg, cwd });
 
 		const getBundle = async () => {
+			if (patterns.length === 0) {
+				return '';
+			}
+
 			const compiler = await createPatternCompiler(patterns, { cwd, id });
 			const stats = await Util.promisify(compiler.run).bind(compiler)();
 
@@ -318,6 +322,7 @@ async function findPatternCandidates({
 	pkg: any;
 }): Promise<PatternCandidate[]> {
 	const entry = Path.join(cwd, getTypingsEntry(pkg));
+
 	const declarationsList = getImportsFromPath(entry, {
 		extensions: ['.d.ts'],
 		deep: true,

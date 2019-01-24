@@ -158,7 +158,7 @@ export class LibraryStoreContainer extends React.Component {
 												})
 											}
 										>
-											Connect Local Library
+											Install Local Library
 										</Components.Button>
 									)}
 								</Flex>
@@ -282,7 +282,7 @@ export class LibraryStoreContainer extends React.Component {
 												size={Components.CopySize.M}
 											>
 												Select a library running on your local computer. Build it and
-												connect the package.json in the library folder.
+												select the package.json in the library folder.
 											</Components.Copy>
 											<Components.Space sizeBottom={SpaceSize.M} />
 											<Components.Button
@@ -299,7 +299,7 @@ export class LibraryStoreContainer extends React.Component {
 													})
 												}
 											>
-												Connect Local Library
+												Install Local Library
 											</Components.Button>
 											<Components.Space sizeBottom={SpaceSize.S} />
 											<Components.Link

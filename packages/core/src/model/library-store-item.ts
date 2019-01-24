@@ -118,7 +118,10 @@ export class LibraryStoreItem {
 	}
 
 	@Mobx.action
-	public connect(sender: { send: T.Sender['send'] }, data: { project: Project }): void {
+	public connect(
+		sender: { send: T.Sender['send']; transaction: T.Sender['transaction'] },
+		data: { project: Project }
+	): void {
 		if (
 			this.state === LibraryStoreItemState.Listed &&
 			this.installType === T.PatternLibraryInstallType.Remote

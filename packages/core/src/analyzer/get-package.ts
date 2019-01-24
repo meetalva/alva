@@ -1,9 +1,9 @@
 import * as npa from 'npm-package-arg';
 import * as Fs from 'fs';
 import * as Path from 'path';
-import * as Util from 'util';
 import * as execa from 'execa';
 import * as semver from 'semver';
+import { mkdirp } from '../alva-util';
 
 const pacote = require('pacote');
 const resolvePkg = require('resolve-pkg');
@@ -51,7 +51,7 @@ export async function getPackage(
 		const yarn = getVendor('yarn.js');
 		const cwd = Path.join(opts.cwd, id);
 
-		await mkdirp(Path.join(cwd));
+		await mkdirp(Path.join(cwd), { fs: Fs });
 		await execa(yarn, ['add', id, ...ARGS], { cwd, stdio: 'inherit' });
 
 		return {
@@ -62,19 +62,6 @@ export async function getPackage(
 		};
 	} catch (err) {
 		return err;
-	}
-}
-
-async function mkdirp(dir: string): Promise<void> {
-	try {
-		const mkdir = Util.promisify(Fs.mkdir);
-		await mkdir(dir, { recursive: true });
-	} catch (err) {
-		if (err.code === 'EEXIST') {
-			return;
-		}
-
-		throw err;
 	}
 }
 

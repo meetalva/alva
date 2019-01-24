@@ -25,7 +25,7 @@ async function main() {
 
 	const cwd = flags.cwd || process.cwd();
 	const path = Path.resolve(cwd, flags.in);
-	const outPath = flags.out ? Path.resolve(cwd, flags.out) : undefined;
+	const outPath = flags.out ? Path.resolve(cwd, flags.out) : '';
 
 	const previousLibrary = Fs.existsSync(outPath)
 		? Model.PatternLibrary.from(

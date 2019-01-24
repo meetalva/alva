@@ -1,9 +1,9 @@
 import { compilerSafeName } from './compiler-safe-name';
 import * as Path from 'path';
 import * as webpack from 'webpack';
-import { ufs } from 'unionfs';
 import * as Fs from 'fs';
 
+const { ufs } = require('unionfs');
 const MemoryFs = require('memory-fs');
 
 export interface CompilerPattern {

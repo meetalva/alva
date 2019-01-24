@@ -41,6 +41,11 @@ export async function getPackage(
 		}
 
 		const version = await getVersion(parsed);
+
+		if (!version) {
+			return new Error(`could not determine version for ${raw}`);
+		}
+
 		const id = [parsed.name, version].join('@');
 
 		const yarn = getVendor('yarn.js');
@@ -53,7 +58,7 @@ export async function getPackage(
 			cwd,
 			path: await resolvePkg(`${parsed.name}/package.json`, { cwd }),
 			version,
-			name: parsed.name
+			name: parsed.name!
 		};
 	} catch (err) {
 		return err;
@@ -73,15 +78,15 @@ async function mkdirp(dir: string): Promise<void> {
 	}
 }
 
-async function getVersion(name: npa.Result): Promise<string> {
+async function getVersion(name: npa.Result): Promise<string | undefined> {
 	if (name.type === 'version') {
-		return name.fetchSpec;
+		return name.fetchSpec!;
 	}
 
 	const packument = await pacote.packument(name.name);
 
 	if (name.type === 'tag') {
-		const version = packument['dist-tags'][name.fetchSpec];
+		const version = packument['dist-tags'][name.fetchSpec!];
 
 		if (typeof version !== 'string') {
 			throw new Error(`Could not determine version of ${name.name} for tag ${name.fetchSpec}`);
@@ -92,7 +97,8 @@ async function getVersion(name: npa.Result): Promise<string> {
 
 	if (name.type === 'range') {
 		const versions = Object.keys(packument.versions).sort(semver.compare);
-		const version = semver.maxSatisfying(versions, name.fetchSpec);
+		const spec = typeof name.fetchSpec === 'string' ? name.fetchSpec : 'latest';
+		const version = semver.maxSatisfying(versions, spec);
 
 		if (typeof version !== 'string') {
 			throw new Error(
@@ -107,5 +113,11 @@ async function getVersion(name: npa.Result): Promise<string> {
 function getVendor(name: string): string {
 	const prodVendor = Path.join(__dirname, 'vendor', name);
 	const devVendor = Path.join(__dirname, '..', '..', 'vendor', name);
-	return [prodVendor, devVendor].find(Fs.existsSync);
+	const found = [prodVendor, devVendor].find(Fs.existsSync);
+
+	if (!found) {
+		throw new Error(`Could not find vendor directory`);
+	}
+
+	return found;
 }

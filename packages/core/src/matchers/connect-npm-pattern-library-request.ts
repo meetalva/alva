@@ -24,7 +24,9 @@ export function connectNpmPatternLibrary({
 			return;
 		}
 
-		const previousLibrary = project.getPatternLibraryById(m.payload.libraryId);
+		const previousLibrary = m.payload.libraryId
+			? project.getPatternLibraryById(m.payload.libraryId)
+			: undefined;
 
 		if (m.payload.libraryId && !previousLibrary) {
 			host.log(`connectNpmPatternLibrary: could not determine previous library`);

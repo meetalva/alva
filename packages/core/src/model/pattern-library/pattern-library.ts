@@ -362,7 +362,7 @@ export class PatternLibrary {
 	}
 
 	public getPackageName(): string {
-		return (this.packageFile as { name: string }).name;
+		return this.packageFile ? (this.packageFile as { name: string }).name : this.name;
 	}
 
 	public getVersion(): string {

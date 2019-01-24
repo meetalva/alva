@@ -16,7 +16,7 @@ const LibraryBoxDemo: React.StatelessComponent<void> = (): JSX.Element => (
 				<Button
 					order={ButtonOrder.Primary}
 					size={ButtonSize.Medium}
-					textColor={Color.Grey20}
+					color={Color.Grey20}
 					inverted
 				>
 					Already installed

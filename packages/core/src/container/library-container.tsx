@@ -44,7 +44,7 @@ export class LibraryContainer extends React.Component<LibrarySettingsContainerPr
 							disabled={props.library.getState() === Types.PatternLibraryState.Connecting}
 							size={ButtonSize.Medium}
 							inverted
-							textColor={Components.Color.Grey50}
+							color={Components.Color.Grey50}
 							onClick={() => {
 								if (props.library.getState() === Types.PatternLibraryState.Connecting) {
 									return;
@@ -64,7 +64,7 @@ export class LibraryContainer extends React.Component<LibrarySettingsContainerPr
 								disabled={props.library.getState() === Types.PatternLibraryState.Connecting}
 								size={ButtonSize.Medium}
 								inverted
-								textColor={Components.Color.Grey50}
+								color={Components.Color.Grey50}
 								onClick={() => {
 									if (props.library.getState() === Types.PatternLibraryState.Connecting) {
 										return;

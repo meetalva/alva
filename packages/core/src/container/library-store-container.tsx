@@ -71,17 +71,24 @@ export class LibraryStoreContainer extends React.Component {
 
 		Mobx.autorun(() => {
 			if (this.submittedValue && this.isValidPackage) {
-				const submittedValue = this.submittedValue;
+				const fragments = this.submittedValue.split('@');
+				const name = (fragments.length >= 3 ? fragments.slice(0, -1) : fragments).join('@');
+				const existing = store.libraryStore.getItemByPackageName(name);
+
 				this.submittedValue = '';
 
-				app.send({
-					id: uuid.v4(),
-					type: MT.ConnectNpmPatternLibraryRequest,
-					payload: {
-						npmId: submittedValue,
-						projectId: store.getProject().getId()
-					}
-				});
+				if (existing) {
+					existing.connect(store.getApp(), { project: store.getProject() });
+				} else {
+					app.send({
+						id: uuid.v4(),
+						type: MT.ConnectNpmPatternLibraryRequest,
+						payload: {
+							npmId: this.submittedValue,
+							projectId: store.getProject().getId()
+						}
+					});
+				}
 			}
 		});
 	}

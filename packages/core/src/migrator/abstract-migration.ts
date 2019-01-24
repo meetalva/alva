@@ -15,8 +15,9 @@ export abstract class AbstractMigration<
 	T extends Types.MigratableProject,
 	V extends Types.MigratableProject
 > {
-	public readonly inputVersion: number;
-	public readonly outputVersion: number;
+	public readonly inputVersion: number = 0;
+	public readonly outputVersion: number = 0;
+
 	public async transform(input: MigrationItem<T>): Promise<MigrationItem<V>> {
 		throw new Error(
 			`Migration.transform is not implemented for ${this.inputVersion} => ${this.outputVersion}`

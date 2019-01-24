@@ -16,7 +16,7 @@ export interface ButtonProps {
 	buttonRole?: ButtonRole;
 	/** @description Spatial weight @default */
 	size?: ButtonSize;
-	textColor?: string;
+	color?: string;
 	as?: keyof JSX.IntrinsicElements;
 	style?: React.CSSProperties;
 	className?: string;
@@ -98,12 +98,15 @@ const SizedBaseButton = styled(DecoratedBaseButton)`
 	flex-grow: ${BUTTON_GROW};
 `;
 
-const primaryFill = props =>
+const primaryFill = (props: ButtonProps) =>
 	props.disabled || props.disabledAppearance ? Color.Grey60 : Color.Blue20;
-const primaryFillActive = props =>
+const primaryFillActive = (props: ButtonProps) =>
 	props.disabled || props.disabledAppearance ? Color.Grey60 : Color.Blue;
 
-const StyledPrimaryButton = styled(SizedBaseButton)`
+const StyledPrimaryButton =
+	styled(SizedBaseButton) <
+	ButtonProps >
+	`
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -120,23 +123,33 @@ const StyledPrimaryButton = styled(SizedBaseButton)`
 	}
 `;
 
-const StyledSecondaryButton = styled(SizedBaseButton)`
+const secondaryFill = (props: ButtonProps) => (props.color ? props.color : Color.Grey50);
+const secondaryFillActive = (props: ButtonProps) =>
+	props.disabled || props.disabledAppearance ? secondaryFill(props) : Color.Black;
+
+const StyledSecondaryButton =
+	styled(SizedBaseButton) <
+	ButtonProps >
+	`
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	align-content: center;
 	text-align: center;
 	background: transparent;
-	border-color: ${(props: ButtonProps) => (props.textColor ? props.textColor : Color.Grey50)};
-	color: ${Color.Grey50};
+	border-color: ${secondaryFill};
+	color: ${secondaryFill};
 
 	&:active {
-		border-color: ${Color.Black};
-		color: ${Color.Black};
+		border-color: ${secondaryFillActive};
+		color: ${secondaryFillActive};
 	}
 `;
 
-const StyledTertiaryButton = styled(SizedBaseButton)`
+const StyledTertiaryButton =
+	styled(SizedBaseButton) <
+	ButtonProps >
+	`
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -170,7 +183,7 @@ const getComponent = (props: ButtonProps): AnyButton => {
 };
 
 export const Button: React.StatelessComponent<ButtonProps> = props => {
-	const Component = getComponent(props);
+	const Component = getComponent(props) as any;
 
 	return (
 		<Component
@@ -184,8 +197,8 @@ export const Button: React.StatelessComponent<ButtonProps> = props => {
 			onDoubleClick={props.onDoubleClick}
 			order={props.order}
 			size={props.size}
-			style={{ color: props.textColor, ...props.style }}
-			textColor={props.textColor}
+			style={{ color: props.color, ...props.style }}
+			color={props.color}
 		>
 			{props.children}
 		</Component>

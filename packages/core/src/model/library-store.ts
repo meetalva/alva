@@ -1,4 +1,5 @@
 import * as Mobx from 'mobx';
+import * as _ from 'lodash';
 import { Project } from './project';
 import { LibraryStoreItem } from './library-store-item';
 
@@ -32,7 +33,7 @@ export class LibraryStore {
 			.getPatternLibraries()
 			.map(lib => LibraryStoreItem.fromLibrary(lib));
 
-		return [...this.recommendations, ...derived];
+		return _.uniqBy([...this.recommendations, ...derived], ['name', 'version']);
 	}
 
 	@Mobx.computed
@@ -51,6 +52,11 @@ export class LibraryStore {
 		this.project = init ? init.project : undefined;
 	}
 
+	public getItemByPackageName(name: string): LibraryStoreItem | undefined {
+		return this.items.find(item => item.packageName === name);
+	}
+
+	@Mobx.action
 	public setProject(project: Project): void {
 		this.project = project;
 	}

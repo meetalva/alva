@@ -178,7 +178,7 @@ export class Project {
 		this.path = init.path;
 		this.userStore = init.userStore;
 		this.draft = init.draft;
-		this.version = init.version;
+		this.version = init.version || 1;
 
 		init.pages.forEach(page => {
 			this.addPage(page);

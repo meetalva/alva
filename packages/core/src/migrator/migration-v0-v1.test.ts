@@ -51,9 +51,9 @@ test('replaces element pattern property id refs', async () => {
 	const path = fixtures.find('v0.alva');
 	const project = Yaml.load(await readFile(path, 'utf-8')) as T.VersionZeroSerializedProject;
 	const boxPattern = builtinPatternLibrary.getPatternByType(T.PatternType.SyntheticBox);
-	const widthPatternProp = boxPattern.getPropertyByContextId('width');
-	const heigthPatternProp = boxPattern.getPropertyByContextId('height');
-	const backgroundPatternProp = boxPattern.getPropertyByContextId('backgroundColor');
+	const widthPatternProp = boxPattern.getPropertyByContextId('width')!;
+	const heigthPatternProp = boxPattern.getPropertyByContextId('height')!;
+	const backgroundPatternProp = boxPattern.getPropertyByContextId('backgroundColor')!;
 
 	const migration = new ZeroOneMigration();
 
@@ -62,7 +62,7 @@ test('replaces element pattern property id refs', async () => {
 		steps: []
 	});
 
-	const boxElement = result.project.elements.find(e => e.patternId === boxPattern.getId());
+	const boxElement = result.project.elements.find(e => e.patternId === boxPattern.getId())!;
 
 	expect(boxElement.propertyValues).toEqual(
 		expect.arrayContaining([
@@ -76,8 +76,8 @@ test('replaces element pattern property id refs', async () => {
 test('replaces element content slot ids', async () => {
 	const path = fixtures.find('v0.alva');
 	const project = Yaml.load(await readFile(path, 'utf-8')) as T.VersionZeroSerializedProject;
-	const boxPattern = builtinPatternLibrary.getPatternByType(T.PatternType.SyntheticBox);
-	const childrenSlot = boxPattern.getSlotByContextId('children');
+	const boxPattern = builtinPatternLibrary.getPatternByType(T.PatternType.SyntheticBox)!;
+	const childrenSlot = boxPattern.getSlotByContextId('children')!;
 
 	const migration = new ZeroOneMigration();
 
@@ -86,8 +86,10 @@ test('replaces element content slot ids', async () => {
 		steps: []
 	});
 
-	const boxElement = result.project.elements.find(e => e.patternId === boxPattern.getId());
-	const boxContent = result.project.elementContents.find(c => c.parentElementId === boxElement.id);
+	const boxElement = result.project.elements.find(e => e.patternId === boxPattern.getId())!;
+	const boxContent = result.project.elementContents.find(
+		c => c.parentElementId === boxElement.id
+	)!;
 
 	expect(boxContent.slotId).toBe(childrenSlot.getId());
 });
@@ -98,8 +100,8 @@ test('replaces element property slot ids', async () => {
 	const syntheticConditional = builtinPatternLibrary.getPatternByType(
 		T.PatternType.SyntheticConditional
 	);
-	const truthySlot = syntheticConditional.getSlotByContextId('truthy');
-	const falsySlot = syntheticConditional.getSlotByContextId('falsy');
+	const truthySlot = syntheticConditional.getSlotByContextId('truthy')!;
+	const falsySlot = syntheticConditional.getSlotByContextId('falsy')!;
 
 	const migration = new ZeroOneMigration();
 
@@ -110,7 +112,7 @@ test('replaces element property slot ids', async () => {
 
 	const conditionalElement = result.project.elements.find(
 		e => e.patternId === syntheticConditional.getId()
-	);
+	)!;
 	const contents = result.project.elementContents.filter(
 		c => c.parentElementId === conditionalElement.id
 	);
@@ -125,7 +127,7 @@ test('replaces old pattern library with new one', async () => {
 	const project = Yaml.load(await readFile(path, 'utf-8')) as T.VersionZeroSerializedProject;
 	const oldLibrary = project.patternLibraries.find(
 		p => p.origin === T.PatternLibraryOrigin.BuiltIn
-	);
+	)!;
 
 	const migration = new ZeroOneMigration();
 
@@ -152,7 +154,7 @@ test('replaces property ids in user store references', async () => {
 	const project = Yaml.load(await readFile(path, 'utf-8')) as T.VersionZeroSerializedProject;
 
 	const textPattern = builtinPatternLibrary.getPatternByType(T.PatternType.SyntheticText);
-	const textPatternProp = textPattern.getPropertyByContextId('text');
+	const textPatternProp = textPattern.getPropertyByContextId('text')!;
 
 	const migration = new ZeroOneMigration();
 
@@ -162,7 +164,7 @@ test('replaces property ids in user store references', async () => {
 	});
 
 	const textElement = M.Element.from(
-		result.project.elements.find(e => e.patternId === textPattern.getId()),
+		result.project.elements.find(e => e.patternId === textPattern.getId())!,
 		{
 			project: M.Project.from({
 				...result.project,
@@ -174,7 +176,7 @@ test('replaces property ids in user store references', async () => {
 
 	const textProp = textElement
 		.getProperties()
-		.find(p => p.getPatternPropertyId() === textPatternProp.getId());
+		.find(p => p.getPatternPropertyId() === textPatternProp.getId())!;
 	const refs = result.project.userStore.references;
 
 	expect(refs).toContainEqual(

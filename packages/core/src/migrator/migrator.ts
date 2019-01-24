@@ -1,5 +1,6 @@
 import * as Types from '../types';
 import { ZeroOneMigration } from './migration-v0-v1';
+import { MigrationStep } from './abstract-migration';
 
 export class Migrator {
 	private migrations = [new ZeroOneMigration()];
@@ -11,7 +12,7 @@ export class Migrator {
 			async (previous, migration) => migration.transform(await previous),
 			Promise.resolve({
 				project: input,
-				steps: []
+				steps: [] as MigrationStep[]
 			})
 		);
 

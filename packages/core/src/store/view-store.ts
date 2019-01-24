@@ -871,6 +871,7 @@ export class ViewStore {
 	@Mobx.action
 	public setProject(project: Model.Project): void {
 		this.project = project;
+		this.libraryStore.setProject(project);
 		this.project.unsetHighlightedElement();
 		this.project.unsetSelectedElement();
 	}

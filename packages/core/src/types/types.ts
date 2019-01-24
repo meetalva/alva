@@ -238,6 +238,7 @@ export interface SerializedPatternLibraryFile {
 }
 
 export enum PatternLibraryOrigin {
+	Unknown = 'unknown',
 	BuiltIn = 'built-in',
 	UserProvided = 'user-provided'
 }

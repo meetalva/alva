@@ -77,6 +77,11 @@ export class LibraryStoreItem {
 		return this.library ? this.library.getPackageName() : this.itemName;
 	}
 
+	@Mobx.computed
+	public get origin(): string | undefined {
+		return this.library ? this.library.getOrigin() : T.PatternLibraryOrigin.Unknown;
+	}
+
 	public constructor(init: LibraryStoreItemInit) {
 		this.id = init.id || uuid.v4();
 		this.library = init.library;
@@ -122,6 +127,10 @@ export class LibraryStoreItem {
 		sender: { send: T.Sender['send']; transaction: T.Sender['transaction'] },
 		data: { project: Project }
 	): void {
+		if (this.state === LibraryStoreItemState.Installing) {
+			return;
+		}
+
 		if (
 			this.state === LibraryStoreItemState.Listed &&
 			this.installType === T.PatternLibraryInstallType.Remote
@@ -134,6 +143,17 @@ export class LibraryStoreItem {
 				payload: {
 					npmId: this.packageName!,
 					projectId: data.project.getId()
+				}
+			});
+		}
+
+		if (this.library && this.installType === T.PatternLibraryInstallType.Local) {
+			sender.send({
+				id: uuid.v4(),
+				type: M.MessageType.UpdatePatternLibraryRequest,
+				payload: {
+					projectId: data.project.getId(),
+					libId: this.library.getId()
 				}
 			});
 		}

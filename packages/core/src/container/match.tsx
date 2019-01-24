@@ -7,7 +7,7 @@ export interface MatchProps<T> {
 
 export interface BranchProps<T> {
 	when: ((value: T) => boolean) | T;
-	children: React.ReactNode;
+	children?: React.ReactNode;
 }
 
 export const Match = function Match<T>(props: MatchProps<T>): JSX.Element | null {

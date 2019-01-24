@@ -420,6 +420,10 @@ export class PatternLibrary {
 	}
 
 	public getInstallType(): Types.PatternLibraryInstallType {
+		if (this.origin === Types.PatternLibraryOrigin.BuiltIn) {
+			return Types.PatternLibraryInstallType.Remote;
+		}
+
 		return this.installType;
 	}
 

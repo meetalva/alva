@@ -4,7 +4,6 @@ import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import styled from 'styled-components';
 import { WithStore } from '../store';
-import { LibraryContainer } from './library-container';
 import { LibraryStoreItemContainer } from './library-store-item-container';
 import { SpaceSize } from '../components/space';
 import { Color } from '../components/colors';
@@ -13,7 +12,6 @@ import * as uuid from 'uuid';
 import { ExternalLink } from 'react-feather';
 import * as T from '../types';
 import { MessageType as MT } from '../message';
-import { LibraryStoreItemState } from '../model';
 
 const validatePackageName = require('validate-npm-package-name');
 

@@ -2,6 +2,7 @@ import * as Mobx from 'mobx';
 import * as _ from 'lodash';
 import { Project } from './project';
 import { LibraryStoreItem } from './library-store-item';
+import * as T from '../types';
 
 export interface LibraryStoreInit {
 	project?: Project;
@@ -31,9 +32,21 @@ export class LibraryStore {
 
 		const derived = this.project
 			.getPatternLibraries()
-			.map(lib => LibraryStoreItem.fromLibrary(lib));
+			.map(lib => LibraryStoreItem.fromLibrary(lib))
+			.sort((a, b) => {
+				if (a.origin === T.PatternLibraryOrigin.BuiltIn) {
+					return 1;
+				}
 
-		return _.uniqBy([...this.recommendations, ...derived], ['name', 'version']);
+				if (b.origin === T.PatternLibraryOrigin.BuiltIn) {
+					return -1;
+				}
+
+				return (a.name || '').localeCompare(b.name || '');
+			});
+
+		const data = [...this.recommendations, ...derived];
+		return _.uniqBy(data, 'packageName');
 	}
 
 	@Mobx.computed
@@ -63,14 +76,14 @@ export class LibraryStore {
 }
 
 export enum LibraryStoreItemType {
-	Recommended,
-	Remote,
-	Local
+	Recommended = 'library-store-item-type-recommended',
+	Remote = 'library-store-item-remote',
+	Local = 'library-store-item-local'
 }
 
 export enum LibraryStoreItemState {
-	Unknown,
-	Listed,
-	Installing,
-	Installed
+	Unknown = 'library-store-item-state-unknown',
+	Listed = 'library-store-item-state-listed',
+	Installing = 'library-store-item-state-installing',
+	Installed = 'library-store-item-state-installed'
 }

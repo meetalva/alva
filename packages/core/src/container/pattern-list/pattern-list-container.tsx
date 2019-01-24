@@ -86,7 +86,9 @@ class PatternLibraryContainer extends React.Component<PatternLibraryContainerPro
 		}
 
 		return (
-			<Components.PatternFolderView name={props.library.getName()}>
+			<Components.PatternFolderView
+				name={props.library.getDisplayName() || props.library.getName()}
+			>
 				{patterns.map(pattern => (
 					<PatternItemContainer key={pattern.getId()} pattern={pattern} />
 				))}

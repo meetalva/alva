@@ -2,6 +2,9 @@
   "name": "@meetalva/essentials",
   "version": "1.0.0",
   "description": "Built-in components for basic layouts and logic",
+  "alva": {
+    "name": "Essentials"
+  },
   "main": "lib/index.js",
   "scripts": {
     "compile": "tsc",

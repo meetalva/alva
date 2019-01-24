@@ -85,6 +85,7 @@ export interface SerializedPatternLibrary {
 	id: string;
 	image: string;
 	name: string;
+	displayName: string;
 	version: string;
 	origin: SerializedPatternLibraryOrigin;
 	patternProperties: PatternProperty.SerializedPatternProperty[];

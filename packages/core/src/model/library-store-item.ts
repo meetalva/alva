@@ -59,6 +59,11 @@ export class LibraryStoreItem {
 	}
 
 	@Mobx.computed
+	public get displayName(): string | undefined {
+		return this.library ? this.library.getDisplayName() : undefined;
+	}
+
+	@Mobx.computed
 	public get description(): string | undefined {
 		return this.library ? this.library.getDescription() : undefined;
 	}

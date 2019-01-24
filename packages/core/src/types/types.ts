@@ -63,6 +63,7 @@ export interface LibraryAnalysis {
 	id: string;
 	image: string;
 	name: string;
+	displayName: string;
 	path: string;
 	patterns: PatternAnalysis[];
 	packageFile: { [key: string]: unknown };

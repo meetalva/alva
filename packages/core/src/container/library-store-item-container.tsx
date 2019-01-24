@@ -104,7 +104,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 		return (
 			<Components.LibraryBox
 				key={props.item.id}
-				name={props.item.name}
+				name={props.item.displayName || props.item.name}
 				description={props.item.description}
 				state={boxState}
 				color={props.item.color}

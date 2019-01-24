@@ -18,6 +18,7 @@ export interface PatternLibraryInit {
 	id: string;
 	image: string;
 	name: string;
+	displayName: string;
 	version: string;
 	origin: Types.PatternLibraryOrigin;
 	installType: Types.PatternLibraryInstallType;
@@ -53,6 +54,7 @@ export class PatternLibrary {
 	@Mobx.observable private color: string;
 	@Mobx.observable private description: string;
 	@Mobx.observable private name: string;
+	@Mobx.observable private displayName: string;
 	@Mobx.observable private image: string;
 	@Mobx.observable private version: string;
 	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
@@ -82,6 +84,7 @@ export class PatternLibrary {
 		this.description = init.description;
 		this.id = init.id || uuid.v4();
 		this.name = init.name;
+		this.displayName = init.displayName;
 		this.image = init.image;
 		this.version = init.version;
 		this.origin = init.origin;
@@ -101,6 +104,7 @@ export class PatternLibrary {
 			id: uuid.v4(),
 			image: '',
 			name: 'Library',
+			displayName: '',
 			version: '1.0.0',
 			origin: Types.PatternLibraryOrigin.UserProvided,
 			patterns: [],
@@ -126,6 +130,7 @@ export class PatternLibrary {
 		const library = PatternLibrary.create({
 			id: uuid.v4(),
 			name: analysis.name,
+			displayName: analysis.displayName,
 			version: analysis.version,
 			origin: opts.analyzeBuiltins
 				? Types.PatternLibraryOrigin.BuiltIn
@@ -158,6 +163,7 @@ export class PatternLibrary {
 			id: serialized.id,
 			image: serialized.image,
 			name: serialized.name,
+			displayName: serialized.displayName,
 			version: serialized.version,
 			origin: deserializeOrigin(serialized.origin),
 			patterns: [],
@@ -361,6 +367,10 @@ export class PatternLibrary {
 		return this.name;
 	}
 
+	public getDisplayName(): string {
+		return this.displayName;
+	}
+
 	public getPackageName(): string {
 		return this.packageFile ? (this.packageFile as { name: string }).name : this.name;
 	}
@@ -477,6 +487,7 @@ export class PatternLibrary {
 			id: this.id,
 			image: this.image,
 			name: this.name,
+			displayName: this.displayName,
 			version: this.version,
 			origin: serializeOrigin(this.origin),
 			patterns: this.getPatterns().map(p => p.toJSON()),

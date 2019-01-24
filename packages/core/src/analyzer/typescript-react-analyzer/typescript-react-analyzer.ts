@@ -105,6 +105,7 @@ export async function analyze(
 				id,
 				bundle: await getBundle(),
 				name: pkg.name || 'Library',
+				displayName: pkg.alva ? pkg.alva.name || '' : undefined,
 				description: pkg.description || '',
 				image: pkg.alva ? pkg.alva.image || '' : undefined,
 				color: pkg.alva ? pkg.alva.color || '' : undefined,

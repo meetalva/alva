@@ -56,6 +56,10 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 		M.MessageType.UpdatePatternLibraryResponse,
 		Handlers.updatePatternLibrary(ctx)
 	);
+	app.match<M.UpdatingPatternLibrary>(
+		M.MessageType.UpdatingPatternLibrary,
+		Handlers.updatingPatternLibrary(ctx)
+	);
 	app.match<M.Cut>(M.MessageType.Cut, Edit.cut(ctx));
 	app.match<M.DeleteSelected>(M.MessageType.DeleteSelected, Edit.deleteSelected(ctx));
 	app.match<M.DuplicateElement>(M.MessageType.DuplicateElement, Edit.duplicateElement(ctx));
@@ -66,7 +70,6 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 	app.match<M.DeleteElement>(M.MessageType.DeleteElement, Edit.removeElement(ctx));
 	app.match<M.CutElement>(M.MessageType.CutElement, Edit.removeElement(ctx));
 	app.match<M.Undo>(M.MessageType.Undo, Edit.undo(ctx));
-
 	app.match<M.ProjectUpdate>(M.MessageType.ProjectUpdate, m => {
 		ctx.store.getEditHistory().record(m.payload);
 	});

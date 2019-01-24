@@ -40,20 +40,20 @@ export function connectPatternLibrary({
 			return;
 		}
 
-		const connections = await dataHost.getConnections(project);
-		const connection = connections.find(c => c.path === path);
+		const pkg = JSON.parse((await host.readFile(path)).contents);
+		const previousLibrary = m.payload.library
+			? project.getPatternLibraryById(m.payload.library)
+			: project.getPatternLibraries().find(p => p.getName() === pkg.name);
 
-		const previousLibrary = connection
-			? project
-					.getPatternLibraries()
-					.find(p => `${p.getName()}@${p.getVersion()}` === connection.id)
-			: m.payload.library
-				? project.getPatternLibraryById(m.payload.library)
-				: undefined;
-
-		if (m.payload.library && !previousLibrary) {
-			host.log(`connectPatternLibrary: could not determine previous library`);
-			return;
+		if (previousLibrary) {
+			app.send({
+				type: MessageType.UpdatingPatternLibrary,
+				id: uuid.v4(),
+				transaction: m.transaction,
+				payload: {
+					libraryId: previousLibrary.getId()
+				}
+			});
 		}
 
 		const analysisResult = await performAnalysis(path, { previousLibrary });

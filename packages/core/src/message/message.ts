@@ -96,7 +96,8 @@ export enum MessageType {
 	ShowUpdateDetails = 'show-update-details',
 	InstallUpdate = 'install-update',
 	ProjectRecordsChanged = 'project-records-changed',
-	ConnectNpmPatternLibraryRequest = 'connect-npm-pattern-library-request'
+	ConnectNpmPatternLibraryRequest = 'connect-npm-pattern-library-request',
+	UpdatingPatternLibrary = 'updating-pattern-library'
 }
 
 export type Message =
@@ -193,7 +194,8 @@ export type Message =
 	| ShowUpdateDetails
 	| InstallUpdate
 	| ProjectRecordsChanged
-	| ConnectNpmPatternLibraryRequest;
+	| ConnectNpmPatternLibraryRequest
+	| UpdatingPatternLibrary;
 
 export type CreateNewFileRequest = Envelope<MessageType.CreateNewFileRequest, { replace: boolean }>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -532,4 +534,9 @@ export type ConnectNpmPatternLibraryRequest = Envelope<
 		projectId: string;
 		libraryId?: string;
 	}
+>;
+
+export type UpdatingPatternLibrary = Envelope<
+	MessageType.UpdatingPatternLibrary,
+	{ libraryId: string }
 >;

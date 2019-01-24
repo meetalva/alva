@@ -46,11 +46,11 @@ async function main() {
 	}
 
 	const project = Model.Project.create({ name: 'Project', draft: true, path: 'project' });
-	const library = Model.PatternLibrary.fromAnalysis(
-		analysis.result,
-		{ project },
-		{ analyzeBuiltins: true }
-	);
+	const library = Model.PatternLibrary.fromAnalysis(analysis.result, {
+		project,
+		analyzeBuiltins: true,
+		installType: Types.PatternLibraryInstallType.Local
+	});
 
 	await writeFile(
 		outPath,

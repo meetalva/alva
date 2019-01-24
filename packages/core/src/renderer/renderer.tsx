@@ -15,10 +15,6 @@ import * as Types from '../types';
 import { BrowserAdapter } from '../adapters/browser-adapter';
 import * as Fs from 'fs';
 
-let app: Model.AlvaApp;
-let history;
-let store: ViewStore;
-
 window.requestIdleCallback = window.requestIdleCallback || (window.requestAnimationFrame as any);
 
 export async function startRenderer(): Promise<void> {
@@ -30,7 +26,7 @@ export async function startRenderer(): Promise<void> {
 		data && data.host !== Types.HostType.Browser ? `ws://${window.location.host}/` : '';
 	const sender = new Sender({ endpoint });
 
-	app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender });
+	const app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender });
 
 	if (data.host) {
 		app.setHostType(data.host);
@@ -50,8 +46,9 @@ export async function startRenderer(): Promise<void> {
 
 	app.setSender(sender);
 
-	history = new Model.EditHistory();
-	store = new ViewStore({ app, history, sender });
+	const history = new Model.EditHistory();
+	const libraryStore = new Model.LibraryStore();
+	const store = new ViewStore({ app, history, sender, libraryStore });
 
 	store.setServerPort(parseInt(window.location.port, 10));
 
@@ -60,6 +57,7 @@ export async function startRenderer(): Promise<void> {
 	}
 
 	const project = store.getProject();
+	libraryStore.setProject(project);
 
 	app.send({
 		id: uuid.v4(),

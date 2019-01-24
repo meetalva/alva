@@ -50,7 +50,6 @@ export function connectNpmPatternLibrary({
 			});
 		}
 
-		console.log(result);
 		const analysisResult = await performAnalysis(result.path, { previousLibrary });
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
@@ -87,7 +86,8 @@ export function connectNpmPatternLibrary({
 				payload: {
 					analysis: analysisResult.result,
 					path: result.path,
-					previousLibraryId: undefined
+					previousLibraryId: undefined,
+					installType: T.PatternLibraryInstallType.Remote
 				}
 			});
 		} else {

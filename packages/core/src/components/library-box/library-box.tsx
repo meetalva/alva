@@ -1,10 +1,17 @@
+// tslint:disable-next-line:no-submodule-imports
+import * as ReactDOMServer from 'react-dom/server';
 import * as React from 'react';
 import styled from 'styled-components';
 import { Color } from '../colors';
 import { Headline } from '../headline';
 import { Copy, CopySize } from '../copy';
 import { getSpace, SpaceSize, Space } from '../space';
-import { PatternLibraryState } from '../../types';
+import { LibraryImage } from './library-image';
+
+export enum LibraryBoxState {
+	Idle,
+	Progress
+}
 
 export interface LibraryBoxProps {
 	color?: string;
@@ -13,7 +20,7 @@ export interface LibraryBoxProps {
 	description?: string;
 	install?: React.ReactNode;
 	version?: string;
-	state: PatternLibraryState;
+	state: LibraryBoxState;
 }
 
 const StyledBox =
@@ -29,6 +36,7 @@ const StyledBox =
 	margin: ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.XS)}px;
 	user-select: none;
 	transition: box-shadow 0.2s;
+	overflow: hidden;
 `;
 
 const StyledImage = styled.div`
@@ -103,7 +111,7 @@ const StyledBottom = styled.div`
 
 export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JSX.Element => (
 	<StyledBox {...props}>
-		{props.image && <StyledImage state={props.state} image={props.image} />}
+		{props.image ? <StyledImage state={props.state} image={props.image} /> : <LibraryImage />}
 		<StyledDetails {...props}>
 			<StyledTop>
 				<Headline order={4}>{props.name}</Headline>
@@ -111,9 +119,8 @@ export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JS
 				<TranslucentCopy size={CopySize.M}>{props.description}</TranslucentCopy>
 				<Space sizeBottom={SpaceSize.S} />
 			</StyledTop>
-
 			<StyledBottom {...props}>
-				{props.state === PatternLibraryState.Connecting && <Loader {...props} />}
+				{props.state === LibraryBoxState.Progress && <Loader {...props} />}
 				<Space sizeTop={SpaceSize.L} />
 				<StyledInstallContainer>
 					{props.install}
@@ -124,3 +131,8 @@ export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JS
 		</StyledDetails>
 	</StyledBox>
 );
+
+function toDataUrl(element: JSX.Element): string {
+	const svg = ReactDOMServer.renderToString(element);
+	return `data:image/svg+xml;utf8,${svg}`;
+}

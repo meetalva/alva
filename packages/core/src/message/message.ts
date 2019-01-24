@@ -250,6 +250,7 @@ export type ConnectPatternLibraryResponse = Envelope<
 		analysis: Types.LibraryAnalysis;
 		path: string;
 		previousLibraryId: string | undefined;
+		installType: Types.PatternLibraryInstallType;
 	}
 >;
 export type ContextMenuRequest = Envelope<

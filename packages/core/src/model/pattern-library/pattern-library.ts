@@ -20,6 +20,7 @@ export interface PatternLibraryInit {
 	name: string;
 	version: string;
 	origin: Types.PatternLibraryOrigin;
+	installType: Types.PatternLibraryInstallType;
 	patternProperties: AnyPatternProperty[];
 	packageFile: { [key: string]: unknown };
 	patterns: Pattern[];
@@ -57,6 +58,7 @@ export class PatternLibrary {
 	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
 	@Mobx.observable private patterns: Map<string, Pattern> = new Map();
 	@Mobx.observable private origin: Types.PatternLibraryOrigin;
+	@Mobx.observable private installType: Types.PatternLibraryInstallType;
 	@Mobx.observable private state: Types.PatternLibraryState;
 	@Mobx.observable private packageFile: { [key: string]: unknown };
 
@@ -83,6 +85,7 @@ export class PatternLibrary {
 		this.image = init.image;
 		this.version = init.version;
 		this.origin = init.origin;
+		this.installType = init.installType;
 		this.packageFile = init.packageFile;
 		init.patterns.forEach(pattern => this.patterns.set(pattern.getId(), pattern));
 		init.patternProperties.forEach(prop => this.patternProperties.set(prop.getId(), prop));
@@ -103,7 +106,8 @@ export class PatternLibrary {
 			patterns: [],
 			patternProperties: [],
 			state: Types.PatternLibraryState.Connected,
-			packageFile: {}
+			packageFile: {},
+			installType: Types.PatternLibraryInstallType.Local
 		};
 	}
 
@@ -113,14 +117,17 @@ export class PatternLibrary {
 
 	public static fromAnalysis(
 		analysis: Types.LibraryAnalysis,
-		{ project }: { project: Project },
-		{ analyzeBuiltins }: { analyzeBuiltins: boolean }
+		opts: {
+			analyzeBuiltins: boolean;
+			project: Project;
+			installType: Types.PatternLibraryInstallType;
+		}
 	): PatternLibrary {
 		const library = PatternLibrary.create({
 			id: uuid.v4(),
 			name: analysis.name,
 			version: analysis.version,
-			origin: analyzeBuiltins
+			origin: opts.analyzeBuiltins
 				? Types.PatternLibraryOrigin.BuiltIn
 				: Types.PatternLibraryOrigin.UserProvided,
 			patternProperties: [],
@@ -131,10 +138,11 @@ export class PatternLibrary {
 			image: analysis.image,
 			color: analysis.color,
 			state: Types.PatternLibraryState.Connected,
-			packageFile: analysis.packageFile
+			packageFile: analysis.packageFile,
+			installType: opts.installType
 		});
 
-		library.import(analysis, { project });
+		library.import(analysis, { project: opts.project });
 
 		return library;
 	}
@@ -155,7 +163,8 @@ export class PatternLibrary {
 			patterns: [],
 			patternProperties: serialized.patternProperties.map(p => PatternProperty.from(p)),
 			state,
-			packageFile: serialized.packageFile
+			packageFile: serialized.packageFile,
+			installType: serialized.installType
 		});
 
 		serialized.patterns.forEach(pattern => {
@@ -352,6 +361,10 @@ export class PatternLibrary {
 		return this.name;
 	}
 
+	public getPackageName(): string {
+		return (this.packageFile as { name: string }).name;
+	}
+
 	public getVersion(): string {
 		return this.version;
 	}
@@ -406,6 +419,10 @@ export class PatternLibrary {
 		return this.image;
 	}
 
+	public getInstallType(): Types.PatternLibraryInstallType {
+		return this.installType;
+	}
+
 	@Mobx.action
 	public removePattern(pattern: Pattern): void {
 		this.patterns.delete(pattern.getId());
@@ -456,7 +473,8 @@ export class PatternLibrary {
 			patterns: this.getPatterns().map(p => p.toJSON()),
 			patternProperties: this.getPatternProperties().map(p => p.toJSON()),
 			state: this.state,
-			packageFile: this.packageFile
+			packageFile: this.packageFile,
+			installType: this.installType
 		};
 	}
 

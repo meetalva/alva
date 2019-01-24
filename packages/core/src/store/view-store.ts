@@ -1,6 +1,6 @@
 import { Sender } from '../sender';
 import { isEqual } from 'lodash';
-import { MessageType, ProjectUpdate } from '../message';
+import { MessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
 import * as Types from '../types';
@@ -12,6 +12,7 @@ export interface ViewStoreInit {
 	app: Model.AlvaApp;
 	sender: Sender;
 	history: Model.EditHistory;
+	libraryStore: Model.LibraryStore;
 }
 
 export enum ClipBoardType {
@@ -41,6 +42,8 @@ export interface WithStore {
  * and call the respective business methods to perform operations.
  */
 export class ViewStore {
+	public readonly libraryStore: Model.LibraryStore;
+
 	private static EPHEMERAL_CONTENTS: WeakMap<
 		Model.Element,
 		Model.ElementContent[]
@@ -106,6 +109,7 @@ export class ViewStore {
 		this.app = init.app;
 		this.editHistory = init.history;
 		this.sender = init.sender;
+		this.libraryStore = init.libraryStore;
 	}
 
 	@Mobx.action

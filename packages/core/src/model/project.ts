@@ -530,6 +530,10 @@ export class Project {
 		return [...this.patternLibraries.values()].find(p => p.contextId === contextid);
 	}
 
+	public getPatternLibraryByName(name: string): PatternLibrary | undefined {
+		return [...this.patternLibraries.values()].find(p => p.getPackageName() === name);
+	}
+
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {
 		return Array.from(this.patternLibraries.values()).reduce<AnyPatternProperty | undefined>(
 			(result, lib) => {

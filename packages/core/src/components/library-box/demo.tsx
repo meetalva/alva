@@ -1,9 +1,8 @@
 import { Color } from '../colors';
 import DemoContainer from '../demo-container';
-import { LibraryBox } from './index';
+import { LibraryBox, LibraryBoxState } from './index';
 import { Button, ButtonOrder, ButtonSize } from '../button';
 import * as React from 'react';
-import { PatternLibraryState } from '../../types';
 
 const LibraryBoxDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer>
@@ -12,7 +11,7 @@ const LibraryBoxDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			image="http://zwainhaus.com/artanddesign/landscape_03.jpg"
 			name="Wireframe Kit"
 			description="Simple wireframing kit to kickstart your product ideas."
-			state={PatternLibraryState.Connected}
+			state={LibraryBoxState.Idle}
 			install={
 				<Button
 					order={ButtonOrder.Primary}

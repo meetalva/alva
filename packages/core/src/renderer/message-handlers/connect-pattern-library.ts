@@ -3,6 +3,7 @@ import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 import { PatternLibrary } from '../../model';
+import * as T from '../../types';
 
 export function connectPatternLibrary({
 	store
@@ -14,11 +15,11 @@ export function connectPatternLibrary({
 			return;
 		}
 
-		const library = PatternLibrary.fromAnalysis(
-			m.payload.analysis,
-			{ project },
-			{ analyzeBuiltins: false }
-		);
+		const library = PatternLibrary.fromAnalysis(m.payload.analysis, {
+			analyzeBuiltins: false,
+			project,
+			installType: m.payload.installType
+		});
 
 		project.addPatternLibrary(library);
 

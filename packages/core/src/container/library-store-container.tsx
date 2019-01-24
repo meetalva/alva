@@ -2,8 +2,10 @@ import * as Components from '../components';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
+import styled from 'styled-components';
 import { WithStore } from '../store';
 import { LibraryContainer } from './library-container';
+import { LibraryStoreItemContainer } from './library-store-item-container';
 import { SpaceSize } from '../components/space';
 import { Color } from '../components/colors';
 import { MessageType } from '../message';
@@ -11,8 +13,13 @@ import * as uuid from 'uuid';
 import { ExternalLink } from 'react-feather';
 import * as T from '../types';
 import { MessageType as MT } from '../message';
+import { LibraryStoreItemState } from '../model';
 
 const validatePackageName = require('validate-npm-package-name');
+
+const Flex = styled.div`
+	display: flex;
+`;
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -83,6 +90,7 @@ export class LibraryStoreContainer extends React.Component {
 		const { store } = this.props as WithStore;
 		const app = store.getApp();
 		const isValidPackage = this.isValidPackage;
+		const libraryStore = store.libraryStore;
 
 		return (
 			<div style={{ overflow: 'scroll', userSelect: 'none' }}>
@@ -106,16 +114,11 @@ export class LibraryStoreContainer extends React.Component {
 						</Components.Copy>
 					</Components.Space>
 					<Components.Space sizeBottom={SpaceSize.XL} />
-
-					<div
-						style={{
-							display: 'flex'
-						}}
-					>
-						{store
-							.getPatternLibraries()
-							.map(library => <LibraryContainer key={library.getId()} library={library} />)}
-					</div>
+					<Flex>
+						{libraryStore.withLibrary.map(item => (
+							<LibraryStoreItemContainer key={item.id} item={item} />
+						))}
+					</Flex>
 				</div>
 				<div style={{ background: Components.Color.White }}>
 					<div
@@ -137,50 +140,11 @@ export class LibraryStoreContainer extends React.Component {
 						</Components.Space>
 
 						<Components.Space sizeBottom={SpaceSize.XXL} />
-						<div
-							style={{
-								display: 'flex'
-							}}
-						>
-							<Components.LibraryBox
-								color="#F4777A"
-								image="http://zwainhaus.com/artanddesign/landscape_03.jpg"
-								name="Material Design"
-								description="A visual language that synthesizes the classic principles of good design with the innovation of technology and science."
-								state={T.PatternLibraryState.Connecting}
-								install={
-									<Components.Button
-										size={Components.ButtonSize.Medium}
-										textColor={Color.Grey10}
-										inverted
-									>
-										Install Library
-									</Components.Button>
-								}
-								version="v3"
-							/>
-
-							<Components.LibraryBox
-								color="#1F282B"
-								image="http://zwainhaus.com/artanddesign/tinyhouse1.jpg"
-								name="Wireframe Kit"
-								description="Simple wireframing kit to kickstart your product ideas."
-								state={T.PatternLibraryState.Connected}
-								install={
-									<Components.Button
-										order={Components.ButtonOrder.Secondary}
-										size={Components.ButtonSize.Medium}
-										textColor={Color.WhiteAlpha75}
-										inverted
-										disabled
-									>
-										Already installed
-									</Components.Button>
-								}
-								version="v1"
-							/>
-						</div>
-
+						<Flex>
+							{libraryStore.recommendations.map(item => (
+								<LibraryStoreItemContainer key={item.id} item={item} />
+							))}
+						</Flex>
 						<Components.Space sizeTop={SpaceSize.XXXL} />
 						<Components.Space size={SpaceSize.XS}>
 							<div
@@ -193,7 +157,7 @@ export class LibraryStoreContainer extends React.Component {
 						</Components.Space>
 						<Components.Space sizeTop={SpaceSize.XXXL} />
 
-						<div style={{ display: 'flex' }}>
+						<Flex>
 							<div style={{ width: '50%', flexShrink: 0 }}>
 								<Components.Space size={SpaceSize.XS}>
 									<div style={{ maxWidth: '360px' }}>
@@ -291,7 +255,7 @@ export class LibraryStoreContainer extends React.Component {
 									</Components.Space>
 								</div>
 							)}
-						</div>
+						</Flex>
 						<Components.Space sizeTop={SpaceSize.XXXL} />
 					</div>
 				</div>

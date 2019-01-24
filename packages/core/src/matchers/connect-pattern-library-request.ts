@@ -92,7 +92,8 @@ export function connectPatternLibrary({
 				payload: {
 					analysis: analysisResult.result,
 					path,
-					previousLibraryId: undefined
+					previousLibraryId: undefined,
+					installType: T.PatternLibraryInstallType.Local
 				}
 			});
 		} else {

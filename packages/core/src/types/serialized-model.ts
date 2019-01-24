@@ -2,6 +2,11 @@ import * as PatternProperty from './pattern-property';
 import * as Types from './types';
 import * as UserStore from './user-store';
 
+export enum PatternLibraryInstallType {
+	Remote = 'remote',
+	Local = 'local'
+}
+
 export enum PatternLibraryState {
 	Pristine = 'pristine',
 	Connecting = 'connecting',
@@ -86,6 +91,7 @@ export interface SerializedPatternLibrary {
 	patterns: SerializedPattern[];
 	state: PatternLibraryState;
 	packageFile: { [key: string]: unknown };
+	installType: PatternLibraryInstallType;
 }
 
 export type SavedProject = VersionOneSerializedProject;

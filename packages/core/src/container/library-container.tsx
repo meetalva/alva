@@ -38,6 +38,7 @@ export class LibraryContainer extends React.Component<LibrarySettingsContainerPr
 				color={props.library.getColor() || Components.Color.Grey50}
 				image={props.library.getImage()}
 				version={props.library.getVersion()}
+				size={Components.LibraryBoxSize.Large}
 				install={
 					mayUpdate ? (
 						<Components.Button

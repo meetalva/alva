@@ -3,13 +3,19 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
 import * as React from 'react';
 import { WithStore } from '../store';
-import { ButtonSize, LibraryBoxState } from '../components';
+import { ButtonSize, LibraryBoxState, LibraryBoxSize } from '../components';
 import { LibraryStoreItem } from '../model/library-store-item';
 import { Match, MatchBranch } from './match';
 import { PatternLibraryInstallType } from '../types';
 
 export interface LibraryStoreItemContainerProps {
 	item: LibraryStoreItem;
+	size: LibraryStoreItemSize;
+}
+
+export enum LibraryStoreItemSize {
+	Medium,
+	Large
 }
 
 interface ActiveButtonProps {
@@ -92,6 +98,9 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				? LibraryBoxState.Progress
 				: LibraryBoxState.Idle;
 
+		const boxSize =
+			props.size === LibraryStoreItemSize.Large ? LibraryBoxSize.Large : LibraryBoxSize.Medium;
+
 		return (
 			<Components.LibraryBox
 				key={props.item.id}
@@ -101,6 +110,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				color={props.item.color}
 				image={props.item.image}
 				version={props.item.version}
+				size={boxSize}
 				install={
 					<div>
 						<Match value={props.item.state}>

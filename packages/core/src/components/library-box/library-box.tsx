@@ -13,6 +13,11 @@ export enum LibraryBoxState {
 	Progress
 }
 
+export enum LibraryBoxSize {
+	Medium,
+	Large
+}
+
 export interface LibraryBoxProps {
 	color?: string;
 	image?: string;
@@ -21,14 +26,15 @@ export interface LibraryBoxProps {
 	install?: React.ReactNode;
 	version?: string;
 	state: LibraryBoxState;
+	size: LibraryBoxSize;
 }
 
 const StyledBox =
 	styled.div <
 	LibraryBoxProps >
 	`
-	width: 360px;
-	background: ${props => (props.color ? props.color : Color.Grey50)};
+	width: 348px;
+	background: ${props => (props.color ? props.color : Color.Grey20)};
 	border-radius: 6px;
 	box-shadow: 0 0 24px 0 ${Color.BlackAlpha15};
 	color: ${Color.White};
@@ -111,7 +117,12 @@ const StyledBottom = styled.div`
 
 export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JSX.Element => (
 	<StyledBox {...props}>
-		{props.image ? <StyledImage state={props.state} image={props.image} /> : <LibraryImage />}
+		{props.size === LibraryBoxSize.Large &&
+			(props.image ? (
+				<StyledImage state={props.state} image={props.image} size={props.size} />
+			) : (
+				<LibraryImage />
+			))}
 		<StyledDetails {...props}>
 			<StyledTop>
 				<Headline order={4}>{props.name}</Headline>

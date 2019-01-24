@@ -1,6 +1,6 @@
 import { Color } from '../colors';
 import DemoContainer from '../demo-container';
-import { LibraryBox, LibraryBoxState } from './index';
+import { LibraryBox, LibraryBoxState, LibraryBoxSize } from './index';
 import { Button, ButtonOrder, ButtonSize } from '../button';
 import * as React from 'react';
 
@@ -12,6 +12,7 @@ const LibraryBoxDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			name="Wireframe Kit"
 			description="Simple wireframing kit to kickstart your product ideas."
 			state={LibraryBoxState.Idle}
+			size={LibraryBoxSize.Large}
 			install={
 				<Button
 					order={ButtonOrder.Primary}

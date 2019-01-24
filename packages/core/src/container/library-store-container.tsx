@@ -4,16 +4,24 @@ import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import styled from 'styled-components';
 import { WithStore } from '../store';
-import { LibraryStoreItemContainer } from './library-store-item-container';
+import { LibraryStoreItemContainer, LibraryStoreItemSize } from './library-store-item-container';
 import { SpaceSize } from '../components/space';
 import { Color } from '../components/colors';
 import { MessageType } from '../message';
 import * as uuid from 'uuid';
-import { ExternalLink } from 'react-feather';
+import { ExternalLink, ChevronDown, Check } from 'react-feather';
 import * as T from '../types';
 import { MessageType as MT } from '../message';
 
 const validatePackageName = require('validate-npm-package-name');
+
+const DetailsSummary = styled.summary`
+	outline: none;
+
+	&::-webkit-details-marker {
+		display: none;
+	}
+`;
 
 const Flex = styled.div`
 	display: flex;
@@ -104,50 +112,105 @@ export class LibraryStoreContainer extends React.Component {
 						width: '90%',
 						maxWidth: '1080px',
 						margin: '0 auto',
-						padding: `${Components.getSpace(
-							Components.SpaceSize.XXL
-						)}px 0 ${Components.getSpace(Components.SpaceSize.XXXL)}px`
+						padding: `${Components.getSpace(Components.SpaceSize.L)}px 0`
 					}}
 				>
-					<Components.Space size={SpaceSize.XS}>
-						<Components.Headline order={3} bold textColor={Components.Color.Grey10}>
-							Connected Libraries
-						</Components.Headline>
-						<Components.Space sizeBottom={SpaceSize.XS} />
-						<Components.Copy textColor={Color.Grey36} size={Components.CopySize.M}>
-							See and update all libraries connected to this project
-						</Components.Copy>
-					</Components.Space>
-					<Components.Space sizeBottom={SpaceSize.XL} />
-					<Flex>
-						{libraryStore.withLibrary.map(item => (
-							<LibraryStoreItemContainer key={item.id} item={item} />
-						))}
-					</Flex>
+					<details>
+						<DetailsSummary>
+							<Components.Space size={SpaceSize.XS}>
+								<Flex style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+									<div>
+										<Components.Headline
+											order={4}
+											bold
+											textColor={Components.Color.Grey20}
+										>
+											Installed Libraries
+										</Components.Headline>
+										<Components.Space sizeBottom={SpaceSize.XS} />
+										<Flex style={{ alignItems: 'center' }}>
+											<Components.Copy textColor={Color.Grey36}>
+												Show {libraryStore.withLibrary.length} installed{' '}
+												{libraryStore.withLibrary.length === 1
+													? 'library'
+													: 'libraries'}
+											</Components.Copy>
+											<Components.Space sizeRight={SpaceSize.XXS} />
+											<ChevronDown color={Color.Grey36} size={Components.IconSize.XS} />
+										</Flex>
+									</div>
+									{store.getApp().isHostType(T.HostType.Electron) && (
+										<Components.Button
+											order={Components.ButtonOrder.Secondary}
+											size={Components.ButtonSize.Medium}
+											onClick={() =>
+												app.send({
+													id: uuid.v4(),
+													payload: {
+														library: undefined,
+														projectId: store.getProject().getId()
+													},
+													type: MessageType.ConnectPatternLibraryRequest
+												})
+											}
+										>
+											Connect Local Library
+										</Components.Button>
+									)}
+								</Flex>
+							</Components.Space>
+						</DetailsSummary>
+						<Components.Space sizeBottom={Components.SpaceSize.S} />
+						<Flex
+							style={{
+								flexWrap: 'wrap'
+							}}
+						>
+							{libraryStore.withLibrary.map(item => (
+								<LibraryStoreItemContainer
+									key={item.id}
+									item={item}
+									size={LibraryStoreItemSize.Medium}
+								/>
+							))}
+						</Flex>
+					</details>
 				</div>
-				<div style={{ background: Components.Color.White }}>
+
+				<div
+					style={{
+						background: Components.Color.White,
+						borderTop: `1px solid ${Color.Grey90}`
+					}}
+				>
 					<div
 						style={{
 							width: '90%',
 							maxWidth: '1080px',
 							margin: '0 auto',
-							padding: `${Components.getSpace(Components.SpaceSize.XXXL + SpaceSize.S)}px 0`
+							padding: `${Components.getSpace(Components.SpaceSize.XXXL + SpaceSize.L)}px 0`
 						}}
 					>
 						<Components.Space size={SpaceSize.XS}>
-							<Components.Headline order={2} bold textColor={Components.Color.Grey10}>
-								Library Store
-							</Components.Headline>
-							<Components.Space sizeBottom={SpaceSize.M} />
-							<Components.Copy textColor={Color.Grey36} size={Components.CopySize.M}>
-								Browse and install compatible code libraries for your prototype
-							</Components.Copy>
+							<div style={{ maxWidth: '260px' }}>
+								<Components.Headline order={2} bold textColor={Components.Color.Grey10}>
+									Library Store
+								</Components.Headline>
+								<Components.Space sizeBottom={SpaceSize.M} />
+								<Components.Copy textColor={Color.Grey36} size={Components.CopySize.M}>
+									Browse and install compatible code libraries for your prototype
+								</Components.Copy>
+							</div>
 						</Components.Space>
 
 						<Components.Space sizeBottom={SpaceSize.XXL} />
 						<Flex>
 							{libraryStore.recommendations.map(item => (
-								<LibraryStoreItemContainer key={item.id} item={item} />
+								<LibraryStoreItemContainer
+									key={item.id}
+									item={item}
+									size={LibraryStoreItemSize.Large}
+								/>
 							))}
 						</Flex>
 						<Components.Space sizeTop={SpaceSize.XXXL} />

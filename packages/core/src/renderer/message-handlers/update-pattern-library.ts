@@ -22,6 +22,7 @@ export function updatePatternLibrary({
 
 		library.import(m.payload.analysis, { project });
 		library.setState(T.PatternLibraryState.Connected);
+		library.setInstallType(m.payload.installType);
 
 		store.commit();
 

@@ -357,6 +357,7 @@ export type UpdatePatternLibraryRequest = Envelope<
 	{
 		libId: string;
 		projectId: string;
+		installType: Types.PatternLibraryInstallType;
 	}
 >;
 export type UpdatePatternLibraryResponse = Envelope<
@@ -365,6 +366,7 @@ export type UpdatePatternLibraryResponse = Envelope<
 		analysis: Types.LibraryAnalysis;
 		path: string;
 		previousLibraryId: string;
+		installType: Types.PatternLibraryInstallType;
 	}
 >;
 export type ExportHtmlProject = Envelope<

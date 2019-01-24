@@ -964,7 +964,8 @@ export class ViewStore {
 			type: MessageType.UpdatePatternLibraryRequest,
 			payload: {
 				libId: library.getId(),
-				projectId: project.getId()
+				projectId: project.getId(),
+				installType: library.getInstallType()
 			},
 			id: uuid.v4()
 		});

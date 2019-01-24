@@ -153,7 +153,8 @@ export class LibraryStoreItem {
 				type: M.MessageType.UpdatePatternLibraryRequest,
 				payload: {
 					projectId: data.project.getId(),
-					libId: this.library.getId()
+					libId: this.library.getId(),
+					installType: this.installType
 				}
 			});
 		}

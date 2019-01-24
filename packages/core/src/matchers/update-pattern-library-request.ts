@@ -76,7 +76,8 @@ export function updatePatternLibrary({
 			payload: {
 				analysis: analysisResult.result,
 				path,
-				previousLibraryId: library.getId()
+				previousLibraryId: library.getId(),
+				installType: m.payload.installType
 			}
 		});
 	};

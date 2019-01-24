@@ -62,7 +62,8 @@ export const libraryMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 								type: Message.MessageType.UpdatePatternLibraryRequest,
 								payload: {
 									libId: library.getId(),
-									projectId
+									projectId,
+									installType: library.getInstallType()
 								}
 							});
 						});

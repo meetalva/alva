@@ -462,6 +462,11 @@ export class PatternLibrary {
 		this.state = state;
 	}
 
+	@Mobx.action
+	public setInstallType(installType: Types.PatternLibraryInstallType): void {
+		this.installType = installType;
+	}
+
 	public toJSON(): Types.SerializedPatternLibrary {
 		return {
 			model: this.model,
@@ -484,13 +489,15 @@ export class PatternLibrary {
 
 	@Mobx.action
 	public update(b: PatternLibrary): void {
+		console.log(b.installType);
+
 		this.bundleId = b.bundleId;
 		this.bundle = b.bundle;
 		this.description = b.description;
 		this.image = b.image;
 		this.name = b.name;
 		this.origin = b.origin;
-		this.state = this.state;
+		this.installType = b.installType;
 
 		const patternChanges = computeDifference<Pattern>({
 			before: this.getPatterns(),

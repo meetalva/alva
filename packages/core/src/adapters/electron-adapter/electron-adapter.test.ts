@@ -3,6 +3,7 @@ import { ElectronAdapter } from './electron-adapter';
 import { AlvaServer } from '../../server';
 import * as M from '../../message';
 import * as Matchers from '../../matchers';
+import * as T from '../../types';
 
 jest.mock('mobx');
 jest.mock('./electron-updater');
@@ -77,7 +78,8 @@ test('reacts to pattern library update request', async () => {
 		id: uuid.v4(),
 		payload: {
 			libId: uuid.v4(),
-			projectId: uuid.v4()
+			projectId: uuid.v4(),
+			installType: T.PatternLibraryInstallType.Local
 		}
 	};
 	server.sender.send(reqMsg);
@@ -93,7 +95,7 @@ test('creates new splashscreen on start', async () => {
 	expect((server as any).host.createWindow).toHaveBeenCalled();
 });
 
-test('create no splashscreen on start with filePath', async () => {
+test('creates no splashscreen on start with filePath', async () => {
 	const server = await AlvaServer.fromHosts({} as any);
 
 	const adapter = new ElectronAdapter({ server, forceUpdates: false });

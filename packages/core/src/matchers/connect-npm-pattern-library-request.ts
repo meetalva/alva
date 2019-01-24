@@ -100,7 +100,8 @@ export function connectNpmPatternLibrary({
 				payload: {
 					analysis: analysisResult.result,
 					path: result.path,
-					previousLibraryId: previousLibrary.getId()
+					previousLibraryId: previousLibrary.getId(),
+					installType: T.PatternLibraryInstallType.Remote
 				}
 			});
 		}

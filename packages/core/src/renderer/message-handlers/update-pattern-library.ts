@@ -20,8 +20,6 @@ export function updatePatternLibrary({
 			return;
 		}
 
-		console.log(m.payload.installType);
-
 		library.import(m.payload.analysis, { project });
 		library.setState(T.PatternLibraryState.Connected);
 		library.setInstallType(m.payload.installType);

@@ -3,6 +3,7 @@ import { MessageType as MT } from '../message';
 import * as T from '../types';
 import * as uuid from 'uuid';
 import { performAnalysis } from './perform-analysis';
+import { PatternLibraryInstallType } from '../types';
 
 export function updatePatternLibrary({
 	host,
@@ -35,15 +36,29 @@ export function updatePatternLibrary({
 		);
 
 		if (!connection || !await host.exists(connection.path)) {
-			app.send({
-				type: MT.ConnectPatternLibraryRequest,
-				id: uuid.v4(),
-				transaction: m.transaction,
-				payload: {
-					projectId: project.getId(),
-					library: library ? library.getId() : undefined
-				}
-			});
+			if (m.payload.installType === PatternLibraryInstallType.Local) {
+				app.send({
+					type: MT.ConnectPatternLibraryRequest,
+					id: uuid.v4(),
+					transaction: m.transaction,
+					payload: {
+						projectId: project.getId(),
+						library: library ? library.getId() : undefined
+					}
+				});
+			}
+
+			if (library && m.payload.installType === PatternLibraryInstallType.Remote) {
+				app.send({
+					type: MT.ConnectNpmPatternLibraryRequest,
+					id: uuid.v4(),
+					transaction: m.transaction,
+					payload: {
+						projectId: project.getId(),
+						npmId: library.getPackageName()
+					}
+				});
+			}
 
 			return;
 		}

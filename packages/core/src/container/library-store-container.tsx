@@ -12,6 +12,7 @@ import * as uuid from 'uuid';
 import { ExternalLink, ChevronDown, Check } from 'react-feather';
 import * as T from '../types';
 import { MessageType as MT } from '../message';
+import { PatternLibraryInstallType } from '../types';
 
 const validatePackageName = require('validate-npm-package-name');
 
@@ -84,7 +85,10 @@ export class LibraryStoreContainer extends React.Component {
 				this.submittedValue = '';
 
 				if (existing) {
-					existing.connect(store.getApp(), { project: store.getProject() });
+					existing.connect(store.getApp(), {
+						project: store.getProject(),
+						installType: PatternLibraryInstallType.Remote
+					});
 				} else {
 					app.send({
 						id: uuid.v4(),

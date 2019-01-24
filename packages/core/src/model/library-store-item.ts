@@ -5,6 +5,7 @@ import { LibraryStoreItemType, LibraryStoreItemState } from './library-store';
 import { Project } from './project';
 import * as T from '../types';
 import * as M from '../message';
+import { PatternLibraryInstallType } from '../types';
 
 export interface LibraryStoreItemInit {
 	id?: string;
@@ -125,7 +126,7 @@ export class LibraryStoreItem {
 	@Mobx.action
 	public connect(
 		sender: { send: T.Sender['send']; transaction: T.Sender['transaction'] },
-		data: { project: Project }
+		data: { project: Project; installType?: PatternLibraryInstallType }
 	): void {
 		if (this.state === LibraryStoreItemState.Installing) {
 			return;
@@ -147,14 +148,14 @@ export class LibraryStoreItem {
 			});
 		}
 
-		if (this.library && this.installType === T.PatternLibraryInstallType.Local) {
+		if (this.library) {
 			sender.send({
 				id: uuid.v4(),
 				type: M.MessageType.UpdatePatternLibraryRequest,
 				payload: {
 					projectId: data.project.getId(),
 					libId: this.library.getId(),
-					installType: this.installType
+					installType: data.installType || this.installType!
 				}
 			});
 		}

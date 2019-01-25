@@ -5,7 +5,7 @@ import { LibraryStoreItemType, LibraryStoreItemState } from './library-store';
 import { Project } from './project';
 import * as T from '../types';
 import * as M from '../message';
-import { PatternLibraryInstallType } from '../types';
+import { PatternLibraryInstallType, PatternLibraryOrigin } from '../types';
 
 export interface LibraryStoreItemInit {
 	id?: string;
@@ -19,10 +19,40 @@ export class LibraryStoreItem {
 	public readonly id: string;
 	private library?: PatternLibrary;
 	private type: LibraryStoreItemType;
-	private itemName: string;
-	private itemVersion: string;
+	@Mobx.observable private internalItemName: string;
+	@Mobx.observable private internalItemVersion: string;
 
 	@Mobx.observable private intermediateState: LibraryStoreItemState;
+	@Mobx.observable private meta?: any;
+
+	@Mobx.computed
+	public get itemName(): string {
+		if (this.meta) {
+			return typeof this.meta.name !== 'undefined' ? this.meta.name : this.internalItemName;
+		}
+
+		return this.internalItemName;
+	}
+
+	@Mobx.computed
+	public get itemVersion(): string {
+		if (this.meta) {
+			return typeof this.meta.version !== 'undefined'
+				? this.meta.version
+				: this.internalItemVersion;
+		}
+
+		return this.internalItemVersion;
+	}
+
+	@Mobx.computed
+	public get fetched(): boolean {
+		if (!this.meta) {
+			return false;
+		}
+
+		return this.meta.version === this.version && this.meta.name === this.packageName;
+	}
 
 	@Mobx.computed
 	public get hasLibrary(): boolean {
@@ -45,37 +75,60 @@ export class LibraryStoreItem {
 
 	@Mobx.computed
 	public get color(): string | undefined {
-		return this.library ? this.library.getColor() : undefined;
+		const alva = this.meta ? this.meta.alva || {} : {};
+		return this.library ? this.library.getColor() : alva.color;
 	}
 
 	@Mobx.computed
 	public get image(): string | undefined {
-		return this.library ? this.library.getImage() : undefined;
+		const alva = this.meta ? this.meta.alva || {} : {};
+		return this.library ? this.library.getImage() : alva.image;
 	}
 
 	@Mobx.computed
 	public get name(): string | undefined {
-		return this.library ? this.library.getName() : this.itemName;
+		const meta = this.meta ? this.meta : {};
+		return this.library
+			? this.library.getName()
+			: meta
+				? meta.name || this.itemName
+				: this.itemName;
 	}
 
 	@Mobx.computed
 	public get displayName(): string | undefined {
-		return this.library ? this.library.getDisplayName() : undefined;
+		const alva = this.meta ? this.meta.alva || {} : {};
+		return this.library
+			? this.library.getDisplayName()
+			: alva
+				? alva.name || this.name
+				: this.name;
 	}
 
 	@Mobx.computed
 	public get description(): string | undefined {
-		return this.library ? this.library.getDescription() : undefined;
+		const meta = this.meta ? this.meta : {};
+		return this.library ? this.library.getDescription() : meta.description;
 	}
 
 	@Mobx.computed
 	public get version(): string | undefined {
-		return this.library ? this.library.getVersion() : this.itemVersion;
+		const meta = this.meta ? this.meta : {};
+		return this.library
+			? this.library.getVersion()
+			: meta
+				? meta.version || this.itemVersion
+				: this.itemVersion;
 	}
 
 	@Mobx.computed
 	public get homepage(): string | undefined {
-		return this.library ? this.library.getHomepage() : undefined;
+		const meta = this.meta ? this.meta : {};
+		return this.library
+			? this.library.getHomepage()
+			: meta
+				? meta.homepage || this.homepage
+				: this.homepage;
 	}
 
 	@Mobx.computed
@@ -97,12 +150,19 @@ export class LibraryStoreItem {
 		this.id = init.id || uuid.v4();
 		this.library = init.library;
 		this.type = init.type;
-		this.itemName = init.name;
-		this.itemVersion = init.version;
+		this.internalItemName = init.name;
+		this.internalItemVersion = init.version;
+
 		this.intermediateState =
 			this.type === LibraryStoreItemType.Recommended
 				? LibraryStoreItemState.Listed
 				: LibraryStoreItemState.Unknown;
+
+		Mobx.autorun(() => {
+			if (!this.fetched) {
+				this.fetch();
+			}
+		});
 	}
 
 	public static fromRecommendation(
@@ -134,6 +194,37 @@ export class LibraryStoreItem {
 			version: library.getVersion()
 		});
 	}
+
+	@Mobx.action
+	public fetch = Mobx.flow<void>(function*(this: LibraryStoreItem): IterableIterator<any> {
+		if (
+			this.library &&
+			(this.installType !== PatternLibraryInstallType.Remote ||
+				this.origin !== PatternLibraryOrigin.UserProvided)
+		) {
+			return;
+		}
+
+		const response = yield (fetch(
+			`https://registry.npmjs.cf/${this.packageName}`
+		) as unknown) as Response;
+
+		if (!response.ok) {
+			this.meta = undefined;
+			return;
+		}
+
+		const data = yield response.json();
+		const meta = data['dist-tags'][this.version!] || data['versions'][this.version!];
+
+		if (!meta) {
+			this.meta = undefined;
+			return;
+		}
+
+		this.meta = meta;
+		console.log(Mobx.toJS(this.meta));
+	});
 
 	@Mobx.action
 	public connect(

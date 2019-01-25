@@ -164,8 +164,6 @@ export class PatternLibrary {
 
 	@Mobx.action
 	public import(analysis: Types.LibraryAnalysis, { project }: { project: Project }): void {
-		console.log(analysis.packageFile);
-
 		this.packageFile = analysis.packageFile;
 
 		const patternsBefore = this.getPatterns();

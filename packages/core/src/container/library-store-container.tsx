@@ -9,7 +9,7 @@ import { SpaceSize } from '../components/space';
 import { Color } from '../components/colors';
 import { MessageType } from '../message';
 import * as uuid from 'uuid';
-import { ExternalLink, ChevronDown, Check } from 'react-feather';
+import { ExternalLink, ChevronDown } from 'react-feather';
 import * as T from '../types';
 import { MessageType as MT } from '../message';
 import { PatternLibraryInstallType } from '../types';
@@ -22,10 +22,6 @@ const DetailsSummary = styled.summary`
 	&::-webkit-details-marker {
 		display: none;
 	}
-`;
-
-const Flex = styled.div`
-	display: flex;
 `;
 
 @MobxReact.inject('store')
@@ -122,7 +118,10 @@ export class LibraryStoreContainer extends React.Component {
 					<details>
 						<DetailsSummary>
 							<Components.Space size={SpaceSize.XS}>
-								<Flex style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+								<Components.Flex
+									alignItems={Components.FlexAlignItems.Center}
+									justifyContent={Components.FlexJustifyContent.SpaceBetween}
+								>
 									<div>
 										<Components.Headline
 											order={4}
@@ -132,7 +131,7 @@ export class LibraryStoreContainer extends React.Component {
 											Installed Libraries
 										</Components.Headline>
 										<Components.Space sizeBottom={SpaceSize.XS} />
-										<Flex style={{ alignItems: 'center' }}>
+										<Components.Flex style={{ alignItems: 'center' }}>
 											<Components.Copy textColor={Color.Grey36}>
 												Show {libraryStore.withLibrary.length} installed{' '}
 												{libraryStore.withLibrary.length === 1
@@ -141,7 +140,7 @@ export class LibraryStoreContainer extends React.Component {
 											</Components.Copy>
 											<Components.Space sizeRight={SpaceSize.XXS} />
 											<ChevronDown color={Color.Grey36} size={Components.IconSize.XS} />
-										</Flex>
+										</Components.Flex>
 									</div>
 									{store.getApp().isHostType(T.HostType.Electron) && (
 										<Components.Button
@@ -161,11 +160,11 @@ export class LibraryStoreContainer extends React.Component {
 											Install Local Library
 										</Components.Button>
 									)}
-								</Flex>
+								</Components.Flex>
 							</Components.Space>
 						</DetailsSummary>
 						<Components.Space sizeBottom={Components.SpaceSize.S} />
-						<Flex
+						<Components.Flex
 							style={{
 								flexWrap: 'wrap'
 							}}
@@ -177,7 +176,7 @@ export class LibraryStoreContainer extends React.Component {
 									size={LibraryStoreItemSize.Medium}
 								/>
 							))}
-						</Flex>
+						</Components.Flex>
 					</details>
 				</div>
 
@@ -208,7 +207,7 @@ export class LibraryStoreContainer extends React.Component {
 						</Components.Space>
 
 						<Components.Space sizeBottom={SpaceSize.XXL} />
-						<Flex>
+						<Components.Flex>
 							{libraryStore.recommendations.map(item => (
 								<LibraryStoreItemContainer
 									key={item.id}
@@ -216,7 +215,7 @@ export class LibraryStoreContainer extends React.Component {
 									size={LibraryStoreItemSize.Large}
 								/>
 							))}
-						</Flex>
+						</Components.Flex>
 						<Components.Space sizeTop={SpaceSize.XXXL} />
 						<Components.Space size={SpaceSize.XS}>
 							<div
@@ -229,7 +228,7 @@ export class LibraryStoreContainer extends React.Component {
 						</Components.Space>
 						<Components.Space sizeTop={SpaceSize.XXXL} />
 
-						<Flex>
+						<Components.Flex>
 							<div style={{ width: '50%', flexShrink: 0 }}>
 								<Components.Space size={SpaceSize.XS}>
 									<div style={{ maxWidth: '360px' }}>
@@ -327,7 +326,7 @@ export class LibraryStoreContainer extends React.Component {
 									</Components.Space>
 								</div>
 							)}
-						</Flex>
+						</Components.Flex>
 						<Components.Space sizeTop={SpaceSize.XXXL} />
 					</div>
 				</div>

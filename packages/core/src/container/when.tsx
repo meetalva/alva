@@ -6,8 +6,13 @@ export interface WhenProps {
 }
 
 export const When: React.SFC<WhenProps> = function When(props) {
-	const key = Object.keys(props).filter(key => typeof props[key] === 'boolean')[0];
-	const truthy = key ? props[key] === true : false;
+	const keys = Object.keys(props).filter(key => typeof props[key] === 'boolean');
+	const truthy = keys.every(key => props[key] === true);
+
+	if (!truthy) {
+		return null;
+	}
+
 	const children = React.Children.toArray(props.children).filter(
 		(c): c is React.ReactElement<unknown> => typeof c !== 'string'
 	);

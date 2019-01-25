@@ -1,4 +1,4 @@
-import * as Components from '../components';
+import * as C from '../components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
 import * as React from 'react';
@@ -20,6 +20,7 @@ export enum LibraryStoreItemSize {
 
 interface ActiveButtonProps {
 	label: string;
+	order?: C.ButtonOrder;
 	onClick: React.MouseEventHandler;
 }
 
@@ -29,27 +30,28 @@ interface DisabledButtonProps {
 
 const ActiveButton: React.SFC<ActiveButtonProps> = props => {
 	return (
-		<Components.Button
+		<C.Button
+			order={props.order}
 			size={ButtonSize.Medium}
 			inverted
-			color={Components.Color.Grey50}
+			color={C.Color.Grey50}
 			onClick={props.onClick}
 		>
 			{props.label}
-		</Components.Button>
+		</C.Button>
 	);
 };
 
 const DisabledButton: React.SFC<DisabledButtonProps> = props => {
 	return (
-		<Components.Button
-			order={Components.ButtonOrder.Secondary}
+		<C.Button
+			order={C.ButtonOrder.Secondary}
 			size={ButtonSize.Medium}
-			color={Components.Color.White}
+			color={C.Color.White}
 			disabled
 		>
 			{props.label}
-		</Components.Button>
+		</C.Button>
 	);
 };
 
@@ -102,7 +104,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 			props.size === LibraryStoreItemSize.Large ? LibraryBoxSize.Large : LibraryBoxSize.Medium;
 
 		return (
-			<Components.LibraryBox
+			<C.LibraryBox
 				key={props.item.id}
 				name={props.item.displayName || props.item.name}
 				description={props.item.description}
@@ -112,7 +114,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				version={props.item.version}
 				size={boxSize}
 				install={
-					<div>
+					<C.Flex alignItems={C.FlexAlignItems.Center}>
 						<Match value={props.item.state}>
 							<MatchBranch when={Model.LibraryStoreItemState.Listed}>
 								<ActiveButton label="Install" onClick={this.handleButtonClick} />
@@ -125,12 +127,14 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 							</MatchBranch>
 							<MatchBranch when={whenNotRemoteAnd(installed)}>
 								<ActiveButton label="Update from Disk" onClick={this.handleButtonClick} />
+								<C.Space sizeLeft={C.SpaceSize.XS} />
 							</MatchBranch>
 							<MatchBranch when={whenRemoteAnd(upToDate)}>
 								<DisabledButton label="Up to Date" />
+								<C.Space sizeLeft={C.SpaceSize.XS} />
 							</MatchBranch>
 						</Match>
-					</div>
+					</C.Flex>
 				}
 			/>
 		);

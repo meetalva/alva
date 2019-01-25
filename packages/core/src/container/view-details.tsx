@@ -11,6 +11,8 @@ import * as React from 'react';
 import * as ReactLoadable from 'react-loadable';
 import * as Types from '../types';
 import { ViewStore } from '../store';
+import { When } from './when';
+import { Match, MatchBranch } from './match';
 
 const PaneDevelopmentEditor = ReactLoadable({
 	loader: () => import('./pane-development-editor').then(m => m.PaneDevelopmentEditor),
@@ -22,70 +24,33 @@ const PaneDevelopmentEditor = ReactLoadable({
 export class ViewDetails extends React.Component {
 	public render(): JSX.Element {
 		const props = this.props as { store: ViewStore };
+		const viewMode = props.store.getApp().getProjectViewMode();
+		const isDesign = viewMode === Types.ProjectViewMode.Design;
 
 		return (
 			<React.Fragment>
-				{props.store.getApp().getProjectViewMode() === Types.ProjectViewMode.Design && (
-					<>
-						<AppPane
-							pane={Types.AppPane.PagesPane}
-							defaultSize={{ width: 140, height: '100%' }}
-							enable={{ right: true }}
-							minWidth={140}
-						>
-							<Components.SideBar
-								side={Components.LayoutSide.Left}
-								direction={Components.LayoutDirection.Column}
-								border={Components.LayoutBorder.Side}
+				<When isDesign={isDesign}>
+					<EditorSidebars />
+				</When>
+				<Components.Flex flexGrow={1} flexDirection={Components.FlexDirection.Column}>
+					<Match value={viewMode}>
+						<MatchBranch when={Types.ProjectViewMode.Design}>
+							<PreviewPaneWrapper isDragging={props.store.getDragging()} />
+							<AppPane
+								pane={Types.AppPane.DevelopmentPane}
+								defaultSize={{ width: '100%', height: 500 }}
+								enable={{ top: true }}
+								minHeight={240}
 							>
-								<PageListContainer />
-							</Components.SideBar>
-						</AppPane>
-						<AppPane
-							pane={Types.AppPane.ElementsPane}
-							defaultSize={{ width: 240, height: '100%' }}
-							enable={{ right: true }}
-							minWidth={240}
-						>
-							<Components.SideBar
-								side={Components.LayoutSide.Left}
-								direction={Components.LayoutDirection.Column}
-								border={Components.LayoutBorder.Side}
-							>
-								<Components.ElementPane>
-									<ElementList />
-								</Components.ElementPane>
-								<AppPane
-									force
-									pane={Types.AppPane.PatternsPane}
-									defaultSize={{ height: 500, width: '100%' }}
-									enable={{ top: true }}
-									minHeight={240}
-								>
-									<Components.PatternsPane>
-										<PatternListContainer />
-									</Components.PatternsPane>
-								</AppPane>
-							</Components.SideBar>
-						</AppPane>
-					</>
-				)}
-				<div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column' }}>
-					{props.store.getApp().getProjectViewMode() === Types.ProjectViewMode.Libraries ? (
-						<LibraryStoreContainer />
-					) : (
-						<PreviewPaneWrapper isDragging={props.store.getDragging()} key="center" />
-					)}
-					<AppPane
-						pane={Types.AppPane.DevelopmentPane}
-						defaultSize={{ width: '100%', height: 500 }}
-						enable={{ top: true }}
-						minHeight={240}
-					>
-						<PaneDevelopmentEditor />
-					</AppPane>
-				</div>
-				{props.store.getApp().getProjectViewMode() !== Types.ProjectViewMode.Libraries && (
+								<PaneDevelopmentEditor />
+							</AppPane>
+						</MatchBranch>
+						<MatchBranch when={Types.ProjectViewMode.Libraries}>
+							<LibraryStoreContainer />
+						</MatchBranch>
+					</Match>
+				</Components.Flex>
+				<When isDesign={isDesign}>
 					<AppPane
 						pane={Types.AppPane.PropertiesPane}
 						defaultSize={{ width: 240, height: '100%' }}
@@ -102,8 +67,59 @@ export class ViewDetails extends React.Component {
 							</Components.PropertyPane>
 						</Components.SideBar>
 					</AppPane>
-				)}
+				</When>
 			</React.Fragment>
+		);
+	}
+}
+
+@MobxReact.observer
+export class EditorSidebars extends React.Component {
+	public render(): JSX.Element {
+		return (
+			<>
+				<AppPane
+					pane={Types.AppPane.PagesPane}
+					defaultSize={{ width: 140, height: '100%' }}
+					enable={{ right: true }}
+					minWidth={140}
+				>
+					<Components.SideBar
+						side={Components.LayoutSide.Left}
+						direction={Components.LayoutDirection.Column}
+						border={Components.LayoutBorder.Side}
+					>
+						<PageListContainer />
+					</Components.SideBar>
+				</AppPane>
+				<AppPane
+					pane={Types.AppPane.ElementsPane}
+					defaultSize={{ width: 240, height: '100%' }}
+					enable={{ right: true }}
+					minWidth={240}
+				>
+					<Components.SideBar
+						side={Components.LayoutSide.Left}
+						direction={Components.LayoutDirection.Column}
+						border={Components.LayoutBorder.Side}
+					>
+						<Components.ElementPane>
+							<ElementList />
+						</Components.ElementPane>
+						<AppPane
+							force
+							pane={Types.AppPane.PatternsPane}
+							defaultSize={{ height: 500, width: '100%' }}
+							enable={{ top: true }}
+							minHeight={240}
+						>
+							<Components.PatternsPane>
+								<PatternListContainer />
+							</Components.PatternsPane>
+						</AppPane>
+					</Components.SideBar>
+				</AppPane>
+			</>
 		);
 	}
 }

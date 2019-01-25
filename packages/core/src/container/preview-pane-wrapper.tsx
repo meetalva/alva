@@ -73,10 +73,10 @@ interface OptimizedPreviewFrameProps extends PreviewFrameProps {
 }
 
 class OptimizedPreviewFrame extends React.Component<OptimizedPreviewFrameProps> {
-	// All state changes  should be performed
-	public shouldComponentUpdate(): boolean {
-		return false;
-	}
+	// All state changes should be performed via messages
+	// public shouldComponentUpdate(): boolean {
+	// 	return false;
+	// }
 
 	public render(): JSX.Element {
 		return (

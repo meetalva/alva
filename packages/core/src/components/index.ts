@@ -11,6 +11,7 @@ export * from './editable-title';
 export * from './element';
 export * from './element-slot';
 export * from './empty-state';
+export * from './flex';
 export * from './fonts';
 export * from './global-styles';
 export * from './headline';

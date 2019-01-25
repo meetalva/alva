@@ -5,6 +5,7 @@ import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
 import { ActionPayloadSelect } from './action-payload-select';
+import { FlexAlignItems } from '../../components';
 
 export interface ActionInputProps {
 	element: Model.Element;
@@ -118,11 +119,10 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 				const page = project.getPageById(props.elementAction.getPayload());
 
 				return (
-					<div
+					<Components.Flex
+						flexWrap={false}
+						alignItems={FlexAlignItems.Center}
 						style={{
-							display: 'flex',
-							alignItems: 'center',
-							flexWrap: 'nowrap',
 							marginTop: '6px'
 						}}
 					>
@@ -143,7 +143,7 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 								.getPages()
 								.map(p => ({ label: p.getName(), value: p.getId() }))}
 						/>
-					</div>
+					</Components.Flex>
 				);
 			}
 		}

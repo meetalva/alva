@@ -69,8 +69,11 @@ export const ChromeContainer = MobxReact.inject('store')(
 						hasPage={typeof page !== 'undefined'}
 						isDesignView={isDesignView}
 					>
-						<ProjectName name={project.getName()} draft={project.getDraft()} /> —{' '}
-						{page!.getName()}
+						<ProjectName
+							name={project ? project.getName() : ''}
+							draft={project ? project.getDraft() : false}
+						/>{' '}
+						— {page ? page!.getName() : ''}
 					</When>
 				</C.ViewSwitch>
 				<C.Flex

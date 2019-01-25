@@ -104,9 +104,15 @@ export function connectPatternLibrary({
 		}
 
 		const analysis = analysisResult.result;
+		const analysisName = analysisResult.result.packageFile
+			? (analysisResult.result.packageFile as { name?: string }).name || 'Library'
+			: 'Library';
+		const analysisVersion = analysisResult.result.packageFile
+			? (analysisResult.result.packageFile as { version?: string }).version || '1.0.0'
+			: '1.0.0';
 
 		dataHost.addConnection(project, {
-			id: `${analysisResult.result.name}@${analysisResult.result.version}`,
+			id: `${analysisName}@${analysisVersion}`,
 			path: analysis.path
 		});
 

@@ -79,21 +79,14 @@ export interface SerializedPatternSlot {
 export interface SerializedPatternLibrary {
 	bundle: string;
 	bundleId: string;
-	color: string;
-	description: string;
-	displayName: string;
-	homepage: string;
 	id: string;
-	image: string;
 	installType: PatternLibraryInstallType;
 	model: Types.ModelName.PatternLibrary;
-	name: string;
 	origin: SerializedPatternLibraryOrigin;
 	packageFile: { [key: string]: unknown };
 	patterns: SerializedPattern[];
 	patternProperties: PatternProperty.SerializedPatternProperty[];
 	state: PatternLibraryState;
-	version: string;
 }
 
 export type SavedProject = VersionOneSerializedProject;

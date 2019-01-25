@@ -13,20 +13,13 @@ const md5 = require('md5');
 export interface PatternLibraryInit {
 	bundleId: string;
 	bundle: string;
-	color: string;
-	description: string;
-	displayName: string;
-	homepage: string;
 	id: string;
-	image: string;
 	installType: Types.PatternLibraryInstallType;
-	name: string;
 	origin: Types.PatternLibraryOrigin;
 	packageFile: { [key: string]: unknown };
 	patternProperties: AnyPatternProperty[];
 	patterns: Pattern[];
 	state: Types.PatternLibraryState;
-	version: string;
 }
 
 export interface BuiltInContext {
@@ -52,19 +45,12 @@ export class PatternLibrary {
 
 	@Mobx.observable private bundleId: string;
 	@Mobx.observable private bundle: string;
-	@Mobx.observable private color: string;
-	@Mobx.observable private description: string;
-	@Mobx.observable private displayName: string;
-	@Mobx.observable private homepage: string;
-	@Mobx.observable private image: string;
 	@Mobx.observable private installType: Types.PatternLibraryInstallType;
-	@Mobx.observable private name: string;
 	@Mobx.observable private origin: Types.PatternLibraryOrigin;
 	@Mobx.observable private packageFile: { [key: string]: unknown };
 	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
 	@Mobx.observable private patterns: Map<string, Pattern> = new Map();
 	@Mobx.observable private state: Types.PatternLibraryState;
-	@Mobx.observable private version: string;
 
 	@Mobx.computed
 	private get slots(): PatternSlot[] {
@@ -76,46 +62,35 @@ export class PatternLibrary {
 
 	@Mobx.computed
 	public get contextId(): string {
-		return [this.name, this.version || '1.0.0'].join('@');
+		return [
+			this.packageFile ? (this.packageFile as { name?: string }).name || 'Library' : 'Library',
+			this.packageFile ? (this.packageFile as { version?: string }).version || '1.0.0' : '1.0.0'
+		].join('@');
 	}
 
 	public constructor(init: PatternLibraryInit) {
 		this.bundleId = init.bundleId;
 		this.bundle = init.bundle;
-		this.color = init.color;
-		this.description = init.description;
-		this.displayName = init.displayName;
-		this.homepage = init.homepage;
 		this.id = init.id || uuid.v4();
 		this.installType = init.installType;
-		this.image = init.image;
-		this.name = init.name;
 		this.origin = init.origin;
 		this.packageFile = init.packageFile;
 		init.patterns.forEach(pattern => this.patterns.set(pattern.getId(), pattern));
 		init.patternProperties.forEach(prop => this.patternProperties.set(prop.getId(), prop));
 		this.state = init.state;
-		this.version = init.version;
 	}
 
 	public static Defaults() {
 		return {
 			bundleId: uuid.v4(),
 			bundle: '',
-			color: '',
-			description: '',
-			displayName: '',
-			homepage: '',
 			id: uuid.v4(),
-			image: '',
 			installType: Types.PatternLibraryInstallType.Local,
-			name: 'Library',
 			origin: Types.PatternLibraryOrigin.UserProvided,
 			packageFile: {},
 			patterns: [],
 			patternProperties: [],
-			state: Types.PatternLibraryState.Connected,
-			version: '1.0.0'
+			state: Types.PatternLibraryState.Connected
 		};
 	}
 
@@ -134,22 +109,15 @@ export class PatternLibrary {
 		const library = PatternLibrary.create({
 			bundle: analysis.bundle,
 			bundleId: analysis.id,
-			color: analysis.color,
-			description: analysis.description,
-			displayName: analysis.displayName,
-			homepage: analysis.homepage,
 			id: uuid.v4(),
-			image: analysis.image,
 			installType: opts.installType,
-			name: analysis.name,
 			origin: opts.analyzeBuiltins
 				? Types.PatternLibraryOrigin.BuiltIn
 				: Types.PatternLibraryOrigin.UserProvided,
 			packageFile: analysis.packageFile,
 			patternProperties: [],
 			patterns: [],
-			state: Types.PatternLibraryState.Connected,
-			version: analysis.version
+			state: Types.PatternLibraryState.Connected
 		});
 
 		library.import(analysis, { project: opts.project });
@@ -163,20 +131,13 @@ export class PatternLibrary {
 		const patternLibrary = new PatternLibrary({
 			bundleId: serialized.bundleId,
 			bundle: serialized.bundle,
-			color: serialized.color,
-			description: serialized.description,
-			displayName: serialized.displayName,
-			homepage: serialized.homepage,
 			id: serialized.id,
-			image: serialized.image,
 			installType: serialized.installType,
-			name: serialized.name,
 			origin: deserializeOrigin(serialized.origin),
 			packageFile: serialized.packageFile,
 			patterns: [],
 			patternProperties: serialized.patternProperties.map(p => PatternProperty.from(p)),
-			state,
-			version: serialized.version
+			state
 		});
 
 		serialized.patterns.forEach(pattern => {
@@ -326,8 +287,10 @@ export class PatternLibrary {
 		return slot ? slot.getId() : uuid.v4();
 	}
 
-	public getDescription(): string {
-		return this.description;
+	public getDescription(): string | undefined {
+		return this.packageFile
+			? (this.packageFile as { description?: string }).description
+			: undefined;
 	}
 
 	public getBundle(): string {
@@ -342,8 +305,12 @@ export class PatternLibrary {
 		return md5(this.bundle);
 	}
 
-	public getColor(): string {
-		return this.color;
+	public getColor(): string | undefined {
+		return this.packageFile
+			? this.packageFile.alva
+				? (this.packageFile.alva as { color?: string }).color
+				: undefined
+			: undefined;
 	}
 
 	public getCapabilites(): Types.LibraryCapability[] {
@@ -370,23 +337,33 @@ export class PatternLibrary {
 	}
 
 	public getName(): string {
-		return this.name;
+		return this.packageFile
+			? (this.packageFile as { name?: string }).name || 'Library'
+			: 'Library';
 	}
 
-	public getDisplayName(): string {
-		return this.displayName;
+	public getDisplayName(): string | undefined {
+		return this.packageFile
+			? this.packageFile.alva
+				? (this.packageFile.alva as { name?: string }).name
+				: undefined
+			: undefined;
 	}
 
 	public getPackageName(): string {
-		return this.packageFile ? (this.packageFile as { name: string }).name : this.name;
+		return this.packageFile
+			? (this.packageFile as { name?: string }).name || 'Library'
+			: 'Library';
 	}
 
 	public getVersion(): string {
-		return this.version;
+		return this.packageFile
+			? (this.packageFile as { version?: string }).version || '1.0.0'
+			: '1.0.0';
 	}
 
-	public getHomepage(): string {
-		return this.homepage;
+	public getHomepage(): string | undefined {
+		return this.packageFile ? (this.packageFile as { homepage?: string }).homepage : undefined;
 	}
 
 	public getOrigin(): Types.PatternLibraryOrigin {
@@ -435,8 +412,12 @@ export class PatternLibrary {
 		return this.state;
 	}
 
-	public getImage(): string {
-		return this.image;
+	public getImage(): string | undefined {
+		return this.packageFile
+			? this.packageFile.alva
+				? (this.packageFile.alva as { image?: string }).image
+				: undefined
+			: undefined;
 	}
 
 	public getInstallType(): Types.PatternLibraryInstallType {
@@ -468,16 +449,6 @@ export class PatternLibrary {
 	}
 
 	@Mobx.action
-	public setDescription(description: string): void {
-		this.description = description;
-	}
-
-	@Mobx.action
-	public setName(name: string): void {
-		this.name = name;
-	}
-
-	@Mobx.action
 	public setState(state: Types.PatternLibraryState): void {
 		this.state = state;
 	}
@@ -491,21 +462,14 @@ export class PatternLibrary {
 		return {
 			bundleId: this.bundleId,
 			bundle: this.bundle,
-			color: this.color,
-			description: this.description,
-			displayName: this.displayName,
-			homepage: this.homepage,
 			id: this.id,
-			image: this.image,
 			installType: this.installType,
-			name: this.name,
 			model: this.model,
 			origin: serializeOrigin(this.origin),
 			packageFile: this.packageFile,
 			patternProperties: this.getPatternProperties().map(p => p.toJSON()),
 			patterns: this.getPatterns().map(p => p.toJSON()),
-			state: this.state,
-			version: this.version
+			state: this.state
 		};
 	}
 
@@ -513,13 +477,9 @@ export class PatternLibrary {
 	public update(b: PatternLibrary): void {
 		this.bundleId = b.bundleId;
 		this.bundle = b.bundle;
-		this.description = b.description;
-		this.displayName = b.displayName;
-		this.homepage = b.homepage;
-		this.image = b.image;
-		this.name = b.name;
 		this.origin = b.origin;
 		this.installType = b.installType;
+		this.packageFile = b.packageFile;
 
 		const patternChanges = computeDifference<Pattern>({
 			before: this.getPatterns(),

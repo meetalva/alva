@@ -103,21 +103,14 @@ export async function analyze(
 			type: Types.LibraryAnalysisResultType.Success,
 			result: {
 				bundle: await getBundle(),
-				color: pkg.alva ? pkg.alva.color || '' : undefined,
-				description: pkg.description || '',
-				displayName: pkg.alva ? pkg.alva.name || '' : undefined,
-				homepage: pkg.homepage || '',
 				id,
-				image: pkg.alva ? pkg.alva.image || '' : undefined,
-				name: pkg.name || 'Library',
 				packageFile: pkg,
 				path: pkgPath,
 				patterns: patterns.map(p => ({
 					path: p.path,
 					pattern: p.pattern,
 					properties: p.properties.map(prop => prop.property)
-				})),
-				version: pkg.version || '1.0.0'
+				}))
 			}
 		};
 	} catch (error) {

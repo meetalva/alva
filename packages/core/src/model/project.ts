@@ -66,6 +66,11 @@ export class Project {
 	@Mobx.observable private userStore: UserStore;
 
 	@Mobx.computed
+	private get flattenedLibraries(): PatternLibrary[] {
+		return [...this.patternLibraries.values()];
+	}
+
+	@Mobx.computed
 	private get activePage(): Page {
 		return this.pages.find(p => p.getActive()) || this.pages[0];
 	}
@@ -519,7 +524,7 @@ export class Project {
 	}
 
 	public getPatternLibraries(): PatternLibrary[] {
-		return [...this.patternLibraries.values()];
+		return this.flattenedLibraries;
 	}
 
 	public getPatternLibraryById(id: string): PatternLibrary | undefined {
@@ -527,11 +532,11 @@ export class Project {
 	}
 
 	public getPatternLibraryByContextId(contextid: string): PatternLibrary | undefined {
-		return [...this.patternLibraries.values()].find(p => p.contextId === contextid);
+		return this.flattenedLibraries.find(p => p.contextId === contextid);
 	}
 
-	public getPatternLibraryByName(name: string): PatternLibrary | undefined {
-		return [...this.patternLibraries.values()].find(p => p.getPackageName() === name);
+	public getPatternLibraryByPackageName(name: string): PatternLibrary | undefined {
+		return this.flattenedLibraries.find(p => p.getPackageName() === name);
 	}
 
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {

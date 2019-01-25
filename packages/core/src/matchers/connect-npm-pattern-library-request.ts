@@ -24,9 +24,11 @@ export function connectNpmPatternLibrary({
 			return;
 		}
 
-		const previousLibrary = m.payload.libraryId
+		const previousLibraryByName = project.getPatternLibraryByPackageName(m.payload.npmId);
+		const previousLibraryById = m.payload.libraryId
 			? project.getPatternLibraryById(m.payload.libraryId)
 			: undefined;
+		const previousLibrary = previousLibraryById || previousLibraryByName;
 
 		if (m.payload.libraryId && !previousLibrary) {
 			host.log(`connectNpmPatternLibrary: could not determine previous library`);
@@ -86,6 +88,7 @@ export function connectNpmPatternLibrary({
 				id: m.id,
 				transaction: m.transaction,
 				payload: {
+					result: 'success',
 					analysis: analysisResult.result,
 					path: result.path,
 					previousLibraryId: undefined,
@@ -98,6 +101,7 @@ export function connectNpmPatternLibrary({
 				id: m.id,
 				transaction: m.transaction,
 				payload: {
+					result: 'success',
 					analysis: analysisResult.result,
 					path: result.path,
 					previousLibraryId: previousLibrary.getId(),

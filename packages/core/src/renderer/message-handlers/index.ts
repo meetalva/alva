@@ -3,7 +3,6 @@ export * from './app-request';
 export * from './change-user-store';
 export * from './check-pattern-library';
 export * from './connect-pattern-library';
-export * from './connect-pattern-library-request';
 export * from './create-new-page';
 export * from './highlight-element';
 export * from './keyboard-change';

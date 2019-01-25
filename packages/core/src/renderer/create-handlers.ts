@@ -35,10 +35,6 @@ export function createHandlers(ctx: MessageHandlerContext): void {
 		M.MessageType.CheckLibraryResponse,
 		Handlers.checkPatternLibrary(ctx)
 	);
-	app.match<M.ConnectPatternLibraryRequest>(
-		M.MessageType.ConnectPatternLibraryRequest,
-		Handlers.connectPatternLibraryRequest(ctx)
-	);
 	app.match<M.ConnectPatternLibraryResponse>(
 		M.MessageType.ConnectPatternLibraryResponse,
 		Handlers.connectPatternLibrary(ctx)

@@ -99,7 +99,9 @@ export class LibraryStoreItem {
 		name: { name: string; version: string },
 		ctx: { project?: Project }
 	): LibraryStoreItem {
-		const library = ctx.project ? ctx.project.getPatternLibraryByName(name.name) : undefined;
+		const library = ctx.project
+			? ctx.project.getPatternLibraryByPackageName(name.name)
+			: undefined;
 
 		return new LibraryStoreItem({
 			library,

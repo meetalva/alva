@@ -15,6 +15,18 @@ export function connectPatternLibrary({
 			return;
 		}
 
+		if (m.payload.result === 'aborted') {
+			const library = m.payload.previousLibraryId
+				? project.getPatternLibraryById(m.payload.previousLibraryId)
+				: undefined;
+
+			if (library) {
+				library.setState(T.PatternLibraryState.Disconnected);
+			}
+
+			return;
+		}
+
 		const library = PatternLibrary.fromAnalysis(m.payload.analysis, {
 			analyzeBuiltins: false,
 			project,
@@ -22,8 +34,6 @@ export function connectPatternLibrary({
 		});
 
 		project.addPatternLibrary(library);
-
-		// store.getApp().setRightSidebarTab(Types.RightSidebarTab.ProjectSettings);
 		store.commit();
 
 		store.getSender().send({

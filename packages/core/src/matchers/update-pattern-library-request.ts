@@ -25,6 +25,7 @@ export function updatePatternLibrary({
 		}
 
 		const library = project.getPatternLibraryById(libId);
+
 		if (!library) {
 			host.log(`connectPatternLibrary: received message without resolveable library: ${m}`);
 			return;
@@ -89,6 +90,7 @@ export function updatePatternLibrary({
 			id: m.id,
 			transaction: m.transaction,
 			payload: {
+				result: 'success',
 				analysis: analysisResult.result,
 				path,
 				previousLibraryId: library.getId(),

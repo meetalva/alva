@@ -13,14 +13,35 @@ export function connectPatternLibrary({
 
 		if (!app) {
 			host.log(`connectPatternLibrary: received message without resolveable app: ${m}`);
+			(await host.getSender()).send({
+				type: M.MessageType.ConnectPatternLibraryResponse,
+				id: m.id,
+				transaction: m.transaction,
+				payload: {
+					result: 'aborted',
+					previousLibraryId: m.payload.library
+				}
+			});
 			return;
 		}
 
 		const project = await dataHost.getProject(m.payload.projectId);
 
+		const abort = () => {
+			app.send({
+				type: M.MessageType.ConnectPatternLibraryResponse,
+				id: m.id,
+				transaction: m.transaction,
+				payload: {
+					result: 'aborted',
+					previousLibraryId: m.payload.library
+				}
+			});
+		};
+
 		if (!project) {
 			host.log(`connectPatternLibrary: received message without resolveable project: ${m}`);
-			return;
+			return abort();
 		}
 
 		const path = await host.selectFile({
@@ -37,13 +58,17 @@ export function connectPatternLibrary({
 
 		if (!path) {
 			host.log(`connectPatternLibrary: no path`);
-			return;
+			return abort();
 		}
 
 		const pkg = JSON.parse((await host.readFile(path)).contents);
-		const previousLibrary = m.payload.library
+
+		const previousLibraryByName =
+			pkg && pkg.name ? project.getPatternLibraryByPackageName(pkg.name) : undefined;
+		const previousLibraryById = m.payload.library
 			? project.getPatternLibraryById(m.payload.library)
-			: project.getPatternLibraries().find(p => p.getName() === pkg.name);
+			: undefined;
+		const previousLibrary = previousLibraryById || previousLibraryByName;
 
 		if (previousLibrary) {
 			app.send({
@@ -74,7 +99,8 @@ export function connectPatternLibrary({
 					}
 				}
 			});
-			return;
+
+			return abort();
 		}
 
 		const analysis = analysisResult.result;
@@ -90,6 +116,7 @@ export function connectPatternLibrary({
 				id: m.id,
 				transaction: m.transaction,
 				payload: {
+					result: 'success',
 					analysis: analysisResult.result,
 					path,
 					previousLibraryId: undefined,
@@ -102,6 +129,7 @@ export function connectPatternLibrary({
 				id: m.id,
 				transaction: m.transaction,
 				payload: {
+					result: 'success',
 					analysis: analysisResult.result,
 					path,
 					previousLibraryId: previousLibrary.getId(),

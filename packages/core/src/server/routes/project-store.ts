@@ -7,7 +7,6 @@ export function projectStoureRouteFactory(server: Types.AlvaServer): Express.Req
 		req: Express.Request,
 		res: Express.Response
 	): Promise<void> {
-		console.log('projectStoreRoute');
 		res.type('html');
 
 		if (typeof req.params.id !== 'string') {

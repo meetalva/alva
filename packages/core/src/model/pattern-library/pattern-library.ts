@@ -489,8 +489,6 @@ export class PatternLibrary {
 
 	@Mobx.action
 	public update(b: PatternLibrary): void {
-		console.log(b.installType);
-
 		this.bundleId = b.bundleId;
 		this.bundle = b.bundle;
 		this.description = b.description;

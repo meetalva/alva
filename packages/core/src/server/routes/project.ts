@@ -4,7 +4,6 @@ import * as Types from '../../types';
 
 export function projectRouteFactory(server: Types.AlvaServer): Express.RequestHandler {
 	return async function projectRoute(req: Express.Request, res: Express.Response): Promise<void> {
-		console.log('projectRoute');
 		res.type('html');
 
 		if (typeof req.params.id !== 'string') {

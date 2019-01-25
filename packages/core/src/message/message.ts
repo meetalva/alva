@@ -248,13 +248,26 @@ export type ConnectPatternLibraryRequest = Envelope<
 >;
 export type ConnectPatternLibraryResponse = Envelope<
 	MessageType.ConnectPatternLibraryResponse,
-	{
-		analysis: Types.LibraryAnalysis;
-		path: string;
-		previousLibraryId: string | undefined;
-		installType: Types.PatternLibraryInstallType;
-	}
+	ConnectPatternLibraryResponsePayload
 >;
+
+export type ConnectPatternLibraryResponsePayload =
+	| ConnectPatternLibraryResponseSuccessPayload
+	| ConnectPatternLibraryResponseAbortPayload;
+
+export interface ConnectPatternLibraryResponseSuccessPayload {
+	result: 'success';
+	analysis: Types.LibraryAnalysis;
+	path: string;
+	previousLibraryId: string | undefined;
+	installType: Types.PatternLibraryInstallType;
+}
+
+export interface ConnectPatternLibraryResponseAbortPayload {
+	result: 'aborted';
+	previousLibraryId: string | undefined;
+}
+
 export type ContextMenuRequest = Envelope<
 	MessageType.ContextMenuRequest,
 	Types.ContextMenuRequestPayload
@@ -364,13 +377,26 @@ export type UpdatePatternLibraryRequest = Envelope<
 >;
 export type UpdatePatternLibraryResponse = Envelope<
 	MessageType.UpdatePatternLibraryResponse,
-	{
-		analysis: Types.LibraryAnalysis;
-		path: string;
-		previousLibraryId: string;
-		installType: Types.PatternLibraryInstallType;
-	}
+	UpdatePatternLibraryResponsePayload
 >;
+
+export type UpdatePatternLibraryResponsePayload =
+	| UpdatePatternLibraryResponseAbortPayload
+	| UpdatePatternLibraryResponseSuccessPayload;
+
+export interface UpdatePatternLibraryResponseAbortPayload {
+	result: 'aborted';
+	previousLibraryId: string | undefined;
+}
+
+export interface UpdatePatternLibraryResponseSuccessPayload {
+	result: 'success';
+	analysis: Types.LibraryAnalysis;
+	path: string;
+	previousLibraryId: string;
+	installType: Types.PatternLibraryInstallType;
+}
+
 export type ExportHtmlProject = Envelope<
 	MessageType.ExportHtmlProject,
 	{ path: string | undefined; projectId: string }

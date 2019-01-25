@@ -95,7 +95,6 @@ async function main(): Promise<void> {
 	}
 
 	const project = projectResult.result;
-	console.log(project.getElements().map(e => e.getName()));
 
 	project.getPatternLibraries().forEach(library => {
 		const script = document.createElement('script');

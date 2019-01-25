@@ -223,7 +223,6 @@ export class LibraryStoreItem {
 		}
 
 		this.meta = meta;
-		console.log(Mobx.toJS(this.meta));
 	});
 
 	@Mobx.action

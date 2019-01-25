@@ -101,7 +101,6 @@ export class ElectronMainMenu {
 			Menu.appMenu(ctx),
 			Menu.fileMenu(ctx),
 			Menu.editMenu(ctx),
-			Menu.libraryMenu(ctx),
 			Menu.viewMenu(ctx),
 			Menu.windowMenu(ctx),
 			Menu.helpMenu(ctx)

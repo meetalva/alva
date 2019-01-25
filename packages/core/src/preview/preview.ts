@@ -29,6 +29,7 @@ async function main(): Promise<void> {
 	const data = getInitialData();
 
 	if (!data) {
+		console.warn('preview received no data');
 		return;
 	}
 
@@ -94,6 +95,7 @@ async function main(): Promise<void> {
 	}
 
 	const project = projectResult.result;
+	console.log(project.getElements().map(e => e.getName()));
 
 	project.getPatternLibraries().forEach(library => {
 		const script = document.createElement('script');

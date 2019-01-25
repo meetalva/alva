@@ -16,13 +16,12 @@ export interface PreviewPaneProps {
 	isDragging: boolean;
 }
 
-const getSrcDoc = _.memoize((_, project: Model.Project) =>
+const getSrcDoc = (_: unknown, project: Model.Project) =>
 	PreviewDocument.previewDocument({
 		transferType: Types.PreviewTransferType.Inline,
 		data: project.toJSON(),
 		scripts: []
-	})
-);
+	});
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -74,9 +73,9 @@ interface OptimizedPreviewFrameProps extends PreviewFrameProps {
 
 class OptimizedPreviewFrame extends React.Component<OptimizedPreviewFrameProps> {
 	// All state changes should be performed via messages
-	// public shouldComponentUpdate(): boolean {
-	// 	return false;
-	// }
+	public shouldComponentUpdate(): boolean {
+		return false;
+	}
 
 	public render(): JSX.Element {
 		return (

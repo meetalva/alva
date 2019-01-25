@@ -22,6 +22,10 @@ const DetailsSummary = styled.summary`
 	&::-webkit-details-marker {
 		display: none;
 	}
+	&::-moz-list-bullet {
+		list-style-type: none;
+		display: block;
+	}
 `;
 
 @MobxReact.inject('store')

@@ -1,5 +1,6 @@
 import * as Mobx from 'mobx';
 import * as uuid from 'uuid';
+import * as semver from 'semver';
 import { PatternLibrary } from './pattern-library';
 import { LibraryStoreItemType, LibraryStoreItemState } from './library-store';
 import { Project } from './project';
@@ -24,6 +25,12 @@ export class LibraryStoreItem {
 
 	@Mobx.observable private intermediateState: LibraryStoreItemState;
 	@Mobx.observable private meta?: any;
+	@Mobx.observable private update?: any;
+
+	@Mobx.computed
+	public get hasUpdate(): boolean {
+		return typeof this.update !== 'undefined';
+	}
 
 	@Mobx.computed
 	public get itemName(): string {
@@ -63,6 +70,10 @@ export class LibraryStoreItem {
 	public get state(): LibraryStoreItemState {
 		if (!this.library) {
 			return this.intermediateState;
+		}
+
+		if (this.hasUpdate) {
+			return LibraryStoreItemState.NeedsUpdate;
 		}
 
 		switch (this.library.getState()) {
@@ -162,6 +173,8 @@ export class LibraryStoreItem {
 			if (!this.fetched) {
 				this.fetch();
 			}
+
+			this.checkForUpdate();
 		});
 	}
 
@@ -262,4 +275,38 @@ export class LibraryStoreItem {
 			});
 		}
 	}
+
+	@Mobx.action
+	public checkForUpdate = Mobx.flow<void>(function*(
+		this: LibraryStoreItem
+	): IterableIterator<any> {
+		if (
+			!this.version ||
+			!this.library ||
+			this.installType !== PatternLibraryInstallType.Remote ||
+			this.origin !== PatternLibraryOrigin.UserProvided
+		) {
+			return;
+		}
+
+		const response = yield (fetch(
+			`https://registry.npmjs.cf/${this.packageName}`
+		) as unknown) as Response;
+
+		if (!response.ok) {
+			return;
+		}
+
+		const data = yield response.json();
+		const latestVersion = (data['dist-tags'] || {}).latest;
+		const latestData = data.versions[latestVersion];
+
+		if (!latestData) {
+			return;
+		}
+
+		if (semver.gt(latestVersion, this.version)) {
+			this.update = latestData;
+		}
+	});
 }

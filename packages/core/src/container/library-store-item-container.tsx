@@ -72,9 +72,11 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 		const installed = (state: Model.LibraryStoreItemState) =>
 			state === Model.LibraryStoreItemState.Installed;
 
-		// TODO: Model "up to date" on library
 		const upToDate = (state: Model.LibraryStoreItemState) =>
 			state === Model.LibraryStoreItemState.Installed;
+
+		const needsUpdate = (state: Model.LibraryStoreItemState) =>
+			state === Model.LibraryStoreItemState.NeedsUpdate;
 
 		const installing = (state: Model.LibraryStoreItemState) =>
 			state === Model.LibraryStoreItemState.Installing;
@@ -127,6 +129,10 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 							</MatchBranch>
 							<MatchBranch when={whenNotRemoteAnd(installed)}>
 								<ActiveButton label="Update from Disk" onClick={this.handleButtonClick} />
+								<C.Space sizeLeft={C.SpaceSize.XS} />
+							</MatchBranch>
+							<MatchBranch when={whenRemoteAnd(needsUpdate)}>
+								<ActiveButton label="Update" onClick={this.handleButtonClick} />
 								<C.Space sizeLeft={C.SpaceSize.XS} />
 							</MatchBranch>
 							<MatchBranch when={whenRemoteAnd(upToDate)}>

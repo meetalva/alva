@@ -20,8 +20,6 @@ export class LibraryStore {
 		}
 	];
 
-	@Mobx.observable private drafts = [];
-
 	@Mobx.observable private project?: Project;
 
 	@Mobx.computed
@@ -61,8 +59,19 @@ export class LibraryStore {
 		return this.items.filter(item => item.hasLibrary);
 	}
 
+	@Mobx.computed
+	public get updateCount(): number {
+		return this.withLibrary.filter(item => item.hasUpdate).length;
+	}
+
 	public constructor(init?: LibraryStoreInit) {
 		this.project = init ? init.project : undefined;
+
+		Mobx.autorun(() => {
+			this.withLibrary.forEach(lib => lib.checkForUpdate());
+		});
+
+		setInterval(() => this.checkForUpdates(), 5 * 60 * 1000);
 	}
 
 	public getItemByPackageName(name: string): LibraryStoreItem | undefined {
@@ -72,6 +81,11 @@ export class LibraryStore {
 	@Mobx.action
 	public setProject(project: Project): void {
 		this.project = project;
+	}
+
+	@Mobx.action
+	public checkForUpdates(): void {
+		this.items.forEach(item => item.checkForUpdate());
 	}
 }
 
@@ -85,5 +99,6 @@ export enum LibraryStoreItemState {
 	Unknown = 'library-store-item-state-unknown',
 	Listed = 'library-store-item-state-listed',
 	Installing = 'library-store-item-state-installing',
-	Installed = 'library-store-item-state-installed'
+	Installed = 'library-store-item-state-installed',
+	NeedsUpdate = 'library-store-item-needs-update'
 }

@@ -9,6 +9,7 @@ import { WithStore } from '../store';
 import * as PreviewDocument from '../preview-document/preview-document';
 import * as Types from '../types';
 import * as _ from 'lodash';
+import * as Mobx from 'mobx';
 import * as Model from '../model';
 import { Layout } from 'react-feather';
 
@@ -16,12 +17,13 @@ export interface PreviewPaneProps {
 	isDragging: boolean;
 }
 
-const getSrcDoc = (_: unknown, project: Model.Project) =>
-	PreviewDocument.previewDocument({
+const getSrcDoc = (_: unknown, project: Model.Project) => {
+	return PreviewDocument.previewDocument({
 		transferType: Types.PreviewTransferType.Inline,
 		data: project.toJSON(),
 		scripts: []
 	});
+};
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -49,7 +51,7 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 			<PreviewPane>
 				<OptimizedPreviewFrame
 					frameRef={(frame: any) => (this.frame = frame)}
-					srcDoc={getSrcDoc(project.getId(), project)}
+					project={project}
 					offCanvas={false}
 					onMouseLeave={() => {
 						props.store.getProject().unsetHighlightedElement();
@@ -69,19 +71,28 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 
 interface OptimizedPreviewFrameProps extends PreviewFrameProps {
 	frameRef: any;
+	project: Model.Project;
 }
 
+@MobxReact.observer
 class OptimizedPreviewFrame extends React.Component<OptimizedPreviewFrameProps> {
-	// All state changes should be performed via messages
-	public shouldComponentUpdate(): boolean {
+	@Mobx.observable private doc: string | undefined;
+
+	// When mounted state changes
+	// are performed via messages
+	public componentWillUpdate() {
 		return false;
+	}
+
+	public componentDidMount() {
+		this.doc = getSrcDoc(this.props.project.getId(), this.props.project);
 	}
 
 	public render(): JSX.Element {
 		return (
 			<PreviewFrame
 				ref={this.props.frameRef}
-				srcDoc={this.props.srcDoc}
+				srcDoc={this.doc}
 				offCanvas={false}
 				onMouseLeave={this.props.onMouseLeave}
 			/>

@@ -53,6 +53,20 @@ export class PatternLibrary {
 	@Mobx.observable private state: Types.PatternLibraryState;
 
 	@Mobx.computed
+	private get version(): string {
+		return this.packageFile
+			? (this.packageFile as { version?: string }).version || '1.0.0'
+			: '1.0.0';
+	}
+
+	@Mobx.computed
+	private get name(): string {
+		return this.packageFile
+			? (this.packageFile as { name?: string }).name || 'Library'
+			: 'Library';
+	}
+
+	@Mobx.computed
 	private get slots(): PatternSlot[] {
 		return this.getPatterns().reduce<PatternSlot[]>(
 			(acc, pattern) => [...acc, ...pattern.getSlots()],
@@ -62,10 +76,7 @@ export class PatternLibrary {
 
 	@Mobx.computed
 	public get contextId(): string {
-		return [
-			this.packageFile ? (this.packageFile as { name?: string }).name || 'Library' : 'Library',
-			this.packageFile ? (this.packageFile as { version?: string }).version || '1.0.0' : '1.0.0'
-		].join('@');
+		return [this.name, this.version].join('@');
 	}
 
 	public constructor(init: PatternLibraryInit) {
@@ -153,6 +164,10 @@ export class PatternLibrary {
 
 	@Mobx.action
 	public import(analysis: Types.LibraryAnalysis, { project }: { project: Project }): void {
+		console.log(analysis.packageFile);
+
+		this.packageFile = analysis.packageFile;
+
 		const patternsBefore = this.getPatterns();
 		const patternsAfter = analysis.patterns.map(item =>
 			Pattern.from(item.pattern, { patternLibrary: this })

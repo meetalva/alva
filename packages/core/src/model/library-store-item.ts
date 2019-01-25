@@ -74,6 +74,11 @@ export class LibraryStoreItem {
 	}
 
 	@Mobx.computed
+	public get homepage(): string | undefined {
+		return this.library ? this.library.getHomepage() : undefined;
+	}
+
+	@Mobx.computed
 	public get installType(): T.PatternLibraryInstallType | undefined {
 		return this.library ? this.library.getInstallType() : T.PatternLibraryInstallType.Remote;
 	}

@@ -102,20 +102,21 @@ export async function analyze(
 		return {
 			type: Types.LibraryAnalysisResultType.Success,
 			result: {
-				id,
 				bundle: await getBundle(),
-				name: pkg.name || 'Library',
-				displayName: pkg.alva ? pkg.alva.name || '' : undefined,
-				description: pkg.description || '',
-				image: pkg.alva ? pkg.alva.image || '' : undefined,
 				color: pkg.alva ? pkg.alva.color || '' : undefined,
+				description: pkg.description || '',
+				displayName: pkg.alva ? pkg.alva.name || '' : undefined,
+				homepage: pkg.homepage || '',
+				id,
+				image: pkg.alva ? pkg.alva.image || '' : undefined,
+				name: pkg.name || 'Library',
+				packageFile: pkg,
+				path: pkgPath,
 				patterns: patterns.map(p => ({
 					path: p.path,
 					pattern: p.pattern,
 					properties: p.properties.map(prop => prop.property)
 				})),
-				path: pkgPath,
-				packageFile: pkg,
 				version: pkg.version || '1.0.0'
 			}
 		};

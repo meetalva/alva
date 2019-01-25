@@ -6,6 +6,7 @@
     "name": "Essentials"
   },
   "main": "lib/index.js",
+  "homepage": "https://github.com/meetalva/alva",
   "scripts": {
     "compile": "tsc",
     "watch": "tsc --watch"

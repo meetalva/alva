@@ -9,7 +9,7 @@
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
     "precommit": "lint-staged",
     "watch": "lerna run watch --stream",
-    "analyse:essentials": "alva analyze --out=packages/essentials/src/analysis.ts --in=packages/essentials/package.json"
+    "analyze:essentials": "alva analyze --out=packages/essentials/src/analysis.ts --in=packages/essentials/package.json"
   },
   "repository": {
     "type": "git",
@@ -57,7 +57,7 @@
     "tslint-config-prettier": "1.15.0",
     "typescript": "3.2.2"
   },
-  "homepage": "https://meetalva.github.io/",
+  "homepage": "https://meetalva.io/",
   "workspaces": [
     "packages/*"
   ],

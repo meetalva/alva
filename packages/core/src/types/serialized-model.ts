@@ -77,22 +77,23 @@ export interface SerializedPatternSlot {
 }
 
 export interface SerializedPatternLibrary {
-	model: Types.ModelName.PatternLibrary;
-	bundleId: string;
 	bundle: string;
+	bundleId: string;
 	color: string;
 	description: string;
+	displayName: string;
+	homepage: string;
 	id: string;
 	image: string;
-	name: string;
-	displayName: string;
-	version: string;
-	origin: SerializedPatternLibraryOrigin;
-	patternProperties: PatternProperty.SerializedPatternProperty[];
-	patterns: SerializedPattern[];
-	state: PatternLibraryState;
-	packageFile: { [key: string]: unknown };
 	installType: PatternLibraryInstallType;
+	model: Types.ModelName.PatternLibrary;
+	name: string;
+	origin: SerializedPatternLibraryOrigin;
+	packageFile: { [key: string]: unknown };
+	patterns: SerializedPattern[];
+	patternProperties: PatternProperty.SerializedPatternProperty[];
+	state: PatternLibraryState;
+	version: string;
 }
 
 export type SavedProject = VersionOneSerializedProject;

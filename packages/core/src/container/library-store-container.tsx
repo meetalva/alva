@@ -13,6 +13,7 @@ import { ExternalLink, ChevronDown } from 'react-feather';
 import * as T from '../types';
 import { MessageType as MT } from '../message';
 import { PatternLibraryInstallType } from '../types';
+import * as semver from 'semver';
 
 const validatePackageName = require('validate-npm-package-name');
 
@@ -80,12 +81,12 @@ export class LibraryStoreContainer extends React.Component {
 			if (this.submittedValue && this.isValidPackage) {
 				const fragments = this.submittedValue.split('@');
 				const name = (fragments.length >= 3 ? fragments.slice(0, -1) : fragments).join('@');
+				const range = fragments.length >= 3 ? fragments[fragments.length - 1] : 'latest';
 				const existing = store.libraryStore.getItemByPackageName(name);
-
-				this.submittedValue = '';
 
 				if (existing) {
 					existing.connect(store.getApp(), {
+						npmId: this.submittedValue,
 						project: store.getProject(),
 						installType: PatternLibraryInstallType.Remote
 					});

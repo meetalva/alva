@@ -91,6 +91,10 @@ export class ElectronAdapter {
 			MT.UpdatePatternLibraryRequest,
 			Matchers.updatePatternLibrary(context)
 		);
+		sender.match<M.UpdateNpmPatternLibraryRequest>(
+			MT.UpdateNpmPatternLibraryRequest,
+			Matchers.updateNpmPatternLibrary(context)
+		);
 		sender.match<M.Copy>(MT.Copy, Matchers.copy(context));
 		sender.match<M.Cut>(MT.Cut, Matchers.cut(context));
 		sender.match<M.CreateNewFileRequest>(

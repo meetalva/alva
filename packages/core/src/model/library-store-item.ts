@@ -241,7 +241,7 @@ export class LibraryStoreItem {
 	@Mobx.action
 	public connect(
 		sender: { send: T.Sender['send']; transaction: T.Sender['transaction'] },
-		data: { project: Project; installType?: PatternLibraryInstallType }
+		data: { project: Project; npmId?: string; installType?: PatternLibraryInstallType }
 	): void {
 		if (this.state === LibraryStoreItemState.Installing) {
 			return;
@@ -257,19 +257,44 @@ export class LibraryStoreItem {
 				id: uuid.v4(),
 				type: M.MessageType.ConnectNpmPatternLibraryRequest,
 				payload: {
-					npmId: this.packageName!,
+					npmId: data.npmId || this.packageName!,
 					projectId: data.project.getId()
 				}
 			});
 		}
 
-		if (this.library) {
+		if (!this.library) {
+			return;
+		}
+
+		if (this.installType === T.PatternLibraryInstallType.Local) {
+			this.intermediateState = LibraryStoreItemState.Installing;
+			this.library.setState(T.PatternLibraryState.Connecting);
+			this.update = undefined;
+
 			sender.send({
 				id: uuid.v4(),
 				type: M.MessageType.UpdatePatternLibraryRequest,
 				payload: {
 					projectId: data.project.getId(),
 					libId: this.library.getId(),
+					installType: data.installType || this.installType!
+				}
+			});
+		}
+
+		if (this.installType === T.PatternLibraryInstallType.Remote) {
+			this.intermediateState = LibraryStoreItemState.Installing;
+			this.library.setState(T.PatternLibraryState.Connecting);
+			this.update = undefined;
+
+			sender.send({
+				id: uuid.v4(),
+				type: M.MessageType.UpdateNpmPatternLibraryRequest,
+				payload: {
+					projectId: data.project.getId(),
+					libId: this.library.getId(),
+					npmId: data.npmId,
 					installType: data.installType || this.installType!
 				}
 			});

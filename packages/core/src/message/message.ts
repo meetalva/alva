@@ -97,6 +97,7 @@ export enum MessageType {
 	InstallUpdate = 'install-update',
 	ProjectRecordsChanged = 'project-records-changed',
 	ConnectNpmPatternLibraryRequest = 'connect-npm-pattern-library-request',
+	UpdateNpmPatternLibraryRequest = 'update-npm-pattern-library-request',
 	UpdatingPatternLibrary = 'updating-pattern-library'
 }
 
@@ -195,6 +196,7 @@ export type Message =
 	| InstallUpdate
 	| ProjectRecordsChanged
 	| ConnectNpmPatternLibraryRequest
+	| UpdateNpmPatternLibraryRequest
 	| UpdatingPatternLibrary;
 
 export type CreateNewFileRequest = Envelope<MessageType.CreateNewFileRequest, { replace: boolean }>;
@@ -371,6 +373,15 @@ export type UpdatePatternLibraryRequest = Envelope<
 	MessageType.UpdatePatternLibraryRequest,
 	{
 		libId: string;
+		projectId: string;
+		installType: Types.PatternLibraryInstallType;
+	}
+>;
+export type UpdateNpmPatternLibraryRequest = Envelope<
+	MessageType.UpdateNpmPatternLibraryRequest,
+	{
+		libId: string;
+		npmId?: string;
 		projectId: string;
 		installType: Types.PatternLibraryInstallType;
 	}

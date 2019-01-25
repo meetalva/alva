@@ -58,6 +58,10 @@ export class NodeAdapter {
 			MT.ConnectNpmPatternLibraryRequest,
 			Matchers.connectNpmPatternLibrary(context)
 		);
+		sender.match<M.UpdateNpmPatternLibraryRequest>(
+			MT.UpdateNpmPatternLibraryRequest,
+			Matchers.updateNpmPatternLibrary(context)
+		);
 
 		Mobx.autorun(async () => {
 			sender.send({

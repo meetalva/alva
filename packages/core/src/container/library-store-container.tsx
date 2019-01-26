@@ -9,7 +9,7 @@ import { SpaceSize } from '../components/space';
 import { Color } from '../components/colors';
 import { MessageType } from '../message';
 import * as uuid from 'uuid';
-import { ExternalLink, ChevronDown } from 'react-feather';
+import { ExternalLink, ChevronDown, RotateCw } from 'react-feather';
 import * as T from '../types';
 import { MessageType as MT } from '../message';
 import { PatternLibraryInstallType } from '../types';
@@ -180,7 +180,7 @@ export class LibraryStoreContainer extends React.Component {
 								</C.Flex>
 							</C.Space>
 						</DetailsSummary>
-						<C.Space sizeBottom={C.SpaceSize.S} />
+						<C.Space sizeBottom={C.SpaceSize.XS} />
 						<C.Flex
 							style={{
 								flexWrap: 'wrap'
@@ -194,6 +194,17 @@ export class LibraryStoreContainer extends React.Component {
 								/>
 							))}
 						</C.Flex>
+						<C.Space size={SpaceSize.XS}>
+							<C.Link onClick={() => libraryStore.checkForUpdates()} color={C.Color.Grey50}>
+								<C.Flex>
+									<RotateCw size={C.IconSize.XS} strokeWidth={2} />
+									<C.Space sizeRight={SpaceSize.XS} />
+									Check for Updates
+								</C.Flex>
+							</C.Link>
+						</C.Space>
+
+						<C.Space sizeBottom={C.SpaceSize.XS} />
 					</details>
 				</div>
 

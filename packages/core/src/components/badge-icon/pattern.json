@@ -1,0 +1,8 @@
+{
+	"name": "badge-icon",
+	"displayName": "Badge Icon",
+	"description": "Counts e.g. notifications",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": ["atom"]
+ }

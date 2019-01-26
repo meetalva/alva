@@ -6,7 +6,6 @@ import { Copy, CopySize } from '../copy';
 
 export interface TabProps {
 	active?: boolean;
-	title: string;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
@@ -27,9 +26,5 @@ const StyledTab = styled.div`
 `;
 
 export const Tab: React.StatelessComponent<TabProps> = props => {
-	return (
-		<StyledTab {...props}>
-			<Copy size={CopySize.S}>{props.title}</Copy>
-		</StyledTab>
-	);
+	return <StyledTab {...props}>{props.children}</StyledTab>;
 };

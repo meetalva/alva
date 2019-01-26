@@ -4,7 +4,7 @@ import * as C from '../../components';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
 import { Check, ChevronDown } from 'react-feather';
-import { When, WhenFalsy, WhenTruthy } from '../when';
+import { When } from '../when';
 const ReactSelectComponents = require('react-select').components;
 const OutsideClickHandler = require('react-outside-click-handler').default;
 
@@ -23,6 +23,7 @@ export class ChromeSwitch extends React.Component {
 		const isDesignView = viewMode === Types.ProjectViewMode.Design;
 
 		const app = store.getApp();
+		const libraryStore = store.libraryStore;
 		const panes = app.getPanes();
 
 		const next = panes.size > 0 ? [] : AppPanes;
@@ -113,15 +114,23 @@ export class ChromeSwitch extends React.Component {
 				</div>
 				<C.Space sizeRight={C.getSpace(C.SpaceSize.M)} />
 				<C.Tab
-					title="Design"
 					active={app.getProjectViewMode() === Types.ProjectViewMode.Design}
 					onClick={() => app.setProjectViewMode(Types.ProjectViewMode.Design)}
-				/>
+				>
+					Design
+				</C.Tab>
 				<C.Tab
-					title="Libraries"
 					active={app.getProjectViewMode() === Types.ProjectViewMode.Libraries}
 					onClick={() => app.setProjectViewMode(Types.ProjectViewMode.Libraries)}
-				/>
+				>
+					Libraries
+					{libraryStore.updateCount > 0 && (
+						<>
+							<C.Space sizeRight={C.SpaceSize.XS} />
+							<C.BadgeIcon color={C.Color.Blue20}>{libraryStore.updateCount}</C.BadgeIcon>
+						</>
+					)}
+				</C.Tab>
 			</C.Flex>
 		);
 	}

@@ -1,4 +1,5 @@
 export * from './add-button';
+export * from './badge-icon';
 export * from './button';
 export * from './button-group';
 export * from './chrome';

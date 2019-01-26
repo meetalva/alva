@@ -7,6 +7,9 @@ import { ButtonSize, LibraryBoxState, LibraryBoxSize } from '../components';
 import { LibraryStoreItem } from '../model/library-store-item';
 import { Match, MatchBranch } from './match';
 import { PatternLibraryInstallType } from '../types';
+import { MessageType } from '../message';
+import * as uuid from 'uuid';
+import { ExternalLink } from 'react-feather';
 
 export interface LibraryStoreItemContainerProps {
 	item: LibraryStoreItem;
@@ -115,6 +118,25 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				image={props.item.image}
 				version={props.item.version}
 				size={boxSize}
+				details={
+					props.item.homepage && (
+						<C.Flex>
+							<ExternalLink size={C.IconSize.XS} strokeWidth={1.5} />
+							<C.Space sizeRight={C.SpaceSize.XXS} />
+							<C.Link
+								onClick={() =>
+									props.store.getApp().send({
+										type: MessageType.OpenExternalURL,
+										id: uuid.v4(),
+										payload: props.item.homepage || ''
+									})
+								}
+							>
+								Learn more
+							</C.Link>
+						</C.Flex>
+					)
+				}
 				install={
 					<C.Flex alignItems={C.FlexAlignItems.Center}>
 						<Match value={props.item.state}>

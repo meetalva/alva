@@ -23,6 +23,7 @@ export interface LibraryBoxProps {
 	image?: string;
 	name?: string;
 	description?: string;
+	details?: React.ReactNode;
 	install?: React.ReactNode;
 	version?: string;
 	state: LibraryBoxState;
@@ -62,7 +63,7 @@ const StyledDetails = styled.div`
 	box-sizing: border-box;
 `;
 
-const TranslucentCopy = styled(Copy)`
+const Translucent = styled.div`
 	opacity: 0.75;
 `;
 
@@ -127,7 +128,11 @@ export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JS
 			<StyledTop>
 				<Headline order={4}>{props.name}</Headline>
 				<Space sizeBottom={SpaceSize.XS} />
-				<TranslucentCopy size={CopySize.M}>{props.description}</TranslucentCopy>
+				<Translucent>
+					<Copy size={CopySize.M}>{props.description}</Copy>
+					<Space sizeBottom={SpaceSize.XS + SpaceSize.XXS} />
+					{props.details}
+				</Translucent>
 				<Space sizeBottom={SpaceSize.S} />
 			</StyledTop>
 			<StyledBottom {...props}>
@@ -135,7 +140,9 @@ export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JS
 				<Space sizeTop={SpaceSize.L} />
 				<StyledInstallContainer>
 					{props.install}
-					<TranslucentCopy>{props.version}</TranslucentCopy>
+					<Translucent>
+						<Copy>{props.version}</Copy>
+					</Translucent>
 				</StyledInstallContainer>
 				<Space sizeBottom={SpaceSize.L} />
 			</StyledBottom>

@@ -135,11 +135,7 @@ export class LibraryStoreItem {
 	@Mobx.computed
 	public get homepage(): string | undefined {
 		const meta = this.meta ? this.meta : {};
-		return this.library
-			? this.library.getHomepage()
-			: meta
-				? meta.homepage || this.homepage
-				: this.homepage;
+		return this.library ? this.library.getHomepage() : meta.homepage;
 	}
 
 	@Mobx.computed

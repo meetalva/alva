@@ -16,7 +16,7 @@ const StyledEmptyState = styled.div`
 	text-align: center;
 	padding: ${getSpace(SpaceSize.XXXL)}px ${getSpace(SpaceSize.XXXL)}px
 		${getSpace(SpaceSize.XXXL + SpaceSize.XXL)}px;
-	height: 100%;
+	min-height: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;

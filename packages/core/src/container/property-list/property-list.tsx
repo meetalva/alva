@@ -18,12 +18,10 @@ export class PropertyListContainer extends React.Component<PropertyListContainer
 
 		if (!selectedElement || selectedElement.getRole() === T.ElementRole.Root) {
 			return (
-				<div>
-					<Components.EmptyState
-						headline="Properties"
-						copy="Select an element to edit properties"
-					/>
-				</div>
+				<Components.EmptyState
+					headline="Properties"
+					copy="Select an element to edit properties"
+				/>
 			);
 		}
 		return <PropertyListVirtual element={selectedElement} />;

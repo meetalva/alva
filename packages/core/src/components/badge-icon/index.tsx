@@ -1,8 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Color } from '../colors';
-import { getSpace, SpaceSize } from '../space';
-import { Copy, CopySize } from '../copy';
 
 export interface BadgeIconProps {
 	color: Color;

@@ -64,6 +64,20 @@ export class PatternListContainer extends React.Component {
 						))}
 					<ElementDragImage element={store.getDraggedElement()} dragRef={this.dragImg} />
 				</div>
+				<div
+					style={{
+						userSelect: 'none',
+						maxWidth: '180px'
+					}}
+				>
+					<Components.Link
+						color={Components.Color.Grey50}
+						onClick={() => store.getApp().setProjectViewMode(Types.ProjectViewMode.Libraries)}
+					>
+						Open Library Store to browse and install more libraries
+					</Components.Link>
+				</div>
+				<Components.Space sizeBottom={Components.SpaceSize.XL} />
 			</div>
 		);
 	}

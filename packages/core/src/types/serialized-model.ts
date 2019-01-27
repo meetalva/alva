@@ -110,7 +110,7 @@ export interface SerializedPatternLibraryV2 {
 	state: PatternLibraryState;
 }
 
-export type SavedProject = VersionOneSerializedProject;
+export type SavedProject = VersionTwoSerializedProject;
 
 export type MigratableProject =
 	| VersionZeroSerializedProject

@@ -76,14 +76,35 @@ export interface SerializedPatternSlot {
 	type: string;
 }
 
-export interface SerializedPatternLibrary {
+export type SerializedPatternLibrary = SerializedPatternLibraryV2;
+
+export interface SerializedPatternLibraryV1 {
+	bundle: string;
+	bundleId: string;
+	description?: string;
+	id: string;
+	installType: PatternLibraryInstallType;
+	model: Types.ModelName.PatternLibrary;
+	name: string;
+	origin: SerializedPatternLibraryOrigin;
+	patterns: SerializedPattern[];
+	patternProperties: PatternProperty.SerializedPatternProperty[];
+	state: PatternLibraryState;
+	version: number;
+}
+
+export interface SerializedPatternLibraryV2 {
 	bundle: string;
 	bundleId: string;
 	id: string;
 	installType: PatternLibraryInstallType;
 	model: Types.ModelName.PatternLibrary;
 	origin: SerializedPatternLibraryOrigin;
-	packageFile: { [key: string]: unknown };
+	packageFile: {
+		name: string;
+		version: string;
+		[key: string]: unknown;
+	};
 	patterns: SerializedPattern[];
 	patternProperties: PatternProperty.SerializedPatternProperty[];
 	state: PatternLibraryState;
@@ -91,7 +112,10 @@ export interface SerializedPatternLibrary {
 
 export type SavedProject = VersionOneSerializedProject;
 
-export type MigratableProject = VersionZeroSerializedProject | VersionOneSerializedProject;
+export type MigratableProject =
+	| VersionZeroSerializedProject
+	| VersionOneSerializedProject
+	| VersionTwoSerializedProject;
 
 export interface VersionZeroSerializedProject {
 	version?: number;
@@ -103,7 +127,7 @@ export interface VersionZeroSerializedProject {
 	name: string;
 	pages: SerializedPage[];
 	pageList: string[];
-	patternLibraries: SerializedPatternLibrary[];
+	patternLibraries: SerializedPatternLibraryV1[];
 	userStore: UserStore.SerializedUserStore;
 }
 
@@ -117,7 +141,21 @@ export interface VersionOneSerializedProject {
 	name: string;
 	pages: SerializedPage[];
 	pageList: string[];
-	patternLibraries: SerializedPatternLibrary[];
+	patternLibraries: SerializedPatternLibraryV1[];
+	userStore: UserStore.SerializedUserStore;
+}
+
+export interface VersionTwoSerializedProject {
+	version: number;
+	model: Types.ModelName.Project;
+	elementActions: SerializedElementAction[];
+	elementContents: SerializedElementContent[];
+	elements: SerializedElement[];
+	id: string;
+	name: string;
+	pages: SerializedPage[];
+	pageList: string[];
+	patternLibraries: SerializedPatternLibraryV2[];
 	userStore: UserStore.SerializedUserStore;
 }
 

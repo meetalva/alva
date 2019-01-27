@@ -47,7 +47,12 @@ export class PatternLibrary {
 	@Mobx.observable private bundle: string;
 	@Mobx.observable private installType: Types.PatternLibraryInstallType;
 	@Mobx.observable private origin: Types.PatternLibraryOrigin;
-	@Mobx.observable private packageFile: { [key: string]: unknown };
+	@Mobx.observable
+	private packageFile: {
+		name: string;
+		version: string;
+		[key: string]: unknown;
+	};
 	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
 	@Mobx.observable private patterns: Map<string, Pattern> = new Map();
 	@Mobx.observable private state: Types.PatternLibraryState;

@@ -13,7 +13,7 @@ export class ZeroOneMigration
 
 	private replaceBuiltins(
 		project: T.VersionZeroSerializedProject,
-		oldBuiltin: T.SerializedPatternLibrary
+		oldBuiltin: T.SerializedPatternLibraryV1
 	): void {
 		oldBuiltin.patterns.forEach(oldPattern => {
 			const newPattern = builtinPatternLibrary.getPatternByType(

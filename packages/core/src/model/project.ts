@@ -39,7 +39,7 @@ export interface ProjectCreateInit {
 export class Project {
 	public readonly model = Types.ModelName.Project;
 
-	private readonly version: 0 | 1 = 0;
+	private readonly version: 0 | 1 | 2 = 2;
 
 	private syncing: boolean = false;
 

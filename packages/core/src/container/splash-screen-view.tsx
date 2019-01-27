@@ -40,8 +40,8 @@ export class SplashScreenView extends React.Component<SplashScreenProps> {
 							icon="ExternalLink"
 						/>
 						<C.Teaser
-							headline="Download Example"
-							description="Download our website as an Alva file"
+							headline="Open Example"
+							description="Open our website as an Alva file"
 							color={C.Color.Grey20}
 							size={C.TeaserSize.Medium}
 							onClick={props.onExampleClick}

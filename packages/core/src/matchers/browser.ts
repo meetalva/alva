@@ -5,6 +5,7 @@ export * from './cut';
 export * from './export-html-project';
 export * from './open-external-url';
 export * from './open-file-request';
+export * from './open-remote-file-request';
 export * from './open-window';
 export * from './paste';
 export * from './save';

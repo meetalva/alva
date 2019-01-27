@@ -59,6 +59,7 @@ export enum MessageType {
 	OpenExternalURL = 'open-external-url',
 	OpenFileRequest = 'open-file-request',
 	OpenFileResponse = 'open-file-response',
+	OpenRemoteFileRequest = 'open-remote-file-request',
 	PageChange = 'page-change',
 	ProjectChange = 'project-change',
 	Paste = 'paste',
@@ -148,6 +149,7 @@ export type Message =
 	| OpenExternalURL
 	| OpenFileRequest
 	| OpenFileResponse
+	| OpenRemoteFileRequest
 	| PageChange
 	| ProjectChange
 	| Paste
@@ -311,6 +313,10 @@ export type OpenExternalURL = Envelope<MessageType.OpenExternalURL, string>;
 export type OpenFileRequest = Envelope<
 	MessageType.OpenFileRequest,
 	{ path?: string; silent?: boolean; replace: boolean; newWindow?: boolean }
+>;
+export type OpenRemoteFileRequest = Envelope<
+	MessageType.OpenRemoteFileRequest,
+	{ type: 'http'; url: string }
 >;
 export type OpenFileResponse = Envelope<MessageType.OpenFileResponse, Types.ProjectPayload>;
 export type PageChange = Envelope<MessageType.PageChange, Types.PageChangePayload>;

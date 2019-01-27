@@ -5,11 +5,9 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { WithStore } from '../store';
 import { LibraryStoreItemContainer, LibraryStoreItemSize } from './library-store-item-container';
-import { SpaceSize } from '../components/space';
-import { Color } from '../components/colors';
 import { MessageType } from '../message';
 import * as uuid from 'uuid';
-import { ExternalLink, ChevronDown, RotateCw } from 'react-feather';
+import { ExternalLink, ChevronDown } from 'react-feather';
 import * as T from '../types';
 import { MessageType as MT } from '../message';
 import { PatternLibraryInstallType } from '../types';
@@ -147,7 +145,7 @@ export class LibraryStoreContainer extends React.Component {
 				>
 					<Details mayToggle={libraryStore.updateCount === 0} open={libraryStore.installedOpen}>
 						<DetailsSummary onClick={this.handleDetailsClick}>
-							<C.Space size={SpaceSize.XS}>
+							<C.Space size={C.SpaceSize.XS}>
 								<C.Flex
 									alignItems={C.FlexAlignItems.Center}
 									justifyContent={C.FlexJustifyContent.SpaceBetween}
@@ -172,17 +170,17 @@ export class LibraryStoreContainer extends React.Component {
 													? 'Updates available'
 													: 'Everything up to date'}
 											</C.Headline>
-											<C.Space sizeBottom={SpaceSize.XS} />
+											<C.Space sizeBottom={C.SpaceSize.XS} />
 											<When mayToggle={libraryStore.updateCount === 0}>
 												<C.Flex style={{ alignItems: 'center' }}>
-														<C.Copy textColor={Color.Grey36}>
+														<C.Copy textColor={C.Color.Grey36}>
 															Show {libraryStore.withLibrary.length} installed{' '}
 															{libraryStore.withLibrary.length === 1
 																? 'library'
 																: 'libraries'}
 														</C.Copy>
-													<C.Space sizeRight={SpaceSize.XXS} />
-													<ChevronDown color={Color.Grey36} size={C.IconSize.XS} />
+													<C.Space sizeRight={C.SpaceSize.XXS} />
+													<ChevronDown color={C.Color.Grey36} size={C.IconSize.XS} />
 												</C.Flex>
 											</When>
 										</div>
@@ -213,14 +211,15 @@ export class LibraryStoreContainer extends React.Component {
 								/>
 							))}
 						</C.Flex>
-						<C.Space size={SpaceSize.XS}>
-							<C.Link onClick={() => libraryStore.checkForUpdates()} color={C.Color.Grey50}>
-								<C.Flex>
-									<RotateCw size={C.IconSize.XS} strokeWidth={2} />
-									<C.Space sizeRight={SpaceSize.XS} />
-									Check for Updates
-								</C.Flex>
-							</C.Link>
+						<C.Space size={C.SpaceSize.XS}>
+							<C.LinkIcon
+								color={C.Color.Grey50}
+								icon="RotateCw"
+								size={C.CopySize.S}
+								onClick={() => libraryStore.checkForUpdates()}
+							>
+								Check for Updates
+							</C.LinkIcon>
 						</C.Space>
 
 						<C.Space sizeBottom={C.SpaceSize.XS} />
@@ -230,7 +229,7 @@ export class LibraryStoreContainer extends React.Component {
 				<div
 					style={{
 						background: C.Color.White,
-						borderTop: `1px solid ${Color.Grey90}`
+						borderTop: `1px solid ${C.Color.Grey90}`
 					}}
 				>
 					<div
@@ -238,22 +237,22 @@ export class LibraryStoreContainer extends React.Component {
 							width: '90%',
 							maxWidth: '1080px',
 							margin: '0 auto',
-							padding: `${C.getSpace(C.SpaceSize.XXXL + SpaceSize.L)}px 0`
+							padding: `${C.getSpace(C.SpaceSize.XXXL + C.SpaceSize.L)}px 0`
 						}}
 					>
-						<C.Space size={SpaceSize.XS}>
+						<C.Space size={C.SpaceSize.XS}>
 							<div style={{ maxWidth: '260px' }}>
 								<C.Headline order={2} bold textColor={C.Color.Grey10}>
 									Library Store
 								</C.Headline>
-								<C.Space sizeBottom={SpaceSize.M} />
-								<C.Copy textColor={Color.Grey36} size={C.CopySize.M}>
+								<C.Space sizeBottom={C.SpaceSize.M} />
+								<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
 									Browse and install compatible code libraries for your prototype
 								</C.Copy>
 							</div>
 						</C.Space>
 
-						<C.Space sizeBottom={SpaceSize.XXL} />
+						<C.Space sizeBottom={C.SpaceSize.XXL} />
 						<C.Flex>
 							{libraryStore.recommendations.map(item => (
 								<LibraryStoreItemContainer
@@ -263,8 +262,8 @@ export class LibraryStoreContainer extends React.Component {
 								/>
 							))}
 						</C.Flex>
-						<C.Space sizeTop={SpaceSize.XXXL} />
-						<C.Space size={SpaceSize.XS}>
+						<C.Space sizeTop={C.SpaceSize.XXXL} />
+						<C.Space size={C.SpaceSize.XS}>
 							<div
 								style={{
 									width: '100%',
@@ -273,20 +272,20 @@ export class LibraryStoreContainer extends React.Component {
 								}}
 							/>
 						</C.Space>
-						<C.Space sizeTop={SpaceSize.XXXL} />
+						<C.Space sizeTop={C.SpaceSize.XXXL} />
 
 						<C.Flex>
 							<div style={{ width: '50%', flexShrink: 0 }}>
-								<C.Space size={SpaceSize.XS}>
+								<C.Space size={C.SpaceSize.XS}>
 									<div style={{ maxWidth: '360px' }}>
 										<C.Headline order={4} bold textColor={C.Color.Grey10}>
 											Install Library from NPM
 										</C.Headline>
-										<C.Space sizeBottom={SpaceSize.XS} />
-										<C.Copy textColor={Color.Grey36} size={C.CopySize.M}>
+										<C.Space sizeBottom={C.SpaceSize.XS} />
+										<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
 											Install any package with a React and TypeScript library from NPM.
 										</C.Copy>
-										<C.Space sizeBottom={SpaceSize.M} />
+										<C.Space sizeBottom={C.SpaceSize.M} />
 										<C.InputButton
 											placeholder="Package Name"
 											value={this.searchValue}
@@ -306,17 +305,17 @@ export class LibraryStoreContainer extends React.Component {
 							</div>
 							{store.getApp().isHostType(T.HostType.Electron) && (
 								<div style={{ width: '50%', flexShrink: 0 }}>
-									<C.Space size={SpaceSize.XS}>
+									<C.Space size={C.SpaceSize.XS}>
 										<div style={{ maxWidth: '360px' }}>
 											<C.Headline order={4} bold textColor={C.Color.Grey10}>
 												Install Local Library
 											</C.Headline>
-											<C.Space sizeBottom={SpaceSize.XS} />
-											<C.Copy textColor={Color.Grey36} size={C.CopySize.M}>
+											<C.Space sizeBottom={C.SpaceSize.XS} />
+											<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
 												Select a library running on your local computer. Build it and
 												select the package.json in the library folder.
 											</C.Copy>
-											<C.Space sizeBottom={SpaceSize.M} />
+											<C.Space sizeBottom={C.SpaceSize.M} />
 											<C.Button
 												order={C.ButtonOrder.Primary}
 												size={C.ButtonSize.Medium}
@@ -333,9 +332,9 @@ export class LibraryStoreContainer extends React.Component {
 											>
 												Install Local Library
 											</C.Button>
-											<C.Space sizeBottom={SpaceSize.S} />
+											<C.Space sizeBottom={C.SpaceSize.S} />
 											<C.Link
-												color={Color.Grey50}
+												color={C.Color.Grey50}
 												onClick={() => {
 													store.getSender().send({
 														type: MessageType.OpenExternalURL,
@@ -347,17 +346,17 @@ export class LibraryStoreContainer extends React.Component {
 											>
 												<div style={{ display: 'flex', alignItems: 'center' }}>
 													<ExternalLink size={C.IconSize.XS} strokeWidth={1.5} />
-													<C.Space sizeRight={SpaceSize.XXS} />
+													<C.Space sizeRight={C.SpaceSize.XXS} />
 													See Guide
 												</div>
 											</C.Link>
-											<C.Space sizeTop={SpaceSize.XXL} />
+											<C.Space sizeTop={C.SpaceSize.XXL} />
 										</div>
 									</C.Space>
 								</div>
 							)}
 						</C.Flex>
-						<C.Space sizeTop={SpaceSize.XXXL} />
+						<C.Space sizeTop={C.SpaceSize.XXXL} />
 					</div>
 				</div>
 			</div>

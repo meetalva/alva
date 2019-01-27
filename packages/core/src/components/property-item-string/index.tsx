@@ -19,7 +19,7 @@ export interface PropertyItemStringProps {
 }
 
 // tslint:disable-next-line:no-any
-export const LinkIcon: StyledComponentClass<{}, {}, any> = styled(Link2)`
+export const PropertyLinkIcon: StyledComponentClass<{}, {}, any> = styled(Link2)`
 	position: absolute;
 	top: 15px;
 	transform: translateY(-50%);

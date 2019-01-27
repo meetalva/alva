@@ -47,7 +47,7 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 										onChange={e => props.elementAction.setPayload(e.target.value)}
 										onBlur={() => window.requestIdleCallback(() => props.store.commit())}
 									/>
-									<Components.LinkIcon
+									<Components.PropertyLinkIcon
 										onClick={() => {
 											props.elementAction.setOpen(true);
 										}}

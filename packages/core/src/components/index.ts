@@ -24,6 +24,7 @@ export * from './layout';
 export * from './layout-switch';
 export * from './library-box';
 export * from './link';
+export * from './link-icon';
 export * from './list';
 export * from './overlay';
 export * from './page-tile';

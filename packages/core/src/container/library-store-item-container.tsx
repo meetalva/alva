@@ -120,21 +120,19 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				size={boxSize}
 				details={
 					props.item.homepage && (
-						<C.Flex>
-							<ExternalLink size={C.IconSize.XS} strokeWidth={1.5} />
-							<C.Space sizeRight={C.SpaceSize.XXS} />
-							<C.Link
-								onClick={() =>
-									props.store.getApp().send({
-										type: MessageType.OpenExternalURL,
-										id: uuid.v4(),
-										payload: props.item.homepage || ''
-									})
-								}
-							>
-								Learn more
-							</C.Link>
-						</C.Flex>
+						<C.LinkIcon
+							icon="ExternalLink"
+							size={C.CopySize.S}
+							onClick={() =>
+								props.store.getApp().send({
+									type: MessageType.OpenExternalURL,
+									id: uuid.v4(),
+									payload: props.item.homepage || ''
+								})
+							}
+						>
+							Learn more
+						</C.LinkIcon>
 					)
 				}
 				install={

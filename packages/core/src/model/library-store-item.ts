@@ -153,6 +153,15 @@ export class LibraryStoreItem {
 		return this.library ? this.library.getOrigin() : T.PatternLibraryOrigin.Unknown;
 	}
 
+	@Mobx.computed
+	public get usesRemoteMeta(): boolean {
+		return (
+			this.hasLibrary &&
+			(this.installType !== PatternLibraryInstallType.Remote ||
+				this.origin !== PatternLibraryOrigin.UserProvided)
+		);
+	}
+
 	public constructor(init: LibraryStoreItemInit) {
 		this.id = init.id || uuid.v4();
 		this.library = init.library;
@@ -206,11 +215,7 @@ export class LibraryStoreItem {
 
 	@Mobx.action
 	public fetch = Mobx.flow<void>(function*(this: LibraryStoreItem): IterableIterator<any> {
-		if (
-			this.library &&
-			(this.installType !== PatternLibraryInstallType.Remote ||
-				this.origin !== PatternLibraryOrigin.UserProvided)
-		) {
+		if (this.usesRemoteMeta) {
 			return;
 		}
 
@@ -224,7 +229,8 @@ export class LibraryStoreItem {
 		}
 
 		const data = yield response.json();
-		const meta = data['dist-tags'][this.version!] || data['versions'][this.version!];
+		const version = data['dist-tags'][this.version!] || this.version!;
+		const meta = data['versions'][version];
 
 		if (!meta) {
 			this.meta = undefined;

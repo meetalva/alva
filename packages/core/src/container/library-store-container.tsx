@@ -60,6 +60,13 @@ export class LibraryStoreContainer extends React.Component {
 		}
 	};
 
+	private handleDetailsClick: React.MouseEventHandler<HTMLDetailsElement> = e => {
+		e.preventDefault();
+		const { store } = this.props as WithStore;
+		const libraryStore = store.libraryStore;
+		libraryStore.installedOpen = !libraryStore.installedOpen;
+	};
+
 	public componentDidMount() {
 		const { store } = this.props as WithStore;
 		const app = store.getApp();
@@ -121,7 +128,7 @@ export class LibraryStoreContainer extends React.Component {
 						padding: `${C.getSpace(C.SpaceSize.L)}px 0`
 					}}
 				>
-					<details open={updateAvailable}>
+					<details open={libraryStore.installedOpen} onClick={this.handleDetailsClick}>
 						<DetailsSummary>
 							<C.Space size={SpaceSize.XS}>
 								<C.Flex

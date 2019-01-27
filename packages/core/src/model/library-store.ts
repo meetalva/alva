@@ -21,6 +21,7 @@ export class LibraryStore {
 	];
 
 	@Mobx.observable private project?: Project;
+	@Mobx.observable private internalInstalledOpen: boolean = false;
 
 	@Mobx.computed
 	private get items(): LibraryStoreItem[] {
@@ -62,6 +63,15 @@ export class LibraryStore {
 	@Mobx.computed
 	public get updateCount(): number {
 		return this.withLibrary.filter(item => item.hasUpdate).length;
+	}
+
+	@Mobx.computed
+	public get installedOpen(): boolean {
+		return this.updateCount > 0 || this.internalInstalledOpen;
+	}
+
+	public set installedOpen(open: boolean) {
+		this.internalInstalledOpen = open;
 	}
 
 	public constructor(init?: LibraryStoreInit) {

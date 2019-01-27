@@ -72,9 +72,12 @@ export class SplashScreenContainer extends React.Component {
 				}}
 				onExampleClick={() => {
 					app.send({
-						type: MessageType.OpenExternalURL,
+						type: MessageType.OpenRemoteFileRequest,
 						id: uuid.v4(),
-						payload: 'https://media.meetalva.io/file/Website.alva'
+						payload: {
+							type: 'http',
+							url: 'https://media.meetalva.io/file/Website.alva'
+						}
 					});
 				}}
 				onGithubClick={() => {

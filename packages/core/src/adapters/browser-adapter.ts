@@ -65,6 +65,10 @@ export class BrowserAdapter {
 				Matchers.createNewFileRequest(context)
 			);
 			app.match<M.OpenFileRequest>(MT.OpenFileRequest, Matchers.openFileRequest(context));
+			app.match<M.OpenRemoteFileRequest>(
+				MT.OpenRemoteFileRequest,
+				Matchers.openRemoteFileRequest(context)
+			);
 		}
 
 		app.match<M.ExportHtmlProject>(MT.ExportHtmlProject, Matchers.exportHtmlProject(context));

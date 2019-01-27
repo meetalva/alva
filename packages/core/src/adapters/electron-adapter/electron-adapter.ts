@@ -119,6 +119,11 @@ export class ElectronAdapter {
 			})
 		);
 
+		sender.match<M.OpenRemoteFileRequest>(
+			MT.OpenRemoteFileRequest,
+			Matchers.openRemoteFileRequest(context)
+		);
+
 		sender.match<M.OpenWindow>(MT.OpenWindow, Matchers.openWindow(context));
 		sender.match<M.Paste>(MT.Paste, Matchers.paste(context));
 		sender.match<M.Save>(MT.Save, Matchers.save(context, { passive: false }));

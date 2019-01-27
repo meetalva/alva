@@ -2,6 +2,7 @@ import * as T from '../types';
 import { builtinPatternLibrary, ElementProperty } from '../model';
 import { AbstractMigration, MigrationItem } from './abstract-migration';
 import { camelCase } from 'lodash';
+import { SerializedPatternLibraryV2 } from '../types';
 
 export type ZeroOneMigrationInput = MigrationItem<T.VersionZeroSerializedProject>;
 export type ZeroOneMigrationOutput = MigrationItem<T.VersionOneSerializedProject>;
@@ -75,7 +76,7 @@ export class ZeroOneMigration
 		project.patternLibraries.splice(
 			project.patternLibraries.indexOf(oldBuiltin),
 			1,
-			builtinPatternLibrary.toJSON()
+			builtinPatternLibrary.toJSON() as any
 		);
 	}
 

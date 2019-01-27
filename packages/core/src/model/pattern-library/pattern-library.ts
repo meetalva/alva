@@ -16,7 +16,11 @@ export interface PatternLibraryInit {
 	id: string;
 	installType: Types.PatternLibraryInstallType;
 	origin: Types.PatternLibraryOrigin;
-	packageFile: { [key: string]: unknown };
+	packageFile: {
+		name: string;
+		version: string;
+		[key: string]: unknown;
+	};
 	patternProperties: AnyPatternProperty[];
 	patterns: Pattern[];
 	state: Types.PatternLibraryState;
@@ -103,7 +107,10 @@ export class PatternLibrary {
 			id: uuid.v4(),
 			installType: Types.PatternLibraryInstallType.Local,
 			origin: Types.PatternLibraryOrigin.UserProvided,
-			packageFile: {},
+			packageFile: {
+				name: 'component-library',
+				version: '1.0.0'
+			},
 			patterns: [],
 			patternProperties: [],
 			state: Types.PatternLibraryState.Connected

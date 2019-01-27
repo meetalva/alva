@@ -10,7 +10,7 @@ export class Migrator {
 		const inputVersion = typeof (input as any).version === 'undefined' ? 0 : 1;
 
 		const migrating = this.migrations.filter(m => m.inputVersion >= inputVersion).reduce(
-			async (previous, migration) => migration.transform(await previous),
+			async (previous, migration) => migration.transform((await previous) as any),
 			Promise.resolve({
 				project: input,
 				steps: [] as MigrationStep[]

@@ -59,7 +59,11 @@ export enum LibraryAnalysisResultType {
 export interface LibraryAnalysis {
 	bundle: string;
 	id: string;
-	packageFile: { [key: string]: unknown };
+	packageFile: {
+		name: string;
+		version: string;
+		[key: string]: unknown;
+	};
 	path: string;
 	patterns: PatternAnalysis[];
 }

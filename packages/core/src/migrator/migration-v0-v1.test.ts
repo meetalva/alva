@@ -168,6 +168,8 @@ test('replaces property ids in user store references', async () => {
 		{
 			project: M.Project.from({
 				...result.project,
+				patternLibraries: (result.project
+					.patternLibraries as unknown[]) as T.SerializedPatternLibraryV2[],
 				draft: true,
 				path: ''
 			})

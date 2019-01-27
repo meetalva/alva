@@ -56,26 +56,31 @@ export const ChromeContainer = MobxReact.inject('store')(
 						<div />
 					</WhenFalsy>
 				</When>
-				<C.ViewSwitch
-					fontSize={C.CopySize.M}
-					justify="center"
-					leftVisible={typeof previousPage !== 'undefined'}
-					rightVisible={typeof nextPage !== 'undefined'}
-					onLeftClick={toPreviousPage}
-					onRightClick={toNextPage}
+				<When
+					hasProject={hasProject}
+					hasPage={typeof page !== 'undefined'}
+					isDesignView={isDesignView}
 				>
-					<When
-						hasProject={hasProject}
-						hasPage={typeof page !== 'undefined'}
-						isDesignView={isDesignView}
-					>
-						<ProjectName
-							name={project ? project.getName() : ''}
-							draft={project ? project.getDraft() : false}
-						/>{' '}
-						— {page ? page!.getName() : ''}
-					</When>
-				</C.ViewSwitch>
+					<WhenTruthy>
+						<C.ViewSwitch
+							fontSize={C.CopySize.M}
+							justify="center"
+							leftVisible={typeof previousPage !== 'undefined'}
+							rightVisible={typeof nextPage !== 'undefined'}
+							onLeftClick={toPreviousPage}
+							onRightClick={toNextPage}
+						>
+							<ProjectName
+								name={project ? project.getName() : ''}
+								draft={project ? project.getDraft() : false}
+							/>{' '}
+							— {page ? page!.getName() : ''}
+						</C.ViewSwitch>
+					</WhenTruthy>
+					<WhenFalsy>
+						<div />
+					</WhenFalsy>
+				</When>
 				<C.Flex
 					alignItems={C.FlexAlignItems.Center}
 					style={{

@@ -12,23 +12,27 @@ export class OneTwoMigration
 	public async transform(item: OneTwoMigrationInput): Promise<OneTwoMigrationOutput> {
 		const { project } = item;
 
-		const patternLibraries = project.patternLibraries.map(library => {
-			const { name, description, version, ...transfer } = library;
-			return {
-				...transfer,
-				packageFile: {
-					description,
-					name,
-					version: version.toString()
-				}
-			};
-		});
-
 		return {
 			steps: item.steps,
 			project: {
 				...project,
-				patternLibraries,
+				patternLibraries: project.patternLibraries.map(
+					(library: T.SerializedPatternLibraryV1) => {
+						const { name, description, version, ...transfer } = library;
+
+						const mappedName = name === 'meetalva-designkit' ? '@meetalva/designkit' : name;
+
+						return {
+							...transfer,
+							packageFile: {
+								...(library as any).packageFile,
+								name: mappedName,
+								version: version ? version.toString() : undefined,
+								description
+							}
+						};
+					}
+				),
 				version: 2
 			}
 		};

@@ -63,16 +63,19 @@ export class PatternLibrary {
 
 	@Mobx.computed
 	private get version(): string {
-		return this.packageFile
-			? (this.packageFile as { version?: string }).version || '1.0.0'
-			: '1.0.0';
+		return this.packageFile.version;
 	}
 
 	@Mobx.computed
 	private get name(): string {
-		return this.packageFile
-			? (this.packageFile as { name?: string }).name || 'Library'
-			: 'Library';
+		return this.packageFile.name;
+	}
+
+	@Mobx.computed
+	private get alvaMeta(): { [key: string]: unknown } {
+		return typeof this.packageFile.alva === 'object' && this.packageFile.alva !== null
+			? this.packageFile.alva
+			: {};
 	}
 
 	@Mobx.computed
@@ -313,8 +316,8 @@ export class PatternLibrary {
 	}
 
 	public getDescription(): string | undefined {
-		return this.packageFile
-			? (this.packageFile as { description?: string }).description
+		return typeof this.packageFile.description === 'string'
+			? this.packageFile.description
 			: undefined;
 	}
 
@@ -331,11 +334,7 @@ export class PatternLibrary {
 	}
 
 	public getColor(): string | undefined {
-		return this.packageFile
-			? this.packageFile.alva
-				? (this.packageFile.alva as { color?: string }).color
-				: undefined
-			: undefined;
+		return typeof this.alvaMeta.color === 'string' ? this.alvaMeta.color : undefined;
 	}
 
 	public getCapabilites(): Types.LibraryCapability[] {
@@ -362,33 +361,23 @@ export class PatternLibrary {
 	}
 
 	public getName(): string {
-		return this.packageFile
-			? (this.packageFile as { name?: string }).name || 'Library'
-			: 'Library';
+		return this.name;
 	}
 
 	public getDisplayName(): string | undefined {
-		return this.packageFile
-			? this.packageFile.alva
-				? (this.packageFile.alva as { name?: string }).name
-				: undefined
-			: undefined;
+		return typeof this.alvaMeta.name === 'string' ? this.alvaMeta.name : this.name;
 	}
 
 	public getPackageName(): string {
-		return this.packageFile
-			? (this.packageFile as { name?: string }).name || 'Library'
-			: 'Library';
+		return this.name;
 	}
 
 	public getVersion(): string {
-		return this.packageFile
-			? (this.packageFile as { version?: string }).version || '1.0.0'
-			: '1.0.0';
+		return this.version;
 	}
 
 	public getHomepage(): string | undefined {
-		return this.packageFile ? (this.packageFile as { homepage?: string }).homepage : undefined;
+		return typeof this.packageFile.homepage === 'string' ? this.packageFile.homepage : undefined;
 	}
 
 	public getOrigin(): Types.PatternLibraryOrigin {
@@ -438,11 +427,7 @@ export class PatternLibrary {
 	}
 
 	public getImage(): string | undefined {
-		return this.packageFile
-			? this.packageFile.alva
-				? (this.packageFile.alva as { image?: string }).image
-				: undefined
-			: undefined;
+		return typeof this.alvaMeta.image === 'string' ? this.alvaMeta.image : undefined;
 	}
 
 	public getInstallType(): Types.PatternLibraryInstallType {

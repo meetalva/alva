@@ -22,7 +22,7 @@ import { builtinPatternLibrary } from './pattern-library/builtin-pattern-library
 export interface ProjectProperties {
 	draft: boolean;
 	id?: string;
-	version?: 0 | 1;
+	version?: 0 | 1 | 2;
 	name: string;
 	pages: Page[];
 	path: string;
@@ -183,7 +183,10 @@ export class Project {
 		this.path = init.path;
 		this.userStore = init.userStore;
 		this.draft = init.draft;
-		this.version = init.version || 1;
+
+		if (typeof init.version !== 'undefined') {
+			this.version = init.version;
+		}
 
 		init.pages.forEach(page => {
 			this.addPage(page);

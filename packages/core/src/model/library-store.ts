@@ -13,10 +13,6 @@ export class LibraryStore {
 		{
 			name: '@meetalva/designkit',
 			version: 'latest'
-		},
-		{
-			name: '@material-ui/core',
-			version: '3.9.0'
 		}
 	];
 

@@ -66,6 +66,11 @@ export class LibraryStore {
 	}
 
 	@Mobx.computed
+	public get withProgress(): LibraryStoreItem[] {
+		return this.items.filter(item => item.state === LibraryStoreItemState.Installing);
+	}
+
+	@Mobx.computed
 	public get updateCount(): number {
 		return this.withLibrary.filter(item => item.hasUpdate).length;
 	}

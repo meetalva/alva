@@ -18,17 +18,29 @@ export function updateNpmPatternLibrary({
 			return;
 		}
 
+		const abort = () => {
+			app.send({
+				type: M.MessageType.ConnectPatternLibraryResponse,
+				id: m.id,
+				transaction: m.transaction,
+				payload: {
+					result: 'aborted',
+					previousLibraryId: m.payload.libId
+				}
+			});
+		};
+
 		const project = await dataHost.getProject(projectId);
 		if (!project) {
 			host.log(`updateNpmPatternLibrary: received message without resolveable project: ${m}`);
-			return;
+			return abort();
 		}
 
 		const previousLibrary = project.getPatternLibraryById(libId);
 
 		if (!previousLibrary) {
 			host.log(`updateNpmPatternLibrary: received message without resolveable library: ${m}`);
-			return;
+			return abort();
 		}
 
 		const result = await getPackage(m.payload.npmId || previousLibrary.getPackageName(), {
@@ -36,6 +48,7 @@ export function updateNpmPatternLibrary({
 		});
 
 		if (result instanceof Error) {
+			abort();
 			return app.send({
 				type: MT.ShowError,
 				id: uuid.v4(),
@@ -68,7 +81,8 @@ export function updateNpmPatternLibrary({
 					}
 				}
 			});
-			return;
+
+			return abort();
 		}
 
 		const analysis = analysisResult.result;

@@ -41,6 +41,7 @@ function getWindowVariant(variant: HostWindowVariant): Electron.BrowserWindowCon
 		title: 'Alva',
 		webPreferences: {
 			nodeIntegration: false,
+			contextIsolation: true,
 			preload: require.resolve('./create-window-preload')
 		}
 	};

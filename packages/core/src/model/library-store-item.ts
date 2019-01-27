@@ -6,7 +6,7 @@ import { LibraryStoreItemType, LibraryStoreItemState } from './library-store';
 import { Project } from './project';
 import * as T from '../types';
 import * as M from '../message';
-import { PatternLibraryInstallType, PatternLibraryOrigin } from '../types';
+import { PatternLibraryInstallType, PatternLibraryOrigin, PatternLibraryState } from '../types';
 
 export interface LibraryStoreItemInit {
 	id?: string;
@@ -239,6 +239,18 @@ export class LibraryStoreItem {
 
 		this.meta = meta;
 	});
+
+	@Mobx.action
+	public abort() {
+		this.intermediateState =
+			this.type === LibraryStoreItemType.Recommended
+				? LibraryStoreItemState.Listed
+				: LibraryStoreItemState.Unknown;
+
+		if (this.library) {
+			this.library.setState(PatternLibraryState.Connected);
+		}
+	}
 
 	@Mobx.action
 	public connect(

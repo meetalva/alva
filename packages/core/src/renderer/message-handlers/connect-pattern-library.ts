@@ -1,6 +1,5 @@
 import * as M from '../../message';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
-import * as Types from '../../types';
 import * as uuid from 'uuid';
 import { PatternLibrary } from '../../model';
 import * as T from '../../types';
@@ -15,14 +14,18 @@ export function connectPatternLibrary({
 			return;
 		}
 
-		if (m.payload.result === 'aborted') {
-			const library = m.payload.previousLibraryId
-				? project.getPatternLibraryById(m.payload.previousLibraryId)
-				: undefined;
+		if (m.payload.result === 'aborted' && m.payload.previousLibraryId) {
+			const library = project.getPatternLibraryById(m.payload.previousLibraryId);
 
 			if (library) {
 				library.setState(T.PatternLibraryState.Disconnected);
 			}
+
+			return;
+		}
+
+		if (m.payload.result === 'aborted') {
+			store.libraryStore.withProgress.forEach(item => item.abort());
 
 			return;
 		}

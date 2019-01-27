@@ -17,11 +17,23 @@ export function connectNpmPatternLibrary({
 			return;
 		}
 
+		const abort = () => {
+			app.send({
+				type: M.MessageType.ConnectPatternLibraryResponse,
+				id: m.id,
+				transaction: m.transaction,
+				payload: {
+					result: 'aborted',
+					previousLibraryId: m.payload.libraryId
+				}
+			});
+		};
+
 		const project = await dataHost.getProject(m.payload.projectId);
 
 		if (!project) {
 			host.log(`connectNpmPatternLibrary: received message without resolveable project: ${m}`);
-			return;
+			return abort();
 		}
 
 		const previousLibraryByName = project.getPatternLibraryByPackageName(m.payload.npmId);
@@ -32,7 +44,7 @@ export function connectNpmPatternLibrary({
 
 		if (m.payload.libraryId && !previousLibrary) {
 			host.log(`connectNpmPatternLibrary: could not determine previous library`);
-			return;
+			return abort();
 		}
 
 		const result = await getPackage(m.payload.npmId, {
@@ -40,6 +52,8 @@ export function connectNpmPatternLibrary({
 		});
 
 		if (result instanceof Error) {
+			abort();
+
 			return app.send({
 				type: MessageType.ShowError,
 				id: uuid.v4(),
@@ -72,7 +86,8 @@ export function connectNpmPatternLibrary({
 					}
 				}
 			});
-			return;
+
+			return abort();
 		}
 
 		const analysis = analysisResult.result;

@@ -13,6 +13,7 @@ import { ExternalLink, ChevronDown, RotateCw } from 'react-feather';
 import * as T from '../types';
 import { MessageType as MT } from '../message';
 import { PatternLibraryInstallType } from '../types';
+import { When } from './when';
 
 const validatePackageName = require('validate-npm-package-name');
 
@@ -128,7 +129,7 @@ export class LibraryStoreContainer extends React.Component {
 						padding: `${C.getSpace(C.SpaceSize.L)}px 0`
 					}}
 				>
-					<details open={libraryStore.installedOpen} onClick={this.handleDetailsClick}>
+					<Details mayToggle={libraryStore.updateCount === 0} open={libraryStore.installedOpen} onClick={this.handleDetailsClick}>
 						<DetailsSummary>
 							<C.Space size={SpaceSize.XS}>
 								<C.Flex
@@ -140,7 +141,9 @@ export class LibraryStoreContainer extends React.Component {
 											<C.Space sizeTop={2} />
 											<C.BadgeIcon
 												color={updateAvailable ? C.Color.Orange : C.Color.Green}
-											/>
+											>
+												{libraryStore.updateCount > 0 ? libraryStore.updateCount : ''}
+											</C.BadgeIcon>
 										</div>
 										<C.Space sizeRight={C.SpaceSize.XS + C.SpaceSize.XXS} />
 										<div>
@@ -154,16 +157,18 @@ export class LibraryStoreContainer extends React.Component {
 													: 'Everything up to date'}
 											</C.Headline>
 											<C.Space sizeBottom={SpaceSize.XS} />
-											<C.Flex style={{ alignItems: 'center' }}>
-												<C.Copy textColor={Color.Grey36}>
-													Show {libraryStore.withLibrary.length} installed{' '}
-													{libraryStore.withLibrary.length === 1
-														? 'library'
-														: 'libraries'}
-												</C.Copy>
-												<C.Space sizeRight={SpaceSize.XXS} />
-												<ChevronDown color={Color.Grey36} size={C.IconSize.XS} />
-											</C.Flex>
+											<When mayToggle={libraryStore.updateCount === 0}>
+												<C.Flex style={{ alignItems: 'center' }}>
+														<C.Copy textColor={Color.Grey36}>
+															Show {libraryStore.withLibrary.length} installed{' '}
+															{libraryStore.withLibrary.length === 1
+																? 'library'
+																: 'libraries'}
+														</C.Copy>
+													<C.Space sizeRight={SpaceSize.XXS} />
+													<ChevronDown color={Color.Grey36} size={C.IconSize.XS} />
+												</C.Flex>
+											</When>
 										</div>
 									</C.Flex>
 									{store.getApp().isHostType(T.HostType.Electron) && (
@@ -193,7 +198,7 @@ export class LibraryStoreContainer extends React.Component {
 								flexWrap: 'wrap'
 							}}
 						>
-							{libraryStore.withLibrary.map(item => (
+							{(libraryStore.updateCount === 0 ? libraryStore.withLibrary : libraryStore.withUpdate).map(item => (
 								<LibraryStoreItemContainer
 									key={item.id}
 									item={item}
@@ -212,7 +217,7 @@ export class LibraryStoreContainer extends React.Component {
 						</C.Space>
 
 						<C.Space sizeBottom={C.SpaceSize.XS} />
-					</details>
+					</Details>
 				</div>
 
 				<div
@@ -352,3 +357,7 @@ export class LibraryStoreContainer extends React.Component {
 		);
 	}
 }
+
+const Details = styled.details<{ mayToggle: boolean; }>`
+	${props => props.mayToggle ? '' : 'appearance: none;'};
+`;

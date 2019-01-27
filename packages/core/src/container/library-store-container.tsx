@@ -129,8 +129,8 @@ export class LibraryStoreContainer extends React.Component {
 						padding: `${C.getSpace(C.SpaceSize.L)}px 0`
 					}}
 				>
-					<Details mayToggle={libraryStore.updateCount === 0} open={libraryStore.installedOpen} onClick={this.handleDetailsClick}>
-						<DetailsSummary>
+					<Details mayToggle={libraryStore.updateCount === 0} open={libraryStore.installedOpen}>
+						<DetailsSummary onClick={this.handleDetailsClick}>
 							<C.Space size={SpaceSize.XS}>
 								<C.Flex
 									alignItems={C.FlexAlignItems.Center}

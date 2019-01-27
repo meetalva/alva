@@ -76,6 +76,11 @@ export class LibraryStore {
 	}
 
 	@Mobx.computed
+	public get updateAvailable(): boolean {
+		return this.updateCount > 0;
+	}
+
+	@Mobx.computed
 	public get installedOpen(): boolean {
 		return this.updateCount > 0 || this.internalInstalledOpen;
 	}

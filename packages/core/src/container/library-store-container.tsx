@@ -68,6 +68,23 @@ export class LibraryStoreContainer extends React.Component {
 		libraryStore.installedOpen = !libraryStore.installedOpen;
 	};
 
+	private handleLocalInstallClick: React.MouseEventHandler<HTMLElement> = e => {
+		e.preventDefault();
+		e.stopPropagation();
+
+		const { store } = this.props as WithStore;
+		const app = store.getApp();
+
+		app.send({
+			type: MessageType.ConnectPatternLibraryRequest,
+			id: uuid.v4(),
+			payload: {
+				library: undefined,
+				projectId: store.getProject().getId()
+			}
+		})
+	}
+
 	public componentDidMount() {
 		const { store } = this.props as WithStore;
 		const app = store.getApp();
@@ -117,7 +134,6 @@ export class LibraryStoreContainer extends React.Component {
 		const app = store.getApp();
 		const isValidPackage = this.isValidPackage;
 		const libraryStore = store.libraryStore;
-		const updateAvailable = libraryStore.updateCount > 0;
 
 		return (
 			<div style={{ overflow: 'scroll', userSelect: 'none' }}>
@@ -140,7 +156,7 @@ export class LibraryStoreContainer extends React.Component {
 										<div>
 											<C.Space sizeTop={2} />
 											<C.BadgeIcon
-												color={updateAvailable ? C.Color.Orange : C.Color.Green}
+												color={libraryStore.updateAvailable ? C.Color.Orange : C.Color.Green}
 											>
 												{libraryStore.updateCount > 0 ? libraryStore.updateCount : ''}
 											</C.BadgeIcon>
@@ -150,9 +166,9 @@ export class LibraryStoreContainer extends React.Component {
 											<C.Headline
 												order={4}
 												bold
-												textColor={updateAvailable ? C.Color.Orange : C.Color.Green}
+												textColor={libraryStore.updateAvailable ? C.Color.Orange : C.Color.Green}
 											>
-												{updateAvailable
+												{libraryStore.updateAvailable
 													? 'Updates available'
 													: 'Everything up to date'}
 											</C.Headline>
@@ -175,16 +191,7 @@ export class LibraryStoreContainer extends React.Component {
 										<C.Button
 											order={C.ButtonOrder.Secondary}
 											size={C.ButtonSize.Medium}
-											onClick={() =>
-												app.send({
-													id: uuid.v4(),
-													payload: {
-														library: undefined,
-														projectId: store.getProject().getId()
-													},
-													type: MessageType.ConnectPatternLibraryRequest
-												})
-											}
+											onClick={this.handleLocalInstallClick}
 										>
 											Install Local Library
 										</C.Button>

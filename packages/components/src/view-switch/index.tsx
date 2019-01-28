@@ -2,7 +2,6 @@ import { Color } from '../colors';
 import { CopySize } from '../copy';
 import { IconProps, IconSize } from '../icons';
 import * as React from 'react';
-import { EditableTitleState } from '../../types';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 
@@ -11,9 +10,15 @@ const tag = require('tag-hoc').default;
 
 export type JustifyType = 'start' | 'center' | 'end' | 'stretch';
 
+export enum ViewSwitchTitleState {
+	Neutral = 'Neutral',
+	Editable = 'Editable',
+	Editing = 'Editing'
+}
+
 export interface ViewEditableTitleProps {
 	fontSize?: CopySize;
-	nameState: EditableTitleState;
+	nameState: ViewSwitchTitleState | 'Neutral' | 'Editabe' | 'Editing';
 	title: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
@@ -113,7 +118,7 @@ const StyledInput = styled.input`
 
 export const ViewEditableTitle: React.SFC<ViewEditableTitleProps> = (props): JSX.Element => (
 	<StyledViewSwitch fontSize={props.fontSize} onClick={props.onClick}>
-		{props.nameState === EditableTitleState.Editing ? (
+		{props.nameState === ViewSwitchTitleState.Editing ? (
 			<StyledInput
 				autofocus
 				fontSize={props.fontSize}

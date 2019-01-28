@@ -1,4 +1,4 @@
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import { ElementContainer } from './element-container';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';

@@ -1,6 +1,6 @@
 import * as Model from '../model';
 import * as Store from '../store';
-import * as Components from '../components';
+import * as Components from '@meetalva/components';
 
 export function above(node: EventTarget, selector: string): HTMLElement | null {
 	let el = node as HTMLElement;

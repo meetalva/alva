@@ -1,4 +1,4 @@
-import * as C from '../components';
+import * as C from '@meetalva/components';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';

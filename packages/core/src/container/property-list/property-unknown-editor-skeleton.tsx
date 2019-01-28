@@ -1,7 +1,7 @@
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import * as Model from '../../model';
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import { PatternUnknownProperty } from '../../model/pattern-property/unknown-property';
 
 export interface PropertyUnknownEditorSkeletonProps {

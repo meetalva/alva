@@ -1,4 +1,4 @@
-import { Teaser, TeaserRow, TeaserSize, Color } from '../components';
+import { Teaser, TeaserRow, TeaserSize, Color } from '@meetalva/components';
 import * as React from 'react';
 
 export interface ConnectPaneProps {

@@ -3,7 +3,7 @@ import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
-import { EditableTitle } from '../../components';
+import { EditableTitle } from '@meetalva/components';
 
 export interface Renameable {
 	getEditableState(): Types.EditableTitleState;

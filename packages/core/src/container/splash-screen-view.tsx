@@ -1,4 +1,4 @@
-import * as C from '../components';
+import * as C from '@meetalva/components';
 import * as React from 'react';
 import { RecentFilesList } from './recent-files-list';
 import { GitHub, Mail, Link, MessageSquare } from 'react-feather';

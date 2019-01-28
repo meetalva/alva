@@ -1,5 +1,5 @@
 import { AppPane } from './app-pane';
-import * as Components from '../components';
+import * as Components from '@meetalva/components';
 import { ElementList } from './element-list';
 import * as MobxReact from 'mobx-react';
 import { PageListContainer } from './page-list/page-list-container';

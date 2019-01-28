@@ -1,10 +1,6 @@
-import { PreviewFrame, PreviewPane, PreviewFrameProps } from '../components';
-import { Copy, CopySize } from '../components/copy';
-import { IconSize } from '../components/icons';
-import { Overlay } from '../components/overlay';
+import * as C from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
-import { Space, SpaceSize } from '../components/space';
 import { WithStore } from '../store';
 import * as PreviewDocument from '../preview-document/preview-document';
 import * as Types from '../types';
@@ -48,7 +44,7 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 		}
 
 		return (
-			<PreviewPane>
+			<C.PreviewPane>
 				<OptimizedPreviewFrame
 					frameRef={(frame: any) => (this.frame = frame)}
 					project={project}
@@ -58,18 +54,18 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 						props.store.getProject().unsetHighlightedElementContent();
 					}}
 				/>
-				<Overlay isVisisble={props.isDragging}>
-					<Space size={[0, 0, SpaceSize.L]}>
-						<Layout size={IconSize.M} />
-					</Space>
-					<Copy size={CopySize.M}>Drop the component on the left element list</Copy>
-				</Overlay>
-			</PreviewPane>
+				<C.Overlay isVisisble={props.isDragging}>
+					<C.Space size={[0, 0, C.SpaceSize.L]}>
+						<Layout size={C.IconSize.M} />
+					</C.Space>
+					<C.Copy size={C.CopySize.M}>Drop the component on the left element list</C.Copy>
+				</C.Overlay>
+			</C.PreviewPane>
 		);
 	}
 }
 
-interface OptimizedPreviewFrameProps extends PreviewFrameProps {
+interface OptimizedPreviewFrameProps extends C.PreviewFrameProps {
 	frameRef: any;
 	project: Model.Project;
 }
@@ -90,7 +86,7 @@ class OptimizedPreviewFrame extends React.Component<OptimizedPreviewFrameProps> 
 
 	public render(): JSX.Element {
 		return (
-			<PreviewFrame
+			<C.PreviewFrame
 				ref={this.props.frameRef}
 				srcDoc={this.doc}
 				offCanvas={false}

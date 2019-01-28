@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Types from '../../types';
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as Store from '../../store';
 import { AcceleratorIndicator } from './accelerator';

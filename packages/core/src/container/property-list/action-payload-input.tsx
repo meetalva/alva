@@ -1,11 +1,11 @@
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
 import { ActionPayloadSelect } from './action-payload-select';
-import { FlexAlignItems } from '../../components';
+import { FlexAlignItems } from '@meetalva/components';
 
 export interface ActionInputProps {
 	element: Model.Element;

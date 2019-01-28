@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as MobxReact from 'mobx-react';
-import * as C from '../components';
+import * as C from '@meetalva/components';
 import { MessageType as MT } from '../message';
 import { File, FileText } from 'react-feather';
 import { ViewStore } from '../store';

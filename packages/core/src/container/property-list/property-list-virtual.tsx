@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import * as Types from '../../types';
 import * as Model from '../../model';
 import { Row, RowType, CardRow, GroupRow, PropertyRow } from './property-row';
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 
 export interface PropertyListVirtualProps {
 	element: Model.Element;

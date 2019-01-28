@@ -16,7 +16,7 @@ const favicon = `<svg width="50" height="50" viewBox="10 10 100 100" xmlns="http
 
 module.exports = {
 	docs: ["*.md", "docs/**/*.md"],
-	entry: ["packages/core/lib/components/**/demo.js"],
+	entry: ["packages/components/lib/**/demo.js"],
 	mount: "@patternplate/render-react/mount",
 	render: "@patternplate/render-react/render",
 	cover: "@meetalva/site",
@@ -29,7 +29,8 @@ module.exports = {
 		colorBorderDark: "rgb(10, 10, 10)",
 		colorTextDark: "rgb(242, 242, 242)",
 		colorRecessDark: "rgb(153, 153, 153)",
-		colorActive: "rgb(215, 0, 82)"
+		colorActive: "rgb(215, 0, 82)",
+		showComponents: process.env.NODE_ENV !== 'production'
 	}
 };
 

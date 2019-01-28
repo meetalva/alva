@@ -1,6 +1,6 @@
 import { AppView } from './app-view';
 import { ChromeContainer } from './chrome/chrome-container';
-import * as Components from '../components';
+import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import * as Types from '../types';

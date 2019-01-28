@@ -1,7 +1,7 @@
 import { Element } from './element';
 import { Project } from '../project';
 import { ModelName } from '../../types';
-import { PlaceholderPosition } from '../../components';
+import { PlaceholderPosition } from '@meetalva/components';
 
 jest.mock('../project', () => {
 	class MockProject {

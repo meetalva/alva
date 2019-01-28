@@ -1,12 +1,4 @@
 {
-	"references": [
-		{
-			"path": "../components"
-		},
-		{
-			"path": "../essentials"
-		}
-	],
 	"compilerOptions": {
 		"composite": true,
 		"outDir": "lib",

@@ -36,8 +36,6 @@
     }
   },
   "devDependencies": {
-    "@patternplate/cli": "^3.2.6",
-    "@patternplate/render-styled-components": "2.5.18",
     "@zeit/ncc": "^0.8.1",
     "concurrently": "3.5.1",
     "css-loader": "1.0.0",
@@ -59,6 +57,7 @@
   "dependencies": {
     "@marionebl/browserfs": "2.0.0",
     "@marionebl/sander": "0.6.1",
+    "@meetalva/components": "1.0.0",
     "@meetalva/essentials": "1.0.0",
     "@types/color": "^3.0.0",
     "@types/dargs": "^5.1.0",

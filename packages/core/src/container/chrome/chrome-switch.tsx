@@ -1,6 +1,6 @@
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
-import * as C from '../../components';
+import * as C from '@meetalva/components';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
 import { Check, ChevronDown } from 'react-feather';

@@ -1,9 +1,9 @@
-import * as C from '../components';
+import * as C from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
 import * as React from 'react';
 import { WithStore } from '../store';
-import { ButtonSize, LibraryBoxState, LibraryBoxSize } from '../components';
+import { ButtonSize, LibraryBoxState, LibraryBoxSize } from '@meetalva/components';
 import { LibraryStoreItem } from '../model/library-store-item';
 import { Match, MatchBranch } from './match';
 import { PatternLibraryInstallType } from '../types';

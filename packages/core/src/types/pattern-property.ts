@@ -1,4 +1,4 @@
-import { IconName } from '../components';
+import { IconName } from '@meetalva/components';
 import { ModelName } from './types';
 
 export enum PatternPropertyType {

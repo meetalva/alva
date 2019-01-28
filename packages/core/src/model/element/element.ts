@@ -11,7 +11,7 @@ import * as Types from '../../types';
 import { UserStoreReference } from '../user-store-reference';
 import * as uuid from 'uuid';
 import { PatternLibrary } from '../pattern-library';
-import { PlaceholderPosition } from '../../components';
+import { PlaceholderPosition } from '@meetalva/components';
 
 export interface ElementInit {
 	contentIds: string[];

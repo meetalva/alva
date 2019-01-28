@@ -1,7 +1,7 @@
 import * as Mobx from 'mobx';
 import { PatternPropertyBase } from './property-base';
 import * as Types from '../../types';
-import { IconName } from '../../components';
+import { IconName } from '@meetalva/components';
 import * as uuid from 'uuid';
 import * as _ from 'lodash';
 import { computeDifference } from '../../alva-util';

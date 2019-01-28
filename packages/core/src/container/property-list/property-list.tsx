@@ -2,7 +2,7 @@ import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import { PropertyListVirtual } from './property-list-virtual';
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import * as T from '../../types';
 
 export interface PropertyListContainerProps {

@@ -1,6 +1,6 @@
 import * as AlvaUtil from '../../alva-util';
 import { ChromeSwitch } from './chrome-switch';
-import * as C from '../../components';
+import * as C from '@meetalva/components';
 import { MessageType } from '../../message';
 import * as MobxReact from 'mobx-react';
 import { Page } from '../../model';

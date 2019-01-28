@@ -5,7 +5,7 @@ import { SplashScreenView } from './splash-screen-view';
 import * as uuid from 'uuid';
 import { ViewStore } from '../store';
 import { FileInput } from './file-input';
-import * as C from '../components';
+import * as C from '@meetalva/components';
 
 @MobxReact.inject('store')
 @MobxReact.observer

@@ -1,7 +1,7 @@
 import { ActionPayloadInput } from './action-payload-input';
 import { UserStorePropertySelect } from '../user-store-property-select';
 import { ViewStore } from '../../store';
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';

@@ -6,7 +6,7 @@ import * as Model from '../model';
 import * as Types from '../types';
 
 import * as uuid from 'uuid';
-import { PlaceholderPosition } from '../components';
+import { PlaceholderPosition } from '@meetalva/components';
 
 export interface ViewStoreInit {
 	app: Model.AlvaApp;

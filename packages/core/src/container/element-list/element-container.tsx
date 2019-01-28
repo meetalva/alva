@@ -1,4 +1,4 @@
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import { ElementContentContainer } from './element-content-container';
 import { ElementSlotContainer } from './element-slot-container';
 import { partition } from 'lodash';
@@ -7,7 +7,7 @@ import * as Model from '../../model';
 import * as React from 'react';
 import * as Types from '../../types';
 import { ViewStore } from '../../store';
-import { PlaceholderPosition } from '../../components';
+import { PlaceholderPosition } from '@meetalva/components';
 import { EditableTitleContainer } from '../editable-title/editable-title-container';
 
 export interface ElementContainerProps {

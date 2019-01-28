@@ -1,4 +1,4 @@
-import * as Components from '../../components';
+import * as C from '@meetalva/components';
 import { ElementDragImage } from '../element-drag-image';
 import { ElementContentContainer } from './element-content-container';
 import * as Mobx from 'mobx';
@@ -9,9 +9,6 @@ import * as React from 'react';
 import * as Store from '../../store';
 import * as Types from '../../types';
 import * as utils from '../../alva-util';
-
-import { Images } from '../../components/icons';
-import { PlaceholderPosition } from '../../components';
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -41,7 +38,7 @@ export class ElementList extends React.Component {
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
-		const icon = utils.above(target, `svg[${Components.ElementAnchors.icon}]`);
+		const icon = utils.above(target, `svg[${C.ElementAnchors.icon}]`);
 
 		// Skip and deselect elements if the root itself is clicked
 		if (target.getAttribute('data-drag-root')) {
@@ -51,7 +48,7 @@ export class ElementList extends React.Component {
 
 		const element = utils.elementFromTarget(e.target, { sibling: false, store });
 		const targetContent = utils.elementContentFromTarget(e.target, { store });
-		const label = utils.above(e.target, `[${Components.ElementAnchors.label}]`);
+		const label = utils.above(e.target, `[${C.ElementAnchors.label}]`);
 
 		if (!element) {
 			return;
@@ -98,9 +95,7 @@ export class ElementList extends React.Component {
 	private handleDragLeave(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
-		const position = getPlaceholderPosition(
-			target.getAttribute(Components.ElementAnchors.placeholder)
-		);
+		const position = getPlaceholderPosition(target.getAttribute(C.ElementAnchors.placeholder));
 
 		const targetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 		const targetContent = utils.elementContentFromTarget(e.target, { store });
@@ -109,8 +104,8 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		if (position !== PlaceholderPosition.None) {
-			targetElement.setPlaceholderHighlighted(PlaceholderPosition.None);
+		if (position !== C.PlaceholderPosition.None) {
+			targetElement.setPlaceholderHighlighted(C.PlaceholderPosition.None);
 		} else {
 			targetElement.setHighlighted(false);
 
@@ -125,14 +120,12 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 
 		const target = e.target as HTMLElement;
-		const position = getPlaceholderPosition(
-			target.getAttribute(Components.ElementAnchors.placeholder)
-		);
+		const position = getPlaceholderPosition(target.getAttribute(C.ElementAnchors.placeholder));
 
 		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		const targetContent =
-			position !== PlaceholderPosition.None
+			position !== C.PlaceholderPosition.None
 				? visualTargetElement && visualTargetElement.getContainer()
 				: utils.elementContentFromTarget(e.target, { store });
 
@@ -148,8 +141,8 @@ export class ElementList extends React.Component {
 			return;
 		}
 
-		targetContent.setHighlighted(position === PlaceholderPosition.None);
-		visualTargetElement.setHighlighted(position === PlaceholderPosition.None);
+		targetContent.setHighlighted(position === C.PlaceholderPosition.None);
+		visualTargetElement.setHighlighted(position === C.PlaceholderPosition.None);
 		visualTargetElement.setPlaceholderHighlighted(position);
 	}
 
@@ -158,13 +151,11 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 
 		const target = e.target as HTMLElement;
-		const position = getPlaceholderPosition(
-			target.getAttribute(Components.ElementAnchors.placeholder)
-		);
+		const position = getPlaceholderPosition(target.getAttribute(C.ElementAnchors.placeholder));
 		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
 		const targetContent =
-			position !== PlaceholderPosition.None
+			position !== C.PlaceholderPosition.None
 				? visualTargetElement && visualTargetElement.getContainer()
 				: utils.elementContentFromTarget(e.target, { store });
 
@@ -221,9 +212,7 @@ export class ElementList extends React.Component {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
 
-		const position = getPlaceholderPosition(
-			target.getAttribute(Components.ElementAnchors.placeholder)
-		);
+		const position = getPlaceholderPosition(target.getAttribute(C.ElementAnchors.placeholder));
 		const draggedElement = store.getDraggedElement();
 		const visualTargetElement = utils.elementFromTarget(e.target, { sibling: false, store });
 
@@ -232,7 +221,7 @@ export class ElementList extends React.Component {
 		}
 
 		const targetContent =
-			position !== PlaceholderPosition.None
+			position !== C.PlaceholderPosition.None
 				? visualTargetElement.getContainer()
 				: utils.elementContentFromTarget(e.target, { store });
 
@@ -241,7 +230,7 @@ export class ElementList extends React.Component {
 		}
 
 		const getDropIndex = () => {
-			if (position === PlaceholderPosition.None) {
+			if (position === C.PlaceholderPosition.None) {
 				return targetContent.getElements().length;
 			}
 
@@ -252,7 +241,7 @@ export class ElementList extends React.Component {
 		};
 
 		const index = getDropIndex();
-		const offset = position === PlaceholderPosition.After ? 1 : 0;
+		const offset = position === C.PlaceholderPosition.After ? 1 : 0;
 
 		if (index === -1) {
 			return;
@@ -298,7 +287,7 @@ export class ElementList extends React.Component {
 		});
 
 		const targetContent = utils.elementContentFromTarget(e.target, { store });
-		const item = utils.above(e.target, `[${Components.ElementAnchors.item}]`);
+		const item = utils.above(e.target, `[${C.ElementAnchors.item}]`);
 
 		const isElementMouseOver = item && targetElement;
 		const isContentMouseOver = item && targetContent;
@@ -325,7 +314,7 @@ export class ElementList extends React.Component {
 		});
 	}
 
-	private getDragAnchors(): Components.DragAreaAnchorProps {
+	private getDragAnchors(): C.DragAreaAnchorProps {
 		const { store } = this.props as { store: Store.ViewStore };
 		const page: Model.Page | undefined = store.getActivePage();
 		const rootElement = page && page.getRoot();
@@ -336,8 +325,8 @@ export class ElementList extends React.Component {
 		const rootElId = rootElement ? rootElement.getId() : 'no-root-element';
 
 		return {
-			[Components.DragAreaAnchors.content]: childrenId,
-			[Components.DragAreaAnchors.element]: rootElId
+			[C.DragAreaAnchors.content]: childrenId,
+			[C.DragAreaAnchors.element]: rootElId
 		};
 	}
 
@@ -355,7 +344,7 @@ export class ElementList extends React.Component {
 		const hasChildren = childContent && childContent.getElements().length > 0;
 
 		return (
-			<Components.DragArea
+			<C.DragArea
 				anchors={this.getDragAnchors()}
 				onClick={e => this.handleClick(e)}
 				onContextMenu={e => this.handleContextMenu(e)}
@@ -367,30 +356,30 @@ export class ElementList extends React.Component {
 				onMouseLeave={e => this.handleMouseLeave(e)}
 				onMouseOver={e => this.handleMouseOver(e)}
 			>
-				<Components.Element.ElementChildren>
+				<C.Element.ElementChildren>
 					{childContent ? <ElementContentContainer content={childContent} /> : null}
 					{!hasChildren && (
-						<Components.EmptyState
+						<C.EmptyState
 							headline="Elements"
 							copy="Drop components here from the library below"
-							image={Images.EmptyElements}
+							image={C.Images.EmptyElements}
 						/>
 					)}
-				</Components.Element.ElementChildren>
+				</C.Element.ElementChildren>
 				<ElementDragImage element={store.getDraggedElement()} dragRef={this.dragImg} />
-			</Components.DragArea>
+			</C.DragArea>
 		);
 	}
 }
 
-function getPlaceholderPosition(value: string | null): PlaceholderPosition {
+function getPlaceholderPosition(value: string | null): C.PlaceholderPosition {
 	switch (value) {
 		case 'before':
-			return PlaceholderPosition.Before;
+			return C.PlaceholderPosition.Before;
 		case 'after':
-			return PlaceholderPosition.After;
+			return C.PlaceholderPosition.After;
 		case 'none':
 		default:
-			return PlaceholderPosition.None;
+			return C.PlaceholderPosition.None;
 	}
 }

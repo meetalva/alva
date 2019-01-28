@@ -1,4 +1,4 @@
-import * as Components from '../components';
+import * as Components from '@meetalva/components';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
 import * as Monaco from 'monaco-editor';

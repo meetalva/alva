@@ -1,4 +1,4 @@
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import { ElementDragImage } from '../element-drag-image';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';

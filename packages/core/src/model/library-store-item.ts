@@ -53,6 +53,11 @@ export class LibraryStoreItem {
 	}
 
 	@Mobx.computed
+	public get updateVersion(): string | undefined {
+		return this.update ? this.update.version : undefined;
+	}
+
+	@Mobx.computed
 	public get fetched(): boolean {
 		if (!this.meta) {
 			return false;

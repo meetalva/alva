@@ -2,6 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 export interface SpaceProps {
+	as?: string;
 	children?: React.ReactNode;
 	className?: string;
 	inside?: boolean;
@@ -10,6 +11,7 @@ export interface SpaceProps {
 	sizeLeft?: SpaceSize;
 	sizeRight?: SpaceSize;
 	sizeTop?: SpaceSize;
+	style?: React.CSSProperties;
 }
 
 export interface StyledSpaceProps {
@@ -104,7 +106,13 @@ export const Space: React.StatelessComponent<SpaceProps> = props => {
 	);
 
 	return (
-		<StyledSpace className={props.className} spaceSize={size} inside={Boolean(props.inside)}>
+		<StyledSpace
+			style={props.style}
+			as={props.as as any}
+			className={props.className}
+			spaceSize={size}
+			inside={Boolean(props.inside)}
+		>
 			{props.children}
 		</StyledSpace>
 	);

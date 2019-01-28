@@ -9,7 +9,7 @@ import { Match, MatchBranch } from './match';
 import { PatternLibraryInstallType } from '../types';
 import { MessageType } from '../message';
 import * as uuid from 'uuid';
-import { ExternalLink } from 'react-feather';
+import { ExternalLink, ArrowRight } from 'react-feather';
 
 export interface LibraryStoreItemContainerProps {
 	item: LibraryStoreItem;
@@ -116,7 +116,24 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				state={boxState}
 				color={props.item.color}
 				image={props.item.image}
-				version={props.item.version}
+				version={
+					<C.Flex alignItems={C.FlexAlignItems.Center}>
+						<span>{props.item.version}</span>
+						{props.item.updateVersion ? (
+							<>
+								<C.Space
+									style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.5 }}
+									as="span"
+									sizeLeft={C.SpaceSize.XS}
+									sizeRight={C.SpaceSize.XS}
+								>
+									<ArrowRight size={12} />
+								</C.Space>
+								<span>{props.item.updateVersion}</span>
+							</>
+						) : null}
+					</C.Flex>
+				}
 				size={boxSize}
 				details={
 					props.item.homepage && (

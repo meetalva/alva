@@ -25,7 +25,7 @@ export interface LibraryBoxProps {
 	description?: string;
 	details?: React.ReactNode;
 	install?: React.ReactNode;
-	version?: string;
+	version?: React.ReactNode;
 	state: LibraryBoxState;
 	size: LibraryBoxSize;
 }

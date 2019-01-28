@@ -57,3 +57,27 @@ test('renames meetalva-designkit to @meetalva/designkit', async () => {
 	const afterKit = result.project.patternLibraries.find(lib => lib.id === beforeKit.id)!;
 	expect(afterKit.packageFile.name).toBe('@meetalva/designkit');
 });
+
+test('keeps existing pkgFile data', async () => {
+	const path = fixtures.find('v1.alva');
+	const project = Yaml.load(await readFile(path, 'utf-8')) as T.VersionOneSerializedProject;
+
+	const beforeLibrary = project.patternLibraries[0] as any;
+
+	beforeLibrary.packageFile = {
+		name: 'before-library',
+		version: '0.0.0',
+		description: 'Some description'
+	};
+
+	const migration = new OneTwoMigration();
+
+	const result = await migration.transform({
+		project,
+		steps: []
+	});
+
+	const afterLibrary = result.project.patternLibraries[0] as any;
+
+	expect(afterLibrary.packageFile).toEqual(beforeLibrary.packageFile);
+});

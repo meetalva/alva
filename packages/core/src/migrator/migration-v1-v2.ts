@@ -18,6 +18,12 @@ export class OneTwoMigration
 				...project,
 				patternLibraries: project.patternLibraries.map(
 					(library: T.SerializedPatternLibraryV1) => {
+						const lib = library as any;
+
+						if (typeof lib.packageFile === 'object') {
+							return (library as unknown) as T.SerializedPatternLibraryV2;
+						}
+
 						const { name, description, version, ...transfer } = library;
 
 						const mappedName = name === 'meetalva-designkit' ? '@meetalva/designkit' : name;
@@ -25,7 +31,7 @@ export class OneTwoMigration
 						return {
 							...transfer,
 							packageFile: {
-								...(library as any).packageFile,
+								...lib.packageFile,
 								name: mappedName,
 								version: version ? version.toString() : undefined,
 								description

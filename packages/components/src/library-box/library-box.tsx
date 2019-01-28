@@ -46,10 +46,12 @@ const StyledBox =
 	overflow: hidden;
 `;
 
+const IMAGE = (props: LibraryBoxProps) => (props.image ? props.image : toDataUrl(<LibraryImage />));
+
 const StyledImage = styled.div`
-	height: 100px;
+	height: 140px;
 	width: 100%;
-	background-image: url('${(props: LibraryBoxProps) => props.image}');
+	background-image: url('${IMAGE}');
 	background-size: cover;
 	background-position: center;
 	border-radius: 6px 6px 0 0;
@@ -118,12 +120,9 @@ const StyledBottom = styled.div`
 
 export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JSX.Element => (
 	<StyledBox {...props}>
-		{props.size === LibraryBoxSize.Large &&
-			(props.image ? (
-				<StyledImage state={props.state} image={props.image} size={props.size} />
-			) : (
-				<LibraryImage />
-			))}
+		{props.size === LibraryBoxSize.Large && (
+			<StyledImage state={props.state} image={props.image} size={props.size} />
+		)}
 		<StyledDetails {...props}>
 			<StyledTop>
 				<Headline order={4}>{props.name}</Headline>

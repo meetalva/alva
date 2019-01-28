@@ -67,7 +67,7 @@ export class LibraryStore {
 
 	@Mobx.computed
 	public get updateCount(): number {
-		return this.withLibrary.filter(item => item.hasUpdate).length;
+		return this.withUpdate.length;
 	}
 
 	@Mobx.computed

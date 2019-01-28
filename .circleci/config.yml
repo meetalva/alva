@@ -44,6 +44,7 @@ commands:
       - save_cache:
           paths:
             - node_modules
+            - packages/components/node_modules
             - packages/core/node_modules
             - packages/tools/node_modules
           key: v5-dependencies-<< parameters.key >>-{{ checksum "yarn.lock" }}
@@ -79,6 +80,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
+            - packages/components/node_modules
             - packages/core/node_modules
             - packages/tools/node_modules
           key: v5-dependencies-macos-{{ checksum "yarn.lock" }}
@@ -135,6 +137,7 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths:
+              - packages/components/lib
               - packages/core/lib
               - packages/essentials/lib
               - packages/site/lib

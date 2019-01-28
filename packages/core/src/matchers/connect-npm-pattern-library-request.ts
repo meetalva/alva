@@ -53,9 +53,7 @@ export function connectNpmPatternLibrary({
 		});
 
 		if (result instanceof Error) {
-			abort();
-
-			return app.send({
+			app.send({
 				type: MessageType.ShowError,
 				id: uuid.v4(),
 				payload: {
@@ -67,6 +65,8 @@ export function connectNpmPatternLibrary({
 					}
 				}
 			});
+
+			return abort();
 		}
 
 		const analysisResult = await performAnalysis(result.path, { previousLibrary });

@@ -62,6 +62,7 @@ export async function getPackage(
 			name: parsed.name!
 		};
 	} catch (err) {
+		err.message = [err.message, err.stdout, err.sterr].filter(Boolean).join('\n');
 		return err;
 	}
 }

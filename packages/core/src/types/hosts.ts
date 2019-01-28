@@ -29,6 +29,7 @@ export interface HostFile {
 export enum HostBase {
 	Source,
 	AppData,
+	AppPath,
 	UserData,
 	UserHome
 }

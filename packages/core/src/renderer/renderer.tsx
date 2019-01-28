@@ -15,10 +15,6 @@ import * as Types from '../types';
 import { BrowserAdapter } from '../adapters/browser-adapter';
 import * as Fs from 'fs';
 
-let app: Model.AlvaApp;
-let history;
-let store: ViewStore;
-
 window.requestIdleCallback = window.requestIdleCallback || (window.requestAnimationFrame as any);
 
 export async function startRenderer(): Promise<void> {
@@ -30,7 +26,7 @@ export async function startRenderer(): Promise<void> {
 		data && data.host !== Types.HostType.Browser ? `ws://${window.location.host}/` : '';
 	const sender = new Sender({ endpoint });
 
-	app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender });
+	const app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender });
 
 	if (data.host) {
 		app.setHostType(data.host);
@@ -40,20 +36,21 @@ export async function startRenderer(): Promise<void> {
 		app.setActiveView(data.view);
 	}
 
+	if (data.projectViewMode) {
+		app.setProjectViewMode(data.projectViewMode);
+	}
+
 	if (data.update) {
 		app.setUpdate(data.update);
 	}
 
 	app.setSender(sender);
 
-	history = new Model.EditHistory();
-	store = new ViewStore({ app, history, sender });
+	const history = new Model.EditHistory();
+	const libraryStore = new Model.LibraryStore();
+	const store = new ViewStore({ app, history, sender, libraryStore });
 
 	store.setServerPort(parseInt(window.location.port, 10));
-
-	if (data.projects) {
-		store.setProjects(data.projects);
-	}
 
 	const project = store.getProject();
 
@@ -101,6 +98,11 @@ export async function startRenderer(): Promise<void> {
 			if (project) {
 				store.setProject(project);
 				store.setActiveAppView(Types.AlvaView.PageDetail);
+
+				if (fragments[fragments.length - 1] === 'store') {
+					app.setProjectViewMode(Types.ProjectViewMode.Libraries);
+				}
+
 				store.commit();
 			}
 		}
@@ -135,12 +137,25 @@ export async function startRenderer(): Promise<void> {
 
 		if (
 			app.isActiveView(Types.AlvaView.PageDetail) &&
-			typeof store.getProject() !== 'undefined'
+			typeof store.getProject() !== 'undefined' &&
+			app.getProjectViewMode() === Types.ProjectViewMode.Design
 		) {
 			window.history.pushState(
 				app.toJSON(),
 				document.title,
 				`/project/${store.getProject().getId()}${hash}`
+			);
+		}
+
+		if (
+			app.isActiveView(Types.AlvaView.PageDetail) &&
+			typeof store.getProject() !== 'undefined' &&
+			app.getProjectViewMode() === Types.ProjectViewMode.Libraries
+		) {
+			window.history.pushState(
+				app.toJSON(),
+				document.title,
+				`/project/${store.getProject().getId()}/store${hash}`
 			);
 		}
 

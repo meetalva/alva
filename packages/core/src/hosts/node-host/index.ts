@@ -5,6 +5,7 @@ import * as Util from 'util';
 import * as Types from '../../types';
 import * as getPort from 'get-port';
 import * as Model from '../../model';
+import * as execa from 'execa';
 
 export class NodeHost implements Types.Host {
 	public type = Types.HostType.Node;
@@ -54,6 +55,7 @@ export class NodeHost implements Types.Host {
 	public async resolveFrom(base: Types.HostBase, ...paths: string[]): Promise<string> {
 		const getBasePath = (b: Types.HostBase): string => {
 			switch (b) {
+				case Types.HostBase.AppPath:
 				case Types.HostBase.Source:
 					return Path.resolve(__dirname, '..', '..');
 				case Types.HostBase.AppData:

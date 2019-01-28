@@ -1,4 +1,4 @@
-import { PageTile } from '../../components';
+import { PageTile } from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import { Page, DroppablePageIndex } from '../../model';
 import * as React from 'react';

@@ -13,14 +13,35 @@ export function connectPatternLibrary({
 
 		if (!app) {
 			host.log(`connectPatternLibrary: received message without resolveable app: ${m}`);
+			(await host.getSender()).send({
+				type: M.MessageType.ConnectPatternLibraryResponse,
+				id: m.id,
+				transaction: m.transaction,
+				payload: {
+					result: 'aborted',
+					previousLibraryId: m.payload.library
+				}
+			});
 			return;
 		}
 
 		const project = await dataHost.getProject(m.payload.projectId);
 
+		const abort = () => {
+			app.send({
+				type: M.MessageType.ConnectPatternLibraryResponse,
+				id: m.id,
+				transaction: m.transaction,
+				payload: {
+					result: 'aborted',
+					previousLibraryId: m.payload.library
+				}
+			});
+		};
+
 		if (!project) {
 			host.log(`connectPatternLibrary: received message without resolveable project: ${m}`);
-			return;
+			return abort();
 		}
 
 		const path = await host.selectFile({
@@ -37,28 +58,34 @@ export function connectPatternLibrary({
 
 		if (!path) {
 			host.log(`connectPatternLibrary: no path`);
-			return;
+			return abort();
 		}
 
-		const connections = await dataHost.getConnections(project);
-		const connection = connections.find(c => c.path === path);
+		const pkg = JSON.parse((await host.readFile(path)).contents);
 
-		const previousLibrary = connection
-			? project
-					.getPatternLibraries()
-					.find(p => `${p.getName()}@${p.getVersion()}` === connection.id)
-			: m.payload.library
-				? project.getPatternLibraryById(m.payload.library)
-				: undefined;
+		const previousLibraryByName =
+			pkg && pkg.name ? project.getPatternLibraryByPackageName(pkg.name) : undefined;
+		const previousLibraryById = m.payload.library
+			? project.getPatternLibraryById(m.payload.library)
+			: undefined;
+		const previousLibrary = previousLibraryById || previousLibraryByName;
 
-		if (m.payload.library && !previousLibrary) {
-			host.log(`connectPatternLibrary: could not determine previous library`);
-			return;
+		if (previousLibrary) {
+			app.send({
+				type: MessageType.UpdatingPatternLibrary,
+				id: uuid.v4(),
+				transaction: m.transaction,
+				payload: {
+					libraryId: previousLibrary.getId()
+				}
+			});
 		}
 
 		const analysisResult = await performAnalysis(path, { previousLibrary });
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
+			host.log(analysisResult.error.message);
+
 			app.send({
 				type: MessageType.ShowError,
 				id: uuid.v4(),
@@ -72,13 +99,20 @@ export function connectPatternLibrary({
 					}
 				}
 			});
-			return;
+
+			return abort();
 		}
 
 		const analysis = analysisResult.result;
+		const analysisName = analysisResult.result.packageFile
+			? (analysisResult.result.packageFile as { name?: string }).name || 'Library'
+			: 'Library';
+		const analysisVersion = analysisResult.result.packageFile
+			? (analysisResult.result.packageFile as { version?: string }).version || '1.0.0'
+			: '1.0.0';
 
 		dataHost.addConnection(project, {
-			id: `${analysisResult.result.name}@${analysisResult.result.version}`,
+			id: `${analysisName}@${analysisVersion}`,
 			path: analysis.path
 		});
 
@@ -88,9 +122,11 @@ export function connectPatternLibrary({
 				id: m.id,
 				transaction: m.transaction,
 				payload: {
+					result: 'success',
 					analysis: analysisResult.result,
 					path,
-					previousLibraryId: undefined
+					previousLibraryId: undefined,
+					installType: T.PatternLibraryInstallType.Local
 				}
 			});
 		} else {
@@ -99,9 +135,11 @@ export function connectPatternLibrary({
 				id: m.id,
 				transaction: m.transaction,
 				payload: {
+					result: 'success',
 					analysis: analysisResult.result,
 					path,
-					previousLibraryId: previousLibrary.getId()
+					previousLibraryId: previousLibrary.getId(),
+					installType: T.PatternLibraryInstallType.Local
 				}
 			});
 		}

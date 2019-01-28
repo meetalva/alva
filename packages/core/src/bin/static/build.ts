@@ -24,6 +24,7 @@ export async function build({
 		payload: {
 			host: Types.HostType.Browser,
 			view: project ? Types.AlvaView.PageDetail : Types.AlvaView.SplashScreen,
+			projectViewMode: Types.ProjectViewMode.Design,
 			project
 		}
 	});

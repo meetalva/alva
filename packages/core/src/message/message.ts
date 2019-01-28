@@ -59,6 +59,7 @@ export enum MessageType {
 	OpenExternalURL = 'open-external-url',
 	OpenFileRequest = 'open-file-request',
 	OpenFileResponse = 'open-file-response',
+	OpenRemoteFileRequest = 'open-remote-file-request',
 	PageChange = 'page-change',
 	ProjectChange = 'project-change',
 	Paste = 'paste',
@@ -95,7 +96,10 @@ export enum MessageType {
 	OpenWindow = 'open-window',
 	ShowUpdateDetails = 'show-update-details',
 	InstallUpdate = 'install-update',
-	ProjectRecordsChanged = 'project-records-changed'
+	ProjectRecordsChanged = 'project-records-changed',
+	ConnectNpmPatternLibraryRequest = 'connect-npm-pattern-library-request',
+	UpdateNpmPatternLibraryRequest = 'update-npm-pattern-library-request',
+	UpdatingPatternLibrary = 'updating-pattern-library'
 }
 
 export type Message =
@@ -145,6 +149,7 @@ export type Message =
 	| OpenExternalURL
 	| OpenFileRequest
 	| OpenFileResponse
+	| OpenRemoteFileRequest
 	| PageChange
 	| ProjectChange
 	| Paste
@@ -191,7 +196,10 @@ export type Message =
 	| UpdateDownload
 	| ShowUpdateDetails
 	| InstallUpdate
-	| ProjectRecordsChanged;
+	| ProjectRecordsChanged
+	| ConnectNpmPatternLibraryRequest
+	| UpdateNpmPatternLibraryRequest
+	| UpdatingPatternLibrary;
 
 export type CreateNewFileRequest = Envelope<MessageType.CreateNewFileRequest, { replace: boolean }>;
 export type ActivatePage = Envelope<MessageType.ActivatePage, { id: string }>;
@@ -244,12 +252,26 @@ export type ConnectPatternLibraryRequest = Envelope<
 >;
 export type ConnectPatternLibraryResponse = Envelope<
 	MessageType.ConnectPatternLibraryResponse,
-	{
-		analysis: Types.LibraryAnalysis;
-		path: string;
-		previousLibraryId: string | undefined;
-	}
+	ConnectPatternLibraryResponsePayload
 >;
+
+export type ConnectPatternLibraryResponsePayload =
+	| ConnectPatternLibraryResponseSuccessPayload
+	| ConnectPatternLibraryResponseAbortPayload;
+
+export interface ConnectPatternLibraryResponseSuccessPayload {
+	result: 'success';
+	analysis: Types.LibraryAnalysis;
+	path: string;
+	previousLibraryId: string | undefined;
+	installType: Types.PatternLibraryInstallType;
+}
+
+export interface ConnectPatternLibraryResponseAbortPayload {
+	result: 'aborted';
+	previousLibraryId: string | undefined;
+}
+
 export type ContextMenuRequest = Envelope<
 	MessageType.ContextMenuRequest,
 	Types.ContextMenuRequestPayload
@@ -291,6 +313,10 @@ export type OpenExternalURL = Envelope<MessageType.OpenExternalURL, string>;
 export type OpenFileRequest = Envelope<
 	MessageType.OpenFileRequest,
 	{ path?: string; silent?: boolean; replace: boolean; newWindow?: boolean }
+>;
+export type OpenRemoteFileRequest = Envelope<
+	MessageType.OpenRemoteFileRequest,
+	{ type: 'http'; url: string }
 >;
 export type OpenFileResponse = Envelope<MessageType.OpenFileResponse, Types.ProjectPayload>;
 export type PageChange = Envelope<MessageType.PageChange, Types.PageChangePayload>;
@@ -354,16 +380,40 @@ export type UpdatePatternLibraryRequest = Envelope<
 	{
 		libId: string;
 		projectId: string;
+		installType: Types.PatternLibraryInstallType;
+	}
+>;
+export type UpdateNpmPatternLibraryRequest = Envelope<
+	MessageType.UpdateNpmPatternLibraryRequest,
+	{
+		libId: string;
+		npmId?: string;
+		projectId: string;
+		installType: Types.PatternLibraryInstallType;
 	}
 >;
 export type UpdatePatternLibraryResponse = Envelope<
 	MessageType.UpdatePatternLibraryResponse,
-	{
-		analysis: Types.LibraryAnalysis;
-		path: string;
-		previousLibraryId: string;
-	}
+	UpdatePatternLibraryResponsePayload
 >;
+
+export type UpdatePatternLibraryResponsePayload =
+	| UpdatePatternLibraryResponseAbortPayload
+	| UpdatePatternLibraryResponseSuccessPayload;
+
+export interface UpdatePatternLibraryResponseAbortPayload {
+	result: 'aborted';
+	previousLibraryId: string | undefined;
+}
+
+export interface UpdatePatternLibraryResponseSuccessPayload {
+	result: 'success';
+	analysis: Types.LibraryAnalysis;
+	path: string;
+	previousLibraryId: string;
+	installType: Types.PatternLibraryInstallType;
+}
+
 export type ExportHtmlProject = Envelope<
 	MessageType.ExportHtmlProject,
 	{ path: string | undefined; projectId: string }
@@ -518,4 +568,18 @@ export type InstallUpdate = EmptyEnvelope<MessageType.InstallUpdate>;
 export type ProjectRecordsChanged = Envelope<
 	MessageType.ProjectRecordsChanged,
 	{ projects: Types.ProjectRecord[] }
+>;
+
+export type ConnectNpmPatternLibraryRequest = Envelope<
+	MessageType.ConnectNpmPatternLibraryRequest,
+	{
+		npmId: string;
+		projectId: string;
+		libraryId?: string;
+	}
+>;
+
+export type UpdatingPatternLibrary = Envelope<
+	MessageType.UpdatingPatternLibrary,
+	{ libraryId: string }
 >;

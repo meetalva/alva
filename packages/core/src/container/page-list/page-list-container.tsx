@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as MobxReact from 'mobx-react';
 import { PageTileContainer } from './page-tile-container';
 import { Page } from '../../model/page';
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 
 import * as Model from '../../model';
 import * as Store from '../../store';

@@ -1,10 +1,11 @@
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
 import { ActionPayloadSelect } from './action-payload-select';
+import { FlexAlignItems } from '@meetalva/components';
 
 export interface ActionInputProps {
 	element: Model.Element;
@@ -46,7 +47,7 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 										onChange={e => props.elementAction.setPayload(e.target.value)}
 										onBlur={() => window.requestIdleCallback(() => props.store.commit())}
 									/>
-									<Components.LinkIcon
+									<Components.PropertyLinkIcon
 										onClick={() => {
 											props.elementAction.setOpen(true);
 										}}
@@ -118,11 +119,10 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 				const page = project.getPageById(props.elementAction.getPayload());
 
 				return (
-					<div
+					<Components.Flex
+						flexWrap={false}
+						alignItems={FlexAlignItems.Center}
 						style={{
-							display: 'flex',
-							alignItems: 'center',
-							flexWrap: 'nowrap',
 							marginTop: '6px'
 						}}
 					>
@@ -143,7 +143,7 @@ export class ActionPayloadInput extends React.Component<ActionInputProps> {
 								.getPages()
 								.map(p => ({ label: p.getName(), value: p.getId() }))}
 						/>
-					</div>
+					</Components.Flex>
 				);
 			}
 		}

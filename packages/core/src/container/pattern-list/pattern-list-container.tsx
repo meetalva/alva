@@ -1,4 +1,4 @@
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import { ElementDragImage } from '../element-drag-image';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
@@ -64,6 +64,20 @@ export class PatternListContainer extends React.Component {
 						))}
 					<ElementDragImage element={store.getDraggedElement()} dragRef={this.dragImg} />
 				</div>
+				<div
+					style={{
+						userSelect: 'none',
+						maxWidth: '180px'
+					}}
+				>
+					<Components.Link
+						color={Components.Color.Grey50}
+						onClick={() => store.getApp().setProjectViewMode(Types.ProjectViewMode.Libraries)}
+					>
+						Open Library Store to browse and install more libraries
+					</Components.Link>
+				</div>
+				<Components.Space sizeBottom={Components.SpaceSize.XL} />
 			</div>
 		);
 	}
@@ -86,7 +100,9 @@ class PatternLibraryContainer extends React.Component<PatternLibraryContainerPro
 		}
 
 		return (
-			<Components.PatternFolderView name={props.library.getName()}>
+			<Components.PatternFolderView
+				name={props.library.getDisplayName() || props.library.getName()}
+			>
 				{patterns.map(pattern => (
 					<PatternItemContainer key={pattern.getId()} pattern={pattern} />
 				))}

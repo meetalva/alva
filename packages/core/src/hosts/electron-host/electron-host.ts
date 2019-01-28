@@ -10,9 +10,13 @@ import { AlvaApp } from '../../model';
 import * as Mobx from 'mobx';
 import * as Message from '../../message';
 import * as ElectronLog from 'electron-log';
+import * as execa from 'execa';
+import { getPackage } from '../../analyzer/get-package';
 
 ElectronLog.transports.console.level = 'info';
 ElectronLog.transports.file.level = 'silly';
+
+const YARN = Path.join(__dirname, '..', '..', '..', 'vendor', 'yarn.js');
 
 export interface ElectronHostInit {
 	process: NodeJS.Process;
@@ -69,6 +73,8 @@ export class ElectronHost implements Types.Host {
 					return Path.resolve(__dirname, '..', '..');
 				case Types.HostBase.AppData:
 					return Path.resolve(Os.tmpdir(), 'alva');
+				case Types.HostBase.AppPath:
+					return Electron.app.getAppPath();
 				case Types.HostBase.UserData:
 					return Electron.app.getPath('userData');
 				case Types.HostBase.UserHome:

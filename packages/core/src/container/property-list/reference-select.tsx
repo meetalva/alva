@@ -1,4 +1,4 @@
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
@@ -24,12 +24,12 @@ export enum IconPosition {
 const OutsideClickHandler = require('react-outside-click-handler').default;
 
 const HoverReveal = styled.div`
-	${Components.LinkIcon} {
+	${Components.PropertyLinkIcon} {
 		opacity: 0;
 		transition: 0.3s ease-in-out opacity;
 	}
 
-	&:hover ${Components.LinkIcon} {
+	&:hover ${Components.PropertyLinkIcon} {
 		opacity: 1;
 	}
 `;
@@ -38,7 +38,7 @@ interface PositionedLinkIconProps {
 	position: IconPosition;
 }
 
-const PositionedLinkIcon = styled(Components.LinkIcon)`
+const PositionedLinkIcon = styled(Components.PropertyLinkIcon)`
 	right: ${(props: PositionedLinkIconProps) =>
 		props.position === IconPosition.Indent ? 20 : 0}px;
 `;

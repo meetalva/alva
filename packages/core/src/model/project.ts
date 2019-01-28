@@ -16,13 +16,13 @@ import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-
 import { UserStoreReference } from './user-store-reference';
 import * as uuid from 'uuid';
 import * as ModelTree from '../model-tree';
-import { PlaceholderPosition } from '../components';
+import { PlaceholderPosition } from '@meetalva/components';
 import { builtinPatternLibrary } from './pattern-library/builtin-pattern-library';
 
 export interface ProjectProperties {
 	draft: boolean;
 	id?: string;
-	version?: 0 | 1;
+	version?: 0 | 1 | 2;
 	name: string;
 	pages: Page[];
 	path: string;
@@ -39,7 +39,7 @@ export interface ProjectCreateInit {
 export class Project {
 	public readonly model = Types.ModelName.Project;
 
-	private readonly version: 0 | 1 = 0;
+	private readonly version: 0 | 1 | 2 = 2;
 
 	private syncing: boolean = false;
 
@@ -64,6 +64,11 @@ export class Project {
 	@Mobx.observable private patternLibraries: Map<string, PatternLibrary> = new Map();
 
 	@Mobx.observable private userStore: UserStore;
+
+	@Mobx.computed
+	private get flattenedLibraries(): PatternLibrary[] {
+		return [...this.patternLibraries.values()];
+	}
 
 	@Mobx.computed
 	private get activePage(): Page {
@@ -178,7 +183,10 @@ export class Project {
 		this.path = init.path;
 		this.userStore = init.userStore;
 		this.draft = init.draft;
-		this.version = init.version;
+
+		if (typeof init.version !== 'undefined') {
+			this.version = init.version;
+		}
 
 		init.pages.forEach(page => {
 			this.addPage(page);
@@ -519,7 +527,7 @@ export class Project {
 	}
 
 	public getPatternLibraries(): PatternLibrary[] {
-		return [...this.patternLibraries.values()];
+		return this.flattenedLibraries;
 	}
 
 	public getPatternLibraryById(id: string): PatternLibrary | undefined {
@@ -527,7 +535,11 @@ export class Project {
 	}
 
 	public getPatternLibraryByContextId(contextid: string): PatternLibrary | undefined {
-		return [...this.patternLibraries.values()].find(p => p.contextId === contextid);
+		return this.flattenedLibraries.find(p => p.contextId === contextid);
+	}
+
+	public getPatternLibraryByPackageName(name: string): PatternLibrary | undefined {
+		return this.flattenedLibraries.find(p => p.getPackageName() === name);
 	}
 
 	public getPatternPropertyById(id: string): AnyPatternProperty | undefined {

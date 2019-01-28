@@ -13,11 +13,14 @@ const md5 = require('md5');
 export interface PatternLibraryInit {
 	bundleId: string;
 	bundle: string;
-	description: string;
 	id: string;
-	name: string;
-	version: string;
+	installType: Types.PatternLibraryInstallType;
 	origin: Types.PatternLibraryOrigin;
+	packageFile: {
+		name: string;
+		version: string;
+		[key: string]: unknown;
+	};
 	patternProperties: AnyPatternProperty[];
 	patterns: Pattern[];
 	state: Types.PatternLibraryState;
@@ -46,13 +49,34 @@ export class PatternLibrary {
 
 	@Mobx.observable private bundleId: string;
 	@Mobx.observable private bundle: string;
-	@Mobx.observable private description: string;
-	@Mobx.observable private name: string;
-	@Mobx.observable private version: string;
+	@Mobx.observable private installType: Types.PatternLibraryInstallType;
+	@Mobx.observable private origin: Types.PatternLibraryOrigin;
+	@Mobx.observable
+	private packageFile: {
+		name: string;
+		version: string;
+		[key: string]: unknown;
+	};
 	@Mobx.observable private patternProperties: Map<string, AnyPatternProperty> = new Map();
 	@Mobx.observable private patterns: Map<string, Pattern> = new Map();
-	@Mobx.observable private origin: Types.PatternLibraryOrigin;
 	@Mobx.observable private state: Types.PatternLibraryState;
+
+	@Mobx.computed
+	private get version(): string {
+		return this.packageFile.version;
+	}
+
+	@Mobx.computed
+	private get name(): string {
+		return this.packageFile.name;
+	}
+
+	@Mobx.computed
+	private get alvaMeta(): { [key: string]: unknown } {
+		return typeof this.packageFile.alva === 'object' && this.packageFile.alva !== null
+			? this.packageFile.alva
+			: {};
+	}
 
 	@Mobx.computed
 	private get slots(): PatternSlot[] {
@@ -64,17 +88,16 @@ export class PatternLibrary {
 
 	@Mobx.computed
 	public get contextId(): string {
-		return [this.name, this.version || '1.0.0'].join('@');
+		return [this.name, this.version].join('@');
 	}
 
 	public constructor(init: PatternLibraryInit) {
 		this.bundleId = init.bundleId;
 		this.bundle = init.bundle;
-		this.description = init.description;
 		this.id = init.id || uuid.v4();
-		this.name = init.name;
-		this.version = init.version;
+		this.installType = init.installType;
 		this.origin = init.origin;
+		this.packageFile = init.packageFile;
 		init.patterns.forEach(pattern => this.patterns.set(pattern.getId(), pattern));
 		init.patternProperties.forEach(prop => this.patternProperties.set(prop.getId(), prop));
 		this.state = init.state;
@@ -84,11 +107,13 @@ export class PatternLibrary {
 		return {
 			bundleId: uuid.v4(),
 			bundle: '',
-			description: '',
 			id: uuid.v4(),
-			name: 'Library',
-			version: '1.0.0',
+			installType: Types.PatternLibraryInstallType.Local,
 			origin: Types.PatternLibraryOrigin.UserProvided,
+			packageFile: {
+				name: 'component-library',
+				version: '1.0.0'
+			},
 			patterns: [],
 			patternProperties: [],
 			state: Types.PatternLibraryState.Connected
@@ -101,25 +126,27 @@ export class PatternLibrary {
 
 	public static fromAnalysis(
 		analysis: Types.LibraryAnalysis,
-		{ project }: { project: Project },
-		{ analyzeBuiltins }: { analyzeBuiltins: boolean }
+		opts: {
+			analyzeBuiltins: boolean;
+			project: Project;
+			installType: Types.PatternLibraryInstallType;
+		}
 	): PatternLibrary {
 		const library = PatternLibrary.create({
-			id: uuid.v4(),
-			name: analysis.name,
-			version: analysis.version,
-			origin: analyzeBuiltins
-				? Types.PatternLibraryOrigin.BuiltIn
-				: Types.PatternLibraryOrigin.UserProvided,
-			patternProperties: [],
-			patterns: [],
 			bundle: analysis.bundle,
 			bundleId: analysis.id,
-			description: analysis.description,
+			id: uuid.v4(),
+			installType: opts.installType,
+			origin: opts.analyzeBuiltins
+				? Types.PatternLibraryOrigin.BuiltIn
+				: Types.PatternLibraryOrigin.UserProvided,
+			packageFile: analysis.packageFile,
+			patternProperties: [],
+			patterns: [],
 			state: Types.PatternLibraryState.Connected
 		});
 
-		library.import(analysis, { project });
+		library.import(analysis, { project: opts.project });
 
 		return library;
 	}
@@ -130,11 +157,10 @@ export class PatternLibrary {
 		const patternLibrary = new PatternLibrary({
 			bundleId: serialized.bundleId,
 			bundle: serialized.bundle,
-			description: serialized.description,
 			id: serialized.id,
-			name: serialized.name,
-			version: serialized.version,
+			installType: serialized.installType,
 			origin: deserializeOrigin(serialized.origin),
+			packageFile: serialized.packageFile,
 			patterns: [],
 			patternProperties: serialized.patternProperties.map(p => PatternProperty.from(p)),
 			state
@@ -153,6 +179,8 @@ export class PatternLibrary {
 
 	@Mobx.action
 	public import(analysis: Types.LibraryAnalysis, { project }: { project: Project }): void {
+		this.packageFile = analysis.packageFile;
+
 		const patternsBefore = this.getPatterns();
 		const patternsAfter = analysis.patterns.map(item =>
 			Pattern.from(item.pattern, { patternLibrary: this })
@@ -287,8 +315,10 @@ export class PatternLibrary {
 		return slot ? slot.getId() : uuid.v4();
 	}
 
-	public getDescription(): string {
-		return this.description;
+	public getDescription(): string | undefined {
+		return typeof this.packageFile.description === 'string'
+			? this.packageFile.description
+			: undefined;
 	}
 
 	public getBundle(): string {
@@ -301,6 +331,10 @@ export class PatternLibrary {
 
 	public getBundleHash(): string {
 		return md5(this.bundle);
+	}
+
+	public getColor(): string | undefined {
+		return typeof this.alvaMeta.color === 'string' ? this.alvaMeta.color : undefined;
 	}
 
 	public getCapabilites(): Types.LibraryCapability[] {
@@ -330,8 +364,20 @@ export class PatternLibrary {
 		return this.name;
 	}
 
+	public getDisplayName(): string | undefined {
+		return typeof this.alvaMeta.name === 'string' ? this.alvaMeta.name : this.name;
+	}
+
+	public getPackageName(): string {
+		return this.name;
+	}
+
 	public getVersion(): string {
 		return this.version;
+	}
+
+	public getHomepage(): string | undefined {
+		return typeof this.packageFile.homepage === 'string' ? this.packageFile.homepage : undefined;
 	}
 
 	public getOrigin(): Types.PatternLibraryOrigin {
@@ -380,6 +426,18 @@ export class PatternLibrary {
 		return this.state;
 	}
 
+	public getImage(): string | undefined {
+		return typeof this.alvaMeta.image === 'string' ? this.alvaMeta.image : undefined;
+	}
+
+	public getInstallType(): Types.PatternLibraryInstallType {
+		if (this.origin === Types.PatternLibraryOrigin.BuiltIn) {
+			return Types.PatternLibraryInstallType.Remote;
+		}
+
+		return this.installType;
+	}
+
 	@Mobx.action
 	public removePattern(pattern: Pattern): void {
 		this.patterns.delete(pattern.getId());
@@ -401,32 +459,26 @@ export class PatternLibrary {
 	}
 
 	@Mobx.action
-	public setDescription(description: string): void {
-		this.description = description;
-	}
-
-	@Mobx.action
-	public setName(name: string): void {
-		this.name = name;
-	}
-
-	@Mobx.action
 	public setState(state: Types.PatternLibraryState): void {
 		this.state = state;
 	}
 
+	@Mobx.action
+	public setInstallType(installType: Types.PatternLibraryInstallType): void {
+		this.installType = installType;
+	}
+
 	public toJSON(): Types.SerializedPatternLibrary {
 		return {
-			model: this.model,
 			bundleId: this.bundleId,
 			bundle: this.bundle,
-			description: this.description,
 			id: this.id,
-			name: this.name,
-			version: this.version,
+			installType: this.installType,
+			model: this.model,
 			origin: serializeOrigin(this.origin),
-			patterns: this.getPatterns().map(p => p.toJSON()),
+			packageFile: this.packageFile,
 			patternProperties: this.getPatternProperties().map(p => p.toJSON()),
+			patterns: this.getPatterns().map(p => p.toJSON()),
 			state: this.state
 		};
 	}
@@ -435,10 +487,9 @@ export class PatternLibrary {
 	public update(b: PatternLibrary): void {
 		this.bundleId = b.bundleId;
 		this.bundle = b.bundle;
-		this.description = b.description;
-		this.name = b.name;
 		this.origin = b.origin;
-		this.state = this.state;
+		this.installType = b.installType;
+		this.packageFile = b.packageFile;
 
 		const patternChanges = computeDifference<Pattern>({
 			before: this.getPatterns(),

@@ -41,6 +41,10 @@ export class NodeAdapter {
 		);
 		sender.match<M.OpenExternalURL>(MT.OpenExternalURL, Matchers.openExternalUrl(context));
 		sender.match<M.OpenFileRequest>(MT.OpenFileRequest, Matchers.openFileRequest(context));
+		sender.match<M.OpenRemoteFileRequest>(
+			MT.OpenRemoteFileRequest,
+			Matchers.openRemoteFileRequest(context)
+		);
 		sender.match<M.OpenWindow>(MT.OpenWindow, Matchers.openWindow(context));
 		sender.match<M.Paste>(MT.Paste, Matchers.paste(context));
 		sender.match<M.Save>(MT.Save, Matchers.save(context, { passive: false }));
@@ -54,6 +58,14 @@ export class NodeAdapter {
 
 		sender.match<M.SaveResult>(MT.SaveResult, () => this.dataHost.checkProjects());
 		sender.match<M.UseFileResponse>(MT.UseFileResponse, () => this.dataHost.checkProjects());
+		sender.match<M.ConnectNpmPatternLibraryRequest>(
+			MT.ConnectNpmPatternLibraryRequest,
+			Matchers.connectNpmPatternLibrary(context)
+		);
+		sender.match<M.UpdateNpmPatternLibraryRequest>(
+			MT.UpdateNpmPatternLibraryRequest,
+			Matchers.updateNpmPatternLibrary(context)
+		);
 
 		Mobx.autorun(async () => {
 			sender.send({

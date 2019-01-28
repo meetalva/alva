@@ -2,7 +2,7 @@ import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import { PropertyListVirtual } from './property-list-virtual';
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import * as T from '../../types';
 
 export interface PropertyListContainerProps {
@@ -18,12 +18,10 @@ export class PropertyListContainer extends React.Component<PropertyListContainer
 
 		if (!selectedElement || selectedElement.getRole() === T.ElementRole.Root) {
 			return (
-				<div>
-					<Components.EmptyState
-						headline="Properties"
-						copy="Select an element to edit properties"
-					/>
-				</div>
+				<Components.EmptyState
+					headline="Properties"
+					copy="Select an element to edit properties"
+				/>
 			);
 		}
 		return <PropertyListVirtual element={selectedElement} />;

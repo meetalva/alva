@@ -1,7 +1,0 @@
-{
-	"name": "project-pane",
-	"displayName": "Project Pane",
-	"flag": "alpha",
-	"version": "1.0.0",
-	"tags": ["atom", "project-pane"]
- }

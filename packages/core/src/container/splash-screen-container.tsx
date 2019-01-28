@@ -5,7 +5,7 @@ import { SplashScreenView } from './splash-screen-view';
 import * as uuid from 'uuid';
 import { ViewStore } from '../store';
 import { FileInput } from './file-input';
-import * as C from '../components';
+import * as C from '@meetalva/components';
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -72,9 +72,12 @@ export class SplashScreenContainer extends React.Component {
 				}}
 				onExampleClick={() => {
 					app.send({
-						type: MessageType.OpenExternalURL,
+						type: MessageType.OpenRemoteFileRequest,
 						id: uuid.v4(),
-						payload: 'https://media.meetalva.io/file/Website.alva'
+						payload: {
+							type: 'http',
+							url: 'https://media.meetalva.io/file/Website.alva'
+						}
 					});
 				}}
 				onGithubClick={() => {

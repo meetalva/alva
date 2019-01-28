@@ -1,6 +1,6 @@
 import { AppView } from './app-view';
 import { ChromeContainer } from './chrome/chrome-container';
-import * as Components from '../components';
+import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import * as Types from '../types';
@@ -49,11 +49,9 @@ export class App extends React.Component {
 					<MenuContainer
 						variant={Types.MenuVariant.Horizontal}
 						menus={[
-							// TODO: Connect to store more cleanly
 							Menu.appMenu(ctx),
 							Menu.fileMenu(ctx),
 							Menu.editMenu(ctx),
-							Menu.libraryMenu(ctx),
 							Menu.viewMenu(ctx),
 							Menu.windowMenu(ctx),
 							Menu.helpMenu(ctx)

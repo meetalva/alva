@@ -1,9 +1,10 @@
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
-import * as Components from '../../components';
+import * as C from '@meetalva/components';
 import { ViewStore } from '../../store';
 import * as Types from '../../types';
 import { Check, ChevronDown } from 'react-feather';
+import { When } from '../when';
 const ReactSelectComponents = require('react-select').components;
 const OutsideClickHandler = require('react-outside-click-handler').default;
 
@@ -18,7 +19,11 @@ const AppPanes = [
 export class ChromeSwitch extends React.Component {
 	public render(): JSX.Element | null {
 		const { store } = this.props as { store: ViewStore };
+		const viewMode = store.getApp().getProjectViewMode();
+		const isDesignView = viewMode === Types.ProjectViewMode.Design;
+
 		const app = store.getApp();
+		const libraryStore = store.libraryStore;
 		const panes = app.getPanes();
 
 		const next = panes.size > 0 ? [] : AppPanes;
@@ -35,75 +40,98 @@ export class ChromeSwitch extends React.Component {
 			typeof navigator !== 'undefined' &&
 			navigator.platform === 'MacIntel' &&
 			app.isHostType(Types.HostType.Electron);
-		const marginLeft = withOffset ? Components.getSpace(Components.SpaceSize.XXL * 2) : 0;
+		const marginLeft = withOffset ? C.getSpace(C.SpaceSize.XXL * 2 + C.SpaceSize.XS) : 0;
 
 		return (
-			<div style={{ marginLeft }}>
-				<Components.LayoutSwitch
-					active={!next}
-					onPrimaryClick={() => app.setPanes(next)}
-					onDoubleClick={event => event.stopPropagation()}
-					onSecondaryClick={() => app.setPaneSelectOpen(!app.getPaneSelectOpen())}
-				>
-					<OutsideClickHandler onOutsideClick={() => app.setPaneSelectOpen(false)}>
-						<Components.Select
-							value={value}
-							components={{
-								Control: props => (
-									<ChevronDown
-										size={Components.IconSize.XXS}
-										style={{ zIndex: 10, pointerEvents: 'none' }}
-									/>
-								),
-								Option: props => (
-									<ReactSelectComponents.Option {...props}>
-										<div style={{ display: 'flex', alignItems: 'center' }}>
-											<Check
-												style={{
-													width: 15,
-													// tslint:disable-next-line:no-any
-													opacity: (props as any).isSelected ? 1 : 0,
-													flexShrink: 0,
-													paddingRight: 5
-												}}
+			<C.Flex alignItems={C.FlexAlignItems.Center} style={{ marginLeft, height: '100%' }}>
+				<div style={{ minWidth: 52 }}>
+					<When isDesignView={isDesignView}>
+						<C.LayoutSwitch
+							active={!next}
+							onPrimaryClick={() => app.setPanes(next)}
+							onDoubleClick={event => event.stopPropagation()}
+							onSecondaryClick={() => app.setPaneSelectOpen(!app.getPaneSelectOpen())}
+						>
+							<OutsideClickHandler onOutsideClick={() => app.setPaneSelectOpen(false)}>
+								<C.Select
+									value={value}
+									components={{
+										Control: props => (
+											<ChevronDown
+												size={C.IconSize.XXS}
+												style={{ zIndex: 10, pointerEvents: 'none' }}
 											/>
-											{props.children}
-										</div>
-									</ReactSelectComponents.Option>
-								)
-							}}
-							controlShouldRenderValue={false}
-							menuIsOpen={app.getPaneSelectOpen()}
-							options={options}
-							onChange={raw => {
-								const items = Array.isArray(raw) ? raw : [raw];
-								items.forEach(item => {
-									const pane = getPane(item.value);
-									if (pane) {
-										app.setPane(pane, !item.selected);
-									}
-								});
-							}}
-							styles={{
-								container: (base: any) => ({
-									...base,
-									display: 'flex'
-								}),
-								menu: (base: any) => ({
-									...base,
-									width: 125,
-									left: -38,
-									overflow: 'hidden',
-									zIndex: 2
-								}),
-								option: () => ({
-									padding: '3px 6px'
-								})
-							}}
-						/>
-					</OutsideClickHandler>
-				</Components.LayoutSwitch>
-			</div>
+										),
+										Option: props => (
+											<ReactSelectComponents.Option {...props}>
+												<C.Flex alignItems={C.FlexAlignItems.Center}>
+													<Check
+														style={{
+															width: 15,
+															// tslint:disable-next-line:no-any
+															opacity: (props as any).isSelected ? 1 : 0,
+															flexShrink: 0,
+															paddingRight: 5
+														}}
+													/>
+													{props.children}
+												</C.Flex>
+											</ReactSelectComponents.Option>
+										)
+									}}
+									controlShouldRenderValue={false}
+									menuIsOpen={app.getPaneSelectOpen()}
+									options={options}
+									onChange={raw => {
+										const items = Array.isArray(raw) ? raw : [raw];
+										items.forEach(item => {
+											const pane = getPane(item.value);
+											if (pane) {
+												app.setPane(pane, !item.selected);
+											}
+										});
+									}}
+									styles={{
+										container: (base: any) => ({
+											...base,
+											display: 'flex'
+										}),
+										menu: (base: any) => ({
+											...base,
+											width: 125,
+											left: -38,
+											overflow: 'hidden',
+											zIndex: 2
+										}),
+										option: () => ({
+											padding: '3px 6px'
+										})
+									}}
+								/>
+							</OutsideClickHandler>
+						</C.LayoutSwitch>
+					</When>
+				</div>
+				<C.Space sizeRight={C.getSpace(C.SpaceSize.M)} />
+				<C.Tab
+					active={app.getProjectViewMode() === Types.ProjectViewMode.Design}
+					onClick={() => app.setProjectViewMode(Types.ProjectViewMode.Design)}
+				>
+					Design
+				</C.Tab>
+				<C.Tab
+					active={app.getProjectViewMode() === Types.ProjectViewMode.Libraries}
+					onClick={() => app.setProjectViewMode(Types.ProjectViewMode.Libraries)}
+				>
+					Libraries
+					{libraryStore.updateCount > 0 && (
+						<>
+							<C.Space sizeRight={C.SpaceSize.XS} />
+							<C.BadgeIcon color={C.Color.Blue20}>{libraryStore.updateCount}</C.BadgeIcon>
+						</>
+					)}
+				</C.Tab>
+			</C.Flex>
 		);
 	}
 }

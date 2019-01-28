@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import * as JSON5 from 'json5';
 import * as Model from '../../model';
 import { WithStore } from '../../store';
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import { PatternUnknownProperty } from '../../model/pattern-property/unknown-property';
 
 export interface PropertyUnknownEditorProps {

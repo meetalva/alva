@@ -29,6 +29,7 @@ async function main(): Promise<void> {
 	const data = getInitialData();
 
 	if (!data) {
+		console.warn('preview received no data');
 		return;
 	}
 

@@ -23,6 +23,11 @@ export enum AlvaView {
 	SplashScreen = 'SplashScreen'
 }
 
+export enum ProjectViewMode {
+	Design = 'Design',
+	Libraries = 'Libraries'
+}
+
 export enum EditableTitleState {
 	Neutral = 'Neutral',
 	Editable = 'Editable',
@@ -53,12 +58,14 @@ export enum LibraryAnalysisResultType {
 
 export interface LibraryAnalysis {
 	bundle: string;
-	description: string;
 	id: string;
-	name: string;
+	packageFile: {
+		name: string;
+		version: string;
+		[key: string]: unknown;
+	};
 	path: string;
 	patterns: PatternAnalysis[];
-	version: string;
 }
 
 export interface LibraryAnalysisSuccess {
@@ -223,11 +230,6 @@ export type ElementPropertyValue =
 	| string[]
 	| unknown;
 
-export enum RightSidebarTab {
-	Properties = 'properties',
-	ProjectSettings = 'project-settings'
-}
-
 export interface SerializedPatternLibraryFile {
 	content: Buffer;
 	id: string;
@@ -235,6 +237,7 @@ export interface SerializedPatternLibraryFile {
 }
 
 export enum PatternLibraryOrigin {
+	Unknown = 'unknown',
 	BuiltIn = 'built-in',
 	UserProvided = 'user-provided'
 }

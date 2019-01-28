@@ -1,17 +1,18 @@
 import { Sender } from '../sender';
 import { isEqual } from 'lodash';
-import { MessageType, ProjectUpdate } from '../message';
+import { MessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
 import * as Types from '../types';
 
 import * as uuid from 'uuid';
-import { PlaceholderPosition } from '../components';
+import { PlaceholderPosition } from '@meetalva/components';
 
 export interface ViewStoreInit {
 	app: Model.AlvaApp;
 	sender: Sender;
 	history: Model.EditHistory;
+	libraryStore: Model.LibraryStore;
 }
 
 export enum ClipBoardType {
@@ -41,6 +42,8 @@ export interface WithStore {
  * and call the respective business methods to perform operations.
  */
 export class ViewStore {
+	public readonly libraryStore: Model.LibraryStore;
+
 	private static EPHEMERAL_CONTENTS: WeakMap<
 		Model.Element,
 		Model.ElementContent[]
@@ -106,6 +109,7 @@ export class ViewStore {
 		this.app = init.app;
 		this.editHistory = init.history;
 		this.sender = init.sender;
+		this.libraryStore = init.libraryStore;
 	}
 
 	@Mobx.action
@@ -867,6 +871,7 @@ export class ViewStore {
 	@Mobx.action
 	public setProject(project: Model.Project): void {
 		this.project = project;
+		this.libraryStore.setProject(project);
 		this.project.unsetHighlightedElement();
 		this.project.unsetSelectedElement();
 	}
@@ -899,7 +904,6 @@ export class ViewStore {
 
 		selectedElement.setSelected(true);
 
-		this.app.setRightSidebarTab(Types.RightSidebarTab.Properties);
 		project.setFocusedItem(selectedElement);
 
 		selectedElement.getAncestors().forEach(ancestor => {
@@ -960,7 +964,8 @@ export class ViewStore {
 			type: MessageType.UpdatePatternLibraryRequest,
 			payload: {
 				libId: library.getId(),
-				projectId: project.getId()
+				projectId: project.getId(),
+				installType: library.getInstallType()
 			},
 			id: uuid.v4()
 		});

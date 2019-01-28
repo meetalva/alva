@@ -5,7 +5,7 @@ import { Project } from '../project';
 import * as Types from '../../types';
 import * as uuid from 'uuid';
 import { PatternLibrary } from '../pattern-library';
-import { PlaceholderPosition } from '../../components';
+import { PlaceholderPosition } from '@meetalva/components';
 
 export interface PageInit {
 	active: boolean;

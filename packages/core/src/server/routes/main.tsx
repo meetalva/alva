@@ -26,6 +26,7 @@ export function mainRouteFactory(server: Types.AlvaServer): Express.RequestHandl
 				payload: {
 					host: server.host.type,
 					view: Types.AlvaView.SplashScreen,
+					projectViewMode: Types.ProjectViewMode.Design,
 					update: await server.dataHost.getUpdate(),
 					projects: await server.dataHost.getProjects()
 				}
@@ -42,7 +43,8 @@ function ServerApp({ sender }: { sender: Types.Sender }) {
 	const store = new Store.ViewStore({
 		app,
 		history,
-		sender: sender as any
+		sender: sender as any,
+		libraryStore: new Model.LibraryStore()
 	});
 
 	return (

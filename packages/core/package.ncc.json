@@ -18,6 +18,7 @@
   },
   "build": {
     "appId": "io.github.meetalva",
+    "asarUnpack": ["./vendor/**/*"],
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
     "productName": "Alva",

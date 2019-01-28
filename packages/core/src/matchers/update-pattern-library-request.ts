@@ -3,6 +3,7 @@ import { MessageType as MT } from '../message';
 import * as T from '../types';
 import * as uuid from 'uuid';
 import { performAnalysis } from './perform-analysis';
+import { PatternLibraryInstallType } from '../types';
 
 export function updatePatternLibrary({
 	host,
@@ -17,16 +18,29 @@ export function updatePatternLibrary({
 			return;
 		}
 
+		const abort = () => {
+			app.send({
+				type: M.MessageType.ConnectPatternLibraryResponse,
+				id: m.id,
+				transaction: m.transaction,
+				payload: {
+					result: 'aborted',
+					previousLibraryId: m.payload.libId
+				}
+			});
+		};
+
 		const project = await dataHost.getProject(projectId);
 		if (!project) {
-			host.log(`connectPatternLibrary: received message without resolveable project: ${m}`);
-			return;
+			host.log(`updatePatternLibrary: received message without resolveable project: ${m}`);
+			return abort();
 		}
 
 		const library = project.getPatternLibraryById(libId);
+
 		if (!library) {
-			host.log(`connectPatternLibrary: received message without resolveable library: ${m}`);
-			return;
+			host.log(`updatePatternLibrary: received message without resolveable library: ${m}`);
+			return abort();
 		}
 
 		const connections = await dataHost.getConnections(project);
@@ -35,17 +49,31 @@ export function updatePatternLibrary({
 		);
 
 		if (!connection || !await host.exists(connection.path)) {
-			app.send({
-				type: MT.ConnectPatternLibraryRequest,
-				id: uuid.v4(),
-				transaction: m.transaction,
-				payload: {
-					projectId: project.getId(),
-					library: library ? library.getId() : undefined
-				}
-			});
+			if (m.payload.installType === PatternLibraryInstallType.Local) {
+				app.send({
+					type: MT.ConnectPatternLibraryRequest,
+					id: uuid.v4(),
+					transaction: m.transaction,
+					payload: {
+						projectId: project.getId(),
+						library: library ? library.getId() : undefined
+					}
+				});
+			}
 
-			return;
+			if (library && m.payload.installType === PatternLibraryInstallType.Remote) {
+				app.send({
+					type: MT.ConnectNpmPatternLibraryRequest,
+					id: uuid.v4(),
+					transaction: m.transaction,
+					payload: {
+						projectId: project.getId(),
+						npmId: library.getPackageName()
+					}
+				});
+			}
+
+			return abort();
 		}
 
 		const { path } = connection;
@@ -66,7 +94,7 @@ export function updatePatternLibrary({
 					}
 				}
 			});
-			return;
+			return abort();
 		}
 
 		app.send({
@@ -74,9 +102,11 @@ export function updatePatternLibrary({
 			id: m.id,
 			transaction: m.transaction,
 			payload: {
+				result: 'success',
 				analysis: analysisResult.result,
 				path,
-				previousLibraryId: library.getId()
+				previousLibraryId: library.getId(),
+				installType: m.payload.installType
 			}
 		});
 	};

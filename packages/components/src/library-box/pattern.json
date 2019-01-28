@@ -1,0 +1,8 @@
+{
+	"name": "library-box",
+	"displayName": "Library Box",
+	"description": "Represent a library",
+	"flag": "alpha",
+	"version": "1.0.0",
+	"tags": ["atom"]
+ }

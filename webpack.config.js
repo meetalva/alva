@@ -7,7 +7,7 @@ const out = flags.out ? flags.out : './packages/core/lib';
 
 module.exports = {
 	mode: flags.production ? 'production' : 'development',
-	devtool: flags.production || flags.sourceMaps ? 'source-maps' : 'eval',
+	devtool: flags.production || flags.sourceMaps ? 'source-maps' : 'cheap-source-map',
 	entry: {
 		preview: require.resolve('./packages/core/src/preview/preview.ts'),
 		previewRenderer: require.resolve('./packages/core/src/preview-renderer/index.ts'),
@@ -42,7 +42,9 @@ module.exports = {
 		})
 	],
 	externals: {
-		mobx: 'Mobx'
+		mobx: 'Mobx',
+		osenv: false,
+		child_process: false
 	},
 	output: {
 		filename: '[name].js',

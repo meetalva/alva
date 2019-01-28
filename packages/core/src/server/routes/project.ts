@@ -18,16 +18,12 @@ export function projectRouteFactory(server: Types.AlvaServer): Express.RequestHa
 			return;
 		}
 
-		// TODO: Formalize this better - this means
-		// we want to sync a project if it is actually used
-		// in an edit interface
-		project.sync(server.sender);
-
 		res.send(
 			RendererDocument.rendererDocument({
 				payload: {
 					host: server.host.type,
 					view: Types.AlvaView.PageDetail,
+					projectViewMode: Types.ProjectViewMode.Design,
 					project,
 					update: await server.dataHost.getUpdate()
 				}

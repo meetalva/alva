@@ -12,6 +12,7 @@ import * as uuid from 'uuid';
 import * as Url from 'url';
 import { HostWindowVariant } from '../../types';
 import * as Mobx from 'mobx';
+import * as RouteParser from 'route-parser';
 
 const throat = require('throat');
 
@@ -78,6 +79,10 @@ export class ElectronAdapter {
 			}
 		});
 
+		sender.match<M.ConnectNpmPatternLibraryRequest>(
+			MT.ConnectNpmPatternLibraryRequest,
+			Matchers.connectNpmPatternLibrary(context)
+		);
 		sender.match<M.ConnectPatternLibraryRequest>(
 			MT.ConnectPatternLibraryRequest,
 			Matchers.connectPatternLibrary(context)
@@ -85,6 +90,10 @@ export class ElectronAdapter {
 		sender.match<M.UpdatePatternLibraryRequest>(
 			MT.UpdatePatternLibraryRequest,
 			Matchers.updatePatternLibrary(context)
+		);
+		sender.match<M.UpdateNpmPatternLibraryRequest>(
+			MT.UpdateNpmPatternLibraryRequest,
+			Matchers.updateNpmPatternLibrary(context)
 		);
 		sender.match<M.Copy>(MT.Copy, Matchers.copy(context));
 		sender.match<M.Cut>(MT.Cut, Matchers.cut(context));
@@ -108,6 +117,11 @@ export class ElectronAdapter {
 
 				return false;
 			})
+		);
+
+		sender.match<M.OpenRemoteFileRequest>(
+			MT.OpenRemoteFileRequest,
+			Matchers.openRemoteFileRequest(context)
 		);
 
 		sender.match<M.OpenWindow>(MT.OpenWindow, Matchers.openWindow(context));
@@ -351,19 +365,20 @@ export class ElectronAdapter {
 	private async getProjectWindows(): Promise<
 		{ project: Project; window: Electron.BrowserWindow }[]
 	> {
+		const projectRoute = new RouteParser('/project/:id(/store)');
+
 		return (await Promise.all(
 			Array.from((await this.getAppWindows()).values()).map(async win => {
 				const parsed = Url.parse(win.webContents.getURL());
-				if (!parsed.pathname || !parsed.pathname.startsWith('/project')) {
+				const match = projectRoute.match(parsed.pathname || '');
+
+				if (!match || !match.id) {
 					return;
 				}
 
-				const fragments = parsed.pathname.split('/').filter(Boolean);
-				const id = fragments[fragments.length - 1];
-
 				return {
 					window: win,
-					project: await this.server.dataHost.getProject(id)
+					project: await this.server.dataHost.getProject(match.id)
 				};
 			})
 		)).filter(

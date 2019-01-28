@@ -70,6 +70,10 @@ export async function analyze(
 		const patterns = await analyzePatterns({ pkgPath, options, pkg, cwd });
 
 		const getBundle = async () => {
+			if (patterns.length === 0) {
+				return '';
+			}
+
 			const compiler = await createPatternCompiler(patterns, { cwd, id });
 			const stats = await Util.promisify(compiler.run).bind(compiler)();
 
@@ -98,17 +102,15 @@ export async function analyze(
 		return {
 			type: Types.LibraryAnalysisResultType.Success,
 			result: {
-				id,
 				bundle: await getBundle(),
-				name: pkg.name || 'Unnamed Library',
-				description: pkg.description || '',
+				id,
+				packageFile: pkg,
+				path: pkgPath,
 				patterns: patterns.map(p => ({
 					path: p.path,
 					pattern: p.pattern,
 					properties: p.properties.map(prop => prop.property)
-				})),
-				path: pkgPath,
-				version: pkg.version || '1.0.0'
+				}))
 			}
 		};
 	} catch (error) {
@@ -315,6 +317,7 @@ async function findPatternCandidates({
 	pkg: any;
 }): Promise<PatternCandidate[]> {
 	const entry = Path.join(cwd, getTypingsEntry(pkg));
+
 	const declarationsList = getImportsFromPath(entry, {
 		extensions: ['.d.ts'],
 		deep: true,

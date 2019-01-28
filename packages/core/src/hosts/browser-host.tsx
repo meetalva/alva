@@ -52,6 +52,7 @@ export class BrowserHost implements Types.Host {
 	public async resolveFrom(base: Types.HostBase, ...paths: string[]): Promise<string> {
 		const getBasePath = (b: Types.HostBase): string => {
 			switch (b) {
+				case Types.HostBase.AppPath:
 				case Types.HostBase.Source:
 					return Path.resolve('/source');
 				case Types.HostBase.AppData:

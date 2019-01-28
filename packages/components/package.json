@@ -1,0 +1,39 @@
+{
+    "name": "@meetalva/components",
+    "version": "1.0.0",
+    "description": "Alva UI components",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/meetalva/alva.git"
+    },
+    "author": {
+      "email": "hey@meetalva.io",
+      "name": "Meet Alva Team",
+      "url": "https://meetalva.io/"
+    },
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/meetalva/alva/issues"
+    },
+    "devDependencies": {
+      "react-testing-library": "5.4.0",
+      "ts-jest": "^23.10.5",
+      "ts-loader": "4.4.1"
+    },
+    "dependencies": {
+      "@types/feather-icons": "4.7.0",
+      "@types/react": "16.7.18",
+      "@types/react-dom": "16.0.7",
+      "@types/react-textarea-autosize": "4.3.3",
+      "@types/styled-components": "4.0.3",
+      "feather-icons": "4.7.3",
+      "react": "16.7.0",
+      "react-dom": "16.4.2",
+      "react-feather": "^1.1.5",
+      "react-select": "2.0.0-beta.6",
+      "react-textarea-autosize": "7.0.4",
+      "react-virtualized": "^9.21.0",
+      "tag-hoc": "1.0.0"
+    },
+    "homepage": "https://meetalva.github.io/"
+  }

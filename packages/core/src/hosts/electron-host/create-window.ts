@@ -1,5 +1,5 @@
 import * as ConvertColor from 'color';
-import { Color } from '../../components/colors';
+import { Color } from '@meetalva/components';
 import * as Electron from 'electron';
 import * as electronIsDev from 'electron-is-dev';
 import { HostWindowOptions, HostWindowVariant } from '../../types';
@@ -41,6 +41,7 @@ function getWindowVariant(variant: HostWindowVariant): Electron.BrowserWindowCon
 		title: 'Alva',
 		webPreferences: {
 			nodeIntegration: false,
+			contextIsolation: true,
 			preload: require.resolve('./create-window-preload')
 		}
 	};

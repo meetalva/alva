@@ -1,7 +1,7 @@
 import { ActionPayloadInput } from './action-payload-input';
 import { UserStorePropertySelect } from '../user-store-property-select';
 import { ViewStore } from '../../store';
-import * as Components from '../../components';
+import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
@@ -163,9 +163,10 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 			: undefined;
 
 		return (
-			<div
+			<Components.Flex
+				alignItems={Components.FlexAlignItems.Center}
+				flexWrap={true}
 				key={props.property.getId()}
-				style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}
 			>
 				<Components.PropertyBox
 					headline={patternProperty.getLabel()}
@@ -173,11 +174,10 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 						.filter(Boolean)
 						.join(' - ')}
 				>
-					<div
+					<Components.Flex
+						alignItems={Components.FlexAlignItems.Center}
+						flexWrap={false}
 						style={{
-							display: 'flex',
-							alignItems: 'center',
-							flexWrap: 'nowrap',
 							marginTop: '12px'
 						}}
 					>
@@ -192,16 +192,15 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 								.map(a => ({ label: a.getName(), value: a.getId() }))}
 							value={{ label: userAction.getName(), value: userAction.getId() }}
 						/>
-					</div>
+					</Components.Flex>
 					{elementAction &&
 						userAction &&
 						userAction.getType() === Types.UserStoreActionType.OpenExternal && (
-							<div
+							<Components.Flex
+								alignItems={Components.FlexAlignItems.Center}
 								style={{
-									display: 'flex',
 									width: '100%',
-									marginTop: '6px',
-									alignItems: 'center'
+									marginTop: '6px'
 								}}
 							>
 								<Components.PropertyLabel label="to" />
@@ -212,17 +211,16 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 									onBlur={() => window.requestIdleCallback(() => props.store.commit())}
 									onChange={e => elementAction.setPayload(e.target.value)}
 								/>
-							</div>
+							</Components.Flex>
 						)}
 					{elementAction &&
 						userAction &&
 						userAction.getAcceptsProperty() && (
-							<div
+							<Components.Flex
+								alignItems={Components.FlexAlignItems.Center}
 								style={{
-									display: 'flex',
 									width: '100%',
-									marginTop: '6px',
-									alignItems: 'center'
+									marginTop: '6px'
 								}}
 							>
 								<Components.PropertyLabel label="named" />
@@ -232,13 +230,13 @@ export class PropertyItemEvent extends React.Component<PropertyItemEventProps> {
 									property={userProperty}
 									type={Types.UserStorePropertyType.Concrete}
 								/>
-							</div>
+							</Components.Flex>
 						)}
 					{elementAction && (
 						<ActionPayloadInput elementAction={elementAction} element={element} />
 					)}
 				</Components.PropertyBox>
-			</div>
+			</Components.Flex>
 		);
 	}
 }

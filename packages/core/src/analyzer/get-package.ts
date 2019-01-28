@@ -53,7 +53,7 @@ export async function getPackage(
 		const cwd = Path.join(opts.cwd, id);
 
 		await mkdirp(Path.join(cwd), { fs: Fs });
-		await execa(yarn, ['add', id, ...ARGS], { cwd, stdio: 'inherit' });
+		await execa(yarn, ['add', id, ...ARGS], { cwd });
 
 		return {
 			cwd,
@@ -62,7 +62,9 @@ export async function getPackage(
 			name: parsed.name!
 		};
 	} catch (err) {
-		err.message = [err.message, err.stdout, err.sterr].filter(Boolean).join('\n');
+		err.message = [err.message, err.stdout, err.sterr, err.cwd ? `cwd: ${err.cwd}` : '']
+			.filter(Boolean)
+			.join('\n');
 		return err;
 	}
 }
@@ -106,7 +108,13 @@ function getVendorDir(opts: { cwd: string; appPath: string }): string {
 		Path.join(__dirname, '..', '..', 'vendor')
 	];
 
-	const vendor = vendors.find(dir => Fs.existsSync(dir) && Fs.statSync(dir).isDirectory());
+	const vendor = vendors.find(dir => {
+		try {
+			return Fs.existsSync(dir) && Fs.statSync(dir).isDirectory();
+		} catch (err) {
+			return false;
+		}
+	});
 
 	if (!vendor) {
 		throw new Error(`Could not find vendor directory at ${vendors.join(', ')}`);

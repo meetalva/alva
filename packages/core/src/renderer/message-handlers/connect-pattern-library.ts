@@ -26,6 +26,7 @@ export function connectPatternLibrary({
 
 		if (m.payload.result === 'aborted') {
 			store.libraryStore.withProgress.forEach(item => item.abort());
+			store.libraryStore.recommendations.forEach(item => item.abort());
 
 			return;
 		}

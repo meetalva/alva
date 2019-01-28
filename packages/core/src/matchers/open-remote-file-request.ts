@@ -6,7 +6,6 @@ export function openRemoteFileRequest({
 	host
 }: T.MatcherContext): T.Matcher<M.OpenRemoteFileRequest> {
 	return async m => {
-		console.log(m);
 		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 		const response = await fetch(m.payload.url);
 

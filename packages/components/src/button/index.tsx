@@ -113,7 +113,7 @@ const StyledPrimaryButton =
 	align-content: center;
 	text-align: center;
 	background: ${props => (props.inverted ? Color.White : primaryFill(props))};
-	border: none;
+	border-color: transparent;
 	color: ${props => (props.inverted ? primaryFill(props) : Color.White)};
 
 	&:active {

@@ -1,9 +1,10 @@
 import * as npa from 'npm-package-arg';
 import * as Fs from 'fs';
 import * as Path from 'path';
-import * as execa from 'execa';
 import * as semver from 'semver';
 import { mkdirp } from '../alva-util';
+import * as ChildProcess from 'child_process';
+import { copy } from 'fs-extra';
 
 const pacote = require('pacote');
 const resolvePkg = require('resolve-pkg');
@@ -25,6 +26,34 @@ export interface PackageResult {
 	path: string;
 	version: string;
 	name: string;
+}
+
+function fork(command: string, args: string[], opts: ChildProcess.ForkOptions): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const cp = ChildProcess.fork(command, args, { ...opts, stdio: 'pipe' });
+		const err: string[] = [];
+		const out: string[] = [];
+
+		if (cp.stdout !== null) {
+			cp.stdout.on('data', data => out.push(data));
+		}
+
+		if (cp.stderr !== null) {
+			cp.stderr.on('data', data => err.push(data));
+		}
+
+		cp.once('error', reject);
+
+		cp.once('exit', code => {
+			if (code !== 0) {
+				return reject(
+					`${command} exited with code ${code}: ${out.join('\n')} ${err.join('\n')}`
+				);
+			}
+
+			resolve(out.join('\n'));
+		});
+	});
 }
 
 export async function getPackage(
@@ -53,7 +82,7 @@ export async function getPackage(
 		const cwd = Path.join(opts.cwd, id);
 
 		await mkdirp(Path.join(cwd), { fs: Fs });
-		await execa(yarn, ['add', id, ...ARGS], { cwd });
+		await fork(yarn, ['add', id, ...ARGS], { cwd });
 
 		return {
 			cwd,

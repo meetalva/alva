@@ -42,7 +42,7 @@ export class NodeAdapter {
 		sender.match<M.OpenExternalURL>(MT.OpenExternalURL, Matchers.openExternalUrl(context));
 		sender.match<M.OpenFileRequest>(MT.OpenFileRequest, Matchers.openFileRequest(context));
 		sender.match<M.OpenRemoteFileRequest>(
-			MT.OpenFileRequest,
+			MT.OpenRemoteFileRequest,
 			Matchers.openRemoteFileRequest(context)
 		);
 		sender.match<M.OpenWindow>(MT.OpenWindow, Matchers.openWindow(context));

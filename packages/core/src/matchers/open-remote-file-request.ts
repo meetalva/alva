@@ -1,16 +1,14 @@
 import * as fetch from 'isomorphic-fetch';
 import * as M from '../message';
 import * as T from '../types';
-import { Persistence } from '../persistence/persistence';
 
 export function openRemoteFileRequest({
 	host
 }: T.MatcherContext): T.Matcher<M.OpenRemoteFileRequest> {
 	return async m => {
+		console.log(m);
 		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 		const response = await fetch(m.payload.url);
-
-		console.log(response);
 
 		if (!response.ok) {
 			sender.send({
@@ -25,8 +23,6 @@ export function openRemoteFileRequest({
 		}
 
 		const downloadedProject = await response.text();
-
-		console.log('!!!');
 
 		sender.send({
 			type: M.MessageType.UseFileRequest,

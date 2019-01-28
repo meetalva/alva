@@ -24,16 +24,16 @@ export class OneTwoMigration
 							return (library as unknown) as T.SerializedPatternLibraryV2;
 						}
 
-						const { name, description, version, ...transfer } = library;
-
-						const mappedName = name === 'meetalva-designkit' ? '@meetalva/designkit' : name;
+						const { name: rawName, description, version: rawVersion, ...transfer } = library;
+						const name = rawName === 'meetalva-designkit' ? '@meetalva/designkit' : rawName;
+						const version = typeof rawVersion === 'string' ? rawVersion : '1.0.0';
 
 						return {
 							...transfer,
 							packageFile: {
 								...lib.packageFile,
-								name: mappedName,
-								version: version ? version.toString() : undefined,
+								name,
+								version,
 								description
 							}
 						};

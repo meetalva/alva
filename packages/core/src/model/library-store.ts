@@ -40,8 +40,7 @@ export class LibraryStore {
 				return (a.name || '').localeCompare(b.name || '');
 			});
 
-		const data = [...this.recommendations, ...derived];
-		return _.uniqBy(data, 'packageName');
+		return _.uniqBy(derived, 'packageName');
 	}
 
 	@Mobx.computed

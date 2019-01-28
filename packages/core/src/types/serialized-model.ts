@@ -90,7 +90,7 @@ export interface SerializedPatternLibraryV1 {
 	patterns: SerializedPattern[];
 	patternProperties: PatternProperty.SerializedPatternProperty[];
 	state: PatternLibraryState;
-	version: number;
+	version: string;
 }
 
 export interface SerializedPatternLibraryV2 {

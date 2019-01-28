@@ -123,8 +123,9 @@ export class LibraryStoreItem {
 	}
 
 	@Mobx.computed
-	public get version(): string | undefined {
+	public get version(): string {
 		const meta = this.meta ? this.meta : {};
+
 		return this.library
 			? this.library.getVersion()
 			: meta
@@ -140,6 +141,10 @@ export class LibraryStoreItem {
 
 	@Mobx.computed
 	public get installType(): T.PatternLibraryInstallType | undefined {
+		if (this.type === LibraryStoreItemType.Recommended) {
+			return T.PatternLibraryInstallType.Remote;
+		}
+
 		return this.library ? this.library.getInstallType() : T.PatternLibraryInstallType.Remote;
 	}
 
@@ -154,7 +159,20 @@ export class LibraryStoreItem {
 	}
 
 	@Mobx.computed
+	public get updateable(): boolean {
+		return (
+			this.hasLibrary &&
+			this.installType === PatternLibraryInstallType.Remote &&
+			this.origin === PatternLibraryOrigin.UserProvided
+		);
+	}
+
+	@Mobx.computed
 	public get usesRemoteMeta(): boolean {
+		if (this.type === LibraryStoreItemType.Recommended) {
+			return true;
+		}
+
 		return (
 			this.hasLibrary &&
 			(this.installType !== PatternLibraryInstallType.Remote ||
@@ -215,7 +233,7 @@ export class LibraryStoreItem {
 
 	@Mobx.action
 	public fetch = Mobx.flow<void>(function*(this: LibraryStoreItem): IterableIterator<any> {
-		if (this.usesRemoteMeta) {
+		if (!this.usesRemoteMeta) {
 			return;
 		}
 
@@ -319,12 +337,7 @@ export class LibraryStoreItem {
 	public checkForUpdate = Mobx.flow<void>(function*(
 		this: LibraryStoreItem
 	): IterableIterator<any> {
-		if (
-			!this.version ||
-			!this.library ||
-			this.installType !== PatternLibraryInstallType.Remote ||
-			this.origin !== PatternLibraryOrigin.UserProvided
-		) {
+		if (!this.updateable) {
 			return;
 		}
 
@@ -344,7 +357,7 @@ export class LibraryStoreItem {
 			return;
 		}
 
-		if (semver.gt(latestVersion, this.version)) {
+		if (semver.gt(latestVersion, this.version!)) {
 			this.update = latestData;
 		}
 	});

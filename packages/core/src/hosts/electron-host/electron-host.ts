@@ -73,6 +73,8 @@ export class ElectronHost implements Types.Host {
 					return Path.resolve(__dirname, '..', '..');
 				case Types.HostBase.AppData:
 					return Path.resolve(Os.tmpdir(), 'alva');
+				case Types.HostBase.AppPath:
+					return Electron.app.getAppPath();
 				case Types.HostBase.UserData:
 					return Electron.app.getPath('userData');
 				case Types.HostBase.UserHome:

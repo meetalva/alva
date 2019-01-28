@@ -27,12 +27,9 @@ export interface PackageResult {
 	name: string;
 }
 
-const VENDOR_DIR = getVendorDir();
-console.log({ VENDOR_DIR });
-
 export async function getPackage(
 	raw: string,
-	opts: { cwd: string }
+	opts: { cwd: string; appPath: string }
 ): Promise<PackageResult | Error> {
 	try {
 		const parsed = npa(raw);
@@ -51,7 +48,8 @@ export async function getPackage(
 
 		const id = [parsed.name, version].join('@');
 
-		const yarn = Path.join(VENDOR_DIR, 'yarn.js');
+		const vendorDir = getVendorDir(opts);
+		const yarn = Path.join(vendorDir, 'yarn.js');
 		const cwd = Path.join(opts.cwd, id);
 
 		await mkdirp(Path.join(cwd), { fs: Fs });
@@ -100,8 +98,12 @@ async function getVersion(name: npa.Result): Promise<string | undefined> {
 	}
 }
 
-function getVendorDir(): string {
-	const vendors = [Path.join(__dirname, 'vendor'), Path.join(__dirname, '..', '..', 'vendor')];
+function getVendorDir(opts: { cwd: string; appPath: string }): string {
+	const vendors = [
+		Path.join(opts.appPath.replace('app.asar', 'app.asar.unpacked'), 'vendor'),
+		Path.join(__dirname, 'vendor'),
+		Path.join(__dirname, '..', '..', 'vendor')
+	];
 
 	const vendor = vendors.find(dir => Fs.existsSync(dir) && Fs.statSync(dir).isDirectory());
 

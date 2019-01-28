@@ -44,7 +44,8 @@ export function updateNpmPatternLibrary({
 		}
 
 		const result = await getPackage(m.payload.npmId || previousLibrary.getPackageName(), {
-			cwd: await host.resolveFrom(T.HostBase.AppData, 'packages')
+			cwd: await host.resolveFrom(T.HostBase.AppData, 'packages'),
+			appPath: await host.resolveFrom(T.HostBase.AppPath, '.')
 		});
 
 		if (result instanceof Error) {

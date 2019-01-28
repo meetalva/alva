@@ -305,7 +305,7 @@ jobs:
 
       - run:
           name: Create static site
-          command: patternplate build --out=./.static --base=/
+          command: NODE_DENV=production patternplate build --out=./.static --base=/
 
       - run:
           name: Deploy to static hosting

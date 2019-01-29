@@ -46,7 +46,11 @@ commands:
             - node_modules
             - packages/components/node_modules
             - packages/core/node_modules
+            - packages/essentials/node_modules
+            - packages/site/node_modules
             - packages/tools/node_modules
+            - packages/types/node_modules
+            - packages/util/node_modules
           key: v5-dependencies-<< parameters.key >>-{{ checksum "yarn.lock" }}
 
       - run:
@@ -78,11 +82,14 @@ jobs:
           command: yarn install --frozen-lockfile || yarn
 
       - save_cache:
-          paths:
             - node_modules
             - packages/components/node_modules
             - packages/core/node_modules
+            - packages/essentials/node_modules
+            - packages/site/node_modules
             - packages/tools/node_modules
+            - packages/types/node_modules
+            - packages/util/node_modules
           key: v5-dependencies-macos-{{ checksum "yarn.lock" }}
 
       - run:
@@ -141,6 +148,8 @@ jobs:
               - packages/core/lib
               - packages/essentials/lib
               - packages/site/lib
+              - packages/types/lib
+              - packages/util/lib
 
   ncc:
     docker:

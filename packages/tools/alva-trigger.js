@@ -174,6 +174,15 @@ async function main(cli) {
 
 	if (!cli.dryRun) {
 		manifest.version = version;
+
+		if (channel === 'pr') {
+			manifest.build.productName = `Alva PR ${prNumber}`;
+		}
+
+		if (channel === 'alpha') {
+			manifest.build.productName = `Alva Canary`;
+		}
+
 		await writeFile(
 			Path.join(projectPath, 'package.ncc.json'),
 			JSON.stringify(manifest, null, '  ')

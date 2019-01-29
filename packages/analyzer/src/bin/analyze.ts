@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import * as Fs from 'fs';
 import { performAnalysis } from '../';
 import * as Path from 'path';

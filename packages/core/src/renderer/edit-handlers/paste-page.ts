@@ -1,5 +1,5 @@
-import * as M from '../../message';
-import * as Model from '../../model';
+import * as M from '@meetalva/message';
+import * as Model from '@meetalva/model';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';

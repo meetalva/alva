@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../types"
+		},
+		{
+			"path": "../model"
 		}
 	],
 	"compilerOptions": {

@@ -1,19 +1,19 @@
 import * as Electron from 'electron';
 import * as Types from '@meetalva/types';
-import * as M from '../../message';
+import * as M from '@meetalva/message';
 import * as Matchers from '../../matchers';
-import { MessageType as MT } from '../../message';
+import { MessageType as MT } from '@meetalva/message';
 import * as ContextMenu from '../../context-menu';
 import { ElectronUpdater } from './electron-updater';
 import { ElectronMainMenu } from './electron-main-menu';
-import { AlvaApp, Project } from '../../model';
+import { AlvaApp, Project } from '@meetalva/model';
 import * as Serde from '../../sender/serde';
 import * as uuid from 'uuid';
 import * as Url from 'url';
 import { HostWindowVariant } from '@meetalva/types';
 import * as Mobx from 'mobx';
 import * as RouteParser from 'route-parser';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 
 const throat = require('throat');
 

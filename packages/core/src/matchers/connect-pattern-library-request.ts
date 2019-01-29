@@ -1,5 +1,5 @@
-import * as M from '../message';
-import { MessageType } from '../message';
+import * as M from '@meetalva/message';
+import { MessageType } from '@meetalva/message';
 import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
 import { performAnalysis } from '@meetalva/analyzer';

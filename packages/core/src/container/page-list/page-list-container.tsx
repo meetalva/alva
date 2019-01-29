@@ -1,10 +1,8 @@
 import * as React from 'react';
 import * as MobxReact from 'mobx-react';
 import { PageTileContainer } from './page-tile-container';
-import { Page } from '../../model/page';
 import * as Components from '@meetalva/components';
-
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import * as Store from '../../store';
 import * as Types from '@meetalva/types';
 import * as utils from '@meetalva/util';
@@ -12,7 +10,7 @@ import * as utils from '@meetalva/util';
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PageListContainer extends React.Component {
-	private draggedPage?: Page;
+	private draggedPage?: Model.Page;
 
 	private handleDragStart(e: React.DragEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };

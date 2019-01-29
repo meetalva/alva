@@ -1,5 +1,5 @@
 import * as fetch from 'isomorphic-fetch';
-import * as M from '../message';
+import * as M from '@meetalva/message';
 import { MatcherCreator } from './context';
 
 export const openRemoteFileRequest: MatcherCreator<M.OpenRemoteFileRequest> = ({ host }) => {

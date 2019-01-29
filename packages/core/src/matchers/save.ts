@@ -1,4 +1,5 @@
-import * as M from '../message';
+import * as M from '@meetalva/message';
+import * as ModelTree from '@meetalva/model-tree';
 import * as T from '@meetalva/types';
 import { Persistence } from '../persistence';
 import * as Path from 'path';
@@ -80,7 +81,7 @@ export const save: MatcherCreator<M.Save, SaveConfig> = (
 		await dataHost.addProject(project);
 
 		if (typeof window === 'undefined') {
-			project.sync(await host.getSender());
+			project.sync(await host.getSender(), ModelTree);
 		}
 
 		try {

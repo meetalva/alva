@@ -1,11 +1,11 @@
 import * as Types from '@meetalva/types';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import * as Path from 'path';
 import { Persistence } from '../persistence';
 import * as Fs from 'fs';
 import { sortBy } from 'lodash';
 import * as Mobx from 'mobx';
-import { Message } from '../message';
+import { Message } from '@meetalva/message';
 
 const pathIsInside = require('path-is-inside');
 

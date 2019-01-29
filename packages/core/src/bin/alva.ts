@@ -3,7 +3,7 @@ import * as ChildProcess from 'child_process';
 import * as uuid from 'uuid';
 import * as dargs from 'dargs';
 import * as Hosts from '../hosts';
-import * as Message from '../message';
+import * as Message from '@meetalva/message';
 import * as Serde from '../sender/serde';
 
 const yargsParser = require('yargs-parser');

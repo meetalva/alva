@@ -1,12 +1,13 @@
-import { Sender } from '../sender';
-import { isEqual } from 'lodash';
-import { Message, MessageType } from '../message';
 import * as Mobx from 'mobx';
-import * as Model from '../model';
+import { isEqual } from 'lodash';
+import { Message, MessageType } from '@meetalva/message';
+import { PlaceholderPosition } from '@meetalva/components';
+import * as Model from '@meetalva/model';
+import * as ModelTree from '@meetalva/model-tree';
 import * as Types from '@meetalva/types';
+import { Sender } from '../sender';
 
 import * as uuid from 'uuid';
-import { PlaceholderPosition } from '@meetalva/components';
 
 export interface ViewStoreInit {
 	app: Model.AlvaApp<Message>;
@@ -688,7 +689,7 @@ export class ViewStore {
 			const project = this.getProject();
 
 			if (project && project.getId() === change.projectId) {
-				project.apply(change);
+				project.apply(change, ModelTree);
 			}
 		});
 
@@ -928,7 +929,7 @@ export class ViewStore {
 			const project = this.getProject();
 
 			if (project && project.getId() === change.projectId) {
-				project.apply(change);
+				project.apply(change, ModelTree);
 			}
 		});
 

@@ -57,7 +57,7 @@ function fork(command: string, args: string[], opts: ChildProcess.ForkOptions): 
 
 export async function getPackage(
 	raw: string,
-	opts: { cwd: string; appPath: string }
+	opts: { cwd: string; dirname: string; appPath: string }
 ): Promise<PackageResult | Error> {
 	try {
 		const parsed = npa(raw);
@@ -129,11 +129,10 @@ async function getVersion(name: npa.Result): Promise<string | undefined> {
 	}
 }
 
-function getVendorDir(opts: { cwd: string; appPath: string }): string {
+function getVendorDir(opts: { cwd: string; appPath: string; dirname: string }): string {
 	const vendors = [
 		Path.join(opts.appPath.replace('app.asar', 'app.asar.unpacked'), 'vendor'),
-		Path.join(__dirname, 'vendor'),
-		Path.join(__dirname, '..', '..', 'vendor')
+		Path.join(opts.dirname, 'vendor')
 	];
 
 	const vendor = vendors.find(dir => {

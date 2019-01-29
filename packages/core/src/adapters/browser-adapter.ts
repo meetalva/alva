@@ -1,11 +1,11 @@
 import * as Types from '@meetalva/types';
-import * as M from '../message';
-import { MessageType as MT } from '../message';
+import * as M from '@meetalva/message';
+import { MessageType as MT } from '@meetalva/message';
 import * as Store from '../store';
 import { BrowserHost } from '../hosts/browser-host';
 import { BrowserDataHost } from '../hosts/browser-data-host';
 import * as Matchers from '../matchers/browser';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import * as Fs from 'fs';
 import * as uuid from 'uuid';
 import * as Mobx from 'mobx';

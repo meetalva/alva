@@ -1,6 +1,6 @@
 import { PageTile } from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
-import { Page, DroppablePageIndex } from '../../model';
+import { Page, DroppablePageIndex } from '@meetalva/model';
 import * as React from 'react';
 import { WithStore } from '../../store';
 import * as Types from '@meetalva/types';

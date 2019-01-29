@@ -1,5 +1,5 @@
 import * as Fs from 'fs';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import * as Types from '@meetalva/types';
 import * as PreviewDocument from '../preview-document';
 

@@ -1,6 +1,6 @@
 import * as T from '@meetalva/types';
-import * as Model from '../model';
-import * as M from '../message';
+import * as Model from '@meetalva/model';
+import * as M from '@meetalva/message';
 
 export type MatcherContext = T.MatcherContext<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
 export type Matcher<M extends M.Message> = (m: M) => Promise<void>;

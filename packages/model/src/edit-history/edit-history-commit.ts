@@ -1,5 +1,5 @@
 import * as uuid from 'uuid';
-import { ProjectUpdatePayload } from '../../message';
+import { ProjectUpdatePayload } from '@meetalva/message';
 import { revert } from './revert';
 
 export class EditHistoryCommit {

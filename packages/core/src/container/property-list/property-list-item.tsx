@@ -1,5 +1,5 @@
 import * as MobxReact from 'mobx-react';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import * as React from 'react';
 import * as ReactLoadable from 'react-loadable';
 import { ViewStore } from '../../store';

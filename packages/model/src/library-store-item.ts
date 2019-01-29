@@ -5,7 +5,7 @@ import { PatternLibrary } from './pattern-library';
 import { LibraryStoreItemType, LibraryStoreItemState } from './library-store';
 import { Project } from './project';
 import * as T from '@meetalva/types';
-import * as M from '../message';
+import * as M from '@meetalva/message';
 import {
 	PatternLibraryInstallType,
 	PatternLibraryOrigin,

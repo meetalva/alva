@@ -1,4 +1,4 @@
-import * as M from '../../message';
+import * as M from '@meetalva/message';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 
 export function undo({ app, store }: MessageHandlerContext): MessageHandler<M.Undo> {

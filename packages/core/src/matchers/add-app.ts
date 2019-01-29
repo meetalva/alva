@@ -1,5 +1,5 @@
-import * as M from '../message';
-import * as Model from '../model';
+import * as M from '@meetalva/message';
+import * as Model from '@meetalva/model';
 import { MatcherCreator } from './context';
 
 export const addApp: MatcherCreator<M.ChangeApp> = ({ host }) => {

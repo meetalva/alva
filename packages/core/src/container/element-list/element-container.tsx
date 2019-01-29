@@ -3,7 +3,7 @@ import { ElementContentContainer } from './element-content-container';
 import { ElementSlotContainer } from './element-slot-container';
 import { partition } from 'lodash';
 import * as MobxReact from 'mobx-react';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import * as React from 'react';
 import * as Types from '@meetalva/types';
 import { ViewStore } from '../../store';

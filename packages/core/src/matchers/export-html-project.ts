@@ -1,4 +1,4 @@
-import * as M from '../message';
+import * as M from '@meetalva/message';
 import * as T from '@meetalva/types';
 import * as Path from 'path';
 import * as uuid from 'uuid';

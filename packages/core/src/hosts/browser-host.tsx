@@ -7,8 +7,8 @@ import * as Menu from '../container/menu';
 import * as Path from 'path';
 import * as Mobx from 'mobx';
 import * as Fs from 'fs';
-import { Message } from '../message';
-import * as Model from '../model';
+import { Message } from '@meetalva/message';
+import * as Model from '@meetalva/model';
 
 export class BrowserHost implements Types.Host<Model.AlvaApp<Message>, Model.Project, Message> {
 	public type = Types.HostType.Browser;

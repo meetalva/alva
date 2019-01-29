@@ -6,7 +6,7 @@ import * as Persistence from '../../persistence';
 import * as Types from '@meetalva/types';
 import { build } from './build';
 import * as Fs from 'fs-extra';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 
 const clearModule = require('clear-module');
 const serveHandler = require('serve-handler');

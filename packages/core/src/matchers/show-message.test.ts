@@ -1,11 +1,11 @@
+import { AlvaApp } from '@meetalva/model';
+import * as M from '@meetalva/message';
+import * as T from '@meetalva/types';
 import { showMessage } from './show-message';
 import { ElectronHost } from '../hosts/electron-host';
-import { AlvaApp } from '../model/alva-app';
 import { Sender } from '../sender';
 import { LocalDataHost } from '../hosts/local-data-host';
 import * as uuid from 'uuid';
-import * as M from '../message';
-import * as T from '@meetalva/types';
 
 jest.mock('../sender');
 jest.mock('../model/alva-app', () => {

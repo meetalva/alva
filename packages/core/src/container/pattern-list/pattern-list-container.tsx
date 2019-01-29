@@ -1,7 +1,7 @@
 import * as Components from '@meetalva/components';
 import { ElementDragImage } from '../element-drag-image';
 import * as MobxReact from 'mobx-react';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import { PatternItemContainer } from './pattern-item-container';
 import * as React from 'react';
 import * as Types from '@meetalva/types';

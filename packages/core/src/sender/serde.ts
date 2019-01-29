@@ -1,7 +1,7 @@
 import * as AlvaUtil from '@meetalva/util';
 import * as _ from 'lodash';
 import { isMessage } from './is-message';
-import * as Message from '../message';
+import * as Message from '@meetalva/message';
 
 const TYPES = Object.values(Message.MessageType);
 const OVERTURE_LENGTH = 8;

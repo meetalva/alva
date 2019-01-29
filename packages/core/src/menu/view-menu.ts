@@ -1,5 +1,5 @@
 import * as uuid from 'uuid';
-import * as Message from '../message';
+import * as Message from '@meetalva/message';
 import * as Types from '@meetalva/types';
 import { MenuCreator } from './context';
 

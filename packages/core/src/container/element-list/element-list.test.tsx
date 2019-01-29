@@ -3,7 +3,7 @@ import * as MobxReact from 'mobx-react';
 import * as ReactTest from 'react-testing-library';
 import { ElementList } from './element-list';
 import { ViewStore } from '../../store';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import * as Type from '@meetalva/types';
 import { Sender } from '../../sender';
 

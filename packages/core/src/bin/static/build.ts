@@ -2,8 +2,8 @@ import * as Fs from 'fs-extra';
 import * as Path from 'path';
 import * as RendererDocument from '../../renderer/renderer-document';
 import * as Types from '@meetalva/types';
-import * as Model from '../../model';
-import { Message } from '../../message';
+import * as Model from '@meetalva/model';
+import { Message } from '@meetalva/message';
 
 export async function build({
 	path,

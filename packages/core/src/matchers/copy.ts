@@ -1,4 +1,4 @@
-import * as M from '../message';
+import * as M from '@meetalva/message';
 import * as Serde from '../sender/serde';
 import * as uuid from 'uuid';
 import { MatcherCreator } from './context';

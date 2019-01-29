@@ -2,6 +2,9 @@
   "name": "@meetalva/analyzer",
   "version": "1.0.0",
   "description": "Derive component meta data and bundles from React projects",
+  "bin": {
+    "alva-analyze": "./bin/analyze"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meetalva/alva.git"
@@ -26,6 +29,7 @@
     "@types/lodash": "4.14.107",
     "@types/node": "^10.12.18",
     "@types/webpack": "^4.4.21",
+    "@meetalva/model": "1.0.0",
     "@meetalva/util": "1.0.0",
     "@meetalva/types": "1.0.0",
     "memory-fs": "0.4.1",

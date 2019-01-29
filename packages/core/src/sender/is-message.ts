@@ -1,4 +1,4 @@
-import { Message } from '../message';
+import { Message } from '@meetalva/message';
 import { isMessageType } from './is-message-type';
 
 // tslint:disable-next-line:no-any

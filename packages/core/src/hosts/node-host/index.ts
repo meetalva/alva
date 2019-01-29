@@ -4,8 +4,8 @@ import * as Path from 'path';
 import * as Util from 'util';
 import * as Types from '@meetalva/types';
 import * as getPort from 'get-port';
-import * as Model from '../../model';
-import * as M from '../../message';
+import * as Model from '@meetalva/model';
+import * as M from '@meetalva/message';
 
 export class NodeHost implements Types.Host<Model.AlvaApp<M.Message>, Model.Project, M.Message> {
 	public type = Types.HostType.Node;

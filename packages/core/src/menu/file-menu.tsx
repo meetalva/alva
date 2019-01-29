@@ -1,12 +1,12 @@
 import * as Types from '@meetalva/types';
-import { MessageType, Message } from '../message';
+import { MessageType, Message } from '@meetalva/message';
 import * as uuid from 'uuid';
 import { FileInput } from '../container/file-input';
 import * as React from 'react';
 import * as Store from '../store';
-import { AlvaApp } from '../model';
+import { AlvaApp } from '@meetalva/model';
 import { MenuCreator } from './context';
-import * as Mo from '../model';
+import * as Mo from '@meetalva/model';
 
 const ids = {
 	file: uuid.v4(),

@@ -1,4 +1,4 @@
-import { ProjectUpdatePayload } from '../../message';
+import { ProjectUpdatePayload } from '@meetalva/message';
 import { EditHistoryCommit } from './edit-history-commit';
 import { EditHistoryStage } from './edit-history-stage';
 

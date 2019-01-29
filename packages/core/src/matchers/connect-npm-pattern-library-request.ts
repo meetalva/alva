@@ -1,7 +1,8 @@
-import * as M from '../message';
-import { MessageType } from '../message';
-import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
+import * as pkgDir from 'pkg-dir';
+import * as M from '@meetalva/message';
+import { MessageType } from '@meetalva/message';
+import * as T from '@meetalva/types';
 import { getPackage, performAnalysis } from '@meetalva/analyzer';
 import { MatcherCreator } from './context';
 
@@ -47,8 +48,28 @@ export const connectNpmPatternLibrary: MatcherCreator<M.ConnectNpmPatternLibrary
 			return abort();
 		}
 
+		const dirname = await pkgDir(__dirname);
+
+		if (dirname === null) {
+			app.send({
+				type: MessageType.ShowError,
+				id: uuid.v4(),
+				payload: {
+					message: 'Sorry, we could not fetch this package.',
+					detail: 'Could not determine pkg root',
+					error: {
+						message: 'Could not determine pkg root',
+						stack: ''
+					}
+				}
+			});
+
+			return abort();
+		}
+
 		const result = await getPackage(m.payload.npmId, {
 			cwd: await host.resolveFrom(T.HostBase.AppData, 'packages'),
+			dirname,
 			appPath: await host.resolveFrom(T.HostBase.AppPath, '.')
 		});
 

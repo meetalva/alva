@@ -1,7 +1,7 @@
 import { PreviewComponentError } from './preview-component-error';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import * as Types from '@meetalva/types';
@@ -54,7 +54,9 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 			// tslint:disable-next-line:no-empty
 			try {
 				return ReactDom.findDOMNode(this);
-			} catch (err) {}
+			} catch (err) {
+				//
+			}
 		})();
 
 		if (!node) {

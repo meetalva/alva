@@ -4,8 +4,8 @@ import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as Store from '../../store';
 import { AcceleratorIndicator } from './accelerator';
-import * as Model from '../../model';
-import { Message } from '../../message';
+import * as Model from '@meetalva/model';
+import { Message } from '@meetalva/message';
 
 @MobxReact.observer
 export class Menu extends React.Component<Types.MenuProps<Model.AlvaApp<Message>, Message>> {

@@ -1,5 +1,5 @@
 import * as Mobx from 'mobx';
-import * as M from '../../message';
+import * as M from '@meetalva/message';
 import * as T from '@meetalva/types';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 import * as uuid from 'uuid';

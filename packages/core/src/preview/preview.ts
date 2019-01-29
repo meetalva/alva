@@ -1,12 +1,13 @@
 import { ElementArea } from './element-area';
 import { getComponents } from './get-components';
 import { getInitialData } from './get-initial-data';
-import * as Message from '../message';
+import * as Message from '@meetalva/message';
 import * as Mobx from 'mobx';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import { PreviewStore } from './preview-store';
 import { Sender } from '../sender';
 import * as Types from '@meetalva/types';
+import * as ModelTree from '@meetalva/model-tree';
 import * as uuid from 'uuid';
 
 export interface Renderer<T> {
@@ -146,7 +147,7 @@ async function main(): Promise<void> {
 	// - when mode is "live", used for editable preview
 	if (mode === Types.PreviewDocumentMode.Live) {
 		store.setSender(sender);
-		project.sync(sender);
+		project.sync(sender, ModelTree);
 
 		sender.match<Message.KeyboardChange>(Message.MessageType.KeyboardChange, message => {
 			store.setMetaDown(message.payload.metaDown);

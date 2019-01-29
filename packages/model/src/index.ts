@@ -14,3 +14,4 @@ export * from './user-store-property';
 export * from './user-store-reference';
 export * from './any-model';
 export * from './library-store';
+export * from './library-store-item';

@@ -7,11 +7,11 @@ import * as RendererDocument from '../../renderer/renderer-document';
 
 import * as Types from '@meetalva/types';
 import { App } from '../../container/app';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import * as Store from '../../store';
 import { ServerStyleSheet } from 'styled-components';
 import { ServerContext } from './context';
-import { Message } from '../../message';
+import { Message } from '@meetalva/message';
 
 export function mainRouteFactory(server: ServerContext): Express.RequestHandler {
 	return async function mainRoute(_: unknown, res: Express.Response): Promise<void> {

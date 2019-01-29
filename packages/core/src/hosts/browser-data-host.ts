@@ -1,11 +1,11 @@
 import * as Types from '@meetalva/types';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import { Persistence } from '../persistence';
 import * as Path from 'path';
 import * as Store from '../store';
 import { sortBy } from 'lodash';
 import * as Mobx from 'mobx';
-import { Message } from '../message';
+import { Message } from '@meetalva/message';
 
 export class BrowserDataHost implements Types.DataHost<Model.Project> {
 	private host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>;

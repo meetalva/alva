@@ -2,7 +2,7 @@ import { AnyModel } from './any-model';
 import { computeDifference } from '@meetalva/util';
 import { Element, ElementContent, ElementProperty } from './element';
 import { ElementAction } from './element-action';
-import * as Message from '../message';
+import * as Message from '@meetalva/message';
 import * as Mobx from 'mobx';
 import * as _ from 'lodash';
 import { Page } from './page';
@@ -15,7 +15,7 @@ import { UserStore } from './user-store';
 import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-enhancer';
 import { UserStoreReference } from './user-store-reference';
 import * as uuid from 'uuid';
-import * as ModelTree from '../model-tree';
+import * as ModelTree from '@meetalva/model-tree';
 import { PlaceholderPosition } from '@meetalva/components';
 import { builtinPatternLibrary } from './pattern-library/builtin-pattern-library';
 
@@ -34,6 +34,10 @@ export interface ProjectCreateInit {
 	name: string;
 	draft: boolean;
 	path: string;
+}
+
+export interface ModelResolver<T> {
+	getModelByName(name?: Types.ModelName): T;
 }
 
 export class Project {
@@ -829,7 +833,7 @@ export class Project {
 		return getByPath(path.split('/'), this);
 	}
 
-	public sync(sender: Types.Sender<Message.Message>): void {
+	public sync(sender: Types.Sender<Message.Message>, tree: ModelResolver<unknown>): void {
 		if (this.syncing) {
 			return;
 		}
@@ -837,15 +841,11 @@ export class Project {
 		this.syncing = true;
 
 		sender.match<Message.ProjectUpdate>(Message.MessageType.ProjectUpdate, m => {
-			this.onProjectUpdate(m);
+			this.onProjectUpdate(m, tree);
 		});
 	}
 
-	public unsync(sender: Types.Sender<Message.Message>): void {
-		sender.unmatch(Message.MessageType.ProjectUpdate, this.onProjectUpdate);
-	}
-
-	public apply(change: Message.ProjectUpdatePayload) {
+	public apply(change: Message.ProjectUpdatePayload, tree: ModelResolver<unknown>) {
 		const target = this.getByPath(change.path);
 
 		if (!target) {
@@ -860,7 +860,7 @@ export class Project {
 				case 'update': {
 					const ValueModel =
 						typeof c.newValue === 'object' && c.newValue !== null
-							? ModelTree.getModelByName(c.newValue.model as Types.ModelName)
+							? tree.getModelByName(c.newValue.model as Types.ModelName)
 							: undefined;
 
 					const value = ValueModel
@@ -883,7 +883,7 @@ export class Project {
 				case 'update': {
 					const ValueModel =
 						typeof c.newValue === 'object'
-							? ModelTree.getModelByName(c.newValue.model as Types.ModelName)
+							? tree.getModelByName(c.newValue.model as Types.ModelName)
 							: undefined;
 					const value = ValueModel
 						? (ValueModel as any).from(c.newValue, { project: this })
@@ -905,14 +905,14 @@ export class Project {
 		}
 	}
 
-	private onProjectUpdate(m: Message.ProjectUpdate) {
+	private onProjectUpdate(m: Message.ProjectUpdate, tree: ModelResolver<unknown>) {
 		const { projectId } = m.payload;
 
 		if (projectId !== this.getId()) {
 			return;
 		}
 
-		this.apply(m.payload);
+		this.apply(m.payload, tree);
 	}
 
 	@Mobx.action

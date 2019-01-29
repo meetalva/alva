@@ -1,4 +1,4 @@
-import * as M from '../message';
+import * as M from '@meetalva/message';
 import * as MimeTypes from 'mime-types';
 import { MatcherCreator } from './context';
 

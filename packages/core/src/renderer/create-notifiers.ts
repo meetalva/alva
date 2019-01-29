@@ -1,6 +1,6 @@
-import * as Message from '../message';
+import * as Message from '@meetalva/message';
 import * as Mobx from 'mobx';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';
 import * as MobxUtils from 'mobx-utils';

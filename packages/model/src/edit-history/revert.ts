@@ -1,4 +1,4 @@
-import { ProjectUpdatePayload, MobxChange } from '../../message';
+import { ProjectUpdatePayload, MobxChange } from '@meetalva/message';
 
 export function revert(update: ProjectUpdatePayload): ProjectUpdatePayload {
 	return {

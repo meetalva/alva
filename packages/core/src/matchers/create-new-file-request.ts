@@ -1,5 +1,5 @@
-import * as M from '../message';
-import * as Model from '../model';
+import * as M from '@meetalva/message';
+import * as Model from '@meetalva/model';
 import * as T from '@meetalva/types';
 import { Persistence } from '../persistence';
 import { MatcherCreator } from './context';

@@ -48,6 +48,9 @@ commands:
             - packages/components/node_modules
             - packages/core/node_modules
             - packages/essentials/node_modules
+            - packages/message/node_modules
+            - packages/model/node_modules
+            - packages/model-tree/node_modules
             - packages/site/node_modules
             - packages/tools/node_modules
             - packages/types/node_modules
@@ -132,6 +135,9 @@ jobs:
               - packages/components/lib
               - packages/core/lib
               - packages/essentials/lib
+              - packages/message/lib
+              - packages/model/lib
+              - packages/model-tree/lib
               - packages/site/lib
               - packages/types/lib
               - packages/util/lib

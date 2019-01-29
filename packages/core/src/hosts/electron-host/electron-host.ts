@@ -6,9 +6,9 @@ import * as Types from '@meetalva/types';
 import * as getPort from 'get-port';
 import * as Electron from 'electron';
 import { createWindow } from './create-window';
-import { AlvaApp } from '../../model';
+import { AlvaApp } from '@meetalva/model';
 import * as Mobx from 'mobx';
-import * as Message from '../../message';
+import * as Message from '@meetalva/message';
 import * as ElectronLog from 'electron-log';
 import Project from 'ts-simple-ast';
 

@@ -1,0 +1,30 @@
+{
+    "name": "@meetalva/message",
+    "version": "1.0.0",
+    "description": "Domain messages for Alva",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/meetalva/alva.git"
+    },
+    "author": {
+      "email": "hey@meetalva.io",
+      "name": "Meet Alva Team",
+      "url": "https://meetalva.io/"
+    },
+    "license": "MIT",
+    "homepage": "https://meetalva.github.io/",
+    "bugs": {
+      "url": "https://github.com/meetalva/alva/issues"
+    },
+    "dependencies": {
+      "@meetalva/util": "1.0.0",
+      "@meetalva/types": "1.0.0",
+      "mobx": "5.0.3"
+    },
+    "devDependencies": {
+      "prettier": "1.12.0",
+      "ts-jest": "23.10.5",
+      "tslib": "1.9.0",
+      "typescript": "3.2.2"
+    }
+  }

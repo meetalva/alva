@@ -11,7 +11,7 @@ import { UserStoreAction } from './user-store-action';
 import { UserStoreEnhancer } from './user-store-enhancer';
 import { UserStoreProperty } from './user-store-property';
 import { UserStoreReference } from './user-store-reference';
-import * as M from '../message';
+import * as M from '@meetalva/message';
 
 export type AnyModel =
 	| AlvaApp<M.Message>

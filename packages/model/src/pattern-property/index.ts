@@ -7,3 +7,4 @@ export * from './number-property';
 export * from './property-base';
 export * from './property';
 export * from './string-property';
+export * from './unknown-property';

@@ -1,5 +1,5 @@
 import * as Mobx from 'mobx';
-import * as Message from '../message';
+import * as Message from '@meetalva/message';
 import * as _ from 'lodash';
 import * as Types from '@meetalva/types';
 import { Project } from './project';

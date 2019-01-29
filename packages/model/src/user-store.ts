@@ -1,8 +1,8 @@
 import { computeDifference } from '@meetalva/util';
 import * as Mobx from 'mobx';
-import * as Message from '../message';
-import { Project } from './project';
+import * as Message from '@meetalva/message';
 import * as Types from '@meetalva/types';
+import { Project } from './project';
 import * as uuid from 'uuid';
 import * as DesignTime from './design-time-user-store';
 import { UserStoreAction } from './user-store-action';
@@ -274,7 +274,7 @@ export class UserStore {
 	}
 
 	@Mobx.action
-	public sync(message: Message.ChangeUserStore, opts?: { withEnhancer: boolean }): void {
+	public sync<T>(message: Message.ChangeUserStore, opts?: { withEnhancer: boolean }): void {
 		const userStore = UserStore.from(message.payload.userStore);
 
 		const propertyChanges = computeDifference<UserStoreProperty>({

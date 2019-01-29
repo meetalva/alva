@@ -3,7 +3,7 @@ import { ElementDragImage } from '../element-drag-image';
 import { ElementContentContainer } from './element-content-container';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import * as React from 'react';
 
 import * as Store from '../../store';

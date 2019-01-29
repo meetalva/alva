@@ -1,7 +1,7 @@
 import { ElementArea } from './element-area';
 import * as Mobx from 'mobx';
-import * as Message from '../message';
-import * as Model from '../model';
+import * as Message from '@meetalva/message';
+import * as Model from '@meetalva/model';
 import { Sender } from '../sender';
 import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';

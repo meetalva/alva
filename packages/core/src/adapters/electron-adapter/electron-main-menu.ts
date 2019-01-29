@@ -1,8 +1,8 @@
 import * as Electron from 'electron';
 import * as Mobx from 'mobx';
-import * as Model from '../../model';
-import * as M from '../../message';
-import { MessageType as MT } from '../../message';
+import * as Model from '@meetalva/model';
+import * as M from '@meetalva/message';
+import { MessageType as MT } from '@meetalva/message';
 import * as Menu from '../../menu';
 import * as Types from '@meetalva/types';
 import * as Url from 'url';

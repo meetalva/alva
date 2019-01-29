@@ -2,7 +2,7 @@
 import * as Fs from 'fs';
 import { performAnalysis } from '@meetalva/analyzer';
 import * as Path from 'path';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import * as Types from '@meetalva/types';
 import * as Util from 'util';
 import * as JSON5 from 'json5';

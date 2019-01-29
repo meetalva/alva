@@ -1,8 +1,9 @@
 import * as Express from 'express';
-import * as PreviewDocument from '../../preview-document';
 import * as Types from '@meetalva/types';
-import { PatternLibrary } from '../../model';
+import { PatternLibrary } from '@meetalva/model';
+import * as ModelTree from '@meetalva/model-tree';
 import { ServerContext } from './context';
+import * as PreviewDocument from '../../preview-document';
 
 export function previewRouteFactory(server: ServerContext): Express.RequestHandler {
 	return async function previewRoute(req: Express.Request, res: Express.Response): Promise<void> {
@@ -23,7 +24,7 @@ export function previewRouteFactory(server: ServerContext): Express.RequestHandl
 		// TODO: Formalize this better - this means
 		// we want to sync a project if it is actually used
 		// in an edit interface
-		project.sync(server.sender);
+		project.sync(server.sender, ModelTree);
 
 		const userLibraries = project.getPatternLibraries();
 

@@ -1,6 +1,6 @@
 import * as Mobx from 'mobx';
-import * as Model from '../model';
-import * as M from '../message';
+import * as Model from '@meetalva/model';
+import * as M from '@meetalva/message';
 import * as Types from '@meetalva/types';
 
 export type MenuStoreItem = Types.MenuItem<Model.AlvaApp<M.Message>, M.Message>;

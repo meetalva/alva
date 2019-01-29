@@ -1,4 +1,4 @@
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 import { PreviewStore } from './preview-store';

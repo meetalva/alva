@@ -1,10 +1,10 @@
 import * as Types from '@meetalva/types';
 import * as Matchers from '../matchers';
-import * as M from '../message';
-import { MessageType as MT } from '../message';
+import * as M from '@meetalva/message';
+import { MessageType as MT } from '@meetalva/message';
 import * as Mobx from 'mobx';
 import * as uuid from 'uuid';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 
 export class NodeAdapter {
 	private host: Types.Host<Model.AlvaApp<M.Message>, Model.Project, M.Message>;

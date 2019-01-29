@@ -7,8 +7,8 @@ import * as WS from 'ws';
 import * as Routes from './routes';
 import * as Sender from '../sender';
 import * as Types from '@meetalva/types';
-import * as Model from '../model';
-import * as M from '../message';
+import * as Model from '@meetalva/model';
+import * as M from '@meetalva/message';
 
 interface AlvaServerInit {
 	app: express.Express;

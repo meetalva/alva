@@ -4,7 +4,7 @@ import * as React from 'react';
 import { AutoSizer, CellMeasurerCache, List, ListRowProps } from 'react-virtualized';
 import styled from 'styled-components';
 import * as Types from '@meetalva/types';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import { Row, RowType, CardRow, GroupRow, PropertyRow } from './property-row';
 import * as Components from '@meetalva/components';
 

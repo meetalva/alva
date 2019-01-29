@@ -1,8 +1,8 @@
 import * as Mobx from 'mobx';
 import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
-import * as M from '../message';
-import { Message } from '../message';
+import * as M from '@meetalva/message';
+import { Message } from '@meetalva/message';
 
 export interface AlvaAppInit {
 	id?: string;

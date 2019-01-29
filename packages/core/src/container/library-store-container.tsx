@@ -5,11 +5,11 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { WithStore } from '../store';
 import { LibraryStoreItemContainer, LibraryStoreItemSize } from './library-store-item-container';
-import { MessageType } from '../message';
+import { MessageType } from '@meetalva/message';
 import * as uuid from 'uuid';
 import { ExternalLink, ChevronDown } from 'react-feather';
 import * as T from '@meetalva/types';
-import { MessageType as MT } from '../message';
+import { MessageType as MT } from '@meetalva/message';
 import { PatternLibraryInstallType } from '@meetalva/types';
 import { When } from './when';
 

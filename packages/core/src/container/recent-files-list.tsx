@@ -1,13 +1,13 @@
 import * as React from 'react';
 import * as MobxReact from 'mobx-react';
 import * as C from '@meetalva/components';
-import { MessageType as MT } from '../message';
+import { MessageType as MT } from '@meetalva/message';
 import { File, FileText } from 'react-feather';
 import { ViewStore } from '../store';
 import { partition } from 'lodash';
 import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
-import { Message } from '../message';
+import { Message } from '@meetalva/message';
 
 const timeago = require('timeago.js');
 

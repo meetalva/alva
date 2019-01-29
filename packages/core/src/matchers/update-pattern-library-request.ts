@@ -1,11 +1,11 @@
-import * as M from '../message';
-import { MessageType as MT } from '../message';
+import * as M from '@meetalva/message';
+import { MessageType as MT } from '@meetalva/message';
 import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
 import { performAnalysis } from '@meetalva/analyzer';
 import { PatternLibraryInstallType } from '@meetalva/types';
 import { MatcherCreator } from './context';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 
 export const updatePatternLibrary: MatcherCreator<M.UpdatePatternLibraryRequest> = ({
 	host,

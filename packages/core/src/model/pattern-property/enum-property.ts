@@ -4,7 +4,7 @@ import * as Types from '../../types';
 import { IconName } from '@meetalva/components';
 import * as uuid from 'uuid';
 import * as _ from 'lodash';
-import { computeDifference } from '../../alva-util';
+import { computeDifference } from '@meetalva/util';
 
 export interface PatternEnumPropertyInit {
 	contextId: string;

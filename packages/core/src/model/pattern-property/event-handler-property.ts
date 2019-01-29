@@ -1,4 +1,4 @@
-import * as AlvaUtil from '../../alva-util';
+import * as AlvaUtil from '@meetalva/util';
 import * as Mobx from 'mobx';
 import { PatternPropertyBase } from './property-base';
 import * as Types from '../../types';
@@ -89,7 +89,7 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 
 	public coerceValue<T>(value: T): string[] {
 		return AlvaUtil.ensureArray(value).map(
-			item => (typeof item === 'string' ? item : item.toString())
+			item => (typeof item === 'string' ? item : String(item))
 		);
 	}
 

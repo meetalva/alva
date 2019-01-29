@@ -2,19 +2,13 @@
 	"references": [
 		{
 			"path": "../components"
-		},
-		{
-			"path": "../essentials"
-		},
-		{
-			"path": "../util"
 		}
 	],
 	"compilerOptions": {
 		"composite": true,
 		"outDir": "lib",
 		"skipLibCheck": true,
-		"lib": ["dom", "es2017"],
+		"lib": ["es2017", "dom"],
 		"experimentalDecorators": true,
 		"moduleResolution": "node",
 		"module": "commonjs",
@@ -22,7 +16,8 @@
 		"target": "es2017",
 		"jsx": "react",
 		"strict": true,
-		"sourceMap": true
+		"sourceMap": true,
+		"declarationMap": true
 	},
 	"include": ["src"]
 }

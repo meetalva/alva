@@ -2,9 +2,8 @@ import * as npa from 'npm-package-arg';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import * as semver from 'semver';
-import { mkdirp } from '../alva-util';
+import { mkdirp } from '@meetalva/util';
 import * as ChildProcess from 'child_process';
-import { copy } from 'fs-extra';
 
 const pacote = require('pacote');
 const resolvePkg = require('resolve-pkg');

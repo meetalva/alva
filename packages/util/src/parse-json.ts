@@ -1,4 +1,4 @@
-import * as Types from '../types';
+import { SerialializationType } from './to-json';
 
 export type ParseResult<T> = ParseSuccess<T> | ParseError;
 
@@ -44,7 +44,7 @@ export function parseJSON<T>(data: string): ParseResult<T> {
 				const refined = ob as { type: string; data: unknown[] };
 
 				switch (refined.type) {
-					case Types.SerialializationType.Set:
+					case SerialializationType.Set:
 						return new Set(refined.data);
 					default:
 						return value;

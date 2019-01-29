@@ -1,13 +1,13 @@
-import * as Model from '../model';
+export interface Indexable {
+	getIndex(): number | undefined;
+	getContainer(): unknown;
+}
 
-export function calculateDropIndex(init: {
-	dragged: Model.Element;
-	target: Model.Element;
-}): number {
+export function calculateDropIndex<T extends Indexable>(init: { dragged: T; target: T }): number {
 	const { dragged, target } = init;
 
 	// We definitely know the drop target has a parent, thus an index
-	const newIndex = target.getIndex() as number;
+	const newIndex = target.getIndex()!;
 
 	// The dragged element is dropped into another
 	// leaf list than it was dragged from.
@@ -17,7 +17,7 @@ export function calculateDropIndex(init: {
 	}
 
 	// If the dragged element has a parent, it has an index
-	const currentIndex = dragged.getIndex();
+	const currentIndex = dragged.getIndex()!;
 
 	// The dragged element is dropped in the same leaf
 	// list as it was dragged from.

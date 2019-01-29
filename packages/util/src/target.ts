@@ -1,6 +1,20 @@
-import * as Model from '../model';
-import * as Store from '../store';
 import * as Components from '@meetalva/components';
+
+export interface PageProvider<T> {
+	getPageById(id: string): T | undefined;
+}
+
+export interface ElementProvider<T extends WithParent<T>> {
+	getElementById(id: string): T | undefined;
+}
+
+export interface ElementContentProvider<T> {
+	getContentById(id: string): T | undefined;
+}
+
+export interface WithParent<T> {
+	getParent(): T | undefined;
+}
 
 export function above(node: EventTarget, selector: string): HTMLElement | null {
 	let el = node as HTMLElement;
@@ -22,10 +36,7 @@ export function above(node: EventTarget, selector: string): HTMLElement | null {
 	return ended ? null : el;
 }
 
-export function pageFromTarget(
-	target: EventTarget,
-	store: Store.ViewStore
-): Model.Page | undefined {
+export function pageFromTarget<T>(target: EventTarget, store: PageProvider<T>): T | undefined {
 	const el = above(target, `[${Components.PageAnchors.page}]`);
 	if (!el) {
 		return;
@@ -45,10 +56,10 @@ export function pageFromTarget(
 	return page;
 }
 
-export function elementFromTarget(
+export function elementFromTarget<T extends WithParent<T>>(
 	target: EventTarget,
-	options: { sibling: boolean; store: Store.ViewStore }
-): Model.Element | undefined {
+	options: { sibling: boolean; store: ElementProvider<T> }
+): T | undefined {
 	const el = above(target, `[${Components.ElementAnchors.element}]`);
 
 	if (!el) {
@@ -70,10 +81,10 @@ export function elementFromTarget(
 	return options.sibling ? element.getParent() : element;
 }
 
-export function elementContentFromTarget(
+export function elementContentFromTarget<T>(
 	target: EventTarget,
-	options: { store: Store.ViewStore }
-): Model.ElementContent | undefined {
+	options: { store: ElementContentProvider<T> }
+): T | undefined {
 	const el = above(target, `[${Components.ElementAnchors.content}]`);
 
 	if (!el) {

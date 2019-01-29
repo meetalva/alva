@@ -1,4 +1,4 @@
-import { computeDifference } from '../../alva-util';
+import { computeDifference } from '@meetalva/util';
 import { isEqual } from 'lodash';
 import * as Mobx from 'mobx';
 import { Pattern, PatternSlot } from '../pattern';

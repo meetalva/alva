@@ -1,5 +1,5 @@
 // tslint:disable:no-non-null-assertion
-import * as AlvaUtil from '../alva-util';
+import * as AlvaUtil from '@meetalva/util';
 import * as Message from '../message';
 import { isMessage } from './is-message';
 import { isMessageType } from './is-message-type';

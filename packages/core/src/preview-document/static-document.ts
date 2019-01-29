@@ -1,6 +1,6 @@
 import * as Path from 'path';
 import * as Types from '../types';
-import * as AlvaUtil from '../alva-util';
+import * as AlvaUtil from '@meetalva/util';
 import * as fetch from 'isomorphic-fetch';
 
 export interface StaticDocumentConfig {

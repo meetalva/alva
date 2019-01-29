@@ -1,5 +1,5 @@
 import { AnyModel } from './any-model';
-import { computeDifference } from '../alva-util';
+import { computeDifference } from '@meetalva/util';
 import { Element, ElementContent, ElementProperty } from './element';
 import { ElementAction } from './element-action';
 import * as Message from '../message';

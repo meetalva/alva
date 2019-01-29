@@ -1,9 +1,11 @@
-import * as Types from '../types';
+export enum SerialializationType {
+	Set = 'set'
+}
 
 export function toJSON(input: unknown): string {
 	return JSON.stringify(input, (_, value) => {
 		if (value instanceof Set) {
-			return { type: Types.SerialializationType.Set, data: Array.from(value) };
+			return { type: SerialializationType.Set, data: Array.from(value) };
 		}
 
 		return value;

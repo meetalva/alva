@@ -1,4 +1,4 @@
-import * as AlvaUtil from '../../alva-util';
+import * as AlvaUtil from '@meetalva/util';
 import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import { PatternLibrary } from '../pattern-library';

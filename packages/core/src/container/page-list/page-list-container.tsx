@@ -7,7 +7,7 @@ import * as Components from '@meetalva/components';
 import * as Model from '../../model';
 import * as Store from '../../store';
 import * as Types from '../../types';
-import * as utils from '../../alva-util';
+import * as utils from '@meetalva/util';
 
 @MobxReact.inject('store')
 @MobxReact.observer

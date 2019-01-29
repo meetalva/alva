@@ -1,4 +1,4 @@
-import { computeDifference } from '../alva-util';
+import { computeDifference } from '@meetalva/util';
 import * as Mobx from 'mobx';
 import * as Message from '../message';
 import { Project } from './project';

@@ -1,7 +1,7 @@
 import * as M from '../message';
 import * as T from '../types';
 import * as uuid from 'uuid';
-import * as AlvaUtil from '../alva-util';
+import * as AlvaUtil from '@meetalva/util';
 
 export function showError({ host }: T.MatcherContext): T.Matcher<M.ShowError> {
 	return async m => {

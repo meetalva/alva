@@ -1,4 +1,4 @@
-import * as AlvaUtil from '../../alva-util';
+import * as AlvaUtil from '@meetalva/util';
 import { ChromeSwitch } from './chrome-switch';
 import * as C from '@meetalva/components';
 import { MessageType } from '../../message';

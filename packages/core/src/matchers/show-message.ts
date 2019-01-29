@@ -18,4 +18,4 @@ export const showMessage: MatcherCreator<M.ShowMessage> = ({ host }) => {
 			sender.send({ ...button.message });
 		}
 	};
-}
+};

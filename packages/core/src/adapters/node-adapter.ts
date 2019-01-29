@@ -11,7 +11,9 @@ export class NodeAdapter {
 	private dataHost: Types.DataHost<Model.Project>;
 	private location: Types.Location;
 
-	public constructor(init: { server: Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message> }) {
+	public constructor(init: {
+		server: Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
+	}) {
 		this.host = init.server.host;
 		this.dataHost = init.server.dataHost;
 		this.location = init.server.location;

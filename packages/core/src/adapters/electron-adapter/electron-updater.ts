@@ -12,7 +12,10 @@ export class ElectronUpdater {
 	private updater: typeof AU.autoUpdater;
 	private force: boolean = false;
 
-	public constructor({ server, force }: Types.ElectronUpdaterInit<Model.AlvaApp<M.Message>, Model.Project, M.Message>) {
+	public constructor({
+		server,
+		force
+	}: Types.ElectronUpdaterInit<Model.AlvaApp<M.Message>, Model.Project, M.Message>) {
 		this.server = server;
 		this.force = force;
 

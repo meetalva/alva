@@ -6,4 +6,4 @@ export const addApp: MatcherCreator<M.ChangeApp> = ({ host }) => {
 	return async message => {
 		host.addApp(Model.AlvaApp.from(message.payload.app, { sender: await host.getSender() }));
 	};
-}
+};

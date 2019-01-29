@@ -12,7 +12,13 @@ export class BrowserDataHost implements Types.DataHost<Model.Project> {
 	private store: Store.ViewStore;
 	@Mobx.observable private projects: Types.ProjectRecord[] | undefined;
 
-	public constructor({ host, store }: { host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>; store: Store.ViewStore }) {
+	public constructor({
+		host,
+		store
+	}: {
+		host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>;
+		store: Store.ViewStore;
+	}) {
 		this.host = host;
 		this.store = store;
 	}

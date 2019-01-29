@@ -147,7 +147,9 @@ export abstract class Host<A, P, M extends SenderMessage> {
 		throw new Error('host.selectSaveFile: not implemented');
 	}
 
-	public async showMessage(opts: HostMessageOptions<M>): Promise<HostMessageButton<M> | undefined> {
+	public async showMessage(
+		opts: HostMessageOptions<M>
+	): Promise<HostMessageButton<M> | undefined> {
 		throw new Error('host.showMessage: not implemented');
 	}
 

@@ -31,4 +31,4 @@ export const copy: MatcherCreator<M.Copy> = ({ host, dataHost }) => {
 			})
 		);
 	};
-}
+};

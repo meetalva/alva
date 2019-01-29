@@ -60,7 +60,7 @@ export const paste: MatcherCreator<M.Paste> = ({ host }) => {
 				host.log(`paste: unknown item type ${itemType}`);
 		}
 	};
-}
+};
 
 function deserializeItemType(type: T.SerializedItemType): T.ItemType {
 	switch (type) {

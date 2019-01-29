@@ -14,11 +14,17 @@ export class LocalDataHost implements Types.DataHost<Model.Project> {
 	private cache: Map<string, Model.Project> = new Map();
 	@Mobx.observable private projects: Types.ProjectRecord[] | undefined;
 
-	private constructor({ host }: { host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message> }) {
+	private constructor({
+		host
+	}: {
+		host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>;
+	}) {
 		this.host = host;
 	}
 
-	public static async fromHost(host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>): Promise<Types.DataHost<Model.Project>> {
+	public static async fromHost(
+		host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>
+	): Promise<Types.DataHost<Model.Project>> {
 		return new LocalDataHost({ host });
 	}
 

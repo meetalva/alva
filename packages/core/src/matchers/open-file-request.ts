@@ -96,4 +96,4 @@ export const openFileRequest: MatcherCreator<M.OpenFileRequest, Interceptor> = (
 			}
 		}
 	};
-}
+};

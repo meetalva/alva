@@ -70,8 +70,10 @@ export class AlvaApp<M extends Message> {
 		init.paneSizes.forEach(paneSize => this.setPaneSize(paneSize));
 	}
 
-	public static from(serialized: Types.SerializedAlvaApp, ctx: { sender: Types.Sender<M.Message> }): AlvaApp<M.Message
-	> {
+	public static from(
+		serialized: Types.SerializedAlvaApp,
+		ctx: { sender: Types.Sender<M.Message> }
+	): AlvaApp<M.Message> {
 		return new AlvaApp(
 			{
 				id: serialized.id,

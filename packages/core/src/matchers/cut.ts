@@ -23,4 +23,4 @@ export const cut: MatcherCreator<M.Cut> = ({ host, dataHost }) => {
 			})
 		);
 	};
-}
+};

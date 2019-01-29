@@ -85,7 +85,9 @@ export class SubMenu extends React.Component<Types.SubMenuProps<Model.AlvaApp<Me
 	}
 }
 
-export class GenericMenuItem extends React.Component<Types.GenericMenuItemProps<Model.AlvaApp<Message>, Message>> {
+export class GenericMenuItem extends React.Component<
+	Types.GenericMenuItemProps<Model.AlvaApp<Message>, Message>
+> {
 	public render(): JSX.Element | null {
 		const { props } = this;
 
@@ -114,7 +116,9 @@ export class GenericMenuItem extends React.Component<Types.GenericMenuItemProps<
 
 @MobxReact.inject('menuStore', 'store')
 @MobxReact.observer
-class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem<Model.AlvaApp<Message>, Message> }> {
+class PlainMenuItem extends React.Component<{
+	menu: Types.ContentMenuItem<Model.AlvaApp<Message>, Message>;
+}> {
 	private handleAction = (
 		e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<unknown> | KeyboardEvent
 	): void => {
@@ -229,11 +233,15 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem<Model.
 
 @MobxReact.inject('menuStore', 'store')
 @MobxReact.observer
-class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem<Model.AlvaApp<Message>, Message> }> {
+class CheckboxMenuItem extends React.Component<{
+	menu: Types.CheckboxMenuItem<Model.AlvaApp<Message>, Message>;
+}> {
 	private handleAction = (e: any) => {
 		e.preventDefault();
 
-		const props = this.props as { menu: Types.CheckboxMenuItem<Model.AlvaApp<Message>, Message> } & {
+		const props = this.props as {
+			menu: Types.CheckboxMenuItem<Model.AlvaApp<Message>, Message>;
+		} & {
 			menuStore: Store.MenuStore;
 			store: Store.ViewStore;
 		};
@@ -262,7 +270,9 @@ class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem<Mo
 	};
 
 	public render(): JSX.Element | null {
-		const props = this.props as { menu: Types.CheckboxMenuItem<Model.AlvaApp<Message>, Message> } & {
+		const props = this.props as {
+			menu: Types.CheckboxMenuItem<Model.AlvaApp<Message>, Message>;
+		} & {
 			menuStore: Store.MenuStore;
 			store: Store.ViewStore;
 		};

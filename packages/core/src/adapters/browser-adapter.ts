@@ -16,7 +16,11 @@ export class BrowserAdapter {
 	public readonly host: BrowserHost;
 	public readonly dataHost: Types.DataHost<Model.Project>;
 
-	private constructor(init: { sender: Types.Sender<M.Message>; store: Store.ViewStore; fs?: typeof Fs }) {
+	private constructor(init: {
+		sender: Types.Sender<M.Message>;
+		store: Store.ViewStore;
+		fs?: typeof Fs;
+	}) {
 		this.sender = init.sender;
 		this.store = init.store;
 

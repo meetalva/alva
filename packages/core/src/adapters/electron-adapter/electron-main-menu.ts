@@ -14,7 +14,9 @@ export class ElectronMainMenu {
 	@Mobx.observable private focusedApp: Model.AlvaApp<M.Message> | undefined;
 	@Mobx.observable private focusedProject: Model.Project | undefined;
 
-	public constructor(init: { server: Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message>; }) {
+	public constructor(init: {
+		server: Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
+	}) {
 		this.server = init.server;
 	}
 
@@ -77,9 +79,14 @@ export class ElectronMainMenu {
 		app: Model.AlvaApp<M.Message> | undefined;
 		project: Model.Project | undefined;
 	}): void {
-		const toElectronAction = (item: Types.MenuItem<Model.AlvaApp<M.Message>, M.Message>): Electron.MenuItemConstructorOptions[] => {
+		const toElectronAction = (
+			item: Types.MenuItem<Model.AlvaApp<M.Message>, M.Message>
+		): Electron.MenuItemConstructorOptions[] => {
 			if (typeof (item as any).click === 'function') {
-				const actionable = item as Types.ActionableMenuItem<Model.AlvaApp<M.Message>, M.Message>;
+				const actionable = item as Types.ActionableMenuItem<
+					Model.AlvaApp<M.Message>,
+					M.Message
+				>;
 				const onClick = actionable.click!;
 				actionable.click = () => {
 					if (!this.focusedApp) {

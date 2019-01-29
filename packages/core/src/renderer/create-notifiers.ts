@@ -104,7 +104,10 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 			}
 
 			if (!appSync.id) {
-				appSync.stop = MobxUtils.deepObserve<Model.AlvaApp<Message.Message>>(app, onAppChange(app));
+				appSync.stop = MobxUtils.deepObserve<Model.AlvaApp<Message.Message>>(
+					app,
+					onAppChange(app)
+				);
 				appSync.id = app.getId();
 			}
 		},
@@ -121,7 +124,11 @@ type MobxChange =
 	| Mobx.IMapDidChange;
 
 type ProjectChangeHandler = (change: MobxChange, path: string, project: Model.Project) => void;
-type AppChangeHandler = (change: MobxChange, path: string, app: Model.AlvaApp<Message.Message>) => void;
+type AppChangeHandler = (
+	change: MobxChange,
+	path: string,
+	app: Model.AlvaApp<Message.Message>
+) => void;
 
 function onProjectChange(app: Model.AlvaApp<Message.Message>): ProjectChangeHandler {
 	return (change, path, project) => {

@@ -24,7 +24,8 @@ export interface ElectronHostInit {
 	forced?: Partial<Types.HostFlags>;
 }
 
-export class ElectronHost implements Types.Host<AlvaApp<Message.Message>, Project, Message.Message> {
+export class ElectronHost
+	implements Types.Host<AlvaApp<Message.Message>, Project, Message.Message> {
 	public type = Types.HostType.Electron;
 
 	private forced?: Partial<Types.HostFlags>;

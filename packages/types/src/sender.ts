@@ -7,24 +7,15 @@ export interface SenderMessage {
 export interface Sender<M extends SenderMessage> {
 	readonly id: string;
 
-	match<T extends M>(
-		type: T['type'],
-		handler: (message: T) => void
-	): Promise<void>;
+	match<T extends M>(type: T['type'], handler: (message: T) => void): Promise<void>;
 
-	unmatch<T extends M>(
-		type: T['type'],
-		handler: (message: T) => void
-	): Promise<void>;
+	unmatch<T extends M>(type: T['type'], handler: (message: T) => void): Promise<void>;
 
 	send<T extends M>(message: T): void;
 
 	pass(envelope: string): void;
 
-	transaction<T extends M, V extends M>(
-		message: T,
-		{ type }: { type: V['type'] }
-	): Promise<V>;
+	transaction<T extends M, V extends M>(message: T, { type }: { type: V['type'] }): Promise<V>;
 
 	setLog(log: undefined | typeof console.log): void;
 }

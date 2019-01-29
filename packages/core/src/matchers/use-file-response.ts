@@ -2,7 +2,7 @@ import * as M from '../message';
 import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
 import * as Model from '../model';
-import { MatcherCreator } from './context';
+import { MatcherCreator } from './context';
 
 export const useFileResponse: MatcherCreator<M.UseFileResponse> = ({ host }) => {
 	return async m => {
@@ -33,4 +33,4 @@ export const useFileResponse: MatcherCreator<M.UseFileResponse> = ({ host }) => 
 			);
 		}
 	};
-}
+};

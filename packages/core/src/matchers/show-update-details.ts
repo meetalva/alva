@@ -4,7 +4,7 @@ import { MatcherCreator } from './context';
 
 const timeago = require('timeago.js');
 
-export const showUpdateDetails: MatcherCreator<M.ShowUpdateDetails> = ({host}) => {
+export const showUpdateDetails: MatcherCreator<M.ShowUpdateDetails> = ({ host }) => {
 	return async m => {
 		await host.showMessage({
 			message: `Restart to update`,
@@ -31,4 +31,4 @@ export const showUpdateDetails: MatcherCreator<M.ShowUpdateDetails> = ({host}) =
 			]
 		});
 	};
-}
+};

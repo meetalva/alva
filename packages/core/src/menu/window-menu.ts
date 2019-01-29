@@ -1,6 +1,6 @@
 import * as uuid from 'uuid';
 import * as Types from '@meetalva/types';
-import { MenuCreator } from './context';
+import { MenuCreator } from './context';
 
 const ids = {
 	window: uuid.v4(),

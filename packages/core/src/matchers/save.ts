@@ -9,7 +9,10 @@ export interface SaveConfig {
 	passive: boolean;
 }
 
-export const save: MatcherCreator<M.Save, SaveConfig> = ({ host, dataHost }, config?: SaveConfig) => {
+export const save: MatcherCreator<M.Save, SaveConfig> = (
+	{ host, dataHost },
+	config?: SaveConfig
+) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 

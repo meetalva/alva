@@ -33,4 +33,4 @@ export const openRemoteFileRequest: MatcherCreator<M.OpenRemoteFileRequest> = ({
 			}
 		});
 	};
-}
+};

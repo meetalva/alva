@@ -52,7 +52,7 @@ jest.mock('../hosts/electron-host', () => {
 jest.mock('../hosts/local-data-host');
 
 test('calls host.showMessage without app on ElectronHost', async () => {
-	const host = await ElectronHost.from({ process }) as any;
+	const host = (await ElectronHost.from({ process })) as any;
 	const dataHost = await LocalDataHost.fromHost(host);
 	const sender = await host.getSender();
 
@@ -76,7 +76,7 @@ test('calls host.showMessage without app on ElectronHost', async () => {
 });
 
 test('calls host.showMessage without app on ElectronHost', async () => {
-	const host = await ElectronHost.from({ process }) as any;
+	const host = (await ElectronHost.from({ process })) as any;
 	const dataHost = await LocalDataHost.fromHost(host);
 
 	host.getApp = async () => undefined;

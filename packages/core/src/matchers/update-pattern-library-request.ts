@@ -6,7 +6,10 @@ import { performAnalysis } from './perform-analysis';
 import { PatternLibraryInstallType } from '@meetalva/types';
 import { MatcherCreator } from './context';
 
-export const updatePatternLibrary: MatcherCreator<M.UpdatePatternLibraryRequest> = ({ host, dataHost }) => {
+export const updatePatternLibrary: MatcherCreator<M.UpdatePatternLibraryRequest> = ({
+	host,
+	dataHost
+}) => {
 	return async m => {
 		const { libId, projectId } = m.payload;
 		const app = await host.getApp(m.appId || '');
@@ -108,4 +111,4 @@ export const updatePatternLibrary: MatcherCreator<M.UpdatePatternLibraryRequest>
 			}
 		});
 	};
-}
+};

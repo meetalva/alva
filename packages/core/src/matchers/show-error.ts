@@ -46,7 +46,9 @@ export const showError: MatcherCreator<M.ShowError> = ({ host }) => {
 			type: 'warning',
 			message: m.payload.message,
 			detail: m.payload.detail,
-			buttons: buttons.filter((b): b is T.HostMessageButton<M.Message> => typeof b !== 'undefined')
+			buttons: buttons.filter(
+				(b): b is T.HostMessageButton<M.Message> => typeof b !== 'undefined'
+			)
 		});
 	};
-}
+};

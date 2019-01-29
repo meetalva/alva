@@ -6,7 +6,11 @@ import { LibraryStoreItemType, LibraryStoreItemState } from './library-store';
 import { Project } from './project';
 import * as T from '@meetalva/types';
 import * as M from '../message';
-import { PatternLibraryInstallType, PatternLibraryOrigin, PatternLibraryState } from '@meetalva/types';
+import {
+	PatternLibraryInstallType,
+	PatternLibraryOrigin,
+	PatternLibraryState
+} from '@meetalva/types';
 
 export interface LibraryStoreItemInit {
 	id?: string;
@@ -277,7 +281,10 @@ export class LibraryStoreItem {
 
 	@Mobx.action
 	public connect(
-		sender: { send: T.Sender<M.Message>['send']; transaction: T.Sender<M.Message>['transaction'] },
+		sender: {
+			send: T.Sender<M.Message>['send'];
+			transaction: T.Sender<M.Message>['transaction'];
+		},
 		data: { project: Project; npmId?: string; installType?: PatternLibraryInstallType }
 	): void {
 		if (this.state === LibraryStoreItemState.Installing) {

@@ -48,4 +48,4 @@ export const openAsset: MatcherCreator<M.AssetReadRequest> = ({ host }) => {
 			});
 		}
 	};
-}
+};

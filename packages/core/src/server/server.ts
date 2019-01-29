@@ -22,7 +22,8 @@ interface AlvaServerInit {
 	};
 }
 
-export class AlvaServer implements Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message> {
+export class AlvaServer
+	implements Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message> {
 	private app: express.Express;
 	private http: Http.Server;
 	private ws: WS.Server;

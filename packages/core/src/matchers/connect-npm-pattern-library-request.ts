@@ -133,4 +133,4 @@ export const connectNpmPatternLibrary: MatcherCreator<M.ConnectNpmPatternLibrary
 			});
 		}
 	};
-}
+};

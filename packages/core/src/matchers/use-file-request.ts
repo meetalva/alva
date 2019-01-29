@@ -4,7 +4,7 @@ import { Persistence } from '../persistence';
 import * as uuid from 'uuid';
 import * as Path from 'path';
 import * as Model from '../model';
-import { MatcherCreator } from './context';
+import { MatcherCreator } from './context';
 
 export const useFileRequest: MatcherCreator<M.UseFileRequest> = ({ host, dataHost }) => {
 	return async m => {
@@ -116,4 +116,4 @@ export const useFileRequest: MatcherCreator<M.UseFileRequest> = ({ host, dataHos
 			}
 		});
 	};
-}
+};

@@ -1,25 +1,30 @@
 {
-    "name": "@meetalva/util",
-    "version": "1.0.0",
-    "description": "Internal utility functions for Alva",
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/meetalva/alva.git"
-    },
-    "author": {
-      "email": "hey@meetalva.io",
-      "name": "Meet Alva Team",
-      "url": "https://meetalva.io/"
-    },
-    "license": "MIT",
-    "homepage": "https://meetalva.github.io/",
-    "bugs": {
-      "url": "https://github.com/meetalva/alva/issues"
-    },
-    "devDependencies": {
-      "prettier": "1.12.0",
-      "ts-jest": "23.10.5",
-      "tslib": "1.9.0",
-      "typescript": "3.2.2"
-    }
+  "name": "@meetalva/util",
+  "version": "1.0.0",
+  "description": "Internal utility functions for Alva",
+  "scripts": {
+    "check:dependencies": "alva-dependencies"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetalva/alva.git"
+  },
+  "author": {
+    "email": "hey@meetalva.io",
+    "name": "Meet Alva Team",
+    "url": "https://meetalva.io/"
+  },
+  "license": "MIT",
+  "homepage": "https://meetalva.github.io/",
+  "bugs": {
+    "url": "https://github.com/meetalva/alva/issues"
+  },
+  "dependencies": {
+    "@meetalva/components": "1.0.0",
+    "url-search-params": "1.1.0",
+    "util.promisify": "1.0.0"
+  },
+  "devDependencies": {
+    "@meetalva/tools": "1.0.0"
   }
+}

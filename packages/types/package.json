@@ -1,6 +1,9 @@
 {
   "name": "@meetalva/types",
   "version": "1.0.0",
+  "scripts": {
+    "check:dependencies": "alva-dependencies"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meetalva/alva.git"
@@ -14,7 +17,7 @@
   "bugs": {
     "url": "https://github.com/meetalva/alva/issues"
   },
-  "dependencies": {
-    "mobx": "5.0.3"
+  "devDependencies": {
+    "@meetalva/tools": "1.0.0"
   }
 }

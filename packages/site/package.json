@@ -4,7 +4,7 @@
   "private": true,
   "main": "./lib/site",
   "scripts": {
-    "compile": "tsc --project ."
+    "check:dependencies": "alva-dependencies --entry lib/site.js"
   },
   "repository": {
     "type": "git",
@@ -20,17 +20,15 @@
     "url": "https://github.com/meetalva/alva/issues"
   },
   "dependencies": {
+    "@emotion/styled": "^10.0.6",
     "@meetalva/designkit": "^1.4.2",
     "@types/react": "16.4.11",
     "@types/react-helmet": "5.0.6",
-    "emotion-server": "^10.0.6",
     "react": "16.4.2",
-    "react-helmet": "5.2.0",
-    "serve": "^10.1.1"
+    "react-dom": "16.4.2",
+    "react-helmet": "5.2.0"
   },
   "devDependencies": {
-    "@patternplate/cli": "^3.2.6",
-    "@patternplate/render-styled-components": "2.5.18",
-    "typescript": "3.2.2"
+    "@meetalva/tools": "1.0.0"
   }
 }

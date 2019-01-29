@@ -7,6 +7,9 @@
 		},
 		{
 			"path": "./packages/site"
+		},
+		{
+			"path": "./packages/tools"
 		}
 	],
 	"compilerOptions": {
@@ -14,13 +17,13 @@
 		"composite": true,
 		"downlevelIteration": true,
 		"experimentalDecorators": true,
-		"skipLibCheck": true,
-		"strict": true,
 		"jsx": "react",
+		"lib": ["dom", "es2017"],
 		"module": "es2015",
 		"moduleResolution": "node",
-		"lib": ["dom", "es2017"],
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
 		"target": "es2017",
-		"sourceMap": true
 	}
 }

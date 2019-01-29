@@ -1,32 +1,44 @@
 {
-    "name": "@meetalva/model",
-    "version": "1.0.0",
-    "description": "Domain model for Alva",
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/meetalva/alva.git"
-    },
-    "author": {
-      "email": "hey@meetalva.io",
-      "name": "Meet Alva Team",
-      "url": "https://meetalva.io/"
-    },
-    "license": "MIT",
-    "homepage": "https://meetalva.github.io/",
-    "bugs": {
-      "url": "https://github.com/meetalva/alva/issues"
-    },
-    "dependencies": {
-      "@meetalva/essentials": "1.0.0",
-      "@meetalva/message": "1.0.0",
-      "@meetalva/util": "1.0.0",
-      "@meetalva/types": "1.0.0",
-      "mobx": "5.0.3"
-    },
-    "devDependencies": {
-      "prettier": "1.12.0",
-      "ts-jest": "23.10.5",
-      "tslib": "1.9.0",
-      "typescript": "3.2.2"
-    }
+  "name": "@meetalva/model",
+  "version": "1.0.0",
+  "description": "Domain model for Alva",
+  "scripts": {
+    "check:dependencies": "alva-dependencies"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetalva/alva.git"
+  },
+  "author": {
+    "email": "hey@meetalva.io",
+    "name": "Meet Alva Team",
+    "url": "https://meetalva.io/"
+  },
+  "license": "MIT",
+  "homepage": "https://meetalva.github.io/",
+  "bugs": {
+    "url": "https://github.com/meetalva/alva/issues"
+  },
+  "dependencies": {
+    "@meetalva/components": "1.0.0",
+    "@meetalva/essentials": "1.0.0",
+    "@meetalva/message": "1.0.0",
+    "@meetalva/util": "1.0.0",
+    "@meetalva/types": "1.0.0",
+    "@types/json5": "0.0.30",
+    "@types/lodash": "4.14.120",
+    "@types/md5": "2.1.33",
+    "@types/semver": "5.5.0",
+    "@types/uuid": "3.4.4",
+    "fuse.js": "3.3.0",
+    "json5": "2.1.0",
+    "lodash": "4.17.11",
+    "md5": "2.2.1",
+    "mobx": "5.0.3",
+    "semver": "5.6.0",
+    "uuid": "3.3.2"
+  },
+  "devDependencies": {
+    "@meetalva/tools": "1.0.0"
   }
+}

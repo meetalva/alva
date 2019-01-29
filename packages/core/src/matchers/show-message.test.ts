@@ -8,7 +8,7 @@ import { LocalDataHost } from '../hosts/local-data-host';
 import * as uuid from 'uuid';
 
 jest.mock('../sender');
-jest.mock('../model/alva-app', () => {
+jest.mock('@meetalva/model/lib/alva-app', () => {
 	class MockAlvaApp {
 		public static fromSender(_: unknown) {
 			return new MockAlvaApp();

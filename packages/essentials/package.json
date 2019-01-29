@@ -2,23 +2,22 @@
   "name": "@meetalva/essentials",
   "version": "1.0.0",
   "description": "Built-in components for basic layouts and logic",
+  "scripts": {
+    "check:dependencies": "alva-dependencies"
+  },
   "alva": {
     "name": "Essentials"
   },
   "main": "lib/index.js",
   "homepage": "https://github.com/meetalva/alva",
-  "scripts": {
-    "compile": "tsc",
-    "watch": "tsc --watch"
-  },
   "license": "MIT",
   "devDependencies": {
+    "@meetalva/tools": "1.0.0"
+  },
+  "dependencies": {
     "@types/node": "^10.12.18",
     "@types/react": "16.7.18",
     "@types/react-helmet": "5.0.6",
-    "typescript": "3.2.2"
-  },
-  "dependencies": {
     "react": "16.7.0",
     "react-helmet": "5.2.0"
   }

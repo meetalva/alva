@@ -83,6 +83,23 @@ jobs:
           name: Add npm bin to path
           command: echo 'export PATH="$(npm bin):$PATH"' >> $BASH_ENV
 
+  deps:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - setup:
+          key: linux
+
+      - attach_workspace:
+          at: ~/repo
+
+      - run:
+          name: Check dependencies
+          command: lerna run check:dependencies --stream
+
   test:
     docker:
       - image: circleci/node:8
@@ -139,6 +156,7 @@ jobs:
               - packages/model/lib
               - packages/model-tree/lib
               - packages/site/lib
+              - packages/tools/lib
               - packages/types/lib
               - packages/util/lib
 
@@ -352,6 +370,9 @@ workflows:
       - install_macos
       - lint
       - compile
+      - deps:
+          requires:
+            - compile
       - test:
           requires:
             - compile

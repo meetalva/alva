@@ -8,7 +8,7 @@ export interface PatternSearchInit {
 }
 
 export class PatternSearch {
-	@Mobx.observable private fuse: Fuse;
+	@Mobx.observable private fuse: Fuse<Types.SerializedPattern>;
 
 	public constructor(init: PatternSearchInit) {
 		this.fuse = new Fuse(init.patterns.map(item => item.toJSON()), {
@@ -21,6 +21,6 @@ export class PatternSearch {
 			// tslint:disable-next-line:no-any
 			return (this.fuse as any).list.map((item: any) => item.id);
 		}
-		return this.fuse.search<Types.SerializedPattern>(term).map(match => match.id);
+		return this.fuse.search(term).map(match => match.id);
 	}
 }

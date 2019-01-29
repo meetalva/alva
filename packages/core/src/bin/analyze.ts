@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as Fs from 'fs';
-import { performAnalysis } from '../matchers/perform-analysis';
+import { performAnalysis } from '@meetalva/analyzer';
 import * as Path from 'path';
 import * as Model from '../model';
 import * as Types from '@meetalva/types';

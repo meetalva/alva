@@ -5,6 +5,7 @@ import * as uuid from 'uuid';
 import { performAnalysis } from '@meetalva/analyzer';
 import { PatternLibraryInstallType } from '@meetalva/types';
 import { MatcherCreator } from './context';
+import * as Model from '../model';
 
 export const updatePatternLibrary: MatcherCreator<M.UpdatePatternLibraryRequest> = ({
 	host,
@@ -78,7 +79,9 @@ export const updatePatternLibrary: MatcherCreator<M.UpdatePatternLibraryRequest>
 		}
 
 		const { path } = connection;
-		const analysisResult = await performAnalysis(path, { previousLibrary: library });
+		const analysisResult = await performAnalysis<Model.PatternLibrary>(path, {
+			previousLibrary: library
+		});
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			app.send({

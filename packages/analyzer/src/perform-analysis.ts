@@ -3,10 +3,10 @@ import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
 
 export interface AssignmentProvider {
-	assignEnumOptionId(id: string): string;
+	assignEnumOptionId(enumId: string, id: string): string;
 	assignPatternId(id: string): string;
-	assignPropertyId(id: string): string;
-	assignSlotId(id: string): string;
+	assignPropertyId(patternId: string, id: string): string;
+	assignSlotId(patternId: string, id: string): string;
 }
 
 export async function performAnalysis<T extends AssignmentProvider>(

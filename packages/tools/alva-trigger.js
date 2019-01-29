@@ -177,10 +177,10 @@ async function main(cli) {
 
 		if (channel === 'pr') {
 			manifest.build.productName = `Alva PR ${prNumber}`;
-			manifest.build.mac.artifactName = `alva-\${version}-pr-${prNumber}.\${ext}`;
-			manifest.build.nsis.artifactName = `alva-\${version}-pr-${prNumber}.\${ext}`;
-			manifest.build.portable.artifactName = `alva-portable-\${version}-pr-${prNumber}.\${ext}`;
-			manifest.build.linux.artifactName = `alva-\${version}-pr-${prNumber}.\${ext}`;
+			manifest.build.mac.artifactName = 'alva-${version}.${ext}';
+			manifest.build.nsis.artifactName = 'alva-${version}.${ext}';
+			manifest.build.portable.artifactName = 'alva-portable-${version}.${ext}';
+			manifest.build.linux.artifactName = 'alva-${version}.${ext}';
 		}
 
 		if (channel === 'alpha') {

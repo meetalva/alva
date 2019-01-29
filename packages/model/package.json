@@ -19,7 +19,6 @@
     "dependencies": {
       "@meetalva/essentials": "1.0.0",
       "@meetalva/message": "1.0.0",
-      "@meetalva/model-tree": "1.0.0",
       "@meetalva/util": "1.0.0",
       "@meetalva/types": "1.0.0",
       "mobx": "5.0.3"

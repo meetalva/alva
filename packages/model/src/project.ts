@@ -15,7 +15,6 @@ import { UserStore } from './user-store';
 import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-enhancer';
 import { UserStoreReference } from './user-store-reference';
 import * as uuid from 'uuid';
-import * as ModelTree from '@meetalva/model-tree';
 import { PlaceholderPosition } from '@meetalva/components';
 import { builtinPatternLibrary } from './pattern-library/builtin-pattern-library';
 

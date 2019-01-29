@@ -1,6 +1,12 @@
 {
 	"references": [
 		{
+			"path": "../essentials",
+		},
+		{
+			"path": "../message"
+		},
+		{
 			"path": "../util"
 		}
 	],

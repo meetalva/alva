@@ -32,6 +32,7 @@
     "@types/json5": "0.0.30",
     "@types/lodash": "4.14.107",
     "@types/node": "^10.12.18",
+    "@types/npm-package-arg": "^6.1.0",
     "@types/webpack": "^4.4.21",
     "json5": "2.1.0",
     "lodash": "4.17.5",

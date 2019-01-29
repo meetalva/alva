@@ -1580,6 +1580,11 @@
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
   integrity sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
 
+"@types/npm-package-arg@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@types/npm-package-arg/-/npm-package-arg-6.1.0.tgz#88bdfce72f6a3d5fa1053c8d44d655e7850642e4"
+  integrity sha512-vbt5fb0y1svMhu++1lwtKmZL76d0uPChFlw7kEzyUmTwfmpHRcFb8i0R8ElT69q/L+QLgK2hgECivIAvaEDwag==
+
 "@types/path-exists@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@types/path-exists/-/path-exists-3.0.0.tgz#ba6b2b477fcf5cf7dc84ac3ba2bcdbcfe323f4fe"

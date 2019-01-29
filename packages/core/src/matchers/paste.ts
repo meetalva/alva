@@ -1,9 +1,10 @@
 import * as M from '../message';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 import * as Serde from '../sender/serde';
 import * as uuid from 'uuid';
+import { MatcherCreator } from './context';
 
-export function paste({ host }: T.MatcherContext): T.Matcher<M.Paste> {
+export const paste: MatcherCreator<M.Paste> = ({ host }) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 

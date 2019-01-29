@@ -2,7 +2,7 @@ import * as Mobx from 'mobx';
 import * as _ from 'lodash';
 import { Project } from './project';
 import { LibraryStoreItem } from './library-store-item';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 
 export interface LibraryStoreInit {
 	project?: Project;

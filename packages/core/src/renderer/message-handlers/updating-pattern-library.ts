@@ -1,5 +1,5 @@
 import * as M from '../../message';
-import * as T from '../../types';
+import * as T from '@meetalva/types';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 
 export function updatingPatternLibrary({

@@ -1,11 +1,12 @@
 import * as M from '../message';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
 import * as AlvaUtil from '@meetalva/util';
+import { MatcherCreator } from './context';
 
-export function showError({ host }: T.MatcherContext): T.Matcher<M.ShowError> {
+export const showError: MatcherCreator<M.ShowError> = ({ host }) => {
 	return async m => {
-		const buttons: (T.HostMessageButton | undefined)[] = [
+		const buttons: (T.HostMessageButton<M.Message> | undefined)[] = [
 			{
 				label: 'OK'
 			},
@@ -45,7 +46,7 @@ export function showError({ host }: T.MatcherContext): T.Matcher<M.ShowError> {
 			type: 'warning',
 			message: m.payload.message,
 			detail: m.payload.detail,
-			buttons: buttons.filter((b): b is T.HostMessageButton => typeof b !== 'undefined')
+			buttons: buttons.filter((b): b is T.HostMessageButton<M.Message> => typeof b !== 'undefined')
 		});
 	};
 }

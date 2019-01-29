@@ -1,5 +1,5 @@
 import { PatternPropertyBase } from './property-base';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 /**
  * A number property is a property that supports numbers only, and undefined.

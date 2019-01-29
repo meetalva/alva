@@ -1,10 +1,8 @@
 import * as fetch from 'isomorphic-fetch';
 import * as M from '../message';
-import * as T from '../types';
+import { MatcherCreator } from './context';
 
-export function openRemoteFileRequest({
-	host
-}: T.MatcherContext): T.Matcher<M.OpenRemoteFileRequest> {
+export const openRemoteFileRequest: MatcherCreator<M.OpenRemoteFileRequest> = ({ host }) => {
 	return async m => {
 		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 		const response = await fetch(m.payload.url);

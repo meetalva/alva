@@ -3,7 +3,7 @@ import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { WithStore } from '../store';
 import * as PreviewDocument from '../preview-document/preview-document';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import * as Model from '../model';

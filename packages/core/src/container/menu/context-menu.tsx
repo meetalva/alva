@@ -3,7 +3,7 @@ import * as MobxReact from 'mobx-react';
 import * as Store from '../../store';
 import * as Menu from './menu';
 import * as Components from '@meetalva/components';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 @MobxReact.inject('menuStore')
 @MobxReact.observer

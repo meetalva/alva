@@ -4,7 +4,7 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import { Injection } from '.';
 
 export interface PreviewComponentProps {

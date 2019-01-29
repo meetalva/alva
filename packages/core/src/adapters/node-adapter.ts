@@ -1,16 +1,17 @@
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as Matchers from '../matchers';
 import * as M from '../message';
 import { MessageType as MT } from '../message';
 import * as Mobx from 'mobx';
 import * as uuid from 'uuid';
+import * as Model from '../model';
 
 export class NodeAdapter {
-	private host: Types.Host;
-	private dataHost: Types.DataHost;
+	private host: Types.Host<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
+	private dataHost: Types.DataHost<Model.Project>;
 	private location: Types.Location;
 
-	public constructor(init: { server: Types.AlvaServer }) {
+	public constructor(init: { server: Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message> }) {
 		this.host = init.server.host;
 		this.dataHost = init.server.dataHost;
 		this.location = init.server.location;

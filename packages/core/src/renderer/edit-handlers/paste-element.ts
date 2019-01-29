@@ -1,7 +1,7 @@
 import * as M from '../../message';
 import * as Model from '../../model';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 
 export function pasteElement({

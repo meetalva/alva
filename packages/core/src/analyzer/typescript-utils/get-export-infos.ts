@@ -2,7 +2,7 @@ import { findDeclaration } from './find-declaration';
 import * as TypeScript from 'typescript';
 import { TypescriptExport } from './typescript-export';
 import { TypeScriptType } from './typescript-type';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 export function getExportInfos(
 	program: TypeScript.Program,

@@ -3,7 +3,7 @@ import * as Fs from 'fs';
 import { performAnalysis } from '../matchers/perform-analysis';
 import * as Path from 'path';
 import * as Model from '../model';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as Util from 'util';
 import * as JSON5 from 'json5';
 

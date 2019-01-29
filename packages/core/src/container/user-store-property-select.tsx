@@ -3,7 +3,7 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '../model';
 import * as React from 'react';
 import { ViewStore } from '../store';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 export interface UserStorePropertySelectProps {
 	autoFocus?: boolean;

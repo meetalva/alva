@@ -2,7 +2,7 @@ import * as ConvertColor from 'color';
 import { Color } from '@meetalva/components';
 import * as Electron from 'electron';
 import * as electronIsDev from 'electron-is-dev';
-import { HostWindowOptions, HostWindowVariant } from '../../types';
+import { HostWindowOptions, HostWindowVariant } from '@meetalva/types';
 
 export async function createWindow(options: HostWindowOptions): Promise<Electron.BrowserWindow> {
 	const windowOptions = getWindowVariant(options.variant);

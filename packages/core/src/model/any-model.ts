@@ -11,9 +11,10 @@ import { UserStoreAction } from './user-store-action';
 import { UserStoreEnhancer } from './user-store-enhancer';
 import { UserStoreProperty } from './user-store-property';
 import { UserStoreReference } from './user-store-reference';
+import * as M from '../message';
 
 export type AnyModel =
-	| AlvaApp
+	| AlvaApp<M.Message>
 	| AnyPatternProperty
 	| Element
 	| ElementContent

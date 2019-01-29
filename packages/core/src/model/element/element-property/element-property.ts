@@ -5,7 +5,7 @@ import { AnyPatternProperty } from '../../pattern-property';
 import { UserStoreProperty } from '../../user-store-property';
 import { UserStoreReference } from '../../user-store-reference';
 import { Project } from '../../project';
-import * as Types from '../../../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 
 export interface ElementPropertyInit {

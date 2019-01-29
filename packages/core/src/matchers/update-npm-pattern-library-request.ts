@@ -1,14 +1,15 @@
 import * as M from '../message';
 import { MessageType as MT } from '../message';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
 import { performAnalysis } from './perform-analysis';
 import { getPackage } from '../analyzer/get-package';
+import { MatcherCreator } from './context';
 
-export function updateNpmPatternLibrary({
+export const updateNpmPatternLibrary: MatcherCreator<M.UpdateNpmPatternLibraryRequest> = ({
 	host,
 	dataHost
-}: T.MatcherContext): T.Matcher<M.UpdateNpmPatternLibraryRequest> {
+}) => {
 	return async m => {
 		const { libId, projectId } = m.payload;
 		const app = await host.getApp(m.appId || '');
@@ -112,4 +113,4 @@ export function updateNpmPatternLibrary({
 			}
 		});
 	};
-}
+};

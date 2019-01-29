@@ -1,23 +1,24 @@
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as Model from '../model';
 import * as Path from 'path';
 import { Persistence } from '../persistence';
 import * as Fs from 'fs';
 import { sortBy } from 'lodash';
 import * as Mobx from 'mobx';
+import { Message } from '../message';
 
 const pathIsInside = require('path-is-inside');
 
-export class LocalDataHost implements Types.DataHost {
-	private host: Types.Host;
+export class LocalDataHost implements Types.DataHost<Model.Project> {
+	private host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>;
 	private cache: Map<string, Model.Project> = new Map();
 	@Mobx.observable private projects: Types.ProjectRecord[] | undefined;
 
-	private constructor({ host }: { host: Types.Host }) {
+	private constructor({ host }: { host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message> }) {
 		this.host = host;
 	}
 
-	public static async fromHost(host: Types.Host): Promise<Types.DataHost> {
+	public static async fromHost(host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>): Promise<Types.DataHost<Model.Project>> {
 		return new LocalDataHost({ host });
 	}
 

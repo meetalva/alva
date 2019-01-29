@@ -60,6 +60,7 @@
     "@meetalva/components": "1.0.0",
     "@meetalva/essentials": "1.0.0",
     "@meetalva/util": "1.0.0",
+    "@meetalva/types": "1.0.0",
     "@types/color": "^3.0.0",
     "@types/dargs": "^5.1.0",
     "@types/electron-devtools-installer": "2.0.3",

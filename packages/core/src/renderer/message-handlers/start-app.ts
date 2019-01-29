@@ -1,6 +1,6 @@
 import * as M from '../../message';
 import * as Model from '../../model';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 
 export function startApp({ store, app }: MessageHandlerContext): MessageHandler<M.StartAppMessage> {

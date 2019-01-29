@@ -1,7 +1,7 @@
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { WithStore } from '../store';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 export interface AppViewProps {
 	view: Types.AlvaView;

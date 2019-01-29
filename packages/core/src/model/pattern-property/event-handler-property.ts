@@ -1,7 +1,7 @@
 import * as AlvaUtil from '@meetalva/util';
 import * as Mobx from 'mobx';
 import { PatternPropertyBase } from './property-base';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 export interface PatternEventInit {
 	type: Types.PatternEventType;

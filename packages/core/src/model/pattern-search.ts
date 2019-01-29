@@ -1,7 +1,7 @@
 import * as Fuse from 'fuse.js';
 import * as Mobx from 'mobx';
 import { Pattern } from './pattern';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 export interface PatternSearchInit {
 	patterns: Pattern[];

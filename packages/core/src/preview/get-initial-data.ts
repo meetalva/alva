@@ -1,4 +1,4 @@
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 export interface InitialData {
 	data: Types.SerializedProject;

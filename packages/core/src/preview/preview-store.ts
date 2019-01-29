@@ -3,7 +3,7 @@ import * as Mobx from 'mobx';
 import * as Message from '../message';
 import * as Model from '../model';
 import { Sender } from '../sender';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 
 export type RequestIdleCallbackHandle = number;
@@ -50,7 +50,7 @@ export interface SyntheticComponents<V> {
 }
 
 export class PreviewStore<V> {
-	@Mobx.observable private app?: Model.AlvaApp;
+	@Mobx.observable private app?: Model.AlvaApp<Message.Message>;
 	@Mobx.observable private highlightArea: ElementArea;
 	@Mobx.observable private metaDown: boolean = false;
 	@Mobx.observable private mode: Types.PreviewDocumentMode;
@@ -375,7 +375,7 @@ export class PreviewStore<V> {
 	}
 
 	@Mobx.action
-	public setApp(app: Model.AlvaApp): void {
+	public setApp(app: Model.AlvaApp<Message.Message>): void {
 		this.app = app;
 	}
 }

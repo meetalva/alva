@@ -5,7 +5,7 @@ import { Pattern, PatternSlot } from '../pattern';
 import { ElementContent } from '../element';
 import { AnyPatternProperty, PatternEnumProperty, PatternProperty } from '../pattern-property';
 import { Project } from '../project';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 
 const md5 = require('md5');

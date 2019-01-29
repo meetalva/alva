@@ -1,14 +1,12 @@
 import * as M from '../message';
 import { MessageType as MT } from '../message';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
 import { performAnalysis } from './perform-analysis';
-import { PatternLibraryInstallType } from '../types';
+import { PatternLibraryInstallType } from '@meetalva/types';
+import { MatcherCreator } from './context';
 
-export function updatePatternLibrary({
-	host,
-	dataHost
-}: T.MatcherContext): T.Matcher<M.UpdatePatternLibraryRequest> {
+export const updatePatternLibrary: MatcherCreator<M.UpdatePatternLibraryRequest> = ({ host, dataHost }) => {
 	return async m => {
 		const { libId, projectId } = m.payload;
 		const app = await host.getApp(m.appId || '');

@@ -1,8 +1,9 @@
 import * as Express from 'express';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as Path from 'path';
+import { ServerContext } from './context';
 
-export function scriptsRouteFactory(server: Types.AlvaServer): Express.RequestHandler {
+export function scriptsRouteFactory(server: ServerContext): Express.RequestHandler {
 	return async function scriptsRoute(req: Express.Request, res: Express.Response): Promise<void> {
 		const results = await Promise.all(
 			[

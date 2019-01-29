@@ -10,7 +10,7 @@ import { PatternSearch } from './pattern-search';
 import { Pattern, PatternSlot } from './pattern';
 import { PatternLibrary } from './pattern-library';
 import { AnyPatternProperty } from './pattern-property';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import { UserStore } from './user-store';
 import { UserStoreEnhancer, defaultCode, defaultJavaScript } from './user-store-enhancer';
 import { UserStoreReference } from './user-store-reference';
@@ -829,7 +829,7 @@ export class Project {
 		return getByPath(path.split('/'), this);
 	}
 
-	public sync(sender: Types.Sender): void {
+	public sync(sender: Types.Sender<Message.Message>): void {
 		if (this.syncing) {
 			return;
 		}
@@ -841,7 +841,7 @@ export class Project {
 		});
 	}
 
-	public unsync(sender: Types.Sender): void {
+	public unsync(sender: Types.Sender<Message.Message>): void {
 		sender.unmatch(Message.MessageType.ProjectUpdate, this.onProjectUpdate);
 	}
 

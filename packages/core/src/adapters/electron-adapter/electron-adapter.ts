@@ -1,5 +1,5 @@
 import * as Electron from 'electron';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as M from '../../message';
 import * as Matchers from '../../matchers';
 import { MessageType as MT } from '../../message';
@@ -10,19 +10,20 @@ import { AlvaApp, Project } from '../../model';
 import * as Serde from '../../sender/serde';
 import * as uuid from 'uuid';
 import * as Url from 'url';
-import { HostWindowVariant } from '../../types';
+import { HostWindowVariant } from '@meetalva/types';
 import * as Mobx from 'mobx';
 import * as RouteParser from 'route-parser';
+import * as Model from '../../model';
 
 const throat = require('throat');
 
 export interface ElectronAdapterInit {
-	server: Types.AlvaServer;
+	server: Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
 	forceUpdates: boolean;
 }
 
 export class ElectronAdapter {
-	private server: Types.AlvaServer;
+	private server: Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
 	private menu: ElectronMainMenu;
 	private updater: ElectronUpdater;
 
@@ -338,7 +339,7 @@ export class ElectronAdapter {
 		this.updater.start();
 	}
 
-	private async getApp(): Promise<AlvaApp | undefined> {
+	private async getApp(): Promise<AlvaApp<M.Message> | undefined> {
 		return this.menu.getApp();
 	}
 

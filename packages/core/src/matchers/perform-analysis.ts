@@ -1,6 +1,6 @@
 import * as Model from '../model';
 import * as Analyzer from '../analyzer';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
 
 export async function performAnalysis(

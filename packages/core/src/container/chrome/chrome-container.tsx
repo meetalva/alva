@@ -9,7 +9,7 @@ import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
 import { LogOut } from 'react-feather';
 import { When, WhenFalsy, WhenTruthy } from '../when';
-import * as T from '../../types';
+import * as T from '@meetalva/types';
 
 export interface InjectedChromeContainerProps {
 	page: Page;

@@ -1,9 +1,9 @@
 import * as M from '../message';
-import * as T from '../types';
 import * as Serde from '../sender/serde';
 import * as uuid from 'uuid';
+import { MatcherCreator } from './context';
 
-export function cut({ host, dataHost }: T.MatcherContext): T.Matcher<M.Cut> {
+export const cut: MatcherCreator<M.Cut> = ({ host, dataHost }) => {
 	return async m => {
 		const project = await dataHost.getProject(m.payload.projectId);
 

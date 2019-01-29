@@ -1,6 +1,6 @@
 import * as M from '../message';
-import * as T from '../types';
+import { MatcherCreator } from './context';
 
-export function openExternalUrl({ host }: T.MatcherContext): T.Matcher<M.OpenExternalURL> {
+export const openExternalUrl: MatcherCreator<M.OpenExternalURL> = ({ host }) => {
 	return async message => host.open(message.payload);
 }

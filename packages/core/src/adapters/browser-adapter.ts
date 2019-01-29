@@ -1,21 +1,22 @@
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as M from '../message';
 import { MessageType as MT } from '../message';
 import * as Store from '../store';
 import { BrowserHost } from '../hosts/browser-host';
 import { BrowserDataHost } from '../hosts/browser-data-host';
 import * as Matchers from '../matchers/browser';
+import * as Model from '../model';
 import * as Fs from 'fs';
 import * as uuid from 'uuid';
 import * as Mobx from 'mobx';
 
 export class BrowserAdapter {
-	public readonly sender: Types.Sender;
+	public readonly sender: Types.Sender<M.Message>;
 	public readonly store: Store.ViewStore;
 	public readonly host: BrowserHost;
-	public readonly dataHost: Types.DataHost;
+	public readonly dataHost: Types.DataHost<Model.Project>;
 
-	private constructor(init: { sender: Types.Sender; store: Store.ViewStore; fs?: typeof Fs }) {
+	private constructor(init: { sender: Types.Sender<M.Message>; store: Store.ViewStore; fs?: typeof Fs }) {
 		this.sender = init.sender;
 		this.store = init.store;
 
@@ -43,7 +44,7 @@ export class BrowserAdapter {
 	public async start() {
 		await this.host.start();
 		const app = this.store.getApp();
-		const context: Types.MatcherContext = {
+		const context: Types.MatcherContext<Model.AlvaApp<M.Message>, Model.Project, M.Message> = {
 			host: this.host,
 			dataHost: this.dataHost,
 			location: window.location

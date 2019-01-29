@@ -3,7 +3,7 @@ import * as MobxReact from 'mobx-react';
 import { Page, DroppablePageIndex } from '../../model';
 import * as React from 'react';
 import { WithStore } from '../../store';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { EditableTitleContainer } from '../editable-title/editable-title-container';
 
 export interface PageTileContainerProps {

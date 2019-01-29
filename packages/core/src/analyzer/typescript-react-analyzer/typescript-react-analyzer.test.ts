@@ -6,7 +6,7 @@ import {
 } from './typescript-react-analyzer';
 import Project from 'ts-simple-ast';
 import * as uuid from 'uuid';
-import { InternalPatternAnalysis } from '../../types';
+import { InternalPatternAnalysis } from '@meetalva/types';
 import * as Path from 'path';
 
 const fixtures = require('fixturez')(__dirname);

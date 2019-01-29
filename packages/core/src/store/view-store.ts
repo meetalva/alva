@@ -1,15 +1,15 @@
 import { Sender } from '../sender';
 import { isEqual } from 'lodash';
-import { MessageType } from '../message';
+import { Message, MessageType } from '../message';
 import * as Mobx from 'mobx';
 import * as Model from '../model';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 import * as uuid from 'uuid';
 import { PlaceholderPosition } from '@meetalva/components';
 
 export interface ViewStoreInit {
-	app: Model.AlvaApp;
+	app: Model.AlvaApp<Message>;
 	sender: Sender;
 	history: Model.EditHistory;
 	libraryStore: Model.LibraryStore;
@@ -49,7 +49,7 @@ export class ViewStore {
 		Model.ElementContent[]
 	> = new WeakMap();
 
-	@Mobx.observable private app: Model.AlvaApp;
+	@Mobx.observable private app: Model.AlvaApp<Message>;
 
 	@Mobx.observable private clipboardItem?: ClipBoardItem;
 
@@ -435,7 +435,7 @@ export class ViewStore {
 		return this.project.getPages().find(page => page.getActive());
 	}
 
-	public getApp(): Model.AlvaApp {
+	public getApp(): Model.AlvaApp<Message> {
 		return this.app;
 	}
 
@@ -802,7 +802,7 @@ export class ViewStore {
 	}
 
 	@Mobx.action
-	public setApp(app: Model.AlvaApp): void {
+	public setApp(app: Model.AlvaApp<Message>): void {
 		if (isEqual(app.toJSON(), this.app.toJSON())) {
 			return;
 		}

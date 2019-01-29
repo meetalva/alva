@@ -6,7 +6,7 @@ import * as Mobx from 'mobx';
 import * as Model from '../model';
 import { PreviewStore } from './preview-store';
 import { Sender } from '../sender';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 
 export interface Renderer<T> {

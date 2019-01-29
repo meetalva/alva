@@ -8,9 +8,9 @@ import { LibraryStoreItemContainer, LibraryStoreItemSize } from './library-store
 import { MessageType } from '../message';
 import * as uuid from 'uuid';
 import { ExternalLink, ChevronDown } from 'react-feather';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 import { MessageType as MT } from '../message';
-import { PatternLibraryInstallType } from '../types';
+import { PatternLibraryInstallType } from '@meetalva/types';
 import { When } from './when';
 
 const validatePackageName = require('validate-npm-package-name');

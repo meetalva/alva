@@ -1,6 +1,6 @@
 import * as Fs from 'fs';
-import * as Model from '../model';
-import * as Message from '../message';
+import * as Types from '.';
+import { SenderMessage } from './sender';
 
 export enum HostType {
 	Unknown = 'unknown',
@@ -8,8 +8,6 @@ export enum HostType {
 	Node = 'node',
 	Electron = 'electron'
 }
-
-import * as Types from '../types';
 
 export interface HostFlags {
 	_: string[];
@@ -55,19 +53,19 @@ export interface HostSelectSaveFileOptions {
 	filters?: ({ name?: string; extensions?: string[] })[];
 }
 
-export interface HostMessageButton {
+export interface HostMessageButton<M> {
 	selected?: boolean;
 	cancel?: boolean;
 	id?: string;
 	label: string;
-	message?: Message.Message;
+	message?: M;
 }
 
-export interface HostMessageOptions {
+export interface HostMessageOptions<M> {
 	type?: 'info' | 'warning' | 'error';
 	message: string;
 	detail?: string;
-	buttons: HostMessageButton[];
+	buttons: HostMessageButton<M>[];
 }
 
 export enum HostWindowVariant {
@@ -90,7 +88,7 @@ export interface ProjectRecord {
 	editDate: number | undefined;
 }
 
-export abstract class Host {
+export abstract class Host<A, P, M extends SenderMessage> {
 	public type: Types.HostType = Types.HostType.Unknown;
 
 	public async getFlags(): Promise<HostFlags> {
@@ -149,12 +147,12 @@ export abstract class Host {
 		throw new Error('host.selectSaveFile: not implemented');
 	}
 
-	public async showMessage(opts: HostMessageOptions): Promise<HostMessageButton | undefined> {
+	public async showMessage(opts: HostMessageOptions<M>): Promise<HostMessageButton<M> | undefined> {
 		throw new Error('host.showMessage: not implemented');
 	}
 
-	public async showContextMenu(opts: {
-		items: Types.ContextMenuItem[];
+	public async showContextMenu<T, M>(opts: {
+		items: Types.ContextMenuItem<T, M>[];
 		position: { x: number; y: number };
 	}): Promise<void> {
 		throw new Error('host.showContextMenu: not implemented');
@@ -168,7 +166,7 @@ export abstract class Host {
 		throw new Error('host.readClipboard: not implemented');
 	}
 
-	public async createWindow(opts: HostWindowOptions): Promise<Electron.BrowserWindow | undefined> {
+	public async createWindow(opts: HostWindowOptions): Promise<unknown | undefined> {
 		throw new Error('host.createWindow: not implemented');
 	}
 
@@ -176,29 +174,32 @@ export abstract class Host {
 		throw new Error('host.toggleDevTools: not implemented');
 	}
 
-	public async getApp(id: string): Promise<Model.AlvaApp | undefined> {
+	public async getApp(id: string): Promise<A | undefined> {
 		throw new Error('host.getApp: not implemented');
 	}
 
-	public async addApp(app: Model.AlvaApp): Promise<void> {
+	public async addApp<T>(app: T): Promise<void> {
 		throw new Error('host.addApp: not implemented');
 	}
 
-	public async getSender(): Promise<Types.Sender> {
+	public async getSender(): Promise<Types.Sender<M>> {
 		throw new Error('host.getSender: not implemented');
 	}
 
-	public setSender(sender: Types.Sender): void {
+	public setSender(sender: Types.Sender<M>): void {
 		throw new Error('host.setSender: not implemented');
 	}
 }
 
-export abstract class DataHost {
-	public async addProject(project: Model.Project): Promise<void> {
+/**
+ * P - Project
+ */
+export abstract class DataHost<P> {
+	public async addProject(project: P): Promise<void> {
 		throw new Error('DataHost.addProject: not implemented');
 	}
 
-	public async getProject(id: string): Promise<Model.Project | undefined> {
+	public async getProject(id: string): Promise<P | undefined> {
 		throw new Error('DataHost.getProject: not implemented');
 	}
 
@@ -211,7 +212,7 @@ export abstract class DataHost {
 	}
 
 	public async addConnection(
-		project: Model.Project,
+		project: P,
 		opts: {
 			id: string;
 			path: string;
@@ -220,7 +221,7 @@ export abstract class DataHost {
 		throw new Error('DataHost.addConnection: not implemented');
 	}
 
-	public async getConnections(project: Model.Project): Promise<{ id: string; path: string }[]> {
+	public async getConnections(project: P): Promise<{ id: string; path: string }[]> {
 		throw new Error('DataHost.getConnections: not implemented');
 	}
 
@@ -237,10 +238,14 @@ export abstract class DataHost {
 	}
 }
 
-export interface MatcherContext {
-	host: Types.Host;
-	dataHost: Types.DataHost;
+/**
+ * A - AlvaApp
+ * P - Project
+ */
+export interface MatcherContext<A, P, M extends SenderMessage> {
+	host: Types.Host<A, P, M>;
+	dataHost: Types.DataHost<P>;
 	location: Types.Location;
 }
 
-export type Matcher<T extends Message.Message> = (m: T) => Promise<void>;
+export type Matcher<T> = (m: T) => Promise<void>;

@@ -1,9 +1,10 @@
 import * as Express from 'express';
 import * as PreviewDocument from '../../preview-document';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { PatternLibrary } from '../../model';
+import { ServerContext } from './context';
 
-export function previewRouteFactory(server: Types.AlvaServer): Express.RequestHandler {
+export function previewRouteFactory(server: ServerContext): Express.RequestHandler {
 	return async function previewRoute(req: Express.Request, res: Express.Response): Promise<void> {
 		res.type('html');
 

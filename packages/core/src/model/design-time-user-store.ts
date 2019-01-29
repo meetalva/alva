@@ -1,5 +1,5 @@
 import * as Mobx from 'mobx';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import { UserStoreProperty } from './user-store-property';
 
 export type DesignTimeDescriptor = ConcreteDesignTimeDescriptor | ComputedDesignTimeDescriptor;

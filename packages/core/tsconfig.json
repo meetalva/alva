@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "../util"
+		},
+		{
+			"path": "../types"
 		}
 	],
 	"compilerOptions": {

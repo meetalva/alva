@@ -3,7 +3,7 @@ import * as Model from '../../model';
 import * as React from 'react';
 import * as ReactLoadable from 'react-loadable';
 import { ViewStore } from '../../store';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as Mobx from 'mobx';
 
 import { PropertyItemAsset } from './property-item-asset';

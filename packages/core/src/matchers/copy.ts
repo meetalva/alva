@@ -1,9 +1,9 @@
 import * as M from '../message';
-import * as T from '../types';
 import * as Serde from '../sender/serde';
 import * as uuid from 'uuid';
+import { MatcherCreator } from './context';
 
-export function copy({ host, dataHost }: T.MatcherContext): T.Matcher<M.Copy> {
+export const copy: MatcherCreator<M.Copy> = ({ host, dataHost }) => {
 	return async m => {
 		const project = await dataHost.getProject(m.payload.projectId);
 

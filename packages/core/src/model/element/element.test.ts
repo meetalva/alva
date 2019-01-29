@@ -1,6 +1,6 @@
 import { Element } from './element';
 import { Project } from '../project';
-import { ModelName } from '../../types';
+import { ModelName } from '@meetalva/types';
 import { PlaceholderPosition } from '@meetalva/components';
 
 jest.mock('../project', () => {

@@ -1,4 +1,4 @@
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import { ZeroOneMigration } from './migration-v0-v1';
 import { OneTwoMigration } from './migration-v1-v2';
 import { MigrationStep } from './abstract-migration';

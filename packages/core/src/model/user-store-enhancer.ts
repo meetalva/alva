@@ -1,5 +1,5 @@
 import * as Mobx from 'mobx';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import { UserStore } from './user-store';
 import { DesignTimeUserStore } from './design-time-user-store';
 import * as uuid from 'uuid';

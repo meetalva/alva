@@ -5,7 +5,7 @@ import * as Handlers from './message-handlers';
 import * as Edit from './edit-handlers';
 
 export interface MessageHandlerContext {
-	app: Model.AlvaApp;
+	app: Model.AlvaApp<M.Message>;
 	history: Model.EditHistory;
 	store: ViewStore;
 }

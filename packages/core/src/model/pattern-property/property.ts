@@ -7,7 +7,7 @@ import { PatternNumberProperty } from './number-property';
 import { PatternPropertyBase } from './property-base';
 import { PatternStringProperty } from './string-property';
 import { PatternUnknownProperty } from './unknown-property';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 export type PatternPropertyValueType =
 	| string

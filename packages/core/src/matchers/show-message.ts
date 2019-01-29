@@ -1,7 +1,8 @@
 import * as M from '../message';
-import * as T from '../types';
+import * as T from '@meetalva/types';
+import { MatcherCreator } from './context';
 
-export function showMessage({ host }: T.MatcherContext): T.Matcher<M.ShowMessage> {
+export const showMessage: MatcherCreator<M.ShowMessage> = ({ host }) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 

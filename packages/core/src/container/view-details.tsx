@@ -9,7 +9,7 @@ import { PropertyListContainer } from './property-list';
 import { LibraryStoreContainer } from './library-store-container';
 import * as React from 'react';
 import * as ReactLoadable from 'react-loadable';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import { ViewStore } from '../store';
 import { When } from './when';
 import { Match, MatchBranch } from './match';

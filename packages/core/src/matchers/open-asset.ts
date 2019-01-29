@@ -1,8 +1,8 @@
 import * as M from '../message';
-import * as T from '../types';
 import * as MimeTypes from 'mime-types';
+import { MatcherCreator } from './context';
 
-export function openAsset({ host }: T.MatcherContext): T.Matcher<M.AssetReadRequest> {
+export const openAsset: MatcherCreator<M.AssetReadRequest> = ({ host }) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 

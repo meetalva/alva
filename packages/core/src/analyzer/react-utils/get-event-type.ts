@@ -1,5 +1,5 @@
 import * as TypeScript from 'typescript';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 export interface GetEventTypeInput {
 	symbol: TypeScript.Symbol;

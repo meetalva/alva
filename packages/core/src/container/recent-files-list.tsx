@@ -5,14 +5,15 @@ import { MessageType as MT } from '../message';
 import { File, FileText } from 'react-feather';
 import { ViewStore } from '../store';
 import { partition } from 'lodash';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
+import { Message } from '../message';
 
 const timeago = require('timeago.js');
 
 interface RecentFileItemProps {
 	project: Types.ProjectRecord;
-	sender: Types.Sender;
+	sender: Types.Sender<Message>;
 }
 
 const RecentFileItem: React.SFC<RecentFileItemProps> = props => {

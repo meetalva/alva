@@ -1,5 +1,5 @@
 import { Envelope, EmptyEnvelope } from './envelope';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as Mobx from 'mobx';
 
 export enum MessageType {

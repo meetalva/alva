@@ -1,6 +1,6 @@
 import * as JSON5 from 'json5';
 import { PatternPropertyBase } from './property-base';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 export interface PatternUnknownPropertyInit {
 	contextId: string;

@@ -1,4 +1,4 @@
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { EditHistory } from './edit-history';
 
 test('starts with empty history', () => {

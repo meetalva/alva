@@ -1,6 +1,6 @@
 import * as Fs from 'fs';
 import * as Model from '../model';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as PreviewDocument from '../preview-document';
 
 const MemoryFileSystem = require('memory-fs');

@@ -1,6 +1,6 @@
 import * as M from '../../message';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 export function projectRequest({ store }: MessageHandlerContext): MessageHandler<M.ProjectRequest> {
 	const app = store.getApp();

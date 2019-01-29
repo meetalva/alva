@@ -1,7 +1,8 @@
 import { AlvaServer } from './server';
+import { SenderMessage } from './sender';
 
-export interface ElectronUpdaterInit {
-	server: AlvaServer;
+export interface ElectronUpdaterInit<A, P, M extends SenderMessage> {
+	server: AlvaServer<A, P, M>;
 	force: boolean;
 }
 

@@ -5,7 +5,7 @@ import { partition } from 'lodash';
 import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import * as React from 'react';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { ViewStore } from '../../store';
 import { PlaceholderPosition } from '@meetalva/components';
 import { EditableTitleContainer } from '../editable-title/editable-title-container';

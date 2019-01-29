@@ -1,5 +1,5 @@
 import * as Model from '../model';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 export function getModelByName(modelName?: Types.ModelName): Types.ModelSurface | undefined {
 	switch (modelName) {

@@ -1,8 +1,9 @@
 import * as Express from 'express';
 import * as RendererDocument from '../../renderer/renderer-document';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
+import { ServerContext } from './context';
 
-export function projectRouteFactory(server: Types.AlvaServer): Express.RequestHandler {
+export function projectRouteFactory(server: ServerContext): Express.RequestHandler {
 	return async function projectRoute(req: Express.Request, res: Express.Response): Promise<void> {
 		res.type('html');
 

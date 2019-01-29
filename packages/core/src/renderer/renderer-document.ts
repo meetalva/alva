@@ -1,4 +1,4 @@
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as Model from '../model';
 
 export interface RenderDocumentData {

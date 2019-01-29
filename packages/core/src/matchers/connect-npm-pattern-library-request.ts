@@ -1,14 +1,15 @@
 import * as M from '../message';
 import { MessageType } from '../message';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 import { getPackage } from '../analyzer/get-package';
 import * as uuid from 'uuid';
 import { performAnalysis } from './perform-analysis';
+import { MatcherCreator } from './context';
 
-export function connectNpmPatternLibrary({
+export const connectNpmPatternLibrary: MatcherCreator<M.ConnectNpmPatternLibraryRequest> = ({
 	host,
 	dataHost
-}: T.MatcherContext): T.Matcher<M.ConnectNpmPatternLibraryRequest> {
+}) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 

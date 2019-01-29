@@ -1,6 +1,6 @@
 import * as Yaml from 'js-yaml';
 import { Migrator } from '../migrator';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 export class Persistence {
 	public static async parse<T extends Types.SerializedProject>(

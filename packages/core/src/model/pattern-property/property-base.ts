@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as Mobx from 'mobx';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 
 export interface PatternPropertyInit<T> {

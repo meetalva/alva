@@ -4,7 +4,7 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '../../model';
 import { PatternItemContainer } from './pattern-item-container';
 import * as React from 'react';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { ViewStore } from '../../store';
 
 @MobxReact.inject('store')

@@ -1,5 +1,5 @@
 import { PatternPropertyBase } from './property-base';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 export class PatternHrefProperty extends PatternPropertyBase<string | undefined> {
 	public readonly type = Types.PatternPropertyType.Href;

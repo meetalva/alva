@@ -1,5 +1,5 @@
 import * as Path from 'path';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as AlvaUtil from '@meetalva/util';
 import * as fetch from 'isomorphic-fetch';
 

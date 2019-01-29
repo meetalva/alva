@@ -7,7 +7,7 @@ import { Page } from '../page';
 import { Pattern } from '../pattern';
 import { AnyPatternProperty } from '../pattern-property';
 import { Project } from '../project';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { UserStoreReference } from '../user-store-reference';
 import * as uuid from 'uuid';
 import { PatternLibrary } from '../pattern-library';

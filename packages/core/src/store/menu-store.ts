@@ -1,8 +1,13 @@
 import * as Mobx from 'mobx';
-import * as Types from '../types';
+import * as Model from '../model';
+import * as M from '../message';
+import * as Types from '@meetalva/types';
+
+export type MenuStoreItem = Types.MenuItem<Model.AlvaApp<M.Message>, M.Message>;
+export type NestedMenuStoreItem = Types.NestedMenuItem<Model.AlvaApp<M.Message>, M.Message>;
 
 export interface MenuMapEntry {
-	menu: Types.MenuItem;
+	menu: MenuStoreItem;
 	active: boolean;
 	depth: number;
 }
@@ -18,15 +23,15 @@ export class MenuStore {
 	}
 
 	@Mobx.computed
-	get topLevel(): Types.MenuItem[] {
+	get topLevel(): MenuStoreItem[] {
 		return [...this.menus].filter(([, m]) => m.depth === 0).map(([, m]) => m.menu);
 	}
 
-	constructor(menus: Types.MenuItem[]) {
+	constructor(menus: MenuStoreItem[]) {
 		this.menus = flatten(menus, { map: this.menus, depth: 0 });
 	}
 
-	public get(id: string): { menu: Types.MenuItem; active: boolean } | undefined {
+	public get(id: string): { menu: MenuStoreItem; active: boolean } | undefined {
 		return this.menus.get(id);
 	}
 
@@ -55,19 +60,19 @@ export class MenuStore {
 	}
 
 	@Mobx.action
-	public add(menu: Types.MenuItem, meta: { active: boolean; depth: number }): void {
+	public add(menu: MenuStoreItem, meta: { active: boolean; depth: number }): void {
 		this.menus.set(menu.id, { menu, ...meta });
 	}
 }
 
-function flatten(menus: Types.MenuItem[], init: { map: MenuMap; depth: number }): MenuMap {
+function flatten(menus: MenuStoreItem[], init: { map: MenuMap; depth: number }): MenuMap {
 	return menus.reduce((acc, menu) => {
 		if (menu.hasOwnProperty('id') && typeof menu.id !== 'undefined') {
 			acc.set(menu.id, { menu, active: false, depth: init.depth });
 		}
 
 		if (menu.hasOwnProperty('submenu')) {
-			const m = menu as Types.NestedMenuItem;
+			const m = menu as NestedMenuStoreItem;
 			flatten(m.submenu, { map: acc, depth: init.depth + 1 });
 		}
 

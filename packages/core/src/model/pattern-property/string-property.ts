@@ -1,5 +1,5 @@
 import { PatternPropertyBase, PatternPropertyInit } from './property-base';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import uuid = require('uuid');
 
 /**

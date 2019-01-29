@@ -1,4 +1,4 @@
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import { UserStore } from '../user-store';

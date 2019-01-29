@@ -5,7 +5,7 @@ import { Sender } from '../sender';
 import { LocalDataHost } from '../hosts/local-data-host';
 import * as uuid from 'uuid';
 import * as M from '../message';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 
 jest.mock('../sender');
 jest.mock('../model/alva-app', () => {
@@ -42,7 +42,7 @@ jest.mock('../hosts/electron-host', () => {
 			return this.sender;
 		}
 
-		public async showMessage(): Promise<T.HostMessageButton | undefined> {
+		public async showMessage(): Promise<T.HostMessageButton<unknown> | undefined> {
 			return;
 		}
 	}
@@ -52,7 +52,7 @@ jest.mock('../hosts/electron-host', () => {
 jest.mock('../hosts/local-data-host');
 
 test('calls host.showMessage without app on ElectronHost', async () => {
-	const host = await ElectronHost.from({ process });
+	const host = await ElectronHost.from({ process }) as any;
 	const dataHost = await LocalDataHost.fromHost(host);
 	const sender = await host.getSender();
 
@@ -76,7 +76,7 @@ test('calls host.showMessage without app on ElectronHost', async () => {
 });
 
 test('calls host.showMessage without app on ElectronHost', async () => {
-	const host = await ElectronHost.from({ process });
+	const host = await ElectronHost.from({ process }) as any;
 	const dataHost = await LocalDataHost.fromHost(host);
 
 	host.getApp = async () => undefined;

@@ -5,7 +5,7 @@ import * as React from 'react';
 import { UserStorePropertySelect } from '../user-store-property-select';
 import { Reference } from './reference';
 import styled from 'styled-components';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
 import * as Mobx from 'mobx';

@@ -4,7 +4,7 @@ import { PropertyListContainer } from './property-list';
 import * as MobxReact from 'mobx-react';
 import { ViewStore } from '../../store';
 import { Project, Element, Pattern, PatternLibrary } from '../../model';
-import * as T from '../../types';
+import * as T from '@meetalva/types';
 import {
 	PatternUnknownProperty,
 	PatternUnknownPropertyInit

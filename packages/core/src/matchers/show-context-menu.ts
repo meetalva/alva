@@ -1,11 +1,9 @@
 import * as M from '../message';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 import * as ContextMenu from '../context-menu';
+import { MatcherCreator } from './context';
 
-export function showContextMenu({
-	host,
-	dataHost
-}: T.MatcherContext): T.Matcher<M.ContextMenuRequest> {
+export const showContextMenu: MatcherCreator<M.ContextMenuRequest> = ({ host, dataHost }) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 
@@ -37,4 +35,4 @@ export function showContextMenu({
 			});
 		}
 	};
-}
+};

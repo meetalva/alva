@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import { PatternSlot } from '../pattern';
 import { Project } from '../project';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 
 export interface ElementContentContext {

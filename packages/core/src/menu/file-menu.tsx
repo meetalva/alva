@@ -1,10 +1,12 @@
-import * as Types from '../types';
-import { MessageType } from '../message';
+import * as Types from '@meetalva/types';
+import { MessageType, Message } from '../message';
 import * as uuid from 'uuid';
 import { FileInput } from '../container/file-input';
 import * as React from 'react';
 import * as Store from '../store';
 import { AlvaApp } from '../model';
+import { MenuCreator } from './context';
+import * as Mo from '../model';
 
 const ids = {
 	file: uuid.v4(),
@@ -17,7 +19,7 @@ const ids = {
 	close: uuid.v4()
 };
 
-export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
+export const fileMenu: MenuCreator = ctx => {
 	const hasProject = typeof ctx.project !== 'undefined';
 	const onDetailView = ctx.app && ctx.app.isActiveView(Types.AlvaView.PageDetail);
 	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.Electron);
@@ -56,9 +58,9 @@ export const fileMenu = (ctx: Types.MenuContext): Types.MenuItem => {
 				// TODO: Inject more deps
 				render: (props: {
 					accelerator: JSX.Element | null;
-					app: AlvaApp;
+					app: Mo.AlvaApp<Message>;
 					style: React.CSSProperties;
-					menu: Types.MenuItem;
+					menu: Types.MenuItem<Mo.AlvaApp<Message>, Mo.Project>;
 					menuStore: Store.MenuStore;
 					onMouseEnter: React.MouseEventHandler<HTMLElement>;
 					onMouseLeave: React.MouseEventHandler<HTMLElement>;

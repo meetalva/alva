@@ -1,8 +1,8 @@
 import * as Mobx from 'mobx';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 import * as M from '../message';
-import { sortBy } from 'lodash';
+import { Message } from '../message';
 
 export interface AlvaAppInit {
 	id?: string;
@@ -15,7 +15,7 @@ export interface AlvaAppInit {
 	state: Types.AppState;
 }
 
-export class AlvaApp {
+export class AlvaApp<M extends Message> {
 	public static Defaults: AlvaAppInit = {
 		activeView: Types.AlvaView.SplashScreen,
 		hasFocusedInput: false,
@@ -56,9 +56,9 @@ export class AlvaApp {
 
 	@Mobx.observable private udpate: Types.UpdateInfo | undefined;
 
-	private sender: Types.Sender;
+	private sender: Types.Sender<M>;
 
-	public constructor(init: AlvaAppInit, ctx: { sender: Types.Sender }) {
+	public constructor(init: AlvaAppInit, ctx: { sender: Types.Sender<M> }) {
 		this.id = init.id || uuid.v4();
 		this.activeView = init.activeView;
 		this.panes = init.panes;
@@ -70,7 +70,8 @@ export class AlvaApp {
 		init.paneSizes.forEach(paneSize => this.setPaneSize(paneSize));
 	}
 
-	public static from(serialized: Types.SerializedAlvaApp, ctx: { sender: Types.Sender }): AlvaApp {
+	public static from(serialized: Types.SerializedAlvaApp, ctx: { sender: Types.Sender<M.Message> }): AlvaApp<M.Message
+	> {
 		return new AlvaApp(
 			{
 				id: serialized.id,
@@ -90,7 +91,7 @@ export class AlvaApp {
 		);
 	}
 
-	public static fromSender(sender: Types.Sender): AlvaApp {
+	public static fromSender(sender: Types.Sender<M.Message>): AlvaApp<M.Message> {
 		return new AlvaApp(AlvaApp.Defaults, { sender });
 	}
 
@@ -216,7 +217,7 @@ export class AlvaApp {
 		return this.udpate;
 	}
 
-	public setSender(sender: Types.Sender): void {
+	public setSender(sender: Types.Sender<M.Message>): void {
 		this.sender = sender;
 	}
 
@@ -239,7 +240,7 @@ export class AlvaApp {
 	}
 
 	@Mobx.action
-	public update(b: AlvaApp): void {
+	public update(b: AlvaApp<M>): void {
 		this.activeView = b.activeView;
 		this.panes = b.panes;
 		this.paneSizes = b.paneSizes;
@@ -247,7 +248,7 @@ export class AlvaApp {
 		this.state = b.state;
 	}
 
-	public send(message: M.Message): void {
+	public send<T extends M>(message: T): void {
 		if (!this.sender) {
 			return;
 		}
@@ -265,8 +266,8 @@ export class AlvaApp {
 		});
 	}
 
-	public async transaction<T extends M.Message, V extends M.Message>(
-		message: M.Message,
+	public async transaction<T extends M, V extends M>(
+		message: M,
 		{ type }: { type: V['type'] }
 	): Promise<V> {
 		message.appId = this.id;

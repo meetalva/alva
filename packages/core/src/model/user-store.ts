@@ -2,7 +2,7 @@ import { computeDifference } from '@meetalva/util';
 import * as Mobx from 'mobx';
 import * as Message from '../message';
 import { Project } from './project';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 import * as DesignTime from './design-time-user-store';
 import { UserStoreAction } from './user-store-action';

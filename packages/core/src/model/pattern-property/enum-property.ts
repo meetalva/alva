@@ -1,6 +1,6 @@
 import * as Mobx from 'mobx';
 import { PatternPropertyBase } from './property-base';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { IconName } from '@meetalva/components';
 import * as uuid from 'uuid';
 import * as _ from 'lodash';

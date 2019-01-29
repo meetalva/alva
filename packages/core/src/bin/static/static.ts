@@ -3,7 +3,7 @@ import * as Path from 'path';
 import * as Hosts from '../../hosts';
 import * as Serde from '../../sender/serde';
 import * as Persistence from '../../persistence';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { build } from './build';
 import * as Fs from 'fs-extra';
 import * as Model from '../../model';

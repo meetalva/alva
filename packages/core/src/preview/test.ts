@@ -1,5 +1,5 @@
 import * as Model from '../model';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 import { PreviewStore } from './preview-store';
 import { ElementArea } from './element-area';

@@ -5,13 +5,15 @@ import * as MobxReact from 'mobx-react';
 import * as ReactDOM from 'react-dom/server';
 import * as RendererDocument from '../../renderer/renderer-document';
 
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import { App } from '../../container/app';
 import * as Model from '../../model';
 import * as Store from '../../store';
 import { ServerStyleSheet } from 'styled-components';
+import { ServerContext } from './context';
+import { Message } from '../../message';
 
-export function mainRouteFactory(server: Types.AlvaServer): Express.RequestHandler {
+export function mainRouteFactory(server: ServerContext): Express.RequestHandler {
 	return async function mainRoute(_: unknown, res: Express.Response): Promise<void> {
 		const sheet = new ServerStyleSheet();
 		const content = ReactDOM.renderToString(
@@ -36,7 +38,7 @@ export function mainRouteFactory(server: Types.AlvaServer): Express.RequestHandl
 }
 
 // TODO: Move to shareable position
-function ServerApp({ sender }: { sender: Types.Sender }) {
+function ServerApp({ sender }: { sender: Types.Sender<Message> }) {
 	const app = new Model.AlvaApp(Model.AlvaApp.Defaults, { sender });
 	const history = new Model.EditHistory();
 

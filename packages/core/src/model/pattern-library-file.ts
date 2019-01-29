@@ -1,5 +1,5 @@
 import { PatternLibrary } from './pattern-library';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 export interface PatternLibraryFileInit {
 	id: string;

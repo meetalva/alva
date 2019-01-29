@@ -11,7 +11,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import { BrowserAdapter } from '../adapters/browser-adapter';
 import * as Fs from 'fs';
 

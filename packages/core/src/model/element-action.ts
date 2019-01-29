@@ -1,7 +1,7 @@
 import * as Mobx from 'mobx';
 import * as Message from '../message';
 import * as _ from 'lodash';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import { Project } from './project';
 import { UserStore } from './user-store';
 import { UserStoreAction } from './user-store-action';

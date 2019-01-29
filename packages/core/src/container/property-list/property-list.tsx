@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ViewStore } from '../../store';
 import { PropertyListVirtual } from './property-list-virtual';
 import * as Components from '@meetalva/components';
-import * as T from '../../types';
+import * as T from '@meetalva/types';
 
 export interface PropertyListContainerProps {
 	onClick?: React.MouseEventHandler<HTMLElement>;

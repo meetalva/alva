@@ -1,0 +1,20 @@
+{
+  "name": "@meetalva/types",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetalva/alva.git"
+  },
+  "author": {
+    "email": "hey@meetalva.io",
+    "name": "Meet Alva Team",
+    "url": "https://meetalva.io/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meetalva/alva/issues"
+  },
+  "dependencies": {
+    "mobx": "5.0.3"
+  }
+}

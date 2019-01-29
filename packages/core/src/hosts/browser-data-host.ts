@@ -1,17 +1,18 @@
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as Model from '../model';
 import { Persistence } from '../persistence';
 import * as Path from 'path';
 import * as Store from '../store';
 import { sortBy } from 'lodash';
 import * as Mobx from 'mobx';
+import { Message } from '../message';
 
-export class BrowserDataHost implements Types.DataHost {
-	private host: Types.Host;
+export class BrowserDataHost implements Types.DataHost<Model.Project> {
+	private host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>;
 	private store: Store.ViewStore;
 	@Mobx.observable private projects: Types.ProjectRecord[] | undefined;
 
-	public constructor({ host, store }: { host: Types.Host; store: Store.ViewStore }) {
+	public constructor({ host, store }: { host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>; store: Store.ViewStore }) {
 		this.host = host;
 		this.store = store;
 	}

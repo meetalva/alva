@@ -2,7 +2,7 @@
 
 import * as ts from 'typescript';
 import { TypeScriptType } from './typescript-type';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 /**
  * A JavaScript export declaration

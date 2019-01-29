@@ -2,7 +2,7 @@ import * as M from '../../message';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
 import * as uuid from 'uuid';
 import { PatternLibrary } from '../../model';
-import * as T from '../../types';
+import * as T from '@meetalva/types';
 
 export function connectPatternLibrary({
 	store

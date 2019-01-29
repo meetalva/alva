@@ -1,10 +1,13 @@
 import * as M from '../message';
-import * as T from '../types';
+import * as T from '@meetalva/types';
+import { MatcherCreator } from './context';
 
-export function openFileRequest(
-	{ host }: T.MatcherContext,
-	intercept?: (path: string) => Promise<boolean>
-): T.Matcher<M.OpenFileRequest> {
+type Interceptor = (path: string) => Promise<boolean>;
+
+export const openFileRequest: MatcherCreator<M.OpenFileRequest, Interceptor> = (
+	{ host },
+	intercept?: Interceptor
+) => {
 	return async m => {
 		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 
@@ -34,7 +37,8 @@ export function openFileRequest(
 		try {
 			const { contents } = await host.readFile(selectedPath);
 
-			const response = await sender.transaction<M.UseFileRequest, M.UseFileResponse>(
+			const s = await host.getSender();
+			const response = await s.transaction<M.UseFileRequest, M.UseFileResponse>(
 				{
 					type: M.MessageType.UseFileRequest,
 					id: m.id,

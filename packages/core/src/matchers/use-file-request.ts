@@ -1,11 +1,12 @@
 import * as M from '../message';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 import { Persistence } from '../persistence';
 import * as uuid from 'uuid';
 import * as Path from 'path';
 import * as Model from '../model';
+import { MatcherCreator } from './context';
 
-export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<M.UseFileRequest> {
+export const useFileRequest: MatcherCreator<M.UseFileRequest> = ({ host, dataHost }) => {
 	return async m => {
 		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 

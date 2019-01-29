@@ -1,5 +1,6 @@
 import * as uuid from 'uuid';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
+import { MenuCreator } from './context';
 
 const ids = {
 	window: uuid.v4(),
@@ -7,7 +8,7 @@ const ids = {
 	front: uuid.v4()
 };
 
-export const windowMenu = (ctx: Types.MenuContext): Types.MenuItem => {
+export const windowMenu: MenuCreator = ctx => {
 	const isElectron = ctx.app ? ctx.app.isHostType(Types.HostType.Electron) : false;
 
 	return {

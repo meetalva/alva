@@ -1,7 +1,7 @@
 // tslint:disable:no-bitwise
-import * as ReactUtils from '../../react-utils';
-import * as Types from '../../../types';
+import * as Types from '@meetalva/types';
 import * as Ts from 'typescript';
+import * as ReactUtils from '../../react-utils';
 import * as TypescriptUtils from '../../typescript-utils';
 import { PropertyInit, PropertyAnalyzeContext } from './types';
 import * as PropertyCreators from './property-creators';

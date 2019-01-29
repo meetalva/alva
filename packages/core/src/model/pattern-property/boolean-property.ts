@@ -1,5 +1,5 @@
 import { PatternPropertyBase } from './property-base';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 /**
  * A boolean property is a property that supports the values true and false only.

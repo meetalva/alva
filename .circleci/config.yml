@@ -72,25 +72,8 @@ jobs:
           name: Install yarn
           command: yarn global add yarn@1.12.3
 
-      - restore_cache:
-          keys:
-          - v5-dependencies-macos-{{ checksum "yarn.lock" }}
-          - v5-dependencies-macos-
-
-      - run:
-          name: Install dependencies
-          command: yarn install --frozen-lockfile || yarn
-
-      - save_cache:
-            - node_modules
-            - packages/components/node_modules
-            - packages/core/node_modules
-            - packages/essentials/node_modules
-            - packages/site/node_modules
-            - packages/tools/node_modules
-            - packages/types/node_modules
-            - packages/util/node_modules
-          key: v5-dependencies-macos-{{ checksum "yarn.lock" }}
+      - setup:
+          key: macos
 
       - run:
           name: Add npm bin to path

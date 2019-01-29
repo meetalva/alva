@@ -2,7 +2,7 @@ import * as M from '../message';
 import { MessageType as MT } from '../message';
 import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
-import { performAnalysis } from './perform-analysis';
+import { performAnalysis } from '@meetalva/analyzer';
 import { PatternLibraryInstallType } from '@meetalva/types';
 import { MatcherCreator } from './context';
 

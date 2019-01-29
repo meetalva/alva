@@ -2,7 +2,7 @@ import * as M from '../message';
 import { MessageType } from '../message';
 import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
-import { performAnalysis } from './perform-analysis';
+import { performAnalysis } from '@meetalva/analyzer';
 import { MatcherCreator } from './context';
 
 export const connectPatternLibrary: MatcherCreator<M.ConnectPatternLibraryRequest> = ({

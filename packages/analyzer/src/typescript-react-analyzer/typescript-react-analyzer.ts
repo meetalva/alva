@@ -1,4 +1,4 @@
-import { createCompiler } from '../../compiler';
+import { createCompiler } from '../compiler';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import * as PropertyAnalyzer from './property-analyzer';
@@ -13,7 +13,6 @@ import * as uuid from 'uuid';
 import { Compiler } from 'webpack';
 import * as resolve from 'resolve';
 import { last } from 'lodash';
-import { InternalPatternAnalysis } from '@meetalva/types';
 import * as Tsa from 'ts-simple-ast';
 import { usesChildren } from '../react-utils/uses-children';
 import { getTsaExport } from '../typescript-utils/get-tsa-export';
@@ -147,7 +146,7 @@ async function analyzePatterns(context: {
 
 	const analyzePattern = getPatternAnalyzer(program, project, context.options);
 
-	return patternCandidates.reduce<InternalPatternAnalysis[]>(
+	return patternCandidates.reduce<Types.InternalPatternAnalysis[]>(
 		(acc, candidate) => [...acc, ...analyzePattern(candidate, acc, analyzePatternExport)],
 		[]
 	);

@@ -2,8 +2,7 @@ import * as M from '../message';
 import { MessageType as MT } from '../message';
 import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
-import { performAnalysis } from './perform-analysis';
-import { getPackage } from '../analyzer/get-package';
+import { getPackage, performAnalysis } from '@meetalva/analyzer';
 import { MatcherCreator } from './context';
 
 export const updateNpmPatternLibrary: MatcherCreator<M.UpdateNpmPatternLibraryRequest> = ({

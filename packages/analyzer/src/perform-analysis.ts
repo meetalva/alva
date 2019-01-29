@@ -1,11 +1,17 @@
-import * as Model from '../model';
-import * as Analyzer from '../analyzer';
+import * as Analyzer from '.';
 import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
 
-export async function performAnalysis(
+export interface AssignmentProvider {
+	assignEnumOptionId(id: string): string;
+	assignPatternId(id: string): string;
+	assignPropertyId(id: string): string;
+	assignSlotId(id: string): string;
+}
+
+export async function performAnalysis<T extends AssignmentProvider>(
 	path: string,
-	{ previousLibrary }: { previousLibrary: Model.PatternLibrary | undefined }
+	{ previousLibrary }: { previousLibrary: T | undefined }
 ): Promise<T.LibraryAnalysisResult> {
 	const getGobalEnumOptionId = previousLibrary
 		? previousLibrary.assignEnumOptionId.bind(previousLibrary)

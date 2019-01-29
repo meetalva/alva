@@ -1,9 +1,8 @@
 import * as M from '../message';
 import { MessageType } from '../message';
 import * as T from '@meetalva/types';
-import { getPackage } from '../analyzer/get-package';
 import * as uuid from 'uuid';
-import { performAnalysis } from './perform-analysis';
+import { getPackage, performAnalysis } from '@meetalva/analyzer';
 import { MatcherCreator } from './context';
 
 export const connectNpmPatternLibrary: MatcherCreator<M.ConnectNpmPatternLibraryRequest> = ({

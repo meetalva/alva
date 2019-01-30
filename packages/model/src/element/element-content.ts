@@ -27,7 +27,7 @@ export class ElementContent {
 	@Mobx.observable private forcedOpen: boolean;
 	@Mobx.observable private highlighted: boolean;
 	@Mobx.observable private id: string;
-	@Mobx.observable private open: boolean = true;
+	@Mobx.observable private open: boolean;
 	@Mobx.observable private parentElementId?: string;
 	private project: Project;
 

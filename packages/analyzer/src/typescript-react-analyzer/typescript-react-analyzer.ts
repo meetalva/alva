@@ -12,12 +12,13 @@ import * as Util from 'util';
 import * as uuid from 'uuid';
 import { Compiler } from 'webpack';
 import * as resolve from 'resolve';
-import { last } from 'lodash';
+import { last, merge } from 'lodash';
 import * as Tsa from 'ts-simple-ast';
 import { usesChildren } from '../react-utils/uses-children';
 import { getTsaExport } from '../typescript-utils/get-tsa-export';
 import { setExtname } from '../typescript-utils/set-extname';
 import { getExportedNode } from '../typescript-utils/get-exported-node';
+import { IdResolver } from '../id-resolver';
 
 const precinct = require('precinct');
 
@@ -31,10 +32,7 @@ export interface PatternCandidate {
 }
 
 export interface AnalyzeOptions {
-	getGlobalPatternId(contextId: string): string;
-	getGlobalPropertyId(patternContextId: string, propertyContextId: string): string;
-	getGlobalSlotId(patternContextId: string, slotContextId: string): string;
-	getGobalEnumOptionId(enumId: string, optionContextId: string): string;
+	ids: Types.ContextIdMap;
 	analyzeBuiltins: boolean;
 }
 
@@ -45,6 +43,7 @@ interface AnalyzeContext {
 	project: Tsa.Project;
 	knownProperties: Types.PropertyAnalysis[];
 	knownPatterns: Types.InternalPatternAnalysis[];
+	resolver: IdResolver;
 }
 
 type PatternAnalyzer = (
@@ -58,14 +57,25 @@ type PatternAnalyzerPredicate = (
 	ctx: AnalyzeContext
 ) => Types.InternalPatternAnalysis | undefined;
 
+export const analyzeDefaults = {
+	analyzeBuiltins: false,
+	ids: {
+		patterns: [],
+		properties: [],
+		enumOptions: [],
+		slots: []
+	}
+};
+
 export async function analyze(
 	pkgPath: string,
-	options: AnalyzeOptions
+	rawOptions: Partial<AnalyzeOptions> = analyzeDefaults
 ): Promise<Types.LibraryAnalysisResult> {
 	try {
 		const id = uuid.v4();
 		const pkg = await readPkg(pkgPath);
 		const cwd = Path.dirname(pkgPath);
+		const options = merge({}, analyzeDefaults, rawOptions) as AnalyzeOptions;
 		const patterns = await analyzePatterns({ pkgPath, options, pkg, cwd });
 
 		const getBundle = async () => {
@@ -173,6 +183,8 @@ export function getPatternAnalyzer(
 	project: Tsa.Project,
 	options: AnalyzeOptions
 ): PatternAnalyzer {
+	const resolver = new IdResolver(options.ids);
+
 	return (
 		candidate: PatternCandidate,
 		previous: Types.InternalPatternAnalysis[],
@@ -194,6 +206,7 @@ export function getPatternAnalyzer(
 					program,
 					project,
 					candidate,
+					resolver,
 					options,
 					knownProperties,
 					knownPatterns: previous
@@ -238,7 +251,7 @@ export function analyzePatternExport(
 	const exportName = ex.exportName || 'default';
 
 	const contextId = `${ctx.candidate.id}:${exportName}`;
-	const id = ctx.options.getGlobalPatternId(contextId);
+	const id = ctx.resolver.getGlobalPatternId(contextId);
 
 	if (ex.ignore) {
 		return;
@@ -247,16 +260,16 @@ export function analyzePatternExport(
 	const properties = PropertyAnalyzer.analyze(propTypes.type, {
 		program: ctx.program,
 		getPropertyId(propertyContextId: string): string {
-			return ctx.options.getGlobalPropertyId(id, propertyContextId);
+			return ctx.resolver.getGlobalPropertyId(id, propertyContextId);
 		},
 		getEnumOptionId: (enumId, optionContextId) =>
-			ctx.options.getGobalEnumOptionId(enumId, optionContextId)
+			ctx.resolver.getGlobalEnumOptionId(enumId, optionContextId)
 	});
 
 	const slots = SlotAnalyzer.analyzeSlots(propTypes.type, {
 		program: ctx.program,
 		getSlotId(slotContextId: string): string {
-			return ctx.options.getGlobalSlotId(id, slotContextId);
+			return ctx.resolver.getGlobalSlotId(id, slotContextId);
 		}
 	});
 
@@ -272,7 +285,7 @@ export function analyzePatternExport(
 				description: 'Element that render inside this element',
 				example: '',
 				hidden: false,
-				id: ctx.options.getGlobalSlotId(id, 'children'),
+				id: ctx.resolver.getGlobalSlotId(id, 'children'),
 				label: 'children',
 				propertyName: 'children',
 				required: false,

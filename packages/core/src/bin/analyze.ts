@@ -37,7 +37,9 @@ async function main() {
 		  )
 		: undefined;
 
-	const analysis = await performAnalysis(path, { previousLibrary });
+	const ids = previousLibrary ? previousLibrary.getIdMap() : undefined;
+
+	const analysis = await performAnalysis(path, { ids });
 
 	if (analysis.type === Types.LibraryAnalysisResultType.Error) {
 		console.trace(analysis.error);

@@ -2,6 +2,7 @@
 module.exports = {
 	preset: 'ts-jest',
 	testMatch: ['**/*.test.ts', '**/*.test.tsx'],
+	modulePathIgnorePatterns: ['<rootDir>\/packages\/core\/nccbuild\/(.*)'],
 	roots: [
 		'packages/analyzer',
 		'packages/components',

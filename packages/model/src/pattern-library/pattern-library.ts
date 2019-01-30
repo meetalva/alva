@@ -1,9 +1,15 @@
 import { computeDifference } from '@meetalva/util';
-import { isEqual } from 'lodash';
+import { isEqual, flatMap } from 'lodash';
 import * as Mobx from 'mobx';
 import { Pattern, PatternSlot } from '../pattern';
 import { ElementContent } from '../element';
-import { AnyPatternProperty, PatternEnumProperty, PatternProperty } from '../pattern-property';
+import {
+	AnyPatternProperty,
+	PatternEnumProperty,
+	PatternProperty,
+	PatternPropertyBase,
+	EnumValue
+} from '../pattern-property';
 import { Project } from '../project';
 import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
@@ -281,38 +287,50 @@ export class PatternLibrary {
 		this.patternProperties.set(property.getId(), property);
 	}
 
-	public assignEnumOptionId(enumId: string, contextId: string): string {
-		const enumProperty = this.getPatternPropertyById(enumId) as PatternEnumProperty;
+	public getIdMap(): Types.ContextIdMap {
+		const enums = this.getPatternProperties().filter(
+			(prop): prop is PatternEnumProperty => prop.type === Types.PatternPropertyType.Enum
+		);
 
-		if (!enumProperty || typeof enumProperty.getOptionByContextId !== 'function') {
-			return uuid.v4();
-		}
-
-		const option = enumProperty.getOptionByContextId(contextId);
-		return option ? option.getId() : uuid.v4();
+		return {
+			patterns: this.getPatterns().map(pattern => ({
+				input: { contextId: pattern.getContextId() },
+				output: pattern.getId()
+			})),
+			properties: this.getPatternProperties().map(prop => ({
+				input: {
+					contextId: prop.getContextId(),
+					parentId: this.getPatternByProperty(prop)!.getId()
+				},
+				output: prop.getId()
+			})),
+			enumOptions: flatMap(enums, prop =>
+				prop.getOptions().map(option => ({
+					input: {
+						contextId: option.getContextId(),
+						parentId: prop.getId()
+					},
+					output: option.getId()
+				}))
+			),
+			slots: this.getSlots().map(slot => ({
+				input: {
+					contextId: slot.getContextId(),
+					parentId: this.getPatternBySlot(slot)!.getId()
+				},
+				output: slot.getId()
+			}))
+		};
 	}
 
-	public assignPatternId(contextId: string): string {
-		const pattern = this.getPatternByContextId(contextId);
-		return pattern ? pattern.getId() : uuid.v4();
+	public getPatternByProperty(property: AnyPatternProperty): Pattern | undefined {
+		return this.getPatterns().find(p =>
+			p.getProperties().some(p => p.getId() === property.getId())
+		);
 	}
 
-	public assignPropertyId(patternId: string, contextId: string): string {
-		const pattern = this.getPatternById(patternId);
-		if (!pattern) {
-			return uuid.v4();
-		}
-		const property = pattern.getPropertyByContextId(contextId);
-		return property ? property.getId() : uuid.v4();
-	}
-
-	public assignSlotId(patternId: string, contextId: string): string {
-		const pattern = this.getPatternById(patternId);
-		if (!pattern) {
-			return uuid.v4();
-		}
-		const slot = pattern.getSlots().find(s => s.getContextId() === contextId);
-		return slot ? slot.getId() : uuid.v4();
+	public getPatternBySlot(slot: PatternSlot): Pattern | undefined {
+		return this.getPatterns().find(p => p.getSlots().some(s => s.getId() === slot.getId()));
 	}
 
 	public getDescription(): string | undefined {

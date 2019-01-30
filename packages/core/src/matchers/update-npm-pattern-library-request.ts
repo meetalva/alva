@@ -85,7 +85,9 @@ export const updateNpmPatternLibrary: MatcherCreator<M.UpdateNpmPatternLibraryRe
 			});
 		}
 
-		const analysisResult = await performAnalysis(result.path, { previousLibrary });
+		const ids = previousLibrary ? previousLibrary.getIdMap() : undefined;
+
+		const analysisResult = await performAnalysis(result.path, { ids });
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			host.log(analysisResult.error.message);

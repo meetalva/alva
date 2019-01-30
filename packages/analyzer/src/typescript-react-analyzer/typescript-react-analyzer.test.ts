@@ -2,7 +2,8 @@ import * as TestUtils from '../test-utils';
 import {
 	getPatternAnalyzer,
 	analyzePatternExport,
-	PatternCandidate
+	PatternCandidate,
+	analyzeDefaults
 } from './typescript-react-analyzer';
 import Project from 'ts-simple-ast';
 import * as uuid from 'uuid';
@@ -19,13 +20,7 @@ test('reuses properties from shared interfaces', () => {
 
 	const project = new Project();
 
-	const analyzePattern = getPatternAnalyzer(program, project, {
-		analyzeBuiltins: false,
-		getGlobalPatternId: () => uuid.v4(),
-		getGlobalPropertyId: () => uuid.v4(),
-		getGlobalSlotId: () => uuid.v4(),
-		getGobalEnumOptionId: () => uuid.v4()
-	});
+	const analyzePattern = getPatternAnalyzer(program, project, analyzeDefaults);
 
 	const candidates: PatternCandidate[] = sourceFiles.map(s => ({
 		id: uuid.v4(),

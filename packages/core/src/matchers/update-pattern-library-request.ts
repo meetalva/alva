@@ -79,9 +79,10 @@ export const updatePatternLibrary: MatcherCreator<M.UpdatePatternLibraryRequest>
 		}
 
 		const { path } = connection;
-		const analysisResult = await performAnalysis<Model.PatternLibrary>(path, {
-			previousLibrary: library
-		});
+
+		const ids = library ? library.getIdMap() : undefined;
+
+		const analysisResult = await performAnalysis(path, { ids });
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			app.send({

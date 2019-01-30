@@ -82,7 +82,9 @@ export const connectPatternLibrary: MatcherCreator<M.ConnectPatternLibraryReques
 			});
 		}
 
-		const analysisResult = await performAnalysis(path, { previousLibrary });
+		const ids = previousLibrary ? previousLibrary.getIdMap() : undefined;
+
+		const analysisResult = await performAnalysis(path, { ids });
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			host.log(analysisResult.error.message);

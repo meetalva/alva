@@ -1,3 +1,4 @@
+export * from './analyzer';
 export * from './export';
 export * from './mobx';
 export * from './serialized-model';

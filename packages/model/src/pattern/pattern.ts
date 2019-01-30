@@ -11,6 +11,7 @@ export interface PatternInit {
 	contextId: string;
 	description: string;
 	exportName: string;
+	group: string;
 	id?: string;
 	icon: string;
 	name: string;
@@ -29,6 +30,7 @@ export class Pattern {
 	@Mobx.observable private contextId: string;
 	@Mobx.observable private description: string;
 	@Mobx.observable private exportName: string;
+	@Mobx.observable private group: string;
 	@Mobx.observable private icon: string;
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
@@ -41,6 +43,7 @@ export class Pattern {
 		this.contextId = init.contextId;
 		this.description = init.description;
 		this.exportName = init.exportName;
+		this.group = init.group;
 		this.icon = init.icon;
 		this.id = init.id || uuid.v4();
 		this.name = AlvaUtil.guessName(init.name);
@@ -57,6 +60,7 @@ export class Pattern {
 				contextId: serialized.contextId,
 				description: serialized.description,
 				exportName: serialized.exportName,
+				group: serialized.group,
 				icon: serialized.icon,
 				id: serialized.id,
 				name: serialized.name,
@@ -90,6 +94,10 @@ export class Pattern {
 
 	public getExportName(): string {
 		return this.exportName;
+	}
+
+	public getGroup(): string {
+		return this.group;
 	}
 
 	public getIcon(): string {
@@ -162,6 +170,7 @@ export class Pattern {
 			contextId: this.contextId,
 			description: this.description,
 			exportName: this.exportName,
+			group: this.group,
 			icon: this.icon,
 			id: this.id,
 			name: this.name,
@@ -176,6 +185,7 @@ export class Pattern {
 		this.contextId = pattern.getContextId();
 		this.description = pattern.getDescription();
 		this.exportName = pattern.getExportName();
+		this.group = pattern.getGroup();
 		this.name = pattern.getName();
 		this.icon = pattern.getIcon();
 		this.patternLibrary = context ? context.patternLibrary : this.patternLibrary;

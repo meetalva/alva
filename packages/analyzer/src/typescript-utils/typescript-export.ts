@@ -47,4 +47,9 @@ export interface TypescriptExport {
 	 * If the export should be ignored
 	 */
 	ignore: boolean;
+
+	/**
+	 * The group name of the export
+	 */
+	group: string;
 }

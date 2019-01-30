@@ -1,6 +1,7 @@
 import * as Components from '@meetalva/components';
 import { ElementDragImage } from '../element-drag-image';
 import * as MobxReact from 'mobx-react';
+import { partition, entries, groupBy } from 'lodash';
 import * as Model from '@meetalva/model';
 import { PatternItemContainer } from './pattern-item-container';
 import * as React from 'react';
@@ -95,6 +96,10 @@ class PatternLibraryContainer extends React.Component<PatternLibraryContainerPro
 			.getPatterns(props.searchResult)
 			.filter(pattern => pattern.getType() !== Types.PatternType.SyntheticPage);
 
+		const [groupedPatterns, ungroupedPatterns] = partition(patterns, isGrouped(true));
+
+		const groupedPatternObject = groupBy(groupedPatterns, pattern => pattern.getGroup());
+
 		if (patterns.length === 0) {
 			return null;
 		}
@@ -103,10 +108,42 @@ class PatternLibraryContainer extends React.Component<PatternLibraryContainerPro
 			<Components.PatternFolderView
 				name={props.library.getDisplayName() || props.library.getName()}
 			>
-				{patterns.map(pattern => (
+				{entries(groupedPatternObject).map(([name, items]) => (
+					<>
+						<Components.Space
+							sizeTop={Components.SpaceSize.S}
+							sizeBottom={Components.SpaceSize.XS}
+						>
+							<Components.Copy textColor={Components.Color.Grey50}>{name}</Components.Copy>
+						</Components.Space>
+						{items.map(patternItem => (
+							<PatternItemContainer key={patternItem.getId()} pattern={patternItem} />
+						))}
+					</>
+				))}
+
+				{groupedPatterns.length === 0 ||
+					(ungroupedPatterns.length !== 0 && (
+						<Components.Space
+							sizeTop={Components.SpaceSize.S}
+							sizeBottom={Components.SpaceSize.XS}
+						>
+							<Components.Copy textColor={Components.Color.Grey50}>
+								Other Components
+							</Components.Copy>
+						</Components.Space>
+					))}
+				{ungroupedPatterns.map(pattern => (
 					<PatternItemContainer key={pattern.getId()} pattern={pattern} />
 				))}
 			</Components.PatternFolderView>
 		);
 	}
+}
+
+function isGrouped(grouped: boolean): (p: Model.Pattern) => boolean {
+	return p => {
+		const group = p.getGroup();
+		return (group !== '' && group !== undefined) === grouped;
+	};
 }

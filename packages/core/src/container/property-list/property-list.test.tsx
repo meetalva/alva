@@ -89,6 +89,7 @@ function createUnknownPropElement(project: Project, mixins?: Mixins): Element {
 			contextId: 'pattern',
 			description: '',
 			exportName: 'pattern',
+			group: '',
 			icon: '',
 			name: 'Pattern',
 			propertyIds: [property.getId()],

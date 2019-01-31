@@ -15,6 +15,7 @@ import {
 export interface LibraryStoreItemInit {
 	id?: string;
 	library?: PatternLibrary;
+	meta?: Map<string, any>;
 	type: LibraryStoreItemType;
 	name: string;
 	version: string;
@@ -28,10 +29,14 @@ export class LibraryStoreItem {
 
 	@Mobx.observable private internalItemName: string;
 	@Mobx.observable private internalItemVersion: string;
-
 	@Mobx.observable private intermediateState: LibraryStoreItemState;
-	@Mobx.observable private meta?: any;
+	@Mobx.observable private storage: Map<string, any>;
 	@Mobx.observable private update?: any;
+
+	@Mobx.computed
+	public get meta(): any {
+		return this.storage.get(this.internalItemName);
+	}
 
 	@Mobx.computed
 	public get hasUpdate(): boolean {
@@ -203,9 +208,13 @@ export class LibraryStoreItem {
 				? LibraryStoreItemState.Listed
 				: LibraryStoreItemState.Unknown;
 
-		Mobx.autorun(() => {
+		this.storage = init.meta || new Map();
+
+		Mobx.autorun(async () => {
 			if (!this.fetched) {
 				this.fetching = this.fetch();
+				const meta = await this.fetching;
+				this.storage.set(init.name, meta);
 			}
 
 			this.checkForUpdate();
@@ -214,13 +223,17 @@ export class LibraryStoreItem {
 
 	public static fromRecommendation(
 		name: { name: string; version: string },
-		ctx: { getLibraryByPackageName(name: string): PatternLibrary | undefined }
+		ctx: {
+			meta: Map<string, any>;
+			getLibraryByPackageName(name: string): PatternLibrary | undefined;
+		}
 	): LibraryStoreItem {
 		return new LibraryStoreItem({
 			library: ctx.getLibraryByPackageName(name.name),
 			type: LibraryStoreItemType.Recommended,
 			name: name.name,
-			version: name.version
+			version: name.version,
+			meta: ctx.meta
 		});
 	}
 
@@ -253,7 +266,6 @@ export class LibraryStoreItem {
 		) as unknown) as Response;
 
 		if (!response.ok) {
-			this.meta = undefined;
 			return;
 		}
 
@@ -262,12 +274,11 @@ export class LibraryStoreItem {
 		const meta = data['versions'][version];
 
 		if (!meta) {
-			this.meta = undefined;
 			return;
 		}
 
-		this.meta = meta;
 		this.fetching = undefined;
+		return meta;
 	});
 
 	@Mobx.action

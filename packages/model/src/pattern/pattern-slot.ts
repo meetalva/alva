@@ -92,6 +92,10 @@ export class PatternSlot {
 		return this.propertyName;
 	}
 
+	public getRequired(): boolean {
+		return this.required;
+	}
+
 	public getType(): Types.SlotType {
 		return this.type;
 	}

@@ -67,6 +67,8 @@ export const saveAs: MatcherCreator<M.SaveAs, SaveAsConfig> = (
 			return;
 		}
 
+		console.log('before', project.getId(), project.getPath());
+
 		project.setPath(targetPath);
 		project.setDraft(false);
 
@@ -77,6 +79,7 @@ export const saveAs: MatcherCreator<M.SaveAs, SaveAsConfig> = (
 		await dataHost.addProject(project);
 
 		if (typeof window === 'undefined') {
+			console.log('after', project.getId(), project.getPath());
 			project.sync(await host.getSender(), ModelTree);
 		}
 

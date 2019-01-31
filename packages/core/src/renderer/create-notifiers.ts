@@ -73,6 +73,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 				typeof projectSync.stop === 'function'
 			) {
 				projectSync.stop();
+				projectSync.id = undefined;
 			}
 
 			if (!projectSync.id) {
@@ -95,12 +96,9 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 				return;
 			}
 
-			if (
-				projectSync.id &&
-				projectSync.id !== app.getId() &&
-				typeof appSync.stop === 'function'
-			) {
+			if (appSync.id && appSync.id !== app.getId() && typeof appSync.stop === 'function') {
 				appSync.stop();
+				appSync.id = undefined;
 			}
 
 			if (!appSync.id) {

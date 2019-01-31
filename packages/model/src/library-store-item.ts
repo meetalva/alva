@@ -15,6 +15,7 @@ import {
 export interface LibraryStoreItemInit {
 	id?: string;
 	library?: PatternLibrary;
+	meta?: Map<string, any>;
 	type: LibraryStoreItemType;
 	name: string;
 	version: string;
@@ -24,12 +25,18 @@ export class LibraryStoreItem {
 	public readonly id: string;
 	private library?: PatternLibrary;
 	private type: LibraryStoreItemType;
+	private fetching?: Promise<unknown>;
+
 	@Mobx.observable private internalItemName: string;
 	@Mobx.observable private internalItemVersion: string;
-
 	@Mobx.observable private intermediateState: LibraryStoreItemState;
-	@Mobx.observable private meta?: any;
+	@Mobx.observable private storage: Map<string, any>;
 	@Mobx.observable private update?: any;
+
+	@Mobx.computed
+	public get meta(): any {
+		return this.storage.get(this.internalItemName);
+	}
 
 	@Mobx.computed
 	public get hasUpdate(): boolean {
@@ -178,15 +185,15 @@ export class LibraryStoreItem {
 
 	@Mobx.computed
 	public get usesRemoteMeta(): boolean {
+		if (this.library && this.library.builtin) {
+			return false;
+		}
+
 		if (this.type === LibraryStoreItemType.Recommended) {
 			return true;
 		}
 
-		return (
-			this.hasLibrary &&
-			(this.installType !== PatternLibraryInstallType.Remote ||
-				this.origin !== PatternLibraryOrigin.UserProvided)
-		);
+		return this.installType === PatternLibraryInstallType.Remote;
 	}
 
 	public constructor(init: LibraryStoreItemInit) {
@@ -201,9 +208,13 @@ export class LibraryStoreItem {
 				? LibraryStoreItemState.Listed
 				: LibraryStoreItemState.Unknown;
 
-		Mobx.autorun(() => {
+		this.storage = init.meta || new Map();
+
+		Mobx.autorun(async () => {
 			if (!this.fetched) {
-				this.fetch();
+				this.fetching = this.fetch();
+				const meta = await this.fetching;
+				this.storage.set(init.name, meta);
 			}
 
 			this.checkForUpdate();
@@ -212,17 +223,17 @@ export class LibraryStoreItem {
 
 	public static fromRecommendation(
 		name: { name: string; version: string },
-		ctx: { project?: Project }
+		ctx: {
+			meta: Map<string, any>;
+			getLibraryByPackageName(name: string): PatternLibrary | undefined;
+		}
 	): LibraryStoreItem {
-		const library = ctx.project
-			? ctx.project.getPatternLibraryByPackageName(name.name)
-			: undefined;
-
 		return new LibraryStoreItem({
-			library,
+			library: ctx.getLibraryByPackageName(name.name),
 			type: LibraryStoreItemType.Recommended,
 			name: name.name,
-			version: name.version
+			version: name.version,
+			meta: ctx.meta
 		});
 	}
 
@@ -246,12 +257,15 @@ export class LibraryStoreItem {
 			return;
 		}
 
+		if (this.fetching) {
+			return this.fetching;
+		}
+
 		const response = yield (fetch(
 			`https://registry.npmjs.cf/${this.packageName}`
 		) as unknown) as Response;
 
 		if (!response.ok) {
-			this.meta = undefined;
 			return;
 		}
 
@@ -260,11 +274,11 @@ export class LibraryStoreItem {
 		const meta = data['versions'][version];
 
 		if (!meta) {
-			this.meta = undefined;
 			return;
 		}
 
-		this.meta = meta;
+		this.fetching = undefined;
+		return meta;
 	});
 
 	@Mobx.action

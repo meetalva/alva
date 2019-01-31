@@ -24,6 +24,8 @@ export class LibraryStoreItem {
 	public readonly id: string;
 	private library?: PatternLibrary;
 	private type: LibraryStoreItemType;
+	private fetching?: Promise<unknown>;
+
 	@Mobx.observable private internalItemName: string;
 	@Mobx.observable private internalItemVersion: string;
 
@@ -178,15 +180,15 @@ export class LibraryStoreItem {
 
 	@Mobx.computed
 	public get usesRemoteMeta(): boolean {
+		if (this.library && this.library.builtin) {
+			return false;
+		}
+
 		if (this.type === LibraryStoreItemType.Recommended) {
 			return true;
 		}
 
-		return (
-			this.hasLibrary &&
-			(this.installType !== PatternLibraryInstallType.Remote ||
-				this.origin !== PatternLibraryOrigin.UserProvided)
-		);
+		return this.installType === PatternLibraryInstallType.Remote;
 	}
 
 	public constructor(init: LibraryStoreItemInit) {
@@ -203,7 +205,7 @@ export class LibraryStoreItem {
 
 		Mobx.autorun(() => {
 			if (!this.fetched) {
-				this.fetch();
+				this.fetching = this.fetch();
 			}
 
 			this.checkForUpdate();
@@ -212,14 +214,10 @@ export class LibraryStoreItem {
 
 	public static fromRecommendation(
 		name: { name: string; version: string },
-		ctx: { project?: Project }
+		ctx: { getLibraryByPackageName(name: string): PatternLibrary | undefined }
 	): LibraryStoreItem {
-		const library = ctx.project
-			? ctx.project.getPatternLibraryByPackageName(name.name)
-			: undefined;
-
 		return new LibraryStoreItem({
-			library,
+			library: ctx.getLibraryByPackageName(name.name),
 			type: LibraryStoreItemType.Recommended,
 			name: name.name,
 			version: name.version
@@ -246,6 +244,10 @@ export class LibraryStoreItem {
 			return;
 		}
 
+		if (this.fetching) {
+			return this.fetching;
+		}
+
 		const response = yield (fetch(
 			`https://registry.npmjs.cf/${this.packageName}`
 		) as unknown) as Response;
@@ -265,6 +267,7 @@ export class LibraryStoreItem {
 		}
 
 		this.meta = meta;
+		this.fetching = undefined;
 	});
 
 	@Mobx.action

@@ -46,7 +46,11 @@ export class LibraryStore {
 	@Mobx.computed
 	public get recommendations(): LibraryStoreItem[] {
 		return this.recommended.map(name =>
-			LibraryStoreItem.fromRecommendation(name, { project: this.project })
+			LibraryStoreItem.fromRecommendation(name, {
+				getLibraryByPackageName: this.project
+					? this.project.getPatternLibraryByPackageName.bind(this.project)
+					: () => undefined
+			})
 		);
 	}
 

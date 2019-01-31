@@ -59,13 +59,13 @@ export enum LibraryAnalysisResultType {
 export interface LibraryAnalysis {
 	bundle: string;
 	id: string;
+	path: string;
+	patterns: PatternAnalysis[];
 	packageFile: {
 		name: string;
 		version: string;
 		[key: string]: unknown;
 	};
-	path: string;
-	patterns: PatternAnalysis[];
 }
 
 export interface LibraryAnalysisSuccess {

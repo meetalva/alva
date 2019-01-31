@@ -21,7 +21,7 @@ import { builtinPatternLibrary } from './pattern-library/builtin-pattern-library
 export interface ProjectProperties {
 	draft: boolean;
 	id?: string;
-	version?: 0 | 1 | 2;
+	version?: 0 | 1 | 2 | 3;
 	name: string;
 	pages: Page[];
 	path: string;
@@ -42,7 +42,7 @@ export interface ModelResolver<T> {
 export class Project {
 	public readonly model = Types.ModelName.Project;
 
-	private readonly version: 0 | 1 | 2 = 2;
+	private readonly version: 0 | 1 | 2 | 3 = 2;
 
 	private syncing: boolean = false;
 
@@ -200,6 +200,7 @@ export class Project {
 		});
 	}
 
+	@Mobx.action
 	public static create(init: ProjectCreateInit): Project {
 		const userStore = new UserStore({
 			id: uuid.v4(),
@@ -219,16 +220,16 @@ export class Project {
 			draft: init.draft
 		});
 
-		project.addPage(
-			Page.create(
-				{
-					active: true,
-					id: uuid.v4(),
-					name: 'Page 1'
-				},
-				{ project }
-			)
+		const page = Page.create(
+			{
+				active: true,
+				id: uuid.v4(),
+				name: 'Page 1'
+			},
+			{ project }
 		);
+
+		project.addPage(page);
 
 		userStore.getPageProperty().setProject(project);
 		return project;
@@ -350,7 +351,7 @@ export class Project {
 	}
 
 	public getBuiltinPatternLibrary(): PatternLibrary {
-		return builtinPatternLibrary;
+		return [...this.patternLibraries.values()].find(lib => lib.builtin)!;
 	}
 
 	public getElementActionById(id: string): undefined | ElementAction {

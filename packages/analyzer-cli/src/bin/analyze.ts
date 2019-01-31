@@ -1,13 +1,11 @@
 import * as Fs from 'fs';
-import { performAnalysis } from '../';
 import * as Path from 'path';
-import * as Types from '@meetalva/types';
-import * as Model from '@meetalva/model';
 import * as Util from 'util';
-import * as JSON5 from 'json5';
+import * as Model from '@meetalva/model';
+import * as Analyzer from '@meetalva/analyzer';
+import * as Types from '@meetalva/types';
 
 const yargsParser = require('yargs-parser');
-const readFile = Util.promisify(Fs.readFile);
 const writeFile = Util.promisify(Fs.writeFile);
 
 async function main() {
@@ -17,6 +15,8 @@ async function main() {
 		flag => !flags.hasOwnProperty(flag) || typeof flags[flag] !== 'string'
 	);
 
+	const analyzeBuiltins = flags.hasOwnProperty('builtins') ? flags.builtins : false;
+
 	if (missing.length > 0) {
 		console.error(`missing required flags: ${missing.map(m => `--${m}`).join(', ')}`);
 		process.exit(1);
@@ -25,19 +25,7 @@ async function main() {
 	const cwd = flags.cwd || process.cwd();
 	const path = Path.resolve(cwd, flags.in);
 	const outPath = flags.out ? Path.resolve(cwd, flags.out) : '';
-
-	const previousLibrary = Fs.existsSync(outPath)
-		? Model.PatternLibrary.from(
-				JSON5.parse(
-					String(await readFile(outPath))
-						.replace(/^export const analysis = /, '')
-						.replace(/\;\n$/, '\n')
-				)
-		  )
-		: undefined;
-
-	const ids = previousLibrary ? previousLibrary.getIdMap() : undefined;
-	const analysis = await performAnalysis(path, { ids });
+	const analysis = await Analyzer.analyze(path, { analyzeBuiltins });
 
 	if (analysis.type === Types.LibraryAnalysisResultType.Error) {
 		console.trace(analysis.error);
@@ -48,7 +36,7 @@ async function main() {
 	const project = Model.Project.create({ name: 'Project', draft: true, path: 'project' });
 	const library = Model.PatternLibrary.fromAnalysis(analysis.result, {
 		project,
-		analyzeBuiltins: true,
+		analyzeBuiltins,
 		installType: Types.PatternLibraryInstallType.Local
 	});
 

@@ -2,10 +2,9 @@ import * as M from '@meetalva/message';
 import { MessageType as MT } from '@meetalva/message';
 import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
-import { performAnalysis } from '@meetalva/analyzer';
+import * as Analyzer from '@meetalva/analyzer';
 import { PatternLibraryInstallType } from '@meetalva/types';
 import { MatcherCreator } from './context';
-import * as Model from '@meetalva/model';
 
 export const updatePatternLibrary: MatcherCreator<M.UpdatePatternLibraryRequest> = ({
 	host,
@@ -79,10 +78,7 @@ export const updatePatternLibrary: MatcherCreator<M.UpdatePatternLibraryRequest>
 		}
 
 		const { path } = connection;
-
-		const ids = library ? library.getIdMap() : undefined;
-
-		const analysisResult = await performAnalysis(path, { ids });
+		const analysisResult = await Analyzer.analyze(path);
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			app.send({

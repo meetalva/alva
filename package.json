@@ -9,7 +9,7 @@
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
     "precommit": "lint-staged",
     "watch": "lerna run watch --stream",
-    "analyze:essentials": "alva analyze --out=packages/essentials/src/analysis.ts --in=packages/essentials/package.json"
+    "analyze:essentials": "alva analyze --in=packages/essentials/package.json --out=packages/essentials/src/analysis.ts --builtins"
   },
   "repository": {
     "type": "git",

@@ -94,6 +94,7 @@ export interface SerializedPatternLibraryV1 {
 }
 
 export interface SerializedPatternLibraryV2 {
+	builtin?: boolean;
 	bundle: string;
 	bundleId: string;
 	id: string;
@@ -110,12 +111,13 @@ export interface SerializedPatternLibraryV2 {
 	state: PatternLibraryState;
 }
 
-export type SavedProject = VersionTwoSerializedProject;
+export type SavedProject = VersionThreeSerializedProject;
 
 export type MigratableProject =
 	| VersionZeroSerializedProject
 	| VersionOneSerializedProject
-	| VersionTwoSerializedProject;
+	| VersionTwoSerializedProject
+	| VersionThreeSerializedProject;
 
 export interface VersionZeroSerializedProject {
 	version?: number;
@@ -158,6 +160,8 @@ export interface VersionTwoSerializedProject {
 	patternLibraries: SerializedPatternLibraryV2[];
 	userStore: UserStore.SerializedUserStore;
 }
+
+export type VersionThreeSerializedProject = VersionTwoSerializedProject;
 
 export interface SerializedProject extends SavedProject {
 	draft: boolean;

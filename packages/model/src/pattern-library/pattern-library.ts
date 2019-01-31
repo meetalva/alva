@@ -17,6 +17,7 @@ import * as uuid from 'uuid';
 const md5 = require('md5');
 
 export interface PatternLibraryInit {
+	builtin: boolean;
 	bundleId: string;
 	bundle: string;
 	id: string;
@@ -51,6 +52,8 @@ export interface PatternLibraryCreateOptions {
 
 export class PatternLibrary {
 	public readonly model = Types.ModelName.PatternLibrary;
+	public readonly builtin: boolean;
+
 	private readonly id: string;
 
 	@Mobx.observable private bundleId: string;
@@ -98,6 +101,7 @@ export class PatternLibrary {
 	}
 
 	public constructor(init: PatternLibraryInit) {
+		this.builtin = init.builtin;
 		this.bundleId = init.bundleId;
 		this.bundle = init.bundle;
 		this.id = init.id || uuid.v4();
@@ -111,6 +115,7 @@ export class PatternLibrary {
 
 	public static Defaults() {
 		return {
+			builtin: false,
 			bundleId: uuid.v4(),
 			bundle: '',
 			id: uuid.v4(),
@@ -139,6 +144,7 @@ export class PatternLibrary {
 		}
 	): PatternLibrary {
 		const library = PatternLibrary.create({
+			builtin: opts.analyzeBuiltins,
 			bundle: analysis.bundle,
 			bundleId: analysis.id,
 			id: uuid.v4(),
@@ -160,7 +166,13 @@ export class PatternLibrary {
 	public static from(serialized: Types.SerializedPatternLibrary): PatternLibrary {
 		const state = deserializeState(serialized.state);
 
+		const builtin =
+			typeof serialized.builtin === 'undefined'
+				? serialized.patterns.some(p => p.type === Types.PatternType.SyntheticPage)
+				: serialized.builtin;
+
 		const patternLibrary = new PatternLibrary({
+			builtin,
 			bundleId: serialized.bundleId,
 			bundle: serialized.bundle,
 			id: serialized.id,
@@ -287,42 +299,6 @@ export class PatternLibrary {
 		this.patternProperties.set(property.getId(), property);
 	}
 
-	public getIdMap(): Types.ContextIdMap {
-		const enums = this.getPatternProperties().filter(
-			(prop): prop is PatternEnumProperty => prop.type === Types.PatternPropertyType.Enum
-		);
-
-		return {
-			patterns: this.getPatterns().map(pattern => ({
-				input: { contextId: pattern.getContextId() },
-				output: pattern.getId()
-			})),
-			properties: this.getPatternProperties().map(prop => ({
-				input: {
-					contextId: prop.getContextId(),
-					parentId: this.getPatternByProperty(prop)!.getId()
-				},
-				output: prop.getId()
-			})),
-			enumOptions: flatMap(enums, prop =>
-				prop.getOptions().map(option => ({
-					input: {
-						contextId: option.getContextId(),
-						parentId: prop.getId()
-					},
-					output: option.getId()
-				}))
-			),
-			slots: this.getSlots().map(slot => ({
-				input: {
-					contextId: slot.getContextId(),
-					parentId: this.getPatternBySlot(slot)!.getId()
-				},
-				output: slot.getId()
-			}))
-		};
-	}
-
 	public getPatternByProperty(property: AnyPatternProperty): Pattern | undefined {
 		return this.getPatterns().find(p =>
 			p.getProperties().some(p => p.getId() === property.getId())
@@ -411,7 +387,7 @@ export class PatternLibrary {
 	}
 
 	public getPatternByType(type: Types.PatternType): Pattern {
-		return this.getPatterns().find(pattern => pattern.getType() === type) as Pattern;
+		return this.getPatterns().find(pattern => pattern.getType() === type)!;
 	}
 
 	public getPatternProperties(): AnyPatternProperty[] {

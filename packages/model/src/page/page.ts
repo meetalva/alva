@@ -88,7 +88,6 @@ export class Page {
 	@Mobx.action
 	public static create(init: PageCreateInit, context: PageContext): Page {
 		const patternLibrary = context.project.getBuiltinPatternLibrary();
-
 		const rootPattern = patternLibrary.getPatternByType(Types.PatternType.SyntheticPage);
 
 		const rootContents = rootPattern.getSlots().map(

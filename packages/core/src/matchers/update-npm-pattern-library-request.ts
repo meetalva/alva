@@ -1,8 +1,8 @@
+import * as uuid from 'uuid';
 import * as M from '@meetalva/message';
 import { MessageType as MT } from '@meetalva/message';
 import * as T from '@meetalva/types';
-import * as uuid from 'uuid';
-import { getPackage, performAnalysis } from '@meetalva/analyzer';
+import * as Analyzer from '@meetalva/analyzer';
 import { MatcherCreator } from './context';
 import pkgDir = require('pkg-dir');
 
@@ -63,11 +63,14 @@ export const updateNpmPatternLibrary: MatcherCreator<M.UpdateNpmPatternLibraryRe
 			return abort();
 		}
 
-		const result = await getPackage(m.payload.npmId || previousLibrary.getPackageName(), {
-			cwd: await host.resolveFrom(T.HostBase.AppData, 'packages'),
-			dirname,
-			appPath: await host.resolveFrom(T.HostBase.AppPath, '.')
-		});
+		const result = await Analyzer.getPackage(
+			m.payload.npmId || previousLibrary.getPackageName(),
+			{
+				cwd: await host.resolveFrom(T.HostBase.AppData, 'packages'),
+				dirname,
+				appPath: await host.resolveFrom(T.HostBase.AppPath, '.')
+			}
+		);
 
 		if (result instanceof Error) {
 			abort();
@@ -85,9 +88,7 @@ export const updateNpmPatternLibrary: MatcherCreator<M.UpdateNpmPatternLibraryRe
 			});
 		}
 
-		const ids = previousLibrary ? previousLibrary.getIdMap() : undefined;
-
-		const analysisResult = await performAnalysis(result.path, { ids });
+		const analysisResult = await Analyzer.analyze(result.path);
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			host.log(analysisResult.error.message);

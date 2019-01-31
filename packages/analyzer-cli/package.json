@@ -1,7 +1,10 @@
 {
-  "name": "@meetalva/analyzer",
+  "name": "@meetalva/analyzer-cli",
   "version": "1.0.0",
   "description": "Derive component meta data and bundles from React projects",
+  "bin": {
+    "alva-analyze": "./bin/analyze"
+  },
   "scripts": {
     "check:dependencies": "alva-dependencies -i typescript-eslint-parser"
   },
@@ -23,29 +26,10 @@
     "@meetalva/tools": "1.0.0"
   },
   "dependencies": {
+    "@meetalva/analyzer": "1.0.0",
     "@meetalva/model": "1.0.0",
     "@meetalva/types": "1.0.0",
-    "@meetalva/util": "1.0.0",
-    "@types/lodash": "4.14.107",
     "@types/node": "^10.12.18",
-    "@types/npm-package-arg": "^6.1.0",
-    "@types/webpack": "^4.4.21",
-    "lodash": "4.17.5",
-    "memory-fs": "0.4.1",
-    "npm-package-arg": "^6.1.0",
-    "pacote": "^9.4.0",
-    "precinct": "5.0.1",
-    "read-pkg": "3.0.0",
-    "resolve-pkg": "^1.0.0",
-    "resolve": "1.8.1",
-    "semver": "^5.6.0",
-    "ts-simple-ast": "20.0.0",
-    "tslib": "1.9.0",
-    "typescript-eslint-parser": "^21.0.2",
-    "typescript": "3.2.2",
-    "unionfs": "^3.0.2",
-    "uuid": "3.2.1",
-    "webpack": "^4.28.2",
     "yargs-parser": "10.1.0"
   }
 }

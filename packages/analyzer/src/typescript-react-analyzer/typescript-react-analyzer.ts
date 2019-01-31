@@ -18,7 +18,7 @@ import { usesChildren } from '../react-utils/uses-children';
 import { getTsaExport } from '../typescript-utils/get-tsa-export';
 import { setExtname } from '../typescript-utils/set-extname';
 import { getExportedNode } from '../typescript-utils/get-exported-node';
-import { IdResolver } from '../id-resolver';
+import * as IdHasher from '../id-hasher';
 
 const precinct = require('precinct');
 
@@ -32,7 +32,6 @@ export interface PatternCandidate {
 }
 
 export interface AnalyzeOptions {
-	ids: Types.ContextIdMap;
 	analyzeBuiltins: boolean;
 }
 
@@ -43,7 +42,6 @@ interface AnalyzeContext {
 	project: Tsa.Project;
 	knownProperties: Types.PropertyAnalysis[];
 	knownPatterns: Types.InternalPatternAnalysis[];
-	resolver: IdResolver;
 }
 
 type PatternAnalyzer = (
@@ -183,8 +181,6 @@ export function getPatternAnalyzer(
 	project: Tsa.Project,
 	options: AnalyzeOptions
 ): PatternAnalyzer {
-	const resolver = new IdResolver(options.ids);
-
 	return (
 		candidate: PatternCandidate,
 		previous: Types.InternalPatternAnalysis[],
@@ -206,7 +202,6 @@ export function getPatternAnalyzer(
 					program,
 					project,
 					candidate,
-					resolver,
 					options,
 					knownProperties,
 					knownPatterns: previous
@@ -251,7 +246,7 @@ export function analyzePatternExport(
 	const exportName = ex.exportName || 'default';
 
 	const contextId = `${ctx.candidate.id}:${exportName}`;
-	const id = ctx.resolver.getGlobalPatternId(contextId);
+	const id = IdHasher.getGlobalPatternId(contextId);
 
 	if (ex.ignore) {
 		return;
@@ -259,18 +254,15 @@ export function analyzePatternExport(
 
 	const properties = PropertyAnalyzer.analyze(propTypes.type, {
 		program: ctx.program,
-		getPropertyId(propertyContextId: string): string {
-			return ctx.resolver.getGlobalPropertyId(id, propertyContextId);
-		},
+		getPropertyId: (propertyContextId: string) =>
+			IdHasher.getGlobalPropertyId(id, propertyContextId),
 		getEnumOptionId: (enumId, optionContextId) =>
-			ctx.resolver.getGlobalEnumOptionId(enumId, optionContextId)
+			IdHasher.getGlobalEnumOptionId(enumId, optionContextId)
 	});
 
 	const slots = SlotAnalyzer.analyzeSlots(propTypes.type, {
 		program: ctx.program,
-		getSlotId(slotContextId: string): string {
-			return ctx.resolver.getGlobalSlotId(id, slotContextId);
-		}
+		getSlotId: (slotContextId: string) => IdHasher.getGlobalSlotId(id, slotContextId)
 	});
 
 	// Try to find out if children are used if they are not typed explicitly
@@ -285,7 +277,7 @@ export function analyzePatternExport(
 				description: 'Element that render inside this element',
 				example: '',
 				hidden: false,
-				id: ctx.resolver.getGlobalSlotId(id, 'children'),
+				id: IdHasher.getGlobalSlotId(id, 'children'),
 				label: 'children',
 				propertyName: 'children',
 				required: false,

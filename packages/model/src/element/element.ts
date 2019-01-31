@@ -130,6 +130,7 @@ export class Element {
 		if (!this.pattern) {
 			return [];
 		}
+
 		return this.pattern.getProperties();
 	}
 
@@ -582,12 +583,12 @@ export class Element {
 	}
 
 	public getPattern(): Pattern | undefined {
-		return this.project.getPatternById(this.patternId);
+		return this.pattern;
 	}
 
 	@Mobx.action
 	public setPattern(pattern: Pattern): void {
-		const previousPattern = this.getPattern();
+		const previousPattern = this.pattern;
 		this.patternId = pattern.getId();
 
 		if (previousPattern) {

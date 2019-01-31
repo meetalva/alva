@@ -2,7 +2,7 @@ import * as M from '@meetalva/message';
 import { MessageType } from '@meetalva/message';
 import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
-import { performAnalysis } from '@meetalva/analyzer';
+import * as Anaylzer from '@meetalva/analyzer';
 import { MatcherCreator } from './context';
 
 export const connectPatternLibrary: MatcherCreator<M.ConnectPatternLibraryRequest> = ({
@@ -82,9 +82,7 @@ export const connectPatternLibrary: MatcherCreator<M.ConnectPatternLibraryReques
 			});
 		}
 
-		const ids = previousLibrary ? previousLibrary.getIdMap() : undefined;
-
-		const analysisResult = await performAnalysis(path, { ids });
+		const analysisResult = await Anaylzer.analyze(path);
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			host.log(analysisResult.error.message);

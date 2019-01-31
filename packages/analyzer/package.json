@@ -23,7 +23,6 @@
     "@meetalva/tools": "1.0.0"
   },
   "dependencies": {
-    "@meetalva/model": "1.0.0",
     "@meetalva/types": "1.0.0",
     "@meetalva/util": "1.0.0",
     "@types/lodash": "4.14.107",
@@ -45,7 +44,6 @@
     "typescript": "3.2.2",
     "unionfs": "^3.0.2",
     "uuid": "3.2.1",
-    "webpack": "^4.28.2",
-    "yargs-parser": "10.1.0"
+    "webpack": "^4.28.2"
   }
 }

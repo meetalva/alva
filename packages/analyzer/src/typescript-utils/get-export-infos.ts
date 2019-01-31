@@ -27,6 +27,9 @@ export function getExportInfos(
 	const iconTag = jsDocTags.find(tag => tag.tagName.escapedText === 'icon');
 	const exportIcon = iconTag ? iconTag.comment : '';
 
+	const groupTag = jsDocTags.find(tag => tag.tagName.escapedText === 'group');
+	const exportGroup = groupTag ? groupTag.comment : '';
+
 	const exportPatternTypeTag = jsDocTags.find(tag => tag.tagName.escapedText === 'patternType');
 	const exportPatternType = exportPatternTypeTag
 		? (exportPatternTypeTag.comment as Types.SerializedPatternType)
@@ -44,14 +47,15 @@ export function getExportInfos(
 
 			return [
 				{
-					exportName,
-					displayName: exportDisplayName,
 					description: exportDescription || '',
+					displayName: exportDisplayName,
+					exportName,
+					group: exportGroup || '',
 					icon: exportIcon || '',
-					type: exportType,
 					ignore: exportIgnore,
 					patternType: exportPatternType,
-					statement
+					statement,
+					type: exportType
 				}
 			];
 		}
@@ -68,14 +72,15 @@ export function getExportInfos(
 
 		return [
 			{
-				exportName,
-				displayName: exportDisplayName,
 				description: exportDescription || '',
+				displayName: exportDisplayName,
+				exportName,
+				group: exportGroup || '',
 				icon: exportIcon || '',
-				type: exportType,
 				ignore: exportIgnore,
 				patternType: exportPatternType,
-				statement
+				statement,
+				type: exportType
 			}
 		];
 	}
@@ -90,14 +95,15 @@ export function getExportInfos(
 
 			return [
 				{
-					exportName: undefined,
-					displayName: exportDisplayName,
 					description: exportDescription || '',
+					displayName: exportDisplayName,
+					exportName: undefined,
+					group: exportGroup || '',
 					icon: exportIcon || '',
-					type: exportType,
 					ignore: exportIgnore,
 					patternType: exportPatternType,
-					statement
+					statement,
+					type: exportType
 				}
 			];
 		}
@@ -114,14 +120,15 @@ export function getExportInfos(
 			const exportName = isDefault ? undefined : exportSpecifier.name.getText();
 
 			return {
-				exportName,
-				displayName: exportDisplayName,
 				description: exportDescription || '',
+				displayName: exportDisplayName,
+				exportName,
+				group: exportGroup || '',
 				icon: exportIcon || '',
-				type: exportType,
 				ignore: exportIgnore,
 				patternType: exportPatternType,
-				statement
+				statement,
+				type: exportType
 			};
 		});
 	}

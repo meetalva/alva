@@ -295,6 +295,7 @@ export function analyzePatternExport(
 			description: ex.description ? ex.description : ctx.candidate.description,
 			exportName,
 			icon: ex.icon,
+			group: ex.group,
 			id,
 			name:
 				ex.displayName || (exportName !== 'default' ? exportName : ctx.candidate.displayName),

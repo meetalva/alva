@@ -55,7 +55,7 @@ export class Element {
 
 	@Mobx.observable private nameEditable: boolean = false;
 
-	@Mobx.observable private open: boolean;
+	@Mobx.observable private open: boolean = true;
 
 	@Mobx.observable private parent?: Element;
 
@@ -152,7 +152,7 @@ export class Element {
 		this.shouldPlaceholderHighlight = init.placeholderHighlighted;
 		this.id = init.id ? init.id : uuid.v4();
 		this.patternId = init.patternId;
-		this.open = init.open;
+		this.open = true;
 		this.forcedOpen = init.forcedOpen;
 		this.project = context.project;
 		this.role = init.role || Types.ElementRole.Node;

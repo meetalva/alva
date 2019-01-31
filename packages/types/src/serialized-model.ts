@@ -55,8 +55,9 @@ export interface SerializedPattern {
 	contextId: string;
 	description: string;
 	exportName: string;
-	icon: string;
+	group: string;
 	id: string;
+	icon: string;
 	name: string;
 	propertyIds: string[];
 	slots: SerializedPatternSlot[];

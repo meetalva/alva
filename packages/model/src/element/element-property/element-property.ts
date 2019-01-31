@@ -148,18 +148,22 @@ export class ElementProperty {
 	}
 
 	public getValue(): Types.ElementPropertyValue {
-		if (this.referencedUserStoreProperty && this.patternProperty) {
+		if (!this.patternProperty) {
+			return undefined;
+		}
+
+		if (this.referencedUserStoreProperty) {
 			const referencedValue = this.referencedUserStoreProperty.getValue();
 			return this.patternProperty.coerceValue(referencedValue);
 		}
 
 		const concreteValue = this.getConcreteValue();
 
-		if (typeof concreteValue !== 'undefined' && this.patternProperty) {
+		if (typeof concreteValue !== 'undefined') {
 			return this.patternProperty.coerceValue(concreteValue);
 		}
 
-		return this.getDefaultValue();
+		return this.patternProperty.getRequired() ? this.getDefaultValue() : undefined;
 	}
 
 	public getRawValue(): string {

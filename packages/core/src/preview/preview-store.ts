@@ -73,14 +73,29 @@ export class PreviewStore<V> {
 		return this.project.getPages().find(page => page.getActive());
 	}
 
-	public getChildren<T>(element: Model.Element, render: (element: Model.Element) => T): T[] {
+	public getChildren<T>(
+		element: Model.Element,
+		render: (element: Model.Element) => T
+	): T[] | null {
 		const childContent = element.getContentBySlotType(Types.SlotType.Children);
 
 		if (!childContent) {
-			return [];
+			return null;
 		}
 
-		return childContent.getElements().map(render);
+		const slot = childContent.getSlot();
+
+		if (!slot) {
+			return null;
+		}
+
+		const elements = childContent.getElements();
+
+		if (elements.length === 0 && !slot.getRequired()) {
+			return null;
+		}
+
+		return elements.map(render);
 	}
 
 	public getComponent(element: Model.Element): V | undefined {
@@ -201,17 +216,22 @@ export class PreviewStore<V> {
 	public getSlots<T>(
 		element: Model.Element,
 		render: (element: Model.Element) => T
-	): { [propName: string]: T[] } {
+	): { [propName: string]: T[] | null } {
 		return element
 			.getContents()
 			.filter(content => content.getSlotType() !== Types.SlotType.Children)
-			.reduce<{ [key: string]: T[] }>((renderProperties, content) => {
+			.reduce<{ [key: string]: T[] | null }>((renderProperties, content) => {
 				const slot = content.getSlot();
 
-				if (slot) {
-					renderProperties[slot.getPropertyName()] = content.getElements().map(render);
+				if (!slot) {
+					return renderProperties;
 				}
 
+				const elements = content.getElements();
+				const children =
+					elements.length === 0 && !slot.getRequired() ? null : elements.map(render);
+
+				renderProperties[slot.getPropertyName()] = children;
 				return renderProperties;
 			}, {});
 	}

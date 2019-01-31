@@ -55,38 +55,5 @@ module.exports = [
 			path: Path.join(__dirname, out, 'scripts'),
 			publicPath: '/scripts/'
 		}
-	},
-	{
-		mode: flags.production ? 'production' : 'development',
-		devtool: flags.production || flags.sourceMaps ? 'source-maps' : 'cheap-source-map',
-		entry: {
-			'alva-analyze': require.resolve('./packages/analyzer/src/bin/analyze.ts'),
-		},
-		module: {
-			rules: [
-				{
-					test: /\.tsx?$/,
-					loader: 'ts-loader',
-					options: {
-						transpileOnly: true,
-						compilerOptions: {
-							composite: false,
-							declaration: false,
-							declarationMap: false,
-							module: 'esnext'
-						}
-					}
-				}
-			]
-		},
-		resolve: {
-			extensions: ['.ts', '.tsx', '.js', '.json']
-		},
-		externals: ['fsevents'],
-		target: 'node',
-		output: {
-			path: Path.join(__dirname, 'packages/core', 'vendor'),
-			publicPath: '/scripts/'
-		}
 	}
 ];

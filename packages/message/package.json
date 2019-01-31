@@ -1,0 +1,25 @@
+{
+  "name": "@meetalva/message",
+  "version": "1.0.0",
+  "description": "Domain messages for Alva",
+  "scripts": {
+    "check:dependencies": "alva-dependencies"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetalva/alva.git"
+  },
+  "author": {
+    "email": "hey@meetalva.io",
+    "name": "Meet Alva Team",
+    "url": "https://meetalva.io/"
+  },
+  "license": "MIT",
+  "homepage": "https://meetalva.github.io/",
+  "bugs": {
+    "url": "https://github.com/meetalva/alva/issues"
+  },
+  "devDependencies": {
+    "@meetalva/tools": "1.0.0"
+  }
+}

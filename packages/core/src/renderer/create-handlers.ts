@@ -1,11 +1,11 @@
-import * as M from '../message';
-import * as Model from '../model';
+import * as M from '@meetalva/message';
+import * as Model from '@meetalva/model';
 import { ViewStore } from '../store';
 import * as Handlers from './message-handlers';
 import * as Edit from './edit-handlers';
 
 export interface MessageHandlerContext {
-	app: Model.AlvaApp;
+	app: Model.AlvaApp<M.Message>;
 	history: Model.EditHistory;
 	store: ViewStore;
 }

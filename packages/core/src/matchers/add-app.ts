@@ -1,9 +1,9 @@
-import * as M from '../message';
-import * as T from '../types';
-import * as Model from '../model';
+import * as M from '@meetalva/message';
+import * as Model from '@meetalva/model';
+import { MatcherCreator } from './context';
 
-export function addApp({ host }: T.MatcherContext): T.Matcher<M.ChangeApp> {
+export const addApp: MatcherCreator<M.ChangeApp> = ({ host }) => {
 	return async message => {
 		host.addApp(Model.AlvaApp.from(message.payload.app, { sender: await host.getSender() }));
 	};
-}
+};

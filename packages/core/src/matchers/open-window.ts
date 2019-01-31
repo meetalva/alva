@@ -1,7 +1,8 @@
-import * as M from '../message';
-import * as T from '../types';
+import * as M from '@meetalva/message';
+import * as T from '@meetalva/types';
+import { MatcherCreator } from './context';
 
-export function openWindow({ host, location }: T.MatcherContext): T.Matcher<M.OpenWindow> {
+export const openWindow: MatcherCreator<M.OpenWindow> = ({ host, location }) => {
 	return async message => {
 		switch (message.payload.view) {
 			case T.AlvaView.PageDetail:
@@ -18,4 +19,4 @@ export function openWindow({ host, location }: T.MatcherContext): T.Matcher<M.Op
 				return;
 		}
 	};
-}
+};

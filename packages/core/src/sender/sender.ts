@@ -1,12 +1,12 @@
 // tslint:disable:no-non-null-assertion
-import * as AlvaUtil from '../alva-util';
-import * as Message from '../message';
+import * as AlvaUtil from '@meetalva/util';
+import * as Message from '@meetalva/message';
 import { isMessage } from './is-message';
 import { isMessageType } from './is-message-type';
 import * as Serde from './serde';
 import * as uuid from 'uuid';
 import { EventEmitter } from 'electron';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 // tslint:disable-next-line:no-eval
 const WS = typeof window !== 'undefined' ? WebSocket : (eval('require("ws")') as typeof WebSocket);
@@ -31,7 +31,7 @@ export type SenderInit = WebSocketInit | PostMessageInit | MixedInit;
 
 export type Matcher = (message: Message.Message) => void;
 
-export class Sender implements Types.Sender {
+export class Sender implements Types.Sender<Message.Message> {
 	public readonly id: string;
 
 	private endpoint?: string;
@@ -186,6 +186,7 @@ export class Sender implements Types.Sender {
 		}
 
 		if (this.window) {
+			console.log(envelope);
 			this.window.postMessage(envelope, '*');
 		}
 	}

@@ -1,14 +1,15 @@
-import * as M from '../message';
-import { MessageType } from '../message';
-import * as T from '../types';
-import { getPackage } from '../analyzer/get-package';
 import * as uuid from 'uuid';
-import { performAnalysis } from './perform-analysis';
+import * as pkgDir from 'pkg-dir';
+import * as M from '@meetalva/message';
+import { MessageType } from '@meetalva/message';
+import * as T from '@meetalva/types';
+import * as Analzyer from '@meetalva/analyzer';
+import { MatcherCreator } from './context';
 
-export function connectNpmPatternLibrary({
+export const connectNpmPatternLibrary: MatcherCreator<M.ConnectNpmPatternLibraryRequest> = ({
 	host,
 	dataHost
-}: T.MatcherContext): T.Matcher<M.ConnectNpmPatternLibraryRequest> {
+}) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 
@@ -47,8 +48,28 @@ export function connectNpmPatternLibrary({
 			return abort();
 		}
 
-		const result = await getPackage(m.payload.npmId, {
+		const dirname = await pkgDir(__dirname);
+
+		if (dirname === null) {
+			app.send({
+				type: MessageType.ShowError,
+				id: uuid.v4(),
+				payload: {
+					message: 'Sorry, we could not fetch this package.',
+					detail: 'Could not determine pkg root',
+					error: {
+						message: 'Could not determine pkg root',
+						stack: ''
+					}
+				}
+			});
+
+			return abort();
+		}
+
+		const result = await Analzyer.getPackage(m.payload.npmId, {
 			cwd: await host.resolveFrom(T.HostBase.AppData, 'packages'),
+			dirname,
 			appPath: await host.resolveFrom(T.HostBase.AppPath, '.')
 		});
 
@@ -69,7 +90,7 @@ export function connectNpmPatternLibrary({
 			return abort();
 		}
 
-		const analysisResult = await performAnalysis(result.path, { previousLibrary });
+		const analysisResult = await Analzyer.analyze(result.path);
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			host.log(analysisResult.error.message);
@@ -132,4 +153,4 @@ export function connectNpmPatternLibrary({
 			});
 		}
 	};
-}
+};

@@ -1,0 +1,23 @@
+{
+	"references": [
+		{
+			"path": "../util"
+		}
+	],
+	"compilerOptions": {
+		"composite": true,
+		"outDir": "lib",
+		"skipLibCheck": true,
+		"lib": ["es2017", "dom"],
+		"experimentalDecorators": true,
+		"moduleResolution": "node",
+		"module": "commonjs",
+		"rootDir": "src",
+		"target": "es2017",
+		"jsx": "react",
+		"strict": true,
+		"sourceMap": true,
+		"declarationMap": true
+	},
+	"include": ["src"]
+}

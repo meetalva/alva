@@ -2,9 +2,9 @@ import * as Fs from 'fs';
 import * as Yaml from 'js-yaml';
 import * as Util from 'util';
 import { ZeroOneMigration } from './migration-v0-v1';
-import * as T from '../types';
-import * as M from '../model';
-import { builtinPatternLibrary } from '../model';
+import * as T from '@meetalva/types';
+import * as M from '@meetalva/model';
+import { builtinPatternLibrary } from '@meetalva/model';
 
 const readFile = Util.promisify(Fs.readFile);
 const fixtures = require('fixturez')(__dirname);

@@ -1,4 +1,4 @@
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 
 // tslint:disable-next-line:no-any
 export function getComponents(project: Model.Project): { [id: string]: any } {

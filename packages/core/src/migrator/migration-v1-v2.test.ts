@@ -2,7 +2,7 @@ import * as Fs from 'fs';
 import * as Yaml from 'js-yaml';
 import * as Util from 'util';
 import { OneTwoMigration } from './migration-v1-v2';
-import * as T from '../types';
+import * as T from '@meetalva/types';
 
 const readFile = Util.promisify(Fs.readFile);
 const fixtures = require('fixturez')(__dirname);

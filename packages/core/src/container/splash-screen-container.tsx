@@ -1,4 +1,4 @@
-import { MessageType } from '../message';
+import { MessageType } from '@meetalva/message';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import { SplashScreenView } from './splash-screen-view';

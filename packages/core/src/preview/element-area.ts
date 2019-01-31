@@ -1,5 +1,5 @@
 import * as MobX from 'mobx';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 
 export interface ElementAreaInit {
 	top: number;

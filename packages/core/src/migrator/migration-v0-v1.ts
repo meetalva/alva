@@ -1,8 +1,7 @@
-import * as T from '../types';
-import { builtinPatternLibrary, ElementProperty } from '../model';
+import * as T from '@meetalva/types';
+import { builtinPatternLibrary } from '@meetalva/model';
 import { AbstractMigration, MigrationItem } from './abstract-migration';
 import { camelCase } from 'lodash';
-import { SerializedPatternLibraryV2 } from '../types';
 
 export type ZeroOneMigrationInput = MigrationItem<T.VersionZeroSerializedProject>;
 export type ZeroOneMigrationOutput = MigrationItem<T.VersionOneSerializedProject>;

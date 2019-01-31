@@ -6,13 +6,15 @@ import * as Util from 'util';
 import * as WS from 'ws';
 import * as Routes from './routes';
 import * as Sender from '../sender';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
+import * as Model from '@meetalva/model';
+import * as M from '@meetalva/message';
 
 interface AlvaServerInit {
 	app: express.Express;
-	host: Types.Host;
+	host: Types.Host<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
 	interface?: string;
-	dataHost: Types.DataHost;
+	dataHost: Types.DataHost<Model.Project>;
 	http: Http.Server;
 	ws: WS.Server;
 	options: {
@@ -20,12 +22,13 @@ interface AlvaServerInit {
 	};
 }
 
-export class AlvaServer implements Types.AlvaServer {
+export class AlvaServer
+	implements Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message> {
 	private app: express.Express;
 	private http: Http.Server;
 	private ws: WS.Server;
-	public readonly dataHost: Types.DataHost;
-	public readonly host: Types.Host;
+	public readonly dataHost: Types.DataHost<Model.Project>;
+	public readonly host: Types.Host<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
 	public sender: Sender.Sender;
 	public readonly port: number;
 	public readonly interface?: string;
@@ -123,8 +126,8 @@ export class AlvaServer implements Types.AlvaServer {
 		host,
 		dataHost
 	}: {
-		host: Types.Host;
-		dataHost: Types.DataHost;
+		host: Types.Host<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
+		dataHost: Types.DataHost<Model.Project>;
 	}): Promise<AlvaServer> {
 		const flags = await host.getFlags();
 		const port = await host.getPort(flags.port);

@@ -174,6 +174,23 @@ async function main(cli) {
 
 	if (!cli.dryRun) {
 		manifest.version = version;
+
+		if (channel === 'pr') {
+			manifest.build.productName = `Alva PR ${prNumber}`;
+			manifest.build.mac.artifactName = 'alva-${version}.${ext}';
+			manifest.build.nsis.artifactName = 'alva-${version}.${ext}';
+			manifest.build.portable.artifactName = 'alva-portable-${version}.${ext}';
+			manifest.build.linux.artifactName = 'alva-${version}.${ext}';
+		}
+
+		if (channel === 'alpha') {
+			manifest.build.productName = `Alva Canary`;
+			manifest.build.mac.artifactName = 'alva-${version}-canary.${ext}';
+			manifest.build.nsis.artifactName = 'alva-${version}-canary.${ext}';
+			manifest.build.portable.artifactName = 'alva-portable-${version}-canary.${ext}';
+			manifest.build.linux.artifactName = 'alva-${version}-canary.${ext}';
+		}
+
 		await writeFile(
 			Path.join(projectPath, 'package.ncc.json'),
 			JSON.stringify(manifest, null, '  ')

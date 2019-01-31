@@ -3,9 +3,9 @@ import { UserStorePropertySelect } from '../user-store-property-select';
 import { ViewStore } from '../../store';
 import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import * as React from 'react';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
 import * as Mobx from 'mobx';
 

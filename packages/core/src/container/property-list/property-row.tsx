@@ -1,7 +1,7 @@
 import { PropertyListItem } from './property-list-item';
 import * as React from 'react';
 import { CellMeasurer, CellMeasurerCache, List, ListRowProps } from 'react-virtualized';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import * as Components from '@meetalva/components';
 
 export enum RowType {

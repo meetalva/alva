@@ -1,7 +1,7 @@
 import * as Express from 'express';
-import * as Types from '../../types';
+import { ServerContext } from './context';
 
-export function libraryRouteFactory(server: Types.AlvaServer): Express.RequestHandler {
+export function libraryRouteFactory(server: ServerContext): Express.RequestHandler {
 	return async function libraryRoute(req: Express.Request, res: Express.Response): Promise<void> {
 		if (typeof req.params.projectId !== 'string' || typeof req.params.libraryId !== 'string') {
 			res.sendStatus(404);

@@ -1,6 +1,7 @@
 import * as uuid from 'uuid';
-import { MessageType as M } from '../message';
-import * as Types from '../types';
+import { MessageType as M, Message } from '@meetalva/message';
+import * as Types from '@meetalva/types';
+import * as Model from '@meetalva/model';
 
 const ids = {
 	cut: uuid.v4(),
@@ -14,7 +15,9 @@ const ids = {
 	sep: uuid.v4()
 };
 
-export const elementContextMenu = (ctx: Types.ElementMenuContext): Types.ContextMenuItem[] => {
+export const elementContextMenu = (
+	ctx: Types.ElementMenuContext<Model.AlvaApp<Message>, Model.Project, Model.Element>
+): Types.ContextMenuItem<Model.AlvaApp<Message>, Message>[] => {
 	const defaultPasteItems = [
 		{
 			id: ids.pasteBelow,

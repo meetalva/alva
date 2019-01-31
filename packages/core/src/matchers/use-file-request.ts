@@ -1,11 +1,13 @@
-import * as M from '../message';
-import * as T from '../types';
-import { Persistence } from '../persistence';
 import * as uuid from 'uuid';
 import * as Path from 'path';
-import * as Model from '../model';
+import * as M from '@meetalva/message';
+import * as T from '@meetalva/types';
+import * as Model from '@meetalva/model';
+import * as ModelTree from '@meetalva/model-tree';
+import { Persistence } from '../persistence';
+import { MatcherCreator } from './context';
 
-export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<M.UseFileRequest> {
+export const useFileRequest: MatcherCreator<M.UseFileRequest> = ({ host, dataHost }) => {
 	return async m => {
 		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 
@@ -72,7 +74,7 @@ export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<
 		await dataHost.addProject(draftProject);
 
 		if (typeof window === 'undefined') {
-			draftProject.sync(await host.getSender());
+			draftProject.sync(await host.getSender(), ModelTree);
 		}
 
 		const connections = await dataHost.getConnections(draftProject);
@@ -115,4 +117,4 @@ export function useFileRequest({ dataHost, host }: T.MatcherContext): T.Matcher<
 			}
 		});
 	};
-}
+};

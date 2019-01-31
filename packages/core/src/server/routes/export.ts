@@ -1,9 +1,9 @@
 import * as Express from 'express';
 import * as PreviewDocument from '../../preview-document';
-import * as Types from '../../types';
 import * as Path from 'path';
+import { ServerContext } from './context';
 
-export function exportRouteFactory(server: Types.AlvaServer): Express.RequestHandler {
+export function exportRouteFactory(server: ServerContext): Express.RequestHandler {
 	return async function exportRoute(req: Express.Request, res: Express.Response): Promise<void> {
 		res.type('html');
 

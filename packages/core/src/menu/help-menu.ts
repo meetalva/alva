@@ -1,6 +1,7 @@
-import * as Types from '../types';
-import * as Message from '../message';
+import * as Types from '@meetalva/types';
+import * as Message from '@meetalva/message';
 import * as uuid from 'uuid';
+import { MenuCreator } from './context';
 
 const ids = {
 	help: uuid.v4(),
@@ -11,7 +12,7 @@ const ids = {
 	devTools: uuid.v4()
 };
 
-export const helpMenu = (ctx: Types.MenuContext): Types.MenuItem => {
+export const helpMenu: MenuCreator = ctx => {
 	const isElectron = typeof ctx.app !== 'undefined' && ctx.app.isHostType(Types.HostType.Electron);
 
 	return {

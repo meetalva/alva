@@ -1,6 +1,6 @@
 import * as Server from '../server';
 import * as Hosts from '../hosts';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as Serde from '../sender/serde';
 import { NodeAdapter } from '../adapters/node-adapter';
 

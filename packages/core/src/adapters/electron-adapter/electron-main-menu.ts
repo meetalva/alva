@@ -1,20 +1,22 @@
 import * as Electron from 'electron';
 import * as Mobx from 'mobx';
-import * as Model from '../../model';
-import * as M from '../../message';
-import { MessageType as MT } from '../../message';
+import * as Model from '@meetalva/model';
+import * as M from '@meetalva/message';
+import { MessageType as MT } from '@meetalva/message';
 import * as Menu from '../../menu';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as Url from 'url';
 import uuid = require('uuid');
 
 export class ElectronMainMenu {
-	private server: Types.AlvaServer;
+	private server: Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
 
-	@Mobx.observable private focusedApp: Model.AlvaApp | undefined;
+	@Mobx.observable private focusedApp: Model.AlvaApp<M.Message> | undefined;
 	@Mobx.observable private focusedProject: Model.Project | undefined;
 
-	public constructor(init: { server: Types.AlvaServer }) {
+	public constructor(init: {
+		server: Types.AlvaServer<Model.AlvaApp<M.Message>, Model.Project, M.Message>;
+	}) {
 		this.server = init.server;
 	}
 
@@ -74,12 +76,17 @@ export class ElectronMainMenu {
 	}
 
 	private render(ctx: {
-		app: Model.AlvaApp | undefined;
+		app: Model.AlvaApp<M.Message> | undefined;
 		project: Model.Project | undefined;
 	}): void {
-		const toElectronAction = (item: Types.MenuItem): Electron.MenuItemConstructorOptions[] => {
+		const toElectronAction = (
+			item: Types.MenuItem<Model.AlvaApp<M.Message>, M.Message>
+		): Electron.MenuItemConstructorOptions[] => {
 			if (typeof (item as any).click === 'function') {
-				const actionable = item as Types.ActionableMenuItem;
+				const actionable = item as Types.ActionableMenuItem<
+					Model.AlvaApp<M.Message>,
+					M.Message
+				>;
 				const onClick = actionable.click!;
 				actionable.click = () => {
 					if (!this.focusedApp) {
@@ -90,7 +97,7 @@ export class ElectronMainMenu {
 			}
 
 			if (Array.isArray((item as any).submenu)) {
-				const nested = item as Types.NestedMenuItem;
+				const nested = item as Types.NestedMenuItem<Model.AlvaApp<M.Message>, M.Message>;
 				(nested as any).submenu = nested.submenu.map(m => toElectronAction(m));
 			}
 
@@ -110,11 +117,11 @@ export class ElectronMainMenu {
 		Electron.Menu.setApplicationMenu(menu);
 	}
 
-	public setApp(app: Model.AlvaApp | undefined) {
+	public setApp(app: Model.AlvaApp<M.Message> | undefined) {
 		return (this.focusedApp = app);
 	}
 
-	public getApp(): Model.AlvaApp | undefined {
+	public getApp(): Model.AlvaApp<M.Message> | undefined {
 		return this.focusedApp;
 	}
 }

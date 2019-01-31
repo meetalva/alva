@@ -1,6 +1,7 @@
 import * as uuid from 'uuid';
-import * as Message from '../message';
-import * as Types from '../types';
+import * as Message from '@meetalva/message';
+import * as Types from '@meetalva/types';
+import { MenuCreator } from './context';
 
 const ids = {
 	view: uuid.v4(),
@@ -15,7 +16,7 @@ const ids = {
 	showEditor: uuid.v4()
 };
 
-export const viewMenu = (ctx: Types.MenuContext): Types.MenuItem => {
+export const viewMenu: MenuCreator = ctx => {
 	const isElectron = typeof ctx.app !== 'undefined' && ctx.app.isHostType(Types.HostType.Electron);
 	const hasNextPage =
 		typeof ctx.project !== 'undefined' && typeof ctx.project.getNextPage() !== 'undefined';

@@ -1,13 +1,14 @@
-import * as M from '../message';
-import { MessageType } from '../message';
-import * as T from '../types';
+import * as M from '@meetalva/message';
+import { MessageType } from '@meetalva/message';
+import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
-import { performAnalysis } from './perform-analysis';
+import * as Anaylzer from '@meetalva/analyzer';
+import { MatcherCreator } from './context';
 
-export function connectPatternLibrary({
+export const connectPatternLibrary: MatcherCreator<M.ConnectPatternLibraryRequest> = ({
 	host,
 	dataHost
-}: T.MatcherContext): T.Matcher<M.ConnectPatternLibraryRequest> {
+}) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 
@@ -81,7 +82,7 @@ export function connectPatternLibrary({
 			});
 		}
 
-		const analysisResult = await performAnalysis(path, { previousLibrary });
+		const analysisResult = await Anaylzer.analyze(path);
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			host.log(analysisResult.error.message);
@@ -144,4 +145,4 @@ export function connectPatternLibrary({
 			});
 		}
 	};
-}
+};

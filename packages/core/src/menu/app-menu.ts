@@ -1,6 +1,7 @@
 import * as uuid from 'uuid';
-import { MessageType } from '../message';
-import * as Types from '../types';
+import { MessageType } from '@meetalva/message';
+import * as Types from '@meetalva/types';
+import { MenuCreator } from './context';
 
 const pkg = require('../../package.json');
 
@@ -15,7 +16,7 @@ const ids = {
 	quit: uuid.v4()
 };
 
-export const appMenu = (ctx: Types.MenuContext): Types.MenuItem => {
+export const appMenu: MenuCreator = ctx => {
 	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.Electron);
 
 	return {

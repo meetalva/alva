@@ -1,14 +1,12 @@
-import * as Message from '../message';
+import * as Message from '@meetalva/message';
 import * as Mobx from 'mobx';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import { ViewStore } from '../store';
-import * as Types from '../types';
 import * as uuid from 'uuid';
 import * as MobxUtils from 'mobx-utils';
-import { string } from 'prop-types';
 
 export interface NotifierContext {
-	app: Model.AlvaApp;
+	app: Model.AlvaApp<Message.Message>;
 	store: ViewStore;
 }
 
@@ -75,6 +73,7 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 				typeof projectSync.stop === 'function'
 			) {
 				projectSync.stop();
+				projectSync.id = undefined;
 			}
 
 			if (!projectSync.id) {
@@ -97,16 +96,16 @@ export function createNotifiers({ app, store }: NotifierContext): void {
 				return;
 			}
 
-			if (
-				projectSync.id &&
-				projectSync.id !== app.getId() &&
-				typeof appSync.stop === 'function'
-			) {
+			if (appSync.id && appSync.id !== app.getId() && typeof appSync.stop === 'function') {
 				appSync.stop();
+				appSync.id = undefined;
 			}
 
 			if (!appSync.id) {
-				appSync.stop = MobxUtils.deepObserve<Model.AlvaApp>(app, onAppChange(app));
+				appSync.stop = MobxUtils.deepObserve<Model.AlvaApp<Message.Message>>(
+					app,
+					onAppChange(app)
+				);
 				appSync.id = app.getId();
 			}
 		},
@@ -123,9 +122,13 @@ type MobxChange =
 	| Mobx.IMapDidChange;
 
 type ProjectChangeHandler = (change: MobxChange, path: string, project: Model.Project) => void;
-type AppChangeHandler = (change: MobxChange, path: string, app: Model.AlvaApp) => void;
+type AppChangeHandler = (
+	change: MobxChange,
+	path: string,
+	app: Model.AlvaApp<Message.Message>
+) => void;
 
-function onProjectChange(app: Model.AlvaApp): ProjectChangeHandler {
+function onProjectChange(app: Model.AlvaApp<Message.Message>): ProjectChangeHandler {
 	return (change, path, project) => {
 		app.send({
 			id: uuid.v4(),
@@ -139,7 +142,7 @@ function onProjectChange(app: Model.AlvaApp): ProjectChangeHandler {
 	};
 }
 
-function onAppChange(app: Model.AlvaApp): AppChangeHandler {
+function onAppChange(app: Model.AlvaApp<Message.Message>): AppChangeHandler {
 	return (change, path, app) => {
 		app.send({
 			id: uuid.v4(),

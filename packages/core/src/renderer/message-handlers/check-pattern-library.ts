@@ -1,6 +1,6 @@
-import * as M from '../../message';
+import * as M from '@meetalva/message';
 import { MessageHandlerContext, MessageHandler } from '../create-handlers';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 
 export function checkPatternLibrary({
 	store

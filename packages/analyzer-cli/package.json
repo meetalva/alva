@@ -1,0 +1,35 @@
+{
+  "name": "@meetalva/analyzer-cli",
+  "version": "1.0.0",
+  "description": "Derive component meta data and bundles from React projects",
+  "bin": {
+    "alva-analyze": "./bin/analyze"
+  },
+  "scripts": {
+    "check:dependencies": "alva-dependencies -i typescript-eslint-parser"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetalva/alva.git"
+  },
+  "author": {
+    "email": "hey@meetalva.io",
+    "name": "Meet Alva Team",
+    "url": "https://meetalva.io/"
+  },
+  "license": "MIT",
+  "homepage": "https://meetalva.github.io/",
+  "bugs": {
+    "url": "https://github.com/meetalva/alva/issues"
+  },
+  "devDependencies": {
+    "@meetalva/tools": "1.0.0"
+  },
+  "dependencies": {
+    "@meetalva/analyzer": "1.0.0",
+    "@meetalva/model": "1.0.0",
+    "@meetalva/types": "1.0.0",
+    "@types/node": "^10.12.18",
+    "yargs-parser": "10.1.0"
+  }
+}

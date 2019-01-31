@@ -1,7 +1,7 @@
 import * as Components from '@meetalva/components';
-import * as Message from '../../message';
+import * as Message from '@meetalva/message';
 import * as MobxReact from 'mobx-react';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';

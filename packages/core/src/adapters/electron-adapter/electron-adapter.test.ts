@@ -1,9 +1,9 @@
 import * as uuid from 'uuid';
 import { ElectronAdapter } from './electron-adapter';
 import { AlvaServer } from '../../server';
-import * as M from '../../message';
+import * as M from '@meetalva/message';
 import * as Matchers from '../../matchers';
-import * as T from '../../types';
+import * as T from '@meetalva/types';
 
 jest.mock('mobx');
 jest.mock('./electron-updater');

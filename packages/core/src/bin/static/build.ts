@@ -1,8 +1,9 @@
 import * as Fs from 'fs-extra';
 import * as Path from 'path';
 import * as RendererDocument from '../../renderer/renderer-document';
-import * as Types from '../../types';
-import * as Model from '../../model';
+import * as Types from '@meetalva/types';
+import * as Model from '@meetalva/model';
+import { Message } from '@meetalva/message';
 
 export async function build({
 	path,
@@ -10,7 +11,7 @@ export async function build({
 	project
 }: {
 	path: string;
-	host: Types.Host;
+	host: Types.Host<Model.AlvaApp<Message>, Model.Project, Message>;
 	project?: Model.Project;
 }): Promise<void> {
 	const pkgDir = require('pkg-dir');

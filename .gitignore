@@ -3,6 +3,8 @@ lib
 nccbuild
 dist
 node_modules
+**/vendor/alva-analyze.js
+**/vendor/alva-analyze.js.map
 *.log
 .DS_Store
 .static

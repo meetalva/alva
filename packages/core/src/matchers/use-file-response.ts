@@ -1,9 +1,10 @@
-import * as M from '../message';
-import * as T from '../types';
+import * as M from '@meetalva/message';
+import * as T from '@meetalva/types';
 import * as uuid from 'uuid';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
+import { MatcherCreator } from './context';
 
-export function useFileResponse({ host }: T.MatcherContext): T.Matcher<M.UseFileResponse> {
+export const useFileResponse: MatcherCreator<M.UseFileResponse> = ({ host }) => {
 	return async m => {
 		const sender = (await host.getApp(m.appId || '')) || (await host.getSender());
 
@@ -32,4 +33,4 @@ export function useFileResponse({ host }: T.MatcherContext): T.Matcher<M.UseFile
 			);
 		}
 	};
-}
+};

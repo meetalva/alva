@@ -1,12 +1,14 @@
 import * as React from 'react';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as Store from '../../store';
 import { AcceleratorIndicator } from './accelerator';
+import * as Model from '@meetalva/model';
+import { Message } from '@meetalva/message';
 
 @MobxReact.observer
-export class Menu extends React.Component<Types.MenuProps> {
+export class Menu extends React.Component<Types.MenuProps<Model.AlvaApp<Message>, Message>> {
 	private menuStore = new Store.MenuStore(this.props.menus);
 
 	public render(): JSX.Element | null {
@@ -51,7 +53,7 @@ export class Menu extends React.Component<Types.MenuProps> {
 	}
 }
 
-export class SubMenu extends React.Component<Types.SubMenuProps> {
+export class SubMenu extends React.Component<Types.SubMenuProps<Model.AlvaApp<Message>, Message>> {
 	public render(): JSX.Element | null {
 		const { props } = this;
 		return (
@@ -83,7 +85,9 @@ export class SubMenu extends React.Component<Types.SubMenuProps> {
 	}
 }
 
-export class GenericMenuItem extends React.Component<Types.GenericMenuItemProps> {
+export class GenericMenuItem extends React.Component<
+	Types.GenericMenuItemProps<Model.AlvaApp<Message>, Message>
+> {
 	public render(): JSX.Element | null {
 		const { props } = this;
 
@@ -96,23 +100,25 @@ export class GenericMenuItem extends React.Component<Types.GenericMenuItemProps>
 		}
 
 		if (props.menu.hasOwnProperty('type') && (props.menu as any).type === 'checkbox') {
-			const menu = props.menu as Types.CheckboxMenuItem;
+			const menu = props.menu as Types.CheckboxMenuItem<Model.AlvaApp<Message>, Message>;
 			return <CheckboxMenuItem menu={menu} />;
 		}
 
 		if (props.menu.hasOwnProperty('submenu')) {
-			const menu = props.menu as Types.NestedMenuItem;
+			const menu = props.menu as Types.NestedMenuItem<Model.AlvaApp<Message>, Message>;
 			return <NestedMenuItem variant={props.variant} menu={menu} />;
 		}
 
-		const menu = props.menu as Types.ContentMenuItem;
+		const menu = props.menu as Types.ContentMenuItem<Model.AlvaApp<Message>, Message>;
 		return <PlainMenuItem menu={menu} />;
 	}
 }
 
 @MobxReact.inject('menuStore', 'store')
 @MobxReact.observer
-class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
+class PlainMenuItem extends React.Component<{
+	menu: Types.ContentMenuItem<Model.AlvaApp<Message>, Message>;
+}> {
 	private handleAction = (
 		e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<unknown> | KeyboardEvent
 	): void => {
@@ -143,7 +149,7 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 		props.menuStore.toggle(menu.menu.id, false);
 
 		if (menu.menu.hasOwnProperty('click')) {
-			const actionable = menu.menu as Types.ActionableMenuItem;
+			const actionable = menu.menu as Types.ActionableMenuItem<Model.AlvaApp<Message>, Message>;
 			if (typeof actionable.click !== 'undefined') {
 				actionable.click(props.store.getApp());
 			}
@@ -227,11 +233,15 @@ class PlainMenuItem extends React.Component<{ menu: Types.ContentMenuItem }> {
 
 @MobxReact.inject('menuStore', 'store')
 @MobxReact.observer
-class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }> {
+class CheckboxMenuItem extends React.Component<{
+	menu: Types.CheckboxMenuItem<Model.AlvaApp<Message>, Message>;
+}> {
 	private handleAction = (e: any) => {
 		e.preventDefault();
 
-		const props = this.props as { menu: Types.CheckboxMenuItem } & {
+		const props = this.props as {
+			menu: Types.CheckboxMenuItem<Model.AlvaApp<Message>, Message>;
+		} & {
 			menuStore: Store.MenuStore;
 			store: Store.ViewStore;
 		};
@@ -252,7 +262,7 @@ class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }>
 
 		props.menuStore.toggle(menu.menu.id, false);
 		if (menu.menu.hasOwnProperty('click')) {
-			const actionable = menu.menu as Types.ActionableMenuItem;
+			const actionable = menu.menu as Types.ActionableMenuItem<Model.AlvaApp<Message>, Message>;
 			if (typeof actionable.click !== 'undefined') {
 				actionable.click(props.store.getApp());
 			}
@@ -260,7 +270,9 @@ class CheckboxMenuItem extends React.Component<{ menu: Types.CheckboxMenuItem }>
 	};
 
 	public render(): JSX.Element | null {
-		const props = this.props as { menu: Types.CheckboxMenuItem } & {
+		const props = this.props as {
+			menu: Types.CheckboxMenuItem<Model.AlvaApp<Message>, Message>;
+		} & {
 			menuStore: Store.MenuStore;
 			store: Store.ViewStore;
 		};
@@ -341,7 +353,7 @@ class SeperatorMenuItem extends React.Component {
 }
 
 interface NestedMenuItemProps {
-	menu: Types.NestedMenuItem;
+	menu: Types.NestedMenuItem<Model.AlvaApp<Message>, Message>;
 	variant: Types.MenuVariant;
 }
 

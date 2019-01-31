@@ -1,5 +1,5 @@
-import * as Types from '../types';
-import * as AlvaUtil from '../alva-util';
+import * as Types from '@meetalva/types';
+import * as AlvaUtil from '@meetalva/util';
 
 export type PreviewDocumentConfig = PreviewDocumentConfigInline | PreviewDocumentConfigMessage;
 

@@ -1,8 +1,12 @@
 {
   "name": "@meetalva/tools",
-  "version": "0.8.1",
+  "version": "1.0.0",
   "private": true,
+  "scripts": {
+    "check:dependencies": "node ./alva-dependencies.js -i dependency-check -i surge"
+  },
   "bin": {
+    "alva-dependencies": "./alva-dependencies.js",
     "alva-deploy": "./alva-deploy.js",
     "alva-trigger": "./alva-trigger.js",
     "alva-version": "./alva-version.js",
@@ -18,11 +22,16 @@
     "url": "https://github.com/meetalva/alva/issues"
   },
   "dependencies": {
+    "@types/execa": "^0.9.0",
+    "@types/read-pkg": "^3.0.0",
+    "dargs": "^6.0.0",
+    "dependency-check": "^3.3.0",
     "execa": "^1.0.0",
     "got": "^9.5.0",
     "lodash": "^4.17.11",
     "node-fetch": "2.1.2",
     "parse-github-url": "^1.0.2",
+    "read-pkg": "^4.0.1",
     "semver": "^5.6.0",
     "semver-utils": "^1.1.4",
     "surge": "0.20.1",

@@ -2,35 +2,33 @@ import * as Os from 'os';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import * as Util from 'util';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as getPort from 'get-port';
 import * as Electron from 'electron';
 import { createWindow } from './create-window';
-import { AlvaApp } from '../../model';
+import { AlvaApp } from '@meetalva/model';
 import * as Mobx from 'mobx';
-import * as Message from '../../message';
+import * as Message from '@meetalva/message';
 import * as ElectronLog from 'electron-log';
-import * as execa from 'execa';
-import { getPackage } from '../../analyzer/get-package';
+import Project from 'ts-simple-ast';
 
 ElectronLog.transports.console.level = 'info';
 ElectronLog.transports.file.level = 'silly';
-
-const YARN = Path.join(__dirname, '..', '..', '..', 'vendor', 'yarn.js');
 
 export interface ElectronHostInit {
 	process: NodeJS.Process;
 	forced?: Partial<Types.HostFlags>;
 }
 
-export class ElectronHost implements Types.Host {
+export class ElectronHost
+	implements Types.Host<AlvaApp<Message.Message>, Project, Message.Message> {
 	public type = Types.HostType.Electron;
 
 	private forced?: Partial<Types.HostFlags>;
 	private process: NodeJS.Process;
-	private sender?: Types.Sender;
+	private sender?: Types.Sender<Message.Message>;
 	private windows: Map<string | number, Electron.BrowserWindow> = new Map();
-	@Mobx.observable private apps: Map<string, AlvaApp> = new Map();
+	@Mobx.observable private apps: Map<string, AlvaApp<Message.Message>> = new Map();
 
 	private constructor(init: ElectronHostInit) {
 		this.process = init.process;
@@ -171,8 +169,8 @@ export class ElectronHost implements Types.Host {
 	}
 
 	public async showMessage(
-		opts: Types.HostMessageOptions
-	): Promise<undefined | Types.HostMessageButton> {
+		opts: Types.HostMessageOptions<Message.Message>
+	): Promise<undefined | Types.HostMessageButton<Message.Message>> {
 		const cancelId = opts.buttons.findIndex(b => typeof b.cancel !== 'undefined' && b.cancel);
 		const defaultId = opts.buttons.findIndex(
 			b => typeof b.selected !== 'undefined' && b.selected
@@ -205,7 +203,7 @@ export class ElectronHost implements Types.Host {
 	}
 
 	public async showContextMenu(opts: {
-		items: Types.ContextMenuItem[];
+		items: Types.ContextMenuItem<AlvaApp<Message.Message>, Message.Message>[];
 		position: { x: number; y: number };
 	}): Promise<void> {
 		const focusedWindow = Electron.BrowserWindow.getFocusedWindow();
@@ -238,20 +236,20 @@ export class ElectronHost implements Types.Host {
 	}
 
 	@Mobx.action
-	public async addApp(app: AlvaApp): Promise<void> {
+	public async addApp(app: any): Promise<void> {
 		this.apps.set(app.getId(), app);
 		return;
 	}
 
-	public async getApp(id: string): Promise<AlvaApp | undefined> {
+	public async getApp(id: string): Promise<AlvaApp<Message.Message> | undefined> {
 		return this.apps.get(id);
 	}
 
-	public async getSender(): Promise<Types.Sender> {
+	public async getSender(): Promise<Types.Sender<Message.Message>> {
 		return this.sender!;
 	}
 
-	public setSender(sender: Types.Sender) {
+	public setSender(sender: Types.Sender<Message.Message>) {
 		this.sender = sender;
 		this.sender.setLog((m: string, message: Message.Message) => {
 			this.log(m, message.type, message.id);

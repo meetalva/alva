@@ -1,4 +1,4 @@
-import * as T from '../types';
+import * as T from '@meetalva/types';
 import { AbstractMigration, MigrationItem } from './abstract-migration';
 
 export type OneTwoMigrationInput = MigrationItem<T.VersionOneSerializedProject>;

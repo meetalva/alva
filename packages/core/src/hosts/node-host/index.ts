@@ -2,18 +2,18 @@ import * as Os from 'os';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import * as Util from 'util';
-import * as Types from '../../types';
+import * as Types from '@meetalva/types';
 import * as getPort from 'get-port';
-import * as Model from '../../model';
-import * as execa from 'execa';
+import * as Model from '@meetalva/model';
+import * as M from '@meetalva/message';
 
-export class NodeHost implements Types.Host {
+export class NodeHost implements Types.Host<Model.AlvaApp<M.Message>, Model.Project, M.Message> {
 	public type = Types.HostType.Node;
 
 	private forced?: Partial<Types.HostFlags>;
 	private process?: NodeJS.Process;
-	private sender?: Types.Sender;
-	private apps: Map<string, Model.AlvaApp> = new Map();
+	private sender?: Types.Sender<M.Message>;
+	private apps: Map<string, Model.AlvaApp<M.Message>> = new Map();
 
 	public static async fromProcess(
 		process: NodeJS.Process,
@@ -40,11 +40,11 @@ export class NodeHost implements Types.Host {
 		return getPort({ port: requested });
 	}
 
-	public async getApp(id: string): Promise<Model.AlvaApp | undefined> {
+	public async getApp(id: string): Promise<Model.AlvaApp<M.Message> | undefined> {
 		return this.apps.get(id);
 	}
 
-	public async addApp(app: Model.AlvaApp): Promise<void> {
+	public async addApp(app: any): Promise<void> {
 		this.apps.set(app.getId(), app);
 	}
 
@@ -126,11 +126,11 @@ export class NodeHost implements Types.Host {
 		return writeFile(path, data);
 	}
 
-	public async getSender(): Promise<Types.Sender> {
+	public async getSender(): Promise<Types.Sender<M.Message>> {
 		return this.sender!;
 	}
 
-	public setSender(sender: Types.Sender) {
+	public setSender(sender: Types.Sender<M.Message>) {
 		this.sender = sender;
 	}
 

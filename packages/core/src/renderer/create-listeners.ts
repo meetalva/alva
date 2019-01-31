@@ -1,6 +1,6 @@
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';
-import * as Message from '../message';
+import * as Message from '@meetalva/message';
 
 export function createListeners({ store }: { store: ViewStore }): void {
 	window.addEventListener('keydown', e => {

@@ -1,13 +1,19 @@
-import * as M from '../message';
-import * as T from '../types';
+import * as M from '@meetalva/message';
+import * as T from '@meetalva/types';
+import * as ModelTree from '@meetalva/model-tree';
 import { Persistence } from '../persistence';
 import * as Path from 'path';
 import * as uuid from 'uuid';
+import { MatcherCreator } from './context';
 
-export function saveAs(
-	{ host, dataHost }: T.MatcherContext,
-	config: { passive: boolean }
-): T.Matcher<M.SaveAs> {
+export interface SaveAsConfig {
+	passive: boolean;
+}
+
+export const saveAs: MatcherCreator<M.SaveAs, SaveAsConfig> = (
+	{ host, dataHost },
+	config?: { passive: boolean }
+) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 
@@ -61,6 +67,8 @@ export function saveAs(
 			return;
 		}
 
+		console.log('before', project.getId(), project.getPath());
+
 		project.setPath(targetPath);
 		project.setDraft(false);
 
@@ -71,7 +79,8 @@ export function saveAs(
 		await dataHost.addProject(project);
 
 		if (typeof window === 'undefined') {
-			project.sync(await host.getSender());
+			console.log('after', project.getId(), project.getPath());
+			project.sync(await host.getSender(), ModelTree);
 		}
 
 		try {
@@ -79,7 +88,7 @@ export function saveAs(
 			await host.writeFile(targetPath, serializeResult.contents);
 			await host.saveFile(`${project.getName()}.alva`, serializeResult.contents);
 
-			if (config.passive) {
+			if (config && config.passive) {
 				return;
 			}
 
@@ -113,4 +122,4 @@ export function saveAs(
 			});
 		}
 	};
-}
+};

@@ -3,10 +3,10 @@ import * as Monaco from 'monaco-editor';
 import * as React from 'react';
 import styled from 'styled-components';
 import * as JSON5 from 'json5';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import { WithStore } from '../../store';
 import * as Components from '@meetalva/components';
-import { PatternUnknownProperty } from '../../model/pattern-property/unknown-property';
+import { PatternUnknownProperty } from '@meetalva/model';
 
 export interface PropertyUnknownEditorProps {
 	property: Model.ElementProperty;

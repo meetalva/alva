@@ -9,7 +9,7 @@
     "lint": "tslint --project . -c tslint.json 'src/**/*.ts'",
     "precommit": "lint-staged",
     "watch": "lerna run watch --stream",
-    "analyze:essentials": "alva analyze --out=packages/essentials/src/analysis.ts --in=packages/essentials/package.json"
+    "analyze:essentials": "alva analyze --in=packages/essentials/package.json --out=packages/essentials/src/analysis.ts --builtins"
   },
   "repository": {
     "type": "git",
@@ -42,21 +42,27 @@
     "@commitlint/prompt-cli": "7.1.2",
     "@meetalva/core": "0.9.2",
     "@meetalva/site": "0.8.1",
-    "@meetalva/tools": "0.8.1",
+    "@meetalva/tools": "1.0.0",
     "@patternplate/cli": "^3.2.6",
     "@patternplate/render-styled-components": "2.5.18",
     "@types/jest": "22.2.2",
+    "css-loader": "1.0.0",
+    "dependency-check": "^3.3.0",
     "husky": "0.14.3",
     "jest": "^23.6.0",
     "jest-dom": "^3.0.0",
     "jest-util": "^23.4.0",
     "lerna": "^3.6.0",
+    "monaco-editor-webpack-plugin": "1.4.0",
     "lint-staged": "7.0.4",
     "prettier": "1.12.0",
+    "style-loader": "0.21.0",
     "ts-jest": "^23.10.5",
+    "ts-loader": "4.4.1",
     "tslint": "5.11.0",
     "tslint-config-prettier": "1.15.0",
-    "typescript": "3.2.2"
+    "typescript": "3.2.2",
+    "webpack-cli": "3.1.0"
   },
   "homepage": "https://meetalva.io/",
   "workspaces": [

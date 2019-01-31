@@ -3,12 +3,9 @@ import * as RTL from 'react-testing-library';
 import { PropertyListContainer } from './property-list';
 import * as MobxReact from 'mobx-react';
 import { ViewStore } from '../../store';
-import { Project, Element, Pattern, PatternLibrary } from '../../model';
-import * as T from '../../types';
-import {
-	PatternUnknownProperty,
-	PatternUnknownPropertyInit
-} from '../../model/pattern-property/unknown-property';
+import { Project, Element, Pattern, PatternLibrary } from '@meetalva/model';
+import * as T from '@meetalva/types';
+import { PatternUnknownProperty, PatternUnknownPropertyInit } from '@meetalva/model';
 
 // tslint:disable-next-line:no-submodule-imports
 import 'jest-dom/extend-expect';

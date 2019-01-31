@@ -3,7 +3,7 @@ import { ChromeContainer } from './chrome/chrome-container';
 import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
 import * as React from 'react';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as Menu from '../menu';
 import { ViewStore } from '../store';
 import * as ReactLoadable from 'react-loadable';

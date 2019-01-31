@@ -3,15 +3,15 @@ import { createListeners } from './create-listeners';
 import { createNotifiers } from './create-notifiers';
 import { createHandlers } from './create-handlers';
 import { Sender } from '../sender';
-import { MessageType } from '../message';
+import { MessageType } from '@meetalva/message';
 import * as Mobx from 'mobx';
 import * as MobxReact from 'mobx-react';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { ViewStore } from '../store';
 import * as uuid from 'uuid';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import { BrowserAdapter } from '../adapters/browser-adapter';
 import * as Fs from 'fs';
 

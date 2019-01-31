@@ -1,13 +1,19 @@
-import * as M from '../message';
-import * as T from '../types';
+import * as M from '@meetalva/message';
+import * as ModelTree from '@meetalva/model-tree';
+import * as T from '@meetalva/types';
 import { Persistence } from '../persistence';
 import * as Path from 'path';
 import * as uuid from 'uuid';
+import { MatcherCreator } from './context';
 
-export function save(
-	{ host, dataHost }: T.MatcherContext,
-	config: { passive: boolean }
-): T.Matcher<M.Save> {
+export interface SaveConfig {
+	passive: boolean;
+}
+
+export const save: MatcherCreator<M.Save, SaveConfig> = (
+	{ host, dataHost },
+	config?: SaveConfig
+) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 
@@ -75,14 +81,14 @@ export function save(
 		await dataHost.addProject(project);
 
 		if (typeof window === 'undefined') {
-			project.sync(await host.getSender());
+			project.sync(await host.getSender(), ModelTree);
 		}
 
 		try {
 			await host.mkdir(Path.dirname(targetPath));
 			await host.writeFile(targetPath, serializeResult.contents);
 
-			if (config.passive) {
+			if (config && config.passive) {
 				return;
 			}
 
@@ -118,4 +124,4 @@ export function save(
 			});
 		}
 	};
-}
+};

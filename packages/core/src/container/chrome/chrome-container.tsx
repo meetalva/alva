@@ -1,15 +1,15 @@
-import * as AlvaUtil from '../../alva-util';
+import * as AlvaUtil from '@meetalva/util';
 import { ChromeSwitch } from './chrome-switch';
 import * as C from '@meetalva/components';
-import { MessageType } from '../../message';
+import { MessageType } from '@meetalva/message';
 import * as MobxReact from 'mobx-react';
-import { Page } from '../../model';
+import { Page } from '@meetalva/model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import * as uuid from 'uuid';
 import { LogOut } from 'react-feather';
 import { When, WhenFalsy, WhenTruthy } from '../when';
-import * as T from '../../types';
+import * as T from '@meetalva/types';
 
 export interface InjectedChromeContainerProps {
 	page: Page;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import * as Components from '@meetalva/components';
-import * as Model from '../model';
+import * as Model from '@meetalva/model';
 
 const StyledDraggedElement = styled.div`
 	position: fixed;

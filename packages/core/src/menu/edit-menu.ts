@@ -1,6 +1,7 @@
-import { MessageType } from '../message';
+import { MessageType } from '@meetalva/message';
 import * as uuid from 'uuid';
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
+import { MenuCreator } from './context';
 
 const ids = {
 	edit: uuid.v4(),
@@ -15,7 +16,7 @@ const ids = {
 	delete: uuid.v4()
 };
 
-export const editMenu = (ctx: Types.MenuContext): Types.MenuItem => {
+export const editMenu: MenuCreator = ctx => {
 	const isElectron = ctx.app && ctx.app.isHostType(Types.HostType.Electron);
 	const hasBrowserClipboard =
 		typeof navigator !== 'undefined' && typeof (navigator as any).clipboard !== 'undefined';

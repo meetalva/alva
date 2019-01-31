@@ -1,23 +1,24 @@
-import * as Types from '../types';
+import * as Types from '@meetalva/types';
 import * as Store from '../store';
 import * as React from 'react';
 import * as MobxReact from 'mobx-react';
 import * as ReactDOM from 'react-dom';
 import * as Menu from '../container/menu';
 import * as Path from 'path';
-import { AlvaApp } from '../model';
 import * as Mobx from 'mobx';
 import * as Fs from 'fs';
+import { Message } from '@meetalva/message';
+import * as Model from '@meetalva/model';
 
-export class BrowserHost implements Types.Host {
+export class BrowserHost implements Types.Host<Model.AlvaApp<Message>, Model.Project, Message> {
 	public type = Types.HostType.Browser;
 
 	private fs?: typeof Fs;
 	private container: HTMLElement;
 	private menuStore: Store.MenuStore;
 	private store: Store.ViewStore;
-	@Mobx.observable private apps: Map<string, AlvaApp> = new Map();
-	private sender?: Types.Sender;
+	@Mobx.observable private apps: Map<string, Model.AlvaApp<Message>> = new Map();
+	private sender?: Types.Sender<Message>;
 
 	constructor(init: { store: Store.ViewStore; fs?: typeof Fs }) {
 		this.container = document.createElement('div');
@@ -171,7 +172,7 @@ export class BrowserHost implements Types.Host {
 		window.location.reload();
 	}
 
-	public async showMessage(opts: Types.HostMessageOptions): Promise<undefined> {
+	public async showMessage(opts: Types.HostMessageOptions<Message>): Promise<undefined> {
 		// TODO: implement custom dialogs
 		alert([opts.message, opts.detail].filter(Boolean).join('\n'));
 		return;
@@ -185,7 +186,7 @@ export class BrowserHost implements Types.Host {
 	}
 
 	public async showContextMenu(opts: {
-		items: Types.ContextMenuItem[];
+		items: Types.ContextMenuItem<Model.AlvaApp<Message>, Message>[];
 		position: { x: number; y: number };
 	}): Promise<undefined> {
 		opts.items.forEach(item => this.menuStore.add(item, { depth: 0, active: false }));
@@ -231,20 +232,20 @@ export class BrowserHost implements Types.Host {
 	}
 
 	@Mobx.action
-	public async addApp(app: AlvaApp): Promise<void> {
+	public async addApp(app: any): Promise<void> {
 		this.apps.set(app.getId(), app);
 		return;
 	}
 
-	public async getApp(id: string): Promise<AlvaApp | undefined> {
+	public async getApp(id: string): Promise<Model.AlvaApp<Message> | undefined> {
 		return this.apps.get(id);
 	}
 
-	public async getSender(): Promise<Types.Sender> {
+	public async getSender(): Promise<Types.Sender<Message>> {
 		return this.sender!;
 	}
 
-	public setSender(sender: Types.Sender) {
+	public setSender(sender: Types.Sender<Message>) {
 		this.sender = sender;
 	}
 }

@@ -1,10 +1,10 @@
-import * as M from '../message';
-import * as T from '../types';
+import * as M from '@meetalva/message';
 import * as uuid from 'uuid';
+import { MatcherCreator } from './context';
 
 const timeago = require('timeago.js');
 
-export function showUpdateDetails({ host }: T.MatcherContext): T.Matcher<M.ShowUpdateDetails> {
+export const showUpdateDetails: MatcherCreator<M.ShowUpdateDetails> = ({ host }) => {
 	return async m => {
 		await host.showMessage({
 			message: `Restart to update`,
@@ -31,4 +31,4 @@ export function showUpdateDetails({ host }: T.MatcherContext): T.Matcher<M.ShowU
 			]
 		});
 	};
-}
+};

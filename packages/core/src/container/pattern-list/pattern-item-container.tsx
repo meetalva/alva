@@ -1,6 +1,6 @@
 import * as Components from '@meetalva/components';
 import * as MobxReact from 'mobx-react';
-import { Pattern } from '../../model';
+import { Pattern } from '@meetalva/model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 

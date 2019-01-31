@@ -1,15 +1,16 @@
-import * as M from '../message';
-import * as T from '../types';
+import * as M from '@meetalva/message';
+import * as T from '@meetalva/types';
 import * as Path from 'path';
 import * as uuid from 'uuid';
 import * as Export from '../export';
 import * as Fs from 'fs';
+import { MatcherCreator } from './context';
 
-export function exportHtmlProject({
+export const exportHtmlProject: MatcherCreator<M.ExportHtmlProject> = ({
 	host,
 	dataHost,
 	location
-}: T.MatcherContext): T.Matcher<M.ExportHtmlProject> {
+}) => {
 	return async m => {
 		const app = await host.getApp(m.appId || '');
 
@@ -112,7 +113,7 @@ export function exportHtmlProject({
 			});
 		}
 	};
-}
+};
 
 type FsResult<T> = FsError | FsSuccess<T>;
 

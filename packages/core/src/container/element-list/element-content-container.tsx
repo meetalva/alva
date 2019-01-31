@@ -1,6 +1,6 @@
 import { ElementContainer } from './element-container';
 import * as MobxReact from 'mobx-react';
-import * as Model from '../../model';
+import * as Model from '@meetalva/model';
 import * as React from 'react';
 
 export interface ElementContentContainerProps {

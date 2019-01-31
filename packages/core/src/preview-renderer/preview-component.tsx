@@ -104,6 +104,7 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 
 	public render(): JSX.Element | null {
 		const props = this.props as Injected;
+		const { store, element, ...other } = this.props as Injected;
 
 		const children = props.store.getChildren(props.element, child => (
 			<PreviewComponent key={child.getId()} element={child} />
@@ -121,8 +122,8 @@ export class PreviewComponent extends React.Component<PreviewComponentProps> {
 		}
 
 		return (
-			<PreviewComponentError name={props.element.getName()}>
-				<Component {...properties} {...slots}>
+			<PreviewComponentError name={props.element.getName()} {...other}>
+				<Component {...properties} {...other} {...slots}>
 					{children}
 				</Component>
 			</PreviewComponentError>

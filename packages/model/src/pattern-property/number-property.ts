@@ -28,6 +28,10 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 	}
 
 	public coerceValue(value: unknown): number | undefined {
+		if (typeof value === 'number' && !Number.isNaN(value)) {
+			return value;
+		}
+
 		const result = typeof value === 'string' ? parseFloat(value) : undefined;
 
 		if (typeof result === 'number' && !Number.isNaN(result)) {
@@ -57,7 +61,7 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 
 	public update(prop: PatternNumberProperty): void {
 		this.contextId = prop.getContextId();
-		this.defaultValue = prop.getDefaultValue();
+		this.defaultValue = prop.defaultValue;
 		this.description = prop.getDescription();
 		this.example = prop.getExample();
 		this.group = prop.getGroup();

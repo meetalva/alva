@@ -186,7 +186,6 @@ export class Sender implements Types.Sender<Message.Message> {
 		}
 
 		if (this.window) {
-			console.log(envelope);
 			this.window.postMessage(envelope, '*');
 		}
 	}

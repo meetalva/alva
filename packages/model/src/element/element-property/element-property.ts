@@ -34,7 +34,8 @@ export class ElementProperty {
 
 	@Mobx.computed
 	private get userStoreReference(): UserStoreReference | undefined {
-		return this.project.getUserStore().getReferenceByElementProperty(this);
+		const userStore = this.project.getUserStore();
+		return userStore ? userStore.getReferenceByElementProperty(this) : undefined;
 	}
 
 	@Mobx.computed
@@ -163,7 +164,7 @@ export class ElementProperty {
 			return this.patternProperty.coerceValue(concreteValue);
 		}
 
-		return this.patternProperty.getRequired() ? this.getDefaultValue() : undefined;
+		return this.getDefaultValue();
 	}
 
 	public getRawValue(): string {

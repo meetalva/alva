@@ -6,6 +6,8 @@ import * as PatternProperty from '../pattern-property';
 import { PatternSlot } from './pattern-slot';
 import * as Types from '@meetalva/types';
 import * as uuid from 'uuid';
+import { PatternPropertyType } from '@meetalva/types';
+import { merge } from 'lodash';
 
 export interface PatternInit {
 	contextId: string;
@@ -39,6 +41,20 @@ export class Pattern {
 	@Mobx.observable private slots: Map<string, PatternSlot> = new Map();
 	@Mobx.observable private type: Types.PatternType;
 
+	public static Defaults(): PatternInit {
+		return {
+			contextId: 'context-id',
+			description: '',
+			exportName: 'pattern',
+			group: '',
+			icon: '',
+			name: 'pattern',
+			propertyIds: [],
+			type: Types.PatternType.Pattern,
+			slots: []
+		};
+	}
+
 	public constructor(init: PatternInit, context: PatternContext) {
 		this.contextId = init.contextId;
 		this.description = init.description;
@@ -70,6 +86,10 @@ export class Pattern {
 			},
 			context
 		);
+	}
+
+	public static fromDefaults(overrides: Partial<PatternInit>, context: PatternContext): Pattern {
+		return new Pattern(merge({}, Pattern.Defaults(), overrides), context);
 	}
 
 	public addProperty(property: PatternProperty.AnyPatternProperty): void {

@@ -166,7 +166,6 @@ export class Element {
 			typeof init.name !== 'undefined' ? init.name : pattern ? pattern.getName() : 'New Element';
 
 		this.editedName = this.name;
-
 		this.propertyValues = new Map(init.propertyValues);
 
 		this.properties

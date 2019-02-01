@@ -16,14 +16,16 @@ export interface Export {
 	type: TypeScript.Type;
 }
 
-export const getFixtureSourceFile = (
-	name: string | string[],
-	ctx: { fixtures: Fixtures }
-): {
+export interface FixtureSourceFile {
 	sourceFile: TypeScript.SourceFile;
 	sourceFiles: TypeScript.SourceFile[];
 	program: TypeScript.Program;
-} => {
+}
+
+export const getFixtureSourceFile = (
+	name: string | string[],
+	ctx: { fixtures: Fixtures }
+): FixtureSourceFile => {
 	const names = Array.isArray(name) ? name : [name];
 	const paths = names
 		.map(n => ctx.fixtures.find(n))
@@ -59,6 +61,22 @@ export const getFirstPropType = (
 	}
 
 	return propTypes[0];
+};
+
+export const getNamedPropType = (name: string, ctx: FixtureSourceFile): Prop => {
+	const props = getPropTypes(ctx.sourceFile, ctx);
+
+	const result = props.find(prop => prop.symbol.getName() === name);
+
+	if (!result) {
+		throw new Error(
+			`Could not find prop with name ${name}. Available props: ${props
+				.map(p => p.symbol.getName())
+				.join(', ')}`
+		);
+	}
+
+	return result;
 };
 
 export const getPropTypes = (

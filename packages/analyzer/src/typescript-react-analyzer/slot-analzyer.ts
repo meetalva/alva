@@ -3,9 +3,13 @@ import * as ReactUtils from '../react-utils';
 import * as Types from '@meetalva/types';
 import * as Ts from 'typescript';
 import * as TypescriptUtils from '../typescript-utils';
+import { analyzeSlotDefault } from './slot-default-analyzer';
+import * as tsa from 'ts-simple-ast';
+import * as Path from 'path';
 
 export interface SlotAnalyzeContext {
 	program: Ts.Program;
+	project: tsa.Project;
 	getSlotId(contextId: string): string;
 }
 
@@ -22,6 +26,9 @@ export function analyzeSlots(
 				typechecker: ctx.program.getTypeChecker()
 			});
 
+			const memberDeclarations = memberSymbol.getDeclarations();
+			const memberDeclaration = memberDeclarations ? memberDeclarations[0] : undefined;
+			const path = memberDeclaration ? memberDeclaration.getSourceFile().fileName : undefined;
 			const memberType = typechecker.getTypeAtLocation(declaration as Ts.Declaration);
 
 			const mayBeChildren =
@@ -46,13 +53,28 @@ export function analyzeSlots(
 				TypescriptUtils.getJsDocValueFromSymbol(memberSymbol, 'description') || '';
 			const hidden = TypescriptUtils.hasJsDocTagFromSymbol(memberSymbol, 'ignore');
 
+			const id = ctx.getSlotId(propertyName);
+
+			const defaultCode = TypescriptUtils.getJsDocValueFromSymbol(memberSymbol, 'default');
+
+			const defaultContent =
+				isImplicitSlot && defaultCode
+					? analyzeSlotDefault(defaultCode, {
+							id,
+							project: ctx.project,
+							path: path
+								? Path.dirname(path)
+								: ctx.project.getRootDirectories()[0]!.getPath()
+					  })
+					: undefined;
+
 			return {
 				contextId: propertyName,
 				label: label || propertyName,
 				description,
 				example,
 				hidden,
-				id: ctx.getSlotId(propertyName),
+				id,
 				propertyName,
 				required,
 				type: propertyName === 'children' && !isExplicitSlot ? 'children' : 'property'

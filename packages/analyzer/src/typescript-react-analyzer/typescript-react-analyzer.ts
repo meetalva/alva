@@ -262,6 +262,7 @@ export function analyzePatternExport(
 
 	const slots = SlotAnalyzer.analyzeSlots(propTypes.type, {
 		program: ctx.program,
+		project: ctx.project,
 		getSlotId: (slotContextId: string) => IdHasher.getGlobalSlotId(id, slotContextId)
 	});
 
@@ -379,7 +380,7 @@ function getImportsFromPath(
 	}, config.init);
 }
 
-function getSignificantPath(input: string): string[] {
+export function getSignificantPath(input: string): string[] {
 	const stripped = Path.basename(input, Path.extname(input));
 
 	if (stripped === 'index' || stripped === 'index.d') {

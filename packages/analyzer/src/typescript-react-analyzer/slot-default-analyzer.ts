@@ -8,6 +8,8 @@ import { findReactComponentType } from '../react-utils';
 
 export interface ElementCandidate {
 	parent: string;
+	patternContextId: string;
+	libraryId: string;
 	id: string;
 	props: ElementProp[];
 	children: ElementCandidate[];
@@ -133,12 +135,17 @@ export function analyzeSlotDefault(
 	const pkgNameAndPath = fragments[fragments.length - 1];
 	const pkgFragments = pkgNameAndPath.split('/');
 	const relPath = pkgNameAndPath.startsWith('/@') ? pkgFragments.slice(2) : pkgFragments.slice(1);
+	const libraryId = pkgNameAndPath.startsWith('/@')
+		? pkgFragments.slice(0, 2)
+		: pkgFragments.slice(0, 1);
 
 	analysis.pattern.contextId = relPath.join('/');
 
 	return {
 		parent: id,
 		id: [id, 'default'].join(':'),
+		libraryId: libraryId.join('/'),
+		patternContextId: analysis.pattern.contextId,
 		props: element
 			.getAttributes()
 			.filter(tsa.TypeGuards.isJsxAttribute)

@@ -1001,10 +1001,10 @@
     mkdirp "^0.5.1"
     rimraf "^2.5.2"
 
-"@meetalva/designkit@^1.4.2":
+"@meetalva/alva-design@^1.4.2":
   version "1.4.2"
-  resolved "https://registry.yarnpkg.com/@meetalva/designkit/-/designkit-1.4.2.tgz#a8afe7d28706b8079f90163ad2f5726afbf84cc7"
-  integrity sha512-XlLUdhJDosjlFdC+vb0em8R7arAC1XTmCE3Hr96RbIlMZTpbFya8o3EpeS1xx+T26OMhbtQN7F5cnTfP96OHuA==
+  resolved "https://registry.yarnpkg.com/@meetalva/alva-design/-/alva-design-1.4.2.tgz#4f16b3a413eb5347b090ab0321d07dac6ef825eb"
+  integrity sha512-OOjsoceAHi1FW2RyDe6OtqMjPp5C2FQWpashsdEVXArF+cNANUOHHEo/44DudXL7twWa8PD0UnMNOVLUl5Xm3g==
   dependencies:
     "@emotion/core" "^10.0.6"
     "@emotion/styled" "^10.0.6"

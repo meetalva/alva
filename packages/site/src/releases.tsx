@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Path from 'path';
-import * as D from '@meetalva/designkit';
+import * as D from '@meetalva/alva-design';
 import styled from '@emotion/styled';
 import data from './releases-data';
 

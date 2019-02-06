@@ -11,7 +11,7 @@ export interface LibraryStoreInit {
 export class LibraryStore {
 	private readonly recommended = [
 		{
-			name: '@meetalva/designkit',
+			name: '@meetalva/alva-design',
 			version: 'latest'
 		}
 	];

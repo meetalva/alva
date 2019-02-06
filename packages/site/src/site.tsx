@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
-import * as D from '@meetalva/designkit';
+import * as D from '@meetalva/alva-design';
 import { Releases } from './releases';
 
 export * from './render';

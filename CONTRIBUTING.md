@@ -35,7 +35,7 @@ See the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) for more info
 ## Setup for contributors
 
 To add a contribution to Alva (improve its features, fix issues),
-get the source of the application itself, and if you don't already have a Alva compatible styleguide, the kickstart styleguide (designkit):
+get the source of the application itself, and if you don't already have a Alva compatible styleguide, the kickstart styleguide (alva-design):
 
 1. Clone the [alva](https://github.com/meetalva/alva) repository:
 
@@ -55,19 +55,19 @@ npm i && npm start
 
 If you don't have a compatible styleguide, follow the next steps:
 
-1. Clone the [designkit](https://github.com/meetalva/designkit) repository:
+1. Clone the [Alva Design](https://github.com/meetalva/alva-design) repository:
 
 ```shell
-git clone git@github.com:meetalva/designkit.git
+git clone git@github.com:meetalva/alva-design.git
 ```
 
-2. Run this command to build the designkit for Alva:
+2. Run this command to build the Alva Design Library for Alva:
 
 ```shell
 npm i && npm build
 ```
 
-3. Now you should be able to open the designkit inside Alva
+3. Now you should be able to open the Alva Design Library inside Alva
 
 ## Typedoc
 
@@ -141,7 +141,7 @@ All the sources of Alva are located in `src`, divided into the following folders
 
 * **components**: All React components for the project, page, page-element, and property panes, as well as the design preview in the middle of the page. Components may be smart (they may contain their own state), but only as long as the state is nothing global, related to multiple components, or fundamental enough. In this case, the state is maintained by the store (see below).
 * **electron**: The bootstrap code to start the Electron App, including the container HTML, and the main menu.
-* **lsg**: The styled components Alva uses, as a living styleguide. Do not mixup this styleguide with the designkit (which also is a styleguide). The LSG contains the styled, logic-less components which are used by the Alva UI. The designkit contains the patterns the designer uses to create a basic design (wireframes).
+* **lsg**: The styled components Alva uses, as a living styleguide. Do not mixup this styleguide with the designkit (which also is a styleguide). The LSG contains the styled, logic-less components which are used by the Alva UI. The Alva Design Library contains the patterns the designer uses to create a basic design (wireframes).
 * **resources**: Resources are files related to the build, like the icons.
 * **store**: The store is the data-center and business logic of Alva. It is a collection of MobX observables and does not contain any UI elements like React components. Instead, all components bind their props to this store by decorating with `@MobX.observer`. The store contains the Alva projects and pages the user edits, as well as the styleguide and styleguide analyzers, the logic to interpret your frontend pattern components.
 

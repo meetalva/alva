@@ -35,9 +35,9 @@ Following along is very useful to understand what happens behind the scences.
 A project setup can be very time consuming though – you might want to have a look at the following
 shortcuts if you don't want to focus on technical setup.
 
-- **Focus on editing components**: Reuse [Alva Designkit](https://github.com/meetalva/designkit) and change to [Create Pattern Guide](./create-pattern)
+- **Focus on editing components**: Reuse [Alva Design Library](https://github.com/meetalva/alva-design) and change to [Create Pattern Guide](./create-pattern)
 
-- **Focus on adding components**: Fetch [Component Library Starter](https://github.com/meetalva/designkit) and skip to [Section 2](#2.-add-components)
+- **Focus on adding components**: Fetch [Component Library Starter](https://github.com/meetalva/alva-design) and skip to [Section 2](#2.-add-components)
 
 ## Prerequesites
 

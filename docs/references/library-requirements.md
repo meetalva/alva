@@ -9,7 +9,7 @@ Pattern libraries are a cornerstone of Alva workflows: They allow you to impleme
 works on the web and make it accessible to everyone on your team. 
 
 As such it is important you understand the assumptions Alva makes concerning pattern libraries.
-See the full list below. A production-level example of an Alva-enabled pattern library it the [Alva Designkit](https://github.com/meetalva/designkit/)
+See the full list below. A production-level example of an Alva-enabled pattern library it the [Alva Design Library](https://github.com/meetalva/alva-design/)
 which is openly available on GitHub.
 
 ## Requirements

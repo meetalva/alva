@@ -24,11 +24,11 @@ installed on your machine.
 * :globe_with_meridians: Internet connection
 
 
-## 1. Setup up Alva Designkit
+## 1. Setup up Alva Design Library
 
 > ❔
 > In this guide we'll skip the project setup
-> part by reusing the Alva Designkit. 
+> part by reusing the Alva Design Library. 
 >
 > If you want to start fresh, skip to our [Create a Library Guide](./create-library.md)
 
@@ -39,7 +39,7 @@ continuing with step 2.
 
 !(video:https://media.meetalva.io/video/add-hello-world.m4v)
 
-Open your favorite text editor in the Alva Designkit folder you just 
+Open your favorite text editor in the Alva Design Library folder you just 
 connected to Alva. We'll show [VSCode](https://code.visualstudio.com/) in screenshots and videos but any text editor will do.
 
 Let's create a new folder called "Hello World" with an `index.tsx` file in it:
@@ -73,7 +73,7 @@ export * from './hello-world';
 ## 3. Build your changes
 
 For Alva to understand your new code you need to build it with the [TypeScript](https://www.typescriptlang.org/) compiler.
-Let's do that real quick. Execute the following command in your Alva Designkit folder.
+Let's do that real quick. Execute the following command in your Alva Design Library folder.
 
 ```
 npm run build
@@ -84,22 +84,22 @@ When TypeScript is done translating your code the terminal window should resembl
 ```
 λ npm run build
 
-> meetalva-designkit@1.0.0 build /Users/marneb/Documents/alva/designkit
+> meetalva-designkit@1.0.0 build /Users/marneb/Documents/alva/alva-design
 > tsc
 
-~/alva/designkit
+~/alva/alva-design
 λ
 ```
 
 We are all set, let's switch back to Alva.
 
-## 4. Update Designkit in your Alva project
+## 4. Update Alva Design Library in your Alva project
 
 !(video:https://media.meetalva.io/video/update-library.m4v)
 
 Start Alva and open the project you created while working through the [Connect a Library Guide](./library). 
 
-On the `meetalva-designkit` card hit the "Update" button. Wait for the card to switch back from "Connecting" to "Connected".
+Open the "Libraries" Tab. On the `Alva Website UI` card hit the "Update" button. Wait for the card to switch back from "Connecting" to "Connected".
 
 
 ## 5. Use the Hello World component

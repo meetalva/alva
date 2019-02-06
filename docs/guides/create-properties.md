@@ -13,11 +13,11 @@ tags:
 
 ---
 
-## 1. Setup up Alva Designkit
+## 1. Setup up Alva Design Library
 
 > ❔
 > In this guide we'll skip the project setup
-> part by reusing the Alva Designkit. 
+> part by reusing the Alva Design Library. 
 >
 > If you want to start fresh, skip to our [Create a Library Guide](./create-library.md)
 Please make sure to follow our [Connnect a Library](./library) and [Create a Pattern](./create-pattern) before 
@@ -93,7 +93,7 @@ export const HelloWorld: React.SFC<HelloWorldProps> = (props) => {
 
 Remember to execute the TypeScript compiler via `npm run build`.
 
-Then fire up Alva, open a new file and connect your Designkit.
+Then fire up Alva, open a new file and connect your Alva Design Library.
 Locate the `HelloWorld` component via search in the component list.
 
 Double-click the component or drag it on Alvas element list. You should 

@@ -26,9 +26,12 @@ Start with a minimal set of components to sketch concepts and iterate fast your 
 git clone https://github.com/meetalva/alva.git
 cd alva
 yarn
-yarn lerna run watch
+yarn tsc -b -w
 
 # In a second terminal window
+yarn webpack -w
+
+# In a third terminal window
 yarn alva
 ```
 

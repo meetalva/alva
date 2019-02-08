@@ -46,10 +46,15 @@ git clone git@github.com:meetalva/alva.git
 2. Run in the main (Alva) repository:
 
 ```shell
-npm i && npm start
-```
+yarn
+yarn tsc -b -w
 
-(Note: Please use *npm* only. We dropped the support for Yarn for now, as we wired our release process to the package-lock.json file.)
+# In a second terminal window
+yarn webpack -w
+
+# In a third terminal window
+yarn alva
+```
 
 3. Now open a compatible styleguide.
 

@@ -38,11 +38,18 @@ yarn
 ## Start the build processes
 
 ```
-yarn run watch
+yarn tsc -b -w
+```
+
+## Start webpack
+In a second terminal window:
+
+```
+yarn webpack -w
 ```
 
 ## Start Alva
-
+In a third terminal window:
 ```sh
 yarn alva # start electron version
 # alternatively:

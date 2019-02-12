@@ -58,12 +58,6 @@ export class Releases extends React.Component {
 		const stableLink = getReleaseLink(stable, this.state.os);
 		const alphaLink = getReleaseLink(alpha, this.state.os);
 
-		const stableLinks = [
-			getReleaseLink(stable, Os.macOS),
-			getReleaseLink(stable, Os.Windows),
-			getReleaseLink(stable, Os.Linux)
-		].filter(l => l.os !== stableLink.os);
-
 		return (
 			<div>
 				<div style={{ display: 'flex' }}>
@@ -72,41 +66,27 @@ export class Releases extends React.Component {
 							Get Alva {this.state.os !== Os.Unknown ? `for` : '   '} {this.state.os}
 						</D.Button>
 					</Link>
-					<D.Space size={D.SpaceSize.XS} />
-					<Link href={alphaLink.link} white={false}>
-						<D.Button order={D.ButtonOrder.Secondary}>Get Alva Canary</D.Button>
-					</Link>
 				</div>
 				<D.Space size={D.SpaceSize.S} />
+
 				<D.Copy color={D.Color.Grey70} size={D.CopySize.Small}>
-					Also available for{' '}
-					{stableLinks.map((link, i) => (
-						<React.Fragment key={link.os}>
-							<Link href={link.link} white>
-								{link.os}
-							</Link>
-							{getSeperator(stableLinks.length, i)}
-						</React.Fragment>
-					))}.
-				</D.Copy>
-				<D.Copy color={D.Color.Grey70} size={D.CopySize.Small}>
-					Check all{' '}
+					Get the Alva{' '}
+					<Link href={alphaLink.link} white>
+						nightly build
+					</Link>{' '}
+					and see<br />all{' '}
 					<Link href={stable ? stable.html_url : ''} white>
 						supported platforms
+					</Link>{' '}
+					on{' '}
+					<Link href={'https://github.com/meetalva/alva'} white>
+						GitHub
 					</Link>
 					.
 				</D.Copy>
 			</div>
 		);
 	}
-}
-
-function getSeperator(length: number, index: number): string {
-	if (index >= length - 1) {
-		return '';
-	}
-
-	return index === length - 2 ? ' and ' : ', ';
 }
 
 function getReleaseLink(release: any, os: Os): { os: Os; link: string } {

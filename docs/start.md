@@ -4,15 +4,13 @@ options:
   order: 0
 ---
 
-# Documentation
-We’re happy that you made the way to our docs. Here you can find [Guides](#guides) and [References](#references). 
-All doc items state the recommended [skill level](#levels):woman_student:. 
+# Docs
+Welcome to Alva! Learn Alva step-by-step with our [Guides](#guides) and check out [References](#references) for technical documentation and requirements for pattern libraries. 
+
   
 ## Guides
 
-Instructions for common use cases that can be followed step by step. 
-This is where you'll want to begin when exploring Alva and its features.
-Most guides are written **for beginners**.
+Learn step-by-step how to create living prototypes with an interactive design system. We have guides for novice as well as advanced users.
 
 ```widget
 const React = require("react");
@@ -20,17 +18,6 @@ const {PatternList} = require("@patternplate/widgets");
 module.exports = () => <PatternList query="is=doc AND tag=guide AND tag!=entry" />;
 ```
 
-## Levels
-
-> :information_source: 
-> The levels are meant to help you decide how much time you'll need to follow a guide. 
-> If you are a beginner: Please tackle the "Expert" level guides! 
->
-> Join us for a [chat and help on Gitter](https://gitter.im/meetalva/Lobby) when you have trouble with anything.
-
-* Beginner
-* Intermediate
-* Expert
 
 ## References
 

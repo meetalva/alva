@@ -24,7 +24,7 @@ const StyledHeadline = styled.div`
 	margin: 0;
 	font-family: ${fonts().NORMAL_FONT};
 	color: ${(props: HeadlineProps) => props.color || 'inherit'};
-	line-height: 5;
+	line-height: 1.3;
 
 	u {
 		text-decoration-color: ${Color.Red};

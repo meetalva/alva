@@ -14,5 +14,6 @@ export enum Color {
 	Pink = 'rgb(236, 3, 97)',
 	PinkLight = 'rgb(236, 52, 126)',
 	VioletDark = 'rgb(81, 0, 77)',
+	VioletLight = 'rgb(130, 56, 185)',
 	Violet = 'rgb(88, 2, 205)'
 }

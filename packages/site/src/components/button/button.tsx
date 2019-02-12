@@ -27,7 +27,7 @@ const StyledButton =
 	ButtonProps >
 	`
 	padding: 12px 20px;
-	min-width: 200px;
+	min-width: 100px;
 	font-size: 18px;
 	font-family: ${fonts().NORMAL_FONT};
 	border-radius: 3px;

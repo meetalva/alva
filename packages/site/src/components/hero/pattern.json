@@ -1,0 +1,7 @@
+{
+	"name": "hero",
+	"displayName": "Hero",
+	"version": "0.1",
+	"tags": ["molecules", "section"],
+	"flag": "alpha"
+}

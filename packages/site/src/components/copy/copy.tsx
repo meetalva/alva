@@ -37,7 +37,15 @@ export const Copy =
 				return 'font-size: 12px;';
 			case CopySize.Medium:
 			default:
-				return 'font-size: 16px';
+				return `
+
+				'font-size: 16px';
+
+				@media screen and (min-width: 960px) {
+					font-size: 18px;
+				}
+
+				`;
 			case CopySize.Large:
 				return `
 					font-size: 18px;

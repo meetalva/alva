@@ -8,6 +8,7 @@ export * from './feature';
 export * from './footer';
 export * from './fonts';
 export * from './headline';
+export * from './hero';
 export * from './icons';
 export * from './image';
 export * from './input';

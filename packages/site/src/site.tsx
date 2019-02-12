@@ -39,138 +39,68 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 				<link rel="icon" href="https://media.meetalva.io/meta/icon_192.png" sizes="192x192" />
 				<link rel="icon" href="https://media.meetalva.io/alva.svg" type="image/x-icon" />
 			</Helmet>
-			<D.Menu logo="https://media.meetalva.io/alva.svg">
+
+			<D.Menu logo="https://media.meetalva.io/alva.svg" badge="Beta v0.9.1">
 				<D.MenuItem
-					linkName="Get Started"
+					linkName="Learn"
 					target="_blank"
 					rel="noopener"
 					href="./doc/docs/guides/start?guides-enabled=true"
 					title="Open Getting Started Tutorial"
 				/>
-				<D.MenuItem
-					linkName="Twitter"
-					target="_blank"
-					rel="noopener"
-					href="https://twitter.com/meetalva"
-					title="Find us on Twitter"
-				/>
-				<D.MenuItem
-					linkName="Github"
-					target="_blank"
-					rel="noopener"
-					href="https://github.com/meetalva/alva"
-					title="Find us on Github"
-				/>
-				<D.MenuItem
-					linkName="Gitter"
-					target="_blank"
-					rel="noopener"
-					href="https://gitter.im/meetalva/Lobby"
-					title="Chat with us on Gitter"
-				/>
+				<D.MenuItem linkName="Our Mission" rel="noopener" href="#" title="Our Mission" />
+				<D.MenuItem linkName="About us" rel="noopener" href="#" title="About us" />
 			</D.Menu>
-			<D.Section backgroundColor={D.Color.Black} textColor={D.Color.White}>
-				<D.Headline level={D.HeadlineLevel.H1}>
-					Create <u>living prototypes</u> with code components.
-				</D.Headline>
-				<D.Space size={D.SpaceSize.M} />
-				<D.Layout maxWidth="640px">
-					<D.Copy size={D.CopySize.Large}>
-						Alva lets you design interactive products based on components engineered by your
-						developers. And guess what – we are entirely open source.
-					</D.Copy>
-				</D.Layout>
+
+			<D.Hero backgroundColor={D.Color.Black} textColor={D.Color.White}>
 				<D.Space size={D.SpaceSize.L} />
-				<Releases />
+
+				<D.Layout maxWidth="960px" center>
+					<D.Headline level={D.HeadlineLevel.H1} textAlign={D.TextAlign.Center}>
+						Create <u>interactive prototypes</u> with your design system.
+					</D.Headline>
+				</D.Layout>
+
+				<D.Space size={D.SpaceSize.M} />
+
+				<D.Layout maxWidth="640px" direction={D.LayoutDirection.Vertical} center>
+					<D.Copy size={D.CopySize.Medium} textAlign={D.TextAlign.Center}>
+						Alva is your team's shared platform which enables better collaboration between
+						designers and developers.
+					</D.Copy>
+
+					<D.Space size={D.SpaceSize.L} />
+
+					<div style={{ display: 'flex', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
+						<Releases />
+						<D.Button order={D.ButtonOrder.Secondary}>Watch mission video</D.Button>
+					</div>
+				</D.Layout>
+
 				<D.Space size={D.SpaceSize.XL} />
+			</D.Hero>
+
+			<D.Section backgroundColor={D.Color.White} textColor={D.Color.Black}>
+				<D.Headline level={D.HeadlineLevel.H3}>
+					1. Design System, Code compontents, SSOT -> Alva
+				</D.Headline>
+				<D.Headline level={D.HeadlineLevel.H3}>
+					2. Use those components to compose new designs + responsive
+				</D.Headline>
+				<D.Headline level={D.HeadlineLevel.H3}>
+					3. Crazy shit -> Data / Interactivity / logic
+				</D.Headline>
 			</D.Section>
-			<D.Feature
-				featureLevel={D.FeatureLevel.Large}
-				headline="Start your prototype with code components"
-				copy="Connect to the components of your React library and start using them for your prototype. Without writing a single line of code."
-				layout={D.FeatureLayout.Center}
-				frame={
-					<video controls autoPlay loop style={{ display: 'block', width: '100%' }}>
-						<source src="https://media.meetalva.io/video/website-01.mp4" type="video/mp4" />
-					</video>
-				}
-				link={
-					<a
-						href="./doc/docs/guides/essentials?guides-enabled=true"
-						style={{ textDecoration: 'none' }}
-						target="_blank"
-						rel="noopener"
-					>
-						<D.Link color={D.Color.Violet}>
-							Learn how to prototype with code components
-						</D.Link>
-					</a>
-				}
-				negativeTop
-			/>
-			<D.Space size={D.SpaceSize.XL} />
-			<D.Feature
-				featureLevel={D.FeatureLevel.Large}
-				headline="Integrate your visual design drafts"
-				copy="Add your latest design drafts from Sketch, Figma or any other design tool to your prototype and show your team how the next component should look like."
-				layout={D.FeatureLayout.Left}
-				frame={
-					<img
-						src="https://media.meetalva.io/video/website-02.png"
-						style={{ display: 'block' }}
-					/>
-				}
-				link={
-					<a
-						href="./doc/docs/guides/design?guides-enabled=true"
-						style={{ textDecoration: 'none' }}
-						target="_blank"
-						rel="noopener"
-					>
-						<D.Link color={D.Color.Violet}>Learn how to integrate your designs</D.Link>
-					</a>
-				}
-			/>
-			<D.Space size={D.SpaceSize.XL} />
-			<D.Feature
-				featureLevel={D.FeatureLevel.Large}
-				headline="Connect everything with interactions"
-				copy="The web is interactive – so let’s design interactively, too. Go beyond static screens and design with interaction, data and logic in mind."
-				layout={D.FeatureLayout.Right}
-				frame={
-					<img
-						src="https://media.meetalva.io/video/website-03.png"
-						style={{ display: 'block' }}
-					/>
-				}
-				link={
-					<a
-						href="./doc/docs/guides/interaction?guides-enabled=true"
-						style={{ textDecoration: 'none' }}
-						target="_blank"
-						rel="noopener"
-					>
-						<D.Link color={D.Color.Violet}>Learn how to work with interactions</D.Link>
-					</a>
-				}
-			/>
-			<D.Space size={D.SpaceSize.XL} />
-			<D.Feature
-				featureLevel={D.FeatureLevel.Medium}
-				headline="Sketch Integration (coming soon)"
-				copy="Integrate Sketch into your prototyping workflow and seamlessly export code to Sketch and import your design drafts to the prototype. Coming later this year."
-				layout={D.FeatureLayout.Center}
-			/>
-			<D.Space size={D.SpaceSize.XL} />
+
 			<D.Space size={D.SpaceSize.XL} />
 
 			<D.Teaser
 				image="https://media.meetalva.io/background.jpg"
-				headline="Our mission is to enable designers and engineers to build better products together. Without friction."
+				headline="We strive for true team play between design and development."
 			>
 				<div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
 					<iframe
-						src="https://www.youtube-nocookie.com/embed/gZT13EKfZXg"
+						src="https://www.youtube-nocookie.com/embed/gZT13EKfZXg?modestbranding=1&rel=0"
 						style={{
 							position: 'absolute',
 							top: 0,
@@ -183,6 +113,39 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					/>
 				</div>
 			</D.Teaser>
+
+			<D.Section backgroundColor={D.Color.Grey95}>
+				<D.Headline
+					level={D.HeadlineLevel.H1}
+					color={D.Color.Violet}
+					fontWeight={D.FontWeight.Light}
+				>
+					Open-minded and <b>open source</b>.
+				</D.Headline>
+				<D.Space size={D.SpaceSize.M} />
+				<D.Layout maxWidth="640px">
+					<D.Copy size={D.CopySize.Large} color={D.Color.Grey50}>
+						Over the years, most design tools have been expensive and proprietary software.
+						Focusing heavily on visual design and ignoring the importance of cross-functional
+						co-creation.
+						<br />
+						<br />
+						Join us and let's invent the next generation of design tools together.
+					</D.Copy>
+				</D.Layout>
+				<D.Space size={D.SpaceSize.L} />
+				<a href="https://github.com/meetalva/alva/" target="_blank" rel="noopener">
+					<D.Button order={D.ButtonOrder.Secondary} color={D.Color.Violet}>
+						Contribute on Github
+					</D.Button>
+				</a>
+				<D.Space size={D.SpaceSize.S} />
+				<a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fmeetalva.io%2F&via=meetalva&text=Create%20living%20prototypes%20with%20code%20components.%20&hashtags=react%2C%20prototype">
+					<D.Button order={D.ButtonOrder.Secondary} color={D.Color.Violet}>
+						Tweet about us
+					</D.Button>
+				</a>
+			</D.Section>
 
 			<D.Section>
 				<D.Layout maxWidth="480px" direction={D.LayoutDirection.Vertical}>
@@ -260,61 +223,15 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 				</D.Layout>
 			</D.Section>
 
-			<D.Section backgroundColor={D.Color.Grey95}>
-				<D.Headline
-					level={D.HeadlineLevel.H1}
-					color={D.Color.Violet}
-					fontWeight={D.FontWeight.Light}
-				>
-					<b>And wait for it</b> – we are entirely open source.
-				</D.Headline>
-				<D.Space size={D.SpaceSize.M} />
-				<D.Layout maxWidth="640px">
-					<D.Copy size={D.CopySize.Large} color={D.Color.Grey50}>
-						For the last years most of the design tools have been expensive and proprietary
-						software. We want to give something back to the community and start the next
-						generation of design tools. Open-minded and open-source.
-					</D.Copy>
-				</D.Layout>
-				<D.Space size={D.SpaceSize.L} />
-				<a href="https://github.com/meetalva/alva/" target="_blank" rel="noopener">
-					<D.Button order={D.ButtonOrder.Secondary} color={D.Color.Violet}>
-						Contribute to Alva on Github
-					</D.Button>
-				</a>
-				<D.Space size={D.SpaceSize.S} />
-				<a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fmeetalva.io%2F&via=meetalva&text=Create%20living%20prototypes%20with%20code%20components.%20&hashtags=react%2C%20prototype">
-					<D.Button order={D.ButtonOrder.Secondary} color={D.Color.Violet}>
-						Tweet about us
-					</D.Button>
-				</a>
-			</D.Section>
-
-			<D.Section backgroundColor={D.Color.Violet}>
-				<D.Headline
-					level={D.HeadlineLevel.H2}
-					color={D.Color.White}
-					fontWeight={D.FontWeight.Light}
-				>
-					Getting Started
-				</D.Headline>
-				<D.Space size={D.SpaceSize.M} />
-				<D.Layout maxWidth="640px">
-					<D.Copy size={D.CopySize.Large} color={D.Color.White}>
-						You're new to Alva? Follow our easy-to-learn guides and shape a new era of product
-						design.
-					</D.Copy>
-				</D.Layout>
-				<D.Space size={D.SpaceSize.M} />
-				<a href="./doc/docs/guides/start?guides-enabled=true" target="_blank" rel="noopener">
-					<D.Button order={D.ButtonOrder.Secondary} color={D.Color.White}>
-						Find our Guides
-					</D.Button>
-				</a>
-			</D.Section>
-
 			<D.Footer copyright="&copy; 2018 Alva">
-				<D.MenuItem linkName="hey@meetalva.io" rel="noopener" href="mailto:hey@meetalva.io" />
+				<D.MenuItem linkName="Write us" rel="noopener" href="mailto:hey@meetalva.io" />
+				<D.MenuItem
+					linkName="Follow us"
+					target="_blank"
+					rel="noopener"
+					href="https://twitter.com/meetalva"
+					title="Find us on Twitter"
+				/>
 				<D.MenuItem
 					linkName="Proudly powered by SinnerSchrader"
 					target="_blank"

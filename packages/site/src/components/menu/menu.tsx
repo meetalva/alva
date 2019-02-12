@@ -2,11 +2,15 @@ import * as React from 'react';
 import styled from '@emotion/styled';
 import { Color } from '../colors';
 import { Image } from '../image';
-import { Layout } from '../layout';
+import { Layout, LayoutAlignItems } from '../layout';
+import { Copy, CopySize } from '../copy';
 
 export interface MenuProps {
 	/** @asset @name Logo */
 	logo?: string;
+
+	/** @name Badge */
+	badge?: string;
 
 	/** @name Sticky @default false */
 	sticky?: boolean;
@@ -18,6 +22,7 @@ const StyledWrapper = styled(Layout)`
 	position: ${(props: MenuProps) => (props.sticky ? 'sticky' : 'static')};
 	top: 0;
 	background-color: ${Color.Black};
+	padding: 0 5vw;
 `;
 
 const StyledMenu = styled.div`
@@ -33,6 +38,19 @@ const StyledMenu = styled.div`
 const StyledImage = styled(Image)`
 	display: block;
 	height: 50px;
+`;
+
+const StyledBadge = styled(Copy)`
+	display: block;
+	height: 24px;
+	padding: 0 8px;
+	margin-left: 3vw;
+
+	border: 2px solid ${Color.VioletLight};
+	border-radius: 3px;
+
+	white-space: nowrap;
+	line-height: 24px;
 `;
 
 const StyledMenuInner = styled.div`
@@ -74,9 +92,12 @@ const StyledMenuInner = styled.div`
 export const Menu: React.StatelessComponent<MenuProps> = (props): JSX.Element => {
 	return (
 		<StyledWrapper sticky={props.sticky}>
-			<Layout width="80%" maxWidth="960px" center>
+			<Layout width="100%" maxWidth="1280px" center>
 				<StyledMenu {...props}>
-					<StyledImage size="50px" src={props.logo} />
+					<Layout alignItems={LayoutAlignItems.Center}>
+						<StyledImage size="50px" src={props.logo} />
+						<StyledBadge size={CopySize.Small}>{props.badge}</StyledBadge>
+					</Layout>
 					<StyledMenuInner>{props.children}</StyledMenuInner>
 				</StyledMenu>
 			</Layout>

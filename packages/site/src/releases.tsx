@@ -45,46 +45,18 @@ export class Releases extends React.Component {
 
 	public render() {
 		const releases = (data.releases || []).filter(r => !r.draft);
-		const alphaReleases = (data.canary || [])
-			.map((id: any) => releases.find((r: any) => r.id === id))
-			.filter(Boolean);
 		const stableReleases = (data.stable || [])
 			.map((id: any) => releases.find((r: any) => r.id === id))
 			.filter(Boolean);
 
-		const alpha = alphaReleases[0];
 		const stable = stableReleases[0];
 
 		const stableLink = getReleaseLink(stable, this.state.os);
-		const alphaLink = getReleaseLink(alpha, this.state.os);
 
 		return (
-			<div>
-				<div style={{ display: 'flex' }}>
-					<Link href={stableLink.link} white={false}>
-						<D.Button order={D.ButtonOrder.Primary}>
-							Get Alva {this.state.os !== Os.Unknown ? `for` : '   '} {this.state.os}
-						</D.Button>
-					</Link>
-				</div>
-				<D.Space size={D.SpaceSize.S} />
-
-				<D.Copy color={D.Color.Grey70} size={D.CopySize.Small}>
-					Get the Alva{' '}
-					<Link href={alphaLink.link} white>
-						nightly build
-					</Link>{' '}
-					and see<br />all{' '}
-					<Link href={stable ? stable.html_url : ''} white>
-						supported platforms
-					</Link>{' '}
-					on{' '}
-					<Link href={'https://github.com/meetalva/alva'} white>
-						GitHub
-					</Link>
-					.
-				</D.Copy>
-			</div>
+			<Link href={stableLink.link} white={false}>
+				<D.Button order={D.ButtonOrder.Primary}>Get started with Alva</D.Button>
+			</Link>
 		);
 	}
 }

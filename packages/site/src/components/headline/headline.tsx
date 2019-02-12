@@ -27,7 +27,7 @@ const StyledHeadline = styled.div`
 	line-height: 1.3;
 
 	u {
-		text-decoration-color: ${Color.Red};
+		text-decoration-color: ${Color.VioletLight};
 	}
 
 	b {
@@ -50,7 +50,7 @@ const StyledHeadline = styled.div`
 				return `
 					font-size: 32px;
 
-					@media screen and (min-width: 450px) {
+					@media screen and (min-width: 550px) {
 						font-size: 48px;
 					}
 					@media screen and (min-width: 960px) {
@@ -60,13 +60,13 @@ const StyledHeadline = styled.div`
 			case HeadlineLevel.H1:
 			default:
 				return `
-					font-size: 48px;
+					font-size: 38px;
 
-					@media screen and (min-width: 450px) {
-						font-size: 64px;
+					@media screen and (min-width: 550px) {
+						font-size: 50px;
 					}
 					@media screen and (min-width: 960px) {
-						font-size: 96px;
+						font-size: 64px;
 					}
 				`;
 		}

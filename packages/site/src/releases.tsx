@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Path from 'path';
-import * as D from '@meetalva/alva-design';
+import * as D from './components';
 import styled from '@emotion/styled';
 import data from './releases-data';
 
@@ -63,12 +63,6 @@ export class Releases extends React.Component {
 			getReleaseLink(stable, Os.Windows),
 			getReleaseLink(stable, Os.Linux)
 		].filter(l => l.os !== stableLink.os);
-
-		console.log({
-			releases: releases.map(r => r.tag_name),
-			alphaReleases: alphaReleases.map(a => a!.tag_name),
-			stableReleases: stableReleases.map(s => s!.tag_name)
-		});
 
 		return (
 			<div>

@@ -1,0 +1,11 @@
+{
+  "name": "headline",
+  "displayName": "Headline",
+  "version": "1.0.0",
+  "tags": ["atoms", "headline"],
+  "flag": "alpha",
+  "patterns": {
+    "fonts": "atoms/fonts",
+    "colors": "atoms/colors"
+  }
+}

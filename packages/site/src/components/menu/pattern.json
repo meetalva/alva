@@ -1,0 +1,7 @@
+{
+	"name": "menu",
+	"displayName": "Menu",
+	"version": "1.2.0",
+	"tags": ["molecules", "navigation", "menu"],
+	"flag": "alpha"
+}

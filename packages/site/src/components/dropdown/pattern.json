@@ -1,0 +1,13 @@
+{
+  "name": "dropdown",
+  "displayName": "Dropdown",
+  "version": "1.0.0",
+  "tags": ["molecules", "dropdown"],
+  "flag": "alpha",
+  "patterns": {
+    "colors": "atoms/colors",
+    "dropdown-item": "atoms/dropdown-item",
+    "fonts": "atoms/fonts",
+    "icons": "atoms/icons"
+  }
+}

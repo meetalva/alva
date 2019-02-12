@@ -1,0 +1,11 @@
+{
+	"name": "button",
+  "displayName": "Button",
+  "version": "1.0.2",
+  "tags": ["atoms", "button", "link"],
+  "flag": "alpha",
+  "patterns": {
+    "colors": "atoms/colors",
+    "fonts": "atoms/fonts"
+  }
+}

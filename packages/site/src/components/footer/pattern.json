@@ -1,0 +1,7 @@
+{
+	"name": "footer",
+	"displayName": "Footer",
+	"version": "1.0.0",
+	"tags": ["molecules", "navigation", "footer"],
+	"flag": "alpha"
+}

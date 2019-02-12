@@ -1,0 +1,7 @@
+{
+	"name": "link",
+  "displayName": "Link",
+  "version": "1.0.2",
+  "tags": ["atoms", "link"],
+  "flag": "alpha"
+}

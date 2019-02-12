@@ -1,0 +1,7 @@
+{
+  "displayName": "Image",
+  "flag": "alpha",
+  "name": "image",
+  "version": "1.0.0",
+  "tags": ["image", "atom"]
+}

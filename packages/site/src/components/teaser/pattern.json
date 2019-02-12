@@ -1,0 +1,14 @@
+{
+  "name": "teaser",
+  "displayName": "Teaser",
+  "version": "1.0.0",
+  "tags": ["molecules", "teaser"],
+  "flag": "alpha",
+  "patterns": {
+    "button": "atoms/button",
+    "colors": "atoms/colors",
+    "copy": "atoms/copy",
+    "headline": "atoms/headline",
+    "image": "atoms/image"
+  }
+}

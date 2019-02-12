@@ -1,0 +1,11 @@
+{
+  "name": "icons",
+  "displayName": "Icons",
+  "version": "1.0.0",
+  "tags": ["atoms"],
+  "flag": "alpha",
+  "patterns": {
+    "colors": "atoms/colors",
+    "headline": "atoms/headline"
+  }
+}

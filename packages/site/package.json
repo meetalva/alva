@@ -19,16 +19,35 @@
   "bugs": {
     "url": "https://github.com/meetalva/alva/issues"
   },
-  "dependencies": {
-    "@emotion/styled": "^10.0.6",
-    "@meetalva/alva-design": "^1.4.2",
-    "@types/react": "16.4.11",
-    "@types/react-helmet": "5.0.6",
-    "react": "16.4.2",
-    "react-dom": "16.4.2",
-    "react-helmet": "5.2.0"
-  },
+
   "devDependencies": {
+    "@commitlint/cli": "^7.1.2",
+    "@commitlint/config-conventional": "^7.1.2",
+    "@commitlint/prompt-cli": "^7.1.2",
+    "@commitlint/travis-cli": "^7.1.2",
+    "@patternplate/cli": "^3.2.5",
+    "@patternplate/render-react": "^3.2.5",
+    "concurrently": "^3.5.1",
+    "husky": "^0.14.3",
+    "node-fetch": "^2.3.0",
+    "semantic-release": "^15.13.2",
+    "surge": "^0.20.1",
+    "typescript": "^3.0.3",
+    "yargs-parser": "^11.1.1",
     "@meetalva/tools": "1.0.0"
+  },
+  "dependencies": {
+    "@emotion/core": "^10.0.6",
+    "@emotion/styled": "^10.0.6",
+    "@types/node": "^8.0.53",
+    "@types/react": "^16.4.14",
+    "@types/react-dom": "^16.0.7",
+    "@types/react-helmet": "^5.0.7",
+    "prop-types": "^15.6.2",
+    "react": "^16.5.1",
+    "react-dom": "^16.5.1",
+    "react-feather": "^1.1.0",
+    "react-helmet": "^5.2.0",
+    "tslib": "^1.7.0"
   }
 }

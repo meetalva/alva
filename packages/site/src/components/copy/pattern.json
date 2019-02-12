@@ -1,0 +1,11 @@
+{
+  "name": "copy",
+  "displayName": "Copy",
+  "version": "1.0.0",
+  "tags": ["atoms", "copy"],
+  "flag": "alpha",
+  "patterns": {
+    "colors": "atoms/colors",
+    "fonts": "atoms/fonts"
+  }
+}

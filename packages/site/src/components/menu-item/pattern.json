@@ -1,0 +1,12 @@
+{
+  "name": "menu-item",
+  "displayName": "Menu Item",
+  "version": "1.0.0",
+  "tags": ["molecules", "menu item"],
+  "flag": "alpha",
+  "patterns": {
+    "colors": "atoms/colors",
+    "copy": "atoms/copy",
+		"space": "atoms/space"
+  }
+}

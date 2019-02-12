@@ -1,0 +1,7 @@
+{
+  "name": "layout",
+  "displayName": "Layout",
+  "version": "1.0.0",
+  "tags": ["atoms", "layout", "forms", "forms-extension"],
+  "flag": "alpha"
+}

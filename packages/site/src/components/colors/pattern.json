@@ -1,0 +1,9 @@
+{
+	"name": "colors",
+	"displayName": "Colors",
+	"version": "1.0.0",
+	"tags": [
+		"natural-laws"
+	],
+	"flag": "alpha"
+}

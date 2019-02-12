@@ -1,0 +1,7 @@
+{
+	"name": "section",
+	"displayName": "Section",
+	"version": "1.2.0",
+	"tags": ["molecules", "section"],
+	"flag": "alpha"
+}

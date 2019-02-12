@@ -1,0 +1,11 @@
+{
+  "name": "dropdown-item",
+  "displayName": "Dropdown Item",
+  "version": "1.0.0",
+  "tags": ["atoms", "dropdown-item"],
+  "flag": "alpha",
+  "patterns": {
+    "colors": "atoms/colors",
+    "fonts": "atoms/fonts"
+  }
+}

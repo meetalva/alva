@@ -1,0 +1,7 @@
+{
+  "name": "feature",
+  "displayName": "Feature",
+  "version": "1.0.0",
+  "tags": ["molecules", "feature"],
+  "flag": "alpha"
+}

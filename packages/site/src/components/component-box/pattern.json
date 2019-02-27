@@ -1,0 +1,7 @@
+{
+  "name": "component-box",
+  "displayName": "Component Box",
+  "version": "1.0.0",
+  "tags": ["molecules", "component-box"],
+  "flag": "alpha"
+}

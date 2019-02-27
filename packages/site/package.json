@@ -19,7 +19,6 @@
   "bugs": {
     "url": "https://github.com/meetalva/alva/issues"
   },
-
   "devDependencies": {
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
@@ -44,6 +43,7 @@
     "@types/react-helmet": "^5.0.7",
     "react": "^16.5.1",
     "react-dom": "^16.5.1",
+    "react-feather": "^1.1.6",
     "react-helmet": "^5.2.0",
     "tslib": "^1.7.0"
   }

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
 import * as D from './components';
-import { Releases } from './releases';
+import { Hero } from './hero';
 
 export * from './render';
 
@@ -40,45 +40,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 				<link rel="icon" href="https://media.meetalva.io/alva.svg" type="image/x-icon" />
 			</Helmet>
 
-			<D.Menu logo="https://media.meetalva.io/alva.svg" badge="Beta v0.9.1">
-				<D.MenuItem
-					linkName="Learn"
-					target="_blank"
-					rel="noopener"
-					href="./doc/docs/guides/start?guides-enabled=true"
-					title="Open Getting Started Tutorial"
-				/>
-				<D.MenuItem linkName="Our Mission" rel="noopener" href="#" title="Our Mission" />
-				<D.MenuItem linkName="About us" rel="noopener" href="#" title="About us" />
-			</D.Menu>
-
-			<D.Hero backgroundColor={D.Color.Black} textColor={D.Color.White}>
-				<D.Space size={D.SpaceSize.L} />
-
-				<D.Layout maxWidth="960px" center>
-					<D.Headline level={D.HeadlineLevel.H1} textAlign={D.TextAlign.Center}>
-						Create <u>interactive prototypes</u> with your design system.
-					</D.Headline>
-				</D.Layout>
-
-				<D.Space size={D.SpaceSize.M} />
-
-				<D.Layout maxWidth="640px" direction={D.LayoutDirection.Vertical} center>
-					<D.Copy size={D.CopySize.Medium} textAlign={D.TextAlign.Center}>
-						Alva is your team's shared platform which enables better collaboration between
-						designers and developers.
-					</D.Copy>
-
-					<D.Space size={D.SpaceSize.L} />
-
-					<div style={{ display: 'flex', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
-						<Releases />
-						<D.Button order={D.ButtonOrder.Secondary}>Watch mission video</D.Button>
-					</div>
-				</D.Layout>
-
-				<D.Space size={D.SpaceSize.XL} />
-			</D.Hero>
+			<Hero />
 
 			<D.Section backgroundColor={D.Color.White} textColor={D.Color.Black}>
 				<D.Headline level={D.HeadlineLevel.H3}>
@@ -93,27 +55,6 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 			</D.Section>
 
 			<D.Space size={D.SpaceSize.XL} />
-
-			<D.Teaser
-				image="https://media.meetalva.io/background.jpg"
-				headline="We strive for true team play between design and development."
-			>
-				<div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
-					<iframe
-						src="https://www.youtube-nocookie.com/embed/gZT13EKfZXg?modestbranding=1&rel=0"
-						style={{
-							position: 'absolute',
-							top: 0,
-							left: 0,
-							width: '100%',
-							height: '100%',
-							borderWidth: 0
-						}}
-						allowFullScreen
-					/>
-				</div>
-			</D.Teaser>
-
 			<D.Section backgroundColor={D.Color.Grey95}>
 				<D.Headline
 					level={D.HeadlineLevel.H1}

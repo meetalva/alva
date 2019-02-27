@@ -1,5 +1,5 @@
 import { Color } from '../colors';
-import { Layout } from '../layout';
+import { Layout, LayoutDirection } from '../layout';
 import * as React from 'react';
 import styled from '@emotion/styled';
 
@@ -17,8 +17,8 @@ const StyledWrapper =
 	styled.div <
 	{ textColor: Color | 'inherit' } >
 	`
+	width: 100%;
 	margin: 0 auto;
-	padding: 0 5vw;
 	color: ${props => props.textColor};
 
 `;
@@ -28,8 +28,11 @@ const StyledWrapper =
  */
 export const Hero: React.StatelessComponent<HeroProps> = (props): JSX.Element => {
 	return (
-		<Layout backgroundColor={props.backgroundColor || Color.White}>
-			<Layout width="100%" maxWidth="1280px" center>
+		<Layout
+			direction={LayoutDirection.Vertical}
+			backgroundColor={props.backgroundColor || Color.White}
+		>
+			<Layout width="100%" center>
 				<StyledWrapper textColor={props.textColor || 'inherit'}>{props.children}</StyledWrapper>
 			</Layout>
 		</Layout>

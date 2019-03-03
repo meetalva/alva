@@ -13,6 +13,10 @@ export class LibraryStore {
 		{
 			name: '@meetalva/alva-design',
 			version: 'latest'
+		},
+		{
+			name: '@meetalva/video-player',
+			version: 'latest'
 		}
 	];
 

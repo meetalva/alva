@@ -62,7 +62,7 @@ export class Pattern {
 		this.group = init.group;
 		this.icon = init.icon;
 		this.id = init.id || uuid.v4();
-		this.name = AlvaUtil.guessName(init.name);
+		this.name = init.name;
 		this.patternLibrary = context.patternLibrary;
 		this.propertyIds = new Set(init.propertyIds || []);
 		this.type = init.type;

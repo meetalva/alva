@@ -65,7 +65,7 @@ export const Teaser: React.SFC<TeaserProps> = props => {
 
 	return (
 		<StyledContainer {...props}>
-			<IconImage stroke-width={1.5} size={IconSize.S} />
+			<IconImage strokeWidth={1.5} size={IconSize.S} />
 			<Space sizeBottom={SpaceSize.XS} />
 			<Headline order={4}>{props.headline}</Headline>
 			<Space sizeBottom={SpaceSize.XS} />

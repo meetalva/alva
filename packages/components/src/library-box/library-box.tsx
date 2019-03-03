@@ -139,9 +139,7 @@ export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JS
 				<Space sizeTop={SpaceSize.L} />
 				<StyledInstallContainer>
 					{props.install}
-					<Translucent>
-						<Copy>{props.version}</Copy>
-					</Translucent>
+					<Translucent>{props.version}</Translucent>
 				</StyledInstallContainer>
 				<Space sizeBottom={SpaceSize.L} />
 			</StyledBottom>

@@ -36,7 +36,7 @@ export const LinkIcon: React.SFC<LinkIconProps> = props => {
 
 	return (
 		<StyledLink {...props}>
-			<IconImage stroke-width={1.5} size={getIconSize(props.size)} strokeWidth={1.5} />
+			<IconImage size={getIconSize(props.size)} strokeWidth={1.5} />
 			<Space sizeRight={SpaceSize.XS} />
 			<Copy size={props.size}>{props.children}</Copy>
 		</StyledLink>

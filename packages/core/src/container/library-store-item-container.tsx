@@ -118,7 +118,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				image={props.item.image}
 				version={
 					<C.Flex alignItems={C.FlexAlignItems.Center}>
-						<span>{props.item.version}</span>
+						<C.Copy>{props.item.version}</C.Copy>
 						{props.item.updateVersion ? (
 							<>
 								<C.Space

@@ -4,7 +4,6 @@ import { Color } from '../colors';
 import { Copy } from '../copy';
 
 export interface MenuItemProps {
-	/** @name Copy */ linkName?: string;
 	/** @name Link */ onClick?: React.MouseEventHandler<HTMLDivElement>;
 	href?: string;
 	target?: string;
@@ -26,9 +25,9 @@ export const MenuItem: React.StatelessComponent<MenuItemProps> = props => {
 			target={props.target}
 			rel={props.rel}
 			title={props.title}
-			style={{ textDecoration: 'none', marginLeft: 32, color: Color.White }}
+			style={{ textDecoration: 'none', marginLeft: 32, color: Color.White, alignSelf: 'center' }}
 		>
-			<StyledMenuItem>{props.linkName}</StyledMenuItem>
+			<StyledMenuItem>{props.children}</StyledMenuItem>
 		</a>
 	);
 };

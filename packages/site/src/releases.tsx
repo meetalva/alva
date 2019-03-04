@@ -45,21 +45,57 @@ export class Releases extends React.Component {
 
 	public render() {
 		const releases = (data.releases || []).filter(r => !r.draft);
+		const alphaReleases = (data.canary || [])
+			.map((id: any) => releases.find((r: any) => r.id === id))
+			.filter(Boolean);
 		const stableReleases = (data.stable || [])
 			.map((id: any) => releases.find((r: any) => r.id === id))
 			.filter(Boolean);
 
+		const alpha = alphaReleases[0];
 		const stable = stableReleases[0];
 
 		const stableLink = getReleaseLink(stable, this.state.os);
+		const alphaLink = getReleaseLink(alpha, this.state.os);
+
+		// const stableLinks = [
+		// 	getReleaseLink(stable, Os.macOS),
+		// 	getReleaseLink(stable, Os.Windows),
+		// 	getReleaseLink(stable, Os.Linux)
+		// ].filter(l => l.os !== stableLink.os);
 
 		return (
-			<Link href={stableLink.link} white={false}>
-				<D.Button order={D.ButtonOrder.Primary}>Get started with Alva</D.Button>
-			</Link>
+			<div>
+				<div style={{ display: 'flex' }}>
+					<Link href={stableLink.link} white={false}>
+						<D.Button order={D.ButtonOrder.Primary}>
+							Get Alva {this.state.os !== Os.Unknown ? `for` : '   '} {this.state.os}
+						</D.Button>
+					</Link>
+				</div>
+				<D.Space size={D.SpaceSize.S} />
+
+				<D.Copy color={D.Color.Grey70} size={D.CopySize.Small} textAlign={D.TextAlign.Center}>
+					<Link href={alphaLink.link} white>
+						Nightly Build
+					</Link>{' '}
+					·{' '}
+					<Link href={stable ? stable.html_url : ''} white>
+						All platforms
+					</Link>
+				</D.Copy>
+			</div>
 		);
 	}
 }
+
+// function getSeperator(length: number, index: number): string {
+// 	if (index >= length - 1) {
+// 		return '';
+// 	}
+
+// 	return index === length - 2 ? ' and ' : ', ';
+// }
 
 function getReleaseLink(release: any, os: Os): { os: Os; link: string } {
 	if (!release) {

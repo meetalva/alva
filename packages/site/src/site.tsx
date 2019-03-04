@@ -165,32 +165,34 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 			</D.Section>
 
 			<D.Footer copyright="&copy; 2018 Alva">
-				<D.MenuItem linkName="Write us" rel="noopener" href="mailto:hey@meetalva.io" />
+				<D.MenuItem rel="noopener" href="mailto:hey@meetalva.io">
+					Write us
+				</D.MenuItem>
 				<D.MenuItem
-					linkName="Follow us"
 					target="_blank"
 					rel="noopener"
 					href="https://twitter.com/meetalva"
 					title="Find us on Twitter"
-				/>
+				>
+					Follow us
+				</D.MenuItem>
+				<D.MenuItem target="_blank" rel="noopener" href="https://sinnerschrader.com">
+					Proudly powered by SinnerSchrader
+				</D.MenuItem>
 				<D.MenuItem
-					linkName="Proudly powered by SinnerSchrader"
-					target="_blank"
-					rel="noopener"
-					href="https://sinnerschrader.com"
-				/>
-				<D.MenuItem
-					linkName="Legal notice"
 					target="_blank"
 					rel="noopener"
 					href="./doc/docs/legalnotice?guides-enabled=true"
-				/>
+				>
+					Legal notice
+				</D.MenuItem>
 				<D.MenuItem
-					linkName="Privacy Policy"
 					target="_blank"
 					rel="noopener"
 					href="./doc/docs/privacypolicy?guides-enabled=true"
-				/>
+				>
+					Privacy Policy
+				</D.MenuItem>
 			</D.Footer>
 		</div>
 	);

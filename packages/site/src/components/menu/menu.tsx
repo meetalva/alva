@@ -51,6 +51,8 @@ const StyledBadge = styled(Copy)`
 
 	white-space: nowrap;
 	line-height: 24px;
+	color: white;
+	text-decoration: none;
 `;
 
 const StyledMenuInner = styled.div`
@@ -96,7 +98,9 @@ export const Menu: React.StatelessComponent<MenuProps> = (props): JSX.Element =>
 				<StyledMenu {...props}>
 					<Layout alignItems={LayoutAlignItems.Center}>
 						<StyledImage size="50px" src={props.logo} />
-						<StyledBadge size={CopySize.Small}>{props.badge}</StyledBadge>
+						<a href="">
+							<StyledBadge size={CopySize.Small}>{props.badge}</StyledBadge>
+						</a>
 					</Layout>
 					<StyledMenuInner>{props.children}</StyledMenuInner>
 				</StyledMenu>

@@ -1,13 +1,15 @@
 ---
-displayName: Guide 8 - Create Library
+displayName: 4. Create a custom library
 
 tags:
   - guide
+  - dev
+
+options:
+  order: 4
 ---
 
-# Guide 8 - Create a Component Library
-
-:woman_student: **Level**: Expert
+# Create a Custom Component Library
 
 ---
 

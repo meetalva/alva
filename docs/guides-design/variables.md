@@ -1,13 +1,16 @@
 ---
-displayName: Guide 5 – Variables
+displayName: 3. Use variables in inputs
 
 tags:
   - guide
+  - design
+  - variables
+
+options:
+  order: 3
 ---
 
-# Guide 5 - Variables
-
-:woman_student: **Level**: Intermediate
+# Use variables in inputs
 
 ---
 

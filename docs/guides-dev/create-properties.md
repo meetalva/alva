@@ -1,11 +1,15 @@
 ---
-displayName: Guide 7 - Create Properties
+displayName: 3. Add properties
 
 tags:
   - guide
+  - dev
+
+options:
+  order: 3
 ---
 
-# Guide 7 - Create Properties
+# Adding Properties to a Component
 
  Learn how to make your patterns configurable with property interfaces.
 

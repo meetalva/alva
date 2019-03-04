@@ -1,13 +1,15 @@
 ---
-displayName: Guide 6 - Create a Pattern
+displayName: 2. Create a component
 
 tags:
   - guide
+  - dev
+
+options:
+  order: 2
 ---
 
-# Guide 6 - Create a Pattern
-
-:woman_student: **Level**: Intermediate
+# Create a Component
 
 ---
 

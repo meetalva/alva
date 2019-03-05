@@ -129,7 +129,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 								>
 									<ArrowRight size={12} />
 								</C.Space>
-								<span>{props.item.updateVersion}</span>
+								<C.Copy>{props.item.updateVersion}</C.Copy>
 							</>
 						) : null}
 					</C.Flex>

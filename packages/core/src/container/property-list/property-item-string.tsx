@@ -24,20 +24,41 @@ export class PropertyItemString extends React.Component<PropertyItemStringProps>
 
 		const example = patternProperty.getExample();
 
+		const valuePre = property.getValue() as string;
+		const value = valuePre && valuePre.includes('px') && Number(valuePre.replace('px', ''));
+		const unit = patternProperty.getUnit().split('|')[0];
+		console.log(unit);
+
 		return (
-			<Components.PropertyItemString
-				description={patternProperty.getDescription()}
-				label={patternProperty.getLabel()}
-				value={property.getValue() as string}
-				onBlur={() => props.store.commit()}
-				onChange={e => {
-					property.setValue(e.target.value);
-				}}
-				onResize={() => {
-					return this.props.onDidRender && this.props.onDidRender();
-				}}
-				placeholder={example ? `e.g.: ${example}` : ''}
-			/>
+			<>
+				{unit.length === 0 ? (
+					<Components.PropertyItemString
+						description={patternProperty.getDescription()}
+						label={patternProperty.getLabel() as string}
+						value={property.getValue() as string}
+						onBlur={() => props.store.commit()}
+						onChange={e => {
+							property.setValue(e.target.value);
+						}}
+						onResize={() => {
+							return this.props.onDidRender && this.props.onDidRender();
+						}}
+						placeholder={example ? `e.g.: ${example}` : ''}
+					/>
+				) : (
+					<Components.PropertyItemNumber
+						description={patternProperty.getDescription()}
+						label={patternProperty.getLabel() as string}
+						value={value}
+						onBlur={() => props.store.commit()}
+						onChange={e => {
+							property.setValue(`${e.target.value}${unit}`);
+						}}
+						unit={unit}
+						placeholder={example ? `e.g.: ${example}` : ''}
+					/>
+				)}
+			</>
 		);
 	}
 }

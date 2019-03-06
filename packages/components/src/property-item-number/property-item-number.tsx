@@ -10,7 +10,7 @@ export interface PropertyItemNumberProps {
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	placeholder?: string;
 	value?: number;
-
+	unit?: string;
 	onMinusClick?: React.MouseEventHandler;
 	onPlusClick?: React.MouseEventHandler;
 }
@@ -29,6 +29,7 @@ export const PropertyItemNumber: React.StatelessComponent<PropertyItemNumberProp
 					: String(props.value)
 			}
 			placeholder={props.placeholder}
+			unit={props.unit}
 		/>
 	</PropertyItem>
 );

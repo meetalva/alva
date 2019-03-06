@@ -271,6 +271,8 @@ function setPropertyMetaData(init: {
 	property.example = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'example') || '';
 	property.required = (symbol.flags & Ts.SymbolFlags.Optional) !== Ts.SymbolFlags.Optional;
 	property.label = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'name') || property.label;
+	property.unit = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'unit') || '';
+	console.log('property analyzer: ', property.unit);
 	property.description = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'description') || '';
 	property.hidden = TypescriptUtils.hasJsDocTagFromSymbol(symbol, 'ignore');
 	property.group = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'group') || '';

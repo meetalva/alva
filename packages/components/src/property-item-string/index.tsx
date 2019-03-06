@@ -14,6 +14,7 @@ export interface PropertyItemStringProps {
 	onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 	placeholder?: string;
 	value?: string;
+	unit?: string;
 	children?(renderProps: PropertyItemStringProps): JSX.Element | null;
 	onResize?(): void;
 }
@@ -29,6 +30,7 @@ export const PropertyLinkIcon: StyledComponentClass<{}, {}, any> = styled(Link2)
 	width: 20px;
 	cursor: pointer;
 	transition: stroke 0.3s ease-in-out;
+	display: none;
 	stroke: ${Color.Grey60};
 	&:hover {
 		stroke: ${Color.Grey20};

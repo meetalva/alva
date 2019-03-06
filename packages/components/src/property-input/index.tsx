@@ -5,6 +5,7 @@ import { getSpace, SpaceSize } from '../space';
 import styled, { css } from 'styled-components';
 import { ChevronUp, ChevronDown } from 'react-feather';
 import { IconSize } from '../icons';
+import { Copy, CopySize } from '../copy';
 
 export const PropertyInputStyles = css`
 	display: block;
@@ -95,6 +96,28 @@ const StyledClicker = styled.div`
 	}
 `;
 
+const StyledUnit = styled.div`
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 100%;
+	display: flex;
+	align-items: center;
+`;
+
+const StyledUnitBox = styled.div`
+	color: ${Color.Grey50};
+	border-radius: 3px;
+	padding: ${getSpace(SpaceSize.XXS)}px;
+	margin-right: ${getSpace(SpaceSize.XS + SpaceSize.XXS)}px;
+	transition: color 0.2s, background 0.2s;
+
+	&:hover {
+		color: ${Color.Black}
+		background: ${Color.Grey90};
+	}
+`;
+
 const StyledInput = styled.input`
 	${PropertyInputStyles};
 	${(props: PropertyInputProps) =>
@@ -108,6 +131,7 @@ export interface PropertyInputProps {
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	placeholder?: string;
 	type?: PropertyInputType;
+	unit?: string;
 	value?: string;
 	onMinusClick?: React.MouseEventHandler;
 	onPlusClick?: React.MouseEventHandler;
@@ -128,15 +152,23 @@ export const PropertyInput: React.SFC<PropertyInputProps> = props => (
 			value={props.value || ''}
 			placeholder={props.placeholder}
 		/>
-		{props.type === 'number' && (
-			<StyledStepper>
-				<StyledClicker onClick={props.onPlusClick}>
-					<ChevronUp size={IconSize.XXS} />
-				</StyledClicker>
-				<StyledClicker onClick={props.onMinusClick}>
-					<ChevronDown size={IconSize.XXS} />
-				</StyledClicker>
-			</StyledStepper>
+		{props.type === 'number' &&
+			(props.onMinusClick !== undefined || props.onPlusClick !== undefined) && (
+				<StyledStepper>
+					<StyledClicker onClick={props.onPlusClick}>
+						<ChevronUp size={IconSize.XXS} />
+					</StyledClicker>
+					<StyledClicker onClick={props.onMinusClick}>
+						<ChevronDown size={IconSize.XXS} />
+					</StyledClicker>
+				</StyledStepper>
+			)}
+		{props.unit && (
+			<StyledUnit>
+				<StyledUnitBox>
+					<Copy size={CopySize.S}>{props.unit}</Copy>
+				</StyledUnitBox>
+			</StyledUnit>
 		)}
 	</StyledWrapper>
 );

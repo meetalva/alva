@@ -67,7 +67,9 @@ export const PropertyRow: React.SFC<PropertyRowProps> = props => (
 						onClick={e => e.preventDefault()}
 						key={props.row.group.name}
 						summary={
-							<Components.Headline order={4}>{props.row.group.name}</Components.Headline>
+							<Components.Headline order={5} bold={true} textColor={Components.Color.Grey50}>
+								{props.row.group.name}
+							</Components.Headline>
 						}
 					>
 						{props.row.group.items.map(property => (

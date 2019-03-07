@@ -36,7 +36,7 @@ export class PropertyItemString extends React.Component<PropertyItemStringProps>
 				onResize={() => {
 					return this.props.onDidRender && this.props.onDidRender();
 				}}
-				placeholder={example ? `e.g.: ${example}` : ''}
+				placeholder={example ? example : ''}
 			/>
 		);
 	}

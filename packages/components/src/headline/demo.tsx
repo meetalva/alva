@@ -4,12 +4,10 @@ import * as React from 'react';
 
 const HeadlineDemo: React.StatelessComponent<void> = (): JSX.Element => (
 	<DemoContainer title="Headline">
-		<Headline bold order={1} tagName="h1">
+		<Headline bold order={1}>
 			Headline Order 1 (Bold)
 		</Headline>
-		<Headline order={1} tagName="h1">
-			Headline Order 1
-		</Headline>
+		<Headline order={1}>Headline Order 1</Headline>
 		<Headline bold order={2}>
 			Headline Order 2 (Bold)
 		</Headline>

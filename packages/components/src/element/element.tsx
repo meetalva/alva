@@ -100,7 +100,7 @@ const StyledElementLabel = styled.div`
 	position: relative;
 	display: flex;
 	align-items: center;
-	font-size: 15px;
+	font-size: 14px;
 	line-height: 21px;
 	z-index: 1;
 	color: ${LABEL_COLOR};

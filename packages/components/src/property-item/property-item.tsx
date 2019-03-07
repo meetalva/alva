@@ -7,7 +7,6 @@ import { PropertyLabel } from './property-label';
 const StyledPropertyItem = styled.label`
 	display: flex;
 	flex-shrink: 0;
-	flex-wrap: wrap;
 	width: 100%;
 	box-sizing: border-box;
 	margin-bottom: ${getSpace(SpaceSize.S)}px;
@@ -17,6 +16,8 @@ const StyledPropertyItemContainer = styled.div`
 	position: relative;
 	display: flex;
 	width: 100%;
+	align-items: baseline;
+	flex-wrap: wrap;
 `;
 
 export interface PropertyItemProps {

@@ -1,5 +1,6 @@
 import { Color } from '../colors';
 import { Copy } from '../copy';
+import { Headline } from '../headline';
 import { IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
@@ -19,12 +20,8 @@ const StyledPatternList = styled.div`
 	margin-bottom: ${getSpace(SpaceSize.XXL)}px;
 `;
 
-const StyledPatternLabel = styled(Copy)`
+const StyledPatternLabel = styled(Headline)`
 	margin-bottom: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px;
-	user-select: none;
-	text-transform: uppercase;
-	font-weight: bold;
-	letter-spacing: 0.1em;
 `;
 
 const StyledPatternListItem = styled.div`
@@ -112,7 +109,9 @@ export interface WithChildren {
 }
 
 export const PatternLabel: React.StatelessComponent<WithChildren> = props => (
-	<StyledPatternLabel textColor={Color.Grey50}>{props.children}</StyledPatternLabel>
+	<StyledPatternLabel order={5} bold={true} textColor={Color.Grey50}>
+		{props.children}
+	</StyledPatternLabel>
 );
 
 export const PatternItemLabel: React.StatelessComponent<WithChildren> = props => (

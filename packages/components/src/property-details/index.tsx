@@ -13,13 +13,9 @@ export interface DetailsProps {
 
 const StyledWrapper = styled.div`
 	margin: 0 -${getSpace(SpaceSize.M)}px;
-	border-top: 1px solid ${Color.Grey90};
+	border-bottom: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
-		border-top-width: 0.5px;
 		border-bottom-width: 0.5px;
-	}
-	&:last-of-type {
-		border-bottom: 1px solid ${Color.Grey90};
 	}
 `;
 
@@ -33,7 +29,7 @@ const StyledSummary = styled.summary`
 	list-style: none;
 	user-select: none;
 	margin-top: ${getSpace(SpaceSize.S)}px;
-	margin-bottom: ${getSpace(SpaceSize.S)}px;
+	margin-bottom: ${getSpace(SpaceSize.M)}px;
 	color: ${Color.Grey50};
 
 	::-webkit-details-marker {

@@ -6,26 +6,30 @@ import styled, { css, StyledComponentClass } from 'styled-components';
 export interface HeadlineProps {
 	children?: React.ReactNode;
 	className?: string;
-	order?: 1 | 2 | 3 | 4;
-	tagName?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div';
+	order?: 1 | 2 | 3 | 4 | 5;
 	textColor?: Color;
 	bold?: boolean;
 }
 
 interface StyledHeadlineProps {
 	className?: string;
-	order?: 1 | 2 | 3 | 4;
+	order?: 1 | 2 | 3 | 4 | 5;
 	textColor?: Color;
 	bold?: boolean;
 }
 
 const StyledHeadline = styled.div`
-	margin: 0;
 	font-family: ${fonts().NORMAL_FONT};
 	${(props: StyledHeadlineProps) => (props.textColor ? `color: ${props.textColor};` : '')};
 	font-weight: ${(props: StyledHeadlineProps) => (props.bold ? '700' : '400')};
 	${(props: HeadlineProps) => {
 		switch (props.order) {
+			case 5:
+				return css`
+					font-size: 11px;
+					text-transform: uppercase;
+					letter-spacing: 0.5px;
+				`;
 			case 4:
 				return css`
 					font-size: 15px;
@@ -53,20 +57,14 @@ const StyledHeadline = styled.div`
 `;
 
 export const Headline: React.StatelessComponent<HeadlineProps> = props => {
-	const tagName = props.tagName === undefined ? 'div' : props.tagName;
-	const Component: StyledComponentClass<
-		StyledHeadlineProps,
-		HeadlineProps
-	> = StyledHeadline.withComponent(tagName);
-
 	return (
-		<Component
+		<StyledHeadline
 			bold={props.bold}
 			className={props.className}
 			textColor={props.textColor}
 			order={props.order}
 		>
 			{props.children}
-		</Component>
+		</StyledHeadline>
 	);
 };

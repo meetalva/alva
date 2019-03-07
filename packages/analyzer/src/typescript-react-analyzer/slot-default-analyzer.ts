@@ -133,13 +133,10 @@ export function analyzeSlotDefault(
 
 	const fragments = analysis.pattern.contextId.split('node_modules');
 	const pkgNameAndPath = fragments[fragments.length - 1];
-	const pkgFragments = pkgNameAndPath.split('/');
-	const relPath = pkgNameAndPath.startsWith('/@') ? pkgFragments.slice(2) : pkgFragments.slice(1);
+	const pkgFragments = pkgNameAndPath.split('/').filter(Boolean);
 	const libraryId = pkgNameAndPath.startsWith('/@')
 		? pkgFragments.slice(0, 2)
 		: pkgFragments.slice(0, 1);
-
-	analysis.pattern.contextId = relPath.join('/');
 
 	return {
 		parent: id,

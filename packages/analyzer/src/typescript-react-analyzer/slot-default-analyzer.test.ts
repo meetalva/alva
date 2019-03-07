@@ -12,7 +12,7 @@ beforeAll(() => {
 	ctx.project = new tsa.Project();
 });
 
-test('should work with Text from @meetalva/essentials', () => {
+test('works with Text from @meetalva/essentials', () => {
 	const result = analyzeSlotDefault(
 		`
 		import * as React from 'react';
@@ -30,7 +30,7 @@ test('should work with Text from @meetalva/essentials', () => {
 	);
 });
 
-test('should work with JSX.IntrinsicElement', () => {
+test('works with JSX.IntrinsicElement', () => {
 	const result = analyzeSlotDefault(
 		`
 		import * as React from 'react';
@@ -42,7 +42,7 @@ test('should work with JSX.IntrinsicElement', () => {
 	expect(result).toBeUndefined();
 });
 
-test('should ignore modules without default export', () => {
+test('ignores modules without default export', () => {
 	const result = analyzeSlotDefault(
 		`
 		import * as React from 'react';
@@ -55,7 +55,7 @@ test('should ignore modules without default export', () => {
 	expect(result).toBeUndefined();
 });
 
-test('should pick up props', () => {
+test('picks up props', () => {
 	const result = analyzeSlotDefault(
 		`
 		import * as React from 'react';
@@ -75,6 +75,40 @@ test('should pick up props', () => {
 					value: '"Hello, World!"'
 				}
 			]
+		})
+	);
+});
+
+test('exposes pattern id via .patternContextId', () => {
+	const result = analyzeSlotDefault(
+		`
+		import * as React from 'react';
+		import { Text } from '@meetalva/essentials';
+		export default () => <Text text="Hello, World!"/>
+	`,
+		{ ...ctx, id: 'meetalva-essentials-text-id' }
+	);
+
+	expect(result).toEqual(
+		expect.objectContaining({
+			patternContextId: 'node_modules/@meetalva/essentials/lib/text.d.ts:Text'
+		})
+	);
+});
+
+test('determines library id with scopes', () => {
+	const result = analyzeSlotDefault(
+		`
+		import * as React from 'react';
+		import { Text } from '@meetalva/essentials';
+		export default () => <Text text="Hello, World!"/>
+	`,
+		{ ...ctx, id: 'meetalva-essentials-text-library-id-scopes' }
+	);
+
+	expect(result).toEqual(
+		expect.objectContaining({
+			libraryId: '@meetalva/essentials'
 		})
 	);
 });

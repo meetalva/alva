@@ -38,6 +38,7 @@ export function createEnumProperty(
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		group: '',
@@ -57,11 +58,12 @@ export function createEnumProperty(
 
 			const name =
 				TypescriptUtils.getJsDocValueFromNode(enumMember, 'name') || enumMember.name.getText();
+			const icon = TypescriptUtils.getJsDocValueFromNode(enumMember, 'icon') || '';
 
 			const option: Types.SerializedEnumOption = {
 				model: Types.ModelName.PatternEnumPropertyOption,
 				contextId: enumMember.name.getText(),
-				icon: undefined,
+				icon,
 				id: ctx.getEnumOptionId(enumId, name),
 				name,
 				ordinal: optionContextId,

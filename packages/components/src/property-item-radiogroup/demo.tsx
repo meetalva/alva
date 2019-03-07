@@ -13,9 +13,9 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 		super(props);
 
 		const values = [
-			{ id: 'id1', name: 'Medium', icon: IconName.ArrowFillLeft },
-			{ id: 'id2', name: 'Rare', icon: IconName.ArrowFillLeft },
-			{ id: 'id3', name: 'Solid Shoe', icon: IconName.ArrowFillLeft }
+			{ id: 'id1', name: 'Medium', icon: 'Plus' },
+			{ id: 'id2', name: 'Rare', icon: 'Youtube' },
+			{ id: 'id3', name: 'Solid Shoe', icon: 'Plus' }
 		];
 
 		this.state = {

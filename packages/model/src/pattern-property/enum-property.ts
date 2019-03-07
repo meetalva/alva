@@ -119,6 +119,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 	public toJSON(): Types.SerializedPatternEnumProperty {
 		return {
 			model: this.model,
+			control: this.control,
 			contextId: this.contextId,
 			defaultOptionId: this.defaultOptionId,
 			example: String(this.example),
@@ -137,6 +138,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 
 	public update(prop: PatternEnumProperty): void {
 		this.contextId = prop.getContextId();
+		this.control = prop.getControl();
 		this.defaultOptionId = prop.getDefaultOptionId();
 		this.example = prop.getExample();
 		this.group = prop.getGroup();
@@ -164,7 +166,7 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 
 export interface PatternEnumPropertyOptionInit {
 	contextId: string;
-	icon: IconName | undefined;
+	icon: string;
 	id: string;
 	name: string;
 	ordinal: string;
@@ -175,7 +177,7 @@ export class PatternEnumPropertyOption {
 	public model = Types.ModelName.PatternEnumPropertyOption;
 
 	@Mobx.observable private contextId: string;
-	@Mobx.observable private icon: IconName | undefined;
+	@Mobx.observable private icon: string;
 	@Mobx.observable private id: string;
 	@Mobx.observable private name: string;
 	@Mobx.observable private ordinal: string;
@@ -190,7 +192,7 @@ export class PatternEnumPropertyOption {
 			ordinal: '0',
 			value: '0',
 			contextId: '0',
-			icon: undefined,
+			icon: '',
 			...mixin
 		};
 	}
@@ -222,7 +224,7 @@ export class PatternEnumPropertyOption {
 		return this.contextId;
 	}
 
-	public getIcon(): IconName | undefined {
+	public getIcon(): string {
 		return this.icon;
 	}
 

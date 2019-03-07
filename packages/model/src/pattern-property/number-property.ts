@@ -45,6 +45,7 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 		return {
 			model: this.model,
 			contextId: this.contextId,
+			control: this.control,
 			defaultValue: this.defaultValue,
 			description: this.description,
 			example: this.example,
@@ -61,6 +62,7 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 
 	public update(prop: PatternNumberProperty): void {
 		this.contextId = prop.getContextId();
+		this.control = prop.getControl();
 		this.defaultValue = prop.defaultValue;
 		this.description = prop.getDescription();
 		this.example = prop.getExample();

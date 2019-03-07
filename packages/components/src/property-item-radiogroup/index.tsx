@@ -1,14 +1,13 @@
 import { Color } from '../colors';
 import { PropertyItem } from '../property-item';
-import { Icon, IconName, IconSize } from '../icons';
 import * as React from 'react';
-import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
+const Icon = require('react-feather');
 
 export interface PropertyItemRadiogroupValues {
 	id: string;
 	name: string;
-	icon: IconName | undefined;
+	icon: string;
 }
 
 export interface PropertyItemRadiogroupProps {
@@ -21,28 +20,25 @@ export interface PropertyItemRadiogroupProps {
 	values: PropertyItemRadiogroupValues[];
 }
 
-export interface RadiogroupItemProps {
+export interface RadioGroupItemProps {
 	active: boolean;
 	name: string;
 	id: string;
-	icon: IconName | undefined;
+	icon: string;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
 const StyledRadioGroup = styled.div`
-	/* stylelint-disable-next-line */
 	display: flex;
 	box-sizing: border-box;
 	width: 100%;
 	height: 30px;
-	//padding: ${getSpace(SpaceSize.S)}px;
 	border: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-width: 0.5px;
 	}
 	background: ${Color.White};
 	border-radius: 3px;
-	//align-items: center;
 `;
 
 const StyledItem = styled.label`
@@ -52,13 +48,14 @@ const StyledItem = styled.label`
 	height: 100%;
 	display: flex;
 	align-items: center;
+	user-select: none;
 	justify-content: center;
 	border-right: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-right-width: 0.5px;
 	}
-	background: ${(props: RadiogroupItemProps) => (props.active ? Color.Blue40 : 'transparent')};
-	color: ${(props: RadiogroupItemProps) => (props.active ? Color.White : Color.Grey50)};
+	background: ${(props: RadioGroupItemProps) => (props.active ? Color.Blue40 : 'transparent')};
+	color: ${(props: RadioGroupItemProps) => (props.active ? Color.White : Color.Grey50)};
 
 	&:first-of-type {
 		border-radius: 3px 0 0 3px;
@@ -74,24 +71,28 @@ const StyledInput = styled.input`
 	display: none;
 `;
 
-export const RadiogroupItem: React.StatelessComponent<RadiogroupItemProps> = props => (
-	<StyledItem
-		icon={props.icon}
-		id={props.id}
-		active={props.active}
-		name={props.name}
-		title={props.name}
-	>
-		{props.icon ? <Icon name={props.icon} size={IconSize.S} /> : props.name}
-		<StyledInput
-			type="radio"
+export const RadioGroupItem: React.StatelessComponent<RadioGroupItemProps> = props => {
+	const IconImage = Icon.hasOwnProperty(props.icon) ? Icon[props.icon] : Icon.Box;
+
+	return (
+		<StyledItem
+			icon={props.icon}
 			id={props.id}
-			name="radiogroup"
-			value={props.id}
-			onChange={props.onChange}
-		/>
-	</StyledItem>
-);
+			active={props.active}
+			name={props.name}
+			title={props.name}
+		>
+			{props.icon ? <IconImage size={18} strokeWidth={1.5} /> : props.name}
+			<StyledInput
+				type="radio"
+				id={props.id}
+				name="radiogroup"
+				value={props.id}
+				onChange={props.onChange}
+			/>
+		</StyledItem>
+	);
+};
 
 export const PropertyItemRadiogroup: React.StatelessComponent<
 	PropertyItemRadiogroupProps
@@ -99,7 +100,7 @@ export const PropertyItemRadiogroup: React.StatelessComponent<
 	<PropertyItem description={props.description} label={props.label}>
 		<StyledRadioGroup>
 			{props.values.map(value => (
-				<RadiogroupItem
+				<RadioGroupItem
 					name={value.name}
 					icon={value.icon}
 					id={value.id}

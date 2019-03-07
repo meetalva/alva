@@ -59,6 +59,7 @@ export interface SerializedPropertyBase {
 	propertyName: string;
 	required: boolean;
 	type: SerializedPatternPropertyType;
+	control: string;
 }
 
 export interface SerializedPatternAssetProperty extends SerializedPropertyBase {
@@ -86,7 +87,7 @@ export interface SerializedPatternEnumProperty extends SerializedPropertyBase {
 export interface SerializedEnumOption {
 	model: ModelName.PatternEnumPropertyOption;
 	contextId: string;
-	icon: IconName | undefined;
+	icon: string;
 	id: string;
 	name: string;
 	ordinal: string;

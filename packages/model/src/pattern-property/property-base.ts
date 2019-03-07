@@ -15,6 +15,7 @@ export interface PatternPropertyInit<T> {
 	label: string;
 	propertyName: string;
 	required?: boolean;
+	control?: string;
 }
 
 export abstract class PatternPropertyBase<T> {
@@ -31,6 +32,7 @@ export abstract class PatternPropertyBase<T> {
 	@Mobx.observable protected label: string;
 	@Mobx.observable protected propertyName: string;
 	@Mobx.observable protected required: boolean = false;
+	@Mobx.observable protected control: string;
 	@Mobx.observable public type: Types.PatternPropertyType = Types.PatternPropertyType.Unknown;
 
 	public constructor(init: PatternPropertyInit<T>) {
@@ -54,6 +56,7 @@ export abstract class PatternPropertyBase<T> {
 
 		this.example = init.example || '';
 		this.group = init.group || '';
+		this.control = init.control || '';
 
 		this.defaultValue = init.defaultValue;
 	}
@@ -115,6 +118,10 @@ export abstract class PatternPropertyBase<T> {
 
 	public getType(): Types.PatternPropertyType {
 		return this.type;
+	}
+
+	public getControl(): string {
+		return this.control;
 	}
 
 	public abstract toJSON(): Types.SerializedPatternProperty;

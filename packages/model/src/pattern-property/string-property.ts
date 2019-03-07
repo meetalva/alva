@@ -27,6 +27,7 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 			label: 'String Property',
 			propertyName: 'stringProperty',
 			required: false,
+			control: '',
 			...mixins
 		};
 	}
@@ -43,7 +44,8 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 			inputType: serialized.inputType,
 			label: serialized.label,
 			propertyName: serialized.propertyName,
-			required: serialized.required
+			required: serialized.required,
+			control: serialized.control
 		});
 	}
 
@@ -89,7 +91,8 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 			label: this.label,
 			propertyName: this.propertyName,
 			required: this.required,
-			type: this.type
+			type: this.type,
+			control: this.control
 		};
 	}
 
@@ -103,5 +106,6 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 		this.label = prop.getLabel();
 		this.propertyName = prop.getPropertyName();
 		this.required = prop.getRequired();
+		this.control = prop.getControl();
 	}
 }

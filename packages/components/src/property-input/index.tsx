@@ -106,6 +106,8 @@ export interface PropertyInputProps {
 	className?: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	onFocus?: React.FocusEventHandler<HTMLInputElement>;
+	onClick?: React.MouseEventHandler;
 	placeholder?: string;
 	type?: PropertyInputType;
 	value?: string;
@@ -124,6 +126,8 @@ export const PropertyInput: React.SFC<PropertyInputProps> = props => (
 			list={props.list}
 			onChange={props.onChange}
 			onBlur={props.onBlur}
+			onFocus={props.onFocus}
+			onClick={props.onClick}
 			type={props.type}
 			value={props.value || ''}
 			placeholder={props.placeholder}

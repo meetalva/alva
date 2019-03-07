@@ -36,6 +36,7 @@ export * from './property-input';
 export * from './property-item';
 export * from './property-item-asset';
 export * from './property-item-boolean';
+export * from './property-item-color';
 export * from './property-item-number';
 export * from './property-item-radiogroup';
 export * from './property-item-select';

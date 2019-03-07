@@ -1,9 +1,6 @@
 {
 	"references": [
 		{
-			"path": "../alva-essentials"
-		},
-		{
 			"path": "../util"
 		},
 		{

@@ -4,8 +4,7 @@ import { Headline } from '../headline';
 import * as React from 'react';
 import { Space, getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
-import { IconSize } from '../icons';
-const Icon = require('react-feather');
+import { IconSize, getIcon, isIcon } from '../icons';
 
 export interface TeaserProps {
 	headline: string;
@@ -61,11 +60,11 @@ const StyledTeaserRow = styled.div`
 export const TeaserRow: React.SFC = props => <StyledTeaserRow>{props.children}</StyledTeaserRow>;
 
 export const Teaser: React.SFC<TeaserProps> = props => {
-	const IconImage = Icon.hasOwnProperty(props.icon) ? Icon[props.icon || 'Box'] : Icon.Box;
+	const icon = isIcon(props.icon) ? props.icon : 'Box';
 
 	return (
 		<StyledContainer {...props}>
-			<IconImage stroke-width={1.5} size={IconSize.S} />
+			{getIcon({ icon: icon || 'Box', size: IconSize.S, strokeWidth: 1.5 })}
 			<Space sizeBottom={SpaceSize.XS} />
 			<Headline order={4}>{props.headline}</Headline>
 			<Space sizeBottom={SpaceSize.XS} />

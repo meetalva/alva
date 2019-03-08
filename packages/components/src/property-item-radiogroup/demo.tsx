@@ -1,7 +1,6 @@
 import { PropertyItemRadiogroup, PropertyItemRadiogroupValues } from './index';
 import * as React from 'react';
 import DemoContainer from '../demo-container';
-import { IconName } from '../icons';
 
 export interface EnumItemDemoState {
 	selectedItem: string;

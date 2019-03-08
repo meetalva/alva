@@ -7,7 +7,6 @@ import * as Types from '@meetalva/types';
 import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import * as Model from '@meetalva/model';
-import { Layout } from 'react-feather';
 
 export interface PreviewPaneProps {
 	isDragging: boolean;

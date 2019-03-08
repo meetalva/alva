@@ -1,8 +1,8 @@
 import { Color } from '../colors';
 import { PropertyItem } from '../property-item';
+import { getIcon, isIcon } from '../icons';
 import * as React from 'react';
 import styled from 'styled-components';
-const Icon = require('react-feather');
 
 export interface PropertyItemRadiogroupValues {
 	id: string;
@@ -65,6 +65,10 @@ const StyledItem = styled.label`
 		border-right: none;
 		border-radius: 0 3px 3px 0;
 	}
+
+	&:active {
+		color: red;
+	}
 `;
 
 const StyledInput = styled.input`
@@ -72,7 +76,7 @@ const StyledInput = styled.input`
 `;
 
 export const RadioGroupItem: React.StatelessComponent<RadioGroupItemProps> = props => {
-	const IconImage = Icon.hasOwnProperty(props.icon) ? Icon[props.icon] : Icon.Box;
+	const icon = isIcon(props.icon) ? props.icon : 'Box';
 
 	return (
 		<StyledItem
@@ -82,7 +86,7 @@ export const RadioGroupItem: React.StatelessComponent<RadioGroupItemProps> = pro
 			name={props.name}
 			title={props.name}
 		>
-			{props.icon ? <IconImage size={18} strokeWidth={1.5} /> : props.name}
+			{props.icon ? getIcon({ icon: icon || 'Box', size: 18, strokeWidth: 1.5 }) : props.name}
 			<StyledInput
 				type="radio"
 				id={props.id}

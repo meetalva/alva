@@ -52,7 +52,7 @@ export interface BoxProps {
 	 * @name Width
 	 * @example auto
 	 * @unit px|%|em|vw|vh
-	 * @group Size
+	 * @group Size & Spacing
 	 * */
 	width?: string;
 
@@ -60,9 +60,25 @@ export interface BoxProps {
 	 * @name Height
 	 * @example auto
 	 * @unit px|%|em|vw|vh
-	 * @group Size
+	 * @group Size & Spacing
 	 * */
 	height?: string;
+
+	/**
+	 * @name Padding
+	 * @default 0
+	 * @unit px|%|em|vw|vh
+	 * @group Size & Spacing
+	 * */
+	padding?: string;
+
+	/**
+	 * @name Margin
+	 * @default 0
+	 * @unit px|%|em|vw|vh
+	 * @group Size & Spacing
+	 * */
+	margin?: string;
 
 	/****** Group: Styling *******/
 
@@ -183,6 +199,8 @@ export const Box: React.SFC<BoxProps> = props => {
 				justifyContent: props.justifyContent,
 				width: props.width,
 				height: props.height,
+				padding: props.padding,
+				margin: props.margin,
 				borderRadius: props.borderRadius,
 				borderWidth: props.borderWidth,
 				borderStyle: props.borderWidth === 'none' ? 'none' : 'solid',

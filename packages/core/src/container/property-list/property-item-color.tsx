@@ -4,7 +4,8 @@ import * as Model from '@meetalva/model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 import { debounce } from 'lodash';
-import { showMessage } from '../../matchers';
+
+const OutsideClickHandler = require('react-outside-click-handler').default;
 
 export interface PropertyItemColorProps {
 	property: Model.ElementProperty;
@@ -69,19 +70,21 @@ export class PropertyItemColor extends React.Component<PropertyItemColorProps> {
 		const example = patternProperty.getExample();
 
 		return (
-			<Components.PropertyItemColor
-				description={patternProperty.getDescription()}
-				onShow={() => this.showPropertyOverlay()}
-				onHide={() => this.hidePropertyOverlay()}
-				onChange={this.handleChange}
-				label={patternProperty.getLabel()}
-				color={this.state.color}
-				show={this.state.displayColorPicker}
-				onBlur={() => window.requestIdleCallback(() => props.store.commit())}
-				onColorPickerChange={this.handleColorPickerChange}
-				onColorPickerChangeComplete={this.handleColorPickerChangeComplete}
-				placeholder={example ? `e.g.: ${example}` : ''}
-			/>
+			<OutsideClickHandler onOutsideClick={() => this.hidePropertyOverlay()}>
+				<Components.PropertyItemColor
+					description={patternProperty.getDescription()}
+					onShow={() => this.showPropertyOverlay()}
+					onHide={() => this.hidePropertyOverlay()}
+					onChange={this.handleChange}
+					label={patternProperty.getLabel()}
+					color={this.state.color}
+					show={this.state.displayColorPicker}
+					onBlur={() => window.requestIdleCallback(() => props.store.commit())}
+					onColorPickerChange={this.handleColorPickerChange}
+					onColorPickerChangeComplete={this.handleColorPickerChangeComplete}
+					placeholder={example ? `e.g.: ${example}` : ''}
+				/>
+			</OutsideClickHandler>
 		);
 	}
 }

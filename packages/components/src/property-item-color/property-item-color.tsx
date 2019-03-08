@@ -45,15 +45,6 @@ const StyledSwatchColor = styled.div`
 	background-color: ${(props: PropertyItemColorSwatchProps) => props.color};
 `;
 
-const StyledCover = styled.div`
-	position: fixed;
-	top: 0px;
-	right: 0px;
-	bottom: 0px;
-	left: 0px;
-	z-index: 20;
-`;
-
 const StyledPropertyOverlay = styled.div`
 	position: absolute;
 	top: 32px;
@@ -68,7 +59,6 @@ const StyledPropertyOverlay = styled.div`
 
 export const PropertyItemColor: React.StatelessComponent<PropertyItemColorProps> = props => (
 	<>
-		{props.show && <StyledCover onClick={props.onHide} />}
 		<PropertyItem description={props.description} label={props.label}>
 			<StyledSwatch onClick={props.onShow}>
 				<StyledSwatchColor color={props.color} />

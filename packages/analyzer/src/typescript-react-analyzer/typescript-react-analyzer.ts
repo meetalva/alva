@@ -276,6 +276,7 @@ export function analyzePatternExport(
 				model: Types.ModelName.PatternSlot,
 				contextId: 'children',
 				description: 'Element that render inside this element',
+				defaultValue: undefined,
 				example: '',
 				hidden: false,
 				id: IdHasher.getGlobalSlotId(id, 'children'),

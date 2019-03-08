@@ -3,22 +3,8 @@ import * as tsa from 'ts-simple-ast';
 import { analyzePatternExport, getSignificantPath } from './typescript-react-analyzer';
 import { getExports, TypeScriptType } from '../typescript-utils';
 import { last } from 'lodash';
-import { InternalPatternAnalysis } from '@meetalva/types';
+import { InternalPatternAnalysis, ElementCandidate } from '@meetalva/types';
 import { findReactComponentType } from '../react-utils';
-
-export interface ElementCandidate {
-	parent: string;
-	patternContextId: string;
-	libraryId: string;
-	id: string;
-	props: ElementProp[];
-	children: ElementCandidate[];
-}
-
-export interface ElementProp {
-	propName: string;
-	value: any;
-}
 
 export interface SlotDefaultContext {
 	project: tsa.Project;

@@ -76,6 +76,24 @@
 		{
 			"type": "node",
 			"request": "launch",
+			"name": "Debug Analyzer",
+			"program": "${workspaceRoot}/packages/analyzer-cli/bin/analyze.js",
+			"runtimeArgs": [
+				"--inspect-brk"
+			],
+			"args": [
+				"--in",
+				"${workspaceRoot}/packages/essentials/package.json",
+				"--out",
+				"false"
+			],
+			"sourceMaps": true,
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen"
+		},
+		{
+			"type": "node",
+			"request": "launch",
 			"name": "Debug Default Content Tests",
 			"program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
 			"runtimeArgs": [

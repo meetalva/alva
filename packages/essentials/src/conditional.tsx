@@ -7,10 +7,40 @@ export interface ConditionalProps {
 	 */
 	condition?: boolean;
 
-	/** @name If True */
+	/**
+	 * @name If True
+	 *
+	 * @default
+	 * ~~~tsx
+	 * import * as React from 'react';
+	 * import { Box, AlignItems, JustifyContent } from '@meetalva/essentials';
+	 * import { Text } from './text';
+	 *
+	 * export default () => (
+	 *   <Box flex={true} justifyContent={JustifyContent.center} alignItems={AlignItems.center} height={100}>
+	 *     <Text text="Shown if condition is true"/>
+	 *   </Box>
+	 * );
+	 * ~~~
+	 **/
 	truthy?: React.ReactNode;
 
-	/** @name If False */
+	/**
+	 * @name If False
+	 *
+	 * @default
+	 * ```tsx
+	 * import * as React from 'react';
+	 * import { Box, AlignItems, JustifyContent } from '@meetalva/essentials';
+	 * import { Text } from './text';
+	 *
+	 * export default () => (
+	 *   <Box flex={true} justifyContent={JustifyContent.center} alignItems={AlignItems.center} height={100}>
+	 *     <Text text="Shown if condition is false"/>
+	 *   </Box>
+	 * );
+	 * ```
+	 **/
 	falsy?: React.ReactNode;
 }
 

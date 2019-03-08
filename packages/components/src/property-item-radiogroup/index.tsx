@@ -3,6 +3,7 @@ import { PropertyItem } from '../property-item';
 import { getIcon, isIcon } from '../icons';
 import * as React from 'react';
 import styled from 'styled-components';
+import { SpaceSize, getSpace } from '../space';
 
 export interface PropertyItemRadiogroupValues {
 	id: string;
@@ -45,7 +46,7 @@ const StyledItem = styled.label`
 	box-sizing: border-box;
 	text-align: center;
 	flex-grow: 1;
-	height: 100%;
+	margin: ${getSpace(SpaceSize.XS)}px 0;
 	display: flex;
 	align-items: center;
 	user-select: none;
@@ -54,8 +55,7 @@ const StyledItem = styled.label`
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-right-width: 0.5px;
 	}
-	background: ${(props: RadioGroupItemProps) => (props.active ? Color.Blue40 : 'transparent')};
-	color: ${(props: RadioGroupItemProps) => (props.active ? Color.White : Color.Grey50)};
+	color: ${(props: RadioGroupItemProps) => (props.active ? Color.Blue : Color.Grey60)};
 
 	&:first-of-type {
 		border-radius: 3px 0 0 3px;
@@ -67,7 +67,7 @@ const StyledItem = styled.label`
 	}
 
 	&:active {
-		color: red;
+		color: ${Color.Grey20};
 	}
 `;
 

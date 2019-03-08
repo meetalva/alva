@@ -105,6 +105,7 @@ export class PatternSlot {
 			model: this.model,
 			contextId: this.contextId,
 			description: this.description,
+			defaultValue: undefined,
 			example: this.example,
 			hidden: this.hidden,
 			label: this.displayName,

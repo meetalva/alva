@@ -199,19 +199,7 @@ export class ViewStore {
 			project
 		});
 
-		elementContents.forEach(content => {
-			const slot = content.getSlot();
-
-			if (!slot) {
-				return;
-			}
-
-			const candidate = slot.getDefaultValue();
-
-			if (!candidate) {
-				return;
-			}
-
+		const fromCandidate = (candidate: Types.ElementCandidate, content: Model.ElementContent) => {
 			const library = project.getPatternLibraryByName(candidate.libraryId);
 
 			if (!library) {
@@ -245,6 +233,32 @@ export class ViewStore {
 			});
 
 			this.addElement(child);
+
+			candidate.children.forEach(childCandidate => {
+				const childContent = child.getContentBySlotType(Types.SlotType.Children);
+
+				if (!childContent) {
+					return;
+				}
+
+				fromCandidate(childCandidate, childContent);
+			});
+		};
+
+		elementContents.forEach(content => {
+			const slot = content.getSlot();
+
+			if (!slot) {
+				return;
+			}
+
+			const candidate = slot.getDefaultValue();
+
+			if (!candidate) {
+				return;
+			}
+
+			fromCandidate(candidate, content);
 		});
 
 		ViewStore.EPHEMERAL_CONTENTS.set(element, elementContents);

@@ -538,6 +538,10 @@ export class Project {
 		return this.patternLibraries.get(id);
 	}
 
+	public getPatternLibraryByName(name: string): PatternLibrary | undefined {
+		return this.flattenedLibraries.find(p => p.getName() === name);
+	}
+
 	public getPatternLibraryByContextId(contextid: string): PatternLibrary | undefined {
 		return this.flattenedLibraries.find(p => p.contextId === contextid);
 	}

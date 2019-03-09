@@ -17,7 +17,12 @@ export interface ConditionalProps {
 	 * import { Text } from './text';
 	 *
 	 * export default () => (
-	 *   <Box flex={true} justifyContent={JustifyContent.center} alignItems={AlignItems.center} height={100}>
+	 *   <Box
+	 *     flex={true}
+	 *     justifyContent={JustifyContent.center}
+	 *     alignItems={AlignItems.center}
+	 *     height="100px"
+	 *     backgroundColor="#eee">
 	 *     <Text text="Shown if condition is true"/>
 	 *   </Box>
 	 * );
@@ -35,8 +40,13 @@ export interface ConditionalProps {
 	 * import { Text } from './text';
 	 *
 	 * export default () => (
-	 *   <Box flex={true} justifyContent={JustifyContent.center} alignItems={AlignItems.center} height={100}>
-	 *     <Text text="Shown if condition is false"/>
+	 *  <Box
+	 *    flex={true}
+	 *    justifyContent={JustifyContent.center}
+	 *    alignItems={AlignItems.center}
+	 *    height="100px"
+	 *    backgroundColor="#eee">
+	 *    <Text text="Shown if condition is false"/>
 	 *   </Box>
 	 * );
 	 * ```

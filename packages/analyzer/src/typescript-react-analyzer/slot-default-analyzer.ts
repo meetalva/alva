@@ -5,6 +5,7 @@ import { getExports, TypeScriptType } from '../typescript-utils';
 import { last } from 'lodash';
 import { InternalPatternAnalysis, ElementCandidate } from '@meetalva/types';
 import { findReactComponentType } from '../react-utils';
+import { tan } from 'color-name';
 
 export interface SlotDefaultContext {
 	project: tsa.Project;
@@ -135,15 +136,32 @@ export function analyzeSlotDefault(
 		props: element
 			.getAttributes()
 			.filter(tsa.TypeGuards.isJsxAttribute)
-			.map(attribute => {
-				const init = attribute.getInitializer();
-				return {
-					propName: attribute.getName(),
-					value: init ? init.getText() : 'true'
-				};
-			}),
+			.map(attribute => ({
+				propName: attribute.getName(),
+				value: getInitValue(attribute.getInitializer())
+			})),
 		children: []
 	};
+}
+
+function getInitValue(
+	init?: tsa.StringLiteral | tsa.JsxExpression | tsa.Expression | undefined
+): unknown {
+	if (typeof init === 'undefined') {
+		return;
+	}
+
+	if (tsa.TypeGuards.isLiteralExpression(init)) {
+		return init.getLiteralValue();
+	}
+
+	if (tsa.TypeGuards.isJsxExpression(init)) {
+		const exp = init.getExpression();
+		return getInitValue(exp);
+	}
+
+	// TODO: Propagate error/warning to user for non-literal attributes
+	return;
 }
 
 export function getElement(

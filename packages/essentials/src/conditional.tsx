@@ -13,8 +13,7 @@ export interface ConditionalProps {
 	 * @default
 	 * ~~~tsx
 	 * import * as React from 'react';
-	 * import { Box, AlignItems, JustifyContent } from '@meetalva/essentials';
-	 * import { Text } from './text';
+	 * import { Box, AlignItems, JustifyContent, Text } from '@meetalva/essentials';
 	 *
 	 * export default () => (
 	 *   <Box
@@ -36,8 +35,7 @@ export interface ConditionalProps {
 	 * @default
 	 * ```tsx
 	 * import * as React from 'react';
-	 * import { Box, AlignItems, JustifyContent } from '@meetalva/essentials';
-	 * import { Text } from './text';
+	 * import { Box, AlignItems, JustifyContent, Text } from '@meetalva/essentials';
 	 *
 	 * export default () => (
 	 *  <Box

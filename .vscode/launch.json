@@ -85,7 +85,7 @@
 				"--in",
 				"${workspaceRoot}/packages/essentials/package.json",
 				"--out",
-				"false"
+				"/dev/null"
 			],
 			"sourceMaps": true,
 			"console": "integratedTerminal",

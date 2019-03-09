@@ -199,6 +199,54 @@ export class ViewStore {
 			project
 		});
 
+		elementContents.forEach(content => {
+			const slot = content.getSlot();
+
+			if (!slot) {
+				return;
+			}
+
+			const candidate = slot.getDefaultValue();
+
+			if (!candidate) {
+				return;
+			}
+
+			const library = project.getPatternLibraryByName(candidate.libraryId);
+
+			if (!library) {
+				return;
+			}
+
+			const pattern = library.getPatternByContextId(candidate.patternContextId);
+
+			if (!pattern) {
+				return;
+			}
+
+			const child = this.createElement({
+				dragged: false,
+				pattern
+			});
+
+			candidate.props.forEach(propCandidate => {
+				const prop = child.getPropertyByContextId(propCandidate.propName);
+
+				if (!prop) {
+					return;
+				}
+
+				prop.setValue(propCandidate.value);
+			});
+
+			content.insert({
+				at: 0,
+				element: child
+			});
+
+			this.addElement(child);
+		});
+
 		ViewStore.EPHEMERAL_CONTENTS.set(element, elementContents);
 		return element;
 	}

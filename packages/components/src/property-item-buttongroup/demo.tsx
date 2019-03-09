@@ -1,10 +1,10 @@
-import { PropertyItemRadiogroup, PropertyItemRadiogroupValues } from './index';
+import { PropertyItemButtonGroup, PropertyItemButtonGroupValues } from './index';
 import * as React from 'react';
 import DemoContainer from '../demo-container';
 
 export interface EnumItemDemoState {
 	selectedItem: string;
-	values: PropertyItemRadiogroupValues[];
+	values: PropertyItemButtonGroupValues[];
 }
 
 export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
@@ -26,8 +26,8 @@ export class BooleanItemDemo extends React.Component<{}, EnumItemDemoState> {
 	public render(): JSX.Element {
 		return (
 			<DemoContainer title="Enum Item">
-				<PropertyItemRadiogroup label="Label" key="0" values={this.state.values} />
-				<PropertyItemRadiogroup
+				<PropertyItemButtonGroup label="Label" key="0" values={this.state.values} />
+				<PropertyItemButtonGroup
 					label="Label"
 					values={this.state.values}
 					selectedValue={this.state.selectedItem}

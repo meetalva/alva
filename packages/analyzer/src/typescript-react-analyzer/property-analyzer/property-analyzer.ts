@@ -291,7 +291,7 @@ function setPropertyMetaData(init: {
 			property.defaultOptionId = defaultOption ? defaultOption.id : undefined;
 			property.inputType =
 				property.control === 'ButtonGroup'
-					? Types.PatternPropertyInputType.RadioGroup
+					? Types.PatternPropertyInputType.ButtonGroup
 					: Types.PatternPropertyInputType.Select;
 			break;
 		case 'EventHandler':

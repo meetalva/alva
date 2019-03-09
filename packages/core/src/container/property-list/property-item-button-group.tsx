@@ -4,15 +4,15 @@ import * as Model from '@meetalva/model';
 import * as React from 'react';
 import { ViewStore } from '../../store';
 
-export interface PropertyItemRadioGroupProps {
+export interface PropertyItemButtonGroupProps {
 	property: Model.ElementProperty;
 }
 
 @MobxReact.inject('store')
 @MobxReact.observer
-export class PropertyItemRadioGroup extends React.Component<PropertyItemRadioGroupProps> {
+export class PropertyItemButtonGroup extends React.Component<PropertyItemButtonGroupProps> {
 	private handleChange(e: React.ChangeEvent<HTMLElement>): void {
-		const props = this.props as PropertyItemRadioGroupProps & { store: ViewStore };
+		const props = this.props as PropertyItemButtonGroupProps & { store: ViewStore };
 		const patternProperty = props.property.getPatternProperty() as Model.PatternEnumProperty;
 		const selectedOption = patternProperty.getOptionById((e.target as HTMLSelectElement).value);
 		const selectedValue = selectedOption ? selectedOption.getValue() : undefined;
@@ -21,7 +21,7 @@ export class PropertyItemRadioGroup extends React.Component<PropertyItemRadioGro
 	}
 
 	public render(): JSX.Element | null {
-		const props = this.props as PropertyItemRadioGroupProps & { store: ViewStore };
+		const props = this.props as PropertyItemButtonGroupProps & { store: ViewStore };
 		const { property } = props;
 
 		const patternProperty = property.getPatternProperty();
@@ -36,7 +36,7 @@ export class PropertyItemRadioGroup extends React.Component<PropertyItemRadioGro
 		const selectedValue = selectedOption ? selectedOption.getId() : undefined;
 
 		return (
-			<Components.PropertyItemRadiogroup
+			<Components.PropertyItemButtonGroup
 				description={patternProperty.getDescription()}
 				label={patternProperty.getLabel()}
 				selectedValue={selectedValue}

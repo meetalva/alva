@@ -91,7 +91,7 @@ test('exposes pattern id via .patternContextId', () => {
 
 	expect(result).toEqual(
 		expect.objectContaining({
-			patternContextId: 'node_modules/@meetalva/essentials/lib/text.d.ts:Text'
+			patternContextId: 'lib/text.d.ts:Text'
 		})
 	);
 });

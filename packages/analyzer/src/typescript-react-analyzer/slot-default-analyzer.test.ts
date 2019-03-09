@@ -55,7 +55,7 @@ test('ignores modules without default export', () => {
 	expect(result).toBeUndefined();
 });
 
-test('picks up props', () => {
+test('picks up string props', () => {
 	const result = analyzeSlotDefault(
 		`
 		import * as React from 'react';
@@ -72,9 +72,31 @@ test('picks up props', () => {
 			props: [
 				{
 					propName: 'text',
-					value: '"Hello, World!"'
+					value: 'Hello, World!'
 				}
 			]
+		})
+	);
+});
+
+test('picks up number props', () => {
+	const result = analyzeSlotDefault(
+		`
+		import * as React from 'react';
+		import { Box } from '@meetalva/essentials';
+		export default () => <Box flex={0} />
+	`,
+		{ ...ctx, id: 'meetalva-essentials-box' }
+	);
+
+	expect(result).toEqual(
+		expect.objectContaining({
+			props: expect.arrayContaining([
+				{
+					propName: 'flex',
+					value: 0
+				}
+			])
 		})
 	);
 });

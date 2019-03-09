@@ -36,12 +36,11 @@ export function analyzeSlotDefault(
 	}
 
 	const jsx = fn.getBody();
+	const element = getElement(jsx);
 
-	if (!tsa.TypeGuards.isJsxElement(jsx) && !tsa.TypeGuards.isJsxSelfClosingElement(jsx)) {
+	if (!element) {
 		return;
 	}
-
-	const element = tsa.TypeGuards.isJsxSelfClosingElement(jsx) ? jsx : jsx.getOpeningElement();
 
 	const tagNameNode = element.getTagNameNode();
 
@@ -124,11 +123,15 @@ export function analyzeSlotDefault(
 		? pkgFragments.slice(0, 2)
 		: pkgFragments.slice(0, 1);
 
+	const contextIdFragments = analysis.pattern.contextId.split(libraryId.join('/'));
+	const patternContextId =
+		contextIdFragments.length > 1 ? contextIdFragments[1].slice(1) : contextIdFragments[0];
+
 	return {
 		parent: id,
 		id: [id, 'default'].join(':'),
 		libraryId: libraryId.join('/'),
-		patternContextId: analysis.pattern.contextId,
+		patternContextId,
 		props: element
 			.getAttributes()
 			.filter(tsa.TypeGuards.isJsxAttribute)
@@ -141,4 +144,16 @@ export function analyzeSlotDefault(
 			}),
 		children: []
 	};
+}
+
+export function getElement(
+	jsx: tsa.Node
+): tsa.JsxOpeningElement | tsa.JsxSelfClosingElement | undefined {
+	if (tsa.TypeGuards.isJsxElement(jsx) || tsa.TypeGuards.isJsxSelfClosingElement(jsx)) {
+		return tsa.TypeGuards.isJsxSelfClosingElement(jsx) ? jsx : jsx.getOpeningElement();
+	}
+
+	if (tsa.TypeGuards.isParenthesizedExpression(jsx)) {
+		return getElement(jsx.getExpression());
+	}
 }

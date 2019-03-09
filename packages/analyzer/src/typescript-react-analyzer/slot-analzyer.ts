@@ -99,8 +99,7 @@ export function analyzeSlots(
 
 export function getCommentValue(declaration: Ts.Declaration): string | undefined {
 	const jsDoc = (declaration as any).jsDoc ? (declaration as any).jsDoc[0] : undefined;
-	const rawComment = jsDoc ? jsDoc.getFullText() : undefined;
-	const comments = extractComments(rawComment);
+	const comments = extractComments(jsDoc ? jsDoc.getFullText() : '');
 	const comment = comments[0];
 	return comment ? comment.value : undefined;
 }

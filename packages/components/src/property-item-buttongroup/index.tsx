@@ -4,6 +4,7 @@ import { getIcon, isIcon } from '../icons';
 import * as React from 'react';
 import styled from 'styled-components';
 import { SpaceSize, getSpace } from '../space';
+import { Copy, CopySize } from '../copy';
 
 export interface PropertyItemButtonGroupValues {
 	id: string;
@@ -86,7 +87,11 @@ export const ButtonGroupItem: React.StatelessComponent<ButtonGroupItemProps> = p
 			name={props.name}
 			title={props.name}
 		>
-			{props.icon ? getIcon({ icon: icon || 'Box', size: 18, strokeWidth: 1.5 }) : props.name}
+			{props.icon ? (
+				getIcon({ icon: icon || 'Box', size: 18, strokeWidth: 1.5 })
+			) : (
+				<Copy size={CopySize.S}>{props.name}</Copy>
+			)}
 			<StyledInput
 				type="radio"
 				id={props.id}

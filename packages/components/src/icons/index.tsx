@@ -19,17 +19,35 @@ export interface LocalIconProps {
 }
 
 const LocalIcons: { [key: string]: JSX.Element } = {
-	FlexAlignStart: <path d="M1 .5h22M5 2h6v12H5zM13 2h6v9h-6z" />,
-	FlexAlignCenter: <path d="M1 12.5h22M5 6h6v12H5zM13 8h6v9h-6z" />,
-	FlexAlignEnd: <path d="M1 23.5h22M5 10h6v12H5zM13 13h6v9h-6z" />,
-	FlexAlignStretch: <path d="M5 2h6v20H5zM1 23.5h22M13 2h6v20h-6zM1 .5h22" />,
-	FlexJustifyStart: <path d="M.5 2v20M2 6h6v12H2zM10 6h6v12h-6z" />,
-	FlexJustifyCenter: <path d="M23.5 2v20M8 6h6v12H8zM16 6h6v12h-6z" />,
-	FlexJustifyEnd: <path d="M12.5 2v20M5 6h6v12H5zM14 6h6v12h-6z" />,
-	FlexJustifySpaceBetween: <path d="M.5 2v20M23.5 2v20M2 6h6v12H2zM16 6h6v12h-6z" />,
-	FlexJustifySpaceAround: <path d="M.5 2v20M23.5 2v20M4 6h6v12H4zM14 6h6v12h-6z" />,
-	FlexNoGrowOrShrink: (
-		<path d="M4.5 4v16M19.5 4v16M7.646 16.646l8.486-8.485M16.132 16.839L7.646 8.354" />
+	FlexAlignStart: (
+		<path d="M13.5,5.5 L17.5,5.5 L17.5,12.5 L13.5,12.5 L13.5,5.5 Z M6.5,5.5 L10.5,5.5 L10.5,15.5 L6.5,15.5 L6.5,5.5 Z M1,2.5 L23,2.5 L1,2.5 Z" />
+	),
+	FlexAlignCenter: (
+		<path d="M17.5,11 L17.5,8 L13.5,8 L13.5,11 L10.5,11 L10.5,16 L6.5,16 L6.5,11 L1,11 L6.5,11 L6.5,6 L10.5,6 L10.5,11 L13.5,11 L13.5,14 L17.5,14 L17.5,11 L23,11 L17.5,11 Z" />
+	),
+	FlexAlignEnd: (
+		<path d="M13.5,11.5 L17.5,11.5 L17.5,18.5 L13.5,18.5 L13.5,11.5 Z M6.5,8.5 L10.5,8.5 L10.5,18.5 L6.5,18.5 L6.5,8.5 Z M1,21.5 L23,21.5 L1,21.5 Z" />
+	),
+	FlexAlignStretch: (
+		<path d="M14,5.5 L18,5.5 L18,18.5 L14,18.5 L14,5.5 Z M7,5.5 L11,5.5 L11,18.5 L7,18.5 L7,5.5 Z M1,21.5 L23,21.5 L1,21.5 Z M1,2.5 L23,2.5 L1,2.5 Z" />
+	),
+	FlexAlignBaseline: (
+		<path d="M17.5,11 L17.5,7 L13.5,7 L13.5,11 L10.5,11 L10.5,16 L6.5,16 L6.5,11 L1,11 L6.5,11 L6.5,6 L10.5,6 L10.5,11 L13.5,11 L13.5,13 L17.5,13 L17.5,11 L23,11 L17.5,11 Z" />
+	),
+	FlexJustifyStart: (
+		<path d="M14,5.5 L18,5.5 L18,18.5 L14,18.5 L14,5.5 Z M7,5.5 L11,5.5 L11,18.5 L7,18.5 L7,5.5 Z M4,1 L4,23 L4,1 Z" />
+	),
+	FlexJustifyCenter: (
+		<path d="M15,5.5 L19,5.5 L19,18.5 L15,18.5 L15,5.5 Z M5,5.5 L9,5.5 L9,18.5 L5,18.5 L5,5.5 Z M12,1 L12,23 L12,1 Z" />
+	),
+	FlexJustifyEnd: (
+		<path d="M13,5.5 L17,5.5 L17,18.5 L13,18.5 L13,5.5 Z M6,5.5 L10,5.5 L10,18.5 L6,18.5 L6,5.5 Z M20,1 L20,23 L20,1 Z" />
+	),
+	FlexJustifySpaceBetween: (
+		<path d="M16.5,5.5 L20.5,5.5 L20.5,18.5 L16.5,18.5 L16.5,5.5 Z M3.5,5.5 L7.5,5.5 L7.5,18.5 L3.5,18.5 L3.5,5.5 Z M23.5,1 L23.5,23 L23.5,1 Z M0.5,1 L0.5,23 L0.5,1 Z" />
+	),
+	FlexJustifySpaceAround: (
+		<path d="M14,5.5 L18,5.5 L18,18.5 L14,18.5 L14,5.5 Z M6,5.5 L10,5.5 L10,18.5 L6,18.5 L6,5.5 Z M23.5,1 L23.5,23 L23.5,1 Z M0.5,1 L0.5,23 L0.5,1 Z" />
 	)
 };
 
@@ -69,7 +87,7 @@ export function isIcon(name: string | undefined): boolean {
 }
 
 export function getIcon(props: IconProps): JSX.Element {
-	if (Object.keys(LocalIcons).includes(props.icon)) {
+	if (LocalIcons.hasOwnProperty(props.icon)) {
 		return <Icon {...props} />;
 	}
 	if (FeatherIcons.hasOwnProperty(props.icon)) {

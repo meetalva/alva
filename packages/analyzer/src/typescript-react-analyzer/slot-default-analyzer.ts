@@ -5,7 +5,6 @@ import { getExports, TypeScriptType } from '../typescript-utils';
 import { last } from 'lodash';
 import { InternalPatternAnalysis, ElementCandidate } from '@meetalva/types';
 import { findReactComponentType } from '../react-utils';
-import { tan } from 'color-name';
 
 export interface SlotDefaultContext {
 	project: tsa.Project;
@@ -43,7 +42,20 @@ export function analyzeSlotDefault(
 		return;
 	}
 
-	const tagNameNode = element.getTagNameNode();
+	return candidateFromJSXElement(element, { project, id });
+}
+
+function candidateFromJSXElement(
+	element: tsa.JsxChild,
+	{ project, id }: { project: tsa.Project; id: string }
+): ElementCandidate | undefined {
+	const nameElement = getNameElement(element);
+
+	if (!nameElement) {
+		return;
+	}
+
+	const tagNameNode = nameElement.getTagNameNode();
 
 	if (!tsa.TypeGuards.isIdentifier(tagNameNode)) {
 		return;
@@ -128,20 +140,36 @@ export function analyzeSlotDefault(
 	const patternContextId =
 		contextIdFragments.length > 1 ? contextIdFragments[1].slice(1) : contextIdFragments[0];
 
+	const children = getChildrenCandidates(element, { project, id });
+
 	return {
 		parent: id,
 		id: [id, 'default'].join(':'),
 		libraryId: libraryId.join('/'),
 		patternContextId,
-		props: element
+		props: nameElement
 			.getAttributes()
 			.filter(tsa.TypeGuards.isJsxAttribute)
 			.map(attribute => ({
 				propName: attribute.getName(),
 				value: getInitValue(attribute.getInitializer())
 			})),
-		children: []
+		children
 	};
+}
+
+function getChildrenCandidates(
+	element: tsa.JsxChild,
+	{ project, id }: { project: tsa.Project; id: string }
+): ElementCandidate[] {
+	if (tsa.TypeGuards.isJsxElement(element)) {
+		return element
+			.getJsxChildren()
+			.map(child => candidateFromJSXElement(child, { project, id }))
+			.filter((candidate): candidate is ElementCandidate => typeof candidate !== 'undefined');
+	}
+
+	return [];
 }
 
 function getInitValue(
@@ -164,14 +192,24 @@ function getInitValue(
 	return;
 }
 
-export function getElement(
-	jsx: tsa.Node
-): tsa.JsxOpeningElement | tsa.JsxSelfClosingElement | undefined {
+export function getElement(jsx: tsa.Node): tsa.JsxElement | tsa.JsxSelfClosingElement | undefined {
 	if (tsa.TypeGuards.isJsxElement(jsx) || tsa.TypeGuards.isJsxSelfClosingElement(jsx)) {
-		return tsa.TypeGuards.isJsxSelfClosingElement(jsx) ? jsx : jsx.getOpeningElement();
+		return jsx;
 	}
 
 	if (tsa.TypeGuards.isParenthesizedExpression(jsx)) {
 		return getElement(jsx.getExpression());
+	}
+}
+
+export function getNameElement(
+	jsx: tsa.JsxChild
+): tsa.JsxOpeningElement | tsa.JsxSelfClosingElement | undefined {
+	if (tsa.TypeGuards.isJsxElement(jsx)) {
+		return jsx.getOpeningElement();
+	}
+
+	if (tsa.TypeGuards.isJsxSelfClosingElement(jsx)) {
+		return jsx;
 	}
 }

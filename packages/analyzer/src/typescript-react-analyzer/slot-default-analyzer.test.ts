@@ -134,3 +134,25 @@ test('determines library id with scopes', () => {
 		})
 	);
 });
+
+test('supports multiple levels of JSX elements', () => {
+	const result = analyzeSlotDefault(
+		`
+		import * as React from 'react';
+		import { Box, Text } from '@meetalva/essentials';
+		export default () => <Box><Text text="Hello, World!"/></Box>
+	`,
+		{ ...ctx, id: 'meetalva-essentials-nested' }
+	);
+
+	expect(result).toEqual(
+		expect.objectContaining({
+			patternContextId: 'lib/box.d.ts:Box',
+			children: expect.arrayContaining([
+				expect.objectContaining({
+					patternContextId: 'lib/text.d.ts:Text'
+				})
+			])
+		})
+	);
+});

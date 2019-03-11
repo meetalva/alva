@@ -1,12 +1,17 @@
+import * as Path from 'path';
 import * as tsa from 'ts-simple-ast';
 import { analyzeSlotDefault } from './slot-default-analyzer';
 
 interface TestContext {
 	project: tsa.Project;
+	pkgPath: string;
 	path: string;
 }
 
-const ctx = ({ path: __dirname } as any) as TestContext;
+const ctx = ({
+	path: __dirname,
+	pkgPath: Path.join(__dirname, 'package.json')
+} as any) as TestContext;
 
 beforeAll(() => {
 	ctx.project = new tsa.Project();
@@ -19,7 +24,7 @@ test('works with Text from @meetalva/essentials', () => {
 		import { Text } from '@meetalva/essentials';
 		export default () => <Text text="Hello, World!"/>
 	`,
-		{ ...ctx, id: 'meetalva-essentials-text' }
+		{ ...ctx, pkg: { name: 'name' }, id: 'meetalva-essentials-text' }
 	);
 
 	expect(result).toEqual(
@@ -36,7 +41,7 @@ test('works with JSX.IntrinsicElement', () => {
 		import * as React from 'react';
 		export default () => <div>Hello, World</div>;
 	`,
-		{ ...ctx, id: 'jsxintrinsic' }
+		{ ...ctx, pkg: { name: 'name' }, id: 'jsxintrinsic' }
 	);
 
 	expect(result).toBeUndefined();
@@ -49,7 +54,7 @@ test('ignores modules without default export', () => {
 		import { Text } from '@meetalva/essentials';
 		export const HelloWorld () => <Text/>;
 	`,
-		{ ...ctx, id: 'no-default-export' }
+		{ ...ctx, pkg: { name: 'name' }, id: 'no-default-export' }
 	);
 
 	expect(result).toBeUndefined();
@@ -62,7 +67,7 @@ test('picks up string props', () => {
 		import { Text } from '@meetalva/essentials';
 		export default () => <Text text="Hello, World!"/>
 	`,
-		{ ...ctx, id: 'meetalva-essentials-text' }
+		{ ...ctx, pkg: { name: 'name' }, id: 'meetalva-essentials-text' }
 	);
 
 	expect(result).toEqual(
@@ -86,7 +91,7 @@ test('picks up number props', () => {
 		import { Box } from '@meetalva/essentials';
 		export default () => <Box flex={0} />
 	`,
-		{ ...ctx, id: 'meetalva-essentials-box' }
+		{ ...ctx, pkg: { name: 'name' }, id: 'meetalva-essentials-box' }
 	);
 
 	expect(result).toEqual(
@@ -108,7 +113,7 @@ test('exposes pattern id via .patternContextId', () => {
 		import { Text } from '@meetalva/essentials';
 		export default () => <Text text="Hello, World!"/>
 	`,
-		{ ...ctx, id: 'meetalva-essentials-text-id' }
+		{ ...ctx, pkg: { name: 'name' }, id: 'meetalva-essentials-text-id' }
 	);
 
 	expect(result).toEqual(
@@ -125,7 +130,11 @@ test('determines library id with scopes', () => {
 		import { Text } from '@meetalva/essentials';
 		export default () => <Text text="Hello, World!"/>
 	`,
-		{ ...ctx, id: 'meetalva-essentials-text-library-id-scopes' }
+		{
+			...ctx,
+			pkg: { name: '@meetalva/essentials' },
+			id: 'meetalva-essentials-text-library-id-scopes'
+		}
 	);
 
 	expect(result).toEqual(
@@ -142,7 +151,7 @@ test('supports multiple levels of JSX elements', () => {
 		import { Box, Text } from '@meetalva/essentials';
 		export default () => <Box><Text text="Hello, World!"/></Box>
 	`,
-		{ ...ctx, id: 'meetalva-essentials-nested' }
+		{ ...ctx, pkg: { name: 'name' }, id: 'meetalva-essentials-nested' }
 	);
 
 	expect(result).toEqual(

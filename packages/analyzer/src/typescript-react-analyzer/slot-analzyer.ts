@@ -12,6 +12,7 @@ const extractComments = require('extract-comments');
 export interface SlotAnalyzeContext {
 	program: Ts.Program;
 	project: tsa.Project;
+	pkg: unknown;
 	getSlotId(contextId: string): string;
 }
 
@@ -75,6 +76,7 @@ export function analyzeSlots(
 					? analyzeSlotDefault(defaultCode, {
 							id,
 							project: ctx.project,
+							pkg: ctx.pkg,
 							path: path
 								? Path.dirname(path)
 								: ctx.project.getRootDirectories()[0]!.getPath()

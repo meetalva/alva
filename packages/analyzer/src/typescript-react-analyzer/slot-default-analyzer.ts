@@ -6,15 +6,18 @@ import { last } from 'lodash';
 import { InternalPatternAnalysis, ElementCandidate } from '@meetalva/types';
 import { findReactComponentType } from '../react-utils';
 
+const findPkg = require('find-pkg');
+
 export interface SlotDefaultContext {
 	project: tsa.Project;
 	id: string;
 	path: string;
+	pkg: unknown;
 }
 
 export function analyzeSlotDefault(
 	code: string,
-	{ project, path, id }: SlotDefaultContext
+	{ project, path, pkg, id }: SlotDefaultContext
 ): ElementCandidate | undefined {
 	const file = project.createSourceFile(Path.join(path, `${id}.tsx`), code, { overwrite: true });
 	const defaultExport = file.getDefaultExportSymbol();
@@ -42,12 +45,12 @@ export function analyzeSlotDefault(
 		return;
 	}
 
-	return candidateFromJSXElement(element, { project, id });
+	return candidateFromJSXElement(element, { project, id, pkg });
 }
 
 function candidateFromJSXElement(
 	element: tsa.JsxChild,
-	{ project, id }: { project: tsa.Project; id: string }
+	{ project, id, pkg }: { project: tsa.Project; id: string; pkg: unknown }
 ): ElementCandidate | undefined {
 	const nameElement = getNameElement(element);
 
@@ -94,13 +97,12 @@ function candidateFromJSXElement(
 	}
 
 	const tsaFile = definition.getSourceFile();
-	const declarationPath = tsaFile.getFilePath();
-	const cwd = project.getFileSystem().getCurrentDirectory();
 	const sourceFile = tsaFile.compilerNode;
 
 	const analysedExports = getExports(sourceFile, project.getProgram().compilerObject)
 		.map(ex => {
-			const significantPath = getSignificantPath(Path.relative(cwd, declarationPath));
+			const pkgPath = findPkg.sync(ex.filePath);
+			const significantPath = getSignificantPath(Path.relative(pkgPath, ex.filePath));
 			const dName = last(significantPath);
 
 			return analyzePatternExport(ex, {
@@ -110,12 +112,13 @@ function candidateFromJSXElement(
 					description: '',
 					displayName: dName ? Path.basename(dName, Path.extname(dName)) : 'Unknown Pattern',
 					id: significantPath.join('/'),
-					sourcePath: Path.dirname(declarationPath)
+					sourcePath: Path.dirname(ex.filePath)
 				},
 				knownPatterns: [],
 				knownProperties: [],
 				program,
 				project,
+				pkg,
 				options: {
 					analyzeBuiltins: false
 				}
@@ -129,24 +132,13 @@ function candidateFromJSXElement(
 		return;
 	}
 
-	const fragments = analysis.pattern.contextId.split('node_modules');
-	const pkgNameAndPath = fragments[fragments.length - 1];
-	const pkgFragments = pkgNameAndPath.split('/').filter(Boolean);
-	const libraryId = pkgNameAndPath.startsWith('/@')
-		? pkgFragments.slice(0, 2)
-		: pkgFragments.slice(0, 1);
-
-	const contextIdFragments = analysis.pattern.contextId.split(libraryId.join('/'));
-	const patternContextId =
-		contextIdFragments.length > 1 ? contextIdFragments[1].slice(1) : contextIdFragments[0];
-
-	const children = getChildrenCandidates(element, { project, id });
+	const children = getChildrenCandidates(element, { project, pkg, id });
 
 	return {
 		parent: id,
 		id: [id, 'default'].join(':'),
-		libraryId: libraryId.join('/'),
-		patternContextId,
+		libraryId: (pkg as { name: string }).name,
+		patternContextId: analysis.pattern.contextId,
 		props: nameElement
 			.getAttributes()
 			.filter(tsa.TypeGuards.isJsxAttribute)
@@ -160,12 +152,12 @@ function candidateFromJSXElement(
 
 function getChildrenCandidates(
 	element: tsa.JsxChild,
-	{ project, id }: { project: tsa.Project; id: string }
+	{ project, pkg, id }: { project: tsa.Project; pkg: unknown; id: string }
 ): ElementCandidate[] {
 	if (tsa.TypeGuards.isJsxElement(element)) {
 		return element
 			.getJsxChildren()
-			.map(child => candidateFromJSXElement(child, { project, id }))
+			.map(child => candidateFromJSXElement(child, { project, pkg, id }))
 			.filter((candidate): candidate is ElementCandidate => typeof candidate !== 'undefined');
 	}
 

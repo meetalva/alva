@@ -20,7 +20,12 @@ test('reuses properties from shared interfaces', () => {
 
 	const project = new Project();
 
-	const analyzePattern = getPatternAnalyzer(program, project, analyzeDefaults);
+	const analyzePattern = getPatternAnalyzer(
+		program,
+		project,
+		{ name: 'shared-properties' },
+		analyzeDefaults
+	);
 
 	const candidates: PatternCandidate[] = sourceFiles.map(s => ({
 		id: uuid.v4(),

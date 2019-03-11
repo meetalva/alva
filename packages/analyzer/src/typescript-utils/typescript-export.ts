@@ -52,4 +52,9 @@ export interface TypescriptExport {
 	 * The group name of the export
 	 */
 	group: string;
+
+	/**
+	 * The file exported from
+	 */
+	filePath: string;
 }

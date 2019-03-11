@@ -40,6 +40,7 @@ interface AnalyzeContext {
 	options: AnalyzeOptions;
 	program: ts.Program;
 	project: Tsa.Project;
+	pkg: unknown;
 	knownProperties: Types.PropertyAnalysis[];
 	knownPatterns: Types.InternalPatternAnalysis[];
 }
@@ -152,7 +153,7 @@ async function analyzePatterns(context: {
 		tsConfigFilePath: optionsPath
 	});
 
-	const analyzePattern = getPatternAnalyzer(program, project, context.options);
+	const analyzePattern = getPatternAnalyzer(program, project, context.pkg, context.options);
 
 	return patternCandidates.reduce<Types.InternalPatternAnalysis[]>(
 		(acc, candidate) => [...acc, ...analyzePattern(candidate, acc, analyzePatternExport)],
@@ -179,6 +180,7 @@ async function createPatternCompiler(
 export function getPatternAnalyzer(
 	program: ts.Program,
 	project: Tsa.Project,
+	pkg: unknown,
 	options: AnalyzeOptions
 ): PatternAnalyzer {
 	return (
@@ -201,6 +203,7 @@ export function getPatternAnalyzer(
 				predicate(ex, {
 					program,
 					project,
+					pkg,
 					candidate,
 					options,
 					knownProperties,
@@ -263,6 +266,7 @@ export function analyzePatternExport(
 	const slots = SlotAnalyzer.analyzeSlots(propTypes.type, {
 		program: ctx.program,
 		project: ctx.project,
+		pkg: ctx.pkg,
 		getSlotId: (slotContextId: string) => IdHasher.getGlobalSlotId(id, slotContextId)
 	});
 
@@ -291,6 +295,7 @@ export function analyzePatternExport(
 	return {
 		symbol,
 		path: ctx.candidate.artifactPath,
+		libraryName: (ctx.pkg as { name: string }).name,
 		pattern: {
 			model: Types.ModelName.Pattern,
 			contextId,

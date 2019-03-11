@@ -49,12 +49,10 @@ export class PropertyItemColor extends React.Component<PropertyItemColorProps> {
 
 	private showPropertyOverlay = () => {
 		this.setState({ displayColorPicker: true });
-		console.log('show it');
 	};
 
 	private hidePropertyOverlay = () => {
 		this.setState({ displayColorPicker: false });
-		console.log('hide it');
 	};
 
 	public render(): JSX.Element | null {

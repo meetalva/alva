@@ -23,7 +23,6 @@ export class PropertyItemString extends React.Component<PropertyItemStringProps>
 		}
 
 		const example = patternProperty.getExample();
-		console.log(patternProperty.getControl());
 		return (
 			<Components.PropertyItemString
 				description={patternProperty.getDescription()}

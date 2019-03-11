@@ -29,7 +29,7 @@ export interface PropertyItemColorSwatchProps {
 const StyledSwatch = styled.div`
 	display: inline-block;
 	padding: 4px;
-	margin-left: 5px;
+	margin-right: 2px;
 	background: #fff;
 	border-radius: 3px;
 	border: 1px solid rgb(229, 230, 231);
@@ -49,12 +49,6 @@ const StyledPropertyOverlay = styled.div`
 	position: absolute;
 	top: 32px;
 	right: 0;
-
-	.sketch-picker {
-		.flexbox-fix {
-			display: none;
-		}
-	}
 `;
 
 export const PropertyItemColor: React.StatelessComponent<PropertyItemColorProps> = props => (

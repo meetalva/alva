@@ -13,17 +13,18 @@ export interface ConditionalProps {
 	 * @default
 	 * ~~~tsx
 	 * import * as React from 'react';
-	 * import { Box, AlignItems, JustifyContent, Text } from '@meetalva/essentials';
+	 * import * as E from '@meetalva/essentials';
+	 * import { Text } from './text';
 	 *
 	 * export default () => (
-	 *   <Box
+	 *   <E.Box
 	 *     flex={true}
-	 *     justifyContent={JustifyContent.center}
-	 *     alignItems={AlignItems.center}
+	 *     justifyContent={E.JustifyContent.center}
+	 *     alignItems={E.AlignItems.center}
 	 *     height="100px"
 	 *     backgroundColor="#eee">
 	 *     <Text text="Shown if condition is true"/>
-	 *   </Box>
+	 *   </E.Box>
 	 * );
 	 * ~~~
 	 **/

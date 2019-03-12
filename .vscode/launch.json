@@ -107,6 +107,23 @@
 			"sourceMaps": true,
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen"
-		}
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Debug Experiments",
+			"program": "${workspaceRoot}/node_modules/.bin/ts-node",
+			"runtimeArgs": [
+				"--inspect-brk"
+			],
+			"args": [
+				"-O",
+				"{\"module\": \"commonjs\"}",
+				"test.ts"
+			],
+			"sourceMaps": true,
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen"
+		},
 	]
 }

@@ -1,10 +1,9 @@
 import * as Path from 'path';
 import * as tsa from 'ts-simple-ast';
-import { analyzePatternExport, getSignificantPath } from './typescript-react-analyzer';
-import { getExports, TypeScriptType } from '../typescript-utils';
-import { last } from 'lodash';
-import { InternalPatternAnalysis, ElementCandidate } from '@meetalva/types';
+import { TypeScriptType } from '../typescript-utils';
+import { ElementCandidate } from '@meetalva/types';
 import { findReactComponentType } from '../react-utils';
+import { flatMap } from 'lodash';
 
 const findPkg = require('find-pkg');
 
@@ -13,11 +12,12 @@ export interface SlotDefaultContext {
 	id: string;
 	path: string;
 	pkg: unknown;
+	pkgPath: string;
 }
 
 export function analyzeSlotDefault(
 	code: string,
-	{ project, path, pkg, id }: SlotDefaultContext
+	{ project, path, pkg, pkgPath, id }: SlotDefaultContext
 ): ElementCandidate | undefined {
 	const file = project.createSourceFile(Path.join(path, `${id}.tsx`), code, { overwrite: true });
 	const defaultExport = file.getDefaultExportSymbol();
@@ -45,12 +45,17 @@ export function analyzeSlotDefault(
 		return;
 	}
 
-	return candidateFromJSXElement(element, { project, id, pkg });
+	return candidateFromJSXElement(element, { project, id, pkg, pkgPath });
 }
 
 function candidateFromJSXElement(
 	element: tsa.JsxChild,
-	{ project, id, pkg }: { project: tsa.Project; id: string; pkg: unknown }
+	{
+		project,
+		id,
+		pkg,
+		pkgPath
+	}: { project: tsa.Project; id: string; pkg: unknown; pkgPath: string }
 ): ElementCandidate | undefined {
 	const nameElement = getNameElement(element);
 
@@ -59,12 +64,13 @@ function candidateFromJSXElement(
 	}
 
 	const tagNameNode = nameElement.getTagNameNode();
+	const tagNameIdentifier = getNameIdentifier(tagNameNode);
 
-	if (!tsa.TypeGuards.isIdentifier(tagNameNode)) {
+	if (!tagNameIdentifier) {
 		return;
 	}
 
-	const definition = tagNameNode.getDefinitionNodes()[0];
+	const definition = tagNameIdentifier.getDefinitionNodes()[0];
 
 	if (!definition) {
 		return;
@@ -77,68 +83,30 @@ function candidateFromJSXElement(
 	}
 
 	const program = project.getProgram().compilerObject;
+	const patternContextBase = Path.relative(
+		Path.dirname(findPkg.sync(definition.getSourceFile().getFilePath())),
+		definition.getSourceFile().getFilePath()
+	);
+
+	const exportSpecifier = getExportSpecifier(definition);
 
 	const symbolType = definition.getType();
-	const typeChecker = project.getTypeChecker().compilerObject;
-	const boxedSymbolType = new TypeScriptType(symbolType.compilerType, typeChecker);
-
-	const reactType = findReactComponentType(boxedSymbolType, {
-		program
-	});
+	const reactType = findReactComponentType(
+		new TypeScriptType(symbolType.compilerType, project.getTypeChecker().compilerObject),
+		{ program }
+	);
 
 	if (!reactType) {
 		return;
 	}
 
-	const propType = reactType.getTypeArguments()[0];
-
-	if (!propType) {
-		return;
-	}
-
-	const tsaFile = definition.getSourceFile();
-	const sourceFile = tsaFile.compilerNode;
-
-	const analysedExports = getExports(sourceFile, project.getProgram().compilerObject)
-		.map(ex => {
-			const pkgPath = findPkg.sync(ex.filePath);
-			const significantPath = getSignificantPath(Path.relative(pkgPath, ex.filePath));
-			const dName = last(significantPath);
-
-			return analyzePatternExport(ex, {
-				candidate: {
-					artifactPath: '',
-					declarationPath: tsaFile.getFilePath(),
-					description: '',
-					displayName: dName ? Path.basename(dName, Path.extname(dName)) : 'Unknown Pattern',
-					id: significantPath.join('/'),
-					sourcePath: Path.dirname(ex.filePath)
-				},
-				knownPatterns: [],
-				knownProperties: [],
-				program,
-				project,
-				pkg,
-				options: {
-					analyzeBuiltins: false
-				}
-			});
-		})
-		.filter((a): a is InternalPatternAnalysis => typeof a !== 'undefined');
-
-	const analysis = analysedExports.find(a => a.symbol === propType.type.symbol);
-
-	if (!analysis) {
-		return;
-	}
-
-	const children = getChildrenCandidates(element, { project, pkg, id });
+	const children = getChildrenCandidates(element, { project, pkg, pkgPath, id });
 
 	return {
 		parent: id,
 		id: [id, 'default'].join(':'),
 		libraryId: (pkg as { name: string }).name,
-		patternContextId: analysis.pattern.contextId,
+		patternContextId: [patternContextBase, exportSpecifier].join(':'),
 		props: nameElement
 			.getAttributes()
 			.filter(tsa.TypeGuards.isJsxAttribute)
@@ -152,12 +120,17 @@ function candidateFromJSXElement(
 
 function getChildrenCandidates(
 	element: tsa.JsxChild,
-	{ project, pkg, id }: { project: tsa.Project; pkg: unknown; id: string }
+	{
+		project,
+		pkg,
+		pkgPath,
+		id
+	}: { project: tsa.Project; pkg: unknown; pkgPath: string; id: string }
 ): ElementCandidate[] {
 	if (tsa.TypeGuards.isJsxElement(element)) {
 		return element
 			.getJsxChildren()
-			.map(child => candidateFromJSXElement(child, { project, pkg, id }))
+			.map(child => candidateFromJSXElement(child, { project, pkg, pkgPath, id }))
 			.filter((candidate): candidate is ElementCandidate => typeof candidate !== 'undefined');
 	}
 
@@ -204,4 +177,120 @@ export function getNameElement(
 	if (tsa.TypeGuards.isJsxSelfClosingElement(jsx)) {
 		return jsx;
 	}
+}
+
+export function getExportSpecifier(definition: tsa.Node<tsa.ts.Node>): string | undefined {
+	const exportable = getExportableNode(definition);
+
+	if (!exportable) {
+		return;
+	}
+
+	if (exportable.isDefaultExport()) {
+		return 'default';
+	}
+
+	const node = (exportable as unknown) as tsa.Node<tsa.ts.Node>;
+
+	if (tsa.TypeGuards.isVariableStatement(node)) {
+		return node.getDeclarations()![0].getName();
+	}
+
+	if (tsa.TypeGuards.isClassDeclaration(node) || tsa.TypeGuards.isFunctionDeclaration(node)) {
+		return node.getName();
+	}
+}
+
+function getNameIdentifier(tagNameNode: tsa.JsxTagNameExpression): tsa.Identifier | undefined {
+	if (tsa.TypeGuards.isIdentifier(tagNameNode)) {
+		return tagNameNode;
+	}
+
+	if (tsa.TypeGuards.isPropertyAccessExpression(tagNameNode)) {
+		return tagNameNode.getNameNode();
+	}
+}
+
+function getExportableNode(definition?: tsa.Node<tsa.ts.Node>): tsa.ExportableNode | undefined {
+	if (!definition || tsa.TypeGuards.isSourceFile(definition)) {
+		return;
+	}
+
+	if (
+		tsa.TypeGuards.isImportSpecifier(definition) ||
+		tsa.TypeGuards.isExportSpecifier(definition)
+	) {
+		const decl = tsa.TypeGuards.isImportSpecifier(definition)
+			? definition.getImportDeclaration()
+			: definition.getExportDeclaration();
+
+		const sourceFile = decl.getModuleSpecifierSourceFile();
+
+		if (sourceFile) {
+			const namedExportSpecifiers = flatMap(
+				sourceFile.getExportDeclarations().map(d => d.getNamedExports())
+			);
+
+			const matchingExportSpecifier = namedExportSpecifiers.find(ne => {
+				const aliasNode = ne.getAliasNode();
+
+				if (aliasNode) {
+					return aliasNode.getText() === definition.getName();
+				}
+
+				return ne.getName() === definition.getName();
+			});
+
+			if (matchingExportSpecifier) {
+				return getExportableNode(matchingExportSpecifier);
+			}
+
+			const exportedSymbols = sourceFile.getExportSymbols().map(d => d.getDeclarations()[0]);
+
+			const matchingExportedSymbol = exportedSymbols.find(s => {
+				if (tsa.TypeGuards.isVariableDeclaration(s)) {
+					return s.getName() === definition.getName();
+				}
+
+				return false;
+			});
+
+			if (matchingExportedSymbol) {
+				return getExportableNode(matchingExportedSymbol);
+			}
+		}
+	}
+
+	if (tsa.TypeGuards.isExportSpecifier(definition)) {
+		const localTarget = definition.getLocalTargetDeclarations()[0];
+
+		if (localTarget) {
+			return getExportableNode(localTarget);
+		} else {
+			const sourceFile = definition.getSourceFile();
+			const namedImportSpecifiers = flatMap(
+				sourceFile.getImportDeclarations().map(d => d.getNamedImports())
+			);
+
+			const matchingImportSpecifier = namedImportSpecifiers.find(ni => {
+				const aliasNode = ni.getAliasNode();
+
+				if (aliasNode) {
+					return aliasNode.getText() === definition.getName();
+				}
+
+				return ni.getName() === definition.getName();
+			});
+
+			if (matchingImportSpecifier) {
+				return getExportableNode(matchingImportSpecifier);
+			}
+		}
+	}
+
+	if (tsa.TypeGuards.isExportableNode(definition) && definition.isExported()) {
+		return definition;
+	}
+
+	return getExportableNode(definition.getParent());
 }

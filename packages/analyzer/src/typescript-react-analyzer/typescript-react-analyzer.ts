@@ -41,6 +41,7 @@ interface AnalyzeContext {
 	program: ts.Program;
 	project: Tsa.Project;
 	pkg: unknown;
+	pkgPath: string;
 	knownProperties: Types.PropertyAnalysis[];
 	knownPatterns: Types.InternalPatternAnalysis[];
 }
@@ -153,7 +154,13 @@ async function analyzePatterns(context: {
 		tsConfigFilePath: optionsPath
 	});
 
-	const analyzePattern = getPatternAnalyzer(program, project, context.pkg, context.options);
+	const analyzePattern = getPatternAnalyzer(
+		program,
+		project,
+		context.pkg,
+		context.pkgPath,
+		context.options
+	);
 
 	return patternCandidates.reduce<Types.InternalPatternAnalysis[]>(
 		(acc, candidate) => [...acc, ...analyzePattern(candidate, acc, analyzePatternExport)],
@@ -181,6 +188,7 @@ export function getPatternAnalyzer(
 	program: ts.Program,
 	project: Tsa.Project,
 	pkg: unknown,
+	pkgPath: string,
 	options: AnalyzeOptions
 ): PatternAnalyzer {
 	return (
@@ -204,6 +212,7 @@ export function getPatternAnalyzer(
 					program,
 					project,
 					pkg,
+					pkgPath,
 					candidate,
 					options,
 					knownProperties,
@@ -267,6 +276,7 @@ export function analyzePatternExport(
 		program: ctx.program,
 		project: ctx.project,
 		pkg: ctx.pkg,
+		pkgPath: ctx.pkgPath,
 		getSlotId: (slotContextId: string) => IdHasher.getGlobalSlotId(id, slotContextId)
 	});
 

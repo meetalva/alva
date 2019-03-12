@@ -1,6 +1,6 @@
-import * as Path from 'path';
 import * as tsa from 'ts-simple-ast';
-import { analyzeSlotDefault } from './slot-default-analyzer';
+import { analyzeSlotDefault, getExportSpecifier } from './slot-default-analyzer';
+import * as uuid from 'uuid';
 
 interface TestContext {
 	project: tsa.Project;
@@ -8,72 +8,39 @@ interface TestContext {
 	path: string;
 }
 
-const ctx = ({
-	path: __dirname,
-	pkgPath: Path.join(__dirname, 'package.json')
-} as any) as TestContext;
+jest.mock('find-pkg', () => ({
+	sync: (input: string) => '/package.json'
+}));
 
-beforeAll(() => {
-	ctx.project = new tsa.Project();
-});
-
-test('works with Text from @meetalva/essentials', () => {
-	const result = analyzeSlotDefault(
-		`
-		import * as React from 'react';
-		import { Text } from '@meetalva/essentials';
-		export default () => <Text text="Hello, World!"/>
-	`,
-		{ ...ctx, pkg: { name: 'name' }, id: 'meetalva-essentials-text' }
-	);
-
-	expect(result).toEqual(
-		expect.objectContaining({
-			id: 'meetalva-essentials-text:default',
-			parent: 'meetalva-essentials-text'
-		})
-	);
-});
-
-test('works with JSX.IntrinsicElement', () => {
-	const result = analyzeSlotDefault(
-		`
-		import * as React from 'react';
-		export default () => <div>Hello, World</div>;
-	`,
-		{ ...ctx, pkg: { name: 'name' }, id: 'jsxintrinsic' }
-	);
-
-	expect(result).toBeUndefined();
-});
-
-test('ignores modules without default export', () => {
-	const result = analyzeSlotDefault(
-		`
-		import * as React from 'react';
-		import { Text } from '@meetalva/essentials';
-		export const HelloWorld () => <Text/>;
-	`,
-		{ ...ctx, pkg: { name: 'name' }, id: 'no-default-export' }
-	);
-
-	expect(result).toBeUndefined();
-});
+jest.mock('../react-utils/find-react-component-type', () => ({
+	findReactComponentType: () => true
+}));
 
 test('picks up string props', () => {
+	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
+
+	project.createSourceFile(
+		'/a.ts',
+		`import * as React from 'react'; export const A: React.SFC = () => null;`
+	);
+
 	const result = analyzeSlotDefault(
 		`
 		import * as React from 'react';
-		import { Text } from '@meetalva/essentials';
-		export default () => <Text text="Hello, World!"/>
+		import { A } from '/a';
+		export default () => <A text="Hello, World!"/>
 	`,
-		{ ...ctx, pkg: { name: 'name' }, id: 'meetalva-essentials-text' }
+		{
+			project,
+			pkgPath: '/package.json',
+			path: '/b.ts',
+			pkg: { name: 'name' },
+			id: 'string-props'
+		}
 	);
 
 	expect(result).toEqual(
 		expect.objectContaining({
-			id: 'meetalva-essentials-text:default',
-			parent: 'meetalva-essentials-text',
 			props: [
 				{
 					propName: 'text',
@@ -85,20 +52,27 @@ test('picks up string props', () => {
 });
 
 test('picks up number props', () => {
+	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
+
+	project.createSourceFile(
+		'/a.ts',
+		`import * as React from 'react'; export const A: React.SFC = () => null;`
+	);
+
 	const result = analyzeSlotDefault(
 		`
 		import * as React from 'react';
-		import { Box } from '@meetalva/essentials';
-		export default () => <Box flex={0} />
+		import { A } from '/a';
+		export default () => <A num={0} />
 	`,
-		{ ...ctx, pkg: { name: 'name' }, id: 'meetalva-essentials-box' }
+		{ project, pkgPath: 'package.json', pkg: { name: 'name' }, id: 'number-props', path: '/b.ts' }
 	);
 
 	expect(result).toEqual(
 		expect.objectContaining({
 			props: expect.arrayContaining([
 				{
-					propName: 'flex',
+					propName: 'num',
 					value: 0
 				}
 			])
@@ -106,62 +80,124 @@ test('picks up number props', () => {
 	);
 });
 
-test('exposes pattern id via .patternContextId', () => {
+test('supports multiple levels of JSX elements', () => {
+	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
+
+	project.createSourceFile(
+		'/ab.ts',
+		`import * as React from 'react'; export const A: React.SFC = () => null; export const B: React.SFC = () => null`
+	);
+
 	const result = analyzeSlotDefault(
 		`
 		import * as React from 'react';
-		import { Text } from '@meetalva/essentials';
-		export default () => <Text text="Hello, World!"/>
-	`,
-		{ ...ctx, pkg: { name: 'name' }, id: 'meetalva-essentials-text-id' }
-	);
-
-	expect(result).toEqual(
-		expect.objectContaining({
-			patternContextId: 'lib/text.d.ts:Text'
-		})
-	);
-});
-
-test('determines library id with scopes', () => {
-	const result = analyzeSlotDefault(
-		`
-		import * as React from 'react';
-		import { Text } from '@meetalva/essentials';
-		export default () => <Text text="Hello, World!"/>
+		import { A, B } from '/ab';
+		export default () => <A><B/></A>
 	`,
 		{
-			...ctx,
-			pkg: { name: '@meetalva/essentials' },
-			id: 'meetalva-essentials-text-library-id-scopes'
+			path: '/b.ts',
+			project,
+			pkg: { name: 'name' },
+			pkgPath: '/package.json',
+			id: 'nested-jsx'
 		}
 	);
 
 	expect(result).toEqual(
 		expect.objectContaining({
-			libraryId: '@meetalva/essentials'
+			patternContextId: 'ab.ts:A',
+			children: [
+				expect.objectContaining({
+					patternContextId: 'ab.ts:B'
+				})
+			]
 		})
 	);
 });
 
-test('supports multiple levels of JSX elements', () => {
+test('works with property access jsx tag names', () => {
+	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
+
+	project.createSourceFile(
+		'/a.ts',
+		`import * as React from 'react'; export const B: React.SFC = () => null`
+	);
+
 	const result = analyzeSlotDefault(
 		`
 		import * as React from 'react';
-		import { Box, Text } from '@meetalva/essentials';
-		export default () => <Box><Text text="Hello, World!"/></Box>
+		import * as A from '/a';
+		export default () => <A.B />
 	`,
-		{ ...ctx, pkg: { name: 'name' }, id: 'meetalva-essentials-nested' }
+		{
+			path: '/b.ts',
+			project,
+			pkg: { name: 'name' },
+			pkgPath: '/package.json',
+			id: 'property-access'
+		}
 	);
 
 	expect(result).toEqual(
 		expect.objectContaining({
-			patternContextId: 'lib/box.d.ts:Box',
-			children: expect.arrayContaining([
-				expect.objectContaining({
-					patternContextId: 'lib/text.d.ts:Text'
-				})
-			])
+			patternContextId: 'a.ts:B'
 		})
 	);
+});
+
+test('determines export names correctly', () => {
+	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
+
+	const file = project.createSourceFile(
+		`${uuid.v4()}`,
+		`
+		export const A = () => {};
+		export function B() {}
+		export class C {}
+
+		const D = 'D';
+		const F = D;
+		export const G = F;
+	`,
+		{ overwrite: true }
+	);
+
+	const namedExports = file
+		.getStatements()
+		.filter(statement => tsa.TypeGuards.isExportableNode(statement) && statement.isNamedExport());
+
+	expect(namedExports.map(namedExport => getExportSpecifier(namedExport))).toEqual([
+		'A',
+		'B',
+		'C',
+		'G'
+	]);
+});
+
+test('determines export from aliased import', () => {
+	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
+
+	const file = project.createSourceFile('/aa.ts', `import { B as A } from './ab'; export { A };`);
+
+	project.createSourceFile('/ab.ts', `export const B = () => {}`);
+
+	const exportDeclaration = file.getStatements().filter(tsa.TypeGuards.isExportDeclaration)[0];
+
+	const namedExport = exportDeclaration.getNamedExports()[0];
+	expect(getExportSpecifier(namedExport)).toEqual('B');
+});
+
+test('determines last export from named import/export chain', () => {
+	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
+
+	const file = project.createSourceFile('/ba.ts', `import { A } from './bb'; export { A };`);
+
+	project.createSourceFile('/bb.ts', `export { C as A } from './bc';`);
+
+	project.createSourceFile('/bc.ts', `export const C = () => {}`);
+
+	const exportDeclaration = file.getStatements().filter(tsa.TypeGuards.isExportDeclaration)[0];
+
+	const namedExport = exportDeclaration.getNamedExports()[0];
+	expect(getExportSpecifier(namedExport)).toEqual('C');
 });

@@ -79,6 +79,7 @@ test('creates defaults for valid blocks', () => {
 		program: file.program,
 		project,
 		pkg: { name: 'name' },
+		pkgPath: 'package.json',
 		getSlotId: id => id
 	});
 

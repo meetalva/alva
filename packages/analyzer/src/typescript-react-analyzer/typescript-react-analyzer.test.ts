@@ -23,7 +23,8 @@ test('reuses properties from shared interfaces', () => {
 	const analyzePattern = getPatternAnalyzer(
 		program,
 		project,
-		{ name: 'shared-properties' },
+		{ name: 'shared-properties' } /** pkg */,
+		'package.json' /** pkgPath */,
 		analyzeDefaults
 	);
 

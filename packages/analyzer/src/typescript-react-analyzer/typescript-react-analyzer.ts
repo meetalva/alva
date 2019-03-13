@@ -3,7 +3,6 @@ import * as Fs from 'fs';
 import * as Path from 'path';
 import * as PropertyAnalyzer from './property-analyzer';
 import * as ReactUtils from '../react-utils';
-import * as readPkg from 'read-pkg';
 import * as SlotAnalyzer from './slot-analzyer';
 import * as Types from '@meetalva/types';
 import * as TypeScriptUtils from '../typescript-utils';
@@ -21,6 +20,7 @@ import { getExportedNode } from '../typescript-utils/get-exported-node';
 import * as IdHasher from '../id-hasher';
 
 const precinct = require('precinct');
+const readPkg = require('read-pkg');
 
 export interface PatternCandidate {
 	artifactPath: string;
@@ -73,7 +73,8 @@ export async function analyze(
 ): Promise<Types.LibraryAnalysisResult> {
 	try {
 		const id = uuid.v4();
-		const pkg = await readPkg(pkgPath);
+		// readPkg is typed faultily
+		const pkg = await readPkg({ cwd: Path.dirname(pkgPath) });
 		const cwd = Path.dirname(pkgPath);
 		const options = merge({}, analyzeDefaults, rawOptions) as AnalyzeOptions;
 		const patterns = await analyzePatterns({ pkgPath, options, pkg, cwd });
@@ -275,8 +276,6 @@ export function analyzePatternExport(
 	const slots = SlotAnalyzer.analyzeSlots(propTypes.type, {
 		program: ctx.program,
 		project: ctx.project,
-		pkg: ctx.pkg,
-		pkgPath: ctx.pkgPath,
 		getSlotId: (slotContextId: string) => IdHasher.getGlobalSlotId(id, slotContextId)
 	});
 

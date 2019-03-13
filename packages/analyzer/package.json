@@ -36,7 +36,7 @@
     "npm-package-arg": "^6.1.0",
     "pacote": "^9.4.0",
     "precinct": "5.0.1",
-    "read-pkg": "3.0.0",
+    "read-pkg": "^5.0.0",
     "remark": "^10.0.1",
     "resolve": "1.8.1",
     "resolve-pkg": "^1.0.0",

@@ -32,9 +32,7 @@ test('picks up string props', () => {
 	`,
 		{
 			project,
-			pkgPath: '/package.json',
 			path: '/b.ts',
-			pkg: { name: 'name' },
 			id: 'string-props'
 		}
 	);
@@ -65,7 +63,7 @@ test('picks up number props', () => {
 		import { A } from '/a';
 		export default () => <A num={0} />
 	`,
-		{ project, pkgPath: 'package.json', pkg: { name: 'name' }, id: 'number-props', path: '/b.ts' }
+		{ project, id: 'number-props', path: '/b.ts' }
 	);
 
 	expect(result).toEqual(
@@ -97,8 +95,6 @@ test('supports multiple levels of JSX elements', () => {
 		{
 			path: '/b.ts',
 			project,
-			pkg: { name: 'name' },
-			pkgPath: '/package.json',
 			id: 'nested-jsx'
 		}
 	);
@@ -132,8 +128,6 @@ test('works with property access jsx tag names', () => {
 		{
 			path: '/b.ts',
 			project,
-			pkg: { name: 'name' },
-			pkgPath: '/package.json',
 			id: 'property-access'
 		}
 	);
@@ -164,8 +158,6 @@ test('determines correct source file for immediate namespace imports', () => {
 		{
 			path: '/b.ts',
 			project,
-			pkg: { name: 'name' },
-			pkgPath: '/package.json',
 			id: 'property-access'
 		}
 	);

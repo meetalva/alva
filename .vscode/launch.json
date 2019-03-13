@@ -90,40 +90,6 @@
 			"sourceMaps": true,
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen"
-		},
-		{
-			"type": "node",
-			"request": "launch",
-			"name": "Debug Default Content Tests",
-			"program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
-			"runtimeArgs": [
-				"--inspect-brk"
-			],
-			"args": [
-				"--runInBand",
-				"--collectCoverage=false",
-				"packages/analyzer/src/typescript-react-analyzer/slot-default-analyzer.test.ts"
-			],
-			"sourceMaps": true,
-			"console": "integratedTerminal",
-			"internalConsoleOptions": "neverOpen"
-		},
-		{
-			"type": "node",
-			"request": "launch",
-			"name": "Debug Experiments",
-			"program": "${workspaceRoot}/node_modules/.bin/ts-node",
-			"runtimeArgs": [
-				"--inspect-brk"
-			],
-			"args": [
-				"-O",
-				"{\"module\": \"commonjs\"}",
-				"test.ts"
-			],
-			"sourceMaps": true,
-			"console": "integratedTerminal",
-			"internalConsoleOptions": "neverOpen"
-		},
+		}
 	]
 }

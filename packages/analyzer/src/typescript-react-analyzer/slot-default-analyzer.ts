@@ -6,18 +6,17 @@ import { findReactComponentType } from '../react-utils';
 import { flatMap } from 'lodash';
 
 const findPkg = require('find-pkg');
+const readPkg = require('read-pkg');
 
 export interface SlotDefaultContext {
 	project: tsa.Project;
 	id: string;
 	path: string;
-	pkg: unknown;
-	pkgPath: string;
 }
 
 export function analyzeSlotDefault(
 	code: string,
-	{ project, path, pkg, pkgPath, id }: SlotDefaultContext
+	{ project, path, id }: SlotDefaultContext
 ): ElementCandidate | undefined {
 	const file = project.createSourceFile(Path.join(path, `${id}.tsx`), code, { overwrite: true });
 	const defaultExport = file.getDefaultExportSymbol();
@@ -45,17 +44,12 @@ export function analyzeSlotDefault(
 		return;
 	}
 
-	return candidateFromJSXElement(element, { project, id, pkg, pkgPath });
+	return candidateFromJSXElement(element, { project, id });
 }
 
 function candidateFromJSXElement(
 	element: tsa.JsxChild,
-	{
-		project,
-		id,
-		pkg,
-		pkgPath
-	}: { project: tsa.Project; id: string; pkg: unknown; pkgPath: string }
+	{ project, id }: { project: tsa.Project; id: string }
 ): ElementCandidate | undefined {
 	const nameElement = getNameElement(element);
 
@@ -88,14 +82,21 @@ function candidateFromJSXElement(
 	}
 
 	const program = project.getProgram().compilerObject;
+	const filePath = exportableNode.getSourceFile().getFilePath();
+	const pkgPath = findPkg.sync(Path.dirname(filePath));
+	const pkg = readPkg.sync({ cwd: Path.dirname(pkgPath) });
+
 	const patternContextBase = Path.relative(
-		Path.dirname(findPkg.sync(exportableNode.getSourceFile().getFilePath())),
+		Path.dirname(pkgPath),
 		exportableNode.getSourceFile().getFilePath()
 	);
 
 	const exportSpecifier = getExportSpecifier(definition);
 
-	const symbolType = exportableNode.getType();
+	const symbolType = (exportableNode as any).getDeclarations
+		? (exportableNode as any).getDeclarations()[0].getType()
+		: exportableNode.getType();
+
 	const reactType = findReactComponentType(
 		new TypeScriptType(symbolType.compilerType, project.getTypeChecker().compilerObject),
 		{ program }
@@ -105,12 +106,12 @@ function candidateFromJSXElement(
 		return;
 	}
 
-	const children = getChildrenCandidates(element, { project, pkg, pkgPath, id });
+	const children = getChildrenCandidates(element, { project, id });
 
 	return {
 		parent: id,
 		id: [id, 'default'].join(':'),
-		libraryId: (pkg as { name: string }).name,
+		libraryId: pkg.name,
 		patternContextId: [patternContextBase, exportSpecifier].join(':'),
 		props: nameElement
 			.getAttributes()
@@ -125,17 +126,12 @@ function candidateFromJSXElement(
 
 function getChildrenCandidates(
 	element: tsa.JsxChild,
-	{
-		project,
-		pkg,
-		pkgPath,
-		id
-	}: { project: tsa.Project; pkg: unknown; pkgPath: string; id: string }
+	{ project, id }: { project: tsa.Project; id: string }
 ): ElementCandidate[] {
 	if (tsa.TypeGuards.isJsxElement(element)) {
 		return element
 			.getJsxChildren()
-			.map(child => candidateFromJSXElement(child, { project, pkg, pkgPath, id }))
+			.map(child => candidateFromJSXElement(child, { project, id }))
 			.filter((candidate): candidate is ElementCandidate => typeof candidate !== 'undefined');
 	}
 

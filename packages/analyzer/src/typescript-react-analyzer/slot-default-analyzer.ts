@@ -71,26 +71,31 @@ function candidateFromJSXElement(
 	}
 
 	const definition = tagNameIdentifier.getDefinitionNodes()[0];
+	const exportable = getExportableNode(definition);
 
-	if (!definition) {
+	if (!definition || !exportable) {
 		return;
 	}
 
-	const symbol = definition.getSymbol();
+	const exportableNode = (exportable as unknown) as tsa.Node<tsa.ts.Node>;
 
-	if (!symbol) {
+	if (
+		!tsa.TypeGuards.isVariableStatement(exportableNode) &&
+		!tsa.TypeGuards.isClassDeclaration(exportableNode) &&
+		!tsa.TypeGuards.isFunctionDeclaration(exportableNode)
+	) {
 		return;
 	}
 
 	const program = project.getProgram().compilerObject;
 	const patternContextBase = Path.relative(
-		Path.dirname(findPkg.sync(definition.getSourceFile().getFilePath())),
-		definition.getSourceFile().getFilePath()
+		Path.dirname(findPkg.sync(exportableNode.getSourceFile().getFilePath())),
+		exportableNode.getSourceFile().getFilePath()
 	);
 
 	const exportSpecifier = getExportSpecifier(definition);
 
-	const symbolType = definition.getType();
+	const symbolType = exportableNode.getType();
 	const reactType = findReactComponentType(
 		new TypeScriptType(symbolType.compilerType, project.getTypeChecker().compilerObject),
 		{ program }

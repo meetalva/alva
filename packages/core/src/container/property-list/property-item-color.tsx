@@ -19,8 +19,7 @@ export interface PropertyItemColorState {
 @MobxReact.observer
 export class PropertyItemColor extends React.Component<PropertyItemColorProps> {
 	public state = {
-		displayColorPicker: false,
-		color: (this.props.property.getValue() || '') as string
+		displayColorPicker: false
 	};
 
 	private commit = debounce(() => {
@@ -31,20 +30,17 @@ export class PropertyItemColor extends React.Component<PropertyItemColorProps> {
 	private handleColorPickerChange = (color: { hex: string }) => {
 		const { property } = this.props;
 		property.setValue(color.hex);
-		this.setState({ color: color.hex });
 	};
 
 	private handleColorPickerChangeComplete = (color: { hex: string }) => {
 		const { property } = this.props;
 		property.setValue(color.hex);
-		this.setState({ color: color.hex });
 		this.commit();
 	};
 
 	private handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { property } = this.props;
 		property.setValue(e.target.value);
-		this.setState({ color: e.target.value });
 	};
 
 	private showPropertyOverlay = () => {
@@ -75,7 +71,7 @@ export class PropertyItemColor extends React.Component<PropertyItemColorProps> {
 					onHide={() => this.hidePropertyOverlay()}
 					onChange={this.handleChange}
 					label={patternProperty.getLabel()}
-					color={this.state.color}
+					color={(this.props.property.getValue() || '') as string}
 					show={this.state.displayColorPicker}
 					onBlur={() => window.requestIdleCallback(() => props.store.commit())}
 					onColorPickerChange={this.handleColorPickerChange}

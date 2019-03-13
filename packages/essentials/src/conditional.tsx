@@ -14,7 +14,6 @@ export interface ConditionalProps {
 	 * ~~~tsx
 	 * import * as React from 'react';
 	 * import * as E from '@meetalva/essentials';
-	 * import { Text } from './text';
 	 *
 	 * export default () => (
 	 *   <E.Box
@@ -36,17 +35,17 @@ export interface ConditionalProps {
 	 * @default
 	 * ```tsx
 	 * import * as React from 'react';
-	 * import { Box, AlignItems, JustifyContent, Text } from '@meetalva/essentials';
+	 * import * as E from '@meetalva/essentials';
 	 *
 	 * export default () => (
-	 *  <Box
+	 *  <E.Box
 	 *    flex={true}
-	 *    justifyContent={JustifyContent.center}
-	 *    alignItems={AlignItems.center}
+	 *    justifyContent={E.JustifyContent.center}
+	 *    alignItems={E.AlignItems.center}
 	 *    height="100px"
 	 *    backgroundColor="#eee">
-	 *    <Text text="Shown if condition is false"/>
-	 *   </Box>
+	 *    <E.Text text="Shown if condition is false"/>
+	 *   </E.Box>
 	 * );
 	 * ```
 	 **/

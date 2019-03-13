@@ -145,6 +145,38 @@ test('works with property access jsx tag names', () => {
 	);
 });
 
+test('determines correct source file for immediate namespace imports', () => {
+	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
+
+	project.createSourceFile(
+		'/thing/a-thing.ts',
+		`import * as React from 'react'; export const AThing: React.SFC = () => null`
+	);
+
+	project.createSourceFile('/thing/index.ts', `export { AThing } from './a-thing`);
+
+	const result = analyzeSlotDefault(
+		`
+		import * as React from 'react';
+		import * as Thing from '/thing';
+		export default () => <Thing.AThing />
+	`,
+		{
+			path: '/b.ts',
+			project,
+			pkg: { name: 'name' },
+			pkgPath: '/package.json',
+			id: 'property-access'
+		}
+	);
+
+	expect(result).toEqual(
+		expect.objectContaining({
+			patternContextId: 'thing/a-thing.ts:AThing'
+		})
+	);
+});
+
 test('determines export names correctly', () => {
 	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
 

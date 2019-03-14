@@ -3,7 +3,6 @@ import { getDefaultCode, getCommentValue, analyzeSlots } from './slot-analzyer';
 import * as TypescriptUtils from '../typescript-utils';
 import * as TestUtils from '../test-utils';
 import { Project } from 'ts-simple-ast';
-import { exec } from 'child_process';
 
 const fixtures = require('fixturez')(__dirname);
 

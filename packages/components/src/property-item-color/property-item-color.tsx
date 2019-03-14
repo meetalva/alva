@@ -26,22 +26,16 @@ export interface PropertyItemColorSwatchProps {
 	color?: string;
 }
 
-const StyledSwatch = styled.div`
-	display: inline-block;
-	padding: 4px;
-	margin-right: 2px;
-	background: #fff;
-	border-radius: 3px;
-	border: 1px solid rgb(229, 230, 231);
-
-	&:hover {
-		border-color: rgb(153, 158, 162);
-	}
-`;
 const StyledSwatchColor = styled.div`
-	width: 36px;
-	height: 100%;
-	border-radius: 2px;
+	position: absolute;
+	right: 5px;
+	top: 5px;
+	z-index: 10;
+
+	width: 30px;
+	height: 20px;
+	border-radius: 3px;
+	border: 0.5px solid rgba(0, 0, 0, 0.2);
 	background-color: ${(props: PropertyItemColorSwatchProps) => props.color};
 `;
 
@@ -49,14 +43,19 @@ const StyledPropertyOverlay = styled.div`
 	position: absolute;
 	top: 32px;
 	right: 0;
+
+	.sketch-picker > :nth-of-type(2) > :nth-of-type(1) > :nth-of-type(2),
+	.sketch-picker > :nth-of-type(2) > :nth-of-type(2),
+	.sketch-picker > :nth-of-type(3) > :nth-of-type(5),
+	.sketch-picker > :nth-of-type(4) {
+		display: none !important;
+	}
 `;
 
 export const PropertyItemColor: React.StatelessComponent<PropertyItemColorProps> = props => (
 	<>
 		<PropertyItem description={props.description} label={props.label}>
-			<StyledSwatch onClick={props.onShow}>
-				<StyledSwatchColor color={props.color} />
-			</StyledSwatch>
+			<StyledSwatchColor color={props.color} />
 			<PropertyInput
 				onFocus={props.onFocus}
 				onChange={props.onChange}

@@ -44,6 +44,10 @@ const StyledPropertyOverlay = styled.div`
 	top: 32px;
 	right: 0;
 
+	.sketch-picker {
+		padding 10px 10px 5px 10px !important;
+	  }
+
 	.sketch-picker > :nth-of-type(2) > :nth-of-type(1) > :nth-of-type(2),
 	.sketch-picker > :nth-of-type(2) > :nth-of-type(2),
 	.sketch-picker > :nth-of-type(3) > :nth-of-type(5),

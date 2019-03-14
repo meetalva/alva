@@ -11,17 +11,9 @@ export interface PropertyItemColorProps {
 	property: Model.ElementProperty;
 }
 
-export interface PropertyItemColorState {
-	propertyOverlay: boolean;
-}
-
 @MobxReact.inject('store')
 @MobxReact.observer
 export class PropertyItemColor extends React.Component<PropertyItemColorProps> {
-	public state = {
-		displayColorPicker: false
-	};
-
 	private commit = debounce(() => {
 		const props = this.props as PropertyItemColorProps & { store: ViewStore };
 		props.store.commit();
@@ -43,14 +35,6 @@ export class PropertyItemColor extends React.Component<PropertyItemColorProps> {
 		property.setValue(e.target.value);
 	};
 
-	private showPropertyOverlay = () => {
-		this.setState({ displayColorPicker: true });
-	};
-
-	private hidePropertyOverlay = () => {
-		this.setState({ displayColorPicker: false });
-	};
-
 	public render(): JSX.Element | null {
 		const props = this.props as PropertyItemColorProps & { store: ViewStore };
 		const { property } = props;
@@ -64,15 +48,15 @@ export class PropertyItemColor extends React.Component<PropertyItemColorProps> {
 		const example = patternProperty.getExample();
 
 		return (
-			<OutsideClickHandler onOutsideClick={() => this.hidePropertyOverlay()}>
+			<OutsideClickHandler onOutsideClick={() => patternProperty.setFocused(false)}>
 				<Components.PropertyItemColor
 					description={patternProperty.getDescription()}
-					onShow={() => this.showPropertyOverlay()}
-					onHide={() => this.hidePropertyOverlay()}
+					onShow={() => patternProperty.setFocused(true)}
+					onHide={() => patternProperty.setFocused(false)}
 					onChange={this.handleChange}
 					label={patternProperty.getLabel()}
 					color={(this.props.property.getValue() || '') as string}
-					show={this.state.displayColorPicker}
+					show={patternProperty.getFocused() || false}
 					onBlur={() => window.requestIdleCallback(() => props.store.commit())}
 					onColorPickerChange={this.handleColorPickerChange}
 					onColorPickerChangeComplete={this.handleColorPickerChangeComplete}

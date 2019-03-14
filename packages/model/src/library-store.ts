@@ -17,6 +17,10 @@ export class LibraryStore {
 		{
 			name: '@meetalva/video-player',
 			version: 'latest'
+		},
+		{
+			name: '@meetalva/maps',
+			version: 'latest'
 		}
 	];
 

@@ -2,14 +2,12 @@ import * as tsa from 'ts-simple-ast';
 import { analyzeSlotDefault, getExportSpecifier } from './slot-default-analyzer';
 import * as uuid from 'uuid';
 
-interface TestContext {
-	project: tsa.Project;
-	pkgPath: string;
-	path: string;
-}
-
 jest.mock('find-pkg', () => ({
 	sync: (input: string) => '/package.json'
+}));
+
+jest.mock('read-pkg', () => ({
+	sync: () => ({ name: 'name ' })
 }));
 
 jest.mock('../react-utils/find-react-component-type', () => ({

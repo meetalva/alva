@@ -146,35 +146,22 @@ export class LibraryStoreContainer extends React.Component {
 					<Details mayToggle={libraryStore.updateCount === 0} open={libraryStore.installedOpen}>
 						<DetailsSummary onClick={this.handleDetailsClick}>
 							<C.Space size={C.SpaceSize.XS}>
-								<C.Flex
-									alignItems={C.FlexAlignItems.Center}
-									justifyContent={C.FlexJustifyContent.SpaceBetween}
-								>
-									<C.Flex>
-										<div>
-											<C.Space sizeTop={2} />
-											<C.BadgeIcon
-												color={libraryStore.updateAvailable ? C.Color.Orange : C.Color.Green}
-											>
-												{libraryStore.updateCount > 0 ? libraryStore.updateCount : ''}
-											</C.BadgeIcon>
-										</div>
-										<C.Space sizeRight={C.SpaceSize.XS + C.SpaceSize.XXS} />
+								<C.Flex>
 										<div>
 											<C.Headline
 												order={4}
 												bold
-												textColor={libraryStore.updateAvailable ? C.Color.Orange : C.Color.Green}
+												textColor={libraryStore.updateAvailable ? C.Color.Blue : C.Color.Green}
 											>
 												{libraryStore.updateAvailable
-													? 'Updates available'
-													: 'Everything up to date'}
+													? 'Updates available 🙌'
+													: 'Up to date 👌'}
 											</C.Headline>
 											<C.Space sizeBottom={C.SpaceSize.XS} />
 											<When mayToggle={libraryStore.updateCount === 0}>
 												<C.Flex style={{ alignItems: 'center' }}>
 														<C.Copy textColor={C.Color.Grey36}>
-															Show {libraryStore.withLibrary.length} installed{' '}
+															Show {libraryStore.withLibrary.length} connected{' '}
 															{libraryStore.withLibrary.length === 1
 																? 'library'
 																: 'libraries'}
@@ -184,16 +171,6 @@ export class LibraryStoreContainer extends React.Component {
 												</C.Flex>
 											</When>
 										</div>
-									</C.Flex>
-									{store.getApp().isHostType(T.HostType.Electron) && (
-										<C.Button
-											order={C.ButtonOrder.Secondary}
-											size={C.ButtonSize.Medium}
-											onClick={this.handleLocalInstallClick}
-										>
-											Install Local Library
-										</C.Button>
-									)}
 								</C.Flex>
 							</C.Space>
 						</DetailsSummary>
@@ -243,11 +220,11 @@ export class LibraryStoreContainer extends React.Component {
 						<C.Space size={C.SpaceSize.XS}>
 							<div style={{ maxWidth: '260px' }}>
 								<C.Headline order={2} bold textColor={C.Color.Grey10}>
-									Library Store
+									Store
 								</C.Headline>
 								<C.Space sizeBottom={C.SpaceSize.M} />
 								<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
-									Browse and install compatible code libraries for your prototype
+									Connect interactive design systems and packages with your prototype
 								</C.Copy>
 							</div>
 						</C.Space>
@@ -255,11 +232,13 @@ export class LibraryStoreContainer extends React.Component {
 						<C.Space sizeBottom={C.SpaceSize.XXL} />
 						<C.Flex>
 							{libraryStore.recommendations.map(item => (
-								<LibraryStoreItemContainer
+								<>{console.log(item.category)}
+									<LibraryStoreItemContainer
 									key={item.id}
 									item={item}
 									size={LibraryStoreItemSize.Large}
 								/>
+								</>
 							))}
 						</C.Flex>
 						<C.Space sizeTop={C.SpaceSize.XXXL} />
@@ -279,11 +258,11 @@ export class LibraryStoreContainer extends React.Component {
 								<C.Space size={C.SpaceSize.XS}>
 									<div style={{ maxWidth: '360px' }}>
 										<C.Headline order={4} bold textColor={C.Color.Grey10}>
-											Install Library from NPM
+											Connect Library from NPM
 										</C.Headline>
 										<C.Space sizeBottom={C.SpaceSize.XS} />
 										<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
-											Install any package with a React and TypeScript library from NPM.
+											Connect any package with a React and TypeScript library from NPM.
 										</C.Copy>
 										<C.Space sizeBottom={C.SpaceSize.M} />
 										<C.InputButton
@@ -298,7 +277,7 @@ export class LibraryStoreContainer extends React.Component {
 												this.searchValue = e.target.value;
 											}}
 										>
-											Install
+											Connect
 										</C.InputButton>
 									</div>
 								</C.Space>
@@ -308,7 +287,7 @@ export class LibraryStoreContainer extends React.Component {
 									<C.Space size={C.SpaceSize.XS}>
 										<div style={{ maxWidth: '360px' }}>
 											<C.Headline order={4} bold textColor={C.Color.Grey10}>
-												Install Local Library
+												Connect Local Library
 											</C.Headline>
 											<C.Space sizeBottom={C.SpaceSize.XS} />
 											<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
@@ -330,7 +309,7 @@ export class LibraryStoreContainer extends React.Component {
 													})
 												}
 											>
-												Install Local Library
+												Connect Local Library
 											</C.Button>
 											<C.Space sizeBottom={C.SpaceSize.S} />
 											<C.Link

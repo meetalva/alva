@@ -156,13 +156,13 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 					<C.Flex alignItems={C.FlexAlignItems.Center}>
 						<Match value={props.item.state}>
 							<MatchBranch when={Model.LibraryStoreItemState.Listed}>
-								<ActiveButton label="Install" onClick={this.handleButtonClick} />
+								<ActiveButton label="Connect" onClick={this.handleButtonClick} />
 							</MatchBranch>
 							<MatchBranch when={whenHasLibraryAnd(installing)}>
 								<DisabledButton label="Updating …" />
 							</MatchBranch>
 							<MatchBranch when={whenNotHasLibraryAnd(installing)}>
-								<DisabledButton label="Installing …" />
+								<DisabledButton label="Connecting …" />
 							</MatchBranch>
 							<MatchBranch when={whenNotRemoteAnd(installed)}>
 								<ActiveButton label="Update from Disk" onClick={this.handleButtonClick} />

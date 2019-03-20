@@ -30,7 +30,6 @@ export class LibraryStore {
 	@Mobx.observable private project?: Project;
 	@Mobx.observable private internalInstalledOpen: boolean = false;
 	@Mobx.observable private meta: Map<string, any> = new Map();
-	@Mobx.observable private category: string | undefined;
 
 	@Mobx.computed
 	private get items(): LibraryStoreItem[] {
@@ -61,7 +60,6 @@ export class LibraryStore {
 		return this.recommended.map(name =>
 			LibraryStoreItem.fromRecommendation(name, {
 				meta: this.meta,
-				category: 'hello world',
 				getLibraryByPackageName: this.project
 					? this.project.getPatternLibraryByPackageName.bind(this.project)
 					: () => undefined

@@ -232,7 +232,8 @@ export class LibraryStoreContainer extends React.Component {
 						<C.Space sizeBottom={C.SpaceSize.XXL} />
 						<C.Flex>
 							{libraryStore.recommendations.map(item => (
-								<>{console.log(item.category)}
+								<>
+									{item.category}
 									<LibraryStoreItemContainer
 									key={item.id}
 									item={item}

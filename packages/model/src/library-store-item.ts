@@ -225,9 +225,8 @@ export class LibraryStoreItem {
 	}
 
 	public static fromRecommendation(
-		name: { name: string; version: string; },
+		name: { name: string; category: string; version: string; },
 		ctx: {
-			category: string | undefined;
 			meta: Map<string, any>;
 			getLibraryByPackageName(name: string): PatternLibrary | undefined;
 		}
@@ -236,7 +235,7 @@ export class LibraryStoreItem {
 			library: ctx.getLibraryByPackageName(name.name),
 			type: LibraryStoreItemType.Recommended,
 			name: name.name,
-			category: ctx.category || '',
+			category: name.category || '',
 			version: name.version,
 			meta: ctx.meta
 		});
@@ -251,7 +250,7 @@ export class LibraryStoreItem {
 		return new LibraryStoreItem({
 			library,
 			type,
-			category: this.category,
+			category: '',
 			name: library.getName(),
 			version: library.getVersion()
 		});

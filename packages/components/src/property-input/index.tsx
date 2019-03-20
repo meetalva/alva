@@ -44,6 +44,9 @@ export const PropertyInputStyles = css`
 		color: ${Color.Black};
 		box-shadow: 0 0 3px ${Color.BlueAlpha40};
 	}
+	:disabled {
+		color: ${Color.Grey60};
+	}
 `;
 
 const StyledWrapper = styled.div`

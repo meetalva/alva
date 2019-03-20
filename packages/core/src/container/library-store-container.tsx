@@ -4,7 +4,7 @@ import * as MobxReact from 'mobx-react';
 import * as React from 'react';
 import styled from 'styled-components';
 import { WithStore } from '../store';
-import { LibraryStoreItemContainer, LibraryStoreItemSize } from './library-store-item-container';
+import { LibraryStoreItemContainer, LibraryStoreItemState, LibraryStoreItemSize } from './library-store-item-container';
 import { MessageType } from '@meetalva/message';
 import * as uuid from 'uuid';
 import { ExternalLink, ChevronDown } from 'react-feather';
@@ -30,11 +30,10 @@ const DetailsSummary = styled.summary`
 @MobxReact.inject('store')
 @MobxReact.observer
 export class LibraryStoreContainer extends React.Component {
-	@Mobx.observable private searchValue = '';
-
-	@Mobx.observable private submittedValue = '';
-
-	@Mobx.observable private isValidPackage = false;
+	@Mobx.observable private searchValue: string = '';
+	@Mobx.observable private submittedValue: string = '';
+	@Mobx.observable private isValidPackage: boolean = false;
+	@Mobx.observable private itemState: LibraryStoreItemState = LibraryStoreItemState.Default;
 
 	@Mobx.computed
 	private get isValidName() {
@@ -99,29 +98,33 @@ export class LibraryStoreContainer extends React.Component {
 			this.checkPackage(searchValue);
 		});
 
-		Mobx.autorun(() => {
+		Mobx.autorun(async () => {
 			if (this.submittedValue && this.isValidPackage) {
 				const fragments = this.submittedValue.split('@');
 				const name = (fragments.length >= 3 ? fragments.slice(0, -1) : fragments).join('@');
 				const existing = store.libraryStore.getItemByPackageName(name);
 
+				this.itemState = LibraryStoreItemState.Progress;
+
 				if (existing) {
-					existing.connect(store.getApp(), {
+					await existing.connect(store.getApp(), {
 						npmId: this.submittedValue,
 						project: store.getProject(),
 						installType: PatternLibraryInstallType.Remote
 					});
 				} else {
-					app.send({
+					await app.transaction({
 						id: uuid.v4(),
 						type: MT.ConnectNpmPatternLibraryRequest,
 						payload: {
 							npmId: this.submittedValue,
 							projectId: store.getProject().getId()
 						}
-					});
+					}, { type: MT.ConnectPatternLibraryResponse })
+
 				}
 
+				this.itemState = LibraryStoreItemState.Done;
 				this.submittedValue = '';
 			}
 		});
@@ -133,8 +136,24 @@ export class LibraryStoreContainer extends React.Component {
 		const isValidPackage = this.isValidPackage;
 		const libraryStore = store.libraryStore;
 
+		const buttonState = () => {
+			switch (this.itemState) {
+				case LibraryStoreItemState.Progress:
+					return C.ButtonState.Progress
+				case LibraryStoreItemState.Done:
+					return C.ButtonState.Done
+				case LibraryStoreItemState.Default:
+				default:
+					return C.ButtonState.Default
+			}
+		}
+
+
 		return (
-			<div style={{ overflow: 'scroll', userSelect: 'none' }}>
+			<div style={{
+				overflow: 'scroll',
+				userSelect: 'none'
+			}}>
 				<div
 					style={{
 						width: '90%',
@@ -290,12 +309,17 @@ export class LibraryStoreContainer extends React.Component {
 											placeholder="Package Name"
 											value={this.searchValue}
 											isValid={() => isValidPackage}
+											state={buttonState()}
+											disabled={this.itemState === LibraryStoreItemState.Progress}
 											onSubmit={e => {
 												e.preventDefault();
-												this.submittedValue = this.searchValue;
+												if (this.itemState !== LibraryStoreItemState.Progress) {
+													this.submittedValue = this.searchValue;
+												}
 											}}
 											onChange={e => {
 												this.searchValue = e.target.value;
+												this.itemState = LibraryStoreItemState.Default;
 											}}
 										>
 											Install

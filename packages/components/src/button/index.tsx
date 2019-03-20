@@ -2,6 +2,7 @@ import { Color } from '../colors';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
+import { Check } from 'react-feather';
 
 export interface ButtonProps {
 	children?: React.ReactNode;
@@ -21,6 +22,7 @@ export interface ButtonProps {
 	style?: React.CSSProperties;
 	className?: string;
 	type?: 'submit' | 'button';
+	state?: ButtonState;
 }
 
 export enum ButtonOrder {
@@ -38,6 +40,12 @@ export enum ButtonSize {
 	Large,
 	Medium,
 	Small
+}
+
+export enum ButtonState {
+	Default,
+	Progress,
+	Done
 }
 
 const BUTTON_FONT_SIZE = (props: ButtonProps): number => {
@@ -80,6 +88,7 @@ const StyledBaseButton = styled.button`
 	border: none;
 	outline: none;
 	user-select: none;
+	position: relative;
 `;
 
 const DecoratedBaseButton = styled(StyledBaseButton)`
@@ -115,6 +124,8 @@ const StyledPrimaryButton =
 	background: ${props => (props.inverted ? Color.White : primaryFill(props))};
 	border-color: transparent;
 	color: ${props => (props.inverted ? primaryFill(props) : Color.White)};
+	${props => props.state && 'color: transparent;'}
+	transition: color 0.1s;
 
 	&:active {
 		background: ${props => (props.inverted ? '' : primaryFillActive(props))};
@@ -199,8 +210,73 @@ export const Button: React.StatelessComponent<ButtonProps> = props => {
 			size={props.size}
 			style={{ color: props.color, ...props.style }}
 			color={props.color}
+			state={props.state}
 		>
 			{props.children}
+			{props.state === ButtonState.Progress && <Spinner />}
+			{props.state === ButtonState.Done && <SpinnerCheck />}
 		</Component>
 	);
 };
+
+const StyledWrapper = styled.div`
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+
+const StyledSpinner = styled.div`
+	width: 15px;
+	height: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	animation: spin 2s linear infinite;
+	@keyframes spin {
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+`;
+
+const StyledInnerSpinner = styled.div`
+	height: 12px;
+	width: 12px;
+
+	border-radius: 50%;
+	border: 1.5px solid ${Color.White};
+	border-left-color: transparent;
+
+	animation: spin 1.5s ease infinite;
+`;
+
+export const Spinner: React.StatelessComponent = () => (
+	<StyledWrapper>
+		<StyledSpinner>
+			<StyledInnerSpinner />
+		</StyledSpinner>
+	</StyledWrapper>
+);
+
+const StyledSpinnerCheck = styled.div`
+	height: 12px;
+	width: 12px;
+
+	border-radius: 50%;
+	border: 1.5px solid ${Color.White};
+	border-left-color: transparent;
+
+	animation: spin 1.5s ease infinite;
+`;
+
+export const SpinnerCheck: React.StatelessComponent = () => (
+	<StyledWrapper>
+		<Check size={18} color={Color.White} strokeWidth={3} />
+	</StyledWrapper>
+);

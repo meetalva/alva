@@ -21,6 +21,12 @@ export enum LibraryStoreItemSize {
 	Large
 }
 
+export enum LibraryStoreItemState {
+	Default,
+	Progress,
+	Done
+}
+
 interface ActiveButtonProps {
 	label: string;
 	order?: C.ButtonOrder;

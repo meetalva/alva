@@ -3,13 +3,6 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '@meetalva/model';
 import * as React from 'react';
 import { WithStore } from '../store';
-import {
-	ButtonSize,
-	LibraryBoxState,
-	LibraryBoxSize,
-	Spinner,
-	IconSize
-} from '@meetalva/components';
 import { LibraryStoreItem } from '@meetalva/model';
 import { Match, MatchBranch } from './match';
 import { PatternLibraryInstallType } from '@meetalva/types';
@@ -47,7 +40,7 @@ const ActiveButton: React.SFC<ActiveButtonProps> = props => {
 	return (
 		<C.Button
 			order={props.order}
-			size={ButtonSize.Medium}
+			size={C.ButtonSize.Medium}
 			inverted
 			color={C.Color.Grey50}
 			onClick={props.onClick}
@@ -61,7 +54,7 @@ const DisabledButton: React.SFC<DisabledButtonProps> = props => {
 	return (
 		<C.Button
 			order={C.ButtonOrder.Secondary}
-			size={ButtonSize.Medium}
+			size={C.ButtonSize.Medium}
 			color={C.Color.White}
 			disabled
 		>
@@ -114,11 +107,13 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 
 		const boxState =
 			props.item.state === Model.LibraryStoreItemState.Installing
-				? LibraryBoxState.Progress
-				: LibraryBoxState.Idle;
+				? C.LibraryBoxState.Progress
+				: C.LibraryBoxState.Idle;
 
 		const boxSize =
-			props.size === LibraryStoreItemSize.Large ? LibraryBoxSize.Large : LibraryBoxSize.Medium;
+			props.size === LibraryStoreItemSize.Large
+				? C.LibraryBoxSize.Large
+				: C.LibraryBoxSize.Medium;
 
 		return (
 			<C.LibraryBox
@@ -172,12 +167,12 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 							</MatchBranch>
 							<MatchBranch when={whenHasLibraryAnd(installing)}>
 								<div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
-									<Spinner size={IconSize.M} />
+									<C.Spinner size={C.IconSize.M} />
 								</div>
 							</MatchBranch>
 							<MatchBranch when={whenNotHasLibraryAnd(installing)}>
 								<div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
-									<Spinner size={IconSize.M} />
+									<C.Spinner size={C.IconSize.M} />
 								</div>
 							</MatchBranch>
 							<MatchBranch when={whenNotRemoteAnd(installed)}>

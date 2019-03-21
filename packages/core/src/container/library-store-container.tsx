@@ -12,6 +12,7 @@ import * as T from '@meetalva/types';
 import { MessageType as MT } from '@meetalva/message';
 import { PatternLibraryInstallType } from '@meetalva/types';
 import { When } from './when';
+import { animateScroll } from 'react-scroll';
 
 const validatePackageName = require('validate-npm-package-name');
 
@@ -126,6 +127,13 @@ export class LibraryStoreContainer extends React.Component {
 
 				this.itemState = LibraryStoreItemState.Done;
 				this.submittedValue = '';
+
+				store.libraryStore.installedOpen = true;
+				animateScroll.scrollToTop({
+					duration: 200,
+					delay: 500,
+					containerId: 'store'
+				})
 			}
 		});
 	}
@@ -150,7 +158,7 @@ export class LibraryStoreContainer extends React.Component {
 
 
 		return (
-			<div style={{
+			<div id="store" style={{
 				overflow: 'scroll',
 				userSelect: 'none'
 			}}>
@@ -192,12 +200,12 @@ export class LibraryStoreContainer extends React.Component {
 											<C.Space sizeBottom={C.SpaceSize.XS} />
 											<When mayToggle={libraryStore.updateCount === 0}>
 												<C.Flex style={{ alignItems: 'center' }}>
-														<C.Copy textColor={C.Color.Grey36}>
-															Show {libraryStore.withLibrary.length} installed{' '}
-															{libraryStore.withLibrary.length === 1
-																? 'library'
-																: 'libraries'}
-														</C.Copy>
+													<C.Copy textColor={C.Color.Grey36}>
+														Show {libraryStore.withLibrary.length} installed{' '}
+														{libraryStore.withLibrary.length === 1
+															? 'library'
+															: 'libraries'}
+													</C.Copy>
 													<C.Space sizeRight={C.SpaceSize.XXS} />
 													<ChevronDown color={C.Color.Grey36} size={C.IconSize.XS} />
 												</C.Flex>

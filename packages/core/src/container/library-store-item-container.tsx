@@ -17,8 +17,10 @@ export interface LibraryStoreItemContainerProps {
 }
 
 export enum LibraryStoreItemSize {
-	Medium,
-	Large
+	Hero,
+	Featured,
+	Default,
+	Installed
 }
 
 interface ActiveButtonProps {
@@ -105,9 +107,20 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				? LibraryBoxState.Progress
 				: LibraryBoxState.Idle;
 
-		const boxSize =
-			props.size === LibraryStoreItemSize.Large ? LibraryBoxSize.Large : LibraryBoxSize.Medium;
-
+		const boxSize = () => {
+			switch (props.size) {
+				case LibraryStoreItemSize.Hero:
+					return LibraryBoxSize.Hero;
+				case LibraryStoreItemSize.Featured:
+					return LibraryBoxSize.Featured;
+				case LibraryStoreItemSize.Default:
+					return LibraryBoxSize.Default;
+				case LibraryStoreItemSize.Installed:
+					return LibraryBoxSize.Installed;
+				default:
+					return LibraryBoxSize.Default;
+			}
+		};
 		return (
 			<C.LibraryBox
 				key={props.item.id}
@@ -134,7 +147,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 						) : null}
 					</C.Flex>
 				}
-				size={boxSize}
+				size={boxSize()}
 				details={
 					props.item.homepage && (
 						<C.LinkIcon

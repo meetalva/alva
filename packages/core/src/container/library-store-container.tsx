@@ -12,6 +12,7 @@ import * as T from '@meetalva/types';
 import { MessageType as MT } from '@meetalva/message';
 import { PatternLibraryInstallType } from '@meetalva/types';
 import { When } from './when';
+import { partition } from 'lodash';
 
 const validatePackageName = require('validate-npm-package-name');
 
@@ -133,6 +134,9 @@ export class LibraryStoreContainer extends React.Component {
 		const isValidPackage = this.isValidPackage;
 		const libraryStore = store.libraryStore;
 
+		const [designSystemPackages, otherPackages] = partition(libraryStore.recommendations, {'category': 'design-system'});
+
+
 		return (
 			<div style={{ overflow: 'scroll', userSelect: 'none' }}>
 				<div
@@ -184,7 +188,7 @@ export class LibraryStoreContainer extends React.Component {
 								<LibraryStoreItemContainer
 									key={item.id}
 									item={item}
-									size={LibraryStoreItemSize.Medium}
+									size={LibraryStoreItemSize.Installed}
 								/>
 							))}
 						</C.Flex>
@@ -224,22 +228,36 @@ export class LibraryStoreContainer extends React.Component {
 								</C.Headline>
 								<C.Space sizeBottom={C.SpaceSize.M} />
 								<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
-									Connect interactive design systems and packages with your prototype
+									Connect interactive design systems and components with your prototype
 								</C.Copy>
 							</div>
 						</C.Space>
 
 						<C.Space sizeBottom={C.SpaceSize.XXL} />
+
 						<C.Flex>
-							{libraryStore.recommendations.map(item => (
-								<>
-									{item.category}
-									<LibraryStoreItemContainer
+							{designSystemPackages.map(item => (
+								<LibraryStoreItemContainer
 									key={item.id}
 									item={item}
-									size={LibraryStoreItemSize.Large}
+									size={LibraryStoreItemSize.Featured}
 								/>
-								</>
+							))}
+						</C.Flex>
+						<C.Space sizeBottom={C.SpaceSize.XXXL} />
+						<C.Space size={C.SpaceSize.XS}>
+							<C.Headline order={3} bold textColor={C.Color.Grey10}>
+								Components
+							</C.Headline>
+						</C.Space>
+						<C.Space sizeBottom={C.SpaceSize.L} />
+						<C.Flex>
+							{otherPackages.map(item => (
+								<LibraryStoreItemContainer
+									key={item.id}
+									item={item}
+									size={LibraryStoreItemSize.Default}
+								/>
 							))}
 						</C.Flex>
 						<C.Space sizeTop={C.SpaceSize.XXXL} />

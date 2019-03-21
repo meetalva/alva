@@ -15,6 +15,11 @@ export class LibraryStore {
 			version: 'latest'
 		},
 		{
+			name: '@meetalva/unsplash',
+			category: 'media',
+			version: 'latest'
+		},
+		{
 			name: '@meetalva/video-player',
 			version: 'latest'
 		},

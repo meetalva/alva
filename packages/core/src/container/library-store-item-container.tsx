@@ -161,7 +161,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 								})
 							}
 						>
-							Learn more
+							Docs
 						</C.LinkIcon>
 					)
 				}

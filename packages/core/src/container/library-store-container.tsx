@@ -179,11 +179,7 @@ export class LibraryStoreContainer extends React.Component {
 							</C.Space>
 						</DetailsSummary>
 						<C.Space sizeBottom={C.SpaceSize.XS} />
-						<C.Flex
-							style={{
-								flexWrap: 'wrap'
-							}}
-						>
+						<C.Flex flexWrap={true} >
 							{(libraryStore.updateCount === 0 ? libraryStore.withLibrary : libraryStore.withUpdate).map(item => (
 								<LibraryStoreItemContainer
 									key={item.id}
@@ -235,7 +231,7 @@ export class LibraryStoreContainer extends React.Component {
 
 						<C.Space sizeBottom={C.SpaceSize.XXL} />
 
-						<C.Flex>
+						<C.Flex flexWrap={true}>
 							{designSystemPackages.map(item => (
 								<LibraryStoreItemContainer
 									key={item.id}
@@ -251,7 +247,7 @@ export class LibraryStoreContainer extends React.Component {
 							</C.Headline>
 						</C.Space>
 						<C.Space sizeBottom={C.SpaceSize.L} />
-						<C.Flex>
+						<C.Flex flexWrap={true}>
 							{otherPackages.map(item => (
 								<LibraryStoreItemContainer
 									key={item.id}

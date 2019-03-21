@@ -1,5 +1,4 @@
 import { Color } from '../colors';
-import { fonts } from '../fonts';
 import * as React from 'react';
 import styled from 'styled-components';
 import { Copy, CopySize } from '../copy';

@@ -7,6 +7,7 @@ import { Headline } from '../headline';
 import { Copy, CopySize } from '../copy';
 import { getSpace, SpaceSize, Space } from '../space';
 import { LibraryImage } from './library-image';
+import * as ColorTool from 'color';
 
 export enum LibraryBoxState {
 	Idle,
@@ -37,7 +38,8 @@ const StyledBox =
 	width: 348px;
 	background: ${props => (props.color ? props.color : Color.Grey20)};
 	border-radius: 6px;
-	box-shadow: 0 0 24px 0 ${Color.BlackAlpha15};
+	box-shadow: 0 0 24px 0 ${props =>
+		props.color ? new ColorTool(props.color).fade(0.4).toString() : Color.BlackAlpha15};
 	color: ${Color.White};
 	text-align: left;
 	margin: ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.XS)}px;

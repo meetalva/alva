@@ -110,38 +110,6 @@ const StyledTop = styled.div`
 	padding: ${getSpace(SpaceSize.L)}px ${getSpace(SpaceSize.XL)}px 0;
 `;
 
-const Loader = styled.div`
-	width: 100%;
-	height: 2px;
-	overflow: hidden;
-	position: absolute;
-	left: 0;
-	top: 0;
-
-	&:after {
-		content: '';
-		display: block;
-		width: 20px;
-		height: 100%;
-		background: ${Color.White};
-		animation: load 1.5s infinite ease;
-		transform: scaleX(1);
-		transform-origin: 0 0;
-	}
-
-	@keyframes load {
-		0% {
-			margin-left: -20px;
-		}
-		50% {
-			transform: scaleX(5);
-		}
-		100% {
-			margin-left: 100%;
-		}
-	}
-`;
-
 const StyledBottom = styled.div`
 	position: relative;
 	padding: 0 ${getSpace(SpaceSize.XL)}px;
@@ -165,7 +133,6 @@ export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JS
 				<Space sizeBottom={SpaceSize.S} />
 			</StyledTop>
 			<StyledBottom {...props}>
-				{props.state === LibraryBoxState.Progress && <Loader {...props} />}
 				<Space sizeTop={SpaceSize.L} />
 				<StyledInstallContainer>
 					{props.install}

@@ -44,6 +44,7 @@ export * from './property-reference';
 export * from './search';
 export * from './select';
 export * from './space';
+export * from './spinner';
 export * from './splash-screen';
 export * from './tab';
 export * from './tab-switch';

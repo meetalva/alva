@@ -3,6 +3,8 @@ import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 import { Check } from 'react-feather';
+import { Spinner } from '../spinner';
+import { IconSize } from '../icons';
 
 export interface ButtonProps {
 	children?: React.ReactNode;
@@ -176,6 +178,17 @@ const StyledTertiaryButton =
 	}
 `;
 
+const StyledWrapper = styled.div`
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+
 export type AnyButton =
 	| typeof StyledPrimaryButton
 	| typeof StyledTertiaryButton
@@ -213,70 +226,16 @@ export const Button: React.StatelessComponent<ButtonProps> = props => {
 			state={props.state}
 		>
 			{props.children}
-			{props.state === ButtonState.Progress && <Spinner />}
-			{props.state === ButtonState.Done && <SpinnerCheck />}
+			{props.state === ButtonState.Progress && (
+				<StyledWrapper>
+					<Spinner size={IconSize.XS} />
+				</StyledWrapper>
+			)}
+			{props.state === ButtonState.Done && (
+				<StyledWrapper>
+					<Check size={18} color={Color.White} strokeWidth={3} />
+				</StyledWrapper>
+			)}
 		</Component>
 	);
 };
-
-const StyledWrapper = styled.div`
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	left: 0;
-	top: 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-`;
-
-const StyledSpinner = styled.div`
-	width: 15px;
-	height: 15px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	animation: spin 2s linear infinite;
-	@keyframes spin {
-		100% {
-			transform: rotate(360deg);
-		}
-	}
-`;
-
-const StyledInnerSpinner = styled.div`
-	height: 12px;
-	width: 12px;
-
-	border-radius: 50%;
-	border: 1.5px solid ${Color.White};
-	border-left-color: transparent;
-
-	animation: spin 1.5s ease infinite;
-`;
-
-export const Spinner: React.StatelessComponent = () => (
-	<StyledWrapper>
-		<StyledSpinner>
-			<StyledInnerSpinner />
-		</StyledSpinner>
-	</StyledWrapper>
-);
-
-const StyledSpinnerCheck = styled.div`
-	height: 12px;
-	width: 12px;
-
-	border-radius: 50%;
-	border: 1.5px solid ${Color.White};
-	border-left-color: transparent;
-
-	animation: spin 1.5s ease infinite;
-`;
-
-export const SpinnerCheck: React.StatelessComponent = () => (
-	<StyledWrapper>
-		<Check size={18} color={Color.White} strokeWidth={3} />
-	</StyledWrapper>
-);

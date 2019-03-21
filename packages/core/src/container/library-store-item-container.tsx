@@ -3,7 +3,13 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '@meetalva/model';
 import * as React from 'react';
 import { WithStore } from '../store';
-import { ButtonSize, LibraryBoxState, LibraryBoxSize } from '@meetalva/components';
+import {
+	ButtonSize,
+	LibraryBoxState,
+	LibraryBoxSize,
+	Spinner,
+	IconSize
+} from '@meetalva/components';
 import { LibraryStoreItem } from '@meetalva/model';
 import { Match, MatchBranch } from './match';
 import { PatternLibraryInstallType } from '@meetalva/types';
@@ -165,10 +171,14 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 								<ActiveButton label="Install" onClick={this.handleButtonClick} />
 							</MatchBranch>
 							<MatchBranch when={whenHasLibraryAnd(installing)}>
-								<DisabledButton label="Updating …" />
+								<div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
+									<Spinner size={IconSize.M} />
+								</div>
 							</MatchBranch>
 							<MatchBranch when={whenNotHasLibraryAnd(installing)}>
-								<DisabledButton label="Installing …" />
+								<div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
+									<Spinner size={IconSize.M} />
+								</div>
 							</MatchBranch>
 							<MatchBranch when={whenNotRemoteAnd(installed)}>
 								<ActiveButton label="Update from Disk" onClick={this.handleButtonClick} />

@@ -42,8 +42,36 @@ const StyledBox =
 	text-align: left;
 	margin: ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.XS)}px;
 	user-select: none;
-	transition: box-shadow 0.2s;
 	overflow: hidden;
+
+	animation: show .2s ease-out both;
+
+	:nth-child(2) {
+		animation-delay: 0.05s;
+	}
+	:nth-child(3) {
+		animation-delay: 0.1s;
+	}
+	:nth-child(4) {
+		animation-delay: 0.15s;
+	}
+	:nth-child(5) {
+		animation-delay: 0.2s;
+	}
+	:nth-child(6) {
+		animation-delay: 0.25s;
+	}
+
+	@keyframes show {
+		from {
+			transform: scale(.95);
+			opacity: 0;
+		}
+		to {
+			transform: scale(1)
+			opacity: 1 !important;
+		}
+	}
 `;
 
 const IMAGE = (props: LibraryBoxProps) => (props.image ? props.image : toDataUrl(<LibraryImage />));

@@ -13,19 +13,29 @@ import { MessageType as MT } from '@meetalva/message';
 import { PatternLibraryInstallType } from '@meetalva/types';
 import { When } from './when';
 import { animateScroll } from 'react-scroll';
+import { FlexJustifyContent } from '@meetalva/components';
 
 const validatePackageName = require('validate-npm-package-name');
 
 
-const Details = styled.details<{ mayToggle: boolean; }>`
-	${props => props.mayToggle ? '' : 'appearance: none;'}
-	max-height: 40px;
-	transition: max-height 120ms ease-out;
-	will-change: height;
+
+const DetailsContainer = styled.div<{ open: boolean; }>`
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 5;
+	background: ${C.Color.Grey97};
+	transition: max-height 100ms ease-out;
+	max-height: 88px;
 
 	&[open] {
-		max-height: 520px;
+		max-height: 600px;
 	}
+`;
+
+const Details = styled.details<{ mayToggle: boolean; }>`
+	${props => props.mayToggle ? '' : 'appearance: none;'}
 `;
 
 const DetailsSummary = styled.summary`
@@ -39,6 +49,12 @@ const DetailsSummary = styled.summary`
 		display: block;
 	}
 `;
+
+const InstalledPackagesContainer = styled.div`
+	display: flex;
+	flex-wrap: wrap;
+`;
+
 
 @MobxReact.inject('store')
 @MobxReact.observer
@@ -173,12 +189,13 @@ export class LibraryStoreContainer extends React.Component {
 
 		return (
 			<div id="store" style={{
+				position: 'relative',
 				overflow: 'scroll',
 				userSelect: 'none',
 				height: '100%',
 				background: C.Color.White
 			}}>
-				<div style={{ background: C.Color.Grey97 }}>
+				<DetailsContainer open={libraryStore.installedOpen}>
 					<div
 						style={{
 							width: '90%',
@@ -242,11 +259,7 @@ export class LibraryStoreContainer extends React.Component {
 								</C.Space>
 							</DetailsSummary>
 							<C.Space sizeBottom={C.SpaceSize.XS} />
-							<C.Flex
-								style={{
-									flexWrap: 'wrap'
-								}}
-							>
+							<InstalledPackagesContainer>
 								{(libraryStore.updateCount === 0 ? libraryStore.withLibrary : libraryStore.withUpdate).map(item => (
 									<LibraryStoreItemContainer
 										key={item.id}
@@ -254,7 +267,7 @@ export class LibraryStoreContainer extends React.Component {
 										size={LibraryStoreItemSize.Medium}
 									/>
 								))}
-							</C.Flex>
+							</InstalledPackagesContainer>
 							{this.online && (
 								<C.Space size={C.SpaceSize.XS}>
 									<C.LinkIcon
@@ -270,7 +283,7 @@ export class LibraryStoreContainer extends React.Component {
 							<C.Space sizeBottom={C.SpaceSize.XS} />
 						</Details>
 					</div>
-				</div>
+				</DetailsContainer>
 
 				<div
 					style={{
@@ -283,7 +296,7 @@ export class LibraryStoreContainer extends React.Component {
 							width: '90%',
 							maxWidth: '1080px',
 							margin: '0 auto',
-							padding: `${C.getSpace(C.SpaceSize.XXXL + C.SpaceSize.L)}px 0`
+							padding: `${C.getSpace(C.SpaceSize.XXXL * 3)}px 0 ${C.getSpace(C.SpaceSize.XXXL + C.SpaceSize.L)}px 0`
 						}}
 					>
 						{this.online ? (

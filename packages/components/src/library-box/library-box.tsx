@@ -77,7 +77,7 @@ const StyledDetails = styled.div`
 			? '300'
 			: props.size === LibraryBoxSize.Featured
 				? '200'
-				: '180'}px;
+				: '185'}px;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;

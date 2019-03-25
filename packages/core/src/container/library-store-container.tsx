@@ -243,8 +243,12 @@ export class LibraryStoreContainer extends React.Component {
 						<C.Space sizeBottom={C.SpaceSize.XXXL} />
 						<C.Space size={C.SpaceSize.XS}>
 							<C.Headline order={3} bold textColor={C.Color.Grey10}>
-								Components
+								Packages
 							</C.Headline>
+							<C.Space sizeBottom={C.SpaceSize.M} />
+								<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
+									Ready-to-use interactive code components
+								</C.Copy>
 						</C.Space>
 						<C.Space sizeBottom={C.SpaceSize.L} />
 						<C.Flex flexWrap={true}>

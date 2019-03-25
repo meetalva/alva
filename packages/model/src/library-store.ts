@@ -16,7 +16,6 @@ export class LibraryStore {
 		},
 		{
 			name: '@meetalva/unsplash',
-			category: 'media',
 			version: 'latest'
 		},
 		{

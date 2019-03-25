@@ -16,6 +16,18 @@ import { animateScroll } from 'react-scroll';
 
 const validatePackageName = require('validate-npm-package-name');
 
+
+const Details = styled.details<{ mayToggle: boolean; }>`
+	${props => props.mayToggle ? '' : 'appearance: none;'}
+	max-height: 40px;
+	transition: max-height 120ms ease-out;
+	will-change: height;
+
+	&[open] {
+		max-height: 520px;
+	}
+`;
+
 const DetailsSummary = styled.summary`
 	outline: none;
 
@@ -435,7 +447,3 @@ export class LibraryStoreContainer extends React.Component {
 		);
 	}
 }
-
-const Details = styled.details<{ mayToggle: boolean; }>`
-	${props => props.mayToggle ? '' : 'appearance: none;'}
-`;

@@ -95,7 +95,6 @@ export class ChromeSwitch extends React.Component {
 										container: (base: any) => ({
 											...base,
 											display: 'flex',
-											position: 'relative',
 											zIndex: 20
 										}),
 										menu: (base: any) => ({

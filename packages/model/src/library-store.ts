@@ -25,6 +25,10 @@ export class LibraryStore {
 		{
 			name: '@meetalva/maps',
 			version: 'latest'
+		},
+		{
+			name: '@meetalva/music-player',
+			version: 'latest'
 		}
 	];
 

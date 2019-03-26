@@ -15,6 +15,14 @@ export class LibraryStore {
 			version: 'latest'
 		},
 		{
+			name: '@meetalva/feather-icons',
+			version: 'latest'
+		},
+    {
+			name: '@meetalva/unsplash',
+			version: 'latest'
+		},
+		{
 			name: '@meetalva/video-player',
 			version: 'latest'
 		},

@@ -1,9 +1,12 @@
 import * as Types from '@meetalva/types';
+import { Element } from '../element';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
+import { ElementCandidate } from '@meetalva/types';
 
 export interface PatternSlotInit {
 	contextId: string;
+	defaultValue: Types.ElementCandidate | undefined;
 	displayName: string;
 	description: string;
 	example: string;
@@ -19,6 +22,7 @@ export class PatternSlot {
 
 	private contextId: string;
 	private displayName: string;
+	private defaultValue: Types.ElementCandidate | undefined;
 	private description: string;
 	private example: string;
 	private hidden: boolean;
@@ -31,6 +35,7 @@ export class PatternSlot {
 		this.type = init.type;
 		this.id = init.id;
 		this.displayName = init.displayName;
+		this.defaultValue = init.defaultValue;
 		this.description = init.description;
 		this.example = init.example;
 		this.hidden = init.hidden;
@@ -44,6 +49,7 @@ export class PatternSlot {
 		return new PatternSlot({
 			contextId: serialized.contextId,
 			description: serialized.description,
+			defaultValue: serialized.defaultValue,
 			displayName: serialized.label,
 			example: serialized.example,
 			hidden: serialized.hidden,
@@ -59,6 +65,7 @@ export class PatternSlot {
 			contextId: this.contextId,
 			description: this.description,
 			displayName: this.displayName,
+			defaultValue: this.defaultValue,
 			example: this.example,
 			hidden: this.hidden,
 			id: uuid.v4(),
@@ -74,6 +81,10 @@ export class PatternSlot {
 
 	public getContextId(): string {
 		return this.contextId;
+	}
+
+	public getDefaultValue(): ElementCandidate | undefined {
+		return this.defaultValue;
 	}
 
 	public getHidden(): boolean {
@@ -105,6 +116,7 @@ export class PatternSlot {
 			model: this.model,
 			contextId: this.contextId,
 			description: this.description,
+			defaultValue: this.defaultValue,
 			example: this.example,
 			hidden: this.hidden,
 			label: this.displayName,

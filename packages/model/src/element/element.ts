@@ -609,6 +609,18 @@ export class Element {
 		return this.placeholderHighlighted;
 	}
 
+	public getPropertyByContextId(contextId: string): ElementProperty | undefined {
+		return this.properties.find(p => {
+			const patternProp = p.getPatternProperty();
+
+			if (!patternProp) {
+				return false;
+			}
+
+			return patternProp.getContextId() === contextId;
+		});
+	}
+
 	public getProperties(): ElementProperty[] {
 		return this.properties;
 	}

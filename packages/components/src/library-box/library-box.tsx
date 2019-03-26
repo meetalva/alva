@@ -46,23 +46,27 @@ const StyledBox =
 	user-select: none;
 	overflow: hidden;
 
-	animation: show .2s ease-out both;
+	${props =>
+		props.size === LibraryBoxSize.Medium &&
+		`
+		animation: show .2s ease-out both;
 
-	:nth-child(2) {
-		animation-delay: 0.05s;
-	}
-	:nth-child(3) {
-		animation-delay: 0.1s;
-	}
-	:nth-child(4) {
-		animation-delay: 0.15s;
-	}
-	:nth-child(5) {
-		animation-delay: 0.2s;
-	}
-	:nth-child(6) {
-		animation-delay: 0.25s;
-	}
+		:nth-child(2) {
+			animation-delay: 0.05s;
+		}
+		:nth-child(3) {
+			animation-delay: 0.1s;
+		}
+		:nth-child(4) {
+			animation-delay: 0.15s;
+		}
+		:nth-child(5) {
+			animation-delay: 0.2s;
+		}
+		:nth-child(6) {
+			animation-delay: 0.25s;
+		}
+	`}
 
 	@keyframes show {
 		from {

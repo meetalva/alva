@@ -33,7 +33,7 @@ const StyledSpinner = styled.div`
 
 	animation: spin 2s linear infinite;
 	@keyframes spin {
-		100% {
+		to {
 			transform: rotate(360deg);
 		}
 	}

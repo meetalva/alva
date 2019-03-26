@@ -126,8 +126,24 @@ const StyledPrimaryButton =
 	background: ${props => (props.inverted ? Color.White : primaryFill(props))};
 	border-color: transparent;
 	color: ${props => (props.inverted ? primaryFill(props) : Color.White)};
-	${props => props.state && 'color: transparent;'}
+	${props =>
+		(props.state === ButtonState.Progress || props.state === ButtonState.Done) &&
+		'color: transparent;'}
 	transition: color 0.1s;
+
+	${props =>
+		props.state === ButtonState.Done &&
+		`
+		animation: showText .1s 1.7s ease both;
+		@keyframes showText {
+			from {
+				color: transparent;
+			}
+			to {
+				color: ${props.inverted ? primaryFill(props) : Color.White};
+			}
+		}
+	`}
 
 	&:active {
 		background: ${props => (props.inverted ? '' : primaryFillActive(props))};
@@ -206,6 +222,28 @@ const getComponent = (props: ButtonProps): AnyButton => {
 	}
 };
 
+const StyledDoneWrapper = styled(StyledWrapper)`
+	animation: checkAnimation 1.5s 0.1s ease both;
+	@keyframes checkAnimation {
+		0% {
+			transform: scale(0.5);
+			opacity: 0;
+		}
+		10% {
+			transform: scale(1);
+			opacity: 1;
+		}
+		90% {
+			transform: scale(1);
+			opacity: 1;
+		}
+		100% {
+			transform: scale(0.5);
+			opacity: 0;
+		}
+	}
+`;
+
 export const Button: React.StatelessComponent<ButtonProps> = props => {
 	const Component = getComponent(props) as any;
 
@@ -232,9 +270,9 @@ export const Button: React.StatelessComponent<ButtonProps> = props => {
 				</StyledWrapper>
 			)}
 			{props.state === ButtonState.Done && (
-				<StyledWrapper>
+				<StyledDoneWrapper>
 					<Check size={18} color={Color.White} strokeWidth={3} />
-				</StyledWrapper>
+				</StyledDoneWrapper>
 			)}
 		</Component>
 	);

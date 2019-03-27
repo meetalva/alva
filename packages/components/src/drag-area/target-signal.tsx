@@ -20,7 +20,7 @@ const StyledTargetSignal = styled.div`
 	margin-top: -${getSpace(SpaceSize.XS)}px;
 	margin-bottom: -${getSpace(SpaceSize.XS)}px;
 	left: ${getSpace(SpaceSize.L)}px;
-	z-index: 10;
+	z-index: 3;
 
 	&::before {
 		content: '';

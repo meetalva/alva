@@ -94,7 +94,8 @@ export class ChromeSwitch extends React.Component {
 									styles={{
 										container: (base: any) => ({
 											...base,
-											display: 'flex'
+											display: 'flex',
+											zIndex: 20
 										}),
 										menu: (base: any) => ({
 											...base,

@@ -79,6 +79,7 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 	public toJSON(): Types.SerializedPatternUnknownProperty {
 		return {
 			model: this.model,
+			control: this.control,
 			contextId: this.contextId,
 			defaultValue: this.defaultValue,
 			description: this.description,
@@ -91,13 +92,13 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type,
-			typeText: this.typeText,
-			control: this.control
+			typeText: this.typeText
 		};
 	}
 
 	public update(prop: PatternUnknownProperty): void {
 		this.contextId = prop.getContextId();
+		this.control = prop.getControl();
 		this.description = prop.getDescription();
 		this.defaultValue = prop.getDefaultValue();
 		this.example = prop.getExample();

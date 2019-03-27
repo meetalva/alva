@@ -81,6 +81,7 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 		return {
 			model: this.model,
 			contextId: this.contextId,
+			control: this.control,
 			defaultValue: this.defaultValue,
 			description: this.description,
 			example: this.example || '',
@@ -91,13 +92,13 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 			label: this.label,
 			propertyName: this.propertyName,
 			required: this.required,
-			type: this.type,
-			control: this.control
+			type: this.type
 		};
 	}
 
 	public update(prop: PatternStringProperty): void {
 		this.contextId = prop.getContextId();
+		this.control = prop.getControl();
 		this.description = prop.getDescription();
 		this.defaultValue = prop.getDefaultValue();
 		this.example = prop.getExample();

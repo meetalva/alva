@@ -12,8 +12,8 @@ import { PropertyItemEnum } from './property-item-enum';
 import { PropertyItemEvent } from './property-item-event';
 import { PropertyItemNumber } from './property-item-number';
 import { PropertyItemString } from './property-item-string';
+import { PropertyItemButtonGroup } from './property-item-button-group';
 import { PropertyItemColor } from './property-item-color';
-import { PropertyItemRadioGroup } from './property-item-radio-group';
 import { ReferenceSelect, IconPosition } from './reference-select';
 import { PropertyUnknownEditorSkeleton } from './property-unknown-editor-skeleton';
 
@@ -62,8 +62,8 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 			}
 			case Types.PatternPropertyType.Enum: {
 				const inputType = patternProperty.getInputType();
-				return inputType === Types.PatternPropertyInputType.RadioGroup ? (
-					<PropertyItemRadioGroup key={id} property={property} />
+				return inputType === Types.PatternPropertyInputType.ButtonGroup ? (
+					<PropertyItemButtonGroup key={id} property={property} />
 				) : (
 					<ReferenceSelect
 						key={id}

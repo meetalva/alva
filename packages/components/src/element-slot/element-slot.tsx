@@ -1,9 +1,10 @@
 import { Color } from '../colors';
 import { ElementAnchors } from '../element';
-import { Icon, IconName, IconSize } from '../icons';
+import { Icon, IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
+import { ChevronRight } from 'react-feather';
 
 export enum ElementSlotState {
 	Default = 'default',
@@ -69,13 +70,19 @@ const StyledElementChildren = styled.div`
 	padding-left: ${getSpace(SpaceSize.L)}px;
 `;
 
-const StyledIcon = styled(Icon)`
+const StyledIconWrapper = styled.div`
 	position: absolute;
-	left: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px;
+	left: ${getSpace(SpaceSize.S)}px;
+	transition: transform 0.2s;
+	height: 100%;
+	width: ${IconSize.XS}px;
+	display: flex;
+	align-items: center;
+`;
+
+const StyledIcon = styled(ChevronRight)`
+	stroke: none;
 	fill: ${Color.Grey60};
-	width: ${getSpace(SpaceSize.S)}px;
-	height: ${getSpace(SpaceSize.S)}px;
-	padding: ${getSpace(SpaceSize.XS)}px;
 	transition: transform 0.2s;
 	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
 `;
@@ -104,13 +111,9 @@ export class ElementSlot extends React.Component<ElementSlotProps> {
 		return (
 			<StyledElementSlot {...{ [ElementAnchors.content]: props.id }}>
 				<StyledElementSlotLabel state={props.state}>
-					<StyledIcon
-						dataIcon={props.id}
-						name={IconName.ArrowFillRight}
-						size={IconSize.XXS}
-						color={Color.Grey60}
-						open={props.open}
-					/>
+					<StyledIconWrapper>
+						<StyledIcon size={IconSize.XS} open={props.open} />
+					</StyledIconWrapper>
 					<StyledElementSlotLabelContent {...{ [ElementAnchors.label]: true }}>
 						{props.title}
 					</StyledElementSlotLabelContent>

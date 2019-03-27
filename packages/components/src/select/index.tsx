@@ -1,18 +1,19 @@
 import { Color } from '../colors';
-import { Icon, IconName } from '../icons';
+import { Icon, IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
+import { ChevronRight } from 'react-feather';
 
 const ReactSelect = require('react-select').default;
 
-const StyledChevron = styled(Icon).attrs({ name: IconName.ArrowFillRight })`
+const StyledChevron = styled(ChevronRight)`
 	color: ${Color.Black};
 	fill: ${Color.Grey60};
-	width: 12px;
-	height: 12px;
-	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px;
-	transform: rotate(90deg);
+	stroke: none;
+	width: ${IconSize.XS}px;
+	height: ${IconSize.XS}px;
+	padding: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px ${getSpace(SpaceSize.XS)}px;
 	transform: rotate(90deg);
 `;
 

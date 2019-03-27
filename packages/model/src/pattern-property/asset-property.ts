@@ -33,6 +33,7 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 		return {
 			model: this.model,
 			contextId: this.contextId,
+			control: this.control,
 			defaultValue: this.defaultValue,
 			description: this.description,
 			example: this.example,
@@ -43,13 +44,13 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 			label: this.label,
 			propertyName: this.propertyName,
 			required: this.required,
-			type: this.type,
-			control: this.control
+			type: this.type
 		};
 	}
 
 	public update(prop: PatternAssetProperty): void {
 		this.contextId = prop.getContextId();
+		this.control = prop.getControl();
 		this.defaultValue = prop.getDefaultValue();
 		this.description = prop.getDescription();
 		this.group = prop.getGroup();

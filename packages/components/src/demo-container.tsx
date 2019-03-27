@@ -21,7 +21,6 @@ const DemoContainer: React.StatelessComponent<DemoContainerProps> = props => (
 		<GlobalStyle />
 		<Space size={SpaceSize.L}>{props.title && <Headline>{props.title}</Headline>}</Space>
 		{React.Children.map(props.children, child => <Space size={SpaceSize.L}>{child}</Space>)}
-		<Icon.IconRegistry />
 	</StyledDemoContainer>
 );
 

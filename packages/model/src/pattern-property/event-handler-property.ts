@@ -101,6 +101,7 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 		return {
 			model: this.model,
 			contextId: this.contextId,
+			control: this.control,
 			description: this.description,
 			event: this.event.toJSON(),
 			example: this.example,
@@ -111,13 +112,13 @@ export class PatternEventHandlerProperty extends PatternPropertyBase<string[]> {
 			label: this.label,
 			propertyName: this.propertyName,
 			required: this.required,
-			type: this.type,
-			control: this.control
+			type: this.type
 		};
 	}
 
 	public update(prop: this): void {
 		this.contextId = prop.getContextId();
+		this.control = prop.getControl();
 		this.description = prop.getDescription();
 		this.event = prop.getEvent();
 		this.group = prop.getGroup();

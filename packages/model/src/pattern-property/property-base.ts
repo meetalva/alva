@@ -82,6 +82,10 @@ export abstract class PatternPropertyBase<T> {
 		return this.contextId;
 	}
 
+	public getControl(): string {
+		return this.control;
+	}
+
 	public getDefaultValue(): T | undefined {
 		return this.coerceValue(this.defaultValue);
 	}
@@ -124,10 +128,6 @@ export abstract class PatternPropertyBase<T> {
 
 	public getType(): Types.PatternPropertyType {
 		return this.type;
-	}
-
-	public getControl(): string {
-		return this.control;
 	}
 
 	public getFocused(): boolean {

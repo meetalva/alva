@@ -123,6 +123,7 @@ function createUnknownProperty(
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		group: '',
@@ -133,8 +134,7 @@ function createUnknownProperty(
 		propertyName: args.symbol.name,
 		required: false,
 		type: Types.PatternPropertyType.Unknown,
-		typeText: print(args.symbol.valueDeclaration),
-		control: ''
+		typeText: print(args.symbol.valueDeclaration)
 	};
 }
 
@@ -145,6 +145,7 @@ function createBooleanProperty(
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		group: '',
@@ -154,8 +155,7 @@ function createBooleanProperty(
 		label: args.symbol.name,
 		propertyName: args.symbol.name,
 		required: false,
-		type: Types.PatternPropertyType.Boolean,
-		control: ''
+		type: Types.PatternPropertyType.Boolean
 	};
 }
 
@@ -166,6 +166,7 @@ function createNumberProperty(
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		group: '',
@@ -175,8 +176,7 @@ function createNumberProperty(
 		label: args.symbol.name,
 		propertyName: args.symbol.name,
 		required: false,
-		type: Types.PatternPropertyType.Number,
-		control: ''
+		type: Types.PatternPropertyType.Number
 	};
 }
 
@@ -191,6 +191,7 @@ function createStringProperty(
 		return {
 			model: Types.ModelName.PatternProperty,
 			contextId: args.symbol.name,
+			control: '',
 			description: '',
 			example: '',
 			group: '',
@@ -200,8 +201,7 @@ function createStringProperty(
 			label: args.symbol.name,
 			propertyName: args.symbol.name,
 			required: false,
-			type: Types.PatternPropertyType.Asset,
-			control: ''
+			type: Types.PatternPropertyType.Asset
 		};
 	}
 
@@ -209,6 +209,7 @@ function createStringProperty(
 		return {
 			model: Types.ModelName.PatternProperty,
 			contextId: args.symbol.name,
+			control: '',
 			description: '',
 			example: '',
 			group: '',
@@ -218,14 +219,14 @@ function createStringProperty(
 			label: args.symbol.name,
 			propertyName: args.symbol.name,
 			required: false,
-			type: Types.PatternPropertyType.Href,
-			control: ''
+			type: Types.PatternPropertyType.Href
 		};
 	}
 
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		group: '',
@@ -235,8 +236,7 @@ function createStringProperty(
 		label: args.symbol.name,
 		propertyName: args.symbol.name,
 		required: false,
-		type: Types.PatternPropertyType.String,
-		control: ''
+		type: Types.PatternPropertyType.String
 	};
 }
 
@@ -249,6 +249,7 @@ function createEventHandlerProperty(
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		// TODO: Allow TSDoc override
@@ -260,8 +261,7 @@ function createEventHandlerProperty(
 		label: args.symbol.name,
 		propertyName: args.symbol.name,
 		required: false,
-		type: Types.PatternPropertyType.EventHandler,
-		control: ''
+		type: Types.PatternPropertyType.EventHandler
 	};
 }
 
@@ -283,14 +283,16 @@ function setPropertyMetaData(init: {
 	property.group = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'group') || '';
 	property.control = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'control') || '';
 
-	// TODO
-
 	switch (property.type) {
 		case 'enum':
 			const defaultOption = property.options.find(
 				option => option.name === TypescriptUtils.getJsDocValueFromSymbol(symbol, 'default')
 			);
 			property.defaultOptionId = defaultOption ? defaultOption.id : undefined;
+			property.inputType =
+				property.control === 'ButtonGroup'
+					? Types.PatternPropertyInputType.ButtonGroup
+					: Types.PatternPropertyInputType.Select;
 			break;
 		case 'EventHandler':
 			break;

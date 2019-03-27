@@ -56,7 +56,8 @@ export class PatternNumberProperty extends PatternPropertyBase<number | undefine
 			label: this.label,
 			propertyName: this.propertyName,
 			required: this.required,
-			type: this.type
+			type: this.type,
+			control: this.control
 		};
 	}
 

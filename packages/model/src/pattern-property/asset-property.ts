@@ -44,7 +44,8 @@ export class PatternAssetProperty extends PatternPropertyBase<string | undefined
 			label: this.label,
 			propertyName: this.propertyName,
 			required: this.required,
-			type: this.type
+			type: this.type,
+			control: this.control
 		};
 	}
 

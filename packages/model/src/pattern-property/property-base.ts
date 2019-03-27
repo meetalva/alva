@@ -16,6 +16,7 @@ export interface PatternPropertyInit<T> {
 	propertyName: string;
 	required?: boolean;
 	control?: string;
+	focused?: boolean;
 }
 
 export abstract class PatternPropertyBase<T> {
@@ -33,6 +34,7 @@ export abstract class PatternPropertyBase<T> {
 	@Mobx.observable protected propertyName: string;
 	@Mobx.observable protected required: boolean = false;
 	@Mobx.observable protected control: string;
+	@Mobx.observable protected focused: boolean = false;
 	@Mobx.observable public type: Types.PatternPropertyType = Types.PatternPropertyType.Unknown;
 
 	public constructor(init: PatternPropertyInit<T>) {
@@ -52,6 +54,10 @@ export abstract class PatternPropertyBase<T> {
 
 		if (typeof init.required !== 'undefined') {
 			this.required = init.required;
+		}
+
+		if (typeof init.focused !== 'undefined') {
+			this.focused = init.focused;
 		}
 
 		this.example = init.example || '';
@@ -122,6 +128,19 @@ export abstract class PatternPropertyBase<T> {
 
 	public getType(): Types.PatternPropertyType {
 		return this.type;
+	}
+
+	public getControl(): string {
+		return this.control;
+	}
+
+	public getFocused(): boolean {
+		return this.focused;
+	}
+
+	@Mobx.action
+	public setFocused(focused: boolean): void {
+		this.focused = focused;
 	}
 
 	public abstract toJSON(): Types.SerializedPatternProperty;

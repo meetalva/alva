@@ -131,7 +131,8 @@ export class PatternEnumProperty extends PatternPropertyBase<EnumValue | undefin
 			propertyName: this.propertyName,
 			options: [...this.options.values()].map(option => option.toJSON()),
 			required: this.required,
-			type: this.type
+			type: this.type,
+			control: this.control
 		};
 	}
 

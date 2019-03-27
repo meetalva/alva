@@ -13,6 +13,7 @@ import { PropertyItemEvent } from './property-item-event';
 import { PropertyItemNumber } from './property-item-number';
 import { PropertyItemString } from './property-item-string';
 import { PropertyItemButtonGroup } from './property-item-button-group';
+import { PropertyItemColor } from './property-item-color';
 import { ReferenceSelect, IconPosition } from './reference-select';
 import { PropertyUnknownEditorSkeleton } from './property-unknown-editor-skeleton';
 
@@ -84,7 +85,13 @@ export class PropertyListItem extends React.Component<PropertyListItemProps> {
 					</ReferenceSelect>
 				);
 			case Types.PatternPropertyType.String:
-				return (
+				const control = patternProperty.getControl();
+
+				return control === 'color' ? (
+					<ReferenceSelect key={id} property={property}>
+						<PropertyItemColor property={property} />
+					</ReferenceSelect>
+				) : (
 					<ReferenceSelect key={id} property={property}>
 						<PropertyItemString property={property} onDidRender={props.onDidRender} />
 					</ReferenceSelect>

@@ -118,7 +118,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				image={props.item.image}
 				version={
 					<C.Flex alignItems={C.FlexAlignItems.Center}>
-						<span>{props.item.version}</span>
+						<C.Copy>{props.item.version}</C.Copy>
 						{props.item.updateVersion ? (
 							<>
 								<C.Space
@@ -129,7 +129,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 								>
 									<ArrowRight size={12} />
 								</C.Space>
-								<span>{props.item.updateVersion}</span>
+								<C.Copy>{props.item.updateVersion}</C.Copy>
 							</>
 						) : null}
 					</C.Flex>

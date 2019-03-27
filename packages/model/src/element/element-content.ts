@@ -35,7 +35,7 @@ export class ElementContent {
 
 	@Mobx.computed
 	private get elements(): Element[] {
-		return this.elementIds
+		return [...new Set(this.elementIds)]
 			.map(id => this.project.getElementById(id))
 			.filter((element): element is Element => typeof element !== 'undefined');
 	}

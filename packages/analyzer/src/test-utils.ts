@@ -79,11 +79,10 @@ export const getNamedPropType = (name: string, ctx: FixtureSourceFile): Prop => 
 	return result;
 };
 
-export const getPropTypes = (
+export const getPropInterface = (
 	sourceFile: TypeScript.SourceFile,
 	ctx: { program: TypeScript.Program }
-): Prop[] => {
-	const typeChecker = ctx.program.getTypeChecker();
+): TypeScriptUtils.TypeScriptType => {
 	const [exp] = TypeScriptUtils.getExports(
 		sourceFile,
 		ctx.program
@@ -94,6 +93,15 @@ export const getPropTypes = (
 		program: ctx.program
 	}) as TypeScriptUtils.TypeScriptType;
 	const [props] = reactType.getTypeArguments();
+	return props;
+};
+
+export const getPropTypes = (
+	sourceFile: TypeScript.SourceFile,
+	ctx: { program: TypeScript.Program }
+): Prop[] => {
+	const typeChecker = ctx.program.getTypeChecker();
+	const props = getPropInterface(sourceFile, ctx);
 
 	return props.type.getApparentProperties().map(symbol => {
 		const declarations = symbol.declarations!;

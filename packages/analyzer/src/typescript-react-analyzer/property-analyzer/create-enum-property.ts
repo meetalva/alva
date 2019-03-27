@@ -42,7 +42,6 @@ export function createEnumProperty(
 		description: '',
 		example: '',
 		group: '',
-		control: '',
 		hidden: false,
 		id: enumId,
 		inputType: Types.PatternPropertyInputType.Default,

@@ -134,8 +134,7 @@ function createUnknownProperty(
 		propertyName: args.symbol.name,
 		required: false,
 		type: Types.PatternPropertyType.Unknown,
-		typeText: print(args.symbol.valueDeclaration),
-		control: ''
+		typeText: print(args.symbol.valueDeclaration)
 	};
 }
 
@@ -156,8 +155,7 @@ function createBooleanProperty(
 		label: args.symbol.name,
 		propertyName: args.symbol.name,
 		required: false,
-		type: Types.PatternPropertyType.Boolean,
-		control: ''
+		type: Types.PatternPropertyType.Boolean
 	};
 }
 
@@ -178,8 +176,7 @@ function createNumberProperty(
 		label: args.symbol.name,
 		propertyName: args.symbol.name,
 		required: false,
-		type: Types.PatternPropertyType.Number,
-		control: ''
+		type: Types.PatternPropertyType.Number
 	};
 }
 
@@ -204,8 +201,7 @@ function createStringProperty(
 			label: args.symbol.name,
 			propertyName: args.symbol.name,
 			required: false,
-			type: Types.PatternPropertyType.Asset,
-			control: ''
+			type: Types.PatternPropertyType.Asset
 		};
 	}
 
@@ -223,8 +219,7 @@ function createStringProperty(
 			label: args.symbol.name,
 			propertyName: args.symbol.name,
 			required: false,
-			type: Types.PatternPropertyType.Href,
-			control: ''
+			type: Types.PatternPropertyType.Href
 		};
 	}
 
@@ -241,8 +236,7 @@ function createStringProperty(
 		label: args.symbol.name,
 		propertyName: args.symbol.name,
 		required: false,
-		type: Types.PatternPropertyType.String,
-		control: ''
+		type: Types.PatternPropertyType.String
 	};
 }
 
@@ -267,8 +261,7 @@ function createEventHandlerProperty(
 		label: args.symbol.name,
 		propertyName: args.symbol.name,
 		required: false,
-		type: Types.PatternPropertyType.EventHandler,
-		control: ''
+		type: Types.PatternPropertyType.EventHandler
 	};
 }
 

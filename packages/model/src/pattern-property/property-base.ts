@@ -130,10 +130,6 @@ export abstract class PatternPropertyBase<T> {
 		return this.type;
 	}
 
-	public getControl(): string {
-		return this.control;
-	}
-
 	public getFocused(): boolean {
 		return this.focused;
 	}

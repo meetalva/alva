@@ -92,8 +92,7 @@ export class PatternStringProperty extends PatternPropertyBase<string | undefine
 			label: this.label,
 			propertyName: this.propertyName,
 			required: this.required,
-			type: this.type,
-			control: this.control
+			type: this.type
 		};
 	}
 

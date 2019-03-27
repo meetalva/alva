@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { Button, ButtonSize } from '../button';
+import { Button, ButtonSize, ButtonState } from '../button';
 import { PropertyInputStyles } from '../property-input';
 
 const StyledWrapper = styled.div`
@@ -27,7 +27,9 @@ export interface InputButtonProps {
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	onSubmit?: React.FormEventHandler<HTMLElement>;
 	placeholder?: string;
+	disabled?: boolean;
 	value?: string;
+	state?: ButtonState;
 	isValid: () => boolean;
 }
 
@@ -39,11 +41,13 @@ export const InputButton: React.SFC<InputButtonProps> = props => (
 			type="text"
 			value={props.value || ''}
 			placeholder={props.placeholder}
+			disabled={props.disabled}
 		/>
 		<StyledButton
 			type="submit"
 			disabledAppearance={props.isValid ? !props.isValid() : true}
 			size={ButtonSize.Medium}
+			state={props.state}
 		>
 			{props.children}
 		</StyledButton>

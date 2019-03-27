@@ -18,7 +18,7 @@ export class LibraryStore {
 			name: '@meetalva/feather-icons',
 			version: 'latest'
 		},
-    {
+		{
 			name: '@meetalva/unsplash',
 			version: 'latest'
 		},

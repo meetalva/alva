@@ -91,7 +91,8 @@ export class PatternUnknownProperty extends PatternPropertyBase<unknown | undefi
 			propertyName: this.propertyName,
 			required: this.required,
 			type: this.type,
-			typeText: this.typeText
+			typeText: this.typeText,
+			control: this.control
 		};
 	}
 

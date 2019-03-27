@@ -46,7 +46,7 @@ export interface BoxProps {
 	/** @name Height @default auto */
 	height?: number | string;
 
-	/** @name Background Color */
+	/** @name Background Color @control color */
 	backgroundColor?: string;
 
 	children?: React.ReactNode;

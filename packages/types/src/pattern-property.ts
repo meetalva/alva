@@ -59,6 +59,7 @@ export interface SerializedPropertyBase {
 	propertyName: string;
 	required: boolean;
 	type: SerializedPatternPropertyType;
+	control: string;
 }
 
 export interface SerializedPatternAssetProperty extends SerializedPropertyBase {

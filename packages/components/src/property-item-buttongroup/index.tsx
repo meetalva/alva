@@ -1,64 +1,62 @@
 import { Color } from '../colors';
 import { PropertyItem } from '../property-item';
-import { Icon, IconName, IconSize } from '../icons';
+import { getIcon, isIcon } from '../icons';
 import * as React from 'react';
-import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
+import { SpaceSize, getSpace } from '../space';
+import { Copy, CopySize } from '../copy';
 
-export interface PropertyItemRadiogroupValues {
+export interface PropertyItemButtonGroupValues {
 	id: string;
 	name: string;
-	icon: IconName | undefined;
+	icon: string;
 }
 
-export interface PropertyItemRadiogroupProps {
+export interface PropertyItemButtonGroupProps {
 	className?: string;
 	description?: string;
 	label: string;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	required?: boolean;
 	selectedValue?: string;
-	values: PropertyItemRadiogroupValues[];
+	values: PropertyItemButtonGroupValues[];
 }
 
-export interface RadiogroupItemProps {
+export interface ButtonGroupItemProps {
 	active: boolean;
 	name: string;
 	id: string;
-	icon: IconName | undefined;
+	icon: string;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
-const StyledRadioGroup = styled.div`
-	/* stylelint-disable-next-line */
+const StyledButtonGroup = styled.div`
 	display: flex;
 	box-sizing: border-box;
 	width: 100%;
 	height: 30px;
-	//padding: ${getSpace(SpaceSize.S)}px;
 	border: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-width: 0.5px;
 	}
 	background: ${Color.White};
 	border-radius: 3px;
-	//align-items: center;
 `;
 
 const StyledItem = styled.label`
 	box-sizing: border-box;
 	text-align: center;
 	flex-grow: 1;
-	height: 100%;
+	margin: ${getSpace(SpaceSize.XS)}px 0;
 	display: flex;
 	align-items: center;
+	user-select: none;
 	justify-content: center;
 	border-right: 1px solid ${Color.Grey90};
 	@media screen and (-webkit-min-device-pixel-ratio: 2) {
 		border-right-width: 0.5px;
 	}
-	background: ${(props: RadiogroupItemProps) => (props.active ? Color.Blue40 : 'transparent')};
-	color: ${(props: RadiogroupItemProps) => (props.active ? Color.White : Color.Grey50)};
+	color: ${(props: ButtonGroupItemProps) => (props.active ? Color.Blue : Color.Grey60)};
 
 	&:first-of-type {
 		border-radius: 3px 0 0 3px;
@@ -68,38 +66,50 @@ const StyledItem = styled.label`
 		border-right: none;
 		border-radius: 0 3px 3px 0;
 	}
+
+	&:active {
+		color: ${Color.Grey20};
+	}
 `;
 
 const StyledInput = styled.input`
 	display: none;
 `;
 
-export const RadiogroupItem: React.StatelessComponent<RadiogroupItemProps> = props => (
-	<StyledItem
-		icon={props.icon}
-		id={props.id}
-		active={props.active}
-		name={props.name}
-		title={props.name}
-	>
-		{props.icon ? <Icon name={props.icon} size={IconSize.S} /> : props.name}
-		<StyledInput
-			type="radio"
-			id={props.id}
-			name="radiogroup"
-			value={props.id}
-			onChange={props.onChange}
-		/>
-	</StyledItem>
-);
+export const ButtonGroupItem: React.StatelessComponent<ButtonGroupItemProps> = props => {
+	const icon = isIcon(props.icon) ? props.icon : 'Box';
 
-export const PropertyItemRadiogroup: React.StatelessComponent<
-	PropertyItemRadiogroupProps
+	return (
+		<StyledItem
+			icon={props.icon}
+			id={props.id}
+			active={props.active}
+			name={props.name}
+			title={props.name}
+		>
+			{props.icon ? (
+				getIcon({ icon: icon || 'Box', size: 18, strokeWidth: 1.5 })
+			) : (
+				<Copy size={CopySize.S}>{props.name}</Copy>
+			)}
+			<StyledInput
+				type="radio"
+				id={props.id}
+				name="buttongroup"
+				value={props.id}
+				onChange={props.onChange}
+			/>
+		</StyledItem>
+	);
+};
+
+export const PropertyItemButtonGroup: React.StatelessComponent<
+	PropertyItemButtonGroupProps
 > = props => (
 	<PropertyItem description={props.description} label={props.label}>
-		<StyledRadioGroup>
+		<StyledButtonGroup>
 			{props.values.map(value => (
-				<RadiogroupItem
+				<ButtonGroupItem
 					name={value.name}
 					icon={value.icon}
 					id={value.id}
@@ -108,6 +118,6 @@ export const PropertyItemRadiogroup: React.StatelessComponent<
 					active={value.id === props.selectedValue}
 				/>
 			))}
-		</StyledRadioGroup>
+		</StyledButtonGroup>
 	</PropertyItem>
 );

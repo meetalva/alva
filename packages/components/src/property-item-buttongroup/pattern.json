@@ -1,0 +1,7 @@
+{
+	"name": "property-item-buttongroup",
+	"displayName": "Property Item: Button Group",
+	"description": "Input field for enum values displayed as button group",
+	"version": "1.0.0",
+	"tags": ["property"]
+}

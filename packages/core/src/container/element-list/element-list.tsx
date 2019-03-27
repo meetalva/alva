@@ -38,7 +38,7 @@ export class ElementList extends React.Component {
 	private handleClick(e: React.MouseEvent<HTMLElement>): void {
 		const { store } = this.props as { store: Store.ViewStore };
 		const target = e.target as HTMLElement;
-		const icon = utils.above(target, `svg[${C.ElementAnchors.icon}]`);
+		const icon = utils.above(target, `div[${C.ElementAnchors.icon}]`);
 
 		// Skip and deselect elements if the root itself is clicked
 		if (target.getAttribute('data-drag-root')) {

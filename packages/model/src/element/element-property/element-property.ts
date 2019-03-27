@@ -211,6 +211,21 @@ export class ElementProperty {
 		return this.patternPropertyId === patternProperty.getId();
 	}
 
+	public getFocused(): boolean {
+		const patternProperty = this.getPatternProperty();
+		if (!patternProperty) {
+			return false;
+		}
+		return patternProperty.getFocused();
+	}
+
+	public setFocused(focused: boolean): void {
+		const patternProperty = this.getPatternProperty();
+		if (patternProperty) {
+			patternProperty.setFocused(focused);
+		}
+	}
+
 	@Mobx.action
 	public setValue(value: Types.ElementPropertyValue): void {
 		if (this.referencedUserStoreProperty && this.patternProperty) {

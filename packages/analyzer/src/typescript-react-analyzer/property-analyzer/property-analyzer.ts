@@ -123,6 +123,7 @@ function createUnknownProperty(
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		group: '',
@@ -144,6 +145,7 @@ function createBooleanProperty(
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		group: '',
@@ -164,6 +166,7 @@ function createNumberProperty(
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		group: '',
@@ -188,6 +191,7 @@ function createStringProperty(
 		return {
 			model: Types.ModelName.PatternProperty,
 			contextId: args.symbol.name,
+			control: '',
 			description: '',
 			example: '',
 			group: '',
@@ -205,6 +209,7 @@ function createStringProperty(
 		return {
 			model: Types.ModelName.PatternProperty,
 			contextId: args.symbol.name,
+			control: '',
 			description: '',
 			example: '',
 			group: '',
@@ -221,6 +226,7 @@ function createStringProperty(
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		group: '',
@@ -243,6 +249,7 @@ function createEventHandlerProperty(
 	return {
 		model: Types.ModelName.PatternProperty,
 		contextId: args.symbol.name,
+		control: '',
 		description: '',
 		example: '',
 		// TODO: Allow TSDoc override
@@ -274,6 +281,7 @@ function setPropertyMetaData(init: {
 	property.description = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'description') || '';
 	property.hidden = TypescriptUtils.hasJsDocTagFromSymbol(symbol, 'ignore');
 	property.group = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'group') || '';
+	property.control = TypescriptUtils.getJsDocValueFromSymbol(symbol, 'control') || '';
 
 	switch (property.type) {
 		case 'enum':
@@ -281,6 +289,10 @@ function setPropertyMetaData(init: {
 				option => option.name === TypescriptUtils.getJsDocValueFromSymbol(symbol, 'default')
 			);
 			property.defaultOptionId = defaultOption ? defaultOption.id : undefined;
+			property.inputType =
+				property.control === 'ButtonGroup'
+					? Types.PatternPropertyInputType.ButtonGroup
+					: Types.PatternPropertyInputType.Select;
 			break;
 		case 'EventHandler':
 			break;

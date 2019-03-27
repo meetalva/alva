@@ -67,7 +67,6 @@ export class App extends React.Component {
 						<ViewDetails />
 					</AppView>
 				</Components.MainArea>
-				<Components.IconRegistry />
 			</Components.Layout>
 		);
 	}

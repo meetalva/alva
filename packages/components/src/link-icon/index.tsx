@@ -2,10 +2,9 @@ import { Color } from '../colors';
 import * as React from 'react';
 import styled from 'styled-components';
 import { Copy, CopySize } from '../copy';
-import { IconSize } from '../icons';
+import { IconSize, isIcon, getIcon } from '../icons';
 import { Space, SpaceSize } from '../space';
 import * as ColorTool from 'color';
-const Icon = require('react-feather');
 
 export interface LinkIconProps {
 	children?: React.ReactNode;
@@ -31,11 +30,11 @@ const StyledLink = styled.div`
 `;
 
 export const LinkIcon: React.SFC<LinkIconProps> = props => {
-	const IconImage = Icon.hasOwnProperty(props.icon) ? Icon[props.icon] : Icon.Box;
+	const icon = isIcon(props.icon) ? props.icon : 'Box';
 
 	return (
 		<StyledLink {...props}>
-			<IconImage size={getIconSize(props.size)} strokeWidth={1.5} />
+			{getIcon({ icon, size: getIconSize(props.size), strokeWidth: 1.5 })}
 			<Space sizeRight={SpaceSize.XS} />
 			<Copy size={props.size}>{props.children}</Copy>
 		</StyledLink>

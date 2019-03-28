@@ -44,6 +44,7 @@ export function getExportInfos(
 			const type = typechecker.getTypeAtLocation(declaration);
 			const exportType = new TypeScriptType(type, typechecker);
 			const exportName = isDefault ? undefined : declaration.name.getText();
+			const filePath = declaration.getSourceFile()!.fileName;
 
 			return [
 				{
@@ -55,7 +56,8 @@ export function getExportInfos(
 					ignore: exportIgnore,
 					patternType: exportPatternType,
 					statement,
-					type: exportType
+					type: exportType,
+					filePath
 				}
 			];
 		}
@@ -69,6 +71,7 @@ export function getExportInfos(
 		const type = typechecker.getTypeAtLocation(statement);
 		const exportType = new TypeScriptType(type, typechecker);
 		const exportName = isDefault ? undefined : statement.name.getText();
+		const filePath = statement.getSourceFile()!.fileName;
 
 		return [
 			{
@@ -80,7 +83,8 @@ export function getExportInfos(
 				ignore: exportIgnore,
 				patternType: exportPatternType,
 				statement,
-				type: exportType
+				type: exportType,
+				filePath
 			}
 		];
 	}
@@ -92,6 +96,7 @@ export function getExportInfos(
 		if (declaration) {
 			const type = typechecker.getTypeAtLocation(declaration);
 			const exportType = new TypeScriptType(type, typechecker);
+			const filePath = declaration.getSourceFile()!.fileName;
 
 			return [
 				{
@@ -103,7 +108,8 @@ export function getExportInfos(
 					ignore: exportIgnore,
 					patternType: exportPatternType,
 					statement,
-					type: exportType
+					type: exportType,
+					filePath
 				}
 			];
 		}
@@ -128,7 +134,8 @@ export function getExportInfos(
 				ignore: exportIgnore,
 				patternType: exportPatternType,
 				statement,
-				type: exportType
+				type: exportType,
+				filePath: statement.getSourceFile().fileName
 			};
 		});
 	}

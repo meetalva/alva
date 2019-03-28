@@ -32,6 +32,7 @@ export class PatternHrefProperty extends PatternPropertyBase<string | undefined>
 	public toJSON(): Types.SerializedPatternHrefProperty {
 		return {
 			model: this.model,
+			control: this.control,
 			contextId: this.contextId,
 			defaultValue: this.defaultValue,
 			description: this.description,
@@ -49,6 +50,7 @@ export class PatternHrefProperty extends PatternPropertyBase<string | undefined>
 
 	public update(prop: PatternHrefProperty): void {
 		this.contextId = prop.getContextId();
+		this.control = prop.getControl();
 		this.description = prop.getDescription();
 		this.defaultValue = prop.getDefaultValue();
 		this.example = prop.getExample();

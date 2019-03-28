@@ -12,6 +12,7 @@ export interface SpaceProps {
 	sizeRight?: SpaceSize;
 	sizeTop?: SpaceSize;
 	style?: React.CSSProperties;
+	onClick?: React.MouseEventHandler;
 }
 
 export interface StyledSpaceProps {
@@ -112,6 +113,7 @@ export const Space: React.StatelessComponent<SpaceProps> = props => {
 			className={props.className}
 			spaceSize={size}
 			inside={Boolean(props.inside)}
+			onClick={props.onClick}
 		>
 			{props.children}
 		</StyledSpace>

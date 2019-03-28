@@ -225,7 +225,7 @@ export class LibraryStoreItem {
 	}
 
 	public static fromRecommendation(
-		name: { name: string; category: string; version: string; },
+		name: { name: string; category: string; version: string },
 		ctx: {
 			meta: Map<string, any>;
 			getLibraryByPackageName(name: string): PatternLibrary | undefined;
@@ -299,13 +299,13 @@ export class LibraryStoreItem {
 	}
 
 	@Mobx.action
-	public connect(
+	public async connect(
 		sender: {
 			send: T.Sender<M.Message>['send'];
 			transaction: T.Sender<M.Message>['transaction'];
 		},
 		data: { project: Project; npmId?: string; installType?: PatternLibraryInstallType }
-	): void {
+	): Promise<void> {
 		if (this.state === LibraryStoreItemState.Installing) {
 			return;
 		}
@@ -316,14 +316,17 @@ export class LibraryStoreItem {
 		) {
 			this.intermediateState = LibraryStoreItemState.Installing;
 
-			sender.send({
-				id: uuid.v4(),
-				type: M.MessageType.ConnectNpmPatternLibraryRequest,
-				payload: {
-					npmId: data.npmId || this.packageName!,
-					projectId: data.project.getId()
-				}
-			});
+			await sender.transaction(
+				{
+					id: uuid.v4(),
+					type: M.MessageType.ConnectNpmPatternLibraryRequest,
+					payload: {
+						npmId: data.npmId || this.packageName!,
+						projectId: data.project.getId()
+					}
+				},
+				{ type: M.MessageType.ConnectPatternLibraryResponse }
+			);
 		}
 
 		if (!this.library) {
@@ -335,15 +338,18 @@ export class LibraryStoreItem {
 			this.library.setState(T.PatternLibraryState.Connecting);
 			this.update = undefined;
 
-			sender.send({
-				id: uuid.v4(),
-				type: M.MessageType.UpdatePatternLibraryRequest,
-				payload: {
-					projectId: data.project.getId(),
-					libId: this.library.getId(),
-					installType: data.installType || this.installType!
-				}
-			});
+			await sender.transaction(
+				{
+					id: uuid.v4(),
+					type: M.MessageType.UpdatePatternLibraryRequest,
+					payload: {
+						projectId: data.project.getId(),
+						libId: this.library.getId(),
+						installType: data.installType || this.installType!
+					}
+				},
+				{ type: M.MessageType.UpdatePatternLibraryResponse }
+			);
 		}
 
 		if (this.installType === T.PatternLibraryInstallType.Remote) {
@@ -351,16 +357,19 @@ export class LibraryStoreItem {
 			this.library.setState(T.PatternLibraryState.Connecting);
 			this.update = undefined;
 
-			sender.send({
-				id: uuid.v4(),
-				type: M.MessageType.UpdateNpmPatternLibraryRequest,
-				payload: {
-					projectId: data.project.getId(),
-					libId: this.library.getId(),
-					npmId: data.npmId,
-					installType: data.installType || this.installType!
-				}
-			});
+			await sender.transaction(
+				{
+					id: uuid.v4(),
+					type: M.MessageType.UpdateNpmPatternLibraryRequest,
+					payload: {
+						projectId: data.project.getId(),
+						libId: this.library.getId(),
+						npmId: data.npmId,
+						installType: data.installType || this.installType!
+					}
+				},
+				{ type: M.MessageType.UpdatePatternLibraryResponse }
+			);
 		}
 	}
 

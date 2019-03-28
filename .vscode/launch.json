@@ -72,6 +72,24 @@
 			"sourceMaps": true,
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Debug Analyzer",
+			"program": "${workspaceRoot}/packages/analyzer-cli/bin/analyze.js",
+			"runtimeArgs": [
+				"--inspect-brk"
+			],
+			"args": [
+				"--in",
+				"${workspaceRoot}/packages/essentials/package.json",
+				"--out",
+				"/dev/null"
+			],
+			"sourceMaps": true,
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen"
 		}
 	]
 }

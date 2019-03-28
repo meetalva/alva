@@ -11,20 +11,23 @@ export interface BoxProps {
 	 * @name Direction
 	 * @default Vertical
 	 * @group Alignment
+	 * @control ButtonGroup
 	 * */
 	flexDirection?: FlexDirection;
 
 	/**
-	 * @name Horizontal
+	 * @name Justify
 	 * @default Center
 	 * @group Alignment
+	 * @control ButtonGroup
 	 * */
 	justifyContent?: JustifyContent;
 
 	/**
-	 * @name Vertical
+	 * @name Align
 	 * @default Center
 	 * @group Alignment
+	 * @control ButtonGroup
 	 * */
 	alignItems?: AlignItems;
 
@@ -46,7 +49,7 @@ export interface BoxProps {
 	/** @name Height @default auto */
 	height?: number | string;
 
-	/** @name Background Color */
+	/** @name Background Color @control color */
 	backgroundColor?: string;
 
 	children?: React.ReactNode;
@@ -60,39 +63,37 @@ export enum FlexDirection {
 }
 
 export enum JustifyContent {
-	/** @name Left */
+	/** @name Start @icon FlexJustifyStart */
 	'flex-start' = 'flex-start',
-	/** @name Center */
-	center = 'center',
-	/** @name End */
+
+	/** @name Center @icon FlexJustifyCenter */
+	'center' = 'center',
+
+	/** @name End @icon FlexJustifyEnd*/
 	'flex-end' = 'flex-end',
-	/** @name Stretch */
-	stretch = 'stretch',
-	/** @name Space Between */
+
+	/** @name Space Between @icon FlexJustifySpaceBetween */
 	'space-between' = 'space-between',
-	/** @name Space Around */
-	'space-around' = 'space-around',
-	/** @name Space Evenly */
-	'space-evenly' = 'space-evenly'
+
+	/** @name Space Around @icon FlexJustifySpaceAround */
+	'space-around' = 'space-around'
 }
 
 export enum AlignItems {
-	/** @name Top */
+	/** @name Start @icon FlexAlignStart */
 	'flex-start' = 'flex-start',
-	/** @name Center */
-	center = 'center',
-	/** @name Bottom */
+
+	/** @name Center @icon FlexAlignCenter */
+	'center' = 'center',
+
+	/** @name Bottom @icon FlexAlignEnd */
 	'flex-end' = 'flex-end',
-	/** @name Stretch */
-	stretch = 'stretch',
-	/** @name Space Between */
-	'space-between' = 'space-between',
-	/** @name Space Around */
-	'space-around' = 'space-around',
-	/** @name Space Evenly */
-	'space-evenly' = 'space-evenly',
-	/** @name Baseline */
-	baseline = 'baseline'
+
+	/** @name Stretch @icon FlexAlignStretch */
+	'stretch' = 'stretch',
+
+	/** @name Baseline @icon FlexAlignBaseline */
+	'baseline' = 'baseline'
 }
 
 /**

@@ -199,6 +199,68 @@ export class ViewStore {
 			project
 		});
 
+		const fromCandidate = (candidate: Types.ElementCandidate, content: Model.ElementContent) => {
+			const library = project.getPatternLibraryByName(candidate.libraryId);
+
+			if (!library) {
+				return;
+			}
+
+			const pattern = library.getPatternByContextId(candidate.patternContextId);
+
+			if (!pattern) {
+				return;
+			}
+
+			const child = this.createElement({
+				dragged: false,
+				pattern
+			});
+
+			candidate.props.forEach(propCandidate => {
+				const prop = child.getPropertyByContextId(propCandidate.propName);
+
+				if (!prop) {
+					return;
+				}
+
+				prop.setValue(propCandidate.value);
+			});
+
+			content.insert({
+				at: 0,
+				element: child
+			});
+
+			this.addElement(child);
+
+			candidate.children.forEach(childCandidate => {
+				const childContent = child.getContentBySlotType(Types.SlotType.Children);
+
+				if (!childContent) {
+					return;
+				}
+
+				fromCandidate(childCandidate, childContent);
+			});
+		};
+
+		elementContents.forEach(content => {
+			const slot = content.getSlot();
+
+			if (!slot) {
+				return;
+			}
+
+			const candidate = slot.getDefaultValue();
+
+			if (!candidate) {
+				return;
+			}
+
+			fromCandidate(candidate, content);
+		});
+
 		ViewStore.EPHEMERAL_CONTENTS.set(element, elementContents);
 		return element;
 	}

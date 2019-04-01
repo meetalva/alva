@@ -130,6 +130,7 @@ export class PatternSlot {
 	public update(b: PatternSlot): void {
 		this.contextId = b.contextId;
 		this.description = b.description;
+		this.defaultValue = b.defaultValue;
 		this.example = b.example;
 		this.hidden = b.hidden;
 		this.displayName = b.displayName;

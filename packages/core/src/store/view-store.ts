@@ -228,7 +228,7 @@ export class ViewStore {
 			});
 
 			content.insert({
-				at: 0,
+				at: undefined,
 				element: child
 			});
 

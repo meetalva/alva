@@ -204,14 +204,18 @@ export class ElementContent {
 	}
 
 	@Mobx.action
-	public insert(options: { at: number; element: Element }): void {
+	public insert(options: { at: number | undefined; element: Element }): void {
 		const id = options.element.getId();
 
 		if (this.elementIds.find(eid => eid === id)) {
 			return;
 		}
 
-		this.elementIds.splice(options.at, 0, id);
+		if (typeof options.at !== 'undefined') {
+			this.elementIds.splice(options.at, 0, id);
+		} else {
+			this.elementIds.push(id);
+		}
 	}
 
 	@Mobx.action

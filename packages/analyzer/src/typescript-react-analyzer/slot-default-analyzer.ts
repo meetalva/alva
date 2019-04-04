@@ -51,6 +51,18 @@ function candidateFromJSXElement(
 	element: tsa.JsxChild,
 	{ project, id }: { project: tsa.Project; id: string }
 ): ElementCandidate | undefined {
+	if (tsa.TypeGuards.isJsxFragment(element)) {
+		return {
+			parent: id,
+			id: [id, 'default'].join(':'),
+			libraryId: '',
+			patternContextId: '',
+			props: [],
+			jsxFragment: true,
+			children: getChildrenCandidates(element, { project, id })
+		};
+	}
+
 	const nameElement = getNameElement(element);
 
 	if (!nameElement) {
@@ -113,6 +125,7 @@ function candidateFromJSXElement(
 		id: [id, 'default'].join(':'),
 		libraryId: pkg.name,
 		patternContextId: [patternContextBase, exportSpecifier].join(':'),
+		jsxFragment: false,
 		props: nameElement
 			.getAttributes()
 			.filter(tsa.TypeGuards.isJsxAttribute)
@@ -128,7 +141,7 @@ function getChildrenCandidates(
 	element: tsa.JsxChild,
 	{ project, id }: { project: tsa.Project; id: string }
 ): ElementCandidate[] {
-	if (tsa.TypeGuards.isJsxElement(element)) {
+	if (tsa.TypeGuards.isJsxElement(element) || tsa.TypeGuards.isJsxFragment(element)) {
 		return element
 			.getJsxChildren()
 			.map(child => candidateFromJSXElement(child, { project, id }))
@@ -158,8 +171,14 @@ function getInitValue(
 	return;
 }
 
-export function getElement(jsx: tsa.Node): tsa.JsxElement | tsa.JsxSelfClosingElement | undefined {
-	if (tsa.TypeGuards.isJsxElement(jsx) || tsa.TypeGuards.isJsxSelfClosingElement(jsx)) {
+export function getElement(
+	jsx: tsa.Node
+): tsa.JsxElement | tsa.JsxSelfClosingElement | tsa.JsxFragment | undefined {
+	if (
+		tsa.TypeGuards.isJsxElement(jsx) ||
+		tsa.TypeGuards.isJsxSelfClosingElement(jsx) ||
+		tsa.TypeGuards.isJsxFragment(jsx)
+	) {
 		return jsx;
 	}
 

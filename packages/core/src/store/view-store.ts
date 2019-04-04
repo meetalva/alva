@@ -200,6 +200,12 @@ export class ViewStore {
 		});
 
 		const fromCandidate = (candidate: Types.ElementCandidate, content: Model.ElementContent) => {
+			if (candidate.jsxFragment) {
+				candidate.children.forEach(childCandidate => {
+					fromCandidate(childCandidate, content);
+				});
+			}
+
 			const library = project.getPatternLibraryByName(candidate.libraryId);
 
 			if (!library) {

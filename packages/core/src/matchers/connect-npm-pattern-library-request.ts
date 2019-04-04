@@ -3,7 +3,7 @@ import * as pkgDir from 'pkg-dir';
 import * as M from '@meetalva/message';
 import { MessageType } from '@meetalva/message';
 import * as T from '@meetalva/types';
-import * as Analzyer from '@meetalva/analyzer';
+import * as Analyzer from '@meetalva/analyzer';
 import { MatcherCreator } from './context';
 
 export const connectNpmPatternLibrary: MatcherCreator<M.ConnectNpmPatternLibraryRequest> = ({
@@ -67,7 +67,7 @@ export const connectNpmPatternLibrary: MatcherCreator<M.ConnectNpmPatternLibrary
 			return abort();
 		}
 
-		const result = await Analzyer.getPackage(m.payload.npmId, {
+		const result = await Analyzer.getPackage(m.payload.npmId, {
 			cwd: await host.resolveFrom(T.HostBase.AppData, 'packages'),
 			dirname,
 			appPath: await host.resolveFrom(T.HostBase.AppPath, '.')
@@ -90,7 +90,7 @@ export const connectNpmPatternLibrary: MatcherCreator<M.ConnectNpmPatternLibrary
 			return abort();
 		}
 
-		const analysisResult = await Analzyer.analyze(result.path);
+		const analysisResult = await Analyzer.analyze(result.path);
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {
 			host.log(analysisResult.error.message);

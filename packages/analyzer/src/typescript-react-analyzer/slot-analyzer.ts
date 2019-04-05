@@ -91,6 +91,8 @@ export function analyzeSlots(
 				id,
 				propertyName,
 				required,
+				quantity:
+					ReactUtils.getReactSlotType(memberType, { program: ctx.program }) || 'multiple',
 				type: propertyName === 'children' && !isExplicitSlot ? 'children' : 'property'
 			};
 		})

@@ -90,6 +90,7 @@ export interface SerializedPatternSlot {
 	label: string;
 	propertyName: string;
 	required: boolean;
+	quantity: string;
 	type: string;
 }
 

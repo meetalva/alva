@@ -295,6 +295,7 @@ export function analyzePatternExport(
 				id: IdHasher.getGlobalSlotId(id, 'children'),
 				label: 'children',
 				propertyName: 'children',
+				quantity: 'multiple',
 				required: false,
 				type: 'children'
 			});

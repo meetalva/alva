@@ -16,11 +16,8 @@ export class LibraryStore {
 			version: 'latest'
 		},
 		{
-			name: '@meetalva/feather-icons',
-			version: 'latest'
-		},
-		{
-			name: '@meetalva/unsplash',
+			name: '@meetalva/material-design',
+			category: 'design-system',
 			version: 'latest'
 		},
 		{
@@ -34,7 +31,19 @@ export class LibraryStore {
 			version: 'latest'
 		},
 		{
+			name: '@meetalva/unsplash',
+			category: 'media',
+			version: 'latest'
+		},
+		{
+			name: '@meetalva/feather-icons',
+			category: 'media',
+			version: 'latest'
+		},
+
+		{
 			name: '@meetalva/music-player',
+			category: 'media',
 			version: 'latest'
 		}
 	];

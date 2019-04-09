@@ -16,6 +16,7 @@ import * as T from '@meetalva/types';
 import { MessageType as MT } from '@meetalva/message';
 import { PatternLibraryInstallType } from '@meetalva/types';
 import { When } from './when';
+import { partition } from 'lodash';
 import { animateScroll } from 'react-scroll';
 import SmoothCollapse from 'react-smooth-collapse';
 
@@ -155,9 +156,11 @@ export class LibraryStoreContainer extends React.Component {
 
 	public render(): JSX.Element | null {
 		const { store } = this.props as WithStore;
-		const app = store.getApp();
 		const isValidPackage = this.isValidPackage;
 		const libraryStore = store.libraryStore;
+		const [designSystemPackages, otherPackages] = partition(libraryStore.recommendations, {
+			category: 'design-system'
+		});
 
 		function translateState(state: LibraryStoreItemState): C.ButtonState {
 			switch (state) {
@@ -190,12 +193,17 @@ export class LibraryStoreContainer extends React.Component {
 					<div
 						style={{
 							width: '90%',
-							maxWidth: '1092px',
+							maxWidth: '1104px',
 							margin: '0 auto',
 							padding: `${C.getSpace(C.SpaceSize.L)}px 0`
 						}}
 					>
-						<C.Space size={C.SpaceSize.XS} onClick={this.handleDetailsClick}>
+						<C.Space
+							size={C.SpaceSize.XS}
+							sizeLeft={C.SpaceSize.L}
+							sizeRight={C.SpaceSize.L}
+							onClick={this.handleDetailsClick}
+						>
 							<C.Flex alignItems={C.FlexAlignItems.FlexStart}>
 								<div>
 									<C.Space sizeTop={2} />
@@ -215,8 +223,8 @@ export class LibraryStoreContainer extends React.Component {
 										}
 									>
 										{libraryStore.updateAvailable
-											? 'Updates available'
-											: 'Everything up to date'}
+											? 'Updates available 🙌'
+											: 'Up to date 👌'}
 									</C.Headline>
 									<C.Space sizeBottom={C.SpaceSize.XS} />
 									<When mayToggle={libraryStore.updateCount === 0}>
@@ -239,21 +247,23 @@ export class LibraryStoreContainer extends React.Component {
 							</C.Flex>
 						</C.Space>
 						<SmoothCollapse expanded={libraryStore.installedOpen}>
-							<C.Space sizeBottom={C.SpaceSize.S} />
-							<InstalledPackagesContainer>
-								{(libraryStore.updateCount === 0
-									? libraryStore.withLibrary
-									: libraryStore.withUpdate
-								).map(item => (
-									<LibraryStoreItemContainer
-										key={item.id}
-										item={item}
-										size={LibraryStoreItemSize.Medium}
-									/>
-								))}
-							</InstalledPackagesContainer>
+							<C.Space size={C.SpaceSize.S}>
+								<C.Flex flexWrap={true}>
+									{libraryStore.withLibrary.map(item => (
+										<LibraryStoreItemContainer
+											key={item.id}
+											item={item}
+											size={LibraryStoreItemSize.Installed}
+										/>
+									))}
+								</C.Flex>
+							</C.Space>
 							{this.online && (
-								<C.Space size={C.SpaceSize.XS}>
+								<C.Space
+									size={C.SpaceSize.XS}
+									sizeLeft={C.SpaceSize.L}
+									sizeRight={C.SpaceSize.L}
+								>
 									<C.LinkIcon
 										color={C.Color.Grey50}
 										icon="RotateCw"
@@ -280,7 +290,7 @@ export class LibraryStoreContainer extends React.Component {
 							width: '90%',
 							maxWidth: '1080px',
 							margin: '0 auto',
-							padding: `${C.getSpace(C.SpaceSize.XXXL * 3)}px 0 ${C.getSpace(
+							padding: `${C.getSpace(C.SpaceSize.XXXL * 2)}px 0 ${C.getSpace(
 								C.SpaceSize.XXXL + C.SpaceSize.L
 							)}px 0`
 						}}
@@ -294,18 +304,42 @@ export class LibraryStoreContainer extends React.Component {
 										</C.Headline>
 										<C.Space sizeBottom={C.SpaceSize.M} />
 										<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
-											Browse and install compatible code libraries for your prototype
+											Connect interactive design systems and components with your
+											prototype
 										</C.Copy>
 									</div>
 								</C.Space>
 
 								<C.Space sizeBottom={C.SpaceSize.XXL} />
-								<C.Flex>
-									{libraryStore.recommendations.map(item => (
+
+								<C.Flex flexWrap={true}>
+									{designSystemPackages.map(item => (
 										<LibraryStoreItemContainer
 											key={item.id}
 											item={item}
-											size={LibraryStoreItemSize.Large}
+											size={LibraryStoreItemSize.Featured}
+										/>
+									))}
+								</C.Flex>
+								<C.Space
+									size={C.SpaceSize.XS}
+									style={{ paddingTop: `${C.SpaceSize.XXL * 2}px` }}
+								>
+									<C.Headline order={3} bold textColor={C.Color.Grey10}>
+										Packages
+									</C.Headline>
+									<C.Space sizeBottom={C.SpaceSize.XS} />
+									<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
+										Ready-to-use interactive code components
+									</C.Copy>
+								</C.Space>
+								<C.Space sizeBottom={C.SpaceSize.L} />
+								<C.Flex flexWrap={true}>
+									{otherPackages.map(item => (
+										<LibraryStoreItemContainer
+											key={item.id}
+											item={item}
+											size={LibraryStoreItemSize.Default}
 										/>
 									))}
 								</C.Flex>
@@ -393,7 +427,7 @@ export class LibraryStoreContainer extends React.Component {
 													this.npmInstallState = LibraryStoreItemState.Default;
 												}}
 											>
-												Install
+												Connect
 											</C.InputButton>
 										</div>
 									</C.Space>
@@ -404,7 +438,7 @@ export class LibraryStoreContainer extends React.Component {
 									<C.Space size={C.SpaceSize.XS}>
 										<div style={{ maxWidth: '360px' }}>
 											<C.Headline order={4} bold textColor={C.Color.Grey10}>
-												Install Local Library
+												Connect Local Library
 											</C.Headline>
 											<C.Space sizeBottom={C.SpaceSize.XS} />
 											<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
@@ -417,7 +451,7 @@ export class LibraryStoreContainer extends React.Component {
 												size={C.ButtonSize.Medium}
 												onClick={this.handleLocalInstallClick}
 											>
-												Install Local Library
+												Connect Local Library
 											</C.Button>
 											<C.Space sizeBottom={C.SpaceSize.S} />
 											<C.Link

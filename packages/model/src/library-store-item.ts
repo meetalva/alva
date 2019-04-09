@@ -17,6 +17,7 @@ export interface LibraryStoreItemInit {
 	library?: PatternLibrary;
 	meta?: Map<string, any>;
 	type: LibraryStoreItemType;
+	category: string;
 	name: string;
 	version: string;
 }
@@ -25,6 +26,7 @@ export class LibraryStoreItem {
 	public readonly id: string;
 	private library?: PatternLibrary;
 	private type: LibraryStoreItemType;
+	public readonly category: string;
 	private fetching?: Promise<unknown>;
 
 	@Mobx.observable private internalItemName: string;
@@ -199,6 +201,7 @@ export class LibraryStoreItem {
 	public constructor(init: LibraryStoreItemInit) {
 		this.id = init.id || uuid.v4();
 		this.library = init.library;
+		this.category = init.category;
 		this.type = init.type;
 		this.internalItemName = init.name;
 		this.internalItemVersion = init.version;
@@ -222,7 +225,7 @@ export class LibraryStoreItem {
 	}
 
 	public static fromRecommendation(
-		name: { name: string; version: string },
+		name: { name: string; category: string; version: string },
 		ctx: {
 			meta: Map<string, any>;
 			getLibraryByPackageName(name: string): PatternLibrary | undefined;
@@ -232,6 +235,7 @@ export class LibraryStoreItem {
 			library: ctx.getLibraryByPackageName(name.name),
 			type: LibraryStoreItemType.Recommended,
 			name: name.name,
+			category: name.category || '',
 			version: name.version,
 			meta: ctx.meta
 		});
@@ -246,6 +250,7 @@ export class LibraryStoreItem {
 		return new LibraryStoreItem({
 			library,
 			type,
+			category: '',
 			name: library.getName(),
 			version: library.getVersion()
 		});

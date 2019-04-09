@@ -16,8 +16,10 @@ export interface LibraryStoreItemContainerProps {
 }
 
 export enum LibraryStoreItemSize {
-	Medium,
-	Large
+	Hero,
+	Featured,
+	Default,
+	Installed
 }
 
 export enum LibraryStoreItemState {
@@ -110,10 +112,20 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				? C.LibraryBoxState.Progress
 				: C.LibraryBoxState.Idle;
 
-		const boxSize =
-			props.size === LibraryStoreItemSize.Large
-				? C.LibraryBoxSize.Large
-				: C.LibraryBoxSize.Medium;
+		const boxSize = () => {
+			switch (props.size) {
+				case LibraryStoreItemSize.Hero:
+					return C.LibraryBoxSize.Hero;
+				case LibraryStoreItemSize.Featured:
+					return C.LibraryBoxSize.Featured;
+				case LibraryStoreItemSize.Default:
+					return C.LibraryBoxSize.Default;
+				case LibraryStoreItemSize.Installed:
+					return C.LibraryBoxSize.Installed;
+				default:
+					return C.LibraryBoxSize.Default;
+			}
+		};
 
 		return (
 			<C.LibraryBox
@@ -141,7 +153,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 						) : null}
 					</C.Flex>
 				}
-				size={boxSize}
+				size={boxSize()}
 				details={
 					props.item.homepage && (
 						<C.LinkIcon
@@ -155,7 +167,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 								})
 							}
 						>
-							Learn more
+							Docs
 						</C.LinkIcon>
 					)
 				}
@@ -163,7 +175,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 					<C.Flex alignItems={C.FlexAlignItems.Center}>
 						<Match value={props.item.state}>
 							<MatchBranch when={Model.LibraryStoreItemState.Listed}>
-								<ActiveButton label="Install" onClick={this.handleButtonClick} />
+								<ActiveButton label="Connect" onClick={this.handleButtonClick} />
 							</MatchBranch>
 							<MatchBranch when={whenHasLibraryAnd(installing)}>
 								<div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>

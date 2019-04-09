@@ -15,8 +15,10 @@ export enum LibraryBoxState {
 }
 
 export enum LibraryBoxSize {
-	Medium,
-	Large
+	Hero,
+	Featured,
+	Default,
+	Installed
 }
 
 export interface LibraryBoxProps {
@@ -35,19 +37,26 @@ const StyledBox =
 	styled.div <
 	LibraryBoxProps >
 	`
-	width: 348px;
+	width: ${(props: LibraryBoxProps) =>
+		props.size === LibraryBoxSize.Hero
+			? '100%'
+			: props.size === LibraryBoxSize.Featured
+				? '348px'
+				: '258px'};
+	margin: ${getSpace(SpaceSize.XS)}px;
+
 	background: ${props => (props.color ? props.color : Color.Grey20)};
 	border-radius: 6px;
 	box-shadow: 0 0 24px 0 ${props =>
 		props.color ? new ColorTool(props.color).fade(0.4).toString() : Color.BlackAlpha15};
 	color: ${Color.White};
 	text-align: left;
-	margin: ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.XS)}px;
+
 	user-select: none;
 	overflow: hidden;
 
 	${props =>
-		props.size === LibraryBoxSize.Medium &&
+		props.size === LibraryBoxSize.Installed &&
 		`
 		animation: show .2s ease-out both;
 
@@ -83,7 +92,12 @@ const StyledBox =
 const IMAGE = (props: LibraryBoxProps) => (props.image ? props.image : toDataUrl(<LibraryImage />));
 
 const StyledImage = styled.div`
-	height: 140px;
+	height: ${(props: LibraryBoxProps) =>
+		props.size === LibraryBoxSize.Hero
+			? '200'
+			: props.size === LibraryBoxSize.Featured
+				? '140'
+				: '101'}px;
 	width: 100%;
 	background-image: url('${IMAGE}');
 	background-size: cover;
@@ -92,7 +106,12 @@ const StyledImage = styled.div`
 `;
 
 const StyledDetails = styled.div`
-	min-height: 200px;
+	min-height: ${(props: LibraryBoxProps) =>
+		props.size === LibraryBoxSize.Hero
+			? '300'
+			: props.size === LibraryBoxSize.Featured
+				? '200'
+				: '185'}px;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -122,7 +141,7 @@ const StyledBottom = styled.div`
 
 export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JSX.Element => (
 	<StyledBox {...props}>
-		{props.size === LibraryBoxSize.Large && (
+		{props.size !== LibraryBoxSize.Installed && (
 			<StyledImage state={props.state} image={props.image} size={props.size} />
 		)}
 		<StyledDetails {...props}>

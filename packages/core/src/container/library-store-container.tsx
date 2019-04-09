@@ -156,7 +156,6 @@ export class LibraryStoreContainer extends React.Component {
 
 	public render(): JSX.Element | null {
 		const { store } = this.props as WithStore;
-		const app = store.getApp();
 		const isValidPackage = this.isValidPackage;
 		const libraryStore = store.libraryStore;
 		const [designSystemPackages, otherPackages] = partition(libraryStore.recommendations, {
@@ -284,7 +283,7 @@ export class LibraryStoreContainer extends React.Component {
 							width: '90%',
 							maxWidth: '1080px',
 							margin: '0 auto',
-							padding: `${C.getSpace(C.SpaceSize.XXXL * 3)}px 0 ${C.getSpace(
+							padding: `${C.getSpace(C.SpaceSize.XXXL * 2)}px 0 ${C.getSpace(
 								C.SpaceSize.XXXL + C.SpaceSize.L
 							)}px 0`
 						}}
@@ -315,12 +314,14 @@ export class LibraryStoreContainer extends React.Component {
 										/>
 									))}
 								</C.Flex>
-								<C.Space sizeBottom={C.SpaceSize.XXXL} />
-								<C.Space size={C.SpaceSize.XS}>
+								<C.Space
+									size={C.SpaceSize.XS}
+									style={{ paddingTop: `${C.SpaceSize.XXL * 2}px` }}
+								>
 									<C.Headline order={3} bold textColor={C.Color.Grey10}>
 										Packages
 									</C.Headline>
-									<C.Space sizeBottom={C.SpaceSize.M} />
+									<C.Space sizeBottom={C.SpaceSize.XS} />
 									<C.Copy textColor={C.Color.Grey36} size={C.CopySize.M}>
 										Ready-to-use interactive code components
 									</C.Copy>

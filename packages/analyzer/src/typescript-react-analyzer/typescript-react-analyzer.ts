@@ -3,7 +3,7 @@ import * as Fs from 'fs';
 import * as Path from 'path';
 import * as PropertyAnalyzer from './property-analyzer';
 import * as ReactUtils from '../react-utils';
-import * as SlotAnalyzer from './slot-analzyer';
+import * as SlotAnalyzer from './slot-analyzer';
 import * as Types from '@meetalva/types';
 import * as TypeScriptUtils from '../typescript-utils';
 import * as ts from 'typescript';
@@ -295,6 +295,7 @@ export function analyzePatternExport(
 				id: IdHasher.getGlobalSlotId(id, 'children'),
 				label: 'children',
 				propertyName: 'children',
+				quantity: 'multiple',
 				required: false,
 				type: 'children'
 			});

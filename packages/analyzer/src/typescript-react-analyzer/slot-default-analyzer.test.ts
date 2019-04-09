@@ -76,6 +76,67 @@ test('picks up number props', () => {
 	);
 });
 
+test('picks up jsx props', () => {
+	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
+
+	project.createSourceFile(
+		'/a.ts',
+		`import * as React from 'react'; export const A: React.SFC = () => null;`
+	);
+
+	project.createSourceFile(
+		'/c.ts',
+		`import * as React from 'react'; export const C: React.SFC = () => null;`
+	);
+
+	const result = analyzeSlotDefault(
+		`
+		import * as React from 'react';
+		import { A } from '/a';
+		import { C } from '/c';
+		export default () => <A jsx={<C />} />
+	`,
+		{ project, id: 'jsx-props', path: '/b.ts' }
+	);
+
+	expect(result).toEqual(
+		expect.objectContaining({
+			props: [
+				{
+					propName: 'jsx',
+					value: expect.objectContaining({
+						patternContextId: 'c.ts:C'
+					})
+				}
+			]
+		})
+	);
+});
+
+test('supports jsx fragment', () => {
+	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
+
+	project.createSourceFile(
+		'/a.ts',
+		`import * as React from 'react'; export const A: React.SFC = () => null;`
+	);
+
+	const result = analyzeSlotDefault(
+		`
+		import * as React from 'react';
+		import { A } from '/a';
+		export default () => <><A /></>
+	`,
+		{ project, id: 'jsx-fragment', path: '/b.ts' }
+	);
+
+	expect(result).toEqual(
+		expect.objectContaining({
+			jsxFragment: true
+		})
+	);
+});
+
 test('supports multiple levels of JSX elements', () => {
 	const project = new tsa.Project({ useVirtualFileSystem: true, addFilesFromTsConfig: false });
 

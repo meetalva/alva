@@ -8,6 +8,7 @@ import * as Types from '@meetalva/types';
 import { Sender } from '../sender';
 
 import * as uuid from 'uuid';
+import { ElementCandidate } from '@meetalva/types';
 
 export interface ViewStoreInit {
 	app: Model.AlvaApp<Message>;
@@ -200,6 +201,12 @@ export class ViewStore {
 		});
 
 		const fromCandidate = (candidate: Types.ElementCandidate, content: Model.ElementContent) => {
+			if (candidate.jsxFragment) {
+				candidate.children.forEach(childCandidate => {
+					fromCandidate(childCandidate, content);
+				});
+			}
+
 			const library = project.getPatternLibraryByName(candidate.libraryId);
 
 			if (!library) {
@@ -217,22 +224,25 @@ export class ViewStore {
 				pattern
 			});
 
-			candidate.props.forEach(propCandidate => {
-				const prop = child.getPropertyByContextId(propCandidate.propName);
-
-				if (!prop) {
-					return;
-				}
-
-				prop.setValue(propCandidate.value);
-			});
-
 			content.insert({
-				at: 0,
+				at: undefined,
 				element: child
 			});
 
 			this.addElement(child);
+
+			candidate.props.forEach(propCandidate => {
+				const prop = child.getPropertyByContextId(propCandidate.propName);
+				const slotContent = child.getContentBySlotContextId(propCandidate.propName);
+
+				if (prop) {
+					prop.setValue(propCandidate.value);
+				}
+
+				if (slotContent) {
+					fromCandidate(propCandidate.value, slotContent);
+				}
+			});
 
 			candidate.children.forEach(childCandidate => {
 				const childContent = child.getContentBySlotType(Types.SlotType.Children);

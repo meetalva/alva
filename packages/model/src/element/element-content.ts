@@ -87,7 +87,7 @@ export class ElementContent {
 				forcedOpen: false,
 				highlighted: false,
 				id: uuid.v4(),
-				open: false,
+				open: true,
 				slotId: slot.getId()
 			},
 			context
@@ -198,20 +198,34 @@ export class ElementContent {
 		return this.slotId;
 	}
 
+	public getSlotContextId(): string | undefined {
+		const slot = this.getSlot();
+
+		if (!slot) {
+			return;
+		}
+
+		return slot.getContextId();
+	}
+
 	public getSlotType(): Types.SlotType | undefined {
 		const slot = this.getSlot();
 		return slot ? slot.getType() : undefined;
 	}
 
 	@Mobx.action
-	public insert(options: { at: number; element: Element }): void {
+	public insert(options: { at: number | undefined; element: Element }): void {
 		const id = options.element.getId();
 
 		if (this.elementIds.find(eid => eid === id)) {
 			return;
 		}
 
-		this.elementIds.splice(options.at, 0, id);
+		if (typeof options.at !== 'undefined') {
+			this.elementIds.splice(options.at, 0, id);
+		} else {
+			this.elementIds.push(id);
+		}
 	}
 
 	@Mobx.action

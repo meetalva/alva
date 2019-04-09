@@ -51,6 +51,18 @@ function candidateFromJSXElement(
 	element: tsa.JsxChild,
 	{ project, id }: { project: tsa.Project; id: string }
 ): ElementCandidate | undefined {
+	if (tsa.TypeGuards.isJsxFragment(element)) {
+		return {
+			parent: id,
+			id: [id, 'default'].join(':'),
+			libraryId: '',
+			patternContextId: '',
+			props: [],
+			jsxFragment: true,
+			children: getChildrenCandidates(element, { project, id })
+		};
+	}
+
 	const nameElement = getNameElement(element);
 
 	if (!nameElement) {
@@ -113,12 +125,13 @@ function candidateFromJSXElement(
 		id: [id, 'default'].join(':'),
 		libraryId: pkg.name,
 		patternContextId: [patternContextBase, exportSpecifier].join(':'),
+		jsxFragment: false,
 		props: nameElement
 			.getAttributes()
 			.filter(tsa.TypeGuards.isJsxAttribute)
 			.map(attribute => ({
 				propName: attribute.getName(),
-				value: getInitValue(attribute.getInitializer())
+				value: getInitValue(attribute.getInitializer(), { project, id })
 			})),
 		children
 	};
@@ -128,7 +141,7 @@ function getChildrenCandidates(
 	element: tsa.JsxChild,
 	{ project, id }: { project: tsa.Project; id: string }
 ): ElementCandidate[] {
-	if (tsa.TypeGuards.isJsxElement(element)) {
+	if (tsa.TypeGuards.isJsxElement(element) || tsa.TypeGuards.isJsxFragment(element)) {
 		return element
 			.getJsxChildren()
 			.map(child => candidateFromJSXElement(child, { project, id }))
@@ -139,7 +152,8 @@ function getChildrenCandidates(
 }
 
 function getInitValue(
-	init?: tsa.StringLiteral | tsa.JsxExpression | tsa.Expression | undefined
+	init: tsa.StringLiteral | tsa.JsxExpression | tsa.Expression | undefined,
+	{ project, id }: { project: tsa.Project; id: string }
 ): unknown {
 	if (typeof init === 'undefined') {
 		return;
@@ -149,17 +163,41 @@ function getInitValue(
 		return init.getLiteralValue();
 	}
 
+	if (isElement(init)) {
+		const element = getElement(init);
+
+		if (element) {
+			return candidateFromJSXElement(element, { id, project });
+		}
+	}
+
 	if (tsa.TypeGuards.isJsxExpression(init)) {
 		const exp = init.getExpression();
-		return getInitValue(exp);
+		return getInitValue(exp, { id, project });
 	}
 
 	// TODO: Propagate error/warning to user for non-literal attributes
 	return;
 }
 
-export function getElement(jsx: tsa.Node): tsa.JsxElement | tsa.JsxSelfClosingElement | undefined {
-	if (tsa.TypeGuards.isJsxElement(jsx) || tsa.TypeGuards.isJsxSelfClosingElement(jsx)) {
+export function isElement(element: tsa.Node): boolean {
+	if (
+		tsa.TypeGuards.isJsxOpeningElement(element) ||
+		tsa.TypeGuards.isJsxSelfClosingElement(element)
+	) {
+		return true;
+	}
+	return false;
+}
+
+export function getElement(
+	jsx: tsa.Node
+): tsa.JsxElement | tsa.JsxSelfClosingElement | tsa.JsxFragment | undefined {
+	if (
+		tsa.TypeGuards.isJsxElement(jsx) ||
+		tsa.TypeGuards.isJsxSelfClosingElement(jsx) ||
+		tsa.TypeGuards.isJsxFragment(jsx)
+	) {
 		return jsx;
 	}
 

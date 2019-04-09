@@ -1,5 +1,5 @@
 import * as Fs from 'fs';
-import { getDefaultCode, getCommentValue, analyzeSlots } from './slot-analzyer';
+import { getDefaultCode, getCommentValue, analyzeSlots } from './slot-analyzer';
 import * as TypescriptUtils from '../typescript-utils';
 import * as TestUtils from '../test-utils';
 import { Project } from 'ts-simple-ast';

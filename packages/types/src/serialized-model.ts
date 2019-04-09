@@ -75,6 +75,7 @@ export interface ElementCandidate {
 	libraryId: string;
 	id: string;
 	props: ElementProp[];
+	jsxFragment: boolean;
 	children: ElementCandidate[];
 }
 
@@ -89,6 +90,7 @@ export interface SerializedPatternSlot {
 	label: string;
 	propertyName: string;
 	required: boolean;
+	quantity: string;
 	type: string;
 }
 

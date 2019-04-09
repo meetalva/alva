@@ -22,7 +22,7 @@ export interface ConditionalProps {
 	 *     alignItems={E.AlignItems.center}
 	 *     height="100px"
 	 *     backgroundColor="#eee">
-	 *     <Text text="Shown if condition is true"/>
+	 *     <E.Text text="Shown if condition is true"/>
 	 *   </E.Box>
 	 * );
 	 * ~~~

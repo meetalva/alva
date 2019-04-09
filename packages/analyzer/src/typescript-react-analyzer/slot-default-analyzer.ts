@@ -58,7 +58,6 @@ function candidateFromJSXElement(
 			libraryId: '',
 			patternContextId: '',
 			props: [],
-			slotContent: [],
 			jsxFragment: true,
 			children: getChildrenCandidates(element, { project, id })
 		};
@@ -121,30 +120,19 @@ function candidateFromJSXElement(
 
 	const children = getChildrenCandidates(element, { project, id });
 
-	const props = nameElement
-		.getAttributes()
-		.filter(tsa.TypeGuards.isJsxAttribute)
-		.map(attribute => ({
-			propName: attribute.getName(),
-			value: getInitValue(attribute.getInitializer(), { project, id })
-		}));
-
-	const slotContent = nameElement
-		.getAttributes()
-		.filter(tsa.TypeGuards.isJsxAttribute)
-		.map(attribute => ({
-			slotName: attribute.getName(),
-			value: getInitValue(attribute.getInitializer(), { project, id })
-		}));
-
 	return {
 		parent: id,
 		id: [id, 'default'].join(':'),
 		libraryId: pkg.name,
 		patternContextId: [patternContextBase, exportSpecifier].join(':'),
 		jsxFragment: false,
-		props,
-		slotContent,
+		props: nameElement
+			.getAttributes()
+			.filter(tsa.TypeGuards.isJsxAttribute)
+			.map(attribute => ({
+				propName: attribute.getName(),
+				value: getInitValue(attribute.getInitializer(), { project, id })
+			})),
 		children
 	};
 }

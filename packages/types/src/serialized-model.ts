@@ -69,18 +69,12 @@ export interface ElementProp {
 	value: any;
 }
 
-export interface ElementSlot {
-	slotName: string;
-	value: any;
-}
-
 export interface ElementCandidate {
 	parent: string;
 	patternContextId: string;
 	libraryId: string;
 	id: string;
 	props: ElementProp[];
-	slotContent: ElementSlot[];
 	jsxFragment: boolean;
 	children: ElementCandidate[];
 }

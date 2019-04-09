@@ -224,14 +224,6 @@ export class ViewStore {
 				pattern
 			});
 
-			candidate.props.forEach(propCandidate => {
-				const prop = child.getPropertyByContextId(propCandidate.propName);
-
-				if (prop) {
-					prop.setValue(propCandidate.value);
-				}
-			});
-
 			content.insert({
 				at: undefined,
 				element: child
@@ -239,17 +231,18 @@ export class ViewStore {
 
 			this.addElement(child);
 
-			if (candidate.slotContent) {
-				candidate.slotContent.forEach(slotContentCandidate => {
-					const slotContent = child.getContentBySlotContextId(slotContentCandidate.slotName);
+			candidate.props.forEach(propCandidate => {
+				const prop = child.getPropertyByContextId(propCandidate.propName);
+				const slotContent = child.getContentBySlotContextId(propCandidate.propName);
 
-					if (!slotContent) {
-						return;
-					}
+				if (prop) {
+					prop.setValue(propCandidate.value);
+				}
 
-					fromCandidate(slotContentCandidate.value as ElementCandidate, slotContent);
-				});
-			}
+				if (slotContent) {
+					fromCandidate(propCandidate.value, slotContent);
+				}
+			});
 
 			candidate.children.forEach(childCandidate => {
 				const childContent = child.getContentBySlotType(Types.SlotType.Children);

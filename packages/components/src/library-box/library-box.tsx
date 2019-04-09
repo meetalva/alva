@@ -43,7 +43,7 @@ const StyledBox =
 			: props.size === LibraryBoxSize.Featured
 				? '348px'
 				: '258px'};
-	margin: ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.XS)}px;
+	margin: ${getSpace(SpaceSize.XS)}px;
 
 	background: ${props => (props.color ? props.color : Color.Grey20)};
 	border-radius: 6px;

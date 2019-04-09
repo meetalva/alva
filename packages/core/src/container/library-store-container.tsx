@@ -247,7 +247,7 @@ export class LibraryStoreContainer extends React.Component {
 							</C.Flex>
 						</C.Space>
 						<SmoothCollapse expanded={libraryStore.installedOpen}>
-							<C.Space size={C.SpaceSize.S} sizeBottom={C.SpaceSize.S} sizeTop={0}>
+							<C.Space size={C.SpaceSize.S}>
 								<C.Flex flexWrap={true}>
 									{libraryStore.withLibrary.map(item => (
 										<LibraryStoreItemContainer

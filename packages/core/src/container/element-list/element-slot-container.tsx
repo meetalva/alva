@@ -28,7 +28,6 @@ export class ElementSlotContainer extends React.Component<ElementSlotContainerPr
 				state={getSlotState(props.content, props.store)}
 				title={slot.getName()}
 			>
-				id: {slot.getContextId()}
 				{props.content
 					.getElements()
 					.map(element => <ElementContainer element={element} key={element.getId()} />)}

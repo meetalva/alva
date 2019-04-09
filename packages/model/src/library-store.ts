@@ -12,26 +12,38 @@ export class LibraryStore {
 	private readonly recommended = [
 		{
 			name: '@meetalva/alva-design',
+			category: 'design-system',
 			version: 'latest'
 		},
 		{
-			name: '@meetalva/feather-icons',
-			version: 'latest'
-		},
-		{
-			name: '@meetalva/unsplash',
+			name: '@meetalva/material-design',
+			category: 'design-system',
 			version: 'latest'
 		},
 		{
 			name: '@meetalva/video-player',
+			category: 'media',
 			version: 'latest'
 		},
 		{
 			name: '@meetalva/maps',
+			category: 'media',
 			version: 'latest'
 		},
 		{
+			name: '@meetalva/unsplash',
+			category: 'media',
+			version: 'latest'
+		},
+		{
+			name: '@meetalva/feather-icons',
+			category: 'media',
+			version: 'latest'
+		},
+
+		{
 			name: '@meetalva/music-player',
+			category: 'media',
 			version: 'latest'
 		}
 	];

@@ -198,6 +198,16 @@ export class ElementContent {
 		return this.slotId;
 	}
 
+	public getSlotContextId(): string | undefined {
+		const slot = this.getSlot();
+
+		if (!slot) {
+			return;
+		}
+
+		return slot.getContextId();
+	}
+
 	public getSlotType(): Types.SlotType | undefined {
 		const slot = this.getSlot();
 		return slot ? slot.getType() : undefined;

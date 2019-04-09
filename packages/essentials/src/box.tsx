@@ -52,6 +52,19 @@ export interface BoxProps {
 	/** @name Background Color @control color */
 	backgroundColor?: string;
 
+	/**
+	 * @default
+	 * ~~~tsx
+	 * import * as React from 'react';
+	 * import * as E from '@meetalva/essentials';
+	 *
+	 * export default () => (
+	 *   <E.Conditional truthy={<E.Text />} />
+	 * );
+	 * ~~~
+	 */
+	foo?: React.ReactNode;
+
 	children?: React.ReactNode;
 }
 

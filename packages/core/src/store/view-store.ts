@@ -8,6 +8,7 @@ import * as Types from '@meetalva/types';
 import { Sender } from '../sender';
 
 import * as uuid from 'uuid';
+import { ElementCandidate } from '@meetalva/types';
 
 export interface ViewStoreInit {
 	app: Model.AlvaApp<Message>;
@@ -226,11 +227,9 @@ export class ViewStore {
 			candidate.props.forEach(propCandidate => {
 				const prop = child.getPropertyByContextId(propCandidate.propName);
 
-				if (!prop) {
-					return;
+				if (prop) {
+					prop.setValue(propCandidate.value);
 				}
-
-				prop.setValue(propCandidate.value);
 			});
 
 			content.insert({
@@ -239,6 +238,18 @@ export class ViewStore {
 			});
 
 			this.addElement(child);
+
+			if (candidate.slotContent) {
+				candidate.slotContent.forEach(slotContentCandidate => {
+					const slotContent = child.getContentBySlotContextId(slotContentCandidate.slotName);
+
+					if (!slotContent) {
+						return;
+					}
+
+					fromCandidate(slotContentCandidate.value as ElementCandidate, slotContent);
+				});
+			}
 
 			candidate.children.forEach(childCandidate => {
 				const childContent = child.getContentBySlotType(Types.SlotType.Children);

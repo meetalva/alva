@@ -58,6 +58,7 @@ function candidateFromJSXElement(
 			libraryId: '',
 			patternContextId: '',
 			props: [],
+			slotContent: [],
 			jsxFragment: true,
 			children: getChildrenCandidates(element, { project, id })
 		};
@@ -120,19 +121,30 @@ function candidateFromJSXElement(
 
 	const children = getChildrenCandidates(element, { project, id });
 
+	const props = nameElement
+		.getAttributes()
+		.filter(tsa.TypeGuards.isJsxAttribute)
+		.map(attribute => ({
+			propName: attribute.getName(),
+			value: getInitValue(attribute.getInitializer(), { project, id })
+		}));
+
+	const slotContent = nameElement
+		.getAttributes()
+		.filter(tsa.TypeGuards.isJsxAttribute)
+		.map(attribute => ({
+			slotName: attribute.getName(),
+			value: getInitValue(attribute.getInitializer(), { project, id })
+		}));
+
 	return {
 		parent: id,
 		id: [id, 'default'].join(':'),
 		libraryId: pkg.name,
 		patternContextId: [patternContextBase, exportSpecifier].join(':'),
 		jsxFragment: false,
-		props: nameElement
-			.getAttributes()
-			.filter(tsa.TypeGuards.isJsxAttribute)
-			.map(attribute => ({
-				propName: attribute.getName(),
-				value: getInitValue(attribute.getInitializer())
-			})),
+		props,
+		slotContent,
 		children
 	};
 }
@@ -152,7 +164,8 @@ function getChildrenCandidates(
 }
 
 function getInitValue(
-	init?: tsa.StringLiteral | tsa.JsxExpression | tsa.Expression | undefined
+	init: tsa.StringLiteral | tsa.JsxExpression | tsa.Expression | undefined,
+	{ project, id }: { project: tsa.Project; id: string }
 ): unknown {
 	if (typeof init === 'undefined') {
 		return;
@@ -162,13 +175,31 @@ function getInitValue(
 		return init.getLiteralValue();
 	}
 
+	if (isElement(init)) {
+		const element = getElement(init);
+
+		if (element) {
+			return candidateFromJSXElement(element, { id, project });
+		}
+	}
+
 	if (tsa.TypeGuards.isJsxExpression(init)) {
 		const exp = init.getExpression();
-		return getInitValue(exp);
+		return getInitValue(exp, { id, project });
 	}
 
 	// TODO: Propagate error/warning to user for non-literal attributes
 	return;
+}
+
+export function isElement(element: tsa.Node): boolean {
+	if (
+		tsa.TypeGuards.isJsxOpeningElement(element) ||
+		tsa.TypeGuards.isJsxSelfClosingElement(element)
+	) {
+		return true;
+	}
+	return false;
 }
 
 export function getElement(

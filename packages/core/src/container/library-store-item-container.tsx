@@ -9,7 +9,6 @@ import { PatternLibraryInstallType } from '@meetalva/types';
 import { MessageType } from '@meetalva/message';
 import * as uuid from 'uuid';
 import { ArrowRight } from 'react-feather';
-import { LibraryBoxSize, LibraryBox } from '@meetalva/components';
 
 export interface LibraryStoreItemContainerProps {
 	item: LibraryStoreItem;
@@ -116,20 +115,20 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 		const boxSize = () => {
 			switch (props.size) {
 				case LibraryStoreItemSize.Hero:
-					return LibraryBoxSize.Hero;
+					return C.LibraryBoxSize.Hero;
 				case LibraryStoreItemSize.Featured:
-					return LibraryBoxSize.Featured;
+					return C.LibraryBoxSize.Featured;
 				case LibraryStoreItemSize.Default:
-					return LibraryBoxSize.Default;
+					return C.LibraryBoxSize.Default;
 				case LibraryStoreItemSize.Installed:
-					return LibraryBoxSize.Installed;
+					return C.LibraryBoxSize.Installed;
 				default:
-					return LibraryBoxSize.Default;
+					return C.LibraryBoxSize.Default;
 			}
 		};
 
 		return (
-			<LibraryBox
+			<C.LibraryBox
 				key={props.item.id}
 				name={props.item.displayName || props.item.name}
 				description={props.item.description}

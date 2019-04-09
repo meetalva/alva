@@ -193,12 +193,17 @@ export class LibraryStoreContainer extends React.Component {
 					<div
 						style={{
 							width: '90%',
-							maxWidth: '1092px',
+							maxWidth: '1104px',
 							margin: '0 auto',
 							padding: `${C.getSpace(C.SpaceSize.L)}px 0`
 						}}
 					>
-						<C.Space size={C.SpaceSize.XS} onClick={this.handleDetailsClick}>
+						<C.Space
+							size={C.SpaceSize.XS}
+							sizeLeft={C.SpaceSize.L}
+							sizeRight={C.SpaceSize.L}
+							onClick={this.handleDetailsClick}
+						>
 							<C.Flex alignItems={C.FlexAlignItems.FlexStart}>
 								<div>
 									<C.Space sizeTop={2} />
@@ -214,7 +219,7 @@ export class LibraryStoreContainer extends React.Component {
 										order={4}
 										bold
 										textColor={
-											libraryStore.updateAvailable ? C.Color.Blue : C.Color.Green
+											libraryStore.updateAvailable ? C.Color.Orange : C.Color.Green
 										}
 									>
 										{libraryStore.updateAvailable
@@ -242,21 +247,23 @@ export class LibraryStoreContainer extends React.Component {
 							</C.Flex>
 						</C.Space>
 						<SmoothCollapse expanded={libraryStore.installedOpen}>
-							<C.Space sizeBottom={C.SpaceSize.S} />
-							<C.Flex flexWrap={true}>
-								{(libraryStore.updateCount === 0
-									? libraryStore.withLibrary
-									: libraryStore.withUpdate
-								).map(item => (
-									<LibraryStoreItemContainer
-										key={item.id}
-										item={item}
-										size={LibraryStoreItemSize.Installed}
-									/>
-								))}
-							</C.Flex>
+							<C.Space size={C.SpaceSize.S} sizeBottom={C.SpaceSize.S} sizeTop={0}>
+								<C.Flex flexWrap={true}>
+									{libraryStore.withLibrary.map(item => (
+										<LibraryStoreItemContainer
+											key={item.id}
+											item={item}
+											size={LibraryStoreItemSize.Installed}
+										/>
+									))}
+								</C.Flex>
+							</C.Space>
 							{this.online && (
-								<C.Space size={C.SpaceSize.XS}>
+								<C.Space
+									size={C.SpaceSize.XS}
+									sizeLeft={C.SpaceSize.L}
+									sizeRight={C.SpaceSize.L}
+								>
 									<C.LinkIcon
 										color={C.Color.Grey50}
 										icon="RotateCw"

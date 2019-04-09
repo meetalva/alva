@@ -87,7 +87,7 @@ export class ElementContent {
 				forcedOpen: false,
 				highlighted: false,
 				id: uuid.v4(),
-				open: false,
+				open: true,
 				slotId: slot.getId()
 			},
 			context

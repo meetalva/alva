@@ -60,7 +60,7 @@ export class PropertyItemColor extends React.Component<PropertyItemColorProps> {
 					onBlur={() => window.requestIdleCallback(() => props.store.commit())}
 					onColorPickerChange={this.handleColorPickerChange}
 					onColorPickerChangeComplete={this.handleColorPickerChangeComplete}
-					placeholder={example ? `e.g.: ${example}` : ''}
+					placeholder={example ? `${example}` : ''}
 				/>
 			</OutsideClickHandler>
 		);

@@ -18,7 +18,7 @@ export interface LinkProps {
 
 /**
  * @name Link
- * @description for Interaction
+ * @description for interaction
  * @icon ExternalLink
  * @patternType synthetic:link
  */

@@ -27,9 +27,9 @@ export interface ImageProps {
 }
 
 /**
- * @name Design
- * @description for Design Drafts
+ * @name Image
  * @icon Image
+ * @description for photos & design assets
  * @patternType synthetic:image
  */
 export const Image: React.SFC<ImageProps> = props => {

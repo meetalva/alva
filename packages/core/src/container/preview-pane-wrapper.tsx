@@ -7,7 +7,6 @@ import * as Types from '@meetalva/types';
 import * as _ from 'lodash';
 import * as Mobx from 'mobx';
 import * as Model from '@meetalva/model';
-import { Layout } from 'react-feather';
 
 export interface PreviewPaneProps {
 	isDragging: boolean;
@@ -56,12 +55,6 @@ export class PreviewPaneWrapper extends React.Component<PreviewPaneProps> {
 						props.store.getProject().unsetHighlightedElementContent();
 					}}
 				/>
-				<C.Overlay isVisisble={props.isDragging}>
-					<C.Space size={[0, 0, C.SpaceSize.L]}>
-						<Layout size={C.IconSize.M} />
-					</C.Space>
-					<C.Copy size={C.CopySize.M}>Drop the component on the left element list</C.Copy>
-				</C.Overlay>
 			</C.PreviewPane>
 		);
 	}

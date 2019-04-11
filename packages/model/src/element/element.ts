@@ -445,6 +445,10 @@ export class Element {
 		return this.getContents().find(content => content.getSlotId() === slotId);
 	}
 
+	public getContentBySlotContextId(slotContextId: string): ElementContent | undefined {
+		return this.getContents().find(content => content.getSlotContextId() === slotContextId);
+	}
+
 	public getContentBySlotType(slotType: Types.SlotType): ElementContent | undefined {
 		return this.getContents().find(content => content.getSlotType() === slotType);
 	}
@@ -607,6 +611,18 @@ export class Element {
 
 	public getPlaceholderHighlighted(): PlaceholderPosition {
 		return this.placeholderHighlighted;
+	}
+
+	public getPropertyByContextId(contextId: string): ElementProperty | undefined {
+		return this.properties.find(p => {
+			const patternProp = p.getPatternProperty();
+
+			if (!patternProp) {
+				return false;
+			}
+
+			return patternProp.getContextId() === contextId;
+		});
 	}
 
 	public getProperties(): ElementProperty[] {

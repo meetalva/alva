@@ -12,7 +12,7 @@ const LibraryBoxDemo: React.StatelessComponent<void> = (): JSX.Element => (
 			name="Wireframe Kit"
 			description="Simple wireframing kit to kickstart your product ideas."
 			state={LibraryBoxState.Idle}
-			size={LibraryBoxSize.Large}
+			size={LibraryBoxSize.Featured}
 			install={
 				<Button
 					order={ButtonOrder.Primary}

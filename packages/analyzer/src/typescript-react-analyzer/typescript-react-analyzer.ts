@@ -3,8 +3,7 @@ import * as Fs from 'fs';
 import * as Path from 'path';
 import * as PropertyAnalyzer from './property-analyzer';
 import * as ReactUtils from '../react-utils';
-import * as readPkg from 'read-pkg';
-import * as SlotAnalyzer from './slot-analzyer';
+import * as SlotAnalyzer from './slot-analyzer';
 import * as Types from '@meetalva/types';
 import * as TypeScriptUtils from '../typescript-utils';
 import * as ts from 'typescript';
@@ -21,6 +20,7 @@ import { getExportedNode } from '../typescript-utils/get-exported-node';
 import * as IdHasher from '../id-hasher';
 
 const precinct = require('precinct');
+const readPkg = require('read-pkg');
 
 export interface PatternCandidate {
 	artifactPath: string;
@@ -40,6 +40,8 @@ interface AnalyzeContext {
 	options: AnalyzeOptions;
 	program: ts.Program;
 	project: Tsa.Project;
+	pkg: unknown;
+	pkgPath: string;
 	knownProperties: Types.PropertyAnalysis[];
 	knownPatterns: Types.InternalPatternAnalysis[];
 }
@@ -71,7 +73,8 @@ export async function analyze(
 ): Promise<Types.LibraryAnalysisResult> {
 	try {
 		const id = uuid.v4();
-		const pkg = await readPkg(pkgPath);
+		// readPkg is typed faultily
+		const pkg = await readPkg({ cwd: Path.dirname(pkgPath) });
 		const cwd = Path.dirname(pkgPath);
 		const options = merge({}, analyzeDefaults, rawOptions) as AnalyzeOptions;
 		const patterns = await analyzePatterns({ pkgPath, options, pkg, cwd });
@@ -152,7 +155,13 @@ async function analyzePatterns(context: {
 		tsConfigFilePath: optionsPath
 	});
 
-	const analyzePattern = getPatternAnalyzer(program, project, context.options);
+	const analyzePattern = getPatternAnalyzer(
+		program,
+		project,
+		context.pkg,
+		context.pkgPath,
+		context.options
+	);
 
 	return patternCandidates.reduce<Types.InternalPatternAnalysis[]>(
 		(acc, candidate) => [...acc, ...analyzePattern(candidate, acc, analyzePatternExport)],
@@ -179,6 +188,8 @@ async function createPatternCompiler(
 export function getPatternAnalyzer(
 	program: ts.Program,
 	project: Tsa.Project,
+	pkg: unknown,
+	pkgPath: string,
 	options: AnalyzeOptions
 ): PatternAnalyzer {
 	return (
@@ -201,6 +212,8 @@ export function getPatternAnalyzer(
 				predicate(ex, {
 					program,
 					project,
+					pkg,
+					pkgPath,
 					candidate,
 					options,
 					knownProperties,
@@ -262,6 +275,7 @@ export function analyzePatternExport(
 
 	const slots = SlotAnalyzer.analyzeSlots(propTypes.type, {
 		program: ctx.program,
+		project: ctx.project,
 		getSlotId: (slotContextId: string) => IdHasher.getGlobalSlotId(id, slotContextId)
 	});
 
@@ -275,11 +289,13 @@ export function analyzePatternExport(
 				model: Types.ModelName.PatternSlot,
 				contextId: 'children',
 				description: 'Element that render inside this element',
+				defaultValue: undefined,
 				example: '',
 				hidden: false,
 				id: IdHasher.getGlobalSlotId(id, 'children'),
 				label: 'children',
 				propertyName: 'children',
+				quantity: 'multiple',
 				required: false,
 				type: 'children'
 			});
@@ -289,6 +305,7 @@ export function analyzePatternExport(
 	return {
 		symbol,
 		path: ctx.candidate.artifactPath,
+		libraryName: (ctx.pkg as { name: string }).name,
 		pattern: {
 			model: Types.ModelName.Pattern,
 			contextId,
@@ -379,7 +396,7 @@ function getImportsFromPath(
 	}, config.init);
 }
 
-function getSignificantPath(input: string): string[] {
+export function getSignificantPath(input: string): string[] {
 	const stripped = Path.basename(input, Path.extname(input));
 
 	if (stripped === 'index' || stripped === 'index.d') {

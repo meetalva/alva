@@ -150,7 +150,7 @@ npm install --save \
   styled-components@4.1.2 \
   @types/react@16.7.17 \
   @types/react-dom@16.0.11 \
-  styled-components@4.1.2
+  @types/styled-components@4.1.4
 ```
 
 After successful installation your `package.json` should look like this:

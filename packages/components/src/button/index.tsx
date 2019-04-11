@@ -2,6 +2,9 @@ import { Color } from '../colors';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
+import { Check } from 'react-feather';
+import { Spinner } from '../spinner';
+import { IconSize } from '../icons';
 
 export interface ButtonProps {
 	children?: React.ReactNode;
@@ -21,6 +24,7 @@ export interface ButtonProps {
 	style?: React.CSSProperties;
 	className?: string;
 	type?: 'submit' | 'button';
+	state?: ButtonState;
 }
 
 export enum ButtonOrder {
@@ -38,6 +42,12 @@ export enum ButtonSize {
 	Large,
 	Medium,
 	Small
+}
+
+export enum ButtonState {
+	Default,
+	Progress,
+	Done
 }
 
 const BUTTON_FONT_SIZE = (props: ButtonProps): number => {
@@ -80,6 +90,7 @@ const StyledBaseButton = styled.button`
 	border: none;
 	outline: none;
 	user-select: none;
+	position: relative;
 `;
 
 const DecoratedBaseButton = styled(StyledBaseButton)`
@@ -115,6 +126,24 @@ const StyledPrimaryButton =
 	background: ${props => (props.inverted ? Color.White : primaryFill(props))};
 	border-color: transparent;
 	color: ${props => (props.inverted ? primaryFill(props) : Color.White)};
+	${props =>
+		(props.state === ButtonState.Progress || props.state === ButtonState.Done) &&
+		'color: transparent;'}
+	transition: color 0.1s;
+
+	${props =>
+		props.state === ButtonState.Done &&
+		`
+		animation: showText .1s 1.7s ease both;
+		@keyframes showText {
+			from {
+				color: transparent;
+			}
+			to {
+				color: ${props.inverted ? primaryFill(props) : Color.White};
+			}
+		}
+	`}
 
 	&:active {
 		background: ${props => (props.inverted ? '' : primaryFillActive(props))};
@@ -165,6 +194,17 @@ const StyledTertiaryButton =
 	}
 `;
 
+const StyledWrapper = styled.div`
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+
 export type AnyButton =
 	| typeof StyledPrimaryButton
 	| typeof StyledTertiaryButton
@@ -181,6 +221,28 @@ const getComponent = (props: ButtonProps): AnyButton => {
 			return StyledPrimaryButton;
 	}
 };
+
+const StyledDoneWrapper = styled(StyledWrapper)`
+	animation: checkAnimation 1.5s 0.1s ease both;
+	@keyframes checkAnimation {
+		0% {
+			transform: scale(0.5);
+			opacity: 0;
+		}
+		10% {
+			transform: scale(1);
+			opacity: 1;
+		}
+		90% {
+			transform: scale(1);
+			opacity: 1;
+		}
+		100% {
+			transform: scale(0.5);
+			opacity: 0;
+		}
+	}
+`;
 
 export const Button: React.StatelessComponent<ButtonProps> = props => {
 	const Component = getComponent(props) as any;
@@ -199,8 +261,19 @@ export const Button: React.StatelessComponent<ButtonProps> = props => {
 			size={props.size}
 			style={{ color: props.color, ...props.style }}
 			color={props.color}
+			state={props.state}
 		>
 			{props.children}
+			{props.state === ButtonState.Progress && (
+				<StyledWrapper>
+					<Spinner size={IconSize.XS} />
+				</StyledWrapper>
+			)}
+			{props.state === ButtonState.Done && (
+				<StyledDoneWrapper>
+					<Check size={18} color={Color.White} strokeWidth={3} />
+				</StyledDoneWrapper>
+			)}
 		</Component>
 	);
 };

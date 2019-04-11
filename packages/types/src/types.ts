@@ -44,6 +44,11 @@ export enum SlotType {
 	Property = 'property'
 }
 
+export enum SlotQuantity {
+	Single = 'single',
+	Multiple = 'multiple'
+}
+
 export interface RenderPage {
 	id: string;
 	name: string;
@@ -85,6 +90,7 @@ export interface PropertyAnalysis {
 
 export interface InternalPatternAnalysis {
 	path: string;
+	libraryName: string;
 	pattern: SerializedModel.SerializedPattern;
 	properties: PropertyAnalysis[];
 	symbol: Ts.Symbol;

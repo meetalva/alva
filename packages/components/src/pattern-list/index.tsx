@@ -1,11 +1,10 @@
 import { Color } from '../colors';
 import { Copy } from '../copy';
 import { Headline } from '../headline';
-import { IconSize } from '../icons';
+import { Icon, IconSize, getIcon, isIcon } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
-const Icon = require('react-feather');
 
 export interface PatternListItemProps {
 	children: React.ReactNode;
@@ -84,19 +83,18 @@ export const PatternFolderView: React.SFC<PatternFolderViewProps> = props => (
 );
 
 export const PatternListItem: React.StatelessComponent<PatternListItemProps> = props => {
-	const { draggable, onDragStart, icon, onClick } = props;
-	const IconImage = Icon.hasOwnProperty(icon) ? Icon[icon] : Icon.Box;
+	const icon = isIcon(props.icon) ? props.icon : 'Box';
 
 	return (
 		<StyledPatternListItem
 			onDoubleClick={props.onDoubleClick}
-			onDragStart={onDragStart}
-			draggable={draggable}
-			onClick={onClick}
+			onDragStart={props.onDragStart}
+			draggable={props.draggable}
+			onClick={props.onClick}
 			icon={props.icon}
 		>
 			<IconWrapper>
-				<IconImage size={IconSize.XS} color={Color.Grey50} />
+				{getIcon({ icon, size: IconSize.XS, color: Color.Grey50, strokeWidth: 2 })}
 			</IconWrapper>
 			<StyledPatternListItemContainer>{props.children}</StyledPatternListItemContainer>
 		</StyledPatternListItem>

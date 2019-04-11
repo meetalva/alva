@@ -44,6 +44,9 @@ export const PropertyInputStyles = css`
 		color: ${Color.Black};
 		box-shadow: 0 0 3px ${Color.BlueAlpha40};
 	}
+	:disabled {
+		color: ${Color.Grey60};
+	}
 `;
 
 const StyledWrapper = styled.div`
@@ -106,6 +109,8 @@ export interface PropertyInputProps {
 	className?: string;
 	onBlur?: React.FocusEventHandler<HTMLInputElement>;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	onFocus?: React.FocusEventHandler<HTMLInputElement>;
+	onClick?: React.MouseEventHandler;
 	placeholder?: string;
 	type?: PropertyInputType;
 	value?: string;
@@ -124,6 +129,8 @@ export const PropertyInput: React.SFC<PropertyInputProps> = props => (
 			list={props.list}
 			onChange={props.onChange}
 			onBlur={props.onBlur}
+			onFocus={props.onFocus}
+			onClick={props.onClick}
 			type={props.type}
 			value={props.value || ''}
 			placeholder={props.placeholder}

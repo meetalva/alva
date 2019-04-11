@@ -1,9 +1,10 @@
 import { Color } from '../colors';
-import { Icon, IconName, IconSize } from '../icons';
+import { IconSize } from '../icons';
 import * as React from 'react';
 import { getSpace, SpaceSize } from '../space';
 import styled from 'styled-components';
 import { TargetSignal } from '../drag-area';
+import { ChevronRight } from 'react-feather';
 
 export const ElementAnchors = {
 	element: 'data-id',
@@ -123,15 +124,20 @@ const StyledElementChildren = styled.div`
 	padding-left: ${getSpace(SpaceSize.L)}px;
 `;
 
-const StyledIcon = styled(Icon)`
+const StyledIconWrapper = styled.div`
 	position: absolute;
-	left: ${getSpace(SpaceSize.XS) + getSpace(SpaceSize.XXS)}px;
-	fill: ${Color.Grey60};
-	width: ${getSpace(SpaceSize.S)}px;
-	height: ${getSpace(SpaceSize.S)}px;
-	padding: ${getSpace(SpaceSize.XS)}px;
+	left: ${getSpace(SpaceSize.S)}px;
 	transition: transform 0.2s;
+	height: 100%;
+	width: ${IconSize.XS}px;
+	display: flex;
+	align-items: center;
+`;
 
+const StyledIcon = styled(ChevronRight)`
+	stroke: none;
+	fill: ${Color.Grey60};
+	transition: transform 0.2s;
 	${(props: StyledIconProps) => (props.open ? 'transform: rotate(90deg)' : '')};
 	${(props: StyledIconProps) => (props.active ? `fill: ${Color.Blue20}` : '')};
 `;
@@ -208,14 +214,13 @@ export class Element extends React.Component<ElementProps> {
 					)}
 				<StyledElementLabel state={props.state} {...{ [ElementAnchors.item]: true }}>
 					{props.capabilities.includes(ElementCapability.Openable) && (
-						<StyledIcon
-							dataIcon={props.id}
-							name={IconName.ArrowFillRight}
-							size={IconSize.XXS}
-							color={Color.Grey60}
-							open={props.open}
-							active={props.state === ElementState.Active}
-						/>
+						<StyledIconWrapper {...{ [ElementAnchors.icon]: true }}>
+							<StyledIcon
+								size={IconSize.XS}
+								open={props.open}
+								active={props.state === ElementState.Active}
+							/>
+						</StyledIconWrapper>
 					)}
 					{containered(props.children, Element.ElementTitle)}
 					{props.description && (

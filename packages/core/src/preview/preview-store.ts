@@ -216,11 +216,11 @@ export class PreviewStore<V> {
 	public getSlots<T>(
 		element: Model.Element,
 		render: (element: Model.Element) => T
-	): { [propName: string]: T[] | null } {
+	): { [propName: string]: T | T[] | null } {
 		return element
 			.getContents()
 			.filter(content => content.getSlotType() !== Types.SlotType.Children)
-			.reduce<{ [key: string]: T[] | null }>((renderProperties, content) => {
+			.reduce<{ [key: string]: T | T[] | null }>((renderProperties, content) => {
 				const slot = content.getSlot();
 
 				if (!slot) {
@@ -230,6 +230,11 @@ export class PreviewStore<V> {
 				const elements = content.getElements();
 				const children =
 					elements.length === 0 && !slot.getRequired() ? null : elements.map(render);
+
+				if (slot.getQuantity() === Types.SlotQuantity.Single) {
+					renderProperties[slot.getPropertyName()] = children && children[0];
+					return renderProperties;
+				}
 
 				renderProperties[slot.getPropertyName()] = children;
 				return renderProperties;

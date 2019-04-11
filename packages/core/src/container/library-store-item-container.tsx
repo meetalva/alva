@@ -3,7 +3,6 @@ import * as MobxReact from 'mobx-react';
 import * as Model from '@meetalva/model';
 import * as React from 'react';
 import { WithStore } from '../store';
-import { ButtonSize, LibraryBoxState, LibraryBoxSize } from '@meetalva/components';
 import { LibraryStoreItem } from '@meetalva/model';
 import { Match, MatchBranch } from './match';
 import { PatternLibraryInstallType } from '@meetalva/types';
@@ -17,8 +16,16 @@ export interface LibraryStoreItemContainerProps {
 }
 
 export enum LibraryStoreItemSize {
-	Medium,
-	Large
+	Hero,
+	Featured,
+	Default,
+	Installed
+}
+
+export enum LibraryStoreItemState {
+	Default,
+	Progress,
+	Done
 }
 
 interface ActiveButtonProps {
@@ -35,7 +42,7 @@ const ActiveButton: React.SFC<ActiveButtonProps> = props => {
 	return (
 		<C.Button
 			order={props.order}
-			size={ButtonSize.Medium}
+			size={C.ButtonSize.Medium}
 			inverted
 			color={C.Color.Grey50}
 			onClick={props.onClick}
@@ -49,7 +56,7 @@ const DisabledButton: React.SFC<DisabledButtonProps> = props => {
 	return (
 		<C.Button
 			order={C.ButtonOrder.Secondary}
-			size={ButtonSize.Medium}
+			size={C.ButtonSize.Medium}
 			color={C.Color.White}
 			disabled
 		>
@@ -102,11 +109,23 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 
 		const boxState =
 			props.item.state === Model.LibraryStoreItemState.Installing
-				? LibraryBoxState.Progress
-				: LibraryBoxState.Idle;
+				? C.LibraryBoxState.Progress
+				: C.LibraryBoxState.Idle;
 
-		const boxSize =
-			props.size === LibraryStoreItemSize.Large ? LibraryBoxSize.Large : LibraryBoxSize.Medium;
+		const boxSize = () => {
+			switch (props.size) {
+				case LibraryStoreItemSize.Hero:
+					return C.LibraryBoxSize.Hero;
+				case LibraryStoreItemSize.Featured:
+					return C.LibraryBoxSize.Featured;
+				case LibraryStoreItemSize.Default:
+					return C.LibraryBoxSize.Default;
+				case LibraryStoreItemSize.Installed:
+					return C.LibraryBoxSize.Installed;
+				default:
+					return C.LibraryBoxSize.Default;
+			}
+		};
 
 		return (
 			<C.LibraryBox
@@ -118,7 +137,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 				image={props.item.image}
 				version={
 					<C.Flex alignItems={C.FlexAlignItems.Center}>
-						<span>{props.item.version}</span>
+						<C.Copy>{props.item.version}</C.Copy>
 						{props.item.updateVersion ? (
 							<>
 								<C.Space
@@ -129,12 +148,12 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 								>
 									<ArrowRight size={12} />
 								</C.Space>
-								<span>{props.item.updateVersion}</span>
+								<C.Copy>{props.item.updateVersion}</C.Copy>
 							</>
 						) : null}
 					</C.Flex>
 				}
-				size={boxSize}
+				size={boxSize()}
 				details={
 					props.item.homepage && (
 						<C.LinkIcon
@@ -148,7 +167,7 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 								})
 							}
 						>
-							Learn more
+							Docs
 						</C.LinkIcon>
 					)
 				}
@@ -156,13 +175,17 @@ export class LibraryStoreItemContainer extends React.Component<LibraryStoreItemC
 					<C.Flex alignItems={C.FlexAlignItems.Center}>
 						<Match value={props.item.state}>
 							<MatchBranch when={Model.LibraryStoreItemState.Listed}>
-								<ActiveButton label="Install" onClick={this.handleButtonClick} />
+								<ActiveButton label="Connect" onClick={this.handleButtonClick} />
 							</MatchBranch>
 							<MatchBranch when={whenHasLibraryAnd(installing)}>
-								<DisabledButton label="Updating …" />
+								<div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
+									<C.Spinner size={C.IconSize.M} />
+								</div>
 							</MatchBranch>
 							<MatchBranch when={whenNotHasLibraryAnd(installing)}>
-								<DisabledButton label="Installing …" />
+								<div style={{ height: '28px', display: 'flex', alignItems: 'center' }}>
+									<C.Spinner size={C.IconSize.M} />
+								</div>
 							</MatchBranch>
 							<MatchBranch when={whenNotRemoteAnd(installed)}>
 								<ActiveButton label="Update from Disk" onClick={this.handleButtonClick} />

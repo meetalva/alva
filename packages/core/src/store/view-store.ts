@@ -8,6 +8,7 @@ import * as Types from '@meetalva/types';
 import { Sender } from '../sender';
 
 import * as uuid from 'uuid';
+import { ElementCandidate } from '@meetalva/types';
 
 export interface ViewStoreInit {
 	app: Model.AlvaApp<Message>;
@@ -197,6 +198,77 @@ export class ViewStore {
 			dragged: Boolean(init.dragged),
 			contents: elementContents,
 			project
+		});
+
+		const fromCandidate = (candidate: Types.ElementCandidate, content: Model.ElementContent) => {
+			if (candidate.jsxFragment) {
+				candidate.children.forEach(childCandidate => {
+					fromCandidate(childCandidate, content);
+				});
+			}
+
+			const library = project.getPatternLibraryByName(candidate.libraryId);
+
+			if (!library) {
+				return;
+			}
+
+			const pattern = library.getPatternByContextId(candidate.patternContextId);
+
+			if (!pattern) {
+				return;
+			}
+
+			const child = this.createElement({
+				dragged: false,
+				pattern
+			});
+
+			content.insert({
+				at: undefined,
+				element: child
+			});
+
+			this.addElement(child);
+
+			candidate.props.forEach(propCandidate => {
+				const prop = child.getPropertyByContextId(propCandidate.propName);
+				const slotContent = child.getContentBySlotContextId(propCandidate.propName);
+
+				if (prop) {
+					prop.setValue(propCandidate.value);
+				}
+
+				if (slotContent) {
+					fromCandidate(propCandidate.value, slotContent);
+				}
+			});
+
+			candidate.children.forEach(childCandidate => {
+				const childContent = child.getContentBySlotType(Types.SlotType.Children);
+
+				if (!childContent) {
+					return;
+				}
+
+				fromCandidate(childCandidate, childContent);
+			});
+		};
+
+		elementContents.forEach(content => {
+			const slot = content.getSlot();
+
+			if (!slot) {
+				return;
+			}
+
+			const candidate = slot.getDefaultValue();
+
+			if (!candidate) {
+				return;
+			}
+
+			fromCandidate(candidate, content);
 		});
 
 		ViewStore.EPHEMERAL_CONTENTS.set(element, elementContents);

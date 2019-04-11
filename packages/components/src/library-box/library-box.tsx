@@ -7,6 +7,7 @@ import { Headline } from '../headline';
 import { Copy, CopySize } from '../copy';
 import { getSpace, SpaceSize, Space } from '../space';
 import { LibraryImage } from './library-image';
+import * as ColorTool from 'color';
 
 export enum LibraryBoxState {
 	Idle,
@@ -14,8 +15,10 @@ export enum LibraryBoxState {
 }
 
 export enum LibraryBoxSize {
-	Medium,
-	Large
+	Hero,
+	Featured,
+	Default,
+	Installed
 }
 
 export interface LibraryBoxProps {
@@ -34,22 +37,67 @@ const StyledBox =
 	styled.div <
 	LibraryBoxProps >
 	`
-	width: 348px;
+	width: ${(props: LibraryBoxProps) =>
+		props.size === LibraryBoxSize.Hero
+			? '100%'
+			: props.size === LibraryBoxSize.Featured
+				? '348px'
+				: '258px'};
+	margin: ${getSpace(SpaceSize.XS)}px;
+
 	background: ${props => (props.color ? props.color : Color.Grey20)};
 	border-radius: 6px;
-	box-shadow: 0 0 24px 0 ${Color.BlackAlpha15};
+	box-shadow: 0 0 24px 0 ${props =>
+		props.color ? new ColorTool(props.color).fade(0.4).toString() : Color.BlackAlpha15};
 	color: ${Color.White};
 	text-align: left;
-	margin: ${getSpace(SpaceSize.S)}px ${getSpace(SpaceSize.XS)}px;
+
 	user-select: none;
-	transition: box-shadow 0.2s;
 	overflow: hidden;
+
+	${props =>
+		props.size === LibraryBoxSize.Installed &&
+		`
+		animation: show .2s ease-out both;
+
+		:nth-child(2) {
+			animation-delay: 0.05s;
+		}
+		:nth-child(3) {
+			animation-delay: 0.1s;
+		}
+		:nth-child(4) {
+			animation-delay: 0.15s;
+		}
+		:nth-child(5) {
+			animation-delay: 0.2s;
+		}
+		:nth-child(6) {
+			animation-delay: 0.25s;
+		}
+	`}
+
+	@keyframes show {
+		from {
+			transform: scale(.95);
+			opacity: 0;
+		}
+		to {
+			transform: scale(1)
+			opacity: 1 !important;
+		}
+	}
 `;
 
 const IMAGE = (props: LibraryBoxProps) => (props.image ? props.image : toDataUrl(<LibraryImage />));
 
 const StyledImage = styled.div`
-	height: 140px;
+	height: ${(props: LibraryBoxProps) =>
+		props.size === LibraryBoxSize.Hero
+			? '200'
+			: props.size === LibraryBoxSize.Featured
+				? '140'
+				: '101'}px;
 	width: 100%;
 	background-image: url('${IMAGE}');
 	background-size: cover;
@@ -58,7 +106,12 @@ const StyledImage = styled.div`
 `;
 
 const StyledDetails = styled.div`
-	min-height: 200px;
+	min-height: ${(props: LibraryBoxProps) =>
+		props.size === LibraryBoxSize.Hero
+			? '300'
+			: props.size === LibraryBoxSize.Featured
+				? '200'
+				: '185'}px;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -80,38 +133,6 @@ const StyledTop = styled.div`
 	padding: ${getSpace(SpaceSize.L)}px ${getSpace(SpaceSize.XL)}px 0;
 `;
 
-const Loader = styled.div`
-	width: 100%;
-	height: 2px;
-	overflow: hidden;
-	position: absolute;
-	left: 0;
-	top: 0;
-
-	&:after {
-		content: '';
-		display: block;
-		width: 20px;
-		height: 100%;
-		background: ${Color.White};
-		animation: load 1.5s infinite ease;
-		transform: scaleX(1);
-		transform-origin: 0 0;
-	}
-
-	@keyframes load {
-		0% {
-			margin-left: -20px;
-		}
-		50% {
-			transform: scaleX(5);
-		}
-		100% {
-			margin-left: 100%;
-		}
-	}
-`;
-
 const StyledBottom = styled.div`
 	position: relative;
 	padding: 0 ${getSpace(SpaceSize.XL)}px;
@@ -120,7 +141,7 @@ const StyledBottom = styled.div`
 
 export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JSX.Element => (
 	<StyledBox {...props}>
-		{props.size === LibraryBoxSize.Large && (
+		{props.size !== LibraryBoxSize.Installed && (
 			<StyledImage state={props.state} image={props.image} size={props.size} />
 		)}
 		<StyledDetails {...props}>
@@ -135,13 +156,10 @@ export const LibraryBox: React.StatelessComponent<LibraryBoxProps> = (props): JS
 				<Space sizeBottom={SpaceSize.S} />
 			</StyledTop>
 			<StyledBottom {...props}>
-				{props.state === LibraryBoxState.Progress && <Loader {...props} />}
 				<Space sizeTop={SpaceSize.L} />
 				<StyledInstallContainer>
 					{props.install}
-					<Translucent>
-						<Copy>{props.version}</Copy>
-					</Translucent>
+					<Translucent>{props.version}</Translucent>
 				</StyledInstallContainer>
 				<Space sizeBottom={SpaceSize.L} />
 			</StyledBottom>

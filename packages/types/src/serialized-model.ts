@@ -64,16 +64,33 @@ export interface SerializedPattern {
 	type: SerializedPatternType;
 }
 
+export interface ElementProp {
+	propName: string;
+	value: any;
+}
+
+export interface ElementCandidate {
+	parent: string;
+	patternContextId: string;
+	libraryId: string;
+	id: string;
+	props: ElementProp[];
+	jsxFragment: boolean;
+	children: ElementCandidate[];
+}
+
 export interface SerializedPatternSlot {
 	model: Types.ModelName.PatternSlot;
 	contextId: string;
 	description: string;
+	defaultValue: ElementCandidate | undefined;
 	example: string;
 	hidden: boolean;
 	id: string;
 	label: string;
 	propertyName: string;
 	required: boolean;
+	quantity: string;
 	type: string;
 }
 

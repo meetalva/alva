@@ -1,4 +1,3 @@
-import { IconName } from '@meetalva/components';
 import { ModelName } from './types';
 
 export enum PatternPropertyType {
@@ -29,10 +28,10 @@ export type SerializedPatternPropertyType =
 export enum PatternPropertyInputType {
 	Default = 'default',
 	Select = 'select',
-	RadioGroup = 'radio-group'
+	ButtonGroup = 'button-group'
 }
 
-export type SerializedPatternPropertyInputType = 'default' | 'select' | 'radio-group';
+export type SerializedPatternPropertyInputType = 'default' | 'select' | 'button-group';
 
 export type SerializedPatternProperty =
 	| SerializedPatternAssetProperty

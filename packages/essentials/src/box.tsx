@@ -145,29 +145,37 @@ export enum FlexWrap {
 }
 
 export enum JustifyContent {
-	/** @name Start @icon Youtube */
+	/** @name Start @icon FlexJustifyStart */
 	'flex-start' = 'flex-start',
-	/** @name Center */
-	center = 'center',
-	/** @name End */
+
+	/** @name Center @icon FlexJustifyCenter */
+	'center' = 'center',
+
+	/** @name End @icon FlexJustifyEnd*/
 	'flex-end' = 'flex-end',
-	/** @name Space Between */
+
+	/** @name Space Between @icon FlexJustifySpaceBetween */
 	'space-between' = 'space-between',
-	/** @name Space Around */
+
+	/** @name Space Around @icon FlexJustifySpaceAround */
 	'space-around' = 'space-around'
 }
 
 export enum AlignItems {
-	/** @name Start */
+	/** @name Start @icon FlexAlignStart */
 	'flex-start' = 'flex-start',
-	/** @name Center */
-	center = 'center',
-	/** @name End */
+
+	/** @name Center @icon FlexAlignCenter */
+	'center' = 'center',
+
+	/** @name Bottom @icon FlexAlignEnd */
 	'flex-end' = 'flex-end',
-	/** @name Stretch */
-	stretch = 'stretch',
-	/** @name Baseline */
-	baseline = 'baseline'
+
+	/** @name Stretch @icon FlexAlignStretch */
+	'stretch' = 'stretch',
+
+	/** @name Baseline @icon FlexAlignBaseline */
+	'baseline' = 'baseline'
 }
 
 /**

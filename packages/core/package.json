@@ -10,7 +10,7 @@
     "check:dependencies": "alva-dependencies -i electron --entry lib/renderer/index.js --entry lib/bin/static/index.js --entry lib/bin/node.js --entry lib/bin/electron.js --entry lib/bin/analyze.js",
     "copy:scripts": "ncp lib/scripts nccbuild/scripts",
     "copy:vendor": "ncp vendor nccbuild/vendor",
-    "compile:ncc": "ncc build src/bin/electron.ts -e electron -e monaco-editor -e ws -o nccbuild && ncp package.ncc.json nccbuild/package.json",
+    "compile:ncc": "ncc build src/bin/electron.ts -e webpack -e electron -e monaco-editor -e ws -o nccbuild && ncp package.ncc.json nccbuild/package.json",
     "bundle": "webpack --production",
     "build:clean": "npm run clean && npm run build",
     "build:electron": "electron-builder --project nccbuild",

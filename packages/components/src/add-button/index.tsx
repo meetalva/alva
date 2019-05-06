@@ -50,7 +50,7 @@ const StyledIcon = styled(Plus)`
 `;
 
 export const AddButton: React.SFC<AddButtonProps> = props => (
-	<StyledSpace size={props.margin ? SpaceSize.XS : 0} {...props}>
+	<StyledSpace size={props.margin ? SpaceSize.XS : 0}>
 		<StyledAddButton onClick={props.onClick} title={props.title} disabled={props.disabled}>
 			<StyledIcon size={IconSize.XS} color={Color.Grey50} />
 			<Copy textColor={Color.Grey50}>{props.children}</Copy>

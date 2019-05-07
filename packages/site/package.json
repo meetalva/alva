@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@emotion/styled": "^10.0.6",
-    "@meetalva/alva-design": "^1.4.2",
+    "@meetalva/alva-design": "^1.4.4",
     "@types/react": "16.4.11",
     "@types/react-helmet": "5.0.6",
     "react": "16.4.2",

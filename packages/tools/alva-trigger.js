@@ -37,10 +37,19 @@ async function main(cli) {
 		typeof manifest.repository === 'object' ? manifest.repository.url : manifest.repository;
 
 	const repo = pgu(giturl);
-	const { body: releases } = await got(`https://api.github.com/repos/${repo.repo}/releases`, {
-		json: true,
-		auth: process.env.GH_TOKEN
-	});
+
+	let releases = [];
+
+	for (let i = 1; i < 4; i++) {
+		const { body: githubReleasePage } = await got(`https://api.github.com/repos/${repo.repo}/releases?page=${i}`, {
+			json: true,
+			auth: process.env.GH_TOKEN
+		});
+
+		if(githubReleasePage !== []) {
+			releases = releases.concat(githubReleasePage)
+		}
+	}
 
 	const sortedReleases = releases.slice(0).sort((a, b) => {
 		return semver.rcompare(a.tag_name, b.tag_name);

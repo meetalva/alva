@@ -3,6 +3,7 @@ import * as Path from 'path';
 import * as D from '@meetalva/alva-design';
 import styled from '@emotion/styled';
 import data from './releases-data';
+const ReactGA = require('react-ga');
 
 enum Os {
 	macOS = 'macOS  ',
@@ -26,9 +27,19 @@ const StyledLink =
 	color: ${props => (props.white ? D.Color.White : 'inherit')};
 `;
 
-const Link: React.SFC<{ href: string; white: boolean }> = props => {
+const Link: React.SFC<{
+	href: string;
+	white: boolean;
+	onClick?: React.MouseEventHandler;
+}> = props => {
 	return (
-		<StyledLink href={props.href} target="_blank" rel="noopener" white={props.white}>
+		<StyledLink
+			href={props.href}
+			onClick={props.onClick}
+			target="_blank"
+			rel="noopener"
+			white={props.white}
+		>
 			{props.children}
 		</StyledLink>
 	);
@@ -64,16 +75,17 @@ export class Releases extends React.Component {
 			getReleaseLink(stable, Os.Linux)
 		].filter(l => l.os !== stableLink.os);
 
-		console.log({
-			releases: releases.map(r => r.tag_name),
-			alphaReleases: alphaReleases.map(a => a!.tag_name),
-			stableReleases: stableReleases.map(s => s!.tag_name)
-		});
-
 		return (
 			<div>
 				<div style={{ display: 'flex' }}>
-					<Link href={stableLink.link} white={false}>
+					<Link
+						href={stableLink.link}
+						white={false}
+						onClick={ReactGA.event({
+							category: 'conversion',
+							action: 'Download Alva ' + this.state.os
+						})}
+					>
 						<D.Button order={D.ButtonOrder.Primary}>
 							Get Alva {this.state.os !== Os.Unknown ? `for` : '   '} {this.state.os}
 						</D.Button>

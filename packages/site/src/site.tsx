@@ -2,6 +2,26 @@ import * as React from 'react';
 import { Helmet } from 'react-helmet';
 import * as D from '@meetalva/alva-design';
 import { Releases } from './releases';
+const ReactGA = require('react-ga');
+
+const gaProperty = 'UA-111349005-1';
+const disableStr = 'ga-disable-' + gaProperty;
+
+if (typeof window !== 'undefined') {
+	if (document.cookie.indexOf(disableStr + '=true') > -1) {
+		window[disableStr] = true;
+	}
+}
+
+function gaOptout() {
+	document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+	window[disableStr] = true;
+	alert('Tracking is deactivated!');
+}
+
+ReactGA.initialize('UA-111349005-1');
+ReactGA.set({ anonymizeIp: true });
+ReactGA.pageview('/');
 
 export * from './render';
 
@@ -333,6 +353,8 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					rel="noopener"
 					href="./doc/docs/privacypolicy?guides-enabled=true"
 				/>
+				<D.Space size={D.SpaceSize.S} />
+				<D.Link onClick={() => gaOptout()}>Opt-out tracking</D.Link>
 			</D.Footer>
 		</div>
 	);

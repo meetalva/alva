@@ -66,6 +66,10 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					rel="noopener"
 					href="./doc/docs/guides/start?guides-enabled=true"
 					title="Open Getting Started Tutorial"
+					onClick={ReactGA.event({
+						category: 'menu',
+						action: 'Get started'
+					})}
 				/>
 				<D.MenuItem
 					linkName="Twitter"
@@ -73,20 +77,32 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					rel="noopener"
 					href="https://twitter.com/meetalva"
 					title="Find us on Twitter"
+					onClick={ReactGA.event({
+						category: 'menu',
+						action: 'Twitter'
+					})}
 				/>
 				<D.MenuItem
-					linkName="Github"
+					linkName="GitHub"
 					target="_blank"
 					rel="noopener"
 					href="https://github.com/meetalva/alva"
 					title="Find us on Github"
+					onClick={ReactGA.event({
+						category: 'menu',
+						action: 'GitHub'
+					})}
 				/>
 				<D.MenuItem
-					linkName="Gitter"
+					linkName="Chat with us"
 					target="_blank"
 					rel="noopener"
 					href="https://gitter.im/meetalva/Lobby"
 					title="Chat with us on Gitter"
+					onClick={ReactGA.event({
+						category: 'menu',
+						action: 'Chat with us'
+					})}
 				/>
 			</D.Menu>
 			<D.Section backgroundColor={D.Color.Black} textColor={D.Color.White}>
@@ -327,7 +343,14 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 				</D.Layout>
 				<D.Space size={D.SpaceSize.M} />
 				<a href="./doc/docs/guides/start?guides-enabled=true" target="_blank" rel="noopener">
-					<D.Button order={D.ButtonOrder.Secondary} color={D.Color.White}>
+					<D.Button
+						order={D.ButtonOrder.Secondary}
+						color={D.Color.White}
+						onClick={ReactGA.event({
+							category: 'conversion',
+							action: 'Find our guides'
+						})}
+					>
 						Find our Guides
 					</D.Button>
 				</a>
@@ -340,6 +363,10 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					target="_blank"
 					rel="noopener"
 					href="https://sinnerschrader.com"
+					onClick={ReactGA.event({
+						category: 'menu',
+						action: 'S2'
+					})}
 				/>
 				<D.MenuItem
 					linkName="Legal notice"

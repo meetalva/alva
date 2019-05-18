@@ -91,7 +91,14 @@ export class Releases extends React.Component {
 						</D.Button>
 					</Link>
 					<D.Space size={D.SpaceSize.XS} />
-					<Link href={alphaLink.link} white={false}>
+					<Link
+						href={alphaLink.link}
+						white={false}
+						onClick={ReactGA.event({
+							category: 'conversion',
+							action: 'Download Canary ' + this.state.os
+						})}
+					>
 						<D.Button order={D.ButtonOrder.Secondary}>Get Alva Canary</D.Button>
 					</Link>
 				</div>

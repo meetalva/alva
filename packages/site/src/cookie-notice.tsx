@@ -15,7 +15,7 @@ export class CookieNotice extends React.Component {
 			this.state.display === true && (
 				<D.CookieNotice
 					text="This website uses cookies to ensure you get the best experience on our website."
-					linkText="Learn more v2"
+					linkText="Learn more"
 					linkHref="doc/docs/privacypolicy"
 					buttonText="Got it"
 					buttonOnClick={() => {

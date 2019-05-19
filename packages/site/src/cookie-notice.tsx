@@ -3,12 +3,9 @@ import * as D from '@meetalva/alva-design';
 
 export class CookieNotice extends React.Component {
 	public state = {
-		display: false
+		display:
+			typeof document !== 'undefined' && document.cookie.indexOf('hidecookienotice=1') === -1
 	};
-
-	public componentDidMount() {
-		this.setState({ display: document.cookie.indexOf('hidecookienotice=1') === -1 });
-	}
 
 	public render() {
 		return (

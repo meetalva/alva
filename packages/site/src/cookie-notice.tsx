@@ -3,7 +3,7 @@ import * as D from '@meetalva/alva-design';
 
 export class CookieNotice extends React.Component {
 	public state = {
-		display: true
+		display: false
 	};
 
 	public componentDidMount() {

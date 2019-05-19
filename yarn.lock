@@ -1013,10 +1013,10 @@
     mkdirp "^0.5.1"
     rimraf "^2.5.2"
 
-"@meetalva/alva-design@^1.4.4":
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/@meetalva/alva-design/-/alva-design-1.4.4.tgz#e48d307e5927453f790d8d651bb8bb8c6e3b7e06"
-  integrity sha512-rc22upg5LUMx8r1MW+tHUjh3kajiA4PhI/jFxG4K+30r8OmR6hlD8C9FunN2yldMO7oFhnLdHwJLhTM3ymV4RQ==
+"@meetalva/alva-design@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@meetalva/alva-design/-/alva-design-1.6.0.tgz#cbce2a4ee396612fd244830dba201efabd014413"
+  integrity sha512-8TnSPPYDpltDyMdlhXoiAx2gropnmksgdpFDVgjA7C69uqTyFTmGxEMY5B3JUkERrIKHKA+l6pp4SHHxQCfNuw==
   dependencies:
     "@emotion/core" "^10.0.6"
     "@emotion/styled" "^10.0.6"

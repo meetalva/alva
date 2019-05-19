@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Helmet } from 'react-helmet';
 import * as D from '@meetalva/alva-design';
 import { Releases } from './releases';
+import { CookieNotice } from './cookie-notice';
 
 export * from './render';
 
@@ -153,13 +154,6 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 						<D.Link color={D.Color.Violet}>Learn how to work with interactions</D.Link>
 					</a>
 				}
-			/>
-			<D.Space size={D.SpaceSize.XL} />
-			<D.Feature
-				featureLevel={D.FeatureLevel.Medium}
-				headline="Sketch Integration (coming soon)"
-				copy="Integrate Sketch into your prototyping workflow and seamlessly export code to Sketch and import your design drafts to the prototype. Coming later this year."
-				layout={D.FeatureLayout.Center}
 			/>
 			<D.Space size={D.SpaceSize.XL} />
 			<D.Space size={D.SpaceSize.XL} />
@@ -334,6 +328,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					href="./doc/docs/privacypolicy?guides-enabled=true"
 				/>
 			</D.Footer>
+			<CookieNotice />
 		</div>
 	);
 };

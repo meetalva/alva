@@ -81,10 +81,12 @@ export class Releases extends React.Component {
 					<Link
 						href={stableLink.link}
 						white={false}
-						onClick={ReactGA.event({
-							category: 'conversion',
-							action: 'Download Alva ' + this.state.os
-						})}
+						onClick={() =>
+							ReactGA.event({
+								category: 'conversion',
+								action: 'Download Alva ' + this.state.os
+							})
+						}
 					>
 						<D.Button order={D.ButtonOrder.Primary}>
 							Get Alva {this.state.os !== Os.Unknown ? `for` : '   '} {this.state.os}
@@ -94,10 +96,12 @@ export class Releases extends React.Component {
 					<Link
 						href={alphaLink.link}
 						white={false}
-						onClick={ReactGA.event({
-							category: 'conversion',
-							action: 'Download Canary ' + this.state.os
-						})}
+						onClick={() =>
+							ReactGA.event({
+								category: 'conversion',
+								action: 'Download Canary ' + this.state.os
+							})
+						}
 					>
 						<D.Button order={D.ButtonOrder.Secondary}>Get Alva Canary</D.Button>
 					</Link>

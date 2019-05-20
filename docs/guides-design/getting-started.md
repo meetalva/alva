@@ -13,8 +13,6 @@ options:
 
 In this guide you'll start your first Alva project and connect a publicly available component library.
 
-[Image]
-
 ---
 
 ## 1. Download and install
@@ -41,7 +39,7 @@ Click on `Create File` and then switch from `Design` to `Library` view in the to
 
 Locate the `Alva Website Design` library and click on `Connect`.
 
-[Image]
+![](https://media.meetalva.io/connect-library.png)
 
 That’s it – you connected your first Design System with Alva!
 

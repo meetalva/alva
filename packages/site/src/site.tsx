@@ -147,7 +147,15 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 						target="_blank"
 						rel="noopener"
 					>
-						<D.Link color={D.Color.Violet}>
+						<D.Link
+							color={D.Color.Violet}
+							onClick={() =>
+								ReactGA.event({
+									category: 'interest',
+									action: 'Learn how to prototype with code components'
+								})
+							}
+						>
 							Learn how to prototype with code components
 						</D.Link>
 					</a>
@@ -172,6 +180,12 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 						style={{ textDecoration: 'none' }}
 						target="_blank"
 						rel="noopener"
+						onClick={() =>
+							ReactGA.event({
+								category: 'interest',
+								action: 'Learn how to integrate your designs'
+							})
+						}
 					>
 						<D.Link color={D.Color.Violet}>Learn how to integrate your designs</D.Link>
 					</a>
@@ -195,6 +209,12 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 						style={{ textDecoration: 'none' }}
 						target="_blank"
 						rel="noopener"
+						onClick={() =>
+							ReactGA.event({
+								category: 'interest',
+								action: 'Learn how to work with interactions'
+							})
+						}
 					>
 						<D.Link color={D.Color.Violet}>Learn how to work with interactions</D.Link>
 					</a>
@@ -210,6 +230,12 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 				<div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
 					<iframe
 						src="https://www.youtube-nocookie.com/embed/gZT13EKfZXg"
+						onClick={() =>
+							ReactGA.event({
+								category: 'interest',
+								action: 'Watch video'
+							})
+						}
 						style={{
 							position: 'absolute',
 							top: 0,
@@ -282,6 +308,12 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 									value="Subscribe"
 									name="subscribe"
 									id="mc-embedded-subscribe"
+									onClick={() =>
+										ReactGA.event({
+											category: 'conversion',
+											action: 'Subscribe to Newsletter'
+										})
+									}
 									style={{
 										fontFamily: 'Graphik, Arial',
 										fontSize: '16px',
@@ -316,7 +348,17 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					</D.Copy>
 				</D.Layout>
 				<D.Space size={D.SpaceSize.L} />
-				<a href="https://github.com/meetalva/alva/" target="_blank" rel="noopener">
+				<a
+					href="https://github.com/meetalva/alva/"
+					target="_blank"
+					rel="noopener"
+					onClick={() =>
+						ReactGA.event({
+							category: 'interest',
+							action: 'Contribute to Alva on Github'
+						})
+					}
+				>
 					<D.Button order={D.ButtonOrder.Secondary} color={D.Color.Violet}>
 						Contribute to Alva on Github
 					</D.Button>
@@ -351,7 +393,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 						color={D.Color.White}
 						onClick={() =>
 							ReactGA.event({
-								category: 'conversion',
+								category: 'interest',
 								action: 'Find our guides'
 							})
 						}
@@ -371,7 +413,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					onClick={() =>
 						ReactGA.event({
 							category: 'menu',
-							action: 'S2'
+							action: 'Link to SinnerSchrader'
 						})
 					}
 				/>

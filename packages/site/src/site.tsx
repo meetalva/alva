@@ -346,6 +346,8 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 							action: 'Find our guides'
 						})}
 					>
+						Find our Guides
+					</D.Button>
 				</a>
 			</D.Section>
 

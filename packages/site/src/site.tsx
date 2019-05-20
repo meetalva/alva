@@ -6,7 +6,7 @@ import { CookieNotice } from './cookie-notice';
 
 const ReactGA = require('react-ga');
 
-const gaProperty = 'UA-111349005-1';
+const gaProperty = 'UA-111449801-1';
 const disableStr = 'ga-disable-' + gaProperty;
 
 if (typeof window !== 'undefined') {
@@ -21,7 +21,7 @@ function gaOptout() {
 	alert('Tracking is deactivated!');
 }
 
-ReactGA.initialize('UA-111349005-1');
+ReactGA.initialize('UA-111449801-1');
 ReactGA.set({ anonymizeIp: true });
 ReactGA.pageview('/');
 

@@ -1013,10 +1013,10 @@
     mkdirp "^0.5.1"
     rimraf "^2.5.2"
 
-"@meetalva/alva-design@^1.6.2":
-  version "1.6.2"
-  resolved "https://registry.yarnpkg.com/@meetalva/alva-design/-/alva-design-1.6.2.tgz#c9890817b8cfa443e99bcb72994a7d6d50babd64"
-  integrity sha512-XnpY/WA/TYluWftDoKybhFPzWViRFQg83aYDEbU7uILLgrWYe1zPWVf+nJztrpr+1PYR5r6iisWpDoqhcIhm5g==
+"@meetalva/alva-design@^1.6.3":
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/@meetalva/alva-design/-/alva-design-1.6.3.tgz#ed8809654b5d6388d922cb91ae2e917fc86923ad"
+  integrity sha512-5MkRoB5kl+OZVrjeqMB7boeikr0GIarX4xAO4WQ5TM0zQK+USqP2B8uWsbPZQ0Sx5kgSvK0+CKUyLMA4EvvOAg==
   dependencies:
     "@emotion/core" "^10.0.6"
     "@emotion/styled" "^10.0.6"
@@ -10082,6 +10082,11 @@ react-feather@^1.1.0, react-feather@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/react-feather/-/react-feather-1.1.5.tgz#f7f9384c17d2d061b5b8298f46efc0e497f48469"
   integrity sha512-hAPWatSFnhTNp9Ub96B7LMgOnWzXonA/LxqC2ANfUuc57jJocuWyO96yow2flUUDpitodh9mf6iOZzkyGYmAng==
+
+react-ga@2.5.7:
+  version "2.5.7"
+  resolved "https://registry.yarnpkg.com/react-ga/-/react-ga-2.5.7.tgz#1c80a289004bf84f84c26d46f3a6a6513081bf2e"
+  integrity sha512-UmATFaZpEQDO96KFjB5FRLcT6hFcwaxOmAJZnjrSiFN/msTqylq9G+z5Z8TYzN/dbamDTiWf92m6MnXXJkAivQ==
 
 react-helmet@5.2.0, react-helmet@^5.2.0:
   version "5.2.0"

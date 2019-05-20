@@ -172,6 +172,8 @@ We only use Google Analytics with IP anonymisation enabled. This means that the 
 
 The IP address transmitted by the user’s browser is not merged with other Google data. Users can prevent the storage of cookies by setting their browser software accordingly. In addition, you can disable the cookie’s sending of the data it has created concerning your use of this website (including your IP address) to Google and the processing of this data by Google if you download and install the browser plugin that is available under the following link: https://tools.google.com/dlpage/gaoptout?hl=en.
 
+ To opt-out from Google Analytics tracking for this site, visit https://www.meetalva.io and click "opt-out tracking" in the footer at the end of the page.
+
 Our legitimate interest in data processing also lies in these purposes. The legal basis for the use of Google Analytics is § 15 para. 3 TMG and Art. 6 para. 1 lit. f GDPR. The data sent by us and linked to cookies, user-identifiers (e.g. User-IDs) or advertising-identifiers are automatically deleted after 26 months. Data whose retention period has been reached is automatically deleted once a month.
 
 ## Link to third parties
@@ -180,4 +182,4 @@ You will find links to other websites on this website, directly or indirectly by
 
 We hereby expressly distance ourselves from all contents of these sites to which links are established and do not adopt these contents as our own. We do not have any influence on changes of the linked content. Our website may contain links to other providers’ websites, which are not covered by this data protection policy. To the extent that the use of websites of other providers involves the capture, processing and use of personal data, please refer to the data protection policy of the relevant provider.
 
-Version: September 2018
+Version: May 2019

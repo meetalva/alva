@@ -227,15 +227,17 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 				image="https://media.meetalva.io/background.jpg"
 				headline="Our mission is to enable designers and engineers to build better products together. Without friction."
 			>
-				<div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
+				<div
+					style={{ padding: '56.25% 0 0 0', position: 'relative' }}
+					onClick={() =>
+						ReactGA.event({
+							category: 'interest',
+							action: 'Watch video'
+						})
+					}
+				>
 					<iframe
 						src="https://www.youtube-nocookie.com/embed/gZT13EKfZXg"
-						onClick={() =>
-							ReactGA.event({
-								category: 'interest',
-								action: 'Watch video'
-							})
-						}
 						style={{
 							position: 'absolute',
 							top: 0,
@@ -387,7 +389,11 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					</D.Copy>
 				</D.Layout>
 				<D.Space size={D.SpaceSize.M} />
-				<a href="./doc/docs/guides/start?guides-enabled=true" target="_blank" rel="noopener">
+				<a
+					href="./doc/docs/guides-design/getting-started.html?guides-design-enabled=true"
+					target="_blank"
+					rel="noopener"
+				>
 					<D.Button
 						order={D.ButtonOrder.Secondary}
 						color={D.Color.White}

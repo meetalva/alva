@@ -27,7 +27,7 @@ export const helpMenu: MenuCreator = ctx => {
 					app.send({
 						type: Message.MessageType.OpenExternalURL,
 						id: uuid.v4(),
-						payload: 'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
+						payload: 'https://meetalva.io/doc/docs/start'
 					});
 				}
 			},

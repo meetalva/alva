@@ -1,21 +1,17 @@
 ---
-displayName: Guide 3 - Connect a Library
+displayName: 1. Install a local library
 
 tags:
   - guide
+  - dev
+
+options:
+  order: 1
 ---
 
-#  Guide 3 - Connect a Pattern Library
+# Install a Local Library
 
-:woman_student: **Level**: Intermediate
-
----
-
-> If you want to skip this guide, feel free to download our [Playground Alva-File](http://media.meetalva.io/file/Website.alva) with a pre-connected library to proceed.
-
----
-
-> :information_source: This guide teaches how to connect an Alva project to the ready-made Alva Design Library. 
+> :information_source: This guide teaches how to connect an Alva project to a local library with the Alva Design Library as example. 
 
 > For a guide on how to create a custom pattern library from scratch, see [Create a custom Library](./doc/docs/guides/create-library?guides-enabled=true).
 

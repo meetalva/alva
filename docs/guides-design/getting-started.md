@@ -1,19 +1,21 @@
 ---
-displayName: Guide 1 – Essentials
+displayName: 1. Get started
 
 tags:
   - guide
+  - design
+
+options:
+  order: 1
 ---
 
-# Guide 1 – Essentials
+# Get started
 
-:woman_student: **Level**: Beginner
+In this guide you'll start your first Alva project and connect a publicly available component library.
+
+[Image]
 
 ---
-
-In this guide you'll take your very first steps with Alva.
-
-
 
 ## 1. Download and install
 
@@ -23,7 +25,7 @@ We fully support macOS and Windows systems and provide untested images for vario
 
 Next, locate the Alva image in your Downloads and double-click on the file to start the installation process.
 
-## 2. Start Alva for the first time
+## 2. Start Alva
 
 Alva should install into your applications folder. Depending on your operating system and
 its configuration the exact location may vary. E.g. for macOS it is `/Applications/Alva`. 
@@ -33,14 +35,20 @@ Find the Alva logo and double-click it to start. Alva should greet you with the 
 ![](https://media.meetalva.io/alva-greeting.png)
 
 
-## 3. Create a new file and add content to it
+## 3. Create a new file and connect a library
 
-Click on `Create new Alva File`. You'll find a list of essential patterns on the bottom left of the next screen.
-Locate the `Text` pattern and drop it onto the element pane right above the patterns list.
+Click on `Create File` and then switch from `Design` to `Library` view in the top left panel. You find a continously growing list of  public component libraries.
 
-![](https://media.meetalva.io/guides/guide-01-01.gif)
+Locate the `Alva Website Design` library and click on `Connect`.
 
-That’s it – we just added your first component to our prototype!
+[Image]
+
+That’s it – you connected your first Design System with Alva!
+
+## 4. Add a text component
+ Go back to the `Design` view. You find the library's components in the bottom left panel. Locate the `Text` component and drop it onto the element pane right above the component list.
+
+![](https://media.meetalva.io/properties.png)
 
 ## 3. Adjust a Property
 After you've selected the newly added text component, have a look at the right side of Alva. That is where all the **properties** – like settings – of the component are shown. In our case there is just a single one – the text value. Let’s **change** that to `Hello Alva!`.

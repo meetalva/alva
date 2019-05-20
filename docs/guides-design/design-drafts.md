@@ -1,13 +1,16 @@
 ---
-displayName: Guide 2 – Design Drafts
+displayName: 4. Add design drafts
 
 tags:
   - guide
+  - design
+  - rapid
+
+options:
+  order: 4
 ---
 
-# Guide 2 - Add Design Drafts
-
-:woman_student: **Level**: Beginner
+# Add Design Drafts
 
 ---
 

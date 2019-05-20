@@ -1,13 +1,16 @@
 ---
-displayName: Guide 4 – Interaction
+displayName: 2. Link pages via interaction
 
 tags:
   - guide
+  - design
+  - interaction
+
+options:
+  order: 2
 ---
 
-# Guide 4 - Interaction
-
-:woman_student: **Level**: Beginner
+# Link pages via interaction
 
 ---
 
@@ -17,6 +20,7 @@ In this guide you will learn how to link pages and bring life into your prototyp
 On the left side of Alva all of the pages are shown. Let’s **add a page** and give it a name.
 
 ![](https://media.meetalva.io/guides/guide-03-01.gif)
+
 
 ## 2. Add Button
 We need an interactive component. Let’s **add a button**, for example.

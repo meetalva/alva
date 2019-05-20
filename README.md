@@ -9,11 +9,11 @@
 > https://meetalva.io
 
 
-# [Get Started](https://meetalva.io/doc/docs/guides/start?guides-enabled=true) | [Let's chat](https://gitter.im/meetalva/Lobby) | [Website](https://meetalva.io)
+# [Get Started](https://meetalva.io/doc/docs/start) | [Let's chat](https://gitter.im/meetalva/Lobby) | [Website](https://meetalva.io)
 
 Start with a minimal set of components to sketch concepts and iterate fast your team to create and enrich components, refine design and implemenation and compose a working, living prototype.
 
-> ⚠️ This is the contributor documentation of Alva. Please refer to [meetalva.io/doc/docs/guides](https://meetalva.io/doc/docs/guides/start?guides-enabled=true) for user docs.
+> ⚠️ This is the contributor documentation of Alva. Please refer to [meetalva.io/doc/docs/guides](https://meetalva.io/doc/docs/start) for user docs.
 
 ## Develop Alva
 

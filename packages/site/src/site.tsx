@@ -44,7 +44,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					linkName="Get Started"
 					target="_blank"
 					rel="noopener"
-					href="./doc/docs/guides/start?guides-enabled=true"
+					href="./doc/docs/start"
 					title="Open Getting Started Tutorial"
 				/>
 				<D.MenuItem
@@ -306,7 +306,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					</D.Copy>
 				</D.Layout>
 				<D.Space size={D.SpaceSize.M} />
-				<a href="./doc/docs/guides/start?guides-enabled=true" target="_blank" rel="noopener">
+				<a href="./doc/docs/start" target="_blank" rel="noopener">
 					<D.Button order={D.ButtonOrder.Secondary} color={D.Color.White}>
 						Find our Guides
 					</D.Button>
@@ -325,7 +325,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 					linkName="Legal notice"
 					target="_blank"
 					rel="noopener"
-					href="./doc/docs/legalnotice?guides-enabled=true"
+					href="./doc/docs/legalnotice"
 				/>
 				<D.MenuItem
 					linkName="Privacy Policy"

@@ -54,7 +54,7 @@ export interface ConditionalProps {
 
 /**
  * @name Conditional
- * @description for Show and Hide Logic
+ * @description for show & hide logic
  * @icon ToggleRight
  * @patternType synthetic:conditional
  */

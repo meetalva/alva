@@ -1,121 +1,216 @@
 import * as React from 'react';
 
 export interface BoxProps {
-	/**
-	 * @name Flex
-	 * @default true
-	 * */
-	flex?: boolean;
+	/****** Group: Layout *******/
 
 	/**
 	 * @name Direction
-	 * @default Vertical
-	 * @group Alignment
+	 * @default Row
+	 * @group Layout
 	 * @control ButtonGroup
 	 * */
 	flexDirection?: FlexDirection;
 
 	/**
 	 * @name Justify
-	 * @default Center
-	 * @group Alignment
+	 * @default JustifyStart
+	 * @group Layout
 	 * @control ButtonGroup
 	 * */
 	justifyContent?: JustifyContent;
 
 	/**
 	 * @name Align
-	 * @default Center
-	 * @group Alignment
+	 * @default AlignStretch
+	 * @group Layout
 	 * @control ButtonGroup
 	 * */
 	alignItems?: AlignItems;
 
-	/** @name Wrap */
-	flexWrap?: boolean;
+	/**
+	 * @name Children
+	 * @default Don't wrap
+	 * @group Layout
+	 * @control ButtonGroup
+	 * */
+	flexWrap?: FlexWrap;
 
-	/** @name Basis */
-	flexBasis?: number;
+	/****** Group: Size *******/
 
-	/** @name Grow */
-	flexGrow?: number;
+	/**
+	 * @name Width
+	 * @example auto
+	 * @unit px|%|em|vw|vh
+	 * @group Size & Spacing
+	 * */
+	width?: string;
 
-	/** @name Shrink @default 1 */
-	flexShrink?: number;
+	/**
+	 * @name Height
+	 * @unit px|%|em|vw|vh
+	 * @group Size & Spacing
+	 * @default 50px
+	 * */
+	height?: string;
 
-	/** @name Width @default auto */
-	width?: number | string;
+	/**
+	 * @name Padding
+	 * @default 0
+	 * @unit px|%|em|vw|vh
+	 * @group Size & Spacing
+	 * */
+	padding?: string;
 
-	/** @name Height @default auto */
-	height?: number | string;
+	/**
+	 * @name Margin
+	 * @default 0
+	 * @unit px|%|em|vw|vh
+	 * @group Size & Spacing
+	 * */
+	margin?: string;
 
-	/** @name Background Color @control color */
+	/****** Group: Flex Children *******/
+
+	/**
+	 * @name Sizing
+	 * @default Shrink if needed
+	 * @group Flex Child
+	 * @description Affects this element only, if inside a Flexible Layout.
+	 * */
+	flex?: Flex;
+
+	/****** Group: Styling *******/
+
+	/**
+	 * @name Background Color
+	 * @group Styling
+	 * @control color
+	 * @default transparent
+	 * */
 	backgroundColor?: string;
+
+	/****** Group: Border *******/
+
+	/**
+	 * @name Radius
+	 * @default 0
+	 * @unit px|%|em
+	 * @group Border
+	 * @control slider
+	 * */
+	borderRadius?: string;
+
+	/**
+	 * @name Width
+	 * @default none
+	 * @unit px|em
+	 * @group Border
+	 * */
+	borderWidth?: string;
+
+	/**
+	 * @name Color
+	 * @default #000000
+	 * @group Border
+	 * @control color
+	 * */
+	borderColor?: string;
 
 	children?: React.ReactNode;
 }
 
+export enum Flex {
+	/** @name Shrink if needed */
+	ShrinkIfNeeded,
+	/** @name Grow if possible */
+	GrowIfPossible,
+	/** @name Don't shrink or grow */
+	DontShrinkOrGrow
+}
+
 export enum FlexDirection {
-	/** @name Horizontal */
-	row = 'row',
-	/** @name Vertical */
-	column = 'column'
+	/** @name Row */
+	Row = 'row',
+	/** @name Column  */
+	Column = 'column'
+}
+
+export enum FlexWrap {
+	/** @name Don't wrap */
+	Nowrap = 'nowrap',
+	/** @name Wrap */
+	Wrap = 'wrap'
 }
 
 export enum JustifyContent {
-	/** @name Start @icon FlexJustifyStart */
-	'flex-start' = 'flex-start',
+	/** @name JustifyStart @icon FlexJustifyStart */
+	JustifyStart = 'flex-start',
 
-	/** @name Center @icon FlexJustifyCenter */
-	'center' = 'center',
+	/** @name JustifyCenter @icon FlexJustifyCenter */
+	JustifyCenter = 'center',
 
-	/** @name End @icon FlexJustifyEnd*/
-	'flex-end' = 'flex-end',
+	/** @name JustifyEnd @icon FlexJustifyEnd*/
+	JustifyEnd = 'flex-end',
 
-	/** @name Space Between @icon FlexJustifySpaceBetween */
-	'space-between' = 'space-between',
+	/** @name JustifySpaceBetween @icon FlexJustifySpaceBetween */
+	JustifyBetween = 'space-between',
 
-	/** @name Space Around @icon FlexJustifySpaceAround */
-	'space-around' = 'space-around'
+	/** @name JustifySpaceAround @icon FlexJustifySpaceAround */
+	JustifyAround = 'space-around'
 }
 
 export enum AlignItems {
-	/** @name Start @icon FlexAlignStart */
-	'flex-start' = 'flex-start',
+	/** @name AlignStart @icon FlexAlignStart */
+	AlignStart = 'flex-start',
 
-	/** @name Center @icon FlexAlignCenter */
-	'center' = 'center',
+	/** @name AlignCenter @icon FlexAlignCenter */
+	AlignCenter = 'center',
 
-	/** @name Bottom @icon FlexAlignEnd */
-	'flex-end' = 'flex-end',
+	/** @name AlignBottom @icon FlexAlignEnd */
+	AlignEnd = 'flex-end',
 
-	/** @name Stretch @icon FlexAlignStretch */
-	'stretch' = 'stretch',
+	/** @name AlignStretch @icon FlexAlignStretch */
+	AlignStrech = 'stretch',
 
-	/** @name Baseline @icon FlexAlignBaseline */
-	'baseline' = 'baseline'
+	/** @name AlignBaseline @icon FlexAlignBaseline */
+	AlignBaseline = 'baseline'
 }
 
 /**
- * @name Box
- * @description for Flexbox Layouts
+ * @name  Box
  * @icon Box
+ * @description for flexible layouts
  * @patternType synthetic:box
  */
 export const Box: React.SFC<BoxProps> = props => {
+	function buildFlexProperty() {
+		switch (props.flex) {
+			case Flex.ShrinkIfNeeded:
+				return '0 1 auto';
+			case Flex.GrowIfPossible:
+				return '1 0 auto';
+			case Flex.DontShrinkOrGrow:
+				return '0 0 auto';
+		}
+	}
+
 	return (
 		<div
 			style={{
-				flexBasis: props.flexBasis,
 				flexDirection: props.flexDirection,
-				flexWrap: props.flexWrap ? 'wrap' : 'nowrap',
-				flexGrow: props.flexGrow,
-				flexShrink: props.flexShrink,
+				flexWrap: props.flexWrap,
+				flex: buildFlexProperty(),
 				alignItems: props.alignItems,
-				display: props.flex ? 'flex' : 'block',
+				display: 'flex',
 				justifyContent: props.justifyContent,
 				width: props.width,
 				height: props.height,
+				padding: props.padding,
+				margin: props.margin,
+				borderRadius: props.borderRadius,
+				borderWidth: props.borderWidth,
+				borderStyle: props.borderWidth === 'none' ? 'none' : 'solid',
+				borderColor: props.borderColor,
 				backgroundColor: props.backgroundColor
 			}}
 		>

@@ -14,7 +14,7 @@ const style = {
 
 /**
  * @name Text
- * @description for Headlines, Copy and more
+ * @description plain text for everything
  * @icon Type
  * @patternType synthetic:text
  */

@@ -88,6 +88,8 @@ export const Select: React.StatelessComponent<SelectProps> = props => (
 				color: state.isFocused ? Color.Blue40 : Color.Grey90,
 				boxShadow: `0 0 3px ${state.isFocused ? Color.BlueAlpha40 : 'transparent'}`,
 				transition: 'color 0.1s, box-shadow 0.1s',
+				position: 'relative',
+				zIndex: '10',
 				':hover': {
 					color: state.isFocused ? Color.Blue40 : Color.Grey60
 				}

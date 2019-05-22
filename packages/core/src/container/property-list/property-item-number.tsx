@@ -58,7 +58,7 @@ export class PropertyItemNumber extends React.Component<PropertyItemNumberProps>
 				value={property.getValue() as number | undefined}
 				onBlur={() => window.requestIdleCallback(() => props.store.commit())}
 				onChange={this.handleChange}
-				placeholder={example ? `e.g.: ${example}` : ''}
+				placeholder={example ? `${example}` : ''}
 				onMinusClick={this.handleMinusClick}
 				onPlusClick={this.handlePlusClick}
 			/>

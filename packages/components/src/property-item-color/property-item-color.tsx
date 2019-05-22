@@ -30,7 +30,7 @@ const StyledSwatchColor = styled.div`
 	position: absolute;
 	right: 5px;
 	top: 5px;
-	z-index: 10;
+	z-index: 1;
 
 	width: 30px;
 	height: 20px;

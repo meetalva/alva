@@ -88,6 +88,26 @@ export const updateNpmPatternLibrary: MatcherCreator<M.UpdateNpmPatternLibraryRe
 			});
 		}
 
+		if (result.type === 'aot') {
+			const aotResponse = await fetch(result.path);
+			const aotData = await aotResponse.json();
+
+			app.send({
+				type: M.MessageType.UpdatePatternLibraryResponse,
+				id: m.id,
+				transaction: m.transaction,
+				payload: {
+					result: 'success',
+					analysis: aotData,
+					path: result.path,
+					previousLibraryId: previousLibrary.getId(),
+					installType: T.PatternLibraryInstallType.Remote
+				}
+			});
+
+			return;
+		}
+
 		const analysisResult = await Analyzer.analyze(result.path);
 
 		if (analysisResult.type === T.LibraryAnalysisResultType.Error) {

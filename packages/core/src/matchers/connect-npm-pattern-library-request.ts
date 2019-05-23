@@ -1,3 +1,4 @@
+import * as fetch from 'isomorphic-fetch';
 import * as uuid from 'uuid';
 import * as pkgDir from 'pkg-dir';
 import * as M from '@meetalva/message';
@@ -88,6 +89,41 @@ export const connectNpmPatternLibrary: MatcherCreator<M.ConnectNpmPatternLibrary
 			});
 
 			return abort();
+		}
+
+		if (result.type === 'aot') {
+			const aotResponse = await fetch(result.path);
+			const aotData = await aotResponse.json();
+
+			if (!previousLibrary) {
+				app.send({
+					type: M.MessageType.ConnectPatternLibraryResponse,
+					id: m.id,
+					transaction: m.transaction,
+					payload: {
+						result: 'success',
+						analysis: aotData,
+						path: result.path,
+						previousLibraryId: undefined,
+						installType: T.PatternLibraryInstallType.Remote
+					}
+				});
+			} else {
+				app.send({
+					type: M.MessageType.UpdatePatternLibraryResponse,
+					id: m.id,
+					transaction: m.transaction,
+					payload: {
+						result: 'success',
+						analysis: aotData,
+						path: result.path,
+						previousLibraryId: previousLibrary.getId(),
+						installType: T.PatternLibraryInstallType.Remote
+					}
+				});
+			}
+
+			return;
 		}
 
 		const analysisResult = await Analyzer.analyze(result.path);

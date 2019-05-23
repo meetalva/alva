@@ -33,6 +33,7 @@ export interface PatternCandidate {
 
 export interface AnalyzeOptions {
 	analyzeBuiltins: boolean;
+	skipAOT: boolean;
 }
 
 interface AnalyzeContext {
@@ -59,6 +60,7 @@ type PatternAnalyzerPredicate = (
 
 export const analyzeDefaults = {
 	analyzeBuiltins: false,
+	skipAOT: false,
 	ids: {
 		patterns: [],
 		properties: [],
@@ -73,46 +75,30 @@ export async function analyze(
 ): Promise<Types.LibraryAnalysisResult> {
 	try {
 		const id = uuid.v4();
-		// readPkg is typed faultily
-		const pkg = await readPkg({ cwd: Path.dirname(pkgPath) });
 		const cwd = Path.dirname(pkgPath);
+		const pkg = await readPkg({ cwd });
 		const options = merge({}, analyzeDefaults, rawOptions) as AnalyzeOptions;
+
+		if (
+			options.skipAOT !== true &&
+			typeof pkg.alva === 'object' &&
+			pkg.alva !== null &&
+			typeof pkg.alva.analysis === 'string'
+		) {
+			const aotAnalysisPath = Path.resolve(cwd, pkg.alva.analysis);
+
+			return {
+				type: Types.LibraryAnalysisResultType.Success,
+				result: JSON.parse(Fs.readFileSync(aotAnalysisPath, 'utf-8'))
+			};
+		}
+
 		const patterns = await analyzePatterns({ pkgPath, options, pkg, cwd });
-
-		const getBundle = async () => {
-			if (patterns.length === 0) {
-				return '';
-			}
-
-			const compiler = await createPatternCompiler(patterns, { cwd, id });
-			const stats = await Util.promisify(compiler.run).bind(compiler)();
-
-			if (stats.hasErrors()) {
-				const message = stats.toString({
-					chunks: false,
-					colors: false
-				});
-
-				console.error(message);
-				throw new Error();
-			}
-
-			if (stats.hasWarnings()) {
-				console.warn(
-					stats.toString({
-						chunks: false,
-						colors: false
-					})
-				);
-			}
-
-			return (compiler.outputFileSystem as any).readFileSync(`/${id}.js`).toString();
-		};
 
 		return {
 			type: Types.LibraryAnalysisResultType.Success,
 			result: {
-				bundle: await getBundle(),
+				bundle: await getBundle(patterns, { cwd, id }),
 				id,
 				packageFile: pkg,
 				path: pkgPath,
@@ -129,6 +115,39 @@ export async function analyze(
 			error
 		};
 	}
+}
+
+async function getBundle(
+	patterns: Types.InternalPatternAnalysis[],
+	{ cwd, id }: { cwd: string; id: string }
+): Promise<string> {
+	if (patterns.length === 0) {
+		return '';
+	}
+
+	const compiler = await createPatternCompiler(patterns, { cwd, id });
+	const stats = await Util.promisify(compiler.run).bind(compiler)();
+
+	if (stats.hasErrors()) {
+		const message = stats.toString({
+			chunks: false,
+			colors: false
+		});
+
+		console.error(message);
+		throw new Error();
+	}
+
+	if (stats.hasWarnings()) {
+		console.warn(
+			stats.toString({
+				chunks: false,
+				colors: false
+			})
+		);
+	}
+
+	return (compiler.outputFileSystem as any).readFileSync(`/${id}.js`).toString();
 }
 
 async function analyzePatterns(context: {

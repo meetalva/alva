@@ -6,8 +6,7 @@
     "alva-analyze": "./bin/analyze.js"
   },
   "scripts": {
-    "build": "ncc build src/bin/analyze.ts -e webpack -o nccbuild",
-    "check:dependencies": "alva-dependencies -i typescript-eslint-parser"
+    "build": "ncc build src/bin/analyze.ts -e webpack -o nccbuild"
   },
   "repository": {
     "type": "git",
@@ -25,7 +24,6 @@
   },
   "devDependencies": {
     "@meetalva/analyzer": "1.0.0",
-    "@meetalva/tools": "1.0.0",
     "@meetalva/types": "1.0.0",
     "@types/node": "^10.12.18",
     "@zeit/ncc": "^0.18.5",

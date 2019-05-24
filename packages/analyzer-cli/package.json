@@ -28,5 +28,8 @@
     "@types/node": "^10.12.18",
     "@zeit/ncc": "^0.18.5",
     "yargs-parser": "10.1.0"
+  },
+  "dependencies": {
+    "webpack": "^4.28.2"
   }
 }

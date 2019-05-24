@@ -48,7 +48,7 @@
   "dependencies": {
     "@marionebl/browserfs": "2.0.0",
     "@meetalva/analyzer": "1.0.0",
-    "@meetalva/analyzer-cli": "1.0.0",
+    "@meetalva/analyzer-cli": "1.0.1-alpha.2",
     "@meetalva/components": "1.0.0",
     "@meetalva/message": "1.0.0",
     "@meetalva/model": "1.0.0",

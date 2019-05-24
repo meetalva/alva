@@ -1031,6 +1031,16 @@
     react-helmet "^5.2.0"
     tslib "^1.7.0"
 
+"@meetalva/analyzer-cli@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@meetalva/analyzer-cli/-/analyzer-cli-1.0.0.tgz#0d00c0d58e9497a82169f7ea3f726f8ce5858dd9"
+  integrity sha512-i9SYcXCvaoMYyZYQEpYymzzIXescmkpGBBGPsAGGVvpRwPrQwUto2WwOPG0gTVYCjghbnxSPgMRhfaJg0ujIUA==
+  dependencies:
+    "@meetalva/analyzer" "1.0.0"
+    "@meetalva/types" "1.0.0"
+    "@types/node" "^10.12.18"
+    yargs-parser "10.1.0"
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"

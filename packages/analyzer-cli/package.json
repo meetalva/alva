@@ -3,7 +3,7 @@
   "version": "1.0.1-alpha.1",
   "description": "Derive component meta data and bundles from React projects",
   "bin": {
-    "alva-analyze": "./bin/analyze"
+    "alva-analyze": "./bin/analyze.js"
   },
   "scripts": {
     "build": "ncc build src/bin/analyze.ts -e webpack -o nccbuild",

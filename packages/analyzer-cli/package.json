@@ -1,11 +1,12 @@
 {
   "name": "@meetalva/analyzer-cli",
-  "version": "1.0.0",
+  "version": "1.0.1-alpha.1",
   "description": "Derive component meta data and bundles from React projects",
   "bin": {
     "alva-analyze": "./bin/analyze"
   },
   "scripts": {
+    "build": "ncc build src/bin/analyze.ts -e webpack -o nccbuild",
     "check:dependencies": "alva-dependencies -i typescript-eslint-parser"
   },
   "repository": {
@@ -23,12 +24,11 @@
     "url": "https://github.com/meetalva/alva/issues"
   },
   "devDependencies": {
-    "@meetalva/tools": "1.0.0"
-  },
-  "dependencies": {
     "@meetalva/analyzer": "1.0.0",
+    "@meetalva/tools": "1.0.0",
     "@meetalva/types": "1.0.0",
     "@types/node": "^10.12.18",
+    "@zeit/ncc": "^0.18.5",
     "yargs-parser": "10.1.0"
   }
 }

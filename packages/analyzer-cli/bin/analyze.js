@@ -1,2 +1,6 @@
 #!/usr/bin/env node
-require('../lib/bin/analyze');
+try {
+    require('../nccbuild');
+} catch (e) {
+    require('../lib/bin/analyze');
+}

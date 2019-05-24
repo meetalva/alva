@@ -27,7 +27,6 @@
   },
   "dependencies": {
     "@meetalva/analyzer": "1.0.0",
-    "@meetalva/model": "1.0.0",
     "@meetalva/types": "1.0.0",
     "@types/node": "^10.12.18",
     "yargs-parser": "10.1.0"

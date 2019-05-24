@@ -41,27 +41,30 @@ async function main() {
 		return;
 	}
 
-	const project = Model.Project.create({ name: 'Project', draft: true, path: 'project' });
-	const library = Model.PatternLibrary.fromAnalysis(analysis.result, {
-		project,
-		analyzeBuiltins,
-		installType: Types.PatternLibraryInstallType.Local
-	});
+	const output = formatData(analysis.result, format);
 
 	if (toFile) {
-		await writeFile(outPath, formatLibrary(library, format));
+		await writeFile(outPath, output);
 	} else {
-		write(formatLibrary(library, format));
+		write(output);
 	}
 }
 
-function formatLibrary(library: Model.PatternLibrary, format: string): string {
+function formatData(input: Types.LibraryAnalysis, format: string): string {
 	switch (format) {
 		case 'json':
-			return JSON.stringify(library.toJSON(), null, '  ');
+			return JSON.stringify(input, null, '  ');
 		case 'js':
+			return `export const analysis = ${JSON.stringify(input, null, '  ')}`;
 		case 'ts':
-			return `export const analysis = ${JSON.stringify(library.toJSON(), null, '  ')}`;
+			return [
+				'import {LibraryAnalysis} from "@meetalva/types";',
+				`export const analysis: LibraryAnalysis = ${JSON.stringify(
+					input,
+					null,
+					'  '
+				)} as unknown as LibraryAnalysis`
+			].join('\n');
 		default:
 			throw new Error(`Unknown format: ${format}`);
 	}

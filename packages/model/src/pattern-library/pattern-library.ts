@@ -139,7 +139,7 @@ export class PatternLibrary {
 		analysis: Types.LibraryAnalysis,
 		opts: {
 			analyzeBuiltins: boolean;
-			project: Project;
+			project?: Project;
 			installType: Types.PatternLibraryInstallType;
 		}
 	): PatternLibrary {
@@ -196,7 +196,7 @@ export class PatternLibrary {
 	}
 
 	@Mobx.action
-	public import(analysis: Types.LibraryAnalysis, { project }: { project: Project }): void {
+	public import(analysis: Types.LibraryAnalysis, { project }: { project?: Project }): void {
 		this.packageFile = analysis.packageFile;
 
 		const patternsBefore = this.getPatterns();
@@ -256,29 +256,31 @@ export class PatternLibrary {
 
 		propChanges.changed.map(change => change.before.update(change.after));
 
-		const touchedPatterns = [...patternChanges.added, ...patternChanges.changed].map(
-			change => change.after
-		);
+		if (project) {
+			const touchedPatterns = [...patternChanges.added, ...patternChanges.changed].map(
+				change => change.after
+			);
 
-		// TODO: This might be solved via a bigger refactoring that
-		// computes available element contents from pattern slots directly
-		touchedPatterns.forEach(pattern => {
-			project.getElementsByPattern(pattern).forEach(element => {
-				const contents = element.getContents();
+			// TODO: This might be solved via a bigger refactoring that
+			// computes available element contents from pattern slots directly
+			touchedPatterns.forEach(pattern => {
+				project.getElementsByPattern(pattern).forEach(element => {
+					const contents = element.getContents();
 
-				pattern
-					.getSlots()
-					// Check if there is a corresponding element content for each pattern slot
-					.filter(slot => !contents.some(content => content.getSlotId() === slot.getId()))
-					.forEach(slot => {
-						// No element content, create a new one and add it to element
-						const content = ElementContent.fromSlot(slot, { project });
-						content.setParentElement(element);
-						element.addContent(content);
-						project.addElementContent(content);
-					});
+					pattern
+						.getSlots()
+						// Check if there is a corresponding element content for each pattern slot
+						.filter(slot => !contents.some(content => content.getSlotId() === slot.getId()))
+						.forEach(slot => {
+							// No element content, create a new one and add it to element
+							const content = ElementContent.fromSlot(slot, { project });
+							content.setParentElement(element);
+							element.addContent(content);
+							project.addElementContent(content);
+						});
+				});
 			});
-		});
+		}
 
 		this.setState(Types.PatternLibraryState.Connected);
 

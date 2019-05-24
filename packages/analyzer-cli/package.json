@@ -1,6 +1,6 @@
 {
   "name": "@meetalva/analyzer-cli",
-  "version": "1.0.1-alpha.1",
+  "version": "1.0.1-alpha.2",
   "description": "Derive component meta data and bundles from React projects",
   "bin": {
     "alva-analyze": "./bin/analyze.js"

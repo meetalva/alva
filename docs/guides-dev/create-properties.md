@@ -23,8 +23,8 @@ options:
 > In this guide we'll skip the project setup
 > part by reusing the Alva Design Library. 
 >
-> If you want to start fresh, skip to our [Create a Library Guide](./create-library.md)
-Please make sure to follow our [Connnect a Library](./library) and [Create a Pattern](./create-pattern) before 
+> If you want to start fresh, skip to our [Create a Library Guide](./create-library.md).
+> Please make sure to follow our [Connnect a Library](./library) and [Create a Pattern](./create-pattern) before 
 continuing with step 2.
 
 ## 2. Add a greeting property
@@ -47,7 +47,7 @@ export const HelloWorld: React.SFC = () => {
 }
 ```
 
-Let's take our componen a bit further. We'll let users
+Let's take our component a bit further. We'll let users
 decide on the greeting they want to use.
 
 Let's set a foundation annd add a `HelloWorldProps` TypeScript interface.
@@ -100,7 +100,7 @@ Remember to execute the TypeScript compiler via `npm run build`.
 Then fire up Alva, open a new file and connect your Alva Design Library.
 Locate the `HelloWorld` component via search in the component list.
 
-Double-click the component or drag it on Alvas element list. You should 
+Double-click the component or drag it on Alva's element list. You should 
 see "Hello, World" in your project preview.
 
 Notice how the property list on the right side of the preview now 

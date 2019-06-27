@@ -45,5 +45,5 @@ You input component now accepts the value you type in. yay!
 
 ## Next
 
-* **Next**: [Create a Pattern](./doc/docs/guides/create-pattern?guides-enabled=true)
+* **Next**: [Add Design Dradfts](./doc/docs/guides-design/design-drafts.html?guides-enabled=true&guides-design-enabled=true)
 

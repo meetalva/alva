@@ -45,4 +45,4 @@ Well, because usually when you click on an element in the preview it gets select
 ## Next
 
 Learn how to connect a compatible code component library
-* **Next**: [Variables](./doc/docs/guides/variables?guides-enabled=true)
+* **Next**: [Variables](./doc/docs/guides-design/variables.html?guides-enabled=true&guides-design-enabled=true)

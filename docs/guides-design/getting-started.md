@@ -68,4 +68,4 @@ As you may have already found out, elements that support children elements have 
 ### Next
 Hooray! You learned the essentials of working with Alva. Let’s jump to the next topic – how to integrate your design drafts into the prototype.
 
-[Guide 2: Add Design Drafts](./doc/docs/guides/design?guides-enabled=true)
+[Guide 2: Link Pages with interaction](./doc/docs/guides-design/interaction.html?guides-enabled=true&guides-design-enabled=true)

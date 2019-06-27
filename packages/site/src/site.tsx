@@ -142,7 +142,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 				}
 				link={
 					<a
-						href="./doc/docs/guides/essentials?guides-enabled=true"
+						href="./doc/docs/guides-design/getting-started"
 						style={{ textDecoration: 'none' }}
 						target="_blank"
 						rel="noopener"
@@ -176,7 +176,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 				}
 				link={
 					<a
-						href="./doc/docs/guides/design?guides-enabled=true"
+						href="./doc/docs/guides-design/design-drafts.html?guides-enabled=true&guides-design-enabled=true"
 						style={{ textDecoration: 'none' }}
 						target="_blank"
 						rel="noopener"
@@ -205,7 +205,7 @@ const Page: React.StatelessComponent<void> = (): JSX.Element => {
 				}
 				link={
 					<a
-						href="./doc/docs/guides/interaction?guides-enabled=true"
+						href="./doc/docs/guides-design/interaction.html?guides-enabled=true&guides-design-enabled=true"
 						style={{ textDecoration: 'none' }}
 						target="_blank"
 						rel="noopener"

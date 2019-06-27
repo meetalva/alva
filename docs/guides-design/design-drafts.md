@@ -29,9 +29,3 @@ After selecting the component, you’ll see an Image property on the right side.
 You can adjust the size of your component and even define minimum or maximum sizes. For example, your component can be 80% width, but at maximum 1280px.
 
 ---
-
-## Next
-
-Let's learn how to create a prototype from our designs by adding interactions.
-
-* **Next**: [Library](./doc/docs/guides/library?guides-enabled=true)

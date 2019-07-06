@@ -67,7 +67,7 @@ export class SplashScreenContainer extends React.Component {
 					app.send({
 						type: MessageType.OpenExternalURL,
 						id: uuid.v4(),
-						payload: 'https://meetalva.io/doc/docs/guides/start?guides-enabled=true'
+						payload: 'https://meetalva.io/doc/docs/start'
 					});
 				}}
 				onExampleClick={() => {

@@ -1,7 +1,6 @@
 import * as Fs from 'fs';
 import * as Path from 'path';
 import * as Util from 'util';
-import * as Model from '@meetalva/model';
 import * as Analyzer from '@meetalva/analyzer';
 import * as Types from '@meetalva/types';
 
@@ -32,7 +31,7 @@ async function main() {
 	const cwd = flags.cwd || process.cwd();
 	const path = Path.resolve(cwd, flags.in);
 	const outPath = flags.out ? Path.resolve(cwd, flags.out) : '';
-	const analysis = await Analyzer.analyze(path, { analyzeBuiltins });
+	const analysis = await Analyzer.analyze(path, { analyzeBuiltins, skipAOT: true });
 	const format = typeof flags.format === 'undefined' ? 'ts' : flags.format;
 
 	if (analysis.type === Types.LibraryAnalysisResultType.Error) {

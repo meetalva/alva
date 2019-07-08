@@ -1,4 +1,5 @@
 import * as npa from 'npm-package-arg';
+import * as fetch from 'isomorphic-fetch';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import * as semver from 'semver';
@@ -7,6 +8,7 @@ import * as ChildProcess from 'child_process';
 
 const pacote = require('pacote');
 const resolvePkg = require('resolve-pkg');
+const packageJson = require('package-json');
 
 const ARGS = [
 	'--exact',
@@ -21,6 +23,7 @@ const ARGS = [
 const TYPES = ['version', 'tag', 'range'];
 
 export interface PackageResult {
+	type: 'aot' | 'ondemand';
 	cwd: string;
 	path: string;
 	version: string;
@@ -61,6 +64,7 @@ export async function getPackage(
 ): Promise<PackageResult | Error> {
 	try {
 		const parsed = npa(raw);
+		const packument = await pacote.packument(parsed.name);
 
 		if (!TYPES.includes(parsed.type)) {
 			return new Error(
@@ -68,13 +72,26 @@ export async function getPackage(
 			);
 		}
 
-		const version = await getVersion(parsed);
+		const version = await getVersion(parsed, packument);
 
 		if (!version) {
 			return new Error(`could not determine version for ${raw}`);
 		}
 
 		const id = [parsed.name, version].join('@');
+
+		const pkgJSONresponse = await fetch(`https://unpkg.com/${id}/package.json`);
+		const pkgJSON = await pkgJSONresponse.json();
+
+		if (typeof pkgJSON.alva === 'object' && typeof pkgJSON.alva.analysis === 'string') {
+			return {
+				type: 'aot',
+				cwd: '',
+				path: `https://unpkg.com/${id}/${pkgJSON.alva.analysis}`,
+				version,
+				name: parsed.name!
+			};
+		}
 
 		const vendorDir = getVendorDir(opts);
 		const yarn = Path.join(vendorDir, 'yarn.js');
@@ -84,6 +101,7 @@ export async function getPackage(
 		await fork(yarn, ['add', id, ...ARGS], { cwd });
 
 		return {
+			type: 'ondemand',
 			cwd,
 			path: await resolvePkg(`${parsed.name}/package.json`, { cwd }),
 			version,
@@ -97,12 +115,10 @@ export async function getPackage(
 	}
 }
 
-async function getVersion(name: npa.Result): Promise<string | undefined> {
+async function getVersion(name: npa.Result, packument: any): Promise<string | undefined> {
 	if (name.type === 'version') {
 		return name.fetchSpec!;
 	}
-
-	const packument = await pacote.packument(name.name);
 
 	if (name.type === 'tag') {
 		const version = packument['dist-tags'][name.fetchSpec!];

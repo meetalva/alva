@@ -461,7 +461,7 @@ export class LibraryStoreContainer extends React.Component {
 														type: MessageType.OpenExternalURL,
 														id: uuid.v4(),
 														payload:
-															'https://meetalva.io/doc/docs/guides/library.html'
+															'https://meetalva.io/doc/docs/guides-dev/install-local-library?search=library'
 													});
 												}}
 											>

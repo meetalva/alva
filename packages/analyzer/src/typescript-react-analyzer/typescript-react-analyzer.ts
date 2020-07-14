@@ -141,10 +141,32 @@ async function analyzePatterns(context: {
 
 	const declarationPaths = patternCandidates.map(p => p.declarationPath);
 
-	const optionsPath = ts.findConfigFile(context.cwd, Fs.existsSync);
-	const options = optionsPath
+	// Get a tsconfig file
+	const optionsPath = ts.findConfigFile(context.cwd.replace('\\dist', ''), Fs.existsSync);
+
+	// First step: Let tsc pick up the config.
+	let options = optionsPath
 		? ts.readConfigFile(optionsPath, path => String(Fs.readFileSync(path)))
 		: { config: {} };
+	// In case of an error, we cannot go further - the config is malformed.
+	if (options.error) {
+		throw new Error(JSON.stringify(options.error, null, 4));
+	}
+
+	// Second step: Parse the config, resolving all potential references.
+	const baseOptionsPath = Path.dirname(optionsPath as string);
+	const parsedConfig = ts.parseJsonConfigFileContent(options.config, ts.sys, baseOptionsPath);
+	// In case the config is present, it already contains possibly merged entries from following the
+	// 'extends' entry, thus it is not required to follow it manually.
+	// This procedure does NOT throw, but generates a list of errors that can/should be evaluated.
+	if (parsedConfig.errors.length > 0) {
+		const formattedErrors = parsedConfig.errors.map(s => JSON.stringify(s, null, 4)).join('\n');
+		throw new Error(
+			`Some errors occurred while attempting to read from ${baseOptionsPath}: ${formattedErrors}`
+		);
+	}
+
+	options = { config: parsedConfig.options, error: undefined };
 
 	const compilerHost = ts.createCompilerHost(options.config);
 	compilerHost.getCurrentDirectory = () => context.cwd;
@@ -163,10 +185,9 @@ async function analyzePatterns(context: {
 		context.options
 	);
 
-	return patternCandidates.reduce<Types.InternalPatternAnalysis[]>(
-		(acc, candidate) => [...acc, ...analyzePattern(candidate, acc, analyzePatternExport)],
-		[]
-	);
+	return patternCandidates.reduce<Types.InternalPatternAnalysis[]>((acc, candidate) => {
+		return [...acc, ...analyzePattern(candidate, acc, analyzePatternExport)];
+	}, []);
 }
 
 async function createPatternCompiler(
@@ -208,8 +229,8 @@ export function getPatternAnalyzer(
 		}
 
 		return TypeScriptUtils.getExports(sourceFile, program)
-			.map(ex =>
-				predicate(ex, {
+			.map(ex => {
+				const retVal = predicate(ex, {
 					program,
 					project,
 					pkg,
@@ -218,8 +239,10 @@ export function getPatternAnalyzer(
 					options,
 					knownProperties,
 					knownPatterns: previous
-				})
-			)
+				});
+
+				return retVal;
+			})
 			.filter((p): p is Types.InternalPatternAnalysis => typeof p !== 'undefined');
 	};
 }
@@ -339,7 +362,6 @@ async function findPatternCandidates({
 	pkg: any;
 }): Promise<PatternCandidate[]> {
 	const entry = Path.join(cwd, getTypingsEntry(pkg));
-
 	const declarationsList = getImportsFromPath(entry, {
 		extensions: ['.d.ts'],
 		deep: true,
@@ -347,11 +369,11 @@ async function findPatternCandidates({
 	});
 
 	return [...declarationsList].map(declarationPath => {
-		const artifactPath = setExtname(declarationPath, '.js');
+		const artifactPath = setExtname(declarationPath, '.js', pkg, cwd);
 		const significantPath = getSignificantPath(Path.relative(cwd, declarationPath));
 		const dName = last(significantPath);
 
-		return {
+		const retVal = {
 			artifactPath,
 			declarationPath,
 			description: '',
@@ -359,6 +381,8 @@ async function findPatternCandidates({
 			id: significantPath.join('/'),
 			sourcePath: Path.dirname(declarationPath)
 		};
+
+		return retVal;
 	});
 }
 

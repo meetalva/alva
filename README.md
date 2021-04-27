@@ -2,11 +2,20 @@
 <img src="https://meetalva.github.io/media/alva.svg" width="300">
 </p>
 
+# ⚠️ Alva is not maintained anymore ⚠️
+You can still download and use [Alva](meetalva.io) or fork the project on [github](https://github.com/meetalva/). 
+
+If you are interested in taking over - please get in touch with us: hey@meetalva.io
+
+--
+
+
 # Meet Alva
 
 > Create living prototypes with code components
 >
 > https://meetalva.io
+>
 
 
 # [Get Started](https://meetalva.io/doc/docs/start) | [Let's chat](https://gitter.im/meetalva/Lobby) | [Website](https://meetalva.io)

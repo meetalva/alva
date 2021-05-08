@@ -31,7 +31,7 @@
     "@types/webpack": "^4.4.21",
     "extract-comments": "^1.1.0",
     "find-pkg": "^2.0.0",
-    "lodash": "4.17.11",
+    "lodash": "4.17.21",
     "memory-fs": "0.4.1",
     "npm-package-arg": "^6.1.0",
     "pacote": "^9.4.0",

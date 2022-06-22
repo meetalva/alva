@@ -27,7 +27,7 @@
     "dargs": "^6.0.0",
     "dependency-check": "^3.3.0",
     "execa": "^1.0.0",
-    "got": "^9.5.0",
+    "got": "^11.8.5",
     "lodash": "^4.17.11",
     "node-fetch": "2.1.2",
     "parse-github-url": "^1.0.2",
